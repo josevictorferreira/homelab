@@ -1,0 +1,13 @@
+repositories:
+  - name: mojo2600
+    url: https://mojo2600.github.io/pihole-kubernetes
+
+releases:
+  - name: pihole
+    needs:
+      - metallb
+    namespace: pihole
+    chart: mojo2600/pihole
+    version: 2.27.0
+    values:
+      - values.yaml

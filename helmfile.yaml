@@ -1,16 +1,4 @@
-repositories:
-  - name: metallb
-    url: https://metallb.github.io/metallb
-
-releases:
-  - name: metallb
-    namespace: metallb-system
-    chart: metallb/metallb
-    version: 0.14.9
-    hooks:
-      - events: ["presync"]
-        command: "sh"
-        args:
-          - "-c"
-          - |
-            kubectl create secret generic -n metallb-system metallb-memberlist --from-literal=secretkey="$(openssl rand -base64 128)"
+helmfiles:
+  - releases/infrastructure/**/helmfile.yml
+  - releases/monitoring/helmfile.yml
+  - releases/services/**/helmfile.yml

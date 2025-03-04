@@ -1,0 +1,20 @@
+repositories:
+  - name: metallb
+    url: https://metallb.github.io/metallb
+
+releases:
+  - name: metallb
+    namespace: metallb-system
+    chart: metallb/metallb
+    version: 0.14.9
+    hooks:
+      - events: ["preapply"]
+        showlogs: true
+        command: "kubectl"
+        args: ["apply", "-f", "metallb-memberlist-secret.yaml"]
+      - events: ["postsync"]
+        showlogs: true
+        command: "kubectl"
+        args: ["apply", "-f", "metallb-config.yaml"]
+        selectors:
+          - name=metallb
