@@ -1,0 +1,11 @@
+releases:
+  - name: homeserver-setup
+    namespace: production
+    chart: ./../../charts/homeserver-setup
+  - name: cloudflared
+    namespace: cloudflare-server
+    createNamespace: true
+    chart: ./../../charts/cloudflared
+
+helmfiles:
+  - metallb/helmfile.yaml

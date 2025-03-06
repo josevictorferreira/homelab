@@ -1,4 +1,7 @@
+helmDefaults:
+  kubeContext: homeserver
+
 helmfiles:
-  - releases/infrastructure/**/helmfile.yml
-  - releases/monitoring/helmfile.yml
-  - releases/services/**/helmfile.yml
+  - releases/infrastructure/helmfile.yaml
+  - releases/monitoring/helmfile.yaml
+  - releases/services/helmfile.yaml

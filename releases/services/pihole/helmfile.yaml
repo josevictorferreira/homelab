@@ -6,7 +6,7 @@ releases:
   - name: pihole
     needs:
       - metallb
-    namespace: pihole
+    namespace: production
     chart: mojo2600/pihole
     version: 2.27.0
     values:

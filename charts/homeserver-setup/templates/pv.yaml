@@ -3,6 +3,8 @@ apiVersion: storage.k8s.io/v1
 metadata:
   name: local-storage
   namespace: production
+  labels:
+    app.kubernetes.io/managed-by: Helm
 provisioner: kubernetes.io/no-provisioner
 volumeBindingMode: WaitForFirstConsumer
 
@@ -12,6 +14,8 @@ kind: PersistentVolume
 metadata:
   name: external-storage-pv
   namespace: production
+  labels:
+    app.kubernetes.io/managed-by: Helm
 spec:
   capacity:
     storage: 10Gi
