@@ -45,5 +45,11 @@ services: ## List services available to setup
 	@echo "  - prometheus"
 	@echo "  - readarr"
 
+sync:
+	helmfile --environment homeserver sync
+
+syncd:
+	helmfile --environment homeserver sync --debug
+
 help: ## Show this help.
 	@printf "Usage: make [target]\n\nTARGETS:\n"; grep -F "##" $(MAKEFILE_LIST) | grep -Fv "grep -F" | grep -Fv "printf " | sed -e 's/\\$$//' | sed -e 's/##//' | column -t -s ":" | sed -e 's/^/    /'; printf "\n"

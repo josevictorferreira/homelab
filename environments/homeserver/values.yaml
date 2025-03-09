@@ -1,0 +1,23 @@
+namespaces:
+  monitoring: monitoring
+  metallb: metallb-system
+  cloudflared: cloudflared-server
+  services: production
+
+nodes:
+  main:
+    hostname: homeserver.k8s.main
+
+load_balancer:
+  addresses:
+    range: 10.10.10.100-10.10.10.199
+    services:
+      grafana: 10.10.10.190
+      pihole: 10.10.10.100
+      qbittorrent: 10.10.10.150
+      readarr: 10.10.10.199
+
+storages:
+  local:
+    path: /mnt/external_storage_1
+    capacity: 100Gi

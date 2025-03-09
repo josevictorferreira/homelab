@@ -24,13 +24,13 @@ persistentVolumeClaim:
   enabled: true
 
 serviceWeb:
-  loadBalancerIP: 10.10.10.100
+  loadBalancerIP: "{{ .Values.load_balancer.addresses.services.pihole }}"
   annotations:
     metallb.universe.tf/allow-shared-ip: pihole-svc
   type: LoadBalancer
 
 serviceDns:
-  loadBalancerIP: 10.10.10.100
+  loadBalancerIP: "{{ .Values.load_balancer.addresses.services.pihole }}"
   annotations:
     metallb.universe.tf/allow-shared-ip: pihole-svc
   type: LoadBalancer

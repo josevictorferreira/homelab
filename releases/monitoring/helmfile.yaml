@@ -4,7 +4,10 @@ repositories:
 releases:
   - name: prometheus
     chart: prometheus-community/kube-prometheus-stack
-    namespace: monitoring
-    createNamespace: true
+    namespace: "{{ .Values.namespaces.monitoring }}"
     values:
-      - values.yaml
+      - values.yaml.gotmpl
+    hooks:
+      - events: ["prepare"]
+        command: "sh"
+        args: ["-c", "sops -d grafana-secret.enc.yaml | kubectl apply -n {{ .Values.namespaces.monitoring }} -f -"]

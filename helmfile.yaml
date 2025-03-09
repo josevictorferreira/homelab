@@ -1,7 +1,19 @@
-helmDefaults:
-  kubeContext: homeserver
+environments:
+  homeserver:
+    values:
+      - environments/homeserver/values.yaml
+    secrets:
+      - environments/homeserver/secrets.enc.yaml
+
+---
 
 helmfiles:
-  - releases/infrastructure/helmfile.yaml
-  - releases/monitoring/helmfile.yaml
-  - releases/services/helmfile.yaml
+  - path: releases/infrastructure/helmfile.yaml
+    values:
+      - {{ toYaml .Values | nindent 8 }}
+  - path: releases/monitoring/helmfile.yaml
+    values:
+      - {{ toYaml .Values | nindent 8 }}
+  - path: releases/services/helmfile.yaml
+    values:
+      - {{ toYaml .Values | nindent 8 }}

@@ -1,4 +1,4 @@
 helmfiles:
-  - pihole/helmfile.yaml
-  - qbittorrent/helmfile.yaml
-  - readarr/helmfile.yaml
+  - path: pihole/helmfile.yaml
+    values:
+      - {{ toYaml .Values | nindent 8 }}

@@ -15,7 +15,7 @@ spec:
         name: cloudflared
     spec:
       nodeSelector:
-        kubernetes.io/hostname: homeserver.k8s.main
+        kubernetes.io/hostname: "{{ .Values.nodeSelector.hostname }}"
       containers:
         - name: cloudflared
           image: cloudflare/cloudflared:latest

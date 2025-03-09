@@ -45,7 +45,7 @@ grafana:
   service:
     enabled: true
     type: LoadBalancer
-    loadBalancerIP: 10.10.10.235
+    loadBalancerIP: {{ .Values | get "load_balancer.addresses.services.grafana" "10.10.10.190" }}
     annotations:
       metallb.universe.tf/allow-shared-ip: grafana
   serviceMonitor:

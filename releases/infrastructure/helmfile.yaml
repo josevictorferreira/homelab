@@ -1,11 +1,22 @@
 releases:
   - name: homeserver-setup
-    namespace: production
+    namespace: "{{ .Values.namespaces.services }}"
     chart: ./../../charts/homeserver-setup
+    values:
+      - nodeSelector:
+          hostname: "{{ .Values.nodes.main.hostname }}"
+      - storages:
+          local:
+            path: {{ .Values.storages.local.path }}
+            capacity: {{ .Values.storages.local.capacity }}
   - name: cloudflared
-    namespace: cloudflare-server
-    createNamespace: true
+    namespace: "{{ .Values.namespaces.cloudflared }}"
     chart: ./../../charts/cloudflared
-
+    values:
+      - nodeSelector:
+          hostname: "{{ .Values.nodes.main.hostname }}"
+      - secret: "{{ .Values.secret.cloudflared_secret }}"
 helmfiles:
-  - metallb/helmfile.yaml
+  - path: metallb/helmfile.yaml
+    values:
+      - {{ toYaml .Values | nindent 8 }}

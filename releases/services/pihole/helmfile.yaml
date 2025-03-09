@@ -4,10 +4,14 @@ repositories:
 
 releases:
   - name: pihole
-    needs:
-      - metallb
-    namespace: production
+    namespace: "{{ .Values.namespaces.services }}"
     chart: mojo2600/pihole
     version: 2.27.0
     values:
-      - values.yaml
+      - values.yaml.gotmpl
+    hooks:
+      - events: ["prepare"]
+        command: "sh"
+        args:
+          - "-c"
+          - "sops -d pihole-secret.enc.yaml | kubectl apply -n {{ .Values.namespaces.services }} -f -"
