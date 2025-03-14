@@ -3,7 +3,7 @@ namespaces:
   metallb: metallb-system
   cloudflared: cloudflared-server
   services: production
-
+    
 nodes:
   main:
     hostname: homeserver.k8s.main
@@ -12,6 +12,7 @@ load_balancer:
   addresses:
     range: 10.10.10.100-10.10.10.199
     services:
+      proxmox: 10.10.10.200
       grafana: 10.10.10.190
       pihole: 10.10.10.100
       qbittorrent: 10.10.10.150
