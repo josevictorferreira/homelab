@@ -14,3 +14,13 @@ releases:
         installCRDs: true
         prometheus:
           enabled: false
+  - name: cert-manager-issuer
+    namespace: "{{ .Values.namespaces.cert_manager }}"
+    chart: ../../../charts/cert-manager-issuer
+    version: 0.1.0
+    needs:
+      - cert-manager
+    values:
+      - cloudflare:
+          email: "{{ .Values.secret.cloudflare_email }}"
+          api_token: "{{ .Values.secret.cloudflare_api_token }}"

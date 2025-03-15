@@ -23,3 +23,6 @@ helmfiles:
   - path: cert-manager/helmfile.yaml
     values:
       - {{ toYaml .Values | nindent 8 }}
+  - path: nginx-ingress/helmfile.yaml
+    values:
+      - {{ toYaml .Values | nindent 8 }}

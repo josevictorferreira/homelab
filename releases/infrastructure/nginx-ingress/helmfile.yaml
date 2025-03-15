@@ -1,0 +1,17 @@
+repositories:
+  - name: ingress-nginx
+    url: https://kubernetes.github.io/ingress-nginx
+
+releases:
+  - name: nginx-ingress
+    namespace: {{ .Values.namespaces.ingress | default "ingress" }}
+    chart: ingress-nginx/ingress-nginx
+    version: 4.12.0
+    values:
+      - controller:
+          service:
+            type: LoadBalancer
+            annotations:
+              metallb.universe.tf/allow-shared-ip: ingress-nginx
+            loadBalancerIP: {{ .Values.load_balancer.addresses.ingress }}
+            externalTrafficPolicy: Local

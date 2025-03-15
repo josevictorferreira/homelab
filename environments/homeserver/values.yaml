@@ -4,6 +4,7 @@ namespaces:
   cloudflared: cloudflared-server
   services: production
   cert_manager: cert-manager
+  ingress: ingress
     
 nodes:
   main:
@@ -12,6 +13,7 @@ nodes:
 load_balancer:
   addresses:
     range: 10.10.10.100-10.10.10.199
+    ingress: 10.10.10.110
     services:
       proxmox: 10.10.10.200
       grafana: 10.10.10.190
