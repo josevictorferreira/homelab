@@ -20,3 +20,6 @@ helmfiles:
   - path: metallb/helmfile.yaml
     values:
       - {{ toYaml .Values | nindent 8 }}
+  - path: cert-manager/helmfile.yaml
+    values:
+      - {{ toYaml .Values | nindent 8 }}
