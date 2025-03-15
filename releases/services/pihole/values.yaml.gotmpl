@@ -1,9 +1,8 @@
 {{- $domain := .Values.secret.domain }}
+{{- $ingressIp := .Values.load_balancer.addresses.ingress }}
 {{- $entries := list }}
 {{- range $name, $ip := .Values.load_balancer.addresses.services }}
-  {{- $entries = append $entries (printf "%s %s.home" $ip $name) }}
-  {{- $entries = append $entries (printf "%s %s.local" $ip $name) }}
-  {{- $entries = append $entries (printf "%s %s.%s" $ip $name $domain) }}
+  {{- $entries = append $entries (printf "%s %s.%s" $ingressIp $name $domain) }}
 {{- end }}
 
 virtualHost: "pihole.local"
