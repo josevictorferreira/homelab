@@ -54,6 +54,17 @@ grafana:
     existingSecret: grafana-secret
     userKey: ADMIN_USER
     passwordKey: ADMIN_PASSWORD
+  ingress:
+    enabled: true
+    ingressClassName: "nginx"
+    annotations:
+      cert-manager.io/cluster-issuer: "cloudflare-issuer"
+    hosts:
+      - grafana.{{ .Values | get "secret.domain" "home" }}
+    tls:
+      - secretName: "wildcard-homeserver-domain-tls"
+        hosts:
+          - "grafana.{{ .Values | get "secret.domain" "home" }}"
 
 kubeApiServer:
   enabled: true
