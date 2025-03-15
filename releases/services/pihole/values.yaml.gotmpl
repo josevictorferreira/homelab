@@ -50,6 +50,20 @@ admin:
 persistentVolumeClaim:
   enabled: true
 
+ingress:
+  enabled: true
+  path: "/"
+  pathType: "Prefix"
+  ingressClassName: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: "cloudflare-issuer"
+  tls:
+    - secretName: "wildcard-homeserver-domain-tls"
+      hosts:
+        - "pihole.{{ $domain }}"
+  hosts:
+    - "pihole.{{ $domain }}"
+
 monitoring:
   podMonitor:
     enabled: true
