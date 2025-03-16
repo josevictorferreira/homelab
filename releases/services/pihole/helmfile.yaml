@@ -1,12 +1,8 @@
-repositories:
-  - name: mojo2600
-    url: https://mojo2600.github.io/pihole-kubernetes
-
 releases:
   - name: pihole
-    namespace: "{{ .Values.namespaces.services }}"
+    namespace: {{ .Values.namespaces.services }}
     chart: mojo2600/pihole
-    version: 2.29.1
+    version: {{ .Values.versions.pihole }}
     values:
       - values.yaml.gotmpl
     hooks:

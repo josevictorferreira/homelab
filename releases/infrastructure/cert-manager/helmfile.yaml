@@ -1,12 +1,8 @@
-repositories:
-  - name: jetstack
-    url: https://charts.jetstack.io
-
 releases:
   - name: cert-manager
     namespace: "{{ .Values.namespaces.cert_manager }}"
     chart: jetstack/cert-manager
-    version: v1.17.1
+    version: {{ .Values.versions.cert_manager }}
     values:
       - global:
           leaderElection:
@@ -17,7 +13,7 @@ releases:
   - name: cert-manager-issuer
     namespace: "{{ .Values.namespaces.cert_manager }}"
     chart: ../../../charts/cert-manager-issuer
-    version: 0.1.0
+    version: {{ .Values.versions.cert_manager_issuer }}
     needs:
       - cert-manager
     values:

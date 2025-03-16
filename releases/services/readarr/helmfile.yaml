@@ -1,11 +1,7 @@
-repositories:
-  - name: readarr
-    url: oci://tccr.io/truecharts/readarr
-
 releases:
   - name: readarr
     namespace: production
     chart: truecharts/readarr
-    version: 21.6.7
+    version: {{ .Values.versions.readarr }}
     values:
       - values.yaml

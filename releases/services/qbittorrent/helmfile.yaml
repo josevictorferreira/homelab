@@ -1,11 +1,7 @@
-repositories:
-  - name: qbittorrent
-    url: oci://tccr.io/truecharts/qbittorrent
-
 releases:
   - name: qbittorrent
     namespace: production
     chart: truecharts/qbittorrent
-    version: 22.4.5
+    version: {{ .Values.versions.qbittorrent }}
     values:
       - values.yaml
