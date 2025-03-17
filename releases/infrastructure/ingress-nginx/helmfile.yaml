@@ -1,5 +1,5 @@
 releases:
-  - name: nginx-ingress
+  - name: ingress-nginx
     namespace: {{ .Values.namespaces.ingress | default "ingress" }}
     chart: ingress-nginx/ingress-nginx
     version: {{ .Values.versions.ingress_nginx }}
