@@ -1,7 +1,7 @@
 releases:
-  - name: homeserver-setup
-    namespace: "{{ .Values.namespaces.services }}"
-    chart: ./../../charts/homeserver-setup
+  - name: cluster-setup
+    namespace: {{ .Values.namespaces.services }}
+    chart: ./../../charts/cluster-setup
     values:
       - nodeSelector:
           hostname: "{{ .Values.nodes.main.hostname }}"
@@ -16,13 +16,61 @@ releases:
       - nodeSelector:
           hostname: "{{ .Values.nodes.main.hostname }}"
       - secret: "{{ .Values.secret.cloudflared_secret }}"
-helmfiles:
-  - path: metallb/helmfile.yaml
+  - name: metallb-setup
+    namespace: {{ .Values.namespaces.metallb }}
+    chart: ../../charts/metallb-setup
     values:
-      - {{ toYaml .Values | nindent 8 }}
-  - path: cert-manager/helmfile.yaml
+      - memberlist:
+          secretkey: {{ .Values.secret.metallb_secretkey }}
+  - name: metallb
+    namespace: {{ .Values.namespaces.metallb }}
+    chart: metallb/metallb
+    version: {{ .Values.versions.metallb }}
+    needs:
+      - metallb-setup
+    wait: true
+  - name: metallb-addresses
+    namespace: {{ .Values.namespaces.metallb }}
+    chart: ../../charts/metallb-addresses
     values:
-      - {{ toYaml .Values | nindent 8 }}
-  - path: ingress-nginx/helmfile.yaml
+      - range: {{ .Values.load_balancer.addresses.range }}
+    needs:
+      - metallb
+    wait: true
+  - name: cert-manager
+    namespace: "{{ .Values.namespaces.cert_manager }}"
+    chart: jetstack/cert-manager
+    version: {{ .Values.versions.cert_manager }}
     values:
-      - {{ toYaml .Values | nindent 8 }}
+      - global:
+          leaderElection:
+            namespace: cert-manager
+        installCRDs: true
+        prometheus:
+          enabled: false
+  - name: ingress-nginx
+    namespace: {{ .Values.namespaces.ingress | default "ingress" }}
+    chart: ingress-nginx/ingress-nginx
+    version: {{ .Values.versions.ingress_nginx }}
+    values:
+      - controller:
+          service:
+            type: LoadBalancer
+            annotations:
+              metallb.universe.tf/allow-shared-ip: ingress-nginx
+            loadBalancerIP: {{ .Values.load_balancer.addresses.ingress }}
+            externalTrafficPolicy: Local
+  - name: cert-manager-issuer
+    namespace: "{{ .Values.namespaces.cert_manager }}"
+    chart: ../../charts/cert-manager-issuer
+    version: {{ .Values.versions.cert_manager_issuer }}
+    needs:
+      - cert-manager
+      - {{ .Values.namespaces.ingress }}/ingress-nginx
+    values:
+      - ingress:
+          namespace: "{{ .Values.namespaces.ingress }}"
+      - domain: "{{ .Values.secret.domain }}"
+      - cloudflare:
+          email: "{{ .Values.secret.cloudflare_email }}"
+          api_token: "{{ .Values.secret.cloudflare_api_token }}"

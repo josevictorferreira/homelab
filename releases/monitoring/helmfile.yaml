@@ -7,4 +7,4 @@ releases:
     hooks:
       - events: ["prepare"]
         command: "sh"
-        args: ["-c", "sops -d grafana-secret.enc.yaml | kubectl apply -n {{ .Values.namespaces.monitoring }} -f -"]
+        args: ["-c", "kubectl create namespace {{ .Values.namespaces.monitoring }} --dry-run=client -o yaml | kubectl apply -f - && sops -d grafana-secret.enc.yaml | kubectl apply -n {{ .Values.namespaces.monitoring }} -f -"]
