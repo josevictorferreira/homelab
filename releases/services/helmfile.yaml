@@ -22,11 +22,15 @@ releases:
     needs:
       - postgresql
     values:
+      - image:
+          tag: "v2.9.3"
       - linkwarden:
           labels:
             app: linkwarden
             release: linkwarden
           domain: "linkwarden.{{ .Values.secret.domain }}"
+          nextAuthSecret:
+            value: "{{ .Values.secret.linkwarden_secret }}"
           data:
             storageType: filesystem
             filesystem:

@@ -57,6 +57,9 @@ edit_secrets: ## Edit sops secrets
 list_manifests_default: ## List all manifests in default namespace
 	kubectl api-resources --verbs=list --namespaced -o name | xargs -n 1 kubectl get --namespace defaul
 
+gen_secret: ## UTILITY: Randomly generate a secret
+	openssl rand -base64 32
+
 remove_ingress: ## Remove ingress namespace
 	sudo kubectl get namespace ingress -o json | jq '.spec.finalizers=[]' | kubectl replace --raw "/api/v1/namespaces/ingress/finalize" -f
 
