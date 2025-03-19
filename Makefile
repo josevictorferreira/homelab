@@ -51,6 +51,9 @@ sync:
 syncd:
 	helmfile --environment homeserver sync --debug
 
+edit_secrets: ## Edit sops secrets
+	sops environments/homeserver/secrets.enc.yaml
+
 list_manifests_default: ## List all manifests in default namespace
 	kubectl api-resources --verbs=list --namespaced -o name | xargs -n 1 kubectl get --namespace defaul
 

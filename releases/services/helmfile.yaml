@@ -1,3 +1,20 @@
+releases:
+  - name: postgresql
+    namespace: {{ .Values.namespaces.services }}
+    chart: bitnami/postgresql
+    version: {{ .Values.versions.postgresql }}
+    values:
+      - global:
+          postgresql:
+            auth:
+              postgresPassword: "{{ .Values.secret.postgresql_password }}"
+      - primary:
+          service:
+            type: LoadBalancer
+            loadBalancerIP: {{ .Values.load_balancer.addresses.services.postgresql }}
+            annotations:
+              - metallb.universe.tf/allow-shared-ip: postgresql
+
 helmfiles:
   - path: pihole/helmfile.yaml
     values:
