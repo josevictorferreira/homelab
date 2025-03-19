@@ -69,7 +69,7 @@ releases:
       - {{ .Values.namespaces.ingress }}/ingress-nginx
     values:
       - ingress:
-          namespace: "{{ .Values.namespaces.ingress }}"
+          namespace: "{{ .Values.namespaces.services }}"
       - domain: "{{ .Values.secret.domain }}"
       - cloudflare:
           email: "{{ .Values.secret.cloudflare_email }}"

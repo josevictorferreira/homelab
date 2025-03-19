@@ -8,12 +8,51 @@ releases:
           postgresql:
             auth:
               postgresPassword: "{{ .Values.secret.postgresql_password }}"
+              database: linkwarden
       - primary:
           service:
             type: LoadBalancer
             loadBalancerIP: {{ .Values.load_balancer.addresses.services.postgresql }}
             annotations:
               - metallb.universe.tf/allow-shared-ip: postgresql
+  - name: linkwarden
+    namespace: {{ .Values.namespaces.services }}
+    chart: fmjstudios/linkwarden
+    version: {{ .Values.versions.linkwarden }}
+    needs:
+      - postgresql
+    values:
+      - linkwarden:
+          labels:
+            app: linkwarden
+            release: linkwarden
+          domain: "linkwarden.{{ .Values.secret.domain }}"
+          data:
+            storageType: filesystem
+            filesystem:
+              pvc:
+                storageClass: local-path
+          database:
+            user: postgres
+            password: "{{ .Values.secret.postgresql_password }}"
+            host: postgresql
+            name: linkwarden
+      - service:
+          port: 80
+          type: LoadBalancer
+          loadBalancerIP: {{ .Values.load_balancer.addresses.services.linkwarden }}
+      - postgresql:
+          enabled: false
+      - ingress:
+          enabled: true
+          className: nginx
+          annotations:
+            cert-manager.io/cluster-issuer: "cloudflare-issuer"
+          tls:
+            - secretName: "wildcard-homeserver-domain-tls"
+              hosts:
+                - "linkwarden.{{ .Values.secret.domain }}"
+            
 
 helmfiles:
   - path: pihole/helmfile.yaml
