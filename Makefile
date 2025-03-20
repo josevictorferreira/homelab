@@ -69,5 +69,8 @@ remove_ingress: ## Remove ingress namespace
 monitor: ## Open monitoring dashboard
 	k9s -n self-hosted -c pods
 
+listen_prometheus: ## Listen to prometheus
+	kubectl --context homeserver -n monitoring port-forward svc/prometheus-prometheus 9090:9090
+
 help: ## Show this help.
 	@printf "Usage: make [target]\n\nTARGETS:\n"; grep -F "##" $(MAKEFILE_LIST) | grep -Fv "grep -F" | grep -Fv "printf " | sed -e 's/\\$$//' | sed -e 's/##//' | column -t -s ":" | sed -e 's/^/    /'; printf "\n"
