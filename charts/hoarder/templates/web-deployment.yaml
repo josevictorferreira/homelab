@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "{{ .Values.app.name }}-web"
+spec:
+  replicas: {{ .Values.app.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.app.name }}-web
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.app.name }}-web
+    spec:
+      containers:
+        - name: {{ .Values.app.name }}-web
+          image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: 3000
+          env:
+            - name: MEILI_ADDR
+              value: http://meilisearch:7700
+            - name: BROWSER_WEB_URL
+              value: http://chrome:9222
+            - name: DATA_DIR
+              value: /data
+            # Add OPENAI_API_KEY to the ConfigMap if necessary
+          volumeMounts:
+            - mountPath: /data
+              name: data
+          envFrom:
+            - secretRef:
+                name: hoarder-secrets
+            - configMapRef:
+                name: hoarder-configuration
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: data-pvc

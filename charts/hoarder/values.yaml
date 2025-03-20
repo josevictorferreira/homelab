@@ -1,0 +1,15 @@
+image:
+  registry: ghcr.io
+  repository: hoarder-app/hoarder
+  tag: latest
+  pullPolicy: Always
+
+app:
+  name: hoarder
+  replicas: 1
+
+service:
+  port: 80
+  annotations: []
+  type: LoadBalancer
+  loadBalancerIP: 10.10.10.180

@@ -18,11 +18,13 @@ load_balancer:
       proxmox: 10.10.10.200
       grafana: 10.10.10.190
       pihole: 10.10.10.100
-      qbittorrent: 10.10.10.150
+      qbittorrent: 10.10.10.105
       readarr: 10.10.10.199
       postgresql: 10.10.10.101
       postgresql_read: 10.10.10.102
       linkwarden: 10.10.10.103
+      rabbitmq: 10.10.10.150
+      frigate: 10.10.10.130
 
 storages:
   local:
