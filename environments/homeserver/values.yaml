@@ -9,6 +9,18 @@ namespaces:
 nodes:
   main:
     hostname: homeserver.k8s.main
+  child_01:
+    hostname: homeserver.k8s.child.01
+  child_02:
+    hostname: homeserver.k8s.child.02
+  child_03:
+    hostname: homeserver.k8s.child.03
+  child_04:
+    hostname: homeserver.k8s.child.04
+  child_05:
+    hostname: homeserver.k8s.child.05
+  child_06:
+    hostname: homeserver.k8s.child.06
 
 load_balancer:
   addresses:
@@ -29,4 +41,4 @@ load_balancer:
 storages:
   local:
     path: /mnt/shared_storage_1
-    capacity: 100Gi
+    capacity: 500Gi

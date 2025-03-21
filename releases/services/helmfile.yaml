@@ -155,9 +155,35 @@ releases:
               ffmpeg:
                 inputs:
                   - path: "{{ .Values.secret.camera_front_uri }}"
-                    roles:
-                      - detect
-            
+                    roles: []
+  - name: proxmox-external-ingress
+    namespace: {{ .Values.namespaces.services }}
+    chart: ./../../charts/ingress-customized
+    values:
+      - app:
+          name: proxmox-external
+          labels:
+            app: proxmox-external
+            release: proxmox-external-ingress
+      - externalService:
+          enabled: true
+          externalName: {{ .Values.load_balancer.addresses.services.proxmox }}
+          ports:
+            - name: https
+              port: 8006
+              targetPort: 8006
+      - ingress:
+          ingressClassName: nginx
+          portName: https
+          hostname: proxmox.{{ .Values.secret.domain }}
+          existingSecret: "wildcard-homeserver-domain-tls"
+          annotations:
+            nginx.ingress.kubernetes.io/upstream-vhost: "promox.{{ .Values.secret.domain }}"
+            nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+            nginx.ingress.kubernetes.io/ssl-redirect: "true"
+            nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+            cert-manager.io/cluster-issuer: "cloudflare-issuer"
+          tls: true
 
 helmfiles:
   - path: pihole/helmfile.yaml

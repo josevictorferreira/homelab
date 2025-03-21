@@ -1,0 +1,19 @@
+{{- if .Values.externalService.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: "{{ .Values.app.name }}"
+  {{- if .Values.app.labels }}
+  labels: {{ toYaml .Values.app.labels | nindent 4 }}
+  {{- end }}
+spec:
+  type: ExternalName
+  externalName: "{{ .Values.externalService.externalName }}"
+  ports:
+  {{ range .Values.externalService.ports }}
+    - name: {{ .name }}
+      port: {{ .port }}
+      targetPort: {{ .targetPort }}
+      protocol: {{ .protocol | default "TCP" }}
+  {{- end }}
+{{- end }}

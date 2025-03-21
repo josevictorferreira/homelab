@@ -4,7 +4,7 @@ releases:
     chart: ./../../charts/cluster-setup
     values:
       - nodeSelector:
-          hostname: "{{ .Values.nodes.main.hostname }}"
+          hostname: "{{ .Values.nodes.child_06.hostname }}"
       - storages:
           local:
             path: {{ .Values.storages.local.path }}
