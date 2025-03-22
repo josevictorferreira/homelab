@@ -1,0 +1,11 @@
+global:
+  postgresql:
+    auth:
+      postgresPassword: "{{ .Values.secret.postgresql_password }}"
+      database: linkwarden
+primary:
+  service:
+    type: LoadBalancer
+    loadBalancerIP: {{ .Values.load_balancer.addresses.services.postgresql }}
+    annotations:
+      - metallb.universe.tf/allow-shared-ip: postgresql

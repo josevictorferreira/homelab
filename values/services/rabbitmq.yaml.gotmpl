@@ -1,0 +1,54 @@
+extraContainerPorts:
+  - name: mqtt
+    protocol: TCP
+    containerPort: 1883
+  - name: mqtts
+    protocol: TCP
+    containerPort: 8883
+service:
+  type: LoadBalancer
+  loadBalancerIP: {{ .Values.load_balancer.addresses.services.rabbitmq }}
+  annotations:
+    - metallb.universe.tf/allow-shared-ip: rabbitmq
+  extraPorts:
+    - name: mqtt
+      port: 1883
+      targetPort: 1883
+    - name: mqtts
+      port: 8883
+      targetPort: 8883
+  extraPortsHeadless:
+    - name: mqtt
+      port: 1883
+      targetPort: 1883
+    - name: mqtts
+      port: 8883
+      targetPort: 8883
+networkPolicy:
+  extraIngress:
+    - ports:
+        - protocol: "TCP"
+          containerPort: 1883
+          port: 1883
+        - protocol: "TCP"
+          containerPort: 8883
+          port: 8883
+auth:
+  username: "{{ .Values.secret.rabbitmq_username }}"
+  erlangCookie: "{{ .Values.secret.rabbitmq_cookie }}"
+  password: "{{ .Values.secret.rabbitmq_password }}"
+extraPlugins: "rabbitmq_management rabbitmq_auth_backend_ldap rabbitmq_prometheus rabbitmq_delayed_message_exchange rabbitmq_mqtt rabbitmq_web_mqtt"
+ingress:
+  enabled: true
+  ingressClassName: nginx
+  hostname: rabbitmq.{{ .Values.secret.domain }}
+  existingSecret: "wildcard-homeserver-domain-tls"
+  annotations:
+    cert-manager.io/cluster-issuer: "cloudflare-issuer"
+  tls: true
+metrics:
+  enabled: true
+  serviceMonitor:
+    namespace: monitoring
+    default:
+      enabled: true

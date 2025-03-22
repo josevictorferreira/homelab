@@ -1,0 +1,7 @@
+controller:
+  service:
+    type: LoadBalancer
+    annotations:
+      metallb.universe.tf/allow-shared-ip: ingress-nginx
+    loadBalancerIP: {{ .Values.load_balancer.addresses.ingress }}
+    externalTrafficPolicy: Local

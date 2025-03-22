@@ -1,17 +1,186 @@
-bases:
-  - bases/defaults.yaml
-  - bases/repositories.yaml
-  - bases/environments.yaml
+environments:
+  homeserver:
+    kubeContext: homeserver
+    values:
+      - environments/homeserver/environment.yaml
+      - environments/homeserver/common.yaml
+      - environments/homeserver/versions.yaml
+    secrets:
+      - environments/homeserver/secrets.enc.yaml
 
 ---
 
-helmfiles:
-  - path: releases/infrastructure/helmfile.yaml
+helmDefaults:
+  kubeContext: homeserver
+  wait: true
+  timeout: 600
+  recreatePods: false
+  force: false
+
+repositories:
+  - name: ingress-nginx
+    url: https://kubernetes.github.io/ingress-nginx
+  - name: jetstack
+    url: https://charts.jetstack.io
+  - name: prometheus-community
+    url: https://prometheus-community.github.io/helm-charts
+  - name: metallb
+    url: https://metallb.github.io/metallb
+  - name: mojo2600
+    url: https://mojo2600.github.io/pihole-kubernetes
+  - name: bitnami
+    url: https://charts.bitnami.com/bitnami
+  - name: fmjstudios
+    url: https://fmjstudios.github.io/helm
+  - name: blakeblackshear
+    url: https://blakeblackshear.github.io/blakeshome-charts
+
+templates:
+  default-infrastructure-release:
+    version: "{{`{{ index .Values.versions .Release.Name }}`}}"
+    missingFileHandler: Warn
+    labels:
+      type: infrastructure
     values:
-      - {{ toYaml .Values | nindent 8 }}
-  - path: releases/monitoring/helmfile.yaml
+      - "values/infrastructure/{{`{{ .Release.Name }}`}}.yaml.gotmpl"
+
+  default-monitoring-release:
+    namespace: {{ .Values.namespaces.monitoring }}
+    version: "{{`{{ index .Values.versions .Release.Name }}`}}"
+    missingFileHandler: Warn
+    labels:
+      type: monitoring
     values:
-      - {{ toYaml .Values | nindent 8 }}
-  - path: releases/services/helmfile.yaml
+      - "values/monitoring/{{`{{ .Release.Name }}`}}.yaml.gotmpl"
+
+  default-self-hosted-release:
+    namespace: {{ .Values.namespaces.services }}
+    version: "{{`{{ index .Values.versions .Release.Name }}`}}"
+    missingFileHandler: Warn
+    labels:
+      type: services
     values:
-      - {{ toYaml .Values | nindent 8 }}
+      - "values/services/{{`{{ .Release.Name }}`}}.yaml.gotmpl"
+    needs:
+      - cluster-setup
+      - "{{ .Values.namespaces.metallb }}/metallb-addresses"
+      - "{{ .Values.namespaces.cert_manager }}/cert-manager-issuer"
+      - "{{ .Values.namespaces.ingress }}/ingress-nginx"
+      - "{{ .Values.namespaces.monitoring }}/prometheus"
+
+releases:
+  - name: cluster-setup
+    namespace: {{ .Values.namespaces.services }}
+    chart: charts/cluster-setup
+    inherit:
+      - template: default-infrastructure-release
+
+  - name: cloudflared
+    namespace: cloudflared-server
+    chart: charts/cloudflared
+    inherit:
+      - template: default-infrastructure-release
+
+  - name: metallb-setup
+    namespace: {{ .Values.namespaces.metallb }}
+    chart: charts/metallb-setup
+    inherit:
+      - template: default-infrastructure-release
+
+  - name: metallb
+    namespace: {{ .Values.namespaces.metallb }}
+    chart: metallb/metallb
+    version: {{ .Values.versions.metallb }}
+    wait: true
+    inherit:
+      - template: default-infrastructure-release
+    needs:
+      - metallb-setup
+
+  - name: metallb-addresses
+    namespace: {{ .Values.namespaces.metallb }}
+    chart: charts/metallb-addresses
+    wait: true
+    inherit:
+      - template: default-infrastructure-release
+    needs:
+      - metallb
+
+  - name: cert-manager
+    namespace: {{ .Values.namespaces.cert_manager }}
+    chart: jetstack/cert-manager
+    version: {{ .Values.versions.cert_manager }}
+    inherit:
+      - template: default-infrastructure-release
+
+  - name: ingress-nginx
+    namespace: {{ .Values.namespaces.ingress }}
+    chart: ingress-nginx/ingress-nginx
+    version: {{ .Values.versions.ingress_nginx }}
+    inherit:
+      - template: default-infrastructure-release
+    needs:
+      - "{{ .Values.namespaces.metallb }}/metallb-addresses"
+
+  - name: cert-manager-issuer
+    namespace: {{ .Values.namespaces.cert_manager }}
+    chart: charts/cert-manager-issuer
+    version: {{ .Values.versions.cert_manager_issuer }}
+    inherit:
+      - template: default-infrastructure-release
+    needs:
+      - "{{ .Values.namespaces.ingress }}/ingress-nginx"
+      - cert-manager
+
+  - name: prometheus
+    chart: prometheus-community/kube-prometheus-stack
+    hooks:
+      - events: ["prepare"]
+        command: "sh"
+        args: ["-c", "kubectl create namespace {{ .Values.namespaces.monitoring }} --dry-run=client -o yaml | kubectl apply -f - && sops -d values/monitoring/grafana-secret.enc.yaml | kubectl apply -n {{ .Values.namespaces.monitoring }} -f -"]
+    inherit:
+      - template: default-monitoring-release
+    needs:
+      - ingress/ingress-nginx
+      - cert-manager/cert-manager-issuer
+
+  - name: postgresql
+    chart: bitnami/postgresql
+    inherit:
+      - template: default-self-hosted-release
+
+  - name: linkwarden
+    chart: fmjstudios/linkwarden
+    needs:
+      - postgresql
+    inherit:
+      - template: default-self-hosted-release
+
+  - name: rabbitmq
+    chart: oci://registry-1.docker.io/bitnamicharts/rabbitmq
+    inherit:
+      - template: default-self-hosted-release
+
+  - name: frigate
+    chart: blakeblackshear/frigate
+    needs:
+      - rabbitmq
+    inherit:
+      - template: default-self-hosted-release
+
+  - name: proxmox-external-ingress
+    chart: charts/ingress-customized
+    inherit:
+      - template: default-self-hosted-release
+
+  - name: pihole
+    inherit:
+      - template: default-self-hosted-release
+    chart: mojo2600/pihole
+    hooks:
+      - events: ["prepare"]
+        command: "sh"
+        args:
+          - "-c"
+          - "sops -d values/services/pihole-secret.enc.yaml | kubectl apply -n {{ .Values.namespaces.services }} -f -"
+

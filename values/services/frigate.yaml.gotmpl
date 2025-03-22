@@ -1,0 +1,36 @@
+service:
+  type: LoadBalancer
+  loadBalancerIP: {{ .Values.load_balancer.addresses.services.frigate }}
+ingress:
+  enabled: true
+  ingressClassName: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: "cloudflare-issuer"
+  hosts:
+    - host: frigate.{{ .Values.secret.domain }}
+      paths:
+        - path: /
+          portName: http
+  tls:
+    - secretName: wildcard-homeserver-domain-tls
+      hosts:
+        - frigate.{{ .Values.secret.domain }}
+persistence:
+  config:
+    enabled: true
+    storageClass: local-path
+  media:
+    enabled: true
+    storageClass: local-storage
+config: |
+  mqtt:
+    host: rabbitmq-headless
+    port: 1883
+    user: {{ .Values.secret.rabbitmq_username }}
+    password: {{ .Values.secret.rabbitmq_password }}
+  cameras:
+    front:
+      ffmpeg:
+        inputs:
+          - path: "{{ .Values.secret.camera_front_uri }}"
+            roles: []

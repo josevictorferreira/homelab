@@ -1,7 +1,0 @@
-releases:
-  - name: qbittorrent
-    namespace: production
-    chart: truecharts/qbittorrent
-    version: {{ .Values.versions.qbittorrent }}
-    values:
-      - values.yaml

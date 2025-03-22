@@ -1,10 +1,9 @@
 namespaces:
+  services: self-hosted
   monitoring: monitoring
   metallb: metallb-system
-  cloudflared: cloudflared-server
-  services: self-hosted
-  cert_manager: cert-manager
   ingress: ingress
+  cert_manager: cert-manager
     
 nodes:
   main:
@@ -20,6 +19,8 @@ nodes:
   child_05:
     hostname: homeserver.k8s.child.05
   child_06:
+    hostname: homeserver.k8s.child.06
+  gpu:
     hostname: homeserver.k8s.child.06
 
 load_balancer:

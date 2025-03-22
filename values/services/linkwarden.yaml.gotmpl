@@ -1,0 +1,34 @@
+image:
+  tag: "v2.9.3"
+linkwarden:
+  labels:
+    app: linkwarden
+    release: linkwarden
+  domain: "linkwarden.{{ .Values.secret.domain }}"
+  nextAuthSecret:
+    value: "{{ .Values.secret.linkwarden_secret }}"
+  data:
+    storageType: filesystem
+    filesystem:
+      pvc:
+        storageClass: local-path
+  database:
+    user: postgres
+    password: "{{ .Values.secret.postgresql_password }}"
+    host: postgresql-hl
+    name: linkwarden
+service:
+  port: 80
+  type: LoadBalancer
+  loadBalancerIP: {{ .Values.load_balancer.addresses.services.linkwarden }}
+postgresql:
+  enabled: false
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: "cloudflare-issuer"
+  tls:
+    - secretName: "wildcard-homeserver-domain-tls"
+      hosts:
+        - "linkwarden.{{ .Values.secret.domain }}"

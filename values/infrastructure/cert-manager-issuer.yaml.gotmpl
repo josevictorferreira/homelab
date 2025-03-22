@@ -1,0 +1,6 @@
+ingress:
+  namespace: "{{ .Values.namespaces.services }}"
+domain: "{{ .Values.secret.domain }}"
+cloudflare:
+  email: "{{ .Values.secret.cloudflare_email }}"
+  api_token: "{{ .Values.secret.cloudflare_api_token }}"

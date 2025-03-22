@@ -1,7 +1,0 @@
-releases:
-  - name: readarr
-    namespace: production
-    chart: truecharts/readarr
-    version: {{ .Values.versions.readarr }}
-    values:
-      - values.yaml

@@ -1,0 +1,6 @@
+nodeSelector:
+  hostname: "{{ .Values.nodes.child_06.hostname }}"
+storages:
+  local:
+    path: {{ .Values.storages.local.path }}
+    capacity: {{ .Values.storages.local.capacity }}
