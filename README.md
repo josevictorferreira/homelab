@@ -2,6 +2,10 @@
 
 My custom Homelab server configuration.
 
+## Install
+
+Use the `make help` command to check available commands
+
 
 ## Tools
 
