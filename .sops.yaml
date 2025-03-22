@@ -1,7 +1,7 @@
 keys:
   - &josevictor age16yrhmz8fytj7j9ns80zl40zjcdfd3pdxh48ld7ys7veea774udtqfn9jyx
 creation_rules:
-  - path_regex: environments/homeserver/secrets\.enc\.ya?ml$
+  - path_regex: environments/homelab/secrets\.enc\.ya?ml$
     age: *josevictor
   - path_regex: releases/services/.*/.*secrets?\.enc\.ya?ml$
     age: *josevictor

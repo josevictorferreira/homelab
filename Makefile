@@ -1,13 +1,13 @@
 .DEFAULT_GOAL := help
 
 sync: ## Sync helmfile
-	helmfile --environment homeserver sync
+	helmfile --environment homelab sync
 
 syncd: ## Sync helmfile with debug
-	helmfile --environment homeserver sync --debug
+	helmfile --environment homelab sync --debug
 
 secrets: ## Edit project secrets
-	sops environments/homeserver/secrets.enc.yaml
+	sops environments/homelab/secrets.enc.yaml
 
 list_manifests_default: ## List all manifests in default namespace
 	kubectl api-resources --verbs=list --namespaced -o name | xargs -n 1 kubectl get --namespace defaul
@@ -25,7 +25,7 @@ monitor: ## Open monitoring dashboard
 	k9s -n self-hosted -c pods
 
 listen_prometheus: ## Listen to prometheus
-	kubectl --context homeserver -n monitoring port-forward svc/prometheus-prometheus 9090:9090
+	kubectl --context homelab -n monitoring port-forward svc/prometheus-prometheus 9090:9090
 
 help: ## Show this help.
 	@printf "Usage: make [target]\n\nTARGETS:\n"; grep -F "##" $(MAKEFILE_LIST) | grep -Fv "grep -F" | grep -Fv "printf " | sed -e 's/\\$$//' | sed -e 's/##//' | column -t -s ":" | sed -e 's/^/    /'; printf "\n"

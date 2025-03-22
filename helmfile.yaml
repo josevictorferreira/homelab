@@ -1,17 +1,17 @@
 environments:
-  homeserver:
-    kubeContext: homeserver
+  homelab:
+    kubeContext: homelab
     values:
-      - environments/homeserver/environment.yaml
-      - environments/homeserver/common.yaml
-      - environments/homeserver/versions.yaml
+      - environments/homelab/environment.yaml
+      - environments/homelab/common.yaml
+      - environments/homelab/versions.yaml
     secrets:
-      - environments/homeserver/secrets.enc.yaml
+      - environments/homelab/secrets.enc.yaml
 
 ---
 
 helmDefaults:
-  kubeContext: homeserver
+  kubeContext: homelab
   wait: true
   timeout: 600
   recreatePods: false
