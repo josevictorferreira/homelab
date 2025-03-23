@@ -161,13 +161,6 @@ releases:
     inherit:
       - template: default-self-hosted-release
 
-  - name: frigate
-    chart: blakeblackshear/frigate
-    needs:
-      - rabbitmq
-    inherit:
-      - template: default-self-hosted-release
-
   - name: proxmox-external-ingress
     chart: charts/ingress-customized
     inherit:
