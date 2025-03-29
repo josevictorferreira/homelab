@@ -1,13 +1,18 @@
+{{- range .Values.certificates.namespaces }}
+---
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: wildcard-homeserver-domain
-  namespace: "{{ .Values.ingress.namespace }}"
+  name: "wildcard-certificate"
+  namespace: "{{ . }}"
+  annotations:
+    cert-manager.io/issue-temporary-certificate: "true"
 spec:
-  secretName: wildcard-homeserver-domain-tls
+  secretName: "wildcard-tls"
   issuerRef:
     name: cloudflare-issuer
     kind: ClusterIssuer
   dnsNames:
-    - "{{ .Values.domain }}"
-    - "*.{{ .Values.domain }}"
+    - "{{ $.Values.domain }}"
+    - "*.{{ $.Values.domain }}"
+{{- end }}

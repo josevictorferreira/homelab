@@ -3,7 +3,19 @@ namespaces:
   monitoring: monitoring
   metallb: metallb-system
   ingress: ingress
-  cert_manager: cert-manager
+  cert-manager: cert-manager
+
+dns:
+  hosts:
+    proxmox_pve1:
+      domain: "pve1.proxmox.local"
+      address: "10.10.10.200"
+    proxmox_pve2:
+      domain: "pve2.proxmox.local"
+      address: "10.10.10.201"
+    proxmox_pve3:
+      domain: "pve3.proxmox.local"
+      address: "10.10.10.202"
     
 nodes:
   main:
@@ -34,10 +46,12 @@ load_balancer:
       qbittorrent: 10.10.10.105
       readarr: 10.10.10.199
       postgresql: 10.10.10.101
-      postgresql_read: 10.10.10.102
       linkwarden: 10.10.10.103
       rabbitmq: 10.10.10.150
       frigate: 10.10.10.130
+      home-assistant: 10.10.10.102
+      sftpgo: 10.10.10.115
+      sftpgoapi: 10.10.10.115
 
 storages:
   local:

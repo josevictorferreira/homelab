@@ -5,16 +5,16 @@ ingress:
   enabled: true
   ingressClassName: nginx
   annotations:
-    cert-manager.io/cluster-issuer: "cloudflare-issuer"
+    cert-manager.io/cluster-issuer: cloudflare-issuer
   hosts:
     - host: frigate.{{ .Values.secret.domain }}
       paths:
         - path: /
           portName: http
   tls:
-    - secretName: wildcard-homeserver-domain-tls
-      hosts:
+    - hosts:
         - frigate.{{ .Values.secret.domain }}
+      secretName: "wildcard-tls"
 persistence:
   config:
     enabled: true

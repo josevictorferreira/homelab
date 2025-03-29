@@ -1,0 +1,85 @@
+image:
+  repository: ghcr.io/drakkan/sftpgo
+
+config:
+  sftpd:
+    max_auth_tries: 4
+    bindings:
+      - port: 22
+  ftpd:
+    bindings:
+      - port: 21
+        tls_mode: 0
+        debug: true
+        active_connections_security: 1
+        passive_connections_security: 1
+        force_passive_ip: {{ .Values.load_balancer.addresses.services.sftpgo }}
+    passive_port_range:
+      start: 50000
+      end: 50009
+
+sftpd:
+  enabled: true
+
+ftpd:
+  enabled: true
+
+webdavd:
+  enabled: true
+
+httpd:
+  enabled: true
+
+hostNetwork: false
+
+service:
+  type: LoadBalancer
+  externalTrafficPolicy: Cluster
+  annotations:
+    metallb.universe.tf/allow-shared-ip: sftpgo
+  loadBalancerIP: "{{ .Values.load_balancer.addresses.services.sftpgo }}"
+  extraPorts:
+    {{- range $port := untilStep 50000 50010 1 }}
+    - name: "ftp-passive-{{ $port }}"
+      port: {{ $port }}
+      targetPort: {{ $port }}
+      protocol: TCP
+    {{- end }}
+
+persistence:
+  enabled: true
+  pvc:
+    accessModes:
+      - ReadWriteOnce
+    resources:
+      requests:
+        storage: 100Gi
+    storageClassName: local-storage
+
+ui:
+  ingress:
+    enabled: true
+    className: nginx
+    tls:
+      - secretName: "wildcard-tls"
+        hosts:
+          - "sftpgo.{{ .Values.secret.domain }}"
+    hosts:
+      - host: "sftpgo.{{ .Values.secret.domain }}"
+        paths:
+          - path: "/"
+            pathType: "Prefix"
+
+api:
+  ingress:
+    enabled: true
+    className: nginx
+    tls:
+      - secretName: "wildcard-tls"
+        hosts:
+          - "sftpgoapi.{{ .Values.secret.domain }}"
+    hosts:
+      - host: "sftpgoapi.{{ .Values.secret.domain }}"
+        paths:
+          - path: "/"
+            pathType: "Prefix"

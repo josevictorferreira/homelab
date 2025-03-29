@@ -40,11 +40,11 @@ auth:
 extraPlugins: "rabbitmq_management rabbitmq_auth_backend_ldap rabbitmq_prometheus rabbitmq_delayed_message_exchange rabbitmq_mqtt rabbitmq_web_mqtt"
 ingress:
   enabled: true
+  annotations:
+    cert-manager.io/cluster-issuer: cloudflare-issuer
   ingressClassName: nginx
   hostname: rabbitmq.{{ .Values.secret.domain }}
-  existingSecret: "wildcard-homeserver-domain-tls"
-  annotations:
-    cert-manager.io/cluster-issuer: "cloudflare-issuer"
+  existingSecret: "wildcard-tls"
   tls: true
 metrics:
   enabled: true

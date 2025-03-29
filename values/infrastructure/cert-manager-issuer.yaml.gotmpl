@@ -1,5 +1,7 @@
-ingress:
-  namespace: "{{ .Values.namespaces.services }}"
+certificates:
+  namespaces:
+    - "{{ .Values.namespaces.services }}"
+    - "{{ .Values.namespaces.monitoring }}"
 domain: "{{ .Values.secret.domain }}"
 cloudflare:
   email: "{{ .Values.secret.cloudflare_email }}"

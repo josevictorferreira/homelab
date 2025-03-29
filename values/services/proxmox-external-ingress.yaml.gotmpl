@@ -14,11 +14,10 @@ ingress:
   ingressClassName: nginx
   portName: https
   hostname: proxmox.{{ .Values.secret.domain }}
-  existingSecret: "wildcard-homeserver-domain-tls"
+  existingSecret: "wildcard-tls"
   annotations:
     nginx.ingress.kubernetes.io/upstream-vhost: "promox.{{ .Values.secret.domain }}"
     nginx.ingress.kubernetes.io/ssl-passthrough: "true"
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
     nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
-    cert-manager.io/cluster-issuer: "cloudflare-issuer"
   tls: true

@@ -13,7 +13,7 @@ environments:
 helmDefaults:
   kubeContext: homelab
   wait: true
-  timeout: 600
+  timeout: 300
   recreatePods: false
   force: false
 
@@ -34,6 +34,10 @@ repositories:
     url: https://fmjstudios.github.io/helm
   - name: blakeblackshear
     url: https://blakeblackshear.github.io/blakeshome-charts
+  - name: pajikos
+    url: http://pajikos.github.io/home-assistant-helm-chart
+
+---
 
 templates:
   default-infrastructure-release:
@@ -41,6 +45,7 @@ templates:
     missingFileHandler: Warn
     labels:
       type: infrastructure
+      name: "{{`{{ .Release.Name }}`}}"
     values:
       - "values/infrastructure/{{`{{ .Release.Name }}`}}.yaml.gotmpl"
 
@@ -50,6 +55,7 @@ templates:
     missingFileHandler: Warn
     labels:
       type: monitoring
+      name: "{{`{{ .Release.Name }}`}}"
     values:
       - "values/monitoring/{{`{{ .Release.Name }}`}}.yaml.gotmpl"
 
@@ -59,12 +65,13 @@ templates:
     missingFileHandler: Warn
     labels:
       type: services
+      name: "{{`{{ .Release.Name }}`}}"
     values:
       - "values/services/{{`{{ .Release.Name }}`}}.yaml.gotmpl"
     needs:
       - cluster-setup
       - "{{ .Values.namespaces.metallb }}/metallb-addresses"
-      - "{{ .Values.namespaces.cert_manager }}/cert-manager-issuer"
+      - "{{ index .Values.namespaces "cert-manager" }}/cert-manager-issuer"
       - "{{ .Values.namespaces.ingress }}/ingress-nginx"
       - "{{ .Values.namespaces.monitoring }}/prometheus"
 
@@ -107,30 +114,30 @@ releases:
       - metallb
 
   - name: cert-manager
-    namespace: {{ .Values.namespaces.cert_manager }}
+    namespace: {{ index .Values.namespaces "cert-manager" }}
     chart: jetstack/cert-manager
-    version: {{ .Values.versions.cert_manager }}
+    version: {{ index .Values.versions "cert-manager" }}
     inherit:
       - template: default-infrastructure-release
 
   - name: ingress-nginx
     namespace: {{ .Values.namespaces.ingress }}
     chart: ingress-nginx/ingress-nginx
-    version: {{ .Values.versions.ingress_nginx }}
+    version: {{ index .Values.versions "ingress-nginx" }}
     inherit:
       - template: default-infrastructure-release
     needs:
       - "{{ .Values.namespaces.metallb }}/metallb-addresses"
 
   - name: cert-manager-issuer
-    namespace: {{ .Values.namespaces.cert_manager }}
+    namespace: {{ index .Values.namespaces "cert-manager" }}
     chart: charts/cert-manager-issuer
-    version: {{ .Values.versions.cert_manager_issuer }}
+    version: {{ index .Values.versions "cert-manager-issuer" }}
     inherit:
       - template: default-infrastructure-release
     needs:
       - "{{ .Values.namespaces.ingress }}/ingress-nginx"
-      - cert-manager
+      - "{{ index .Values.namespaces "cert-manager" }}/cert-manager"
 
   - name: prometheus
     chart: prometheus-community/kube-prometheus-stack
@@ -141,8 +148,8 @@ releases:
     inherit:
       - template: default-monitoring-release
     needs:
-      - ingress/ingress-nginx
-      - cert-manager/cert-manager-issuer
+      - "{{ .Values.namespaces.ingress }}/ingress-nginx"
+      - "{{ index .Values.namespaces "cert-manager" }}/cert-manager-issuer"
 
   - name: postgresql
     chart: bitnami/postgresql
@@ -177,3 +184,7 @@ releases:
           - "-c"
           - "sops -d values/services/pihole-secret.enc.yaml | kubectl apply -n {{ .Values.namespaces.services }} -f -"
 
+  - name: sftpgo
+    inherit:
+      - template: default-self-hosted-release
+    chart: charts/sftpgo

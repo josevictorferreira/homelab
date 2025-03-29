@@ -1,8 +1,14 @@
-ingress:
-  namespace: ingress
-
+## The web domain to be used
 domain: test.domain.io
 
+## Certificates related configs
+certificates:
+  ## Set the namespaces where the certificates will be installed
+  namespaces:
+    - self-hosted
+    - monitoring
+
+## Cloudflare configs
 cloudflare:
   email: cloudflare@email.com
   api_token: cloudflare-api-token-secret-1

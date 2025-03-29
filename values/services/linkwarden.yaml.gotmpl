@@ -27,8 +27,8 @@ ingress:
   enabled: true
   className: nginx
   annotations:
-    cert-manager.io/cluster-issuer: "cloudflare-issuer"
+    cert-manager.io/cluster-issuer: cloudflare-issuer
   tls:
-    - secretName: "wildcard-homeserver-domain-tls"
-      hosts:
+    - hosts:
         - "linkwarden.{{ .Values.secret.domain }}"
+      secretName: "wildcard-tls"

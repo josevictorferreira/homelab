@@ -1,0 +1,33 @@
+apiVersion: v2
+type: application
+name: sftpgo
+version: 0.0.0
+appVersion: 2.6.6
+kubeVersion: ">=1.23.0-0"
+description: Full-featured and highly configurable SFTP, HTTP/S, FTP/S and WebDAV server.
+keywords:
+  - sftp
+  - ftp
+  - webdav
+home: https://sftpgo.com
+icon: https://cdn.statically.io/gh/drakkan/sftpgo/v2.6.6/static/img/logo.png
+sources:
+  - https://github.com/drakkan/sftpgo
+  - https://github.com/sftpgo/helm-chart
+  - https://github.com/sagikazarmark/helm-charts/tree/06ebf671519118f1ddabf1ba7dd7f4e2f85ea816/charts/sftpgo
+maintainers:
+  - name: sagikazarmark
+    email: mark@sagikazarmark.com
+    url: https://sagikazarmark.com
+  - name: Nicola Murino
+    email: nicola.murino@gmail.com
+    url: https://sftpgo.com
+annotations:
+  artifacthub.io/changes: |
+  artifacthub.io/images: |
+    - name: sftpgo
+      image: ghcr.io/drakkan/sftpgo:v2.6.6
+    - name: sftpgo-alpine
+      image: ghcr.io/drakkan/sftpgo:v2.6.6-alpine
+    - name: sftpgo-distroless-slim
+      image: ghcr.io/drakkan/sftpgo:v2.6.6-distroless-slim

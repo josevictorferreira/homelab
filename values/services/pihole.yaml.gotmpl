@@ -1,6 +1,9 @@
 {{- $domain := .Values.secret.domain }}
 {{- $ingressIp := .Values.load_balancer.addresses.ingress }}
 {{- $entries := list }}
+{{- range .Values.dns.hosts }}
+  {{- $entries = append $entries (printf "%s %s" .address .domain) }}
+{{- end }}
 {{- range $name, $ip := .Values.load_balancer.addresses.services }}
   {{- $entries = append $entries (printf "%s %s.%s" $ingressIp $name $domain) }}
 {{- end }}
@@ -56,11 +59,11 @@ ingress:
   pathType: "Prefix"
   ingressClassName: "nginx"
   annotations:
-    cert-manager.io/cluster-issuer: "cloudflare-issuer"
+    cert-manager.io/cluster-issuer: cloudflare-issuer
   tls:
-    - secretName: "wildcard-homeserver-domain-tls"
-      hosts:
+    - hosts:
         - "pihole.{{ $domain }}"
+      secretName: "wildcard-tls"
   hosts:
     - "pihole.{{ $domain }}"
 
