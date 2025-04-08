@@ -1,0 +1,40 @@
+image:
+  repository: codeberg.org/readeck/readeck
+  pullPolicy: IfNotPresent
+  tag: "0.17.1"
+
+env: {}
+
+service:
+  main:
+    type: LoadBalancer
+    loadBalancerIP: {{ .Values.load_balancer.addresses.services.readeck }}
+    ports:
+      http:
+        port: 8000
+
+ingress:
+  main:
+    enabled: true
+    annotations:
+      cert-manager.io/cluster-issuer: cloudflare-issuer
+    ingressClassName: nginx
+    hosts:
+      - host: "readeck.{{ .Values.secret.domain }}"
+        paths:
+          - path: /
+            pathType: Prefix
+    tls:
+      - hosts:
+          - "readeck.{{ .Values.secret.domain }}"
+        secretName: "wildcard-tls"
+
+
+persistence:
+  data:
+    enabled: true
+    mountPath: /readeck
+    accessMode: ReadWriteOnce
+    size: 100Mi
+    emptyDir:
+      enabled: false

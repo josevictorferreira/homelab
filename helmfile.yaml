@@ -36,6 +36,8 @@ repositories:
     url: https://blakeblackshear.github.io/blakeshome-charts
   - name: pajikos
     url: http://pajikos.github.io/home-assistant-helm-chart
+  - name: zekker6
+    url: https://zekker6.github.io/helm-charts
 
 ---
 
@@ -188,3 +190,8 @@ releases:
     inherit:
       - template: default-self-hosted-release
     chart: charts/sftpgo
+
+  - name: readeck
+    inherit:
+      - template: default-self-hosted-release
+    chart: zekker6/readeck
