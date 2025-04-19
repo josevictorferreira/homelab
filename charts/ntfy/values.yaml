@@ -1,0 +1,757 @@
+# Default Helm values for fmjstudios/ntfy.
+# Reference: https://github.com/fmjstudios/helm
+
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+## @section ntfy Image parameters
+##
+
+## ntfy Server Image
+## ref: https://hub.docker.com/r/binwiederhier/ntfy
+## @param image.registry The Docker registry to pull the image from
+## @param image.repository The registry repository to pull the image from
+## @param image.tag The image tag to pull
+## @param image.digest The image digest to pull
+## @param image.pullPolicy The Kubernetes image pull policy
+## @param image.pullSecrets A list of secrets to use for pulling images from private registries
+
+image:
+  registry: docker.io
+  repository: binwiederhier/ntfy
+  tag: v2.11.0
+  digest: ""
+  ## Specify a imagePullPolicy
+  ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
+  ## ref: https://kubernetes.io/docs/user-guide/images/#pre-pulling-images
+  ##
+  pullPolicy: IfNotPresent
+  ## Optionally specify an array of imagePullSecrets.
+  ## Secrets must be manually created in the namespace.
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+  ## e.g:
+  ## pullSecrets:
+  ##   - myRegistryKeySecretName
+  ##
+  pullSecrets: []
+
+## @section Name overrides
+##
+
+## @param nameOverride String to partially override ntfy.fullname
+##
+nameOverride: ""
+
+## @param fullnameOverride String to fully override ntfy.fullname
+##
+fullnameOverride: ""
+
+## @section Workload overrides
+##
+
+## @param kind The kind of workload to deploy ntfy as (`StatefulSet` or `Deployment`)
+##
+kind: StatefulSet
+
+## @section ntfy Configuration parameters
+##
+
+## ntfy configuration
+## ref: https://docs.ntfy.sh/config/ or https://github.com/binwiederhier/ntfy/blob/main/server/server.yml
+ntfy:
+  ## @param ntfy.baseURL [string] The public facing URL for the service (e.g. https://ntfy.example.com)
+  ##
+  baseURL: ""
+
+  ## @param ntfy.listenHTTP [string] The listen address for the HTTP server (e.g. ":80", "127.0.0.1:80")
+  ##
+  listenHTTP: ":8080"
+
+  ## @param ntfy.listenHTTPS [string] The listen address for the HTTPS server (e.g. ":443", "127.0.0.1:443") -
+  ## setting this parameter requires also setting ntfy.keyFile and ntfy.certFile
+  ##
+  listenHTTPS: ""
+
+  ## @param ntfy.listenUnix [string] The path to a Unix socket to listen on (e.g. "/var/run/ntfy/ntfy.sock")
+  ##
+  listenUnix: ""
+
+  ## @param ntfy.listenUnixMode [string] The Linux permissions for the Unix socket (e.g. "0700")
+  ##
+  listenUnixMode: ""
+
+  ## @param ntfy.keyFile [string] The path to a certificate key file (e.g. "/var/lib/ntfy/tls.key")
+  ##
+  keyFile: ""
+
+  ## @param ntfy.certFile [string] The path to a certificate file (e.g. "/var/lib/ntfy/tls.crt")
+  ##
+  certFile: ""
+
+  ## @param ntfy.firebaseKeyFile [string] The path to a Firebase key file (e.g. "/var/lib/ntfy/key.json")
+  ##
+  firebaseKeyFile: ""
+
+  ## @param ntfy.behindProxy [default: false] Whether or not ntfy is hosted behind a proxy
+  ##
+  behindProxy: false
+
+  ## @param ntfy.keepaliveInterval [string] Interval in which keepalive messages are sent to the client
+  ##
+  keepaliveInterval: ""
+
+  ## @param ntfy.managerInterval [string] Interval in which the manager prunes old messages
+  ##
+  managerInterval: ""
+
+  ## @param ntfy.disallowedTopics [array] Define topic names that are not allowed
+  ##
+  disallowedTopics: []
+
+  ## @param ntfy.webRoot [string] Define topic names that are not allowed
+  ##
+  webRoot: "/"
+
+  ## @param ntfy.enableSignup [default: false] Allow users to sign up via the web app or API
+  ##
+  enableSignup: false
+
+  ## @param ntfy.enableLogin [default: false] Allow users to sign in via the web app or API
+  ##
+  enableLogin: false
+
+  ## @param ntfy.enableReservations [default: false] Allow users to reserve topics
+  ##
+  enableReservations: false
+
+  ## @param ntfy.globalTopicLimit [default: 15000] The total number of topics before the server rejects new topics
+  ##
+  globalTopicLimit: 15000
+
+  ## Data configuration
+  ##
+  data:
+    ## @param ntfy.data.rootPath [default: /var/lib/ntfy] The root path for ntfy to store its' files
+    ##
+    rootPath: /var/lib/ntfy
+
+    ## Kubernetes PVC settings
+    ##
+    pvc:
+      ## @param ntfy.data.pvc.size [default: 5Gi] The size given to the new PVC
+      ##
+      size: 5Gi
+      ## @param ntfy.data.pvc.storageClass [default: standard] The storageClass given to the new PVC
+      ##
+      storageClass: standard
+      ## @param ntfy.data.pvc.reclaimPolicy [default: Retain] The resourcePolicy given to the new PVC
+      ##
+      reclaimPolicy: Retain
+      ## @param ntfy.data.pvc.existingClaim [string] Provide the name to an existing PVC
+      ##
+      existingClaim: ""
+
+  ## Cache configuration
+  ##
+  cache:
+    ## @param ntfy.cache.file [default: cache.db] The path where to create the SQLite cache database, beginning at ntfy.data.rootPath (e.g. "cache.db")
+    ##
+    file: "cache.db"
+
+    ## @param ntfy.cache.duration [string] The duration for which messages will be buffered before they are deleted (e.g. "12h")
+    ##
+    duration: ""
+
+    ## @param ntfy.cache.startupQueries [string] SQLite queries to run on database initialization (e.g. to enable WAL mode)
+    ## ref: https://github.com/binwiederhier/ntfy/blob/main/server/server.yml#L49
+    ## Example:
+    ##  startupQueries: |
+    ##      pragma journal_mode = WAL;
+    ##      pragma synchronous = normal;
+    ##      pragma temp_store = memory;
+    ##      pragma busy_timeout = 15000;
+    ##      vacuum;
+    ##
+    startupQueries: ""
+
+    ## @param ntfy.cache.batchSize [default: 0] The amount of messages within a single batch (e.g. 32)
+    ##
+    batchSize: 0
+
+    ## @param ntfy.cache.batchTimeout [string] The timeout after which to write the batched messages to the DB (e.g. "0ms")
+    ##
+    batchTimeout: ""
+
+  ## Auth configuration
+  ##
+  auth:
+    ## @param ntfy.auth.file [string] The path where to create the SQLite user database (e.g. "auth.db")
+    ##
+    file: ""
+
+    ## @param ntfy.auth.defaultAccess [string] The default access level for new users. Can be `deny-all`, `read-only` or `write-only`.
+    ##
+    defaultAccess: "deny-all"
+
+    ## @param ntfy.auth.startupQueries [string] SQLite queries to run on database initialization (e.g. to enable WAL mode)
+    ## ref: https://github.com/binwiederhier/ntfy/blob/main/server/server.yml#L49
+    ## Example:
+    ##  startupQueries: |
+    ##      pragma journal_mode = WAL;
+    ##      pragma synchronous = normal;
+    ##      pragma temp_store = memory;
+    ##      pragma busy_timeout = 15000;
+    ##      vacuum;
+    ##
+    startupQueries: ""
+
+  ## Attachment configuration
+  ##
+  attachment:
+    ## @param ntfy.attachment.cacheDir [string] The directory for attached files (e.g. "attachments")
+    ##
+    cacheDir: ""
+    ## @param ntfy.attachment.totalSizeLimit [string] The maximum total size of cacheDir (e.g. "5G")
+    ##
+    totalSizeLimit: ""
+    ## @param ntfy.attachment.fileSizeLimit [string] The maximum size of a single attachment (e.g. "15M")
+    ##
+    fileSizeLimit: ""
+    ## @param ntfy.attachment.expiryDuration [string] The duration after which uploaded attachments are deleted (e.g. "3h")
+    ##
+    expiryDuration: ""
+
+  ## SMTP configuration
+  ##
+  smtp:
+    ## @param ntfy.smtp.senderAddr [string] The hostname:port of the SMTP server (e.g. "mail.example.com:587")
+    ##
+    senderAddr: ""
+    ## @param ntfy.smtp.senderFrom [string] The e-=mail address of the sender (e.g. "ntfy@example.com")
+    ##
+    senderFrom: ""
+    ## @param ntfy.smtp.senderUser [string] The username of the SMTP user (e.g. "ntfy@example.com")
+    ##
+    senderUser: ""
+    ## @param ntfy.smtp.senderPass [string] The password of the SMTP user (e.g. "ntfy@example.com")
+    ##
+    senderPass: ""
+    ## @param ntfy.smtp.existingSecret [string] An existing secret with a `username` and `password` key
+    ##
+    existingSecret: ""
+
+    ## Incoming SMTP server configuration
+    ##
+    incoming:
+      ## @param ntfy.smtp.incoming.listen [string] The IP address and port the SMTP server will listen on (e.g. ":25" or "0.0.0.0:25")
+      ##
+      listen: ""
+      ## @param ntfy.smtp.incoming.domain [string] The email domain (e.g. "example.com")
+      ##
+      domain: ""
+      ## @param ntfy.smtp.incoming.addrPrefix [string] Optional prefix to prevent spam. If set to "ntfy-" for example,
+      ## only emails to "ntfy-$topic@ntfy.sh" will be accepted. If not set, all emails to $topic@ntfy.sh will be accepted
+      ##
+      addrPrefix: ""
+
+  ## Web configuration
+  ##
+  web:
+    ## @param ntfy.web.publicKey [string] is the generated VAPID public key, (e.g. "AA...")
+    ##
+    publicKey: ""
+    ## @param ntfy.web.privateKey [string] is the generated VAPID private key, (e.g. "AA...")
+    ##
+    privateKey: ""
+    ## @param ntfy.web.existingSecret [string] An existing secret with a `privateKey` and `publicKey` a
+    ##
+    existingSecret: ""
+    ## @param ntfy.web.file [string] is a database file to keep track of browser subscription endpoints (e.g. "/var/cache/ntfy/webpush.db")
+    ##
+    file: ""
+    ## @param ntfy.web.emailAddress [string] is the admin email address send to the push provider, (e.g. "sysadmin@example.com")
+    ##
+    emailAddress: ""
+    ## @param ntfy.web.startupQueries [string] SQLite queries to run on database initialization (e.g. to enable WAL mode)
+    ##
+    startupQueries: ""
+
+  ## Twilio configuration
+  ##
+  twilio:
+    ## @param ntfy.twilio.accountSID [string] is the Twilio account SID, (e.g. "AC12345beefbeef67890beefbeef122586")
+    ##
+    accountSID: ""
+    ## @param ntfy.twilio.token [string] is the Twilio authentication token, (e.g. "ThisIsAnAuthenticationToken")
+    ##
+    token: ""
+    ## @param ntfy.twilio.existingSecret [string] An existing secret containing a `accountSID` and `token` key
+    ##
+    existingSecret: ""
+    ## @param ntfy.twilio.phoneNumber [string] The outgoing Twilio phone number (e.g. "+18775132586")
+    ##
+    phoneNumber: ""
+    ## @param ntfy.twilio.verifyService [string] Twilio verify service SID (e.g. "VA12345beefbeef67890beefbeef122586")
+    ##
+    verifyService: ""
+
+  ## Upstream configuration
+  ##
+  upstream:
+    ## @param ntfy.upstream.baseURL [string] The base URL of the upstream server, should be "https://ntfy.sh"
+    ##
+    baseURL: ""
+    ## @param ntfy.upstream.accessToken [string] the token used to authenticate with the upstream APNS server
+    ##
+    accessToken: ""
+    ## @param ntfy.upstream.existingSecret [string] A existing Secret containing a `token` key
+    ##
+    existingSecret: ""
+
+  ## Message configuration
+  ##
+  message:
+    ## @param ntfy.message.sizeLimit [string] The maximum size of a message body (e.g. "4k")
+    ##
+    sizeLimit: ""
+    ## @param ntfy.message.delayLimit [string] The maximum delay of a message when using the "Delay" header (e.g. "12h")
+    ##
+    delayLimit: ""
+
+  ## Visitor configuration
+  ##
+  visitor:
+    ## @param ntfy.visitor.subscriptionLimit [default: 30] The number of subscriptions per visitor (IP address)
+    ##
+    subscriptionLimit: 30
+    ## @param ntfy.visitor.requestLimitBurst [default: 60] The initial bucket of requests each visitor has (e.g. "60")
+    ##
+    requestLimitBurst: 60
+    ## @param ntfy.visitor.requestLimitReplenish [default: 5s] The rate at which the bucket is refilled (e.g. "5s")
+    ##
+    requestLimitReplenish: "5s"
+    ## @param ntfy.visitor.requestLimitExemptHosts [string] A comma-separated list of hostnames, IPs or CIDRs to be
+    ## exempt from request rate limiting. Hostnames are resolved at the time the server is started. (e.g. "1.2.3.4,ntfy.example.com,8.7.6.0/24")
+    ##
+    requestLimitExemptHosts: ""
+    ## @param ntfy.visitor.messageDailyLimit [default: 15000] Hard daily limit of messages per visitor and day. The limit is reset
+    ## every day at midnight UTC. If the limit is not set (or set to zero), the request limit (see above) governs the
+    ## upper limit.
+    ##
+    messageDailyLimit: 15000
+    ## @param ntfy.visitor.emailLimitBurst [default: 16] The initial bucket of emails each visitor has (e.g. "60")
+    ##
+    emailLimitBurst: 16
+    ## @param ntfy.visitor.emailLimitReplenish [default: 1h] The rate at which the bucket is refilled (e.g. "5s")
+    ##
+    emailLimitReplenish: "1h"
+    ## @param ntfy.visitor.attachmentTotalSizeLimit [default: 100M] The total storage limit used for attachments per visitor
+    ##
+    attachmentTotalSizeLimit: "100M"
+    ## @param ntfy.visitor.attachmentDailyBandwidthLimit [default: 500M] The total daily attachment download/upload traffic limit per visitor
+    ##
+    attachmentDailyBandwidthLimit: "500M"
+    ## @param ntfy.visitor.subscriberRateLimiting [default: false] Whether to enable subscriber-based rate limiting
+    ##
+    subscriberRateLimiting: false
+
+  ## Stripe configuration
+  ##
+  stripe:
+    ## @param ntfy.stripe.secretKey [string] The key used for the Stripe API communication
+    ##
+    secretKey: ""
+    ## @param ntfy.stripe.webhookKey [string] The webhook key used for the Stripe API communication
+    ##
+    webhookKey: ""
+    ## @param ntfy.stripe.existingSecret [string] An existing secret containing a `secretKey` and `weboohKey` keys
+    ##
+    existingSecret: ""
+
+    ## @param ntfy.stripe.billingContact [string] is an email address or site displayed in the "Upgrade tier" dialog to let people reach
+    ##   out with billing questions. If unset, nothing will be displayed
+    ##
+    billingContact: ""
+
+  ## Metrics configuration
+  ##
+  metrics:
+    ## @param ntfy.metrics.enabled [default: false] enables the /metrics endpoint for the ntfy server
+    ##
+    enabled: false
+    ## @param ntfy.metrics.listenHTTP [string] exposes the metrics endpoint via a dedicated [IP]:port. If set, this option
+    ## implicitly enables metrics as well
+    ##
+    listenHTTP: ":9090"
+    ## @param ntfy.metrics.profileListenHTTP [string] If enabled, ntfy will listen on a dedicated listen IP/port
+    ##
+    profileListenHTTP: ""
+
+  ## Log configuration
+  ##
+  log:
+    ## @param ntfy.log.level [default: info] One of "trace", "debug", "info" (default), "warn" or "error"
+    ##
+    level: info
+    ## @param ntfy.log.levelOverrides [string] lets you override the log level if certain fields match
+    ## ref: https://github.com/binwiederhier/ntfy/blob/main/server/server.yml#L347
+    ##
+    levelOverrides: ""
+    ## @param ntfy.log.format [default: text] One of "text" (default) or "json"
+    ##
+    format: text
+    ## @param ntfy.log.file [string] The filename to write logs to. If this is not set, ntfy logs to stderr
+    ##
+    file: ""
+
+## @section ConfigMap parameters
+##
+
+## ntfy ConfigMap settings
+## @param configMap.annotations Annotations for the ConfigMap resource
+## @param configMap.labels Extra Labels for the ConfigMap resource
+
+configMap:
+  annotations: {}
+  labels: {}
+
+## @section Common Secret parameters
+##
+
+## ntfy Common Secret settings
+## @param secret.annotations Common annotations for the SMTP, HIBP, Admin and Database secrets
+## @param secret.labels Common extra labels for the SMTP, HIBP, Admin and Database secrets
+
+secret:
+  annotations: {}
+  labels: {}
+
+## @section Ingress parameters
+##
+
+## ntfy Ingress settings
+## @param ingress.enabled Whether to enable Ingress
+## @param ingress.className The IngressClass to use for the pod's ingress
+## @param ingress.whitelist A comma-separated list of IP addresses to whitelist
+## @param ingress.annotations Annotations for the Ingress resource
+## @param ingress.tls A list of hostnames and secret names to use for TLS
+## @param ingress.extraHosts A list of extra hosts for the Ingress resource (with ntfy.baseURL)
+
+ingress:
+  enabled: false
+  className: ""
+  whitelist: ""
+  annotations: {}
+  # kubernetes.io/ingress.class: nginx
+  # kubernetes.io/tls-acme: "true"
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+  extraHosts: []
+  # - host: domain.tld
+  #   paths:
+  #     - path: /
+  #       pathType: ImplementationSpecific
+
+## @section Service parameters
+##
+
+## ntfy Service settings
+service:
+  ## @param service.type [default: ClusterIP] The type of service to create
+  ##
+  type: ClusterIP
+  ## @param service.nodePort [default: 30080] The Node port to use on the service
+  ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#type-nodeport
+  ## NOTE: choose port between <30000-32767>
+  ##
+  nodePort: 30080
+  ## @param service.extraPorts Extra ports to add to the service
+  ## https://kubernetes.io/docs/concepts/services-networking/service/#multi-port-services
+  ## e.g.
+  ## extraPorts:
+  ##   - name: https
+  ##     protocol: TCP
+  ##     port: 443
+  ##     targetPort: 9377
+  ##
+  extraPorts: []
+  ## @param service.annotations [object] Annotations for the service resource
+  ##
+  annotations: {}
+  ## @param service.labels [object] Labels for the service resource
+  ##
+  labels: {}
+  ## @param service.externalTrafficPolicy [default: Cluster] The external traffic policy for the service
+  ## ref: https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip
+  ##
+  externalTrafficPolicy: Cluster
+  ## @param service.internalTrafficPolicy [default: Cluster] The internal traffic policy for the service
+  ## ref: https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip
+  ##
+  internalTrafficPolicy: Cluster
+  ## @param service.clusterIP [string] Define a static cluster IP for the service
+  ##
+  clusterIP: ""
+  ## @param service.loadBalancerIP Set the Load Balancer IP
+  ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#internal-load-balancer
+  ##
+  loadBalancerIP: ""
+  ## @param service.loadBalancerClass Define Load Balancer class if service type is `LoadBalancer` (optional, cloud specific)
+  ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#type-loadbalancer
+  ##
+  loadBalancerClass: ""
+  ## @param service.loadBalancerSourceRanges Service Load Balancer source ranges
+  ## https://kubernetes.io/docs/tasks/access-application-cluster/configure-cloud-provider-firewall/#restrict-access-for-loadbalancer-service
+  ## e.g.
+  ## loadBalancerSourceRanges:
+  ##   - 10.10.10.0/24
+  ##
+  loadBalancerSourceRanges: []
+  ## @param service.externalIPs Service External IPs
+  ## https://kubernetes.io/docs/concepts/services-networking/service/#external-ips
+  ## e.g.
+  ## externalIPs:
+  ##   - 10.10.10.1
+  ##   - 201.22.30.1
+  ##
+  externalIPs: []
+  ## @param service.sessionAffinity Session Affinity for Kubernetes service, can be "None" or "ClientIP"
+  ## If "ClientIP", consecutive client requests will be directed to the same Pod
+  ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#virtual-ips-and-service-proxies
+  ##
+  sessionAffinity: None
+  ## @param service.sessionAffinityConfig Additional settings for the sessionAffinity
+  ## sessionAffinityConfig:
+  ##   clientIP:
+  ##     timeoutSeconds: 300
+  ##
+  sessionAffinityConfig: {}
+  ## @param service.ipFamilyPolicy [object] The ipFamilyPolicy
+  ## ref: https://kubernetes.io/docs/concepts/services-networking/dual-stack/
+  ##
+  ipFamilyPolicy: ""
+
+  ## Kubernetes Service Ports
+  ##
+  ports:
+    ## @param service.ports.http [default: 8080] The port to use on the service for HTTP traffic
+    ##
+    http: 8080
+    ## @param service.ports.https [number, nullable] The port to use on the service for HTTPS traffic in case ntfy.listenHTTPS is active.
+    ##
+    https: 8443
+
+## @section RBAC parameters
+##
+
+## ntfy RBAC settings
+## @param rbac.create Whether to create RBAC resources
+## @param rbac.rules Extra rules to add to the Role
+##
+rbac:
+  create: true
+  rules: []
+
+## @section Service Account parameters
+##
+
+## ntfy Service Account settings
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
+## @param serviceAccount.create Whether a service account should be created
+## @param serviceAccount.automount Whether to automount the service account token
+## @param serviceAccount.annotations Annotations to add to the service account
+## @param serviceAccount.name A custom name for the service account, otherwise ntfy.fullname is used
+## @param serviceAccount.secrets A list of secrets mountable by this service account
+##
+serviceAccount:
+  create: true
+  automount: false
+  annotations: {}
+  name: ""
+  secrets: []
+
+## @section Liveness Probe parameters
+##
+
+## ntfy Liveness Probe
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+##
+livenessProbe:
+  ## @param livenessProbe.enabled Enable or disable the use of liveness probes
+  ##
+  enabled: false
+  ## @param livenessProbe.initialDelaySeconds Configure the initial delay seconds for the liveness probe
+  ##
+  initialDelaySeconds: 5
+  ## @param livenessProbe.timeoutSeconds Configure the initial delay seconds for the liveness probe
+  ##
+  timeoutSeconds: 1
+  ## @param livenessProbe.periodSeconds Configure the seconds for each period of the liveness probe
+  ##
+  periodSeconds: 10
+  ## @param livenessProbe.successThreshold Configure the success threshold for the liveness probe
+  ##
+  successThreshold: 1
+  ## @param livenessProbe.failureThreshold Configure the failure threshold for the liveness probe
+  ##
+  failureThreshold: 10
+
+## @section Readiness Probe parameters
+##
+
+## ntfy Readiness Probe
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+##
+readinessProbe:
+  ## @param readinessProbe.enabled Enable or disable the use of readiness probes
+  ##
+  enabled: false
+  ## @param readinessProbe.initialDelaySeconds Configure the initial delay seconds for the readiness probe
+  ##
+  initialDelaySeconds: 5
+  ## @param readinessProbe.timeoutSeconds Configure the initial delay seconds for the readiness probe
+  ##
+  timeoutSeconds: 1
+  ## @param readinessProbe.periodSeconds Configure the seconds for each period of the readiness probe
+  ##
+  periodSeconds: 10
+  ## @param readinessProbe.successThreshold Configure the success threshold for the readiness probe
+  ##
+  successThreshold: 1
+  ## @param readinessProbe.failureThreshold Configure the failure threshold for the readiness probe
+  ##
+  failureThreshold: 3
+
+## @section Startup Probe parameters
+##
+
+## ntfy Startup Probe
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+##
+startupProbe:
+  ## @param startupProbe.enabled Enable or disable the use of readiness probes
+  ##
+  enabled: false
+  ## @param startupProbe.initialDelaySeconds Configure the initial delay seconds for the startup probe
+  ##
+  initialDelaySeconds: 5
+  ## @param startupProbe.timeoutSeconds Configure the initial delay seconds for the startup probe
+  ##
+  timeoutSeconds: 1
+  ## @param startupProbe.periodSeconds Configure the seconds for each period of the startup probe
+  ##
+  periodSeconds: 10
+  ## @param startupProbe.successThreshold Configure the success threshold for the startup probe
+  ##
+  successThreshold: 1
+  ## @param startupProbe.failureThreshold Configure the failure threshold for the startup probe
+  ##
+  failureThreshold: 10
+
+## @section PodDisruptionBudget parameters
+##
+
+## ntfy pod disruption budget settings
+## ref: # https://kubernetes.io/docs/tasks/run-application/configure-pdb/
+## @param podDisruptionBudget.enabled [default: true] Enable the pod disruption budget
+## @param podDisruptionBudget.minAvailable [default: 1] The minimum amount of pods which need to be available
+##
+podDisruptionBudget:
+  enabled: false
+  minAvailable: 1
+  # maxUnavailable:
+
+## @section Pod settings
+##
+
+## ntfy resource settings
+## ref: https://kubernetes.io/docs/user-guide/compute-resources/
+## @param resources The resource limits/requests for the ntfy pod
+##
+resources: {}
+# limits:
+#   cpu: 100m
+#   memory: 128Mi
+# requests:
+#   cpu: 100m
+#   memory: 128Mi
+
+## ref: https://kubernetes.io/docs/concepts/storage/volumes/
+## @param volumes Define volumes for the ntfy pod
+##
+volumes: []
+
+## ref: https://kubernetes.io/docs/concepts/storage/volumes/
+## @param volumeMounts Define volumeMounts for the ntfy pod
+##
+volumeMounts: []
+
+## ref: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
+## @param initContainers Define initContainers for the main ntfy server
+##
+initContainers: []
+
+## @param nodeSelector Node labels for pod assignment
+## ref: https://kubernetes.io/docs/user-guide/node-selection/
+##
+nodeSelector: {}
+
+## @param tolerations Tolerations for pod assignment
+## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+##
+tolerations: []
+
+## @param affinity Affinity for pod assignment
+## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+##
+affinity: {}
+
+## @param strategy Specify a deployment strategy for the ntfy pod
+##
+strategy: {}
+#  type: RollingUpdate
+#  rollingUpdate:
+#    maxUnavailable: 1
+
+## @param podAnnotations Extra annotations for the ntfy pod
+##
+podAnnotations: {}
+
+## @param podLabels Extra labels for the ntfy pod
+##
+podLabels: {}
+#  pod-security.kubernetes.io/warn: privileged
+#  pod-security.kubernetes.io/audit: privileged
+#  pod-security.kubernetes.io/enforce: baseline
+
+## @param priorityClassName The name of an existing PriorityClass
+## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/
+##
+priorityClassName: ""
+
+## @section Security context settings
+##
+
+## @param podSecurityContext Security context settings for the ntfy pod
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+##
+podSecurityContext: {}
+# fsGroup: 1001
+# supplementalGroups:
+#   - 1001
+
+## @param securityContext General security context settings for
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+##
+securityContext: {}
+# allowPrivilegeEscalation: false
+# privileged: false
+# readOnlyRootFilesystem: true
+# runAsNonRoot: true
+# runAsGroup: 1001
+# runAsUser: 1001
+# capabilities:
+#   drop:
+#     - ALL

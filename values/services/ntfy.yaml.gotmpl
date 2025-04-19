@@ -1,0 +1,31 @@
+image:
+  registry: docker.io
+  repository: binwiederhier/ntfy
+  tag: "v2.11.0"
+
+ntfy:
+  baseURL: "ntfy.{{ .Values.secret.domain }}"
+  listenHTTP: ":80"
+  listenHTTPS: ":443"
+  behindProxy: true
+  data:
+    rootPath: "/data"
+    pvc:
+      storageClass: local-path
+
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: cloudflare-issuer
+  tls:
+    - hosts:
+        - "ntfy.{{ .Values.secret.domain }}"
+      secretName: "wildcard-tls"
+
+service:
+  type: LoadBalancer
+  loadBalancerIP: {{ .Values.load_balancer.addresses.services.ntfy }}
+  ports:
+    http: 80
+    https: 80

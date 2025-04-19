@@ -1,0 +1,922 @@
+{
+    "title": "Chart Values",
+    "type": "object",
+    "properties": {
+        "image": {
+            "type": "object",
+            "properties": {
+                "registry": {
+                    "type": "string",
+                    "description": "The Docker registry to pull the image from",
+                    "default": "docker.io"
+                },
+                "repository": {
+                    "type": "string",
+                    "description": "The registry repository to pull the image from",
+                    "default": "binwiederhier/ntfy"
+                },
+                "tag": {
+                    "type": "string",
+                    "description": "The image tag to pull",
+                    "default": "v2.11.0"
+                },
+                "digest": {
+                    "type": "string",
+                    "description": "The image digest to pull",
+                    "default": ""
+                },
+                "pullPolicy": {
+                    "type": "string",
+                    "description": "The Kubernetes image pull policy",
+                    "default": "IfNotPresent"
+                },
+                "pullSecrets": {
+                    "type": "array",
+                    "description": "A list of secrets to use for pulling images from private registries",
+                    "default": [],
+                    "items": {}
+                }
+            }
+        },
+        "nameOverride": {
+            "type": "string",
+            "description": "String to partially override ntfy.fullname",
+            "default": ""
+        },
+        "fullnameOverride": {
+            "type": "string",
+            "description": "String to fully override ntfy.fullname",
+            "default": ""
+        },
+        "kind": {
+            "type": "string",
+            "description": "The kind of workload to deploy ntfy as (`StatefulSet` or `Deployment`)",
+            "default": "StatefulSet"
+        },
+        "ntfy": {
+            "type": "object",
+            "properties": {
+                "baseURL": {
+                    "type": "string",
+                    "description": "The public facing URL for the service (e.g. https://ntfy.example.com)",
+                    "default": "\"\""
+                },
+                "listenHTTP": {
+                    "type": "string",
+                    "description": "The listen address for the HTTP server (e.g. \":80\", \"127.0.0.1:80\")",
+                    "default": "\"\""
+                },
+                "listenHTTPS": {
+                    "type": "string",
+                    "description": "The listen address for the HTTPS server (e.g. \":443\", \"127.0.0.1:443\") -",
+                    "default": "\"\""
+                },
+                "listenUnix": {
+                    "type": "string",
+                    "description": "The path to a Unix socket to listen on (e.g. \"/var/run/ntfy/ntfy.sock\")",
+                    "default": "\"\""
+                },
+                "listenUnixMode": {
+                    "type": "string",
+                    "description": "The Linux permissions for the Unix socket (e.g. \"0700\")",
+                    "default": "\"\""
+                },
+                "keyFile": {
+                    "type": "string",
+                    "description": "The path to a certificate key file (e.g. \"/var/lib/ntfy/tls.key\")",
+                    "default": "\"\""
+                },
+                "certFile": {
+                    "type": "string",
+                    "description": "The path to a certificate file (e.g. \"/var/lib/ntfy/tls.crt\")",
+                    "default": "\"\""
+                },
+                "firebaseKeyFile": {
+                    "type": "string",
+                    "description": "The path to a Firebase key file (e.g. \"/var/lib/ntfy/key.json\")",
+                    "default": "\"\""
+                },
+                "behindProxy": {
+                    "type": "boolean",
+                    "description": "Whether or not ntfy is hosted behind a proxy",
+                    "default": "false"
+                },
+                "keepaliveInterval": {
+                    "type": "string",
+                    "description": "Interval in which keepalive messages are sent to the client",
+                    "default": "\"\""
+                },
+                "managerInterval": {
+                    "type": "string",
+                    "description": "Interval in which the manager prunes old messages",
+                    "default": "\"\""
+                },
+                "disallowedTopics": {
+                    "type": "array",
+                    "description": "Define topic names that are not allowed",
+                    "default": "[]",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "webRoot": {
+                    "type": "string",
+                    "description": "Define topic names that are not allowed",
+                    "default": "\"\""
+                },
+                "enableSignup": {
+                    "type": "boolean",
+                    "description": "Allow users to sign up via the web app or API",
+                    "default": "false"
+                },
+                "enableLogin": {
+                    "type": "boolean",
+                    "description": "Allow users to sign in via the web app or API",
+                    "default": "false"
+                },
+                "enableReservations": {
+                    "type": "boolean",
+                    "description": "Allow users to reserve topics",
+                    "default": "false"
+                },
+                "globalTopicLimit": {
+                    "type": "number",
+                    "description": "The total number of topics before the server rejects new topics",
+                    "default": "15000"
+                },
+                "data": {
+                    "type": "object",
+                    "properties": {
+                        "rootPath": {
+                            "type": "string",
+                            "description": "The root path for ntfy to store its' files",
+                            "default": "/var/lib/ntfy"
+                        },
+                        "pvc": {
+                            "type": "object",
+                            "properties": {
+                                "size": {
+                                    "type": "string",
+                                    "description": "The size given to the new PVC",
+                                    "default": "5Gi"
+                                },
+                                "storageClass": {
+                                    "type": "string",
+                                    "description": "The storageClass given to the new PVC",
+                                    "default": "standard"
+                                },
+                                "reclaimPolicy": {
+                                    "type": "string",
+                                    "description": "The resourcePolicy given to the new PVC",
+                                    "default": "Retain"
+                                },
+                                "existingClaim": {
+                                    "type": "string",
+                                    "description": "Provide the name to an existing PVC",
+                                    "default": "\"\""
+                                }
+                            }
+                        }
+                    }
+                },
+                "cache": {
+                    "type": "object",
+                    "properties": {
+                        "file": {
+                            "type": "string",
+                            "description": "The path where to create the SQLite cache database, beginning at ntfy.data.rootPath (e.g. \"cache.db\")",
+                            "default": "cache.db"
+                        },
+                        "duration": {
+                            "type": "string",
+                            "description": "The duration for which messages will be buffered before they are deleted (e.g. \"12h\")",
+                            "default": "\"\""
+                        },
+                        "startupQueries": {
+                            "type": "string",
+                            "description": "SQLite queries to run on database initialization (e.g. to enable WAL mode)",
+                            "default": "\"\""
+                        },
+                        "batchSize": {
+                            "type": "number",
+                            "description": "The amount of messages within a single batch (e.g. 32)",
+                            "default": "0"
+                        },
+                        "batchTimeout": {
+                            "type": "string",
+                            "description": "The timeout after which to write the batched messages to the DB (e.g. \"0ms\")",
+                            "default": "\"\""
+                        }
+                    }
+                },
+                "auth": {
+                    "type": "object",
+                    "properties": {
+                        "file": {
+                            "type": "string",
+                            "description": "The path where to create the SQLite user database (e.g. \"auth.db\")",
+                            "default": "\"\""
+                        },
+                        "defaultAccess": {
+                            "type": "string",
+                            "description": "The default access level for new users. Can be `deny-all`, `read-only` or `write-only`.",
+                            "default": "\"\""
+                        },
+                        "startupQueries": {
+                            "type": "string",
+                            "description": "SQLite queries to run on database initialization (e.g. to enable WAL mode)",
+                            "default": "\"\""
+                        }
+                    }
+                },
+                "attachment": {
+                    "type": "object",
+                    "properties": {
+                        "cacheDir": {
+                            "type": "string",
+                            "description": "The directory for attached files (e.g. \"attachments\")",
+                            "default": "\"\""
+                        },
+                        "totalSizeLimit": {
+                            "type": "string",
+                            "description": "The maximum total size of cacheDir (e.g. \"5G\")",
+                            "default": "\"\""
+                        },
+                        "fileSizeLimit": {
+                            "type": "string",
+                            "description": "The maximum size of a single attachment (e.g. \"15M\")",
+                            "default": "\"\""
+                        },
+                        "expiryDuration": {
+                            "type": "string",
+                            "description": "The duration after which uploaded attachments are deleted (e.g. \"3h\")",
+                            "default": "\"\""
+                        }
+                    }
+                },
+                "smtp": {
+                    "type": "object",
+                    "properties": {
+                        "senderAddr": {
+                            "type": "string",
+                            "description": "The hostname:port of the SMTP server (e.g. \"mail.example.com:587\")",
+                            "default": "\"\""
+                        },
+                        "senderFrom": {
+                            "type": "string",
+                            "description": "The e-=mail address of the sender (e.g. \"ntfy@example.com\")",
+                            "default": "\"\""
+                        },
+                        "senderUser": {
+                            "type": "string",
+                            "description": "The username of the SMTP user (e.g. \"ntfy@example.com\")",
+                            "default": "\"\""
+                        },
+                        "senderPass": {
+                            "type": "string",
+                            "description": "The password of the SMTP user (e.g. \"ntfy@example.com\")",
+                            "default": "\"\""
+                        },
+                        "existingSecret": {
+                            "type": "string",
+                            "description": "An existing secret with a `username` and `password` key",
+                            "default": "\"\""
+                        },
+                        "incoming": {
+                            "type": "object",
+                            "properties": {
+                                "listen": {
+                                    "type": "string",
+                                    "description": "The IP address and port the SMTP server will listen on (e.g. \":25\" or \"0.0.0.0:25\")",
+                                    "default": "\"\""
+                                },
+                                "domain": {
+                                    "type": "string",
+                                    "description": "The email domain (e.g. \"example.com\")",
+                                    "default": "\"\""
+                                },
+                                "addrPrefix": {
+                                    "type": "string",
+                                    "description": "Optional prefix to prevent spam. If set to \"ntfy-\" for example,",
+                                    "default": "\"\""
+                                }
+                            }
+                        }
+                    }
+                },
+                "web": {
+                    "type": "object",
+                    "properties": {
+                        "publicKey": {
+                            "type": "string",
+                            "description": "is the generated VAPID public key, (e.g. \"AA...\")",
+                            "default": "\"\""
+                        },
+                        "privateKey": {
+                            "type": "string",
+                            "description": "is the generated VAPID private key, (e.g. \"AA...\")",
+                            "default": "\"\""
+                        },
+                        "existingSecret": {
+                            "type": "string",
+                            "description": "An existing secret with a `privateKey` and `publicKey` a",
+                            "default": "\"\""
+                        },
+                        "file": {
+                            "type": "string",
+                            "description": "is a database file to keep track of browser subscription endpoints (e.g. \"/var/cache/ntfy/webpush.db\")",
+                            "default": "\"\""
+                        },
+                        "emailAddress": {
+                            "type": "string",
+                            "description": "is the admin email address send to the push provider, (e.g. \"sysadmin@example.com\")",
+                            "default": "\"\""
+                        },
+                        "startupQueries": {
+                            "type": "string",
+                            "description": "SQLite queries to run on database initialization (e.g. to enable WAL mode)",
+                            "default": "\"\""
+                        }
+                    }
+                },
+                "twilio": {
+                    "type": "object",
+                    "properties": {
+                        "accountSID": {
+                            "type": "string",
+                            "description": "is the Twilio account SID, (e.g. \"AC12345beefbeef67890beefbeef122586\")",
+                            "default": "\"\""
+                        },
+                        "token": {
+                            "type": "string",
+                            "description": "is the Twilio authentication token, (e.g. \"ThisIsAnAuthenticationToken\")",
+                            "default": "\"\""
+                        },
+                        "existingSecret": {
+                            "type": "string",
+                            "description": "An existing secret containing a `accountSID` and `token` key",
+                            "default": "\"\""
+                        },
+                        "phoneNumber": {
+                            "type": "string",
+                            "description": "The outgoing Twilio phone number (e.g. \"+18775132586\")",
+                            "default": "\"\""
+                        },
+                        "verifyService": {
+                            "type": "string",
+                            "description": "Twilio verify service SID (e.g. \"VA12345beefbeef67890beefbeef122586\")",
+                            "default": "\"\""
+                        }
+                    }
+                },
+                "upstream": {
+                    "type": "object",
+                    "properties": {
+                        "baseURL": {
+                            "type": "string",
+                            "description": "The base URL of the upstream server, should be \"https://ntfy.sh\"",
+                            "default": "\"\""
+                        },
+                        "accessToken": {
+                            "type": "string",
+                            "description": "the token used to authenticate with the upstream APNS server",
+                            "default": "\"\""
+                        },
+                        "existingSecret": {
+                            "type": "string",
+                            "description": "A existing Secret containing a `token` key",
+                            "default": "\"\""
+                        }
+                    }
+                },
+                "message": {
+                    "type": "object",
+                    "properties": {
+                        "sizeLimit": {
+                            "type": "string",
+                            "description": "The maximum size of a message body (e.g. \"4k\")",
+                            "default": "\"\""
+                        },
+                        "delayLimit": {
+                            "type": "string",
+                            "description": "The maximum delay of a message when using the \"Delay\" header (e.g. \"12h\")",
+                            "default": "\"\""
+                        }
+                    }
+                },
+                "visitor": {
+                    "type": "object",
+                    "properties": {
+                        "subscriptionLimit": {
+                            "type": "number",
+                            "description": "The number of subscriptions per visitor (IP address)",
+                            "default": "30"
+                        },
+                        "requestLimitBurst": {
+                            "type": "number",
+                            "description": "The initial bucket of requests each visitor has (e.g. \"60\")",
+                            "default": "60"
+                        },
+                        "requestLimitReplenish": {
+                            "type": "string",
+                            "description": "The rate at which the bucket is refilled (e.g. \"5s\")",
+                            "default": "5s"
+                        },
+                        "requestLimitExemptHosts": {
+                            "type": "string",
+                            "description": "A comma-separated list of hostnames, IPs or CIDRs to be",
+                            "default": "\"\""
+                        },
+                        "messageDailyLimit": {
+                            "type": "number",
+                            "description": "Hard daily limit of messages per visitor and day. The limit is reset",
+                            "default": "15000"
+                        },
+                        "emailLimitBurst": {
+                            "type": "number",
+                            "description": "The initial bucket of emails each visitor has (e.g. \"60\")",
+                            "default": "16"
+                        },
+                        "emailLimitReplenish": {
+                            "type": "string",
+                            "description": "The rate at which the bucket is refilled (e.g. \"5s\")",
+                            "default": "1h"
+                        },
+                        "attachmentTotalSizeLimit": {
+                            "type": "string",
+                            "description": "The total storage limit used for attachments per visitor",
+                            "default": "100M"
+                        },
+                        "attachmentDailyBandwidthLimit": {
+                            "type": "string",
+                            "description": "The total daily attachment download/upload traffic limit per visitor",
+                            "default": "500M"
+                        },
+                        "subscriberRateLimiting": {
+                            "type": "boolean",
+                            "description": "Whether to enable subscriber-based rate limiting",
+                            "default": "false"
+                        }
+                    }
+                },
+                "stripe": {
+                    "type": "object",
+                    "properties": {
+                        "secretKey": {
+                            "type": "string",
+                            "description": "The key used for the Stripe API communication",
+                            "default": "\"\""
+                        },
+                        "webhookKey": {
+                            "type": "string",
+                            "description": "The webhook key used for the Stripe API communication",
+                            "default": "\"\""
+                        },
+                        "existingSecret": {
+                            "type": "string",
+                            "description": "An existing secret containing a `secretKey` and `weboohKey` keys",
+                            "default": "\"\""
+                        },
+                        "billingContact": {
+                            "type": "string",
+                            "description": "is an email address or site displayed in the \"Upgrade tier\" dialog to let people reach",
+                            "default": "\"\""
+                        }
+                    }
+                },
+                "metrics": {
+                    "type": "object",
+                    "properties": {
+                        "enabled": {
+                            "type": "boolean",
+                            "description": "enables the /metrics endpoint for the ntfy server",
+                            "default": "false"
+                        },
+                        "listenHTTP": {
+                            "type": "string",
+                            "description": "exposes the metrics endpoint via a dedicated [IP]:port. If set, this option",
+                            "default": "\"\""
+                        },
+                        "profileListenHTTP": {
+                            "type": "string",
+                            "description": "If enabled, ntfy will listen on a dedicated listen IP/port",
+                            "default": "\"\""
+                        }
+                    }
+                },
+                "log": {
+                    "type": "object",
+                    "properties": {
+                        "level": {
+                            "type": "string",
+                            "description": "One of \"trace\", \"debug\", \"info\" (default), \"warn\" or \"error\"",
+                            "default": "info"
+                        },
+                        "levelOverrides": {
+                            "type": "string",
+                            "description": "lets you override the log level if certain fields match",
+                            "default": "\"\""
+                        },
+                        "format": {
+                            "type": "string",
+                            "description": "One of \"text\" (default) or \"json\"",
+                            "default": "text"
+                        },
+                        "file": {
+                            "type": "string",
+                            "description": "The filename to write logs to. If this is not set, ntfy logs to stderr",
+                            "default": "\"\""
+                        }
+                    }
+                }
+            }
+        },
+        "configMap": {
+            "type": "object",
+            "properties": {
+                "annotations": {
+                    "type": "object",
+                    "description": "Annotations for the ConfigMap resource",
+                    "default": {}
+                },
+                "labels": {
+                    "type": "object",
+                    "description": "Extra Labels for the ConfigMap resource",
+                    "default": {}
+                }
+            }
+        },
+        "secret": {
+            "type": "object",
+            "properties": {
+                "annotations": {
+                    "type": "object",
+                    "description": "Common annotations for the SMTP, HIBP, Admin and Database secrets",
+                    "default": {}
+                },
+                "labels": {
+                    "type": "object",
+                    "description": "Common extra labels for the SMTP, HIBP, Admin and Database secrets",
+                    "default": {}
+                }
+            }
+        },
+        "ingress": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "description": "Whether to enable Ingress",
+                    "default": false
+                },
+                "className": {
+                    "type": "string",
+                    "description": "The IngressClass to use for the pod's ingress",
+                    "default": ""
+                },
+                "whitelist": {
+                    "type": "string",
+                    "description": "A comma-separated list of IP addresses to whitelist",
+                    "default": ""
+                },
+                "annotations": {
+                    "type": "object",
+                    "description": "Annotations for the Ingress resource",
+                    "default": {}
+                },
+                "tls": {
+                    "type": "array",
+                    "description": "A list of hostnames and secret names to use for TLS",
+                    "default": [],
+                    "items": {}
+                },
+                "extraHosts": {
+                    "type": "array",
+                    "description": "A list of extra hosts for the Ingress resource (with ntfy.baseURL)",
+                    "default": [],
+                    "items": {}
+                }
+            }
+        },
+        "service": {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "description": "The type of service to create",
+                    "default": "ClusterIP"
+                },
+                "nodePort": {
+                    "type": "number",
+                    "description": "The Node port to use on the service",
+                    "default": "30080"
+                },
+                "extraPorts": {
+                    "type": "array",
+                    "description": "Extra ports to add to the service",
+                    "default": [],
+                    "items": {}
+                },
+                "externalTrafficPolicy": {
+                    "type": "string",
+                    "description": "The external traffic policy for the service",
+                    "default": "Cluster"
+                },
+                "internalTrafficPolicy": {
+                    "type": "string",
+                    "description": "The internal traffic policy for the service",
+                    "default": "Cluster"
+                },
+                "clusterIP": {
+                    "type": "string",
+                    "description": "Define a static cluster IP for the service",
+                    "default": "\"\""
+                },
+                "loadBalancerIP": {
+                    "type": "string",
+                    "description": "Set the Load Balancer IP",
+                    "default": ""
+                },
+                "loadBalancerClass": {
+                    "type": "string",
+                    "description": "Define Load Balancer class if service type is `LoadBalancer` (optional, cloud specific)",
+                    "default": ""
+                },
+                "loadBalancerSourceRanges": {
+                    "type": "array",
+                    "description": "Service Load Balancer source ranges",
+                    "default": [],
+                    "items": {}
+                },
+                "externalIPs": {
+                    "type": "array",
+                    "description": "Service External IPs",
+                    "default": [],
+                    "items": {}
+                },
+                "sessionAffinity": {
+                    "type": "string",
+                    "description": "Session Affinity for Kubernetes service, can be \"None\" or \"ClientIP\"",
+                    "default": "None"
+                },
+                "sessionAffinityConfig": {
+                    "type": "object",
+                    "description": "Additional settings for the sessionAffinity",
+                    "default": {}
+                },
+                "ports": {
+                    "type": "object",
+                    "properties": {
+                        "http": {
+                            "type": "number",
+                            "description": "The port to use on the service for HTTP traffic",
+                            "default": "8080"
+                        },
+                        "https": {
+                            "type": "number",
+                            "description": "The port to use on the service for HTTPS traffic in case ntfy.listenHTTPS is active.",
+                            "default": 8443,
+                            "nullable": true
+                        }
+                    }
+                }
+            }
+        },
+        "rbac": {
+            "type": "object",
+            "properties": {
+                "create": {
+                    "type": "boolean",
+                    "description": "Whether to create RBAC resources",
+                    "default": true
+                },
+                "rules": {
+                    "type": "array",
+                    "description": "Extra rules to add to the Role",
+                    "default": [],
+                    "items": {}
+                }
+            }
+        },
+        "serviceAccount": {
+            "type": "object",
+            "properties": {
+                "create": {
+                    "type": "boolean",
+                    "description": "Whether a service account should be created",
+                    "default": true
+                },
+                "automount": {
+                    "type": "boolean",
+                    "description": "Whether to automount the service account token",
+                    "default": false
+                },
+                "annotations": {
+                    "type": "object",
+                    "description": "Annotations to add to the service account",
+                    "default": {}
+                },
+                "name": {
+                    "type": "string",
+                    "description": "A custom name for the service account, otherwise ntfy.fullname is used",
+                    "default": ""
+                },
+                "secrets": {
+                    "type": "array",
+                    "description": "A list of secrets mountable by this service account",
+                    "default": [],
+                    "items": {}
+                }
+            }
+        },
+        "livenessProbe": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "description": "Enable or disable the use of liveness probes",
+                    "default": false
+                },
+                "initialDelaySeconds": {
+                    "type": "number",
+                    "description": "Configure the initial delay seconds for the liveness probe",
+                    "default": 5
+                },
+                "timeoutSeconds": {
+                    "type": "number",
+                    "description": "Configure the initial delay seconds for the liveness probe",
+                    "default": 1
+                },
+                "periodSeconds": {
+                    "type": "number",
+                    "description": "Configure the seconds for each period of the liveness probe",
+                    "default": 10
+                },
+                "successThreshold": {
+                    "type": "number",
+                    "description": "Configure the success threshold for the liveness probe",
+                    "default": 1
+                },
+                "failureThreshold": {
+                    "type": "number",
+                    "description": "Configure the failure threshold for the liveness probe",
+                    "default": 10
+                }
+            }
+        },
+        "readinessProbe": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "description": "Enable or disable the use of readiness probes",
+                    "default": false
+                },
+                "initialDelaySeconds": {
+                    "type": "number",
+                    "description": "Configure the initial delay seconds for the readiness probe",
+                    "default": 5
+                },
+                "timeoutSeconds": {
+                    "type": "number",
+                    "description": "Configure the initial delay seconds for the readiness probe",
+                    "default": 1
+                },
+                "periodSeconds": {
+                    "type": "number",
+                    "description": "Configure the seconds for each period of the readiness probe",
+                    "default": 10
+                },
+                "successThreshold": {
+                    "type": "number",
+                    "description": "Configure the success threshold for the readiness probe",
+                    "default": 1
+                },
+                "failureThreshold": {
+                    "type": "number",
+                    "description": "Configure the failure threshold for the readiness probe",
+                    "default": 3
+                }
+            }
+        },
+        "startupProbe": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "description": "Enable or disable the use of readiness probes",
+                    "default": false
+                },
+                "initialDelaySeconds": {
+                    "type": "number",
+                    "description": "Configure the initial delay seconds for the startup probe",
+                    "default": 5
+                },
+                "timeoutSeconds": {
+                    "type": "number",
+                    "description": "Configure the initial delay seconds for the startup probe",
+                    "default": 1
+                },
+                "periodSeconds": {
+                    "type": "number",
+                    "description": "Configure the seconds for each period of the startup probe",
+                    "default": 10
+                },
+                "successThreshold": {
+                    "type": "number",
+                    "description": "Configure the success threshold for the startup probe",
+                    "default": 1
+                },
+                "failureThreshold": {
+                    "type": "number",
+                    "description": "Configure the failure threshold for the startup probe",
+                    "default": 10
+                }
+            }
+        },
+        "podDisruptionBudget": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "description": "Enable the pod disruption budget",
+                    "default": "true"
+                },
+                "minAvailable": {
+                    "type": "number",
+                    "description": "The minimum amount of pods which need to be available",
+                    "default": "1"
+                }
+            }
+        },
+        "resources": {
+            "type": "object",
+            "description": "The resource limits/requests for the ntfy pod",
+            "default": {}
+        },
+        "volumes": {
+            "type": "array",
+            "description": "Define volumes for the ntfy pod",
+            "default": [],
+            "items": {}
+        },
+        "volumeMounts": {
+            "type": "array",
+            "description": "Define volumeMounts for the ntfy pod",
+            "default": [],
+            "items": {}
+        },
+        "initContainers": {
+            "type": "array",
+            "description": "Define initContainers for the main ntfy server",
+            "default": [],
+            "items": {}
+        },
+        "nodeSelector": {
+            "type": "object",
+            "description": "Node labels for pod assignment",
+            "default": {}
+        },
+        "tolerations": {
+            "type": "array",
+            "description": "Tolerations for pod assignment",
+            "default": [],
+            "items": {}
+        },
+        "affinity": {
+            "type": "object",
+            "description": "Affinity for pod assignment",
+            "default": {}
+        },
+        "strategy": {
+            "type": "object",
+            "description": "Specify a deployment strategy for the ntfy pod",
+            "default": {}
+        },
+        "podAnnotations": {
+            "type": "object",
+            "description": "Extra annotations for the ntfy pod",
+            "default": {}
+        },
+        "podLabels": {
+            "type": "object",
+            "description": "Extra labels for the ntfy pod",
+            "default": {}
+        },
+        "priorityClassName": {
+            "type": "string",
+            "description": "The name of an existing PriorityClass",
+            "default": ""
+        },
+        "podSecurityContext": {
+            "type": "object",
+            "description": "Security context settings for the ntfy pod",
+            "default": {}
+        },
+        "securityContext": {
+            "type": "object",
+            "description": "General security context settings for",
+            "default": {}
+        }
+    }
+}

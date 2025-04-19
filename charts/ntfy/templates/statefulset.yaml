@@ -1,0 +1,14 @@
+{{- if eq .Values.kind "StatefulSet" }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "ntfy.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "ntfy.labels" . | nindent 4 }}
+spec:
+  {{ include "ntfy.podSpec" . | nindent 2 }}
+  persistentVolumeClaimRetentionPolicy:
+    whenDeleted: {{ .Values.ntfy.data.pvc.reclaimPolicy }}
+    whenScaled: {{ .Values.ntfy.data.pvc.reclaimPolicy }}
+{{- end }}

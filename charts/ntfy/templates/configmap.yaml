@@ -1,0 +1,220 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "ntfy.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/component: ntfy
+    {{- include "ntfy.labels" . | nindent 4 }}
+    {{- if .Values.configMap.labels }}
+    {{- toYaml .Values.configMap.labels | nindent 4 }}
+    {{- end }}
+  {{- if .Values.configMap.annotations }}
+  annotations:
+  {{- toYaml .Values.configMap.annotations | nindent 4 }}
+  {{- end }}
+data:
+  config.yml: |
+    base-url: {{ .Values.ntfy.baseURL }}
+    listen-http: {{ .Values.ntfy.listenHTTP }}
+    web-root: {{ .Values.ntfy.webRoot }}
+    global-topic-limit: {{ .Values.ntfy.globalTopicLimit }}
+    {{- if .Values.ntfy.listenHTTPS }}
+    listen-https: {{ .Values.ntfy.listenHTTPS }}
+    key-file: {{ .Values.ntfy.keyFile }}
+    cert-file: {{ .Values.ntfy.certFile }}
+    {{- end }}
+    {{- if .Values.ntfy.listenUnix }}
+    listen-unix: {{ .Values.ntfy.listenUnix }}
+    listen-unix-mode: {{ .Values.ntfy.listenUnixMode }}
+    {{- end }}
+    {{- if .Values.ntfy.firebaseKeyFile }}
+    firebase-key-file: {{ .Values.ntfy.firebaseKeyFile }}
+    {{- end }}
+    {{- if .Values.ntfy.behindProxy }}
+    behind-proxy: {{ .Values.ntfy.behindProxy }}
+    {{- end }}
+    {{- if .Values.ntfy.keepaliveInterval }}
+    keepalive-interval: {{ .Values.ntfy.keepaliveInterval }}
+    {{- end }}
+    {{- if .Values.ntfy.managerInterval }}
+    manager-interval: {{ .Values.ntfy.managerInterval }}
+    {{- end }}
+    {{- if .Values.ntfy.disallowedTopics }}
+    {{- with .Values.ntfy.disallowedTopics }}
+    disallowed-topics:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+    {{- end }}
+    {{- if .Values.ntfy.enableSignup }}
+    enable-signup: {{ .Values.ntfy.enableSignup }}
+    {{- end }}
+    {{- if .Values.ntfy.enableLogin }}
+    enable-login: {{ .Values.ntfy.enableLogin }}
+    {{- end }}
+    {{- if .Values.ntfy.enableReservations }}
+    enable-reservations: {{ .Values.ntfy.enableReservations }}
+    {{- end }}
+    {{- /*
+      CACHE SETTINGS
+    */}}
+    {{- if .Values.ntfy.cache.file }}
+    cache-file: {{ .Values.ntfy.cache.file }}
+    {{- end }}
+    {{- if .Values.ntfy.cache.duration }}
+    cache-duration: {{ .Values.ntfy.cache.duration }}
+    {{- end }}
+    {{- if .Values.ntfy.cache.startupQueries }}
+    cache-startup-queries: {{ .Values.ntfy.cache.startupQueries }}
+    {{- end }}
+    {{- if .Values.ntfy.cache.batchSize }}
+    cache-batch-size: {{ .Values.ntfy.cache.batchSize }}
+    {{- end }}
+    {{- if .Values.ntfy.cache.batchTimeout }}
+    cache-batch-timeout: {{ .Values.ntfy.cache.batchTimeout }}
+    {{- end }}
+    {{- /*
+      AUTH SETTINGS
+    */}}
+    {{- if .Values.ntfy.auth.file }}
+    auth-file: {{ .Values.ntfy.auth.file }}
+    {{- end }}
+    {{- if .Values.ntfy.auth.defaultAccess }}
+    auth-default-access: {{ .Values.ntfy.auth.defaultAccess }}
+    {{- end }}
+    {{- if .Values.ntfy.auth.startupQueries }}
+    auth-startup-queries: {{ .Values.ntfy.auth.startupQueries }}
+    {{- end }}
+    {{- /*
+      ATTACHMENT SETTINGS
+    */}}
+    {{- if .Values.ntfy.attachment.cacheDir }}
+    attachment-cache-dir: {{ .Values.ntfy.attachment.cacheDir }}
+    {{- end }}
+    {{- if .Values.ntfy.attachment.totalSizeLimit }}
+    attachment-total-size-limit: {{ .Values.ntfy.attachment.totalSizeLimit }}
+    {{- end }}
+    {{- if .Values.ntfy.attachment.fileSizeLimit }}
+    attachment-file-size-limit: {{ .Values.ntfy.attachment.fileSizeLimit }}
+    {{- end }}
+    {{- if .Values.ntfy.attachment.expiryDuration }}
+    attachment-expiry-duration: {{ .Values.ntfy.attachment.expiryDuration }}
+    {{- end }}
+    {{- /*
+      SMTP SETTINGS
+    */}}
+    {{- if .Values.ntfy.smtp.senderAddr }}
+    smtp-sender-addr: {{ .Values.ntfy.smtp.senderAddr }}
+    {{- end }}
+    {{- if .Values.ntfy.smtp.senderFrom }}
+    smtp-sender-from: {{ .Values.ntfy.smtp.senderFrom }}
+    {{- end }}
+    {{- if .Values.ntfy.smtp.incoming.listen }}
+    smtp-server-listen: {{ .Values.ntfy.smtp.incoming.listen }}
+    {{- end }}
+    {{- if .Values.ntfy.smtp.incoming.domain }}
+    smtp-server-domain: {{ .Values.ntfy.smtp.incoming.domain }}
+    {{- end }}
+    {{- if .Values.ntfy.smtp.incoming.addrPrefix }}
+    smtp-server-addr-prefix: {{ .Values.ntfy.smtp.incoming.addrPrefix }}
+    {{- end }}
+    {{- /*
+      WEB SETTINGS
+    */}}
+    {{- if .Values.ntfy.web.file }}
+    web-push-file: {{ .Values.ntfy.web.file }}
+    {{- end }}
+    {{- if .Values.ntfy.web.emailAddress }}
+    web-push-email-address: {{ .Values.ntfy.web.emailAddress }}
+    {{- end }}
+    {{- if .Values.ntfy.web.startupQueries }}
+    web-push-startup-queries: {{ .Values.ntfy.web.startupQueries }}
+    {{- end }}
+    {{- /*
+      TWILIO SETTINGS
+    */}}
+    {{- if .Values.ntfy.twilio.phoneNumber }}
+    twilio-phone-number: {{ .Values.ntfy.twilio.phoneNumber }}
+    {{- end }}
+    {{- if .Values.ntfy.twilio.verifyService }}
+    twilio-verify-service: {{ .Values.ntfy.twilio.verifyService }}
+    {{- end }}
+    {{- /*
+      UPSTREAM SETTINGS
+    */}}
+    {{- if .Values.ntfy.upstream.baseURL }}
+    upstream-base-url: {{ .Values.ntfy.upstream.baseURL }}
+    {{- end }}
+    {{- /*
+      MESSAGE SETTINGS
+    */}}
+    {{- if .Values.ntfy.message.sizeLimit }}
+    message-size-limit: {{ .Values.ntfy.message.sizeLimit }}
+    {{- end }}
+    {{- if .Values.ntfy.message.delayLimit }}
+    message-size-limit: {{ .Values.ntfy.message.delayLimit }}
+    {{- end }}
+    {{- /*
+      VISITOR SETTINGS
+    */}}
+    {{- if .Values.ntfy.visitor.subscriptionLimit }}
+    visitor-subscription-limit: {{ .Values.ntfy.visitor.subscriptionLimit }}
+    {{- end }}
+    {{- if .Values.ntfy.visitor.requestLimitBurst }}
+    visitor-request-limit-burst: {{ .Values.ntfy.visitor.requestLimitBurst }}
+    {{- end }}
+    {{- if .Values.ntfy.visitor.requestLimitReplenish }}
+    visitor-request-limit-replenish: {{ .Values.ntfy.visitor.requestLimitReplenish }}
+    {{- end }}
+    {{- if .Values.ntfy.visitor.requestLimitExemptHosts }}
+    visitor-request-limit-exempt-hosts: {{ .Values.ntfy.visitor.requestLimitExemptHosts }}
+    {{- end }}
+    {{- if .Values.ntfy.visitor.messageDailyLimit }}
+    visitor-message-daily-limit: {{ .Values.ntfy.visitor.messageDailyLimit }}
+    {{- end }}
+    {{- if .Values.ntfy.visitor.emailLimitBurst }}
+    visitor-email-limit-burst: {{ .Values.ntfy.visitor.emailLimitBurst }}
+    {{- end }}
+    {{- if .Values.ntfy.visitor.emailLimitReplenish }}
+    visitor-email-limit-replenish: {{ .Values.ntfy.visitor.emailLimitReplenish }}
+    {{- end }}
+    {{- if .Values.ntfy.visitor.attachmentTotalSizeLimit }}
+    visitor-attachment-total-size-limit: {{ .Values.ntfy.visitor.attachmentTotalSizeLimit }}
+    {{- end }}
+    {{- if .Values.ntfy.visitor.attachmentDailyBandwidthLimit }}
+    visitor-attachment-daily-bandwidth-limit: {{ .Values.ntfy.visitor.attachmentDailyBandwidthLimit }}
+    {{- end }}
+    {{- if .Values.ntfy.visitor.subscriberRateLimiting }}
+    visitor-subscriber-rate-limiting: {{ .Values.ntfy.visitor.subscriberRateLimiting }}
+    {{- end }}
+    {{- /*
+      STRIPE SETTINGS
+    */}}
+    {{- if .Values.ntfy.stripe.billingContact }}
+    billing-contact: {{ .Values.ntfy.stripe.billingContact }}
+    {{- end }}
+    {{- /*
+      METRICS SETTINGS
+    */}}
+    {{- if .Values.ntfy.metrics.enabled }}
+    enable-metrics: {{ .Values.ntfy.metrics.enabled }}
+    {{- end }}
+    {{- if .Values.ntfy.metrics.listenHTTP }}
+    metrics-listen-http: {{ .Values.ntfy.metrics.listenHTTP }}
+    {{- end }}
+    {{- if .Values.ntfy.metrics.profileListenHTTP }}
+    profile-listen-http: {{ .Values.ntfy.metrics.profileListenHTTP }}
+    {{- end }}
+    {{- /*
+      LOGGING SETTINGS
+    */}}
+    log-level: {{ .Values.ntfy.log.level }}
+    {{- if .Values.ntfy.log.levelOverrides }}
+    log-level-overrides: {{ .Values.ntfy.log.levelOverrides }}
+    {{- end }}
+    {{- if .Values.ntfy.log.format }}
+    log-format: {{ .Values.ntfy.log.format }}
+    {{- end }}
+    {{- if .Values.ntfy.log.file }}
+    log-file: {{ .Values.ntfy.log.file }}
+    {{- end }}

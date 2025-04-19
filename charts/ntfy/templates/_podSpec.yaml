@@ -1,0 +1,190 @@
+{{/*
+  Define the Kubernetes pod spec to be reused within the Deployment/StatefulSet.
+*/}}
+{{- define "ntfy.podSpec" -}}
+replicas: 1
+selector:
+  matchLabels:
+      {{- include "ntfy.selectorLabels" . | nindent 6 }}
+{{- if .Values.strategy -}}
+{{- if eq .Values.kind "Deployment" }}
+strategy:
+{{- else }}
+updateStrategy:
+{{- end }}
+  {{- toYaml .Values.strategy | nindent 4 }}
+{{- end }}
+template:
+  metadata:
+      {{- if .Values.podAnnotations }}
+    annotations:
+      checksum/secrets: {{ include (print $.Template.BasePath "/secrets.yaml") . | sha256sum }}
+      checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        {{- if .Values.podAnnotations }}
+        {{- toYaml .Values.podAnnotations | nindent 8 }}
+        {{- end }}
+      {{- end }}
+    labels:
+        {{- include "ntfy.selectorLabels" . | nindent 8 }}
+        {{- if .Values.podLabels -}}
+        {{- toYaml .Values.podLabels | nindent 8 }}
+        {{- end }}
+  spec:
+      {{- if .Values.image.pullSecrets }}
+    imagePullSecrets:
+        {{- toYaml .Values.image.pullSecrets | nindent 8 }}
+      {{- end }}
+    serviceAccountName: {{ include "ntfy.serviceAccountName" . }}
+    automountServiceAccountToken: {{ .Values.serviceAccount.automount }}
+    containers:
+      - name: {{ .Chart.Name }}
+        image: {{ include "ntfy.image" . }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        args: ["serve"]
+        env:
+            {{- if (or .Values.ntfy.smtp.senderUser .Values.ntfy.smtp.existingSecret) }}
+          - name: NTFY_SMTP_SENDER_USER
+            valueFrom:
+              secretKeyRef:
+                name: {{ default (include "ntfy.secrets.smtp" .) .Values.ntfy.smtp.existingSecret }}
+                key: username
+            {{- end }}
+            {{- if (or .Values.ntfy.smtp.senderPass .Values.ntfy.smtp.existingSecret) }}
+          - name: NTFY_SMTP_SENDER_PASS
+            valueFrom:
+              secretKeyRef:
+                name: {{ default (include "ntfy.secrets.smtp" .) .Values.ntfy.smtp.existingSecret }}
+                key: password
+            {{- end }}
+            {{- if (or .Values.ntfy.web.publicKey .Values.ntfy.web.existingSecret) }}
+          - name: NTFY_WEB_PUSH_PUBLIC_KEY
+            valueFrom:
+              secretKeyRef:
+                name: {{ default (include "ntfy.secrets.web" .) .Values.ntfy.web.existingSecret }}
+                key: publicKey
+            {{- end }}
+            {{- if (or .Values.ntfy.web.privateKey .Values.ntfy.web.existingSecret) }}
+          - name: NTFY_WEB_PUSH_PRIVATE_KEY
+            valueFrom:
+              secretKeyRef:
+                name: {{ default (include "ntfy.secrets.web" .) .Values.ntfy.web.existingSecret }}
+                key: privateKey
+            {{- end }}
+            {{- if (or .Values.ntfy.twilio.accountSID .Values.ntfy.twilio.existingSecret) }}
+          - name: NTFY_TWILIO_ACCOUNT
+            valueFrom:
+              secretKeyRef:
+                name: {{ include "ntfy.secrets.twilio" . }}
+                key: accountSID
+            {{- end }}
+            {{- if (or .Values.ntfy.twilio.token .Values.ntfy.twilio.existingSecret) }}
+          - name: NTFY_TWILIO_AUTH_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: {{ include "ntfy.secrets.twilio" . }}
+                key: token
+            {{- end }}
+            {{- if (or .Values.ntfy.upstream.accessToken .Values.ntfy.upstream.existingSecret) }}
+          - name: NTFY_UPSTREAM_ACCESS_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: {{ include "ntfy.secrets.upstream" . }}
+                key: token
+            {{- end }}
+          {{/* Container settings */}}
+        ports:
+          - name: http
+            containerPort: {{ .Values.ntfy.listenHTTP | trimPrefix ":" }}
+            protocol: TCP
+            {{- if .Values.ntfy.listenHTTPS }}
+          - name: https
+            containerPort: {{ .Values.ntfy.listenHTTPS | trimPrefix ":" }}
+            protocol: TCP
+            {{- end }}
+        volumeMounts:
+          - name: {{ printf "%s-config" (include "ntfy.fullname" .) }}
+            mountPath: /var/lib/ntfy
+            {{- if (or .Values.ntfy.cache.file .Values.ntfy.auth.file .Values.ntfy.attachment.cacheDir) }}
+          - name: {{ include "ntfy.pv" . }}
+            mountPath: {{ .Values.ntfy.data.rootPath }}
+            {{- end }}
+        {{- if .Values.volumeMounts }}
+          {{- toYaml .Values.volumeMounts | nindent 12 }}
+        {{- end }}
+        {{- if .Values.resources }}
+        resources:
+          {{- toYaml .Values.resources | nindent 12 }}
+        {{- end }}
+        {{- if .Values.securityContext }}
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 12 }}
+        {{- end }}
+        {{- if .Values.livenessProbe.enabled }}
+        livenessProbe:
+          httpGet:
+            path: /
+            port: http
+          initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+          successThreshold: {{ .Values.livenessProbe.successThreshold }}
+          failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
+        {{- end }}
+        {{- if .Values.readinessProbe.enabled }}
+        readinessProbe:
+          httpGet:
+            path: /
+            port: http
+          initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
+          successThreshold: {{ .Values.readinessProbe.successThreshold }}
+          failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
+        {{- end }}
+        {{- if .Values.startupProbe.enabled }}
+        startupProbe:
+          httpGet:
+            path: /
+            port: http
+          initialDelaySeconds: {{ .Values.startupProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.startupProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.startupProbe.timeoutSeconds }}
+          successThreshold: {{ .Values.startupProbe.successThreshold }}
+          failureThreshold: {{ .Values.startupProbe.failureThreshold }}
+        {{- end }}
+    {{- if .Values.priorityClassName }}
+    priorityClassName: {{ .Values.priorityClassName }}
+    {{- end }}
+    volumes:
+      - name: {{ printf "%s-config" (include "ntfy.fullname" .) }}
+        configMap:
+          name: {{ include "ntfy.fullname" . }}
+        {{- if (or .Values.ntfy.cache.file .Values.ntfy.auth.file .Values.ntfy.attachment.cacheDir)}}
+      - name: {{ include "ntfy.pv" . }}
+        persistentVolumeClaim:
+          claimName: {{ default (include "ntfy.pvc" .) .Values.ntfy.data.pvc.existingClaim }}
+        {{- end }}
+    {{- if .Values.volumes }}
+      {{- toYaml .Values.volumes | nindent 8 }}
+    {{- end }}
+    {{- if .Values.nodeSelector }}
+    nodeSelector:
+      {{- toYaml .Values.nodeSelector | nindent 8 }}
+    {{- end }}
+    {{- if .Values.affinity }}
+    affinity:
+      {{- toYaml .Values.affinity | nindent 8 }}
+    {{- end }}
+    {{- if .Values.tolerations }}
+    tolerations:
+      {{- toYaml .Values.tolerations | nindent 8 }}
+    {{- end }}
+    {{- if .Values.podSecurityContext }}
+    securityContext:
+      {{- toYaml .Values.podSecurityContext | nindent 8 }}
+    {{- end }}
+    {{- if .Values.initContainers }}
+    initContainers:
+      {{- toYaml .Values.initContainers | nindent 8 }}
+    {{- end }}
+{{- end }}

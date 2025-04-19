@@ -1,0 +1,26 @@
+---
+{{- /*
+  Cache DB PVC
+*/}}
+{{- if not .Values.ntfy.data.pvc.existingClaim }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "ntfy.pvc" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "ntfy.labels" . | nindent 4 }}
+  annotations:
+    meta.helm.sh/release-name: {{ $.Release.Name | quote }}
+    meta.helm.sh/release-namespace: {{ $.Release.Namespace | quote }}
+    {{- if (eq .Values.ntfy.data.pvc.reclaimPolicy "Retain") }}
+    helm.sh/resource-policy: keep
+    {{- end }}
+spec:
+  storageClassName: {{ .Values.ntfy.data.pvc.storageClass | default "standard" }}
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.ntfy.data.pvc.size }}
+{{- end }}

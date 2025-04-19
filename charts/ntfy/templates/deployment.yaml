@@ -1,0 +1,11 @@
+{{- if eq .Values.kind "Deployment" }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "ntfy.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "ntfy.labels" . | nindent 4 }}
+spec:
+  {{ include "ntfy.podSpec" . | nindent 2 }}
+{{- end }}

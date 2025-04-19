@@ -195,3 +195,8 @@ releases:
     inherit:
       - template: default-self-hosted-release
     chart: zekker6/readeck
+
+  - name: ntfy
+    inherit:
+      - template: default-self-hosted-release
+    chart: charts/ntfy

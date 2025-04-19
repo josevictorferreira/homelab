@@ -1,0 +1,84 @@
+ntfy:
+  baseURL: ntfy.helm.private
+  listenHTTP: ":8080"
+  listenHTTPS: ""
+  keyFile: ""
+  certFile: ""
+  behindProxy: true
+  enableSignup: false
+  enableLogin: true
+  enableReservations: false
+  globalTopicLimit: 15000
+  data:
+    rootPath: /var/lib/ntfy
+  cache:
+    file: "cache.db"
+  auth:
+    file: "auth.db"
+    defaultAccess: "deny-all"
+  attachment:
+    cacheDir: "attachments"
+
+  web:
+    file: ""
+    emailAddress: ""
+
+  upstream:
+    baseURL: ""
+    accessToken: ""
+    existingSecret: ""
+
+  metrics:
+    enabled: true
+    listenHTTP: ":9090"
+    profileListenHTTP: ""
+
+  log:
+    level: info
+    levelOverrides: ""
+    format: text
+    file: ""
+
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: development-issuer
+  tls:
+    - secretName: ntfy-ingress-tls
+      hosts:
+        - ntfy.helm.private
+
+service:
+  type: ClusterIP
+  ports:
+    http: 8080
+    https: 8443
+  annotations: {}
+  labels: {}
+  ipFamilyPolicy: ""
+
+livenessProbe:
+  enabled: true
+
+readinessProbe:
+  enabled: true
+
+startupProbe:
+  enabled: true
+
+podSecurityContext: {}
+#  fsGroup: 1001
+# supplementalGroups:
+#   - 1001
+
+securityContext: {}
+#  runAsGroup: 1001
+#  runAsUser: 1001
+#  allowPrivilegeEscalation: false
+#  privileged: false
+#  runAsNonRoot: true
+#  readOnlyRootFilesystem: false
+#  capabilities:
+#    drop:
+#      - ALL
