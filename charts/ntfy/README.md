@@ -120,11 +120,11 @@ Parameters.
 | `ntfy.web.file`                              | is a database file to keep track of browser subscription endpoints (e.g. "/var/cache/ntfy/webpush.db") | `""`            |
 | `ntfy.web.emailAddress`                      | is the admin email address send to the push provider, (e.g. "sysadmin@example.com")                    | `""`            |
 | `ntfy.web.startupQueries`                    | SQLite queries to run on database initialization (e.g. to enable WAL mode)                             | `""`            |
-| `ntfy.twilio.accountSID`                     | is the Twilio account SID, (e.g. "AC12345beefbeef67890beefbeef122586")                                 | `""`            |
-| `ntfy.twilio.token`                          | is the Twilio authentication token, (e.g. "ThisIsAnAuthenticationToken")                               | `""`            |
+| `ntfy.twilio.accountSID`                     | is the Twilio account SID, (e.g. )                                 | `""`            |
+| `ntfy.twilio.token`                          | is the Twilio authentication token, (e.g. "")                               | `""`            |
 | `ntfy.twilio.existingSecret`                 | An existing secret containing a `accountSID` and `token` key                                           | `""`            |
-| `ntfy.twilio.phoneNumber`                    | The outgoing Twilio phone number (e.g. "+18775132586")                                                 | `""`            |
-| `ntfy.twilio.verifyService`                  | Twilio verify service SID (e.g. "VA12345beefbeef67890beefbeef122586")                                  | `""`            |
+| `ntfy.twilio.phoneNumber`                    | The outgoing Twilio phone number (e.g. "")                                                 | `""`            |
+| `ntfy.twilio.verifyService`                  | Twilio verify service SID (e.g. "")                                  | `""`            |
 | `ntfy.upstream.baseURL`                      | The base URL of the upstream server, should be "https://ntfy.sh"                                       | `""`            |
 | `ntfy.upstream.accessToken`                  | the token used to authenticate with the upstream APNS server                                           | `""`            |
 | `ntfy.upstream.existingSecret`               | A existing Secret containing a `token` key                                                             | `""`            |

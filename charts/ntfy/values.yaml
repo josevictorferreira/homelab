@@ -279,19 +279,19 @@ ntfy:
   ## Twilio configuration
   ##
   twilio:
-    ## @param ntfy.twilio.accountSID [string] is the Twilio account SID, (e.g. "AC12345beefbeef67890beefbeef122586")
+    ## @param ntfy.twilio.accountSID [string] is the Twilio account SID, (e.g. "")
     ##
     accountSID: ""
-    ## @param ntfy.twilio.token [string] is the Twilio authentication token, (e.g. "ThisIsAnAuthenticationToken")
+    ## @param ntfy.twilio.token [string] is the Twilio authentication token, (e.g. "")
     ##
     token: ""
     ## @param ntfy.twilio.existingSecret [string] An existing secret containing a `accountSID` and `token` key
     ##
     existingSecret: ""
-    ## @param ntfy.twilio.phoneNumber [string] The outgoing Twilio phone number (e.g. "+18775132586")
+    ## @param ntfy.twilio.phoneNumber [string] The outgoing Twilio phone number (e.g. "")
     ##
     phoneNumber: ""
-    ## @param ntfy.twilio.verifyService [string] Twilio verify service SID (e.g. "VA12345beefbeef67890beefbeef122586")
+    ## @param ntfy.twilio.verifyService [string] Twilio verify service SID (e.g. "")
     ##
     verifyService: ""
 
