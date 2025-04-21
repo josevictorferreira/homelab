@@ -38,6 +38,8 @@ repositories:
     url: http://pajikos.github.io/home-assistant-helm-chart
   - name: zekker6
     url: https://zekker6.github.io/helm-charts
+  - name: alarm-server-charts
+    url: git+https://github.com/josevictorferreira/alarm_server@.helm/alarm-server?ref=main
 
 ---
 
@@ -200,3 +202,8 @@ releases:
     inherit:
       - template: default-self-hosted-release
     chart: charts/ntfy
+
+  - name: alarm-server
+    inherit:
+      - template: default-self-hosted-release
+    chart: alarm-server-charts/alarm-server

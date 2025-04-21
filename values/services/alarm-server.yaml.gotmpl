@@ -1,0 +1,42 @@
+image:
+  repository: "ghcr.io/josevictorferreira/alarm_server"
+  tag: "latest"
+  pullPolicy: Always
+
+strategy:
+  type: RollingUpdate
+  maxSurge: 1
+  maxUnavailable: 1
+  minReadySeconds: 10
+
+app:
+  label: "alarm-server"
+  command: ["./bin/server"]
+  replicaCount: 1
+  service:
+    port: 8888
+    type: LoadBalancer
+    loadBalancerIP: {{ index .Values.load_balancer.addresses.services "alarm-server" }}
+    annotations: {}
+  env:
+    port: "8888"
+    address: 0.0.0.0
+    mqtt_url: mqtt://{{ .Values.secret.rabbitmq_username }}:{{ .Values.secret.rabbitmq_password }}@rabbitmq-headless:1883
+    mqtt_topic: alarms
+    message_parser: icsee
+    message_filters: alarm
+    log_level: info
+    log_output: stdout
+    ntfy_enabled: "true"
+    ntfy_url: "https://ntfy.{{ .Values.secret.domain }}"
+    ntfy_topic: camera_alarms
+  resources:
+    requests:
+      memory: 512Mi
+      cpu: 30m
+    limits:
+      memory: 512Mi
+  healthcheck_command:
+    - bash
+    - -c
+    - echo "PING" | nc 127.0.0.1 8888 | grep -q "PONG"
