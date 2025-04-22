@@ -1,0 +1,19 @@
+image:
+  repository: louislam/uptime-kuma
+  pullPolicy: IfNotPresent
+  tag: "1.23.13-debian"
+
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: cloudflare-issuer
+  hosts:
+    - host: "status.{{ .Values.secret.domain }}"
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - hosts:
+        - "status.{{ .Values.secret.domain }}"
+      secretName: "wildcard-tls"

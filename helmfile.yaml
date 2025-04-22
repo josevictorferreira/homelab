@@ -40,6 +40,8 @@ repositories:
     url: https://zekker6.github.io/helm-charts
   - name: alarm-server-charts
     url: git+https://github.com/josevictorferreira/alarm_server@.helm/alarm-server?ref=main
+  - name: uptime-kuma
+    url: https://helm.irsigler.cloud
 
 ---
 
@@ -156,7 +158,7 @@ releases:
       - "{{ index .Values.namespaces "cert-manager" }}/cert-manager-issuer"
 
   - name: postgresql
-    chart: bitnami/postgresql
+    chart: oci://registry-1.docker.io/bitnamicharts/postgresql
     inherit:
       - template: default-self-hosted-release
 
@@ -207,3 +209,8 @@ releases:
     inherit:
       - template: default-self-hosted-release
     chart: alarm-server-charts/alarm-server
+
+  - name: uptime-kuma
+    inherit:
+      - template: default-self-hosted-release
+    chart: uptime-kuma/uptime-kuma
