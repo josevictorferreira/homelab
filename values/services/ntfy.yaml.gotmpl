@@ -6,12 +6,26 @@ image:
 ntfy:
   baseURL: "ntfy.{{ .Values.secret.domain }}"
   listenHTTP: ":80"
-  listenHTTPS: ":443"
   behindProxy: true
+  web:
+    file: "/data/webpush.db"
+    emailAddress: "alerts@{{ .Values.secret.domain }}"
   data:
     rootPath: "/data"
     pvc:
+      size: 5Gi
       storageClass: local-path
+  upstream:
+    baseURL: "https://ntfy.sh"
+  log:
+    level: "debug"
+  cache:
+    file: "/data/cache.db"
+  attachment:
+    cacheDir: "/data/attachments"
+    totalSizeLimit: "5G"
+    fileSizeLimit: "15M"
+    expiryDuration: "3h"
 
 ingress:
   enabled: true
@@ -28,4 +42,3 @@ service:
   loadBalancerIP: {{ .Values.load_balancer.addresses.services.ntfy }}
   ports:
     http: 80
-    https: 80

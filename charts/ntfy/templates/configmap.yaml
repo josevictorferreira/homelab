@@ -15,7 +15,7 @@ metadata:
   {{- end }}
 data:
   config.yml: |
-    base-url: {{ .Values.ntfy.baseURL }}
+    base-url: https://{{ .Values.ntfy.baseURL }}
     listen-http: {{ .Values.ntfy.listenHTTP }}
     web-root: {{ .Values.ntfy.webRoot }}
     global-topic-limit: {{ .Values.ntfy.globalTopicLimit }}
