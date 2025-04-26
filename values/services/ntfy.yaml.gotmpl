@@ -8,6 +8,8 @@ ntfy:
   listenHTTP: ":80"
   behindProxy: true
   web:
+    publicKey: {{ .Values.secret.vapid_public_key }}
+    privateKey: {{ .Values.secret.vapid_private_key }}
     file: "/data/webpush.db"
     emailAddress: "alerts@{{ .Values.secret.domain }}"
   data:
