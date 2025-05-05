@@ -1,11 +1,24 @@
 keys:
   - &josevictor age16yrhmz8fytj7j9ns80zl40zjcdfd3pdxh48ld7ys7veea774udtqfn9jyx
+  - &josevictorferreira age1jx9qu5p0ycvymrl2gykd9z3w8x8n67jxnatxs49j7qzspjr6asqqf8u35h
 creation_rules:
   - path_regex: environments/homelab/secrets\.enc\.ya?ml$
-    age: *josevictor
+    key_groups:
+      - age:
+        - *josevictor
+        - *josevictorferreira
   - path_regex: releases/services/.*/.*secrets?\.enc\.ya?ml$
-    age: *josevictor
+    key_groups:
+      - age:
+        - *josevictor
+        - *josevictorferreira
   - path_regex: releases/monitoring/.*secrets?\.enc\.ya?ml$
-    age: *josevictor
+    key_groups:
+      - age:
+        - *josevictor
+        - *josevictorferreira
   - path_regex: releases/infrastructure/.*/.*secrets?\.enc\.ya?ml$
-    age: *josevictor
+    key_groups:
+      - age:
+        - *josevictor
+        - *josevictorferreira
