@@ -24,7 +24,8 @@ app:
     mqtt_url: mqtt://{{ .Values.secret.rabbitmq_username }}:{{ .Values.secret.rabbitmq_password }}@{{ .Values.load_balancer.addresses.services.rabbitmq }}:1883
     mqtt_topic: alarms
     message_parser: icsee
-    message_filters: alarm
+    message_filters: alarm,log
+    message_priority: low
     log_level: info
     log_output: stdout
     ntfy_enabled: "true"

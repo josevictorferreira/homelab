@@ -1,0 +1,132 @@
+image:
+  repository: ghcr.io/home-operations/qbittorrent
+  pullPolicy: IfNotPresent
+  tag: 5.1.0@sha256:1cd84c74d3c7ccb7d2edb43fec4cdd2306f6ca30b7e85efd762fa476e1470fba
+qbitportforwardImage:
+  repository: docker.io/mjmeli/qbittorrent-port-forward-gluetun-server
+  pullPolicy: IfNotPresent
+  tag: latest@sha256:67d0d21ed792cf80716d4211e7162b6d375af5c12f3cf096c9032ad705dddaa8
+
+securityContext:
+  fsGroup: 65534
+  container:
+    fsGroup: 65534
+    runAsUser: 65534
+    runAsGroup: 65534
+    readOnlyRootFilesystem: false
+
+qbitportforward:
+  enabled: false
+  QBT_USERNAME: {{ .Values.secret.qbt_username }}
+  QBT_PASSWORD: {{ .Values.secret.qbt_password }}
+
+service:
+  main:
+    type: LoadBalancer
+    loadBalancerIP: {{ .Values.load_balancer.addresses.services.qbittorrent }}
+    annotations:
+      metallb.universe.tf/allow-shared-ip: qbittorrent
+    ports:
+      main:
+        port: 80
+        targetPort: 8080
+  torrent:
+    enabled: true
+    ports:
+      torrent:
+        enabled: true
+        port: 6881
+        protocol: tcp
+      torrentudp:
+        enabled: true
+        port: 6881
+        protocol: udp
+  gluetun:
+    enabled: true
+    type: ClusterIP
+    ports:
+      gluetun:
+        enabled: true
+        port: 8000
+        targetPort: 8000
+        protocol: http
+
+workload:
+  main:
+    podSpec:
+      containers:
+        main:
+          env:
+            QBT_WEBUI_PORT: 8080
+            QBT_TORRENTING_PORT: 6881
+  qbitportforward:
+    enabled: true
+    type: Deployment
+    strategy: RollingUpdate
+    replicas: 1
+    podSpec:
+      containers:
+        qbitportforward:
+          primary: true
+          enabled: true
+          imageSelector: qbitportforwardImage
+          probes:
+            liveness:
+              enabled: false
+            readiness:
+              enabled: false
+            startup:
+              enabled: false
+          env:
+            QBT_USERNAME: "{{ .Values.secret.qbt_username }}"
+            QBT_PASSWORD: "{{ .Values.secret.qbt_password }}"
+            QBT_ADDR: 'http://localhost:8080'
+            GTN_ADDR: 'http://localhost:8000'
+
+persistence:
+  config:
+    enabled: true
+    type: nfs
+    path: /mnt/shared_storage_1/qbittorrent/config
+    server: 10.10.10.200
+  shared:
+    enabled: true
+    type: nfs
+    path: /mnt/shared_storage_1/qbittorrent/shared
+    server: 10.10.10.200
+
+ingress:
+  main:
+    enabled: true
+    primary: true
+    ingressClassName: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: cloudflare-issuer
+    hosts:
+      - host: "qbittorrent.{{ .Values.secret.domain }}"
+        paths:
+          - path: /
+            pathType: Prefix
+    tls:
+      - hosts:
+          - "qbittorrent.{{ .Values.secret.domain }}"
+        secretName: "wildcard-tls"
+    integrations:
+      traefik:
+        enabled: false
+
+portal:
+  open:
+    enabled: true
+
+addons:
+  vpn:
+    type: gluetun
+    killSwitch: true
+    env:
+      QBT_USERNAME: "{{ .Values.secret.qbt_username }}"
+      QBT_PASSWORD: "{{ .Values.secret.qbt_password }}"
+      SERVER_COUNTRIES: netherlands
+      VPN_SERVICE_PROVIDER: nordvpn
+      VPN_TYPE: wireguard
+      WIREGUARD_PRIVATE_KEY: {{ .Values.secret.wireguard_private_key }}

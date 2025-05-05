@@ -214,3 +214,8 @@ releases:
     inherit:
       - template: default-self-hosted-release
     chart: uptime-kuma/uptime-kuma
+
+  - name: qbittorrent
+    inherit:
+      - template: default-self-hosted-release
+    chart: oci://tccr.io/truecharts/qbittorrent
