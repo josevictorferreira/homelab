@@ -1,0 +1,121 @@
+image:
+  repository: ghcr.io/home-operations/prowlarr
+  tag: 1.35.1.5034@sha256:866e9f26acc49b49ce18f650c145eb36cc5211fbf3fdfb3d629683319af8cb41
+  pullPolicy: IfNotPresent
+exportarrImage:
+  repository: ghcr.io/onedr0p/exportarr
+  pullPolicy: IfNotPresent
+  tag: v2.2.0@sha256:320b0ea7399f4b9af4741dcdddd7d40c05c36b0359679305d8a54df4e97065df
+securityContext:
+  container:
+    readOnlyRootFilesystem: false
+service:
+  main:
+    type: LoadBalancer
+    loadBalancerIP: {{ .Values.load_balancer.addresses.services.prowlarr }}
+    annotations:
+      metallb.universe.tf/allow-shared-ip: prowlarr
+    ports:
+      main:
+        port: 9696
+  metrics:
+    enabled: true
+    type: ClusterIP
+    ports:
+      metrics:
+        enabled: true
+        port: 9697
+workload:
+  main:
+    podSpec:
+      containers:
+        main:
+          probes:
+            liveness:
+              path: /ping
+            readiness:
+              path: /ping
+            startup:
+              type: tcp
+          env:
+            PROWLARR__SERVER__PORT: 9696
+            PROWLARR__AUTH__REQUIRED: DisabledForLocalAddresses
+            PROWLARR__APP__THEME: dark
+            PROWLARR__APP__INSTANCENAME: Prowlarr
+            PROWLARR__LOG__LEVEL: info
+            PROWLARR__UPDATE__BRANCH: develop
+        exportarr:
+          enabled: true
+          imageSelector: exportarrImage
+          args:
+            - prowlarr
+          probes:
+            liveness:
+              enabled: true
+              type: http
+              path: /healthz
+              port: 9697
+            readiness:
+              enabled: true
+              type: http
+              path: /healthz
+              port: 9697
+            startup:
+              enabled: true
+              type: http
+              path: /healthz
+              port: 9697
+          env:
+            INTERFACE: 0.0.0.0
+            PORT: 9697
+            URL: http://localhost:9696
+            CONFIG: "/config/config.xml"
+persistence:
+  config:
+    enabled: true
+    targetSelector:
+      main:
+        main:
+          mountPath: /config
+        exportarr:
+          mountPath: /config
+          readOnly: true
+configmap:
+  dashboard:
+    enabled: true
+    labels:
+      grafana_dashboard: "1"
+    data:
+      prowlarr.json: >-
+        {{ readFile "../../config/prowlarr/dashboard.json" | indent 8 | quote }}
+
+ingress:
+  main:
+    enabled: true
+    primary: true
+    ingressClassName: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: cloudflare-issuer
+    hosts:
+      - host: "prowlarr.{{ .Values.secret.domain }}"
+        paths:
+          - path: /
+            pathType: Prefix
+    tls:
+      - hosts:
+          - "prowlarr.{{ .Values.secret.domain }}"
+        secretName: "wildcard-tls"
+    integrations:
+      traefik:
+        enabled: false
+
+metrics:
+  main:
+    enabled: true
+    type: "servicemonitor"
+    endpoints:
+      - port: metrics
+        path: /metrics
+    targetSelector: metrics
+    prometheusRule:
+      enabled: false

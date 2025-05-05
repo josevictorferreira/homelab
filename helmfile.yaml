@@ -219,3 +219,8 @@ releases:
     inherit:
       - template: default-self-hosted-release
     chart: oci://tccr.io/truecharts/qbittorrent
+
+  - name: prowlarr
+    inherit:
+      - template: default-self-hosted-release
+    chart: oci://tccr.io/truecharts/prowlarr
