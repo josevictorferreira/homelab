@@ -35,7 +35,13 @@ kubectl delete all -n kube-system --selector 'app=klipper-lb'
 
 ## NordVPN
 
-Get nordvpn private key and edit the values file (must install wireguard-tools before):
+In case you have setted the secret access key in sops-nix, run the following to fetch the wireguard private key:
+```console
+curl -s -u token:$(cat /run/secrets/nordvpn_access_token) https://api.nordvpn.com/v1/users/services/credentials
+```
+
+
+Or if in arch linux, after downloading nordvpn cli, run the following to get wireguard private key:
 
 ```bash
 nordvpn login --legacy
