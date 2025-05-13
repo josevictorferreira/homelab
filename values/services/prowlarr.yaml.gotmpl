@@ -28,6 +28,17 @@ service:
 workload:
   main:
     podSpec:
+      initContainers:
+        main:
+          enabled: true
+          type: init
+          # imageSelector: image
+          command:
+            - /bin/sh
+            - -c
+            - |
+              mkdir -p /config/Definitions/Custom
+              echo -n "{{ exec "sh" (list "-c" "sops -d ../../config/prowlarr/custom-indexer.enc.yml | yq '.data' --join-output | base64 -w 0") }}" | base64 -d > /config/Definitions/Custom/custom-indexer.yml 
       containers:
         main:
           probes:
@@ -80,14 +91,15 @@ persistence:
         exportarr:
           mountPath: /config
           readOnly: true
-configmap:
-  dashboard:
+  custom-definitions:
     enabled: true
-    labels:
-      grafana_dashboard: "1"
-    data:
-      prowlarr.json: >-
-        {{ readFile "../../config/prowlarr/dashboard.json" | indent 8 | quote }}
+    targetSelector:
+      main:
+        main:
+          mountPath: /config/Definitions/Custom
+        exportarr:
+          mountPath: /config/Definitions/Custom
+          readOnly: true
 
 ingress:
   main:
