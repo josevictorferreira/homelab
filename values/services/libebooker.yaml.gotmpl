@@ -1,0 +1,33 @@
+image:
+  repository: "ghcr.io/josevictorferreira/libebooker"
+  tag: "latest"
+  pullPolicy: Always
+
+strategy:
+  type: RollingUpdate
+  maxSurge: 1
+  maxUnavailable: 1
+  minReadySeconds: 10
+
+app:
+  label: "libebooker"
+  command: ["bundle", "exec", "rackup"]
+  replicaCount: 1
+  service:
+    port: 9292
+    type: LoadBalancer
+    loadBalancerIP: 10.10.10.123
+    annotations: {}
+  env:
+    port: "9292"
+    address: 0.0.0.0
+  resources:
+    requests:
+      memory: 512Mi
+      cpu: 30m
+    limits:
+      memory: 512Mi
+  healthcheck_command:
+    - bash
+    - -c
+    - curl 0.0.0.0 9292 | grep "OK"

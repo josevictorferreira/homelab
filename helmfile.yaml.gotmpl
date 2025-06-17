@@ -40,6 +40,8 @@ repositories:
     url: https://zekker6.github.io/helm-charts
   - name: alarm-server-charts
     url: git+https://github.com/josevictorferreira/alarm_server@.helm/alarm-server?ref=main
+  - name: libebooker-charts
+    url: git+ssh://git@github.com/josevictorferreira/libebooker@.helm/libebooker?ref=main
   - name: uptime-kuma
     url: https://helm.irsigler.cloud
 
@@ -205,11 +207,6 @@ releases:
       - template: default-self-hosted-release
     chart: charts/ntfy
 
-  - name: alarm-server
-    inherit:
-      - template: default-self-hosted-release
-    chart: alarm-server-charts/alarm-server
-
   - name: uptime-kuma
     inherit:
       - template: default-self-hosted-release
@@ -224,3 +221,13 @@ releases:
     inherit:
       - template: default-self-hosted-release
     chart: oci://tccr.io/truecharts/prowlarr
+
+  - name: alarm-server
+    inherit:
+      - template: default-self-hosted-release
+    chart: alarm-server-charts/alarm-server
+
+  - name: libebooker
+    inherit:
+      - template: default-self-hosted-release
+    chart: libebooker-charts/libebooker
