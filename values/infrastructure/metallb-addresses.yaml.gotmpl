@@ -1,1 +1,4 @@
-range: {{ .Values.load_balancer.addresses.range }}
+ranges:
+{{- range .Values.load_balancer.addresses.ranges }}
+  - {{ . }}
+{{- end }}

@@ -19,6 +19,8 @@ Use the `make help` command to check available commands
 
 - Remember to disable enterprise repository on pve -> Updates -> Repositories.
 
+- On PVE1, create a new network named `vmbr1` with CIDR `192.168.10.0` and later assign a new network bridge in it's VMs. This is needed for Pihole be accessible from outside the main network.
+
 
 ## K3s Cluster
 

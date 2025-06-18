@@ -37,12 +37,14 @@ nodes:
 
 load_balancer:
   addresses:
-    range: 10.10.10.100-10.10.10.199
+    ranges:
+      - 192.168.10.10-192.168.10.10
+      - 10.10.10.100-10.10.10.199
     ingress: 10.10.10.110
     services:
+      pihole: 192.168.10.10
       proxmox: 10.10.10.200
       grafana: 10.10.10.190
-      pihole: 10.10.10.100
       readarr: 10.10.10.199
       postgresql: 10.10.10.101
       linkwarden: 10.10.10.103
@@ -54,6 +56,7 @@ load_balancer:
       readeck: 10.10.10.111
       ntfy: 10.10.10.114
       alarm-server: 10.10.10.155
+      libebooker: 10.10.10.123
       status: 10.10.10.122
       qbittorrent: 10.10.10.119
       prowlarr: 10.10.10.120
