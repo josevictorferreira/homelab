@@ -27,7 +27,4 @@ app:
       cpu: 30m
     limits:
       memory: 512Mi
-  healthcheck_command:
-    - bash
-    - -c
-    - curl 0.0.0.0 9292 | grep "OK"
+  healthcheck_path: /health
