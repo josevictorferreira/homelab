@@ -38,11 +38,10 @@ nodes:
 load_balancer:
   addresses:
     ranges:
-      - 192.168.10.10-192.168.10.10
       - 10.10.10.100-10.10.10.199
     ingress: 10.10.10.110
     services:
-      pihole: 192.168.10.10
+      pihole: 10.10.10.100
       proxmox: 10.10.10.200
       grafana: 10.10.10.190
       readarr: 10.10.10.199
