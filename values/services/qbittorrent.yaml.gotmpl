@@ -35,11 +35,11 @@ service:
     ports:
       torrent:
         enabled: true
-        port: 6881
+        port: 62657
         protocol: tcp
       torrentudp:
         enabled: true
-        port: 6881
+        port: 62657
         protocol: udp
   gluetun:
     enabled: true
@@ -50,7 +50,6 @@ service:
         port: 8000
         targetPort: 8000
         protocol: http
-
 workload:
   main:
     podSpec:
@@ -58,7 +57,7 @@ workload:
         main:
           env:
             QBT_WEBUI_PORT: 8080
-            QBT_TORRENTING_PORT: 6881
+            QBT_TORRENTING_PORT: 62657
   qbitportforward:
     enabled: true
     type: Deployment
@@ -126,7 +125,7 @@ addons:
     env:
       QBT_USERNAME: "{{ .Values.secret.qbt_username }}"
       QBT_PASSWORD: "{{ .Values.secret.qbt_password }}"
-      SERVER_COUNTRIES: netherlands
-      VPN_SERVICE_PROVIDER: nordvpn
-      VPN_TYPE: wireguard
+      VPN_SERVICE_PROVIDER: "nordvpn"
+      VPN_TYPE: "wireguard"
+      SERVER_COUNTRIES: "Canada"
       WIREGUARD_PRIVATE_KEY: {{ .Values.secret.wireguard_private_key }}
