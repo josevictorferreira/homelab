@@ -1,0 +1,8 @@
+{{- if .Values.persistence.enabled }}
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: homepage-data-pvc
+spec:
+  {{- toYaml .Values.persistence.pvc | nindent 2 }}
+{{- end}}

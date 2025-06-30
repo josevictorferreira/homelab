@@ -1,0 +1,51 @@
+replicaCount: 1
+
+image:
+  registry: ghcr.io
+  repository: gethomepage/homepage
+  pullPolicy: IfNotPresent
+  tag: "v1.3.2"
+  sha: "4f923bf0e9391b3a8bc5527e539b022e92dcc8a3a13e6ab66122ea9ed030e196"
+
+service:
+  type: LoadBalancer
+  annotations:
+    metallb.universe.tf/allow-shared-ip: homepage
+  loadBalancerIP: {{ .Values.load_balancer.addresses.services.homepage }}
+  port: 80
+
+ingress:
+  enabled: true
+  ingressClassName: nginx
+  hosts:
+    - host: "homepage.{{ .Values.secret.domain }}"
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: wildcard-tls
+      hosts:
+        - "homepage.{{ .Values.secret.domain }}"
+
+persistence:
+  enabled: true
+  pvc:
+    accessModes:
+      - ReadWriteOnce
+    resources:
+      requests:
+        storage: 2Gi
+    storageClassName: local-path
+
+volumes:
+  - name: homepage-data
+    persistentVolumeClaim:
+      claimName: homepage-data-pvc
+
+volumeMounts:
+  - name: homepage-data
+    mountPath: /app/config
+
+podSecurityContext:
+  fsGroup: 1001
+  fsGroupChangePolicy: OnRootMismatch
