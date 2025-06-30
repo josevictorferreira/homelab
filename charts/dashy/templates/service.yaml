@@ -1,0 +1,16 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: dashy
+  annotations:
+    {{- toYaml .Values.service.annotations | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  {{- if .Values.service.loadBalancerIP }}
+  loadBalancerIP: {{ .Values.service.loadBalancerIP }}
+  {{- end }}
+  selector:
+    app: dashy
+  ports:
+    - port: 8080
+

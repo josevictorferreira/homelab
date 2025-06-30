@@ -1,0 +1,8 @@
+{{- if .Values.persistence.enabled }}
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: dashy
+spec:
+  {{- toYaml .Values.persistence.pvc | nindent 2 }}
+{{- end}}

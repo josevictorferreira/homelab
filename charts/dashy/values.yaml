@@ -1,0 +1,19 @@
+fullnameOverride: dashy
+replicas: 1
+image:
+  repository: Lissy93/dashy
+  tag: 2.1.1
+  pullPolicy: IfNotPresent
+
+ingress:
+  enabled: true
+  host: test.application.com
+  tls: []
+
+persistence:
+  pvc: {}
+
+service:
+  annotations: {}
+  type: LoadBalancer
+  loadBalancerIP: 10.10.10.124

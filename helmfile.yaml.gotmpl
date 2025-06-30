@@ -197,11 +197,6 @@ releases:
       - template: default-self-hosted-release
     chart: charts/sftpgo
 
-  - name: readeck
-    inherit:
-      - template: default-self-hosted-release
-    chart: zekker6/readeck
-
   - name: ntfy
     inherit:
       - template: default-self-hosted-release
@@ -231,3 +226,8 @@ releases:
     inherit:
       - template: default-self-hosted-release
     chart: libebooker-charts/libebooker
+
+  - name: dashy
+    inherit:
+      - template: default-self-hosted-release
+    chart: charts/dashy
