@@ -27,6 +27,10 @@ ingress:
       hosts:
         - "homepage.{{ .Values.secret.domain }}"
 
+extraEnv:
+  - name: LOG_LEVEL
+    value: "debug"
+
 persistence:
   enabled: true
   pvc:
@@ -38,14 +42,116 @@ persistence:
     storageClassName: local-path
 
 volumes:
-  - name: homepage-data
-    persistentVolumeClaim:
-      claimName: homepage-data-pvc
+  - name: homepage-config
+    configMap:
+      name: homepage
+      defaultMode: 0644
 
 volumeMounts:
-  - name: homepage-data
-    mountPath: /app/config
+  - mountPath: /app/config/custom.js
+    name: homepage-config
+    subPath: custom.js
+  - mountPath: /app/config/custom.css
+    name: homepage-config
+    subPath: custom.css
+  - mountPath: /app/config/bookmarks.yaml
+    name: homepage-config
+    subPath: bookmarks.yaml
+  - mountPath: /app/config/docker.yaml
+    name: homepage-config
+    subPath: docker.yaml
+  - mountPath: /app/config/kubernetes.yaml
+    name: homepage-config
+    subPath: kubernetes.yaml
+  - mountPath: /app/config/services.yaml
+    name: homepage-config
+    subPath: services.yaml
+  - mountPath: /app/config/settings.yaml
+    name: homepage-config
+    subPath: settings.yaml
+  - mountPath: /app/config/widgets.yaml
+    name: homepage-config
+    subPath: widgets.yaml
 
 podSecurityContext:
-  fsGroup: 1001
-  fsGroupChangePolicy: OnRootMismatch
+  runAsUser: 1000
+  runAsGroup: 1000
+  runAsNonRoot: true
+
+settingsYaml: |
+  title: Homelab
+  description: My homelab homepage
+  startUrl: "https://homepage.{{ .Values.secret.domain }}"
+  theme: dark
+  color: slate
+  base: "https://homepage.{{ .Values.secret.domain }}"
+  target: _self
+
+bookmarksYaml: |
+  - Developer:
+    - Github:
+      - abbr: GH
+        icon: github.svg
+        href: "https://github.com/josevictorferreira"
+        description: My GitHub profile
+  - Social:
+    - X:
+      - abbr: X
+        icon: x.svg
+        href: "https://x.com"
+        description: X (formerly Twitter)
+    - Reddit:
+      - abbr: RE
+        icon: reddit.svg
+        href: "https://reddit.com"
+        description: Reddit
+  - Entertainment:
+    - YouTube:
+      - abbr: YT
+        icon: youtube.svg
+        href: "https://youtube.com"
+        description: YouTube
+
+servicesYaml: |-
+  - Monitoring:
+    - Grafana:
+        icon: "grafana.svg"
+        href: "https://grafana.{{ .Values.secret.domain }}"
+        description: "Grafana for monitoring and visualization"
+    - Uptime Kuma:
+        icon: uptime-kuma.svg
+        href: "https://status.{{ .Values.secret.domain }}"
+        description: "Uptime Kuma for service monitoring"
+    - Ntfy Notifications:
+        icon: ntfy.svg
+        href: "https://ntfy.{{ .Values.secret.domain }}"
+        description: "Ntfy for notifications"
+  - Network:
+    - Pihole:
+        icon: "pi-hole.svg"
+        href: "https://pihole.{{ .Values.secret.domain }}/admin"
+        description: "Pihole for ad blocking and DNS management"
+  - Downloads:
+    - qBittorrent:
+        icon: "qbittorrent.svg"
+        href: "https://qbittorrent.{{ .Values.secret.domain }}"
+        description: "qBittorrent for torrent management"
+    - Prowlarr:
+        icon: "prowlarr.svg"
+        href: "https://prowlarr.{{ .Values.secret.domain }}"
+        description: "Prowlarr for indexer management"
+  - Files:
+    - SFTPGo:
+        icon: "sftpgo.webp"
+        href: "sftp://sftpgo.{{ .Values.secret.domain }}/web/client/login"
+        description: "SFTP server for file transfers"
+    - SFTPGo Admin:
+        icon: "sftpgo.webp"
+        href: "https://sftpgo.{{ .Values.secret.domain }}/web/admin/login"
+        description: "SFTP server admin interface"
+  - Bookmarks:
+    - Linkwarden:
+        icon: "linkwarden.webp"
+        href: "https://linkwarden.{{ .Values.secret.domain }}"
+        description: "Linkwarden for bookmark management"
+

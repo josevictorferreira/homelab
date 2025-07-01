@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: homepage
+  labels:
+    app.kubernetes.io/name: homepage
+data:
+  kubernetes.yaml: |-
+    {{- .Values.kubernetesYaml | nindent 4 }}
+
+  settings.yaml: |-
+    {{- .Values.settingsYaml | nindent 4 }}
+
+  custom.css: |-
+    {{ .Values.customCss | nindent 4 }}
+
+  custom.js: |-
+    {{ .Values.customJs | nindent 4 }}
+
+  bookmarks.yaml: |-
+    {{- .Values.bookmarksYaml | nindent 4 }}
+
+  services.yaml: |-
+    {{- .Values.servicesYaml | nindent 4 }}
+
+  widgets.yaml: |-
+    {{- .Values.widgetsYaml | nindent 4 }}
+
+  docker.yaml: |-
+    {{- .Values.dockerYaml | nindent 4 }}
