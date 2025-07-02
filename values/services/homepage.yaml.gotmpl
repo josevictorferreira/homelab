@@ -32,14 +32,7 @@ extraEnv:
     value: "debug"
 
 persistence:
-  enabled: true
-  pvc:
-    accessModes:
-      - ReadWriteOnce
-    resources:
-      requests:
-        storage: 2Gi
-    storageClassName: local-path
+  enabled: false
 
 volumes:
   - name: homepage-config
@@ -83,42 +76,34 @@ kubernetesYaml: |
   ingress: true
 
 widgetsYaml: |
+  - greeting:
+      text_size: 4xl
+      text: root@homelab
   - datetime:
       text_size: xl
       format:
         timeStyle: short
         hourCycle: h23
         dateStyle: long
+  - search:
+      provider: [duckduckgo]
+      focus: true
   - openmeteo:
       label: {{ .Values.secret.openmeteo_label }}
       latitude: {{ .Values.secret.openmeteo_latitude }}
       longitude: {{ .Values.secret.openmeteo_longitude }}
       timezone: {{ .Values.secret.openmeteo_timezone }}
       units: metric
-      city: Ibiporã
       cache: 5
       format:
         maximumFractionDigits: 0
-  - kubernetes:
-      cluster:
-        show: true
-        cpu: true
-        memory: true
-        showLabel: true
-        label: "Homelab K8s Cluster"
-      nodes:
-        show: false
-        cpu: true
-        memory: true
-        showLabel: true
-        label: "K8s Nodes"
 
 settingsYaml: |
   title: Homelab
   description: My homelab homepage
   startUrl: "https://homepage.{{ .Values.secret.domain }}"
   theme: dark
-  color: slate
+  color: zinc
   base: "https://homepage.{{ .Values.secret.domain }}"
   target: _self
   bookmarksStyle: icons
@@ -126,22 +111,38 @@ settingsYaml: |
   hideErrors: true
   hideVersion: true
   disableUpdateCheck: true
+  useEqualHeights: true
+  statusStyle: dot
   layout:
-    Infra:
+    Bookmarks:
+      style: column
+      columns: 1
+    Articles:
+      style: column
+      columns: 1
+    Downloads:
+      style: column
+      columns: 1
+    Files:
+      style: column
+      columns: 1
+    Network:
+      style: column
+      columns: 1
+    Monitoring:
       style: row
       columns: 3
-    Monitoring:
+    Infra:
       style: row
       columns: 3
 
 bookmarksYaml: |
-  - Developer:
+  - Bookmarks:
     - Github:
       - abbr: GH
         icon: github.svg
         href: "https://github.com/josevictorferreira"
         description: My GitHub profile
-  - Social:
     - X:
       - abbr: X
         icon: x.svg
@@ -152,7 +153,6 @@ bookmarksYaml: |
         icon: reddit.svg
         href: "https://reddit.com"
         description: Reddit
-  - Entertainment:
     - YouTube:
       - abbr: YT
         icon: youtube.svg
@@ -270,7 +270,7 @@ servicesYaml: |-
         description: "SFTP server admin interface"
         namespace: self-hosted
         app: sftpgo
-  - Bookmarks:
+  - Articles:
     - Linkwarden:
         icon: "linkwarden.webp"
         href: "https://linkwarden.{{ .Values.secret.domain }}"
