@@ -122,24 +122,42 @@ servicesYaml: |-
         icon: uptime-kuma.svg
         href: "https://status.{{ .Values.secret.domain }}"
         description: "Uptime Kuma for service monitoring"
+        widget:
+          type: uptimekuma
+          url: http://status.{{ .Values.secret.domain }}/
+          slug: homelab
     - Ntfy Notifications:
         icon: ntfy.svg
         href: "https://ntfy.{{ .Values.secret.domain }}"
         description: "Ntfy for notifications"
   - Network:
-    - Pihole:
+    - Pi-hole:
         icon: "pi-hole.svg"
         href: "https://pihole.{{ .Values.secret.domain }}/admin"
         description: "Pihole for ad blocking and DNS management"
+        widget:
+          type: pihole
+          url: http://{{ .Values.load_balancer.addresses.services.pihole }}
+          version: 5
+          key: {{ .Values.secret.pihole_api_key }}
   - Downloads:
     - qBittorrent:
         icon: "qbittorrent.svg"
         href: "https://qbittorrent.{{ .Values.secret.domain }}"
         description: "qBittorrent for torrent management"
+        widget:
+          type: qbittorrent
+          url: "http://{{ .Values.load_balancer.addresses.services.qbittorrent }}"
+          username: {{ .Values.secret.qbt_username }}
+          password: {{ .Values.secret.qbt_password }}
     - Prowlarr:
         icon: "prowlarr.svg"
         href: "https://prowlarr.{{ .Values.secret.domain }}"
         description: "Prowlarr for indexer management"
+        widget:
+          type: prowlarr
+          url: "http://{{ .Values.load_balancer.addresses.services.prowlarr }}"
+          key: {{ .Values.secret.prowlarr_api_key }}
   - Files:
     - SFTPGo:
         icon: "sftpgo.webp"
