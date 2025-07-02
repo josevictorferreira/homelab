@@ -118,13 +118,18 @@ servicesYaml: |-
         icon: "grafana.svg"
         href: "https://grafana.{{ .Values.secret.domain }}"
         description: "Grafana for monitoring and visualization"
+        widget:
+          type: grafana
+          url: "http://{{ .Values.load_balancer.addresses.services.grafana }}"
+          username: "{{ .Values.secret.grafana_username }}"
+          password: '{{ .Values.secret.grafana_password }}'
     - Uptime Kuma:
         icon: uptime-kuma.svg
-        href: "https://status.{{ .Values.secret.domain }}"
+        href: "http://status.{{ .Values.secret.domain }}"
         description: "Uptime Kuma for service monitoring"
         widget:
           type: uptimekuma
-          url: http://status.{{ .Values.secret.domain }}/
+          url: http://uptime-kuma:3001/
           slug: homelab
     - Ntfy Notifications:
         icon: ntfy.svg
@@ -137,9 +142,9 @@ servicesYaml: |-
         description: "Pihole for ad blocking and DNS management"
         widget:
           type: pihole
-          url: http://{{ .Values.load_balancer.addresses.services.pihole }}
-          version: 5
-          key: {{ .Values.secret.pihole_api_key }}
+          url: http://pihole-web/
+          version: 6
+          key: "{{ .Values.secret.pihole_api_key }}"
   - Downloads:
     - qBittorrent:
         icon: "qbittorrent.svg"
@@ -156,7 +161,7 @@ servicesYaml: |-
         description: "Prowlarr for indexer management"
         widget:
           type: prowlarr
-          url: "http://{{ .Values.load_balancer.addresses.services.prowlarr }}"
+          url: "http://{{ .Values.load_balancer.addresses.services.prowlarr }}:9696"
           key: {{ .Values.secret.prowlarr_api_key }}
   - Files:
     - SFTPGo:
@@ -172,4 +177,8 @@ servicesYaml: |-
         icon: "linkwarden.webp"
         href: "https://linkwarden.{{ .Values.secret.domain }}"
         description: "Linkwarden for bookmark management"
+        widget:
+          type: linkwarden
+          url: "http://linkwarden"
+          key: "{{ .Values.secret.linkwarden_api_key }}"
 
