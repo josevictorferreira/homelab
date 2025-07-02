@@ -78,6 +78,41 @@ podSecurityContext:
   runAsGroup: 1000
   runAsNonRoot: true
 
+kubernetesYaml: |
+  mode: cluster
+  ingress: true
+
+widgetsYaml: |
+  - datetime:
+      text_size: xl
+      format:
+        timeStyle: short
+        hourCycle: h23
+        dateStyle: long
+  - openmeteo:
+      label: {{ .Values.secret.openmeteo_label }}
+      latitude: {{ .Values.secret.openmeteo_latitude }}
+      longitude: {{ .Values.secret.openmeteo_longitude }}
+      timezone: {{ .Values.secret.openmeteo_timezone }}
+      units: metric
+      city: Ibiporã
+      cache: 5
+      format:
+        maximumFractionDigits: 0
+  - kubernetes:
+      cluster:
+        show: true
+        cpu: true
+        memory: true
+        showLabel: true
+        label: "Homelab K8s Cluster"
+      nodes:
+        show: false
+        cpu: true
+        memory: true
+        showLabel: true
+        label: "K8s Nodes"
+
 settingsYaml: |
   title: Homelab
   description: My homelab homepage
@@ -86,6 +121,18 @@ settingsYaml: |
   color: slate
   base: "https://homepage.{{ .Values.secret.domain }}"
   target: _self
+  bookmarksStyle: icons
+  language: pt-BR
+  hideErrors: true
+  hideVersion: true
+  disableUpdateCheck: true
+  layout:
+    Infra:
+      style: row
+      columns: 3
+    Monitoring:
+      style: row
+      columns: 3
 
 bookmarksYaml: |
   - Developer:
@@ -113,11 +160,44 @@ bookmarksYaml: |
         description: YouTube
 
 servicesYaml: |-
+  - Infra:
+    - PVE1:
+        icon: "proxmox.svg"
+        href: "https://proxmox.{{ .Values.secret.domain }}"
+        description: "Proxmox for virtualization management"
+        widget:
+          type: proxmox
+          url: "https://{{ .Values.load_balancer.addresses.services.proxmox }}:8006"
+          username: "{{ .Values.secret.proxmox_username }}"
+          password: '{{ .Values.secret.proxmox_password }}'
+          node: pve1
+    - PVE2:
+        icon: "proxmox.svg"
+        href: "https://{{ .Values.dns.hosts.proxmox_pve2.address }}:8006"
+        description: "PVE2 virtualization management"
+        widget:
+          type: proxmox
+          url: "https://{{ .Values.dns.hosts.proxmox_pve2.address }}:8006"
+          username: "{{ .Values.secret.proxmox_username }}"
+          password: '{{ .Values.secret.proxmox_password }}'
+          node: pve2
+    - PVE3:
+        icon: "proxmox.svg"
+        href: "https://{{ .Values.dns.hosts.proxmox_pve3.address }}:8006"
+        description: "PVE3 virtualization management"
+        widget:
+          type: proxmox
+          url: "https://{{ .Values.dns.hosts.proxmox_pve3.address }}:8006"
+          username: "{{ .Values.secret.proxmox_username }}"
+          password: '{{ .Values.secret.proxmox_password }}'
+          node: pve3
   - Monitoring:
     - Grafana:
         icon: "grafana.svg"
         href: "https://grafana.{{ .Values.secret.domain }}"
         description: "Grafana for monitoring and visualization"
+        namespace: monitoring
+        app: grafana
         widget:
           type: grafana
           url: "http://{{ .Values.load_balancer.addresses.services.grafana }}"
@@ -127,12 +207,16 @@ servicesYaml: |-
         icon: uptime-kuma.svg
         href: "http://status.{{ .Values.secret.domain }}"
         description: "Uptime Kuma for service monitoring"
+        namespace: self-hosted
+        app: uptime-kuma
         widget:
           type: uptimekuma
           url: http://uptime-kuma:3001/
           slug: homelab
     - Ntfy Notifications:
         icon: ntfy.svg
+        namespace: self-hosted
+        app: ntfy
         href: "https://ntfy.{{ .Values.secret.domain }}"
         description: "Ntfy for notifications"
   - Network:
@@ -140,6 +224,8 @@ servicesYaml: |-
         icon: "pi-hole.svg"
         href: "https://pihole.{{ .Values.secret.domain }}/admin"
         description: "Pihole for ad blocking and DNS management"
+        namespace: self-hosted
+        app: pihole
         widget:
           type: pihole
           url: http://pihole-web/
@@ -150,6 +236,8 @@ servicesYaml: |-
         icon: "qbittorrent.svg"
         href: "https://qbittorrent.{{ .Values.secret.domain }}"
         description: "qBittorrent for torrent management"
+        namespace: self-hosted
+        app: qbittorrent
         widget:
           type: qbittorrent
           url: "http://{{ .Values.load_balancer.addresses.services.qbittorrent }}"
@@ -159,6 +247,12 @@ servicesYaml: |-
         icon: "prowlarr.svg"
         href: "https://prowlarr.{{ .Values.secret.domain }}"
         description: "Prowlarr for indexer management"
+        namespace: self-hosted
+        app: prowlarr
+        podSelector: >-
+          app.kubernetes.io/name in (
+            prowlarr
+          )
         widget:
           type: prowlarr
           url: "http://{{ .Values.load_balancer.addresses.services.prowlarr }}:9696"
@@ -168,15 +262,21 @@ servicesYaml: |-
         icon: "sftpgo.webp"
         href: "sftp://sftpgo.{{ .Values.secret.domain }}/web/client/login"
         description: "SFTP server for file transfers"
+        namespace: self-hosted
+        app: sftpgo
     - SFTPGo Admin:
         icon: "sftpgo.webp"
         href: "https://sftpgo.{{ .Values.secret.domain }}/web/admin/login"
         description: "SFTP server admin interface"
+        namespace: self-hosted
+        app: sftpgo
   - Bookmarks:
     - Linkwarden:
         icon: "linkwarden.webp"
         href: "https://linkwarden.{{ .Values.secret.domain }}"
         description: "Linkwarden for bookmark management"
+        namespace: self-hosted
+        app: linkwarden
         widget:
           type: linkwarden
           url: "http://linkwarden"
