@@ -1,0 +1,41 @@
+image:
+  repository: "glanceapp/glance"
+  tag: "v0.8.4@sha256:6df86a7e8868d1eda21f35205134b1962c422957e42a0c44d4717c8e8f741b1a"
+  pullPolicy: IfNotPresent
+
+replicaCount: 1
+
+service:
+  port: 8080
+  type: LoadBalancer
+  loadBalancerIP: 10.10.10.127
+  annotations: {}
+
+serviceAccount:
+  create: true
+  automount: true
+  annotations: {}
+  name: ""
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: chart-emaple.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+
+volumes: []
+
+volumeMounts: []
+
+glanceConfig:
+  pages:
+    - name: Home
+      columns:
+        - size: small
+          widgets:
+            - type: calendar
