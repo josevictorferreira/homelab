@@ -69,11 +69,7 @@ glanceConfig:
             - type: twitch-channels
               channels:
                 - theprimeagen
-                - j_blow
-                - piratesoftware
                 - cohhcarnage
-                - christitustech
-                - EJ_SA
 
         - size: full
           widgets:
@@ -84,45 +80,45 @@ glanceConfig:
 
             - type: videos
               channels:
-                - UCXuqSBlHAE6Xw-yeJA0Tunw # Linus Tech Tips
-                - UCR-DXc1voovS8nhAvccRZhg # Jeff Geerling
-                - UCsBjURrPoezykLs9EqgamOA # Fireship
-                - UCBJycsmduvYEL83R_U4JriQ # Marques Brownlee
                 - UCHnyfMqiRRG1u-2MsSQLbXA # Veritasium
+                - UCR-DXc1voovS8nhAvccRZhg # Jeff Geerling
+                - UCciQ8wFcVoIIMi-lfu8-cjQ # Anton Petrov
+                - UC6Bo2Gquf86J5VU6K2-12bw # Sabine Hossenfelder
+                - UCpMcsdZf2KkAnfmxiq2MfMQ # Arvin Ash
 
             - type: group
               widgets:
                 - type: reddit
-                  subreddit: technology
+                  subreddit: selfhosted
                   show-thumbnails: true
                 - type: reddit
-                  subreddit: selfhosted
+                  subreddit: homelab
                   show-thumbnails: true
 
         - size: small
           widgets:
             - type: weather
-              location: London, United Kingdom
+              location: {{ .Values.secret.location}}
               units: metric
-              hour-format: 12h
+              hour-format: 24h
 
             - type: markets
               markets:
-                - symbol: SPY
-                  name: S&P 500
                 - symbol: BTC-USD
                   name: Bitcoin
-                - symbol: NVDA
-                  name: NVIDIA
-                - symbol: AAPL
-                  name: Apple
-                - symbol: MSFT
-                  name: Microsoft
+                - symbol: KAS-USD
+                  name: Kaspa
+                - symbol: "USDBRL=X"
+                  name: Brazilian Real
 
             - type: releases
               cache: 1d
               repositories:
                 - glanceapp/glance
-                - go-gitea/gitea
-                - immich-app/immich
-                - syncthing/syncthing
+                - pi-hole/pi-hole
+                - grafana/grafana
+                - linkwarden/linkwarden
+                - drakkan/sftpgo
+                - binwiederhier/ntfy
+                - louislam/uptime-kuma
+                - prowlarr/prowlarr
