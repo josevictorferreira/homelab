@@ -51,26 +51,21 @@ glanceConfig:
             - type: calendar
               first-day-of-week: monday
 
-            - type: rss
-              limit: 10
-              collapse-after: 3
-              cache: 12h
-              feeds:
-                - url: https://selfh.st/rss/
-                  title: selfh.st
-                  limit: 4
-                - url: https://ciechanow.ski/atom.xml
-                - url: https://www.joshwcomeau.com/rss.xml
-                  title: Josh Comeau
-                - url: https://samwho.dev/rss.xml
-                - url: https://ishadeed.com/feed.xml
-                  title: Ahmad Shadeed
-
-            - type: twitch-channels
-              channels:
-                - theprimeagen
-                - cohhcarnage
-
+            - type: custom-api
+              title: Linkwarden Latest Bookmarks
+              cache: 1h
+              method: GET
+              url: http://linkwarden/api/v1/links
+              headers:
+                Authorization: Bearer {{ .Values.secret.linkwarden_api_key }}
+              template: |
+                <ul class="list list-gap-10 collapsible-container" data-collapse-after="5">
+                  {{`{{ range .JSON.Array "response" }}`}}
+                    <li>
+                      <a class="size-title-dynamic color-primary-if-not-visited" href="{{`{{ .String "url" }}`}}" target="_blank" rel="noopener noreferrer">{{`{{ .String "name" }}`}}</a>
+                    </li>
+                  {{`{{ end }}`}}
+                </ul>
         - size: full
           widgets:
             - type: group
@@ -83,8 +78,9 @@ glanceConfig:
                 - UCHnyfMqiRRG1u-2MsSQLbXA # Veritasium
                 - UCR-DXc1voovS8nhAvccRZhg # Jeff Geerling
                 - UCciQ8wFcVoIIMi-lfu8-cjQ # Anton Petrov
-                - UC6Bo2Gquf86J5VU6K2-12bw # Sabine Hossenfelder
+                - UC1yNl2E66ZzKApQdRuTQ4tw # Sabine Hossenfelder
                 - UCpMcsdZf2KkAnfmxiq2MfMQ # Arvin Ash
+                - UC9PIn6-XuRKZ5HmYeu46AIw # Barely Sociable
 
             - type: group
               widgets:
