@@ -68,6 +68,7 @@ glanceConfig:
                       {{`{{ end }}`}}
                       <a class="size-title-dynamic color-primary-if-not-visited" href="{{`{{ .String "url" }}`}}" target="_self" rel="noopener noreferrer">{{`{{ $title }}`}}</a>
                       <ul class="list-horizontal-text">
+                        <li style="color: {{`{{ .String "collection.color" }}`}};">{{`{{ .String "collection.name" }}`}}</li>
                         {{`{{ $tags := .Array "tags" }}`}}
                         {{`{{ range $index, $tag := $tags }}`}}
                           <li>{{`{{ .String "name" }}`}} </li>
