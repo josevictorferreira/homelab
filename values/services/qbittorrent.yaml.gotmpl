@@ -85,9 +85,15 @@ workload:
 persistence:
   config:
     enabled: true
-    type: nfs
-    path: /mnt/shared_storage_1/qbittorrent/config
-    server: 10.10.10.200
+    size: 1Gi
+    storageClass: longhorn
+    targetSelector:
+      main:
+        main:
+          mountPath: /config
+        exportarr:
+          mountPath: /config
+          readOnly: true
   shared:
     enabled: true
     type: nfs
