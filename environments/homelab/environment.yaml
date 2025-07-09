@@ -5,6 +5,9 @@ namespaces:
   ingress: ingress
   cert-manager: cert-manager
 
+addresses:
+  nfs_server: 10.10.10.200
+
 dns:
   hosts:
     proxmox_pve1:

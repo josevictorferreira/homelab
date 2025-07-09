@@ -53,8 +53,15 @@ persistence:
       - ReadWriteOnce
     resources:
       requests:
-        storage: 100Gi
-    storageClassName: local-storage
+        storage: 1Gi
+    storageClassName: longhorn
+
+volumes:
+  - name: sftpgo-shared-storage
+    type: nfs
+    path: /mnt/shared_storage
+    server: {{ .Values.addresses.nfs_server }}
+    readOnly: false
 
 ui:
   ingress:
