@@ -44,6 +44,8 @@ repositories:
     url: git+ssh://git@github.com/josevictorferreira/libebooker@.helm/libebooker?ref=main
   - name: uptime-kuma
     url: https://helm.irsigler.cloud
+  - name: longhorn
+    url: https://charts.longhorn.io
 
 ---
 
@@ -146,6 +148,13 @@ releases:
     needs:
       - "{{ .Values.namespaces.ingress }}/ingress-nginx"
       - "{{ index .Values.namespaces "cert-manager" }}/cert-manager"
+
+  - name: longhorn
+    namespace: longhorn-system
+    chart: longhorn/longhorn
+    version: {{ .Values.versions.longhorn }}
+    inherit:
+      - template: default-infrastructure-release
 
   - name: prometheus
     chart: prometheus-community/kube-prometheus-stack

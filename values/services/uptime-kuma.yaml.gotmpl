@@ -3,6 +3,9 @@ image:
   pullPolicy: IfNotPresent
   tag: "1.23.13-debian"
 
+volume:
+  storageClassName: longhorn
+
 ingress:
   enabled: true
   className: nginx

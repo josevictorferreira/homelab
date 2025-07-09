@@ -4,6 +4,9 @@ global:
       postgresPassword: "{{ .Values.secret.postgresql_password }}"
       database: linkwarden
 primary:
+  persistence:
+    enabled: true
+    storageClass: longhorn
   service:
     type: LoadBalancer
     loadBalancerIP: {{ .Values.load_balancer.addresses.services.postgresql }}

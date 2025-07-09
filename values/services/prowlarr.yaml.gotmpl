@@ -84,6 +84,8 @@ workload:
 persistence:
   config:
     enabled: true
+    size: 1Gi
+    storageClass: longhorn
     targetSelector:
       main:
         main:
@@ -93,6 +95,8 @@ persistence:
           readOnly: true
   custom-definitions:
     enabled: true
+    size: 1Gi
+    storageClass: longhorn
     targetSelector:
       main:
         main:

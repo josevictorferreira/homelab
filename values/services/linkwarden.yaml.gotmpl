@@ -13,7 +13,7 @@ linkwarden:
     storageType: filesystem
     filesystem:
       pvc:
-        storageClass: local-path
+        storageClass: longhorn
   database:
     user: postgres
     password: "{{ .Values.secret.postgresql_password }}"

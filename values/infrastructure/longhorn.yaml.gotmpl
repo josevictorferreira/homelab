@@ -1,0 +1,25 @@
+defaultSettings:
+  defaultReplicaCount: 2
+
+service:
+  ui:
+    type: LoadBalancer
+    loadBalancerIP: "{{ .Values.load_balancer.addresses.services.longhorn }}"
+  manager:
+    type: LoadBalancer
+    loadBalancerIP: "{{ index .Values.load_balancer.addresses.services "longhorn-manager" }}"
+
+ingress:
+  enabled: true
+  host: longhorn.{{ .Values.secret.domain }}
+  ingressClassName: nginx
+  path: /
+  pathType: Prefix
+  tls:
+    - secretName: "wildcard-tls"
+      hosts:
+        - "longhorn.{{ .Values.secret.domain }}"
+  
+metrics:
+  serviceMonitor:
+    enabled: true
