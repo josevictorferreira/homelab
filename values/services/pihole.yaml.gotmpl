@@ -8,6 +8,11 @@
   {{- $entries = append $entries (printf "%s %s.%s" $ingressIp $name $domain) }}
 {{- end }}
 
+image:
+  repository: "pihole/pihole"
+  tag: "v6.1.2@sha256:9bb0f057b530599e3aa3f05645b81bb9081a571345bcdea0804f80f6239ab18b"
+  pullPolicy: "IfNotPresent"
+
 virtualHost: "pihole.local"
 
 DNS1: 1.1.1.1
@@ -25,7 +30,6 @@ ftl:
   dns_listeningMode: "ALL"
   dns_hosts: "{{ join ";" $entries }}"
 
-# Check: https://github.com/hagezi/dns-blocklists
 adlists:
   - "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/pro.plus.txt"
 
