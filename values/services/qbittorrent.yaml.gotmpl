@@ -56,8 +56,11 @@ workload:
       containers:
         main:
           env:
+            DOCKER_MODS: "ghcr.io/vuetorrent/vuetorrent-lsio-mod:latest"
             QBT_WEBUI_PORT: 8080
             QBT_TORRENTING_PORT: 62657
+            # QBT_Preferences_WebUI_UseCustomWebui: "true"
+            # QBT_Preferences_WebUI_CustomWebuiPath: "/config/qBittorrent/vuetorrent"
   qbitportforward:
     enabled: true
     type: Deployment
@@ -77,6 +80,7 @@ workload:
             startup:
               enabled: false
           env:
+            DOCKER_MODS: "ghcr.io/vuetorrent/vuetorrent-lsio-mod:latest"
             QBT_USERNAME: "{{ .Values.secret.qbt_username }}"
             QBT_PASSWORD: "{{ .Values.secret.qbt_password }}"
             QBT_ADDR: 'http://localhost:8080'
@@ -87,6 +91,8 @@ persistence:
     enabled: true
     size: 1Gi
     storageClass: longhorn
+    accessModes:
+      - ReadWriteMany
     targetSelector:
       main:
         main:
