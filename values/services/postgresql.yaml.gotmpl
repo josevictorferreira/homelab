@@ -7,6 +7,9 @@ primary:
   persistence:
     enabled: true
     storageClass: longhorn
+    reclaimPolicy: Retain
+    accessModes:
+      - ReadWriteMany
   service:
     type: LoadBalancer
     loadBalancerIP: {{ .Values.load_balancer.addresses.services.postgresql }}
