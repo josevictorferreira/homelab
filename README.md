@@ -36,6 +36,16 @@ kubectl delete all -n kube-system --selector 'app=traefik'
 kubectl delete all -n kube-system --selector 'app=klipper-lb'
 ```
 
+### Label the worker nodes
+```bash
+kubectl label node homeserver.k8s.child.01 node-group=child --overwrite
+kubectl label node homeserver.k8s.child.02 node-group=child --overwrite
+kubectl label node homeserver.k8s.child.03 node-group=child --overwrite
+kubectl label node homeserver.k8s.child.04 node-group=child --overwrite
+kubectl label node homeserver.k8s.child.05 node-group=child --overwrite
+kubectl label node homeserver.k8s.child.06 node-group=child --overwrite
+```
+
 ### Taint the master node
 ```bash
 kubectl taint nodes --all node-role.kubernetes.io/master-
