@@ -15,7 +15,7 @@ image:
 
 virtualHost: "pihole.local"
 
-replicaCount: 2
+replicaCount: 1
 
 DNS1: 1.1.1.1
 DNS2: 1.0.0.1
@@ -60,7 +60,7 @@ persistentVolumeClaim:
   enabled: true
   storageClass: longhorn
   accessModes:
-    - "ReadWriteMany"
+    - "ReadWriteOnce"
 
 ingress:
   enabled: true

@@ -36,6 +36,11 @@ kubectl delete all -n kube-system --selector 'app=traefik'
 kubectl delete all -n kube-system --selector 'app=klipper-lb'
 ```
 
+### Taint the master node
+```bash
+kubectl taint nodes --all node-role.kubernetes.io/master-
+```
+
 
 ## NordVPN
 

@@ -9,7 +9,7 @@ primary:
     storageClass: longhorn
     reclaimPolicy: Retain
     accessModes:
-      - ReadWriteMany
+      - ReadWriteOnce
   service:
     type: LoadBalancer
     loadBalancerIP: {{ .Values.load_balancer.addresses.services.postgresql }}

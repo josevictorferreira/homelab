@@ -1,0 +1,52 @@
+annotations:
+  artifacthub.io/category: storage
+  artifacthub.io/changes: |
+    - kind: removed
+      description: convert 'existingSecret' from object to string and fixed key to 'uri'
+  artifacthub.io/images: |
+    - name: linkwarden
+      image: ghcr.io/linkwarden/linkwarden:v2.5.3
+  artifacthub.io/license: MIT
+  artifacthub.io/links: |
+    - name: Source
+      url: https://github.com/fmjstudios/helm
+    - name: Support
+      url: https://github.com/fmjstudios/helm/issues
+    - name: Linkwarden Homepage
+      url: https://linkwarden.app/
+    - name: Linkwarden Documentation
+      url: https://docs.linkwarden.app/
+  artifacthub.io/prerelease: "false"
+  artifacthub.io/signKey: |
+    fingerprint: 654213659810F05D16A7EDECB6C4D653E669D643
+    url: https://keys.openpgp.org/vks/v1/by-fingerprint/654213659810F05D16A7EDECB6C4D653E669D643
+  org.opencontainers.image.licenses: MIT
+  org.opencontainers.image.vendor: FMJ Studios
+apiVersion: v2
+appVersion: 2.5.3
+dependencies:
+- condition: postgresql.enabled
+  name: postgresql
+  repository: oci://registry-1.docker.io/bitnamicharts
+  version: ~15.5
+description: Linkwarden is an open-source collaborative bookmark manager to collect,
+  organize and preserve webpages
+home: https://linkwarden.app/
+icon: https://raw.githubusercontent.com/linkwarden/linkwarden/4640c1c966d37b7fc22e4ebfcb244d03da1d6d82/assets/logo.png
+keywords:
+- bookmarks
+- archival
+- collaboration
+- linkding
+- linkace
+- archivebox
+kubeVersion: '>=1.26.0-0'
+maintainers:
+- email: info@fmj.studio
+  name: fmjstudios
+- email: info@fmj.dev
+  name: FMJdev
+name: linkwarden
+sources:
+- https://github.com/fmjstudios/helm
+version: 0.3.3

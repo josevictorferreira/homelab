@@ -1,0 +1,184 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "linkwarden.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "linkwarden.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.linkwarden.replicas }}
+  selector:
+    matchLabels:
+      {{- include "linkwarden.selectorLabels" . | nindent 6 }}
+  {{- if .Values.strategy -}}
+  strategy:
+  {{- toYaml .Values.strategy | nindent 4 }}
+  {{- end }}
+  template:
+    metadata:
+      {{- if .Values.podAnnotations }}
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        checksum/secrets: {{ include (print $.Template.BasePath "/secrets.yaml") . | sha256sum }}
+        {{- if .Values.podAnnotations }}
+        {{- toYaml .Values.podAnnotations | nindent 8 }}
+        {{- end }}
+      {{- end }}
+      labels:
+        {{- include "linkwarden.selectorLabels" . | nindent 8 }}
+        {{- if .Values.podLabels -}}
+        {{- toYaml .Values.podLabels | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- if .Values.image.pullSecrets }}
+      imagePullSecrets:
+        {{- toYaml .Values.image.pullSecrets | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "linkwarden.serviceAccountName" . }}
+      automountServiceAccountToken: {{ .Values.serviceAccount.automount }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "linkwarden.configmaps.general" . }}
+            {{- range $_, $v := .Values.linkwarden.auth.sso }}
+            - configMapRef:
+                name: {{ printf "%s-%s" (include "linkwarden.configmaps.auth" $) $v.provider }}
+            {{- end }}
+          env:
+            {{- if or .Values.linkwarden.nextAuthSecret.value .Values.linkwarden.nextAuthSecret.existingSecret.name }}
+            - name: NEXTAUTH_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.linkwarden.nextAuthSecret.existingSecret.name | default (include "linkwarden.secrets.nextAuth" .) }}
+                  key: {{ .Values.linkwarden.nextAuthSecret.existingSecret.key | default "token" }}
+            {{- end }}
+            {{- if or .Values.linkwarden.data.s3.accessKey .Values.linkwarden.data.s3.existingSecret }}
+            - name: SPACES_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ default (include "linkwarden.secrets.s3" .) .Values.linkwarden.data.s3.existingSecret }}
+                  key: accessKey
+            {{- end }}
+            {{- if or .Values.linkwarden.data.s3.secretKey .Values.linkwarden.data.s3.existingSecret }}
+            - name: SPACES_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ default (include "linkwarden.secrets.s3" .) .Values.linkwarden.data.s3.existingSecret }}
+                  key: secretKey
+            {{- end }}
+            {{- if or (include "linkwarden.db.uri" .) .Values.linkwarden.database.existingSecret }}
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ default .Values.linkwarden.database.existingSecret (include "linkwarden.secrets.db" .) }}
+                  key: uri
+            {{- end }}
+            {{/* Authentication settings */}}
+            {{- range $_, $v := .Values.linkwarden.auth.sso -}}
+            {{- $providerArg := (dict "provider" $v.provider) -}}
+            - name: {{ include "linkwarden.auth.envs.clientId" $providerArg }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $v.existingSecret | default (printf "%s-%s" (include "linkwarden.auth.secrets.base" $) $v.provider) }}
+                  key: clientId
+            - name: {{ include "linkwarden.auth.envs.clientSecret" $providerArg }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $v.existingSecret | default (printf "%s-%s" (include "linkwarden.auth.secrets.base" $) $v.provider) }}
+                  key: clientSecret
+            {{- end -}}
+            {{- range $key, $value := .Values.linkwarden.envs }}
+            - name: {{ $key | upper }}
+              value: {{ $value | quote }}
+            {{- end }}
+          {{/* Container settings */}}
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+          volumeMounts:
+          {{- if eq .Values.linkwarden.data.storageType "filesystem" }}
+            - name: {{ include "linkwarden.pv.name" . }}
+              mountPath: {{ include "linkwarden.paths.data" .  }}
+          {{- end }}
+          {{- if .Values.volumeMounts }}
+            {{- toYaml .Values.volumeMounts | nindent 12 }}
+          {{- end }}
+          {{- if .Values.resources }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          {{- end }}
+          {{- if .Values.securityContext }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          {{- end }}
+          {{- if .Values.livenessProbe.enabled }}
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+            successThreshold: {{ .Values.livenessProbe.successThreshold }}
+            failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
+          {{- end }}
+          {{- if .Values.readinessProbe.enabled }}
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
+            successThreshold: {{ .Values.readinessProbe.successThreshold }}
+            failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
+          {{- end }}
+          {{- if .Values.startupProbe.enabled }}
+          startupProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: {{ .Values.startupProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.startupProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.startupProbe.timeoutSeconds }}
+            successThreshold: {{ .Values.startupProbe.successThreshold }}
+            failureThreshold: {{ .Values.startupProbe.failureThreshold }}
+          {{- end }}
+      {{- if .Values.priorityClassName }}
+      priorityClassName: {{ .Values.priorityClassName }}
+      {{- end }}
+      {{- if or (eq .Values.linkwarden.data.storageType "filesystem") .Values.volumes }}
+      volumes:
+      {{- if eq .Values.linkwarden.data.storageType "filesystem" }}
+        - name: {{ include "linkwarden.pv.name" . }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.linkwarden.data.filesystem.pvc.existingClaim | default (include "linkwarden.pvc.name" .) }}
+      {{- if .Values.volumes }}
+        {{- toYaml .Values.volumes | nindent 8 }}
+      {{- end }}
+      {{- end }}
+      {{- end }}
+      {{- if .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml .Values.nodeSelector | nindent 8 }}
+      {{- end }}
+      {{- if .Values.affinity }}
+      affinity:
+        {{- toYaml .Values.affinity | nindent 8 }}
+      {{- end }}
+      {{- if .Values.tolerations }}
+      tolerations:
+        {{- toYaml .Values.tolerations | nindent 8 }}
+      {{- end }}
+      {{- if .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- end }}
+      {{- if .Values.initContainers }}
+      initContainers:
+        {{- toYaml .Values.initContainers | nindent 8 }}
+      {{- end }}

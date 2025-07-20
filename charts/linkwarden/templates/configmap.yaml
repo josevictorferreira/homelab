@@ -1,0 +1,92 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "linkwarden.configmaps.general" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/component: linkwarden
+    {{- include "linkwarden.labels" . | nindent 4 }}
+    {{- if .Values.configMap.labels }}
+    {{- toYaml .Values.configMap.labels | nindent 4 }}
+    {{- end }}
+  {{- if .Values.configMap.annotations }}
+  annotations:
+  {{- toYaml .Values.configMap.annotations | nindent 4 }}
+  {{- end }}
+data:
+  NEXTAUTH_URL: {{ (include "linkwarden.ingress.url" .) | quote }}
+  PAGINATION_TAKE_COUNT: {{ .Values.linkwarden.paginationTakeCount | quote }}
+  {{- if eq .Values.linkwarden.data.storageType "filesystem" }}
+  STORAGE_FOLDER: {{ include "linkwarden.paths.data" . | quote }}
+  {{- end }}
+  {{- if eq .Values.linkwarden.data.storageType "s3" }}
+  SPACES_ENDPOINT: {{ .Values.linkwarden.data.s3.endpoint }}
+  SPACES_REGION: {{ .Values.linkwarden.data.s3.region }}
+  SPACES_BUCKET_NAME: {{ .Values.linkwarden.data.s3.bucketName }}
+  {{- if .Values.linkwarden.data.s3.forcePathStyle }}
+  SPACES_FORCE_PATH_STYLE: {{ .Values.linkwarden.data.s3.forcePathStyle }}
+  {{- end }}
+  {{- end }}
+  AUTOSCROLL_TIMEOUT: {{ .Values.linkwarden.autoscrollTimeout | quote }}
+  RE_ARCHIVE_LIMIT: {{ .Values.linkwarden.rearchiveLimit | quote }}
+  {{- if .Values.linkwarden.maxFileSize }}
+  NEXT_PUBLIC_MAX_FILE_SIZE: {{ .Values.linkwarden.maxFileSize | quote }}
+  {{- end }}
+  {{- if .Values.linkwarden.maxLinksPerUser }}
+  MAX_LINKS_PER_USER: {{ .Values.linkwarden.maxLinksPerUser | quote }}
+  {{- end }}
+  {{- if .Values.linkwarden.archiveTakeCount }}
+  ARCHIVE_TAKE_COUNT: {{ .Values.linkwarden.archiveTakeCount | quote }}
+  {{- end }}
+  {{- if .Values.linkwarden.browserTimeout }}
+  BROWSER_TIMEOUT: {{ .Values.linkwarden.browserTimeout | quote }}
+  {{- end }}
+  {{- if .Values.linkwarden.ignoreUnauthorizedCA }}
+  IGNORE_UNAUTHORIZED_CA: {{ .Values.linkwarden.ignoreUnauthorizedCA | quote }}
+  {{- end }}
+  {{- if .Values.linkwarden.ignoreHTTPSErrors }}
+  IGNORE_HTTPS_ERRORS: {{ .Values.linkwarden.ignoreHTTPSErrors | quote }}
+  {{- end }}
+---
+{{- range $_, $v := .Values.linkwarden.auth.sso }}
+{{- $providerArg := (dict "provider" $v.provider) }}
+{{- $provider := $v.provider }}
+{{- $issuer := $v.issuer }}
+{{- $issuerList := include "linkwarden.auth.providers.withIssuers" $ | fromJsonArray }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ printf "%s-%s" (include "linkwarden.configmaps.auth" $) $v.provider }}
+  namespace: {{ $.Release.Namespace }}
+  labels:
+    app.kubernetes.io/component: linkwarden
+    {{- include "linkwarden.labels" $ | nindent 4 }}
+    {{- if $.Values.configMap.labels }}
+    {{- toYaml $.Values.configMap.labels | nindent 4 }}
+    {{- end }}
+  {{- if $.Values.configMap.annotations }}
+  annotations:
+  {{- toYaml $.Values.configMap.annotations | nindent 4 }}
+  {{- end }}
+data:
+  {{ include "linkwarden.auth.envs.nextPublicEnable" $providerArg }}: "true"
+  {{- if $v.customName }}
+  {{ include "linkwarden.auth.envs.customName" $providerArg }}: {{ $v.customName }}
+  {{- end }}
+  {{- if has $issuer $issuerList }}
+  {{- if $v.issuer }}
+  {{ include "linkwarden.auth.envs.issuer" $providerArg }}: {{ $issuer }}
+  {{- end }}
+  {{- end }}
+  {{- if (eq $provider "atlassian") }}
+  {{- if $v.scope }}
+  {{ printf "%s_SCOPE" $provider | upper }}: {{ $v.scope }}
+  {{- end }}
+  {{- end }}
+  {{- if (eq $provider "foursquare") }}
+  {{- if $v.apiVersion }}
+  {{ printf "%s_APIVERSION" $provider | upper }}: {{ $v.apiVersion }}
+  {{- end }}
+  {{- end }}
+---
+{{- end }}

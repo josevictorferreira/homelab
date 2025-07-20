@@ -1,0 +1,54 @@
+linkwarden:
+  domain: "linkwarden.helm.private"
+  nextAuthSecret:
+    value: "PretendThisIsARandomString"
+  ignoreUnauthorizedCA: true
+  #  data:
+  #    filesystem:
+  #      pvc:
+  #        existingClaim: linkwarden-pvc
+
+  database:
+    user: "linkwarden"
+    password: "linkwarden"
+    port: 5432
+    name: "linkwarden"
+
+  auth:
+    disableRegistration: false
+    enableCredentials: true
+    disableNewSSOUsers: false
+    sso: []
+#      - provider: "authentik"
+#        customName: "authentik-custom"
+#        issuer: "authentik"
+#        clientId: "someId"
+#        clientSecret: "someSecret"
+
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: development-issuer
+  tls:
+    - secretName: linkwarden-ingress-tls
+      hosts:
+        - "linkwarden.helm.private"
+
+livenessProbe:
+  enabled: true
+
+readinessProbe:
+  enabled: true
+
+startupProbe:
+  enabled: true
+
+postgresql:
+  enabled: true
+  auth:
+    enablePostgresUser: true
+    postgresPassword: "postgres"
+    username: "linkwarden"
+    password: "linkwarden"
+    database: "linkwarden"

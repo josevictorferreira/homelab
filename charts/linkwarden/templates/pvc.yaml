@@ -1,0 +1,22 @@
+{{- if not .Values.linkwarden.data.filesystem.pvc.existingClaim }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "linkwarden.pvc.name" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "linkwarden.labels" . | nindent 4 }}
+  annotations:
+    meta.helm.sh/release-name: {{ $.Release.Name | quote }}
+    meta.helm.sh/release-namespace: {{ $.Release.Namespace | quote }}
+    {{- if (eq .Values.linkwarden.data.filesystem.pvc.reclaimPolicy "Retain") }}
+    helm.sh/resource-policy: keep
+    {{- end }}
+spec:
+  storageClassName: {{ .Values.linkwarden.data.filesystem.pvc.storageClass | default "standard" }}
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.linkwarden.data.filesystem.pvc.size }}
+{{- end }}
