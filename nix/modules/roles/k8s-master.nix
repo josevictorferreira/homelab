@@ -6,11 +6,11 @@ let
   isInit = hostName == masterHostname;
   clusterInitFlags = [
     "--cluster-init"
-    "--disable=traefik,servicelb"
     "--node-taint=node-role.kubernetes.io/control-plane=true:NoSchedule"
   ];
   initFlags = [
     "--node-name=${hostName}"
+    "--disable=traefik,servicelb"
     "--node-label=node-group=master"
   ] ++ (if isInit then clusterInitFlags else [ ]);
 in
