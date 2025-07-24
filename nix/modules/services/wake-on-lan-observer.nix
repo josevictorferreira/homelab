@@ -5,6 +5,7 @@ let
         { name = "pve1"; ip = "10.10.10.200"; mac = "68:1D:EF:30:C1:03"; }
         { name = "pve2"; ip = "10.10.10.201"; mac = "68:1D:EF:3B:71:4E"; }
         { name = "pve3"; ip = "10.10.10.202"; mac = "68:1D:EF:3E:30:37"; }
+        { name = "pve4"; ip = "10.10.10.203"; mac = "B0:41:6F:16:1F:72"; }
     ];
 
     mkPveService = node: {
