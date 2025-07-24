@@ -7,7 +7,7 @@
     ./../modules/services/wake-on-lan-observer.nix
   ];
 
-  networking.hostName = hostName;
+  networking.hostName = "raspberry-pi4";
   networking.staticIP = {
     enable = true;
     interface = "end0";
