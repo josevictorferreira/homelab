@@ -3,7 +3,7 @@
 {
   imports = [
     ./base.nix
-    ./../modules/roles/k8s-master.nix
+    ./../modules/roles/k8s-worker.nix
   ];
 
   networking.hostName = hostName;
