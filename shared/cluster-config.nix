@@ -51,6 +51,7 @@
 
   masters = [
     "k8s-node-212-gamma"
+    "k8s-node-217-theta"
   ];
 
   tokenFile = "/run/secrets/k3s_token";
