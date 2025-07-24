@@ -1,10 +1,43 @@
-TARGETS := $(shell grep -E '^[a-zA-Z0-9_-]+:.*?# .*$$' $(MAKEFILE_LIST) | cut -d: -f1)
-.PHONY: $(TARGETS)
-
+GREEN=\033[0;32m
+CYAN=\033[0;36m
+BOLD=\033[1m
+RESET=\033[0m
+GIT_BASE_ADDRESS := git@github.com:josevictorferreira
 DEFAULT_ENV := homelab
 APPS_NAMESPACE := self-hosted
+TARGETS := $(shell grep -E '^[a-zA-Z0-9_-]+:.*?# .*$$' $(MAKEFILE_LIST) | cut -d: -f1)
 
+.PHONY: $(TARGETS)
 .DEFAULT_GOAL := help
+
+SUBTRESS := \
+  nix=$(GIT_BASE_ADDRESS)/nix-config-homelab.git@main
+
+subtree_clean_check: ## Check if the git working tree is clean.
+	@if ! git diff --quiet || ! git diff --cached --quiet; then \
+		echo -e "❌ Git working tree is dirty. Please commit or stash your changes."; \
+		exit 1; \
+	else \
+		echo -e "✅ Git working tree is clean.\n"; \
+	fi
+
+subtree_sync: subtree_clean_check ## Add or sync subtrees to the config directory.
+	@for entry in $(SUBTRESS); do \
+		name=$$(echo $$entry | cut -d= -f1); \
+		repo=$$(echo $$entry | cut -d= -f2 | cut -d@ -f1,2); \
+		branch=$$(echo $$entry | cut -d@ -f3); \
+		echo -e "$(GREEN)--- 🔁 SYNC $$name ---$(RESET)"; \
+		if [ ! -d "config/$$name" ]; then \
+			echo -e "$(CYAN) Adding $$repo -> config/$$name (branch: $$branch)$(RESET)"; \
+			git subtree add --prefix=config/$$name $$repo $$branch --squash; \
+		else \
+			echo -e "$(CYAN) Pulling from $$repo (branch: $$branch)$(RESET)"; \
+			git subtree pull --prefix=config/$$name $$repo $$branch --squash || true; \
+			echo -e "$(CYAN) Pushing config/$$name to $$repo (branch: $$branch)$(RESET)"; \
+			git subtree push --prefix=config/$$name $$repo $$branch || true; \
+		fi; \
+		echo -e "✅ $(GREEN)DONE.$(RESET)\n"; \
+	done
 
 apply: ## Apply helmfile.: REL=<release_name>
 	helmfile -e $(DEFAULT_ENV) -l name=$(REL) apply
