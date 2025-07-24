@@ -42,6 +42,16 @@
       system = "x86_64-linux";
       machine = "intel-nuc-vm";
     };
+    k8s-node-217-theta = {
+      ipAddress = "10.10.10.217";
+      system = "x86_64-linux";
+      machine = "intel-nuc-vm";
+    };
+    k8s-node-218-iota = {
+      ipAddress = "10.10.10.218";
+      system = "x86_64-linux";
+      machine = "intel-nuc-vm";
+    };
     k8s-nixos-template = {
       ipAddress = "10.10.10.250";
       system = "x86_64-linux";
