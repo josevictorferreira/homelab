@@ -18,10 +18,10 @@ ingress:
 persistence:
   config:
     enabled: true
-    storageClass: longhorn
+    storageClass: ceph-rbd
   media:
     enabled: true
-    storageClass: longhorn
+    storageClass: ceph-rbd
 config: |
   mqtt:
     host: rabbitmq-headless

@@ -6,7 +6,7 @@ global:
 primary:
   persistence:
     enabled: true
-    storageClass: longhorn
+    storageClass: ceph-rbd
     reclaimPolicy: Retain
     accessModes:
       - ReadWriteOnce

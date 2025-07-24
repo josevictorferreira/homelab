@@ -5,7 +5,7 @@ grafana:
   persistence:
     enabled: true
     type: pvc
-    storageClassName: "longhorn"
+    storageClassName: "ceph-rbd"
     accessModes:
       - ReadWriteOnce
     size: 1Gi
@@ -49,7 +49,7 @@ prometheus:
     storageSpec:
       volumeClaimTemplate:
         spec:
-          storageClassName: longhorn
+          storageClassName: ceph-rbd
           accessModes: ["ReadWriteOnce"]
           resources:
             requests:

@@ -44,8 +44,8 @@ repositories:
     url: git+ssh://git@github.com/josevictorferreira/libebooker@.helm/libebooker?ref=main
   - name: uptime-kuma
     url: https://helm.irsigler.cloud
-  - name: longhorn
-    url: https://charts.longhorn.io
+  - name: ceph-csi
+    url: https://ceph.github.io/csi-charts
 
 ---
 
@@ -149,10 +149,9 @@ releases:
       - "{{ .Values.namespaces.ingress }}/ingress-nginx"
       - "{{ index .Values.namespaces "cert-manager" }}/cert-manager"
 
-  - name: longhorn
-    namespace: longhorn-system
-    chart: longhorn/longhorn
-    version: {{ .Values.versions.longhorn }}
+  - name: ceph-csi-rbd
+    namespace: {{ index .Values.namespaces "ceph-csi" }}
+    chart: ceph-csi/ceph-csi-rbd
     inherit:
       - template: default-infrastructure-release
 
@@ -167,11 +166,14 @@ releases:
     needs:
       - "{{ .Values.namespaces.ingress }}/ingress-nginx"
       - "{{ index .Values.namespaces "cert-manager" }}/cert-manager-issuer"
+      - "{{ index .Values.namespaces "ceph-csi" }}/ceph-csi-rbd"
 
   - name: postgresql
     chart: oci://registry-1.docker.io/bitnamicharts/postgresql
     inherit:
       - template: default-self-hosted-release
+    needs:
+      - "{{ index .Values.namespaces "ceph-csi" }}/ceph-csi-rbd"
 
   - name: linkwarden
     chart: charts/linkwarden
@@ -179,11 +181,15 @@ releases:
       - postgresql
     inherit:
       - template: default-self-hosted-release
+    needs:
+      - "{{ index .Values.namespaces "ceph-csi" }}/ceph-csi-rbd"
 
   - name: rabbitmq
     chart: oci://registry-1.docker.io/bitnamicharts/rabbitmq
     inherit:
       - template: default-self-hosted-release
+    needs:
+      - "{{ index .Values.namespaces "ceph-csi" }}/ceph-csi-rbd"
 
   - name: proxmox-external-ingress
     chart: charts/ingress-customized
@@ -200,31 +206,43 @@ releases:
         args:
           - "-c"
           - "sops -d values/services/pihole-secret.enc.yaml | kubectl apply -n {{ .Values.namespaces.services }} -f -"
+    needs:
+      - "{{ index .Values.namespaces "ceph-csi" }}/ceph-csi-rbd"
 
   - name: sftpgo
     inherit:
       - template: default-self-hosted-release
     chart: charts/sftpgo
+    needs:
+      - "{{ index .Values.namespaces "ceph-csi" }}/ceph-csi-rbd"
 
   - name: ntfy
     inherit:
       - template: default-self-hosted-release
     chart: charts/ntfy
+    needs:
+      - "{{ index .Values.namespaces "ceph-csi" }}/ceph-csi-rbd"
 
   - name: uptime-kuma
     inherit:
       - template: default-self-hosted-release
     chart: uptime-kuma/uptime-kuma
+    needs:
+      - "{{ index .Values.namespaces "ceph-csi" }}/ceph-csi-rbd"
 
   - name: qbittorrent
     inherit:
       - template: default-self-hosted-release
     chart: oci://tccr.io/truecharts/qbittorrent
+    needs:
+      - "{{ index .Values.namespaces "ceph-csi" }}/ceph-csi-rbd"
 
   - name: prowlarr
     inherit:
       - template: default-self-hosted-release
     chart: oci://tccr.io/truecharts/prowlarr
+    needs:
+      - "{{ index .Values.namespaces "ceph-csi" }}/ceph-csi-rbd"
 
   - name: alarm-server
     inherit:

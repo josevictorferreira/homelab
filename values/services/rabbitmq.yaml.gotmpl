@@ -35,7 +35,7 @@ networkPolicy:
           port: 8883
 persistence:
   enabled: true
-  storageClass: longhorn
+  storageClass: ceph-rbd
 auth:
   username: "{{ .Values.secret.rabbitmq_username }}"
   erlangCookie: "{{ .Values.secret.rabbitmq_cookie }}"

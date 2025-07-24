@@ -13,7 +13,7 @@ linkwarden:
     storageType: filesystem
     filesystem:
       pvc:
-        storageClass: longhorn
+        storageClass: ceph-rbd
         reclaimPolicy: Retain
   database:
     user: postgres

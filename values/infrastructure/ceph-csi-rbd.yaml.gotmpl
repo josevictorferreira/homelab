@@ -1,0 +1,22 @@
+csiConfig:
+  - clusterID: {{ .Values.secret.ceph_cluster_fsid }}
+    monitors:
+      - "10.10.10.200:6789"
+      - "10.10.10.201:6789"
+      - "10.10.10.202:6789"
+      - "10.10.10.203:6789"
+
+secrets:
+  create: true
+  userID: {{ .Values.secret.ceph_user }}
+  userKey: {{ .Values.secret.ceph_key }}
+
+storageClass:
+  - name: ceph-rbd
+    clusterID: {{ .Values.secret.ceph_cluster_fsid }}
+    pool: {{ .Values.secret.ceph_pool }}
+    reclaimPolicy: Delete
+    isDefault: true
+    allowVolumeExpansion: true
+    imageFeatures: "layering,deep-flatten,fast-diff,exclusive-lock"
+

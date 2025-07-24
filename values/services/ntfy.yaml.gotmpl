@@ -16,7 +16,7 @@ ntfy:
     rootPath: "/data"
     pvc:
       size: 5Gi
-      storageClass: longhorn
+      storageClass: ceph-rbd
   upstream:
     baseURL: "https://ntfy.sh"
   log:

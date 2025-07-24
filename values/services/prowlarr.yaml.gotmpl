@@ -85,7 +85,7 @@ persistence:
   config:
     enabled: true
     size: 1Gi
-    storageClass: longhorn
+    storageClass: ceph-rbd
     targetSelector:
       main:
         main:
@@ -96,7 +96,7 @@ persistence:
   custom-definitions:
     enabled: true
     size: 1Gi
-    storageClass: longhorn
+    storageClass: ceph-rbd
     targetSelector:
       main:
         main:
