@@ -21,20 +21,20 @@ subtree_clean_check: ## Check if the git working tree is clean.
 		echo -e "✅ Git working tree is clean.\n"; \
 	fi
 
-subtree_sync: subtree_clean_check ## Add or sync subtrees to the config directory.
+subtree_sync: subtree_clean_check ## Add or sync subtrees to the repository.
 	@for entry in $(SUBTRESS); do \
 		name=$$(echo $$entry | cut -d= -f1); \
 		repo=$$(echo $$entry | cut -d= -f2 | cut -d@ -f1,2); \
 		branch=$$(echo $$entry | cut -d@ -f3); \
 		echo -e "$(GREEN)--- 🔁 SYNC $$name ---$(RESET)"; \
-		if [ ! -d "config/$$name" ]; then \
-			echo -e "$(CYAN) Adding $$repo -> config/$$name (branch: $$branch)$(RESET)"; \
-			git subtree add --prefix=config/$$name $$repo $$branch --squash; \
+		if [ ! -d "$$name" ]; then \
+			echo -e "$(CYAN) Adding $$repo -> $$name (branch: $$branch)$(RESET)"; \
+			git subtree add --prefix=$$name $$repo $$branch --squash; \
 		else \
 			echo -e "$(CYAN) Pulling from $$repo (branch: $$branch)$(RESET)"; \
-			git subtree pull --prefix=config/$$name $$repo $$branch --squash || true; \
-			echo -e "$(CYAN) Pushing config/$$name to $$repo (branch: $$branch)$(RESET)"; \
-			git subtree push --prefix=config/$$name $$repo $$branch || true; \
+			git subtree pull --prefix=$$name $$repo $$branch --squash || true; \
+			echo -e "$(CYAN) Pushing $$name to $$repo (branch: $$branch)$(RESET)"; \
+			git subtree push --prefix=$$name $$repo $$branch || true; \
 		fi; \
 		echo -e "✅ $(GREEN)DONE.$(RESET)\n"; \
 	done
