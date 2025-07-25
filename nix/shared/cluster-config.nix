@@ -50,22 +50,22 @@
     k8s-node-218-iota = {
       ipAddress = "10.10.10.218";
       system = "x86_64-linux";
-      machine = "intel-nuc-vm";
+      machine = "amd-mini-pc";
     };
     k8s-node-219-kappa = {
       ipAddress = "10.10.10.219";
       system = "x86_64-linux";
-      machine = "intel-nuc-vm";
+      machine = "amd-mini-pc";
     };
     k8s-node-220-lambda = {
-      ipAddress = "10.10.10.250";
+      ipAddress = "10.10.10.220";
       system = "x86_64-linux";
-      machine = "intel-nuc-vm";
+      machine = "amd-mini-pc";
     };
-    k8s-nixos-template = {
+    k8s-node-template = {
       ipAddress = "10.10.10.250";
       system = "x86_64-linux";
-      machine = "intel-nuc-vm";
+      machine = "amd-mini-pc";
     };
   };
 
@@ -75,7 +75,7 @@
     "k8s-node-215-zeta"
   ];
 
-  tokenFile = "/etc/rancher/k3s/agent-token";
+  tokenFile = "/run/secrets/k3s_token";
 
   portsUdpToExpose = [
     8472

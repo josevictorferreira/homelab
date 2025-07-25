@@ -31,7 +31,6 @@
   services.xserver.xkb.layout = "us";
 
   services.qemuGuest.enable = true;
-  services.cloud-init.enable = true;
   services.openssh.enable = true;
 
   programs.gnupg.agent = {
