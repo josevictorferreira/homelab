@@ -10,8 +10,6 @@
   ];
 
   environment.systemPackages = with pkgs; [
-    sops
-    age
     git
     vim
     wget
