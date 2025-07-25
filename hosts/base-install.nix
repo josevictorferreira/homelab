@@ -13,7 +13,7 @@
   i18n.defaultLocale = "en_US.UTF-8";
   services.xserver.xkb.layout = "us";
 
-  networking.hostName = "base";
+  networking.hostName = "k8s-node-template";
   networking.useDHCP = true;
 
   users.users.josevictor = {
