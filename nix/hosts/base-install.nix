@@ -7,9 +7,14 @@
 
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
+  boot.growPartition = true;
 
   time.timeZone = "America/Sao_Paulo";
   i18n.defaultLocale = "en_US.UTF-8";
+  services.xserver.xkb.layout = "us";
+
+  networking.hostName = "base";
+  networking.useDHCP = true;
 
   security.sudo = {
     enable = true;
@@ -17,9 +22,10 @@
   };
 
   environment.systemPackages = with pkgs; [
+    sops
+    age
     git
     vim
-    wget
     curl
     gnumake
     htop
@@ -27,8 +33,6 @@
 
   # make a copy of current system configuration to /run/current-system/configuration.nix in case of a accidental deletion
   system.copySystemConfiguration = true;
-
-  services.xserver.xkb.layout = "us";
 
   services.qemuGuest.enable = true;
   services.openssh.enable = true;
@@ -60,5 +64,6 @@
 
   system.stateVersion = "25.05";
 
+  nix.settings.trusted-users = [ "root" "@wheel" ];
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 }
