@@ -3,13 +3,12 @@
 {
   imports = [
     ./base.nix
-    ./../modules/roles/k8s-master.nix
   ];
 
   networking.hostName = hostName;
+  networking.useDHCP = true;
   networking.staticIP = {
-    enable = true;
+    enable = false;
     interface = "ens18";
-    address = hostConfig.ipAddress;
   };
 }
