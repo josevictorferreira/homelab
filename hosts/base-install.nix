@@ -1,5 +1,8 @@
 { pkgs, ... }:
 
+let
+  ageSecret = "";
+in
 {
   imports = [
     ./hardware-configuration.nix
