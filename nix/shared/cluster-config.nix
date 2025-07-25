@@ -52,6 +52,16 @@
       system = "x86_64-linux";
       machine = "intel-nuc-vm";
     };
+    k8s-node-219-kappa = {
+      ipAddress = "10.10.10.219";
+      system = "x86_64-linux";
+      machine = "intel-nuc-vm";
+    };
+    k8s-node-220-lambda = {
+      ipAddress = "10.10.10.250";
+      system = "x86_64-linux";
+      machine = "intel-nuc-vm";
+    };
     k8s-nixos-template = {
       ipAddress = "10.10.10.250";
       system = "x86_64-linux";
@@ -60,8 +70,9 @@
   };
 
   masters = [
+    "k8s-node-219-kappa"
     "k8s-node-212-gamma"
-    "k8s-node-217-theta"
+    "k8s-node-215-zeta"
   ];
 
   tokenFile = "/run/secrets/k3s_token";
