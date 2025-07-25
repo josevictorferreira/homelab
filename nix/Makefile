@@ -2,8 +2,10 @@
 
 .DEFAULT_GOAL := help
 
+HOSTNAME := $(shell hostname)
+
 hostname: ## Print the actual hostanme of the current machine.
-	@echo $$HOSTNAME
+	hostname
 
 rebuild: ## Rebuild NixOS configuration.
 	sudo nixos-rebuild switch --flake .#$$HOSTNAME
