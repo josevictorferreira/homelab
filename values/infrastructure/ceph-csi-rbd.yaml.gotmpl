@@ -12,11 +12,12 @@ secrets:
   userKey: {{ .Values.secret.ceph_key }}
 
 storageClass:
-  - name: ceph-rbd
-    clusterID: {{ .Values.secret.ceph_cluster_fsid }}
-    pool: {{ .Values.secret.ceph_pool }}
-    reclaimPolicy: Delete
-    isDefault: true
-    allowVolumeExpansion: true
-    imageFeatures: "layering,deep-flatten,fast-diff,exclusive-lock"
+  name: ceph-rbd
+  create: true
+  clusterID: {{ .Values.secret.ceph_cluster_fsid }}
+  pool: {{ .Values.secret.ceph_pool }}
+  reclaimPolicy: Delete
+  isDefault: true
+  allowVolumeExpansion: true
+  imageFeatures: "layering,deep-flatten,fast-diff,exclusive-lock"
 
