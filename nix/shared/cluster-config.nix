@@ -75,7 +75,7 @@
     "k8s-node-215-zeta"
   ];
 
-  tokenFile = "/run/secrets/k3s_token";
+  tokenFile = "/etc/rancher/k3s/agent-token";
 
   portsUdpToExpose = [
     8472
