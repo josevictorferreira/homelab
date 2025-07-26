@@ -1,8 +1,7 @@
-{ lib, ... }:
+{ lib, hostName, hostConfig, clusterConfig, ... }:
 
 let
-  config = import ./../../shared/cluster-config.nix;
-  isMaster = config.networking.hostName == builtins.head (config.masters);
+  isMaster = hostName == builtins.head (clusterConfig.masters);
 in
 {
   services.keepalived = {
@@ -10,13 +9,11 @@ in
     openFirewall = true;
 
     vrrpInstances."k8s-api" = {
-      interface = "eth0";
+      interface = hostConfig.interface;
       virtualRouterId = 51;
       state = lib.mkDefault (if isMaster then "MASTER" else "BACKUP");
       priority = lib.mkDefault (if isMaster then 150 else 100);
-      advertInt = 1;
-      virtualIps = [ "${config.clusterIpAddress}/24 dev eth0" ];
-
+      virtualIps = [{ addr = "${clusterConfig.clusterIpAddress}/24"; dev = hostConfig.interface; }];
       trackScripts = [ "haproxy-up" ];
     };
 
@@ -25,6 +22,7 @@ in
       interval = 2;
       rise = 2;
       fall = 2;
+      user = "root";
     };
   };
 }
