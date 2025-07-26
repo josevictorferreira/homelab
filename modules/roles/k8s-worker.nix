@@ -2,7 +2,6 @@
 
 let
   initFlags = [
-    "--tls-san=${clusterConfig.clusterIpAddress}"
     "--node-name=${hostName}"
     "--node-label=node-group=worker"
   ];
