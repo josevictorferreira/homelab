@@ -12,6 +12,8 @@ let
     "--node-name=${hostName}"
     "--disable=traefik,servicelb"
     "--node-label=node-group=master"
+    "--etcd-arg=quota-backend-bytes=8589934592"
+    "--etcd-arg=max-wals=5"
   ] ++ (if isInit then clusterInitFlags else [ ]);
 in
 {
