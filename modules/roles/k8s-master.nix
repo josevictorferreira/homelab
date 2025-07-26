@@ -22,8 +22,8 @@ in
     ./../services/keepalived-k8s.nix
   ];
 
-  networking.firewall.allowedTCPPorts = clusterConfig.portsTcpToExpose ++ [ 6443 ];
-  networking.firewall.allowedUDPPorts = clusterConfig.portsUdpToExpose ++ [ 6443 ];
+  networking.firewall.allowedTCPPorts = clusterConfig.portsTcpToExpose;
+  networking.firewall.allowedUDPPorts = clusterConfig.portsUdpToExpose;
 
   services.k3s = {
     enable = true;
