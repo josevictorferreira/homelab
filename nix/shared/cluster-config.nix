@@ -1,6 +1,8 @@
 {
   clusterName = "homelab";
 
+  clusterIpAddress = "10.10.10.250";
+
   hosts = {
     raspberry-pi4 = {
       ipAddress = "10.10.10.209";

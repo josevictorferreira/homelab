@@ -1,9 +1,8 @@
 { clusterConfig, hostName, ... }:
 
 let
-  masterHostname = builtins.head clusterConfig.masters;
-  serverAddress = clusterConfig.hosts.${masterHostname}.ipAddress;
   initFlags = [
+    "--tls-san=${clusterConfig.clusterIpAddress}"
     "--node-name=${hostName}"
     "--node-label=node-group=worker"
   ];
@@ -17,6 +16,6 @@ in
     role = "agent";
     extraFlags = toString initFlags;
     tokenFile = clusterConfig.tokenFile;
-    serverAddr = "https://${serverAddress}:6443";
+    serverAddr = "https://${clusterConfig.clusterIpAddress}:6443";
   };
 }
