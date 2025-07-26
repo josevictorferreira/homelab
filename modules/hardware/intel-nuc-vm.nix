@@ -18,7 +18,7 @@
     {
       device = "/dev/disk/by-uuid/bbfdaeb1-3e4f-4ca9-bd5d-c3fecff96e4f";
       fsType = "ext4";
-      mountOptions = [ "defaults" "noatime" "nodiratime" "discard" ];
+      options = [ "defaults" "noatime" "nodiratime" "discard" ];
     };
 
   fileSystems."/boot" =
