@@ -8,6 +8,7 @@ let
     "--node-taint=node-role.kubernetes.io/control-plane=true:NoSchedule"
   ];
   initFlags = [
+    "--https-listen-port=6444"
     "--tls-san=${clusterConfig.clusterIpAddress}"
     "--node-name=${hostName}"
     "--disable=traefik,servicelb"
