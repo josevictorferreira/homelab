@@ -2,13 +2,13 @@
 
 let
   masterHostname = builtins.head clusterConfig.masters;
-  serverAddress = clusterConfig.hosts.${masterHostname}.ipAddress;
   isInit = hostName == masterHostname;
   clusterInitFlags = [
     "--cluster-init"
     "--node-taint=node-role.kubernetes.io/control-plane=true:NoSchedule"
   ];
   initFlags = [
+    "--tls-san=${clusterConfig.clusterIpAddress}"
     "--node-name=${hostName}"
     "--disable=traefik,servicelb"
     "--node-label=node-group=master"
@@ -17,8 +17,13 @@ let
   ] ++ (if isInit then clusterInitFlags else [ ]);
 in
 {
-  networking.firewall.allowedTCPPorts = clusterConfig.portsTcpToExpose;
-  networking.firewall.allowedUDPPorts = clusterConfig.portsUdpToExpose;
+  imports = [
+    ./../services/haproxy-k8s-api.nix
+    ./../services/keepalived-k8s.nix
+  ];
+
+  networking.firewall.allowedTCPPorts = clusterConfig.portsTcpToExpose ++ [ 6443 ];
+  networking.firewall.allowedUDPPorts = clusterConfig.portsUdpToExpose ++ [ 6443 ];
 
   services.k3s = {
     enable = true;
@@ -26,6 +31,6 @@ in
     tokenFile = clusterConfig.tokenFile;
     extraFlags = toString initFlags;
   } // lib.optionalAttrs (!isInit) {
-    serverAddr = "https://${serverAddress}:6443";
+    serverAddr = "https://${clusterConfig.clusterIpAddress}:6443";
   };
 }
