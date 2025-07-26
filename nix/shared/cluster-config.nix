@@ -16,7 +16,7 @@
       system = "x86_64-linux";
       machine = "intel-nuc-vm";
       interface = "ens18";
-      roles = [ "k8s-worker" ];
+      roles = [ "k8s-master" ];
     };
     k8s-node-211-beta = {
       ipAddress = "10.10.10.211";
@@ -49,40 +49,12 @@
     k8s-node-215-zeta = {
       ipAddress = "10.10.10.215";
       system = "x86_64-linux";
-      machine = "intel-nuc-vm";
+      machine = "amd-mini-pc";
       interface = "ens18";
       roles = [ "k8s-master" ];
     };
     k8s-node-216-eta = {
       ipAddress = "10.10.10.216";
-      system = "x86_64-linux";
-      machine = "intel-nuc-vm";
-      interface = "ens18";
-      roles = [ "k8s-worker" ];
-    };
-    k8s-node-217-theta = {
-      ipAddress = "10.10.10.217";
-      system = "x86_64-linux";
-      machine = "intel-nuc-vm";
-      interface = "ens18";
-      roles = [ "k8s-worker" ];
-    };
-    k8s-node-218-iota = {
-      ipAddress = "10.10.10.218";
-      system = "x86_64-linux";
-      machine = "amd-mini-pc";
-      interface = "ens18";
-      roles = [ "k8s-worker" ];
-    };
-    k8s-node-219-kappa = {
-      ipAddress = "10.10.10.219";
-      system = "x86_64-linux";
-      machine = "amd-mini-pc";
-      interface = "ens18";
-      roles = [ "k8s-master" ];
-    };
-    k8s-node-220-lambda = {
-      ipAddress = "10.10.10.220";
       system = "x86_64-linux";
       machine = "amd-mini-pc";
       interface = "ens18";
@@ -98,7 +70,7 @@
   };
 
   masters = [
-    "k8s-node-219-kappa"
+    "k8s-node-210-alpha"
     "k8s-node-212-gamma"
     "k8s-node-215-zeta"
   ];
