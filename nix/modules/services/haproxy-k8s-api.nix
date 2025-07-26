@@ -8,7 +8,7 @@ let
       let
         host = config.hosts.${name};
       in
-      "${name} ${host.ipAddress}:6443"
+      "${name} ${host.ipAddress}:6444"
     )
     config.masters;
 in
