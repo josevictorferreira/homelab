@@ -41,6 +41,7 @@ in
 
   services.k3s = {
     enable = true;
+    dataDir = "/var/lib/rancher/k3s";
     role = "server";
     tokenFile = clusterConfig.tokenFile;
     extraFlags = toString initFlags;
