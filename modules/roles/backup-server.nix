@@ -1,10 +1,14 @@
 { ... }:
 
 {
+  imports = [
+    ./../services/wake-on-lan-observer.nix
+  ];
+
   services.nfs.server = {
     enable = true;
     exports = ''
-      /mnt/backup-storage/longhorn *(rw,sync,no_subtree_check,no_root_squash)
+      /mnt/backup-storage/backups *(rw,sync,no_subtree_check,no_root_squash)
     '';
   };
 
@@ -14,6 +18,6 @@
 
   # Create backup directory
   systemd.tmpfiles.rules = [
-    "d /mnt/backup-storage/longhorn 0755 root root -"
+    "d /mnt/backup-storage/backups 0755 root root -"
   ];
 }

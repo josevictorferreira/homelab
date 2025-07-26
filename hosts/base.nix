@@ -1,5 +1,8 @@
-{ pkgs, hostName, ... }:
+{ pkgs, hostName, hostConfig, ... }:
 
+let
+  roles = map (role: ./../modules/roles/${role}.nix) hostConfig.roles;
+in
 {
   imports = [
     ./../modules/common/sops.nix
@@ -11,7 +14,7 @@
     ./../modules/programs/vim.nix
     ./../modules/programs/git.nix
     ./../modules/programs/zsh.nix
-  ];
+  ] ++ roles;
 
   environment.systemPackages = with pkgs; [
     age
@@ -26,5 +29,12 @@
 
   environment.sessionVariables = {
     HOSTNAME = hostName;
+  };
+
+  networking.hostName = hostName;
+  networking.staticIP = {
+    enable = true;
+    interface = hostConfig.interface;
+    address = hostConfig.ipAddress;
   };
 }

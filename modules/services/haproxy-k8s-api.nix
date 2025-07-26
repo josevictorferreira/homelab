@@ -36,7 +36,7 @@ in
       backend kubernetes-masters
         balance roundrobin
         option tcp-check
-    '' + (lib.concatStringSep "\n"
+    '' + (lib.concatStringsSep "\n"
       (map (s: "        server ${s} check") masters)) + "\n";
   };
 }

@@ -22,7 +22,7 @@
           modules = [
             sops-nix.nixosModules.sops
             ./modules/hardware/${hosts.${hostName}.machine}.nix
-            ./hosts/${hostName}.nix
+            ./hosts/base.nix
           ];
         };
     in
