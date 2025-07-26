@@ -1,4 +1,4 @@
-{ lib, hostName, clusterConfig, ... }:
+{ lib, pkgs, hostName, clusterConfig, ... }:
 
 let
   masterHostname = builtins.head clusterConfig.masters;
@@ -15,6 +15,9 @@ let
     "--node-label=node-group=master"
     "--etcd-arg=quota-backend-bytes=8589934592"
     "--etcd-arg=max-wals=5"
+    "--etcd-arg=auto-compaction-mode=periodic"
+    "--etcd-arg=auto-compaction-retention=30m"
+    "--etcd-arg=snapshot-count=10000"
   ] ++ (if isInit then clusterInitFlags else [ ]);
 in
 {
@@ -23,11 +26,22 @@ in
     ./../services/keepalived-k8s.nix
   ];
 
+  environment.systemPackages = with pkgs; [
+    xfsprogs
+  ];
+
+  fileSystems."/var/lib/rancher/k3s/server/db" = {
+    device = "/dev/disk/by-label/k3sdb";
+    fsType = "xfs";
+    options = [ "noatime" "nodiratime" ];
+  };
+
   networking.firewall.allowedTCPPorts = clusterConfig.portsTcpToExpose;
   networking.firewall.allowedUDPPorts = clusterConfig.portsUdpToExpose;
 
   services.k3s = {
     enable = true;
+    dataDir = "/var/lib/rancher/k3s";
     role = "server";
     tokenFile = clusterConfig.tokenFile;
     extraFlags = toString initFlags;
