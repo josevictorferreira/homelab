@@ -13,6 +13,7 @@
   boot.initrd.availableKernelModules = [ "uhci_hcd" "ehci_pci" "ahci" "virtio_pci" "virtio_scsi" "sd_mod" "sr_mod" "btrfs" ];
   boot.initrd.kernelModules = [ ];
   boot.kernelModules = [
+    "nft_expr_counter"
     "kvm-amd"
     "rbd" # For ceph storage
     "btrfs"
