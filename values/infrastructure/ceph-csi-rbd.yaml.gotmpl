@@ -1,7 +1,6 @@
 csiConfig:
   - clusterID: {{ .Values.secret.ceph_cluster_fsid }}
     monitors:
-      - "10.10.10.200:6789"
       - "10.10.10.201:6789"
       - "10.10.10.202:6789"
       - "10.10.10.203:6789"
