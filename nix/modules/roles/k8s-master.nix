@@ -38,6 +38,7 @@ in
 
   networking.firewall.allowedTCPPorts = clusterConfig.portsTcpToExpose;
   networking.firewall.allowedUDPPorts = clusterConfig.portsUdpToExpose;
+  networking.nftables.enable = true;
 
   services.k3s = {
     enable = true;
