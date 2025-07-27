@@ -30,7 +30,7 @@ in
     xfsprogs
   ];
 
-  fileSystems."/var/lib/rancher/k3s/server/db" = {
+  fileSystems."/var/lib/rancher" = {
     device = "/dev/disk/by-label/k3sdb";
     fsType = "xfs";
     options = [ "noatime" "nodiratime" ];
