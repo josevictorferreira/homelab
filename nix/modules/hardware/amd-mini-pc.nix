@@ -1,4 +1,4 @@
-{ lib, modulesPath, ... }:
+{ lib, pkgs, modulesPath, ... }:
 
 {
   imports =
@@ -6,23 +6,29 @@
       (modulesPath + "/profiles/qemu-guest.nix")
     ];
 
-  boot.initrd.availableKernelModules = [ "uhci_hcd" "ehci_pci" "ahci" "virtio_pci" "virtio_scsi" "sd_mod" "sr_mod" ];
+  environment.systemPackages = with pkgs; [
+    btrfs-progs
+  ];
+
+  boot.initrd.availableKernelModules = [ "uhci_hcd" "ehci_pci" "ahci" "virtio_pci" "virtio_scsi" "sd_mod" "sr_mod" "btrfs" ];
   boot.initrd.kernelModules = [ ];
   boot.kernelModules = [
     "kvm-amd"
     "rbd" # For ceph storage
+    "btrfs"
   ];
   boot.extraModulePackages = [ ];
 
   fileSystems."/" =
     {
-      device = "/dev/disk/by-uuid/bbfdaeb1-3e4f-4ca9-bd5d-c3fecff96e4f";
-      fsType = "ext4";
+      device = "/dev/disk/by-label/nixos";
+      fsType = "btrfs";
+      options = [ "compress=zstd" "noatime" "space_cache=v2" ];
     };
 
   fileSystems."/boot" =
     {
-      device = "/dev/disk/by-uuid/B20C-5022";
+      device = "/dev/disk/by-label/boot";
       fsType = "vfat";
       options = [ "fmask=0022" "dmask=0022" ];
     };
