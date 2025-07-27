@@ -32,8 +32,8 @@ in
 
   fileSystems."/var/lib/rancher/k3s/server/db" = {
     device = "/dev/disk/by-label/k3sdb";
-    fsType = "xfs";
-    options = [ "noatime" "nodiratime" ];
+    fsType = "btrfs";
+    options = [ "compress=zstd" "noatime" "space_cache=v2" ];
   };
 
   networking.firewall.allowedTCPPorts = clusterConfig.portsTcpToExpose;
