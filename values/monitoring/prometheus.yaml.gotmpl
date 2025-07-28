@@ -3,8 +3,6 @@ crds:
 
 grafana:
   enabled: true
-  nodeSelector:
-    node-group: child
   persistence:
     enabled: true
     type: pvc
@@ -43,8 +41,6 @@ prometheus:
   enabled: true
   prometheusSpec:
     replicas: 1
-    nodeSelector:
-      node-group: child
     podMonitorSelectorNilUsesHelmValues: false
     serviceMonitorSelectorNilUsesHelmValues: false
     retention: 120h

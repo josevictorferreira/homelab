@@ -7,8 +7,10 @@ csiConfig:
 
 secret:
   create: true
-  userID: {{ .Values.secret.ceph_user }}
-  userKey: {{ .Values.secret.ceph_key }}
+  userID: "{{ .Values.secret.ceph_user }}"
+  userKey: "{{ .Values.secret.ceph_key }}"
+  encryptionPassphrase: ""
+  
 
 storageClass:
   name: ceph-rbd
