@@ -5,7 +5,7 @@ csiConfig:
       - "10.10.10.202:6789"
       - "10.10.10.203:6789"
 
-secrets:
+secret:
   create: true
   userID: {{ .Values.secret.ceph_user }}
   userKey: {{ .Values.secret.ceph_key }}
@@ -18,7 +18,7 @@ storageClass:
   reclaimPolicy: Delete
   isDefault: true
   allowVolumeExpansion: true
-  imageFeatures: "layering,deep-flatten,fast-diff,exclusive-lock"
+  imageFeatures: "layering,deep-flatten,object-map,fast-diff,exclusive-lock"
 
 
 logLevel: 0

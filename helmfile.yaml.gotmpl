@@ -136,6 +136,7 @@ releases:
 
   - name: cert-manager-issuer
     namespace: {{ index .Values.namespaces "cert-manager" }}
+    createNamespace: true
     chart: charts/cert-manager-issuer
     version: {{ index .Values.versions "cert-manager-issuer" }}
     inherit:
@@ -150,12 +151,13 @@ releases:
     inherit:
       - template: default-infrastructure-release
 
+  - name: pihole
+    inherit:
+      - template: default-self-hosted-release
+    chart: mojo2600/pihole
+
   - name: prometheus
     chart: prometheus-community/kube-prometheus-stack
-    hooks:
-      - events: ["prepare"]
-        command: "sh"
-        args: ["-c", "kubectl create namespace {{ .Values.namespaces.monitoring }} --dry-run=client -o yaml | kubectl apply -f - && sops -d values/monitoring/grafana-secret.enc.yaml | kubectl apply -n {{ .Values.namespaces.monitoring }} -f -"]
     inherit:
       - template: default-monitoring-release
     needs:
@@ -183,11 +185,6 @@ releases:
     chart: charts/ingress-customized
     inherit:
       - template: default-self-hosted-release
-
-  - name: pihole
-    inherit:
-      - template: default-self-hosted-release
-    chart: mojo2600/pihole
 
   - name: sftpgo
     inherit:
