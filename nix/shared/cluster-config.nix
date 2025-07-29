@@ -1,6 +1,8 @@
 {
   clusterName = "homelab";
 
+  clusterDomain = "homelab.local";
+
   clusterIpAddress = "10.10.10.250";
 
   hosts = {

@@ -1,4 +1,4 @@
-{ pkgs, hostName, hostConfig, ... }:
+{ pkgs, hostName, hostConfig, clusterConfig, ... }:
 
 let
   roles = map (role: ./../modules/roles/${role}.nix) hostConfig.roles;
@@ -35,7 +35,8 @@ in
   };
 
   networking.hostName = hostName;
-  networking.domain = "homelab.local";
+  networking.domain = clusterConfig.clusterDomain;
+  networking.fqdn = "${hostName}.${clusterConfig.clusterDomain}";
   networking.staticIP = {
     enable = true;
     interface = hostConfig.interface;
