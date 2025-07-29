@@ -34,6 +34,7 @@ in
     HOSTNAME = hostName;
   };
 
+  boot.kernel.sysctl."kernel.hostname" = "${hostName}.${clusterConfig.clusterDomain}";
   networking.hostName = hostName;
   networking.domain = clusterConfig.clusterDomain;
   networking.fqdn = "${hostName}.${clusterConfig.clusterDomain}";
