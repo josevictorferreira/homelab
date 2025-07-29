@@ -13,6 +13,7 @@ secret:
   
 storageClass:
   name: ceph-cephfs
+  mounter: kernel
   create: true
   clusterID: {{ .Values.secret.ceph_cluster_fsid }}
   fsName: "{{ .Values.secret.cephfs_name }}"

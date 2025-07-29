@@ -35,6 +35,7 @@ in
   };
 
   networking.hostName = hostName;
+  networking.domain = "homelab.local";
   networking.staticIP = {
     enable = true;
     interface = hostConfig.interface;
