@@ -35,7 +35,7 @@
 
   config = lib.mkIf config.networking.staticIP.enable {
     networking.interfaces.${config.networking.staticIP.interface} = {
-      mtu = 9000;
+      mtu = 1500;
       ipv4.addresses = [{
         address = config.networking.staticIP.address;
         prefixLength = config.networking.staticIP.prefixLength;
