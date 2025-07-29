@@ -53,8 +53,8 @@ serviceDhcp:
 
 admin:
   enabled: true
-  existingSecret: "pihole-secret"
-  passwordKey: "ADMIN_PASSWORD"
+
+adminPassword: "{{ .Values.secret.pihole_admin_password }}"
 
 persistentVolumeClaim:
   enabled: true

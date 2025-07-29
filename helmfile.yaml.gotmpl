@@ -13,7 +13,7 @@ environments:
 helmDefaults:
   kubeContext: homelab
   wait: true
-  timeout: 300
+  timeout: 1200
   recreatePods: false
   force: false
 
@@ -27,7 +27,7 @@ repositories:
   - name: metallb
     url: https://metallb.github.io/metallb
   - name: mojo2600
-    url: https://mojo2600.github.io/pihole-kubernetes
+    url: git+https://github.com/mojo2600/pihole-kubernetes@charts/pihole?ref=main
   - name: bitnami
     url: https://charts.bitnami.com/bitnami
   - name: fmjstudios
@@ -171,6 +171,7 @@ releases:
 
   - name: linkwarden
     chart: charts/linkwarden
+    timeout: 10000
     needs:
       - postgresql
     inherit:
