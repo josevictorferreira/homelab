@@ -15,7 +15,7 @@ image:
 
 virtualHost: "pihole.local"
 
-replicaCount: 1
+replicaCount: 3
 
 DNS1: 1.1.1.1
 DNS2: 1.0.0.1
@@ -58,9 +58,9 @@ adminPassword: "{{ .Values.secret.pihole_admin_password }}"
 
 persistentVolumeClaim:
   enabled: true
-  storageClass: ceph-rbd
+  storageClass: ceph-cephfs
   accessModes:
-    - "ReadWriteOnce"
+    - "ReadWriteMany"
 
 ingress:
   enabled: true

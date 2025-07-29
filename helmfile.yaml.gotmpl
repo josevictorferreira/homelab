@@ -85,6 +85,7 @@ templates:
       - "{{ index .Values.namespaces "cert-manager" }}/cert-manager-issuer"
       - "{{ .Values.namespaces.ingress }}/ingress-nginx"
       - "{{ index .Values.namespaces "ceph-csi" }}/ceph-csi-rbd"
+      - "{{ index .Values.namespaces "cephfs-csi" }}/ceph-csi-cephfs"
 
 releases:
   - name: cluster-setup
@@ -148,6 +149,12 @@ releases:
   - name: ceph-csi-rbd
     namespace: {{ index .Values.namespaces "ceph-csi" }}
     chart: ceph-csi/ceph-csi-rbd
+    inherit:
+      - template: default-infrastructure-release
+
+  - name: ceph-csi-cephfs
+    namespace: {{ index .Values.namespaces "cephfs-csi" }}
+    chart: ceph-csi/ceph-csi-cephfs
     inherit:
       - template: default-infrastructure-release
 

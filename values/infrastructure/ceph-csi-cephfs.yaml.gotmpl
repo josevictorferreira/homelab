@@ -1,0 +1,26 @@
+csiConfig:
+  - clusterID: {{ .Values.secret.ceph_cluster_fsid }}
+    monitors:
+      - "10.10.10.201:6789"
+      - "10.10.10.202:6789"
+      - "10.10.10.203:6789"
+
+secret:
+  create: true
+  userID: "{{ .Values.secret.cephfs_user }}"
+  userKey: "{{ .Values.secret.cephfs_key }}"
+  encryptionPassphrase: ""
+  
+storageClass:
+  name: ceph-cephfs
+  create: true
+  clusterID: {{ .Values.secret.ceph_cluster_fsid }}
+  fsName: "{{ .Values.secret.cephfs_name }}"
+  pool: "{{ .Values.secret.cephfs_data_pool }}"
+  reclaimPolicy: Delete
+  allowVolumeExpansion: true
+  mountOptions: ["_netdev"]
+
+logLevel: 0
+sidecarLogLevel: 0
+logSlowOperationInterval: 5m

@@ -17,6 +17,7 @@
     "kvm-amd"
     "rbd" # For ceph storage
     "btrfs"
+    "ceph"
   ];
   boot.extraModulePackages = [ ];
 
