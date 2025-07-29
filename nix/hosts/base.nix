@@ -17,7 +17,6 @@ in
   ] ++ roles;
 
   boot.supportedFilesystems = [ "nfs" ];
-  services.nfs.client.enable = true;
   services.rpcbind.enable = true;
 
   environment.systemPackages = with pkgs; [
