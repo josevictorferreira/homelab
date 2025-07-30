@@ -9,7 +9,6 @@ secret:
   create: true
   userID: "{{ .Values.secret.cephfs_user }}"
   userKey: "{{ .Values.secret.cephfs_key }}"
-  encryptionPassphrase: ""
   
 storageClass:
   name: ceph-cephfs
@@ -20,7 +19,6 @@ storageClass:
   pool: "{{ .Values.secret.cephfs_data_pool }}"
   reclaimPolicy: Delete
   allowVolumeExpansion: true
-  mountOptions: ["_netdev"]
 
 logLevel: 0
 sidecarLogLevel: 0
