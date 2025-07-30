@@ -9,7 +9,7 @@ grafana:
     storageClassName: "ceph-rbd"
     accessModes:
       - ReadWriteOnce
-    size: 1Gi
+    size: 10Gi
     finalizers:
       - kubernetes.io/pvc-protection
   service:
@@ -44,7 +44,6 @@ prometheus:
     podMonitorSelectorNilUsesHelmValues: false
     serviceMonitorSelectorNilUsesHelmValues: false
     retention: 120h
-    retentionSize: "1GB"
     storageSpec:
       volumeClaimTemplate:
         spec:
@@ -52,4 +51,4 @@ prometheus:
           accessModes: ["ReadWriteOnce"]
           resources:
             requests:
-              storage: 2Gi
+              storage: 25Gi
