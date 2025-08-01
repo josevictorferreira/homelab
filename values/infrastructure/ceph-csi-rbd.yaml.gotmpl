@@ -10,18 +10,16 @@ secret:
   userID: "{{ .Values.secret.ceph_user }}"
   userKey: "{{ .Values.secret.ceph_key }}"
   encryptionPassphrase: ""
-  
 
 storageClass:
   name: ceph-rbd
   create: true
   clusterID: {{ .Values.secret.ceph_cluster_fsid }}
   pool: {{ .Values.secret.ceph_pool }}
-  reclaimPolicy: Delete
+  reclaimPolicy: Retain
   isDefault: true
   allowVolumeExpansion: true
   imageFeatures: "layering,deep-flatten,object-map,fast-diff,exclusive-lock"
-
 
 logLevel: 0
 sidecarLogLevel: 0

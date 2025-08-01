@@ -47,6 +47,7 @@ load_balancer:
     ingress: 10.10.10.110
     services:
       pihole: 10.10.10.100
+      piholedns: 10.10.10.104
       proxmox: 10.10.10.200
       grafana: 10.10.10.190
       readarr: 10.10.10.199

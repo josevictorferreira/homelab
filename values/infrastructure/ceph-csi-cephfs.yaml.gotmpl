@@ -7,17 +7,17 @@ csiConfig:
 
 secret:
   create: true
-  userID: "{{ .Values.secret.cephfs_user }}"
-  userKey: "{{ .Values.secret.cephfs_key }}"
+  userID: "{{ .Values.secret.ceph_user }}"
+  userKey: "{{ .Values.secret.ceph_key }}"
   
 storageClass:
   name: ceph-cephfs
   mounter: kernel
   create: true
+  reclaimPolicy: Retain
   clusterID: {{ .Values.secret.ceph_cluster_fsid }}
   fsName: "{{ .Values.secret.cephfs_name }}"
   pool: "{{ .Values.secret.cephfs_data_pool }}"
-  reclaimPolicy: Delete
   allowVolumeExpansion: true
 
 logLevel: 0

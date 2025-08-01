@@ -10,12 +10,12 @@
 
 image:
   repository: "pihole/pihole"
-  tag: "v6.1.2@sha256:9bb0f057b530599e3aa3f05645b81bb9081a571345bcdea0804f80f6239ab18b"
+  tag: "2025.07.0@sha256:da0216f6ee64c36dd9cae8576d3ec8c8f7436d6f5fb504a8f58bdda913647db5"
   pullPolicy: "IfNotPresent"
 
 virtualHost: "pihole.local"
 
-replicaCount: 1
+replicaCount: 3
 
 DNS1: 1.1.1.1
 DNS2: 1.0.0.1
@@ -27,6 +27,8 @@ podDnsConfig:
   - 127.0.0.1
   - 1.1.1.1
   - 1.0.0.1
+
+privileged: "true"
 
 ftl:
   dns_listeningMode: "ALL"
@@ -58,9 +60,9 @@ adminPassword: "{{ .Values.secret.pihole_admin_password }}"
 
 persistentVolumeClaim:
   enabled: true
-  storageClass: ceph-rbd
+  storageClass: ceph-cephfs
   accessModes:
-    - "ReadWriteOnce"
+    - "ReadWriteMany"
 
 ingress:
   enabled: true
