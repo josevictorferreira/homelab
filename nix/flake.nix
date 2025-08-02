@@ -11,7 +11,7 @@
       flakeRoot = ./.;
       username = "josevictor";
       clusterConfig = import ./shared/cluster-config.nix;
-      domain = clusterConfig.domain;
+      domain = clusterConfig.clusterDomain;
       hosts = clusterConfig.hosts;
 
       mkHost = hostFqdn:
