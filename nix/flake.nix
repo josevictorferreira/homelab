@@ -33,8 +33,8 @@
       nixosConfigurations =
         nixpkgs.lib.mapAttrs'
           (hostName: _: {
-            name = "${hostName}.${domain}"; # new key ➜ k8s-node-216-eta.homelab.local
-            value = mkHost "${hostName}.${domain}"; # built with FQDN too
+            name = "${hostName}.${domain}";
+            value = mkHost "${hostName}.${domain}";
           })
           hosts;
     };
