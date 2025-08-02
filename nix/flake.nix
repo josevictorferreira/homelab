@@ -19,7 +19,7 @@
           system = hosts.${builtins.head (builtins.split "\\." hostFqdn)}.system;
           specialArgs = {
             inherit self inputs hostFqdn username flakeRoot clusterConfig;
-            hostName = hostFqdn;
+            hostName = builtins.head (builtins.split "\\." hostFqdn);
             hostConfig = hosts.${builtins.head (builtins.split "\\." hostFqdn)};
           };
           modules = [
