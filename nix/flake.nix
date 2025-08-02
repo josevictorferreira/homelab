@@ -5,28 +5,37 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
     sops-nix.url = "github:Mic92/sops-nix";
   };
+
   outputs = { self, nixpkgs, sops-nix, ... }@inputs:
     let
       flakeRoot = ./.;
       username = "josevictor";
       clusterConfig = import ./shared/cluster-config.nix;
+      domain = clusterConfig.domain;
       hosts = clusterConfig.hosts;
 
-      mkHost = hostName:
+      mkHost = hostFqdn:
         nixpkgs.lib.nixosSystem {
-          system = hosts.${hostName}.system;
+          system = hosts.${hostFqdn}.${/* or your mapping */ "system"}; # adjust if needed
           specialArgs = {
-            inherit self inputs hostName username flakeRoot clusterConfig;
-            hostConfig = hosts.${hostName};
+            inherit self inputs hostFqdn username flakeRoot clusterConfig;
+            hostConfig = hosts.${builtins.head (builtins.split "\\." hostFqdn)};
           };
           modules = [
             sops-nix.nixosModules.sops
-            ./modules/hardware/${hosts.${hostName}.machine}.nix
+            ./modules/hardware/${hosts.${builtins.head (builtins.split "\\." hostFqdn)}.machine}.nix
             ./hosts/base.nix
           ];
         };
     in
     {
-      nixosConfigurations = nixpkgs.lib.mapAttrs (hostName: _system: mkHost hostName) hosts;
+      nixosConfigurations =
+        nixpkgs.lib.mapAttrs'
+          (hostName: _: {
+            name = "${hostName}.${domain}"; # new key ➜ k8s-node-216-eta.homelab.local
+            value = mkHost "${hostName}.${domain}"; # built with FQDN too
+          })
+          hosts;
     };
 }
+
