@@ -16,7 +16,7 @@
 
       mkHost = hostFqdn:
         nixpkgs.lib.nixosSystem {
-          system = hosts.${hostFqdn}.${/* or your mapping */ "system"}; # adjust if needed
+          system = hosts.${builtins.head (builtins.split "\\." hostFqdn)}.system;
           specialArgs = {
             inherit self inputs hostFqdn username flakeRoot clusterConfig;
             hostConfig = hosts.${builtins.head (builtins.split "\\." hostFqdn)};
