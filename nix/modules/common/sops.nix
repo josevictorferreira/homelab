@@ -10,6 +10,11 @@ in
     age.keyFile = ageKeyFilePath;
   };
 
+  sops.templates."minio-env".content = ''
+    MINIO_ROOT_USER={{ minio_root_user }}
+    MINIO_ROOT_PASSWORD={{ minio_root_password }}
+  '';
+
   sops.secrets."k3s_token" = {
     owner = config.users.users.${username}.name;
     mode = "0400";

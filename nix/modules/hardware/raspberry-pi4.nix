@@ -1,4 +1,4 @@
-{ lib, pkgs, modulesPath, ... }:
+{ lib, modulesPath, ... }:
 
 {
   imports =
@@ -10,18 +10,8 @@
   boot.loader.generic-extlinux-compatible.enable = true;
 
   boot.initrd.availableKernelModules = [ "xhci_pci" "usbhid" ];
-  boot.initrd.kernelModules = [ "zfs" ];
   boot.kernelModules = [ ];
   boot.extraModulePackages = [ ];
-
-  environment.systemPackages = with pkgs; [
-    btrfs-progs
-    zfs
-  ];
-
-  boot.supportedFilesystems = [ "btrfs" "zfs" ];
-
-  boot.zfs.extraPools = [ "backup-pool" ];
 
   fileSystems."/" =
     {

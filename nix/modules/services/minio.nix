@@ -1,17 +1,21 @@
-{ ... }:
+{ config, ... }:
 
+let
+  minioCredentialsFile = config.sops.templates."minio-env".path;
+in
 {
   services.minio = {
     enable = true;
-    dataDir = [ "/mnt/backup-storage/minio" ];
+    dataDir = [ "/backup/minio" ];
+    rootCredentialsFile = minioCredentialsFile;
     listenAddress = "0.0.0.0:9000";
     consoleAddress = "0.0.0.0:9001";
-    rootPasswordFile = "/etc/minio-root-password";
+    region = "sa-east-1";
   };
 
-  networking.firewall.allowedTCPPorts = [ 9000 9001 ];
-
   systemd.tmpfiles.rules = [
-    "d /mnt/backup-storage/minio 0755 minio-user minio-user -"
+    "d /backup/minio 0750 minio minio -"
   ];
+
+  networking.firewall.allowedTCPPorts = [ 9000 9001 ];
 }
