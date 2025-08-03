@@ -11,8 +11,7 @@ in
   };
 
   sops.secrets."minio_credentials" = {
-    owner = "minio";
-    group = "minio";
+    owner = config.users.users.${username}.name;
     mode = "0400";
   };
 
