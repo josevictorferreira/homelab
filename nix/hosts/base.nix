@@ -46,7 +46,7 @@ in
     address = hostConfig.ipAddress;
   };
 
-  services.zramSwap.enable = true;
+  services.zswap.enable = true;
   services.earlyoom.enable = true;
   boot.kernel.sysctl."vm.swappiness" = 180;
 }
