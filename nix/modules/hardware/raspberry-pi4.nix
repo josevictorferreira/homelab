@@ -10,7 +10,7 @@
   boot.loader.generic-extlinux-compatible.enable = true;
 
   boot.initrd.availableKernelModules = [ "xhci_pci" "usbhid" ];
-  boot.initrd.kernelModules = [ ];
+  boot.initrd.kernelModules = [ "zfs" ];
   boot.kernelModules = [ ];
   boot.extraModulePackages = [ ];
 
