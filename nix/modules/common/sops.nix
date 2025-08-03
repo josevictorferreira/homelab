@@ -12,6 +12,7 @@ in
 
   sops.secrets."minio_credentials" = {
     owner = "minio";
+    group = "minio";
     mode = "0400";
   };
 
