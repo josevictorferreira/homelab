@@ -15,7 +15,6 @@ in
       MINIO_ROOT_USER={{ .minio_root_user }}
       MINIO_ROOT_PASSWORD={{ .minio_root_password }}
     '';
-    format = "binary";
     owner = "minio";
     group = "minio";
     mode = "0400";
