@@ -1,4 +1,4 @@
-{ pkgs, hostName, hostConfig, clusterConfig, ... }:
+{ pkgs, lib, hostName, hostConfig, clusterConfig, ... }:
 
 let
   roles = map (role: ./../modules/roles/${role}.nix) hostConfig.roles;
@@ -38,6 +38,8 @@ in
   networking.hostName = hostName;
   networking.domain = clusterConfig.clusterDomain;
   networking.fqdn = "${hostName}.${clusterConfig.clusterDomain}";
+  networking.hostId = lib.mkDefault
+    (builtins.substring 0 8 (builtins.hashString "sha1" hostName));
   networking.staticIP = {
     enable = true;
     interface = hostConfig.interface;

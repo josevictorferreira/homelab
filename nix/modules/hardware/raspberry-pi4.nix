@@ -16,9 +16,10 @@
 
   environment.systemPackages = with pkgs; [
     btrfs-progs
+    zfs
   ];
 
-  boot.supportedFilesystems = [ "btrfs" ];
+  boot.supportedFilesystems = [ "btrfs" "zfs" ];
 
   fileSystems."/" =
     {
