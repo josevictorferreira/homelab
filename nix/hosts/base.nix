@@ -46,7 +46,12 @@ in
     address = hostConfig.ipAddress;
   };
 
-  services.zswap.enable = true;
+  zramSwap = {
+    enable = true;
+    memoryPercent = 30;
+    compressionAlgorithm = "zstd";
+  };
+
   services.earlyoom.enable = true;
   boot.kernel.sysctl."vm.swappiness" = 180;
 }
