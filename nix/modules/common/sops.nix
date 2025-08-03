@@ -11,8 +11,8 @@ in
   };
 
   sops.templates."minio-env".content = ''
-    MINIO_ROOT_USER={{ minio_root_user }}
-    MINIO_ROOT_PASSWORD={{ minio_root_password }}
+    MINIO_ROOT_USER={{ .minio_root_user }}
+    MINIO_ROOT_PASSWORD={{ .minio_root_password }}
   '';
 
   sops.secrets."k3s_token" = {
