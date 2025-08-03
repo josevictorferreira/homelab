@@ -1,13 +1,10 @@
 { config, ... }:
 
-let
-  minioCredentialsFile = config.sops.templates."minio-env".path;
-in
 {
   services.minio = {
     enable = true;
     dataDir = [ "/backup/minio" ];
-    rootCredentialsFile = minioCredentialsFile;
+    rootCredentialsFile = "/run/secrets/minio_credentials";
     listenAddress = "0.0.0.0:9000";
     consoleAddress = "0.0.0.0:9001";
     region = "sa-east-1";
