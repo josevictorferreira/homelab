@@ -49,7 +49,7 @@ in
   zramSwap = {
     enable = true;
     memoryPercent = 30;
-    compressionAlgorithm = "zstd";
+    algorithm = "zstd";
   };
 
   services.earlyoom.enable = true;
