@@ -1,0 +1,51 @@
+{ lib, config, pkgs, modulesPath, hostName, clusterConfig, ... }:
+
+let
+  cfg = config.roles.backupTarget;
+  wolMachines = builtins.filterAttrs (name: _: name != hostName) clusterConfig.hosts;
+in
+{
+  options.roles.backupTarget = {
+    enable = lib.mkEnableOption "Enable backup target role";
+  };
+
+  config = lib.mkIf cfg.enable {
+    imports = [
+      "${modulesPath}/services/wake-on-lan-observer.nix"
+      "${modulesPath}/services/minio.nix"
+    ];
+
+    environment.systemPackages = with pkgs; [
+      zfs
+    ];
+
+    boot.supportedFilesystems = [ "zfs" ];
+
+    boot.zfs.extraPools = [ "backup-pool" ];
+
+    services.nfs.server = {
+      enable = true;
+      exports = ''
+        /backups *(rw,sync,no_subtree_check,no_root_squash)
+      '';
+    };
+
+    services.minio = {
+      enable = true;
+      dataDir = "/backups/minio";
+      rootCredentialsFile = "/run/secrets/minio_credentials";
+    };
+
+    services.wakeOnLanObserver = {
+      enable = true;
+      machines = lib.attrValues (lib.mapAttrsToAttrs (name: value: value // { inherit name; }) wolMachines);
+    };
+
+    networking.firewall.allowedTCPPorts = [ 2049 111 ];
+    networking.firewall.allowedUDPPorts = [ 2049 111 ];
+
+    systemd.tmpfiles.rules = [
+      "d /backups 0755 root root -"
+    ];
+  };
+}
