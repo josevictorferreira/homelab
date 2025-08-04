@@ -1,0 +1,11 @@
+keys:
+  - &josevictor age16yrhmz8fytj7j9ns80zl40zjcdfd3pdxh48ld7ys7veea774udtqfn9jyx
+  - &josevictorferreira age1jx9qu5p0ycvymrl2gykd9z3w8x8n67jxnatxs49j7qzspjr6asqqf8u35h
+  - &homelab age1myzhwq67gu5zrfk8fvs0p7mh5fk67d20ltwqf9325ya83lm06ytsyax3j2
+creation_rules:
+  - path_regex: ^secrets/.*\.enc\.ya?ml$
+    key_groups:
+      - age:
+        - *josevictor
+        - *josevictorferreira
+        - *homelab
