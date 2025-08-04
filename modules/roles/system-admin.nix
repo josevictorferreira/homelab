@@ -1,4 +1,4 @@
-{ lib, config, clusterAdmin, commonsPath, programsPath, ... }:
+{ lib, config, pkgs, usersConfig, commonsPath, programsPath, ... }:
 
 let
   cfg = config.roles.systemAdmin;
@@ -18,23 +18,33 @@ in
       "${programsPath}/git.nix"
     ];
 
+    environment.systemPackages = with pkgs; [
+      age
+      sops
+      git
+      vim
+      curl
+      gnumake
+      htop
+    ];
+
     users = {
       enable = true;
-      username = clusterAdmin.username;
-      keys = clusterAdmin.keys;
+      username = usersConfig.admin.username;
+      keys = usersConfig.admin.keys;
     };
 
     sops = {
       enable = true;
-      username = clusterAdmin.username;
+      username = usersConfig.admin.username;
     };
 
     programs.vim.enable = true;
     programs.zsh.enable = true;
     programs.git = {
       enable = true;
-      name = clusterAdmin.name;
-      email = clusterAdmin.email;
+      name = usersConfig.admin.name;
+      email = usersConfig.admin.email;
     };
 
     services.ssh.enable = true;
