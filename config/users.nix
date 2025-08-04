@@ -1,5 +1,5 @@
 {
-  cluster_admin = {
+  admin = {
     name = "Jose Victor Ferreira";
     username = "josevictor";
     email = "root@josevictor.me";
