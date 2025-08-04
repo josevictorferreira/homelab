@@ -1,4 +1,4 @@
-{ lib, config, pkgs, modulesPath, hostName, clusterConfig, ... }:
+{ lib, config, pkgs, servicesPath, hostName, clusterConfig, ... }:
 
 let
   cfg = config.roles.backupTarget;
@@ -11,8 +11,8 @@ in
 
   config = lib.mkIf cfg.enable {
     imports = [
-      "${modulesPath}/services/wake-on-lan-observer.nix"
-      "${modulesPath}/services/minio.nix"
+      "${servicesPath}/wake-on-lan-observer.nix"
+      "${servicesPath}/minio.nix"
     ];
 
     environment.systemPackages = with pkgs; [
