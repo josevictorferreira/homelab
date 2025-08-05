@@ -4,9 +4,10 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
     sops-nix.url = "github:Mic92/sops-nix";
+    deploy-rs.url = "github:serokell/deploy-rs";
   };
 
-  outputs = { self, nixpkgs, sops-nix, ... }@inputs:
+  outputs = { self, nixpkgs, sops-nix, deploy-rs, ... }@inputs:
     let
       flakeRoot = ./.;
       commonsPath = "${flakeRoot}/modules/commons";
@@ -33,6 +34,36 @@
     in
     {
       nixosConfigurations = nixpkgs.lib.mapAttrs (hostName: _system: mkHost hostName) hosts;
+
+      deploy.nodes = nixpkgs.lib.mapAttrs
+        (_hostName: hostCfg:
+          let
+            sshUser = usersConfig.admin.username;
+          in
+          {
+            hostname = hostCfg.ipAddress;
+            sshUser = sshUser;
+            fastConnection = true;
+            remoteBuild = false;
+
+            profiles.system = {
+              user = sshUser;
+              path = self.nixosConfigurations.${_hostName}.config.system.build.toplevel;
+              autoRollback = true;
+            };
+          }
+        )
+        hosts;
+
+      apps.${builtins.currentSystem}.deploy = {
+        type = "app";
+        program = "${deploy-rs.packages.${builtins.currentSystem}.deploy-rs}/bin/deploy";
+      };
+
+      checks = nixpkgs.lib.mapAttrs
+        (sys: deployLib:
+          deployLib.deployChecks self.deploy)
+        deploy-rs.lib;
     };
 }
 
