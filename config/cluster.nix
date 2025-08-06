@@ -1,4 +1,10 @@
-{
+{ lib }:
+
+let
+  filterHostsWithRoles = hosts: role: (lib.attrsets.filterAttrs (name: value: builtins.elem role value.roles) hosts);
+  filterHostsNamesWithRoles = hosts: role: (builtins.attrNames (filterHostsWithRoles hosts role));
+in
+rec {
   name = "ze-homelab";
 
   domain = "ze.lab";
@@ -22,7 +28,7 @@
       roles = [
         "nixos-server"
         "system-admin"
-        "backup-target"
+        "backup-server"
       ];
     };
     lab-alpha-cp = {
@@ -75,11 +81,13 @@
     };
   };
 
-  controlPlanes = [
-    "lab-alpha-cp"
-    "lab-beta-cp"
-    "lab-delta-cp"
-  ];
+  nodeGroups = rec {
+    k8sControlPlanes = filterHostsNamesWithRoles hosts "k8s-control-plane";
+    k8sWorkers = filterHostsNamesWithRoles hosts "k8s-worker";
+    k8sServers = k8sControlPlanes ++ k8sWorkers;
+    backupServers = filterHostsNamesWithRoles hosts "backup-server";
+    nixosServers = filterHostsNamesWithRoles hosts "nixos-server";
+  };
 
   tokenFile = "/run/secrets/k3s_token";
 

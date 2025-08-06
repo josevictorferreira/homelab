@@ -1,14 +1,14 @@
 { lib, config, pkgs, servicesPath, hostName, clusterConfig, ... }:
 
 let
-  cfg = config.roles.backupTarget;
+  cfg = config.roles.backupServer;
   wolMachines = lib.attrsets.filterAttrs (name: _: name != hostName) clusterConfig.hosts;
   wolMachinesList = lib.attrValues
     (lib.mapAttrs (name: value: value // { inherit name; })
       wolMachines);
 in
 {
-  options.roles.backupTarget = {
+  options.roles.backupServer = {
     enable = lib.mkEnableOption "Enable backup target role";
   };
 

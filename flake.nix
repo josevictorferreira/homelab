@@ -17,7 +17,7 @@
       extendedLib = nixpkgs.lib.extend (selfLib: superLib: {
         strings = superLib.strings // (import ./lib/strings.nix { lib = superLib; });
       });
-      clusterConfig = import ./config/cluster.nix;
+      clusterConfig = (import ./config/cluster.nix { lib = extendedLib; });
       usersConfig = import ./config/users.nix;
       hosts = clusterConfig.hosts;
 
@@ -58,6 +58,8 @@
           }
         )
         hosts;
+
+      deployGroups = nixpkgs.lib.mapAttrs (_name: values: builtins.concatStringsSep " " (builtins.map (v: ".#${v}") values)) clusterConfig.nodeGroups;
 
       checks = nixpkgs.lib.mapAttrs
         (sys: deployLib:
