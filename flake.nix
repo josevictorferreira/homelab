@@ -10,7 +10,7 @@
   outputs = { self, nixpkgs, sops-nix, deploy-rs, ... }@inputs:
     let
       flakeRoot = ./.;
-      commonsPath = "${flakeRoot}/modules/commons";
+      commonsPath = "${flakeRoot}/modules/common";
       rolesPath = "${flakeRoot}/modules/roles";
       programsPath = "${flakeRoot}/modules/programs";
       servicesPath = "${flakeRoot}/modules/services";
@@ -54,11 +54,6 @@
           }
         )
         hosts;
-
-      apps.${builtins.currentSystem}.deploy = {
-        type = "app";
-        program = "${deploy-rs.packages.${builtins.currentSystem}.deploy-rs}/bin/deploy";
-      };
 
       checks = nixpkgs.lib.mapAttrs
         (sys: deployLib:
