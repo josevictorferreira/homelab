@@ -10,7 +10,7 @@ in
   };
 
   imports = [
-    "${commonsPath}/nix-defaults.nix"
+    "${commonsPath}/nix.nix"
     "${commonsPath}/locale.nix"
     "${commonsPath}/static-ip.nix"
   ];

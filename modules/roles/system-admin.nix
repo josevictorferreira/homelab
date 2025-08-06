@@ -39,9 +39,9 @@ in
       username = usersConfig.admin.username;
     };
 
-    programs.vim.enable = true;
-    programs.zsh.enable = true;
-    programs.git = {
+    programs.vimCustom.enable = true;
+    programs.zshCustom.enable = true;
+    programs.gitCustom = {
       enable = true;
       name = usersConfig.admin.name;
       email = usersConfig.admin.email;

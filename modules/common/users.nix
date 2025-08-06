@@ -12,7 +12,7 @@ in
       description = "The username for the normal user.";
     };
     keys = lib.mkOption {
-      type = lib.types.attrsOf lib.types.str;
+      type = lib.types.listOf lib.types.str;
       default = [ ];
       description = "SSH public keys for the user.";
     };
