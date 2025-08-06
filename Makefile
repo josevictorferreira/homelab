@@ -1,4 +1,4 @@
-.PHONY: check deploy rebuild clean secrets help 
+.PHONY: check ddeploy deploy gdeploy secrets help 
 
 .DEFAULT_GOAL := help
 
@@ -7,8 +7,19 @@ HOSTNAME := $(shell hostname)
 check: ## Check if the flake is valid.
 	@bash -c "nix flake check --show-trace --impure"
 
-deploy: ## Deploy
-	@nix run github:serokell/deploy-rs -- --dry-activate .#lab-pi-bk -- --impure
+ddeploy: ## Dry deploy.: HOST=$(HOSTNAME)
+	@nix run github:serokell/deploy-rs -- --dry-activate . -- --impure
+
+deploy: ## Deploy.: HOST=$(HOSTNAME)
+	@nix run github:serokell/deploy-rs -- \
+		--auto-rollback=true \
+		.#$(HOSTNAME) \
+		-- --impure
+
+gdeploy: ## Group deploy.: GROUP=$(GROUP)
+	@nix run github:serokell/deploy-rs -- \
+		--auto-rollback true \
+		--targets "$$(nix eval --raw .#deployGroups.$(GROUP))"
 
 secrets: ## Edit the secrets file
 	sops secrets/cluster-secrets.enc.yaml
