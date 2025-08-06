@@ -22,8 +22,7 @@
         nixpkgs.lib.nixosSystem {
           system = hosts.${hostName}.system;
           specialArgs = {
-            inherit self inputs usersConfig flakeRoot commonsPath rolesPath programsPath servicesPath clusterConfig;
-            hostName = hostName;
+            inherit self inputs hostName usersConfig flakeRoot commonsPath rolesPath programsPath servicesPath clusterConfig;
             hostConfig = hosts.${hostName};
           };
           modules = [
@@ -36,7 +35,7 @@
       nixosConfigurations = nixpkgs.lib.mapAttrs (hostName: _system: mkHost hostName) hosts;
 
       deploy.nodes = nixpkgs.lib.mapAttrs
-        (_hostName: hostCfg:
+        (hostName: hostCfg:
           let
             sshUser = usersConfig.admin.username;
           in
@@ -48,7 +47,7 @@
 
             profiles.system = {
               user = sshUser;
-              path = self.nixosConfigurations.${_hostName}.config.system.build.toplevel;
+              path = deploy-rs.lib.${hostCfg.system}.activate.nixos self.nixosConfigurations.${hostName};
               autoRollback = true;
             };
           }
