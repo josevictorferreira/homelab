@@ -41,13 +41,14 @@
       deploy.nodes = nixpkgs.lib.mapAttrs
         (hostName: hostCfg:
           let
+            isRemoteNeeded = hostCfg.system != builtins.currentSystem;
             sshUser = usersConfig.admin.username;
           in
           {
             hostname = hostCfg.ipAddress;
             sshUser = sshUser;
             fastConnection = true;
-            remoteBuild = false;
+            remoteBuild = isRemoteNeeded;
 
             profiles.system = {
               user = sshUser;

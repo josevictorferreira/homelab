@@ -1,20 +1,14 @@
-.PHONY: rebuild check clean secrets help 
+.PHONY: check deploy rebuild clean secrets help 
 
 .DEFAULT_GOAL := help
 
 HOSTNAME := $(shell hostname)
 
 check: ## Check if the flake is valid.
-	@bash -c "nix flake check --show-trace"
+	@bash -c "nix flake check --show-trace --impure"
 
 deploy: ## Deploy
- 	@nix run github:serokell/deploy-rs -- --dry-activate .#lab-pi-bk
-
-rebuild: ## Rebuild NixOS configuration.
-	sudo nixos-rebuild switch --flake .#$$HOSTNAME
-
-clean: ## Clean up the Nix store.
-	nix-collect-garbage -d
+	@nix run github:serokell/deploy-rs -- --dry-activate .#lab-pi-bk -- --impure
 
 secrets: ## Edit the secrets file
 	sops secrets/cluster-secrets.enc.yaml
