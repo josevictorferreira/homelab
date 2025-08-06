@@ -89,8 +89,6 @@ rec {
     nixosServers = filterHostsNamesWithRoles hosts "nixos-server";
   };
 
-  tokenFile = "/run/secrets/k3s_token";
-
   portsUdpToExpose = [
     8472
     51820
