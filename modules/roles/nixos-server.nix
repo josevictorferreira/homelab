@@ -21,8 +21,8 @@ in
     networking.firewall.enable = false;
 
     networking.hostName = hostName;
-    networking.domain = clusterConfig.clusterDomain;
-    networking.fqdn = "${hostName}.${clusterConfig.clusterDomain}";
+    networking.domain = clusterConfig.domain;
+    networking.fqdn = "${hostName}.${clusterConfig.domain}";
     networking.hostId = lib.mkDefault
       (builtins.substring 0 8 (builtins.hashString "sha1" hostName));
 
