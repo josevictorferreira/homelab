@@ -1,10 +1,10 @@
 { lib, config, ... }:
 
 let
-  cfg = config.nix;
+  cfg = config.nixDefaults;
 in
 {
-  options.nix = {
+  options.nixDefaults = {
     enable = lib.mkEnableOption "Enable Nix package manager";
   };
 
