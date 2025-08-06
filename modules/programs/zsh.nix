@@ -1,10 +1,10 @@
 { lib, config, ... }:
 
 let
-  cfg = config.programs.zsh;
+  cfg = config.programs.zshCustom;
 in
 {
-  options.programs.zsh = {
+  options.programs.zshCustom = {
     enable = lib.mkEnableOption "Enable Zsh shell";
   };
 

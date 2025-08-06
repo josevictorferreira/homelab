@@ -1,10 +1,10 @@
 { lib, config, pkgs, ... }:
 
 let
-  cfg = config.programs.vim;
+  cfg = config.programs.vimCustom;
 in
 {
-  options.programs.vim = {
+  options.programs.vimCustom = {
     enable = lib.mkEnableOption "Enable Vim as default editor";
   };
 
