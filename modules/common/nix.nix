@@ -9,7 +9,9 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    nix.settings.experimental-features = [ "nix-command" "flakes" ];
     system.stateVersion = "25.05";
+
+    nix.settings.trusted-users = [ "root" "@wheel" ];
+    nix.settings.experimental-features = [ "nix-command" "flakes" ];
   };
 } 
