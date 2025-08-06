@@ -2,18 +2,24 @@
 
 .DEFAULT_GOAL := help
 
-HOSTNAME := $(shell hostname)
-
 check: ## Check if the flake is valid.
-	@bash -c "nix flake check --show-trace"
+	@bash -c "nix flake check --show-trace --all-systems"
 
 ddeploy: ## Dry deploy.: HOST=$(HOSTNAME)
-	@nix run github:serokell/deploy-rs -- --dry-activate .
+	@nix run github:serokell/deploy-rs -- \
+    --debug-logs \
+		--dry-activate \
+		.#$(HOST) \
+    -- \
+    --show-trace
 
 deploy: ## Deploy.: HOST=$(HOSTNAME)
 	@nix run github:serokell/deploy-rs -- \
-		--auto-rollback=true \
-		.#$(HOSTNAME)
+    --debug-logs \
+		--auto-rollback true \
+		.#$(HOST) \
+    -- \
+    --show-trace
 
 gdeploy: ## Group deploy.: GROUP=$(GROUP)
 	@nix run github:serokell/deploy-rs -- \
