@@ -20,7 +20,7 @@ in
         "--node-label=node-group=worker"
       ];
       tokenFile = clusterConfig.tokenFile;
-      serverAddr = "https://${clusterConfig.clusterIpAddress}:6443";
+      serverAddr = "https://${clusterConfig.ipAddress}:6443";
     };
   };
 }

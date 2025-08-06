@@ -1,8 +1,11 @@
-.PHONY: rebuild clean secrets help 
+.PHONY: rebuild check clean secrets help 
 
 .DEFAULT_GOAL := help
 
 HOSTNAME := $(shell hostname)
+
+check: ## Check if the flake is valid.
+  $(shell nix flake check --show-trace)
 
 rebuild: ## Rebuild NixOS configuration.
 	sudo nixos-rebuild switch --flake .#$$HOSTNAME
