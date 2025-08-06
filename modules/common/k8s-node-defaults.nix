@@ -1,11 +1,14 @@
 { lib, pkgs, config, clusterConfig, usersConfig, ... }:
 
+let
+  cfg = config.k8sNodeDefaults;
+in
 {
-  options.k8sNodeDefaults = lib.mkOption {
+  options.k8sNodeDefaults = {
     enable = lib.mkEnableOption "Enable base configurations for k3s nodes";
   };
 
-  config = lib.mkIf config.k8sNodeDefaults.enable {
+  config = lib.mkIf cfg.enable {
     sops.secrets."k3s_token" = {
       owner = config.users.users.${usersConfig.admin.username}.name;
       mode = "0400";
