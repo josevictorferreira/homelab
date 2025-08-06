@@ -24,9 +24,9 @@ in
       enable = true;
       role = "server";
       tokenFile = clusterConfig.tokenFile;
-      extraFlags = toString [
+      extraFlags = toString ([
         "--https-listen-port=6444"
-        "--tls-san=${clusterConfig.clusterIpAddress}"
+        "--tls-san=${clusterConfig.ipAddress}"
         "--node-name=${hostName}"
         "--disable=traefik,servicelb"
         "--node-label=node-group=control-plane"
@@ -35,9 +35,9 @@ in
         "--etcd-arg=auto-compaction-mode=periodic"
         "--etcd-arg=auto-compaction-retention=30m"
         "--etcd-arg=snapshot-count=10000"
-      ] ++ (if cfg.isInit then clusterInitFlags else [ ]);
+      ] ++ (if cfg.isInit then clusterInitFlags else [ ]));
     } // lib.optionalAttrs (!cfg.isInit) {
-      serverAddr = "https://${clusterConfig.clusterIpAddress}:6443";
+      serverAddr = "https://${clusterConfig.ipAddress}:6443";
     };
   };
 }

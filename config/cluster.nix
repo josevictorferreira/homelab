@@ -58,7 +58,7 @@
       roles = [
         "nixos-server"
         "system-admin"
-        "k3s-worker"
+        "k8s-worker"
       ];
     };
     lab-delta-cp = {
