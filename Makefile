@@ -5,10 +5,10 @@
 HOSTNAME := $(shell hostname)
 
 check: ## Check if the flake is valid.
-  $(shell nix flake check --show-trace)
+	@bash -c "nix flake check --show-trace"
 
 deploy: ## Deploy
-  nix run github:serokell/deploy-rs -- --dry-activate .#lab-pi-bk
+ 	@nix run github:serokell/deploy-rs -- --dry-activate .#lab-pi-bk
 
 rebuild: ## Rebuild NixOS configuration.
 	sudo nixos-rebuild switch --flake .#$$HOSTNAME
