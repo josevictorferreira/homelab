@@ -27,6 +27,5 @@ in
     time.timeZone = cfg.timeZone;
     i18n.defaultLocale = cfg.defaultLocale;
     services.xserver.xkb.layout = cfg.xkbLayout;
-    i18n.locales = [ cfg.defaultLocale ];
   };
 }

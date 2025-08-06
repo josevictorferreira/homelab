@@ -2,19 +2,22 @@
 
 let
   cfg = config.roles.backupTarget;
-  wolMachines = builtins.filterAttrs (name: _: name != hostName) clusterConfig.hosts;
+  wolMachines = lib.attrsets.filterAttrs (name: _: name != hostName) clusterConfig.hosts;
+  wolMachinesList = lib.attrValues
+    (lib.mapAttrs (name: value: value // { inherit name; })
+      wolMachines);
 in
 {
   options.roles.backupTarget = {
     enable = lib.mkEnableOption "Enable backup target role";
   };
 
-  config = lib.mkIf cfg.enable {
-    imports = [
-      "${servicesPath}/wake-on-lan-observer.nix"
-      "${servicesPath}/minio.nix"
-    ];
+  imports = [
+    "${servicesPath}/wake-on-lan-observer.nix"
+    "${servicesPath}/minio-extra.nix"
+  ];
 
+  config = lib.mkIf cfg.enable {
     environment.systemPackages = with pkgs; [
       zfs
     ];
@@ -30,7 +33,7 @@ in
       '';
     };
 
-    services.minio = {
+    services.minioExtra = {
       enable = true;
       dataDir = "/backups/minio";
       rootCredentialsFile = "/run/secrets/minio_credentials";
@@ -38,7 +41,7 @@ in
 
     services.wakeOnLanObserver = {
       enable = true;
-      machines = lib.attrValues (lib.mapAttrsToAttrs (name: value: value // { inherit name; }) wolMachines);
+      machines = wolMachinesList;
     };
 
     networking.firewall.allowedTCPPorts = [ 2049 111 ];
