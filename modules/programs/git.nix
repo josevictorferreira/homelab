@@ -1,10 +1,10 @@
 { lib, config, ... }:
 
 let
-  cfg = config.programs.git;
+  cfg = config.programs.gitCustom;
 in
 {
-  options.programs.git = {
+  options.programs.gitCustom = {
     enable = lib.mkEnableOption "Admin tools for the cluster admin user";
     name = lib.mkOption {
       type = lib.types.str;
