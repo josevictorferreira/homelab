@@ -11,7 +11,7 @@ in
     enable = lib.mkEnableOption "Enable Kubernetes control plane role";
     isInit = lib.mkOption {
       type = lib.types.bool;
-      default = (builtins.head clusterConfig.controlPlanes) == hostName;
+      default = (builtins.head clusterConfig.nodeGroups.k8sControlPlanes) == hostName;
       description = "Whether this node is the initial control plane node";
     };
   };
