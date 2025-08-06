@@ -14,7 +14,7 @@ in
 
   imports = [
     "${servicesPath}/wake-on-lan-observer.nix"
-    "${servicesPath}/minio-extra.nix"
+    "${servicesPath}/minio.nix"
   ];
 
   config = lib.mkIf cfg.enable {
@@ -33,7 +33,7 @@ in
       '';
     };
 
-    services.minioExtra = {
+    services.minioCustom = {
       enable = true;
       dataDir = "/backups/minio";
       rootCredentialsFile = "/run/secrets/minio_credentials";
