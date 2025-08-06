@@ -5,21 +5,20 @@
 HOSTNAME := $(shell hostname)
 
 check: ## Check if the flake is valid.
-	@bash -c "nix flake check --show-trace --impure"
+	@bash -c "nix flake check --show-trace"
 
 ddeploy: ## Dry deploy.: HOST=$(HOSTNAME)
-	@nix run github:serokell/deploy-rs -- --dry-activate . -- --impure
+	@nix run github:serokell/deploy-rs -- --dry-activate .
 
 deploy: ## Deploy.: HOST=$(HOSTNAME)
 	@nix run github:serokell/deploy-rs -- \
 		--auto-rollback=true \
-		.#$(HOSTNAME) \
-		-- --impure
+		.#$(HOSTNAME)
 
 gdeploy: ## Group deploy.: GROUP=$(GROUP)
 	@nix run github:serokell/deploy-rs -- \
-		--auto-rollback true \
-		--targets "$$(nix eval --raw .#deployGroups.$(GROUP))"
+    --targets "$$(nix eval --raw .#deployGroups.$(GROUP))" \
+    --auto-rollback true
 
 secrets: ## Edit the secrets file
 	sops secrets/cluster-secrets.enc.yaml
