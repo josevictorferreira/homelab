@@ -14,6 +14,9 @@
       rolesPath = "${flakeRoot}/modules/roles";
       programsPath = "${flakeRoot}/modules/programs";
       servicesPath = "${flakeRoot}/modules/services";
+      extendedLib = nixpkgs.lib.extend (selfLib: superLib: {
+        strings = superLib.strings // (import ./lib/strings.nix { lib = superLib; });
+      });
       clusterConfig = import ./config/cluster.nix;
       usersConfig = import ./config/users.nix;
       hosts = clusterConfig.hosts;
@@ -22,6 +25,7 @@
         nixpkgs.lib.nixosSystem {
           system = hosts.${hostName}.system;
           specialArgs = {
+            lib = extendedLib;
             inherit self inputs hostName usersConfig flakeRoot commonsPath rolesPath programsPath servicesPath clusterConfig;
             hostConfig = hosts.${hostName};
           };
@@ -60,4 +64,3 @@
         deploy-rs.lib;
     };
 }
-
