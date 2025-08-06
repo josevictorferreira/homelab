@@ -1,10 +1,10 @@
 { lib, config, ... }:
 
 let
-  cfg = config.services.minio;
+  cfg = config.services.minioExtra;
 in
 {
-  options.services.minio = {
+  options.services.minioExtra = {
     enable = lib.mkEnableOption "Enable MinIO object storage service";
     dataDir = lib.mkOption {
       type = lib.types.listOf lib.types.str;

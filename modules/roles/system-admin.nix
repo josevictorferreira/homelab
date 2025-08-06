@@ -8,16 +8,16 @@ in
     enable = lib.mkEnableOption "Admin tools for the cluster admin user";
   };
 
-  config = lib.mkIf cfg.enable {
-    imports = [
-      "${commonsPath}/users.nix"
-      "${commonsPath}/ssh.nix"
-      "${commonsPath}/sops.nix"
-      "${programsPath}/vim.nix"
-      "${programsPath}/zsh.nix"
-      "${programsPath}/git.nix"
-    ];
+  imports = [
+    "${commonsPath}/users.nix"
+    "${commonsPath}/ssh.nix"
+    "${commonsPath}/sops.nix"
+    "${programsPath}/vim.nix"
+    "${programsPath}/zsh.nix"
+    "${programsPath}/git.nix"
+  ];
 
+  config = lib.mkIf cfg.enable {
     environment.systemPackages = with pkgs; [
       age
       sops

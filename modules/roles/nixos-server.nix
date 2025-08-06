@@ -9,13 +9,13 @@ in
     enable = lib.mkEnableOption "Enable default nix machine configurations";
   };
 
-  config = lib.mkIf cfg.enable {
-    imports = [
-      "${commonsPath}/nix.nix"
-      "${commonsPath}/locale.nix"
-      "${commonsPath}/static-ip.nix"
-    ];
+  imports = [
+    "${commonsPath}/nix.nix"
+    "${commonsPath}/locale.nix"
+    "${commonsPath}/static-ip.nix"
+  ];
 
+  config = lib.mkIf cfg.enable {
     nix.enable = true;
     locale.enable = true;
     networking.firewall.enable = false;
