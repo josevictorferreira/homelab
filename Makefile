@@ -1,6 +1,11 @@
-.PHONY: check ddeploy deploy gdeploy secrets help 
+.PHONY: groups check ddeploy deploy gdeploy secrets help 
 
 .DEFAULT_GOAL := help
+
+AVAILABLE_GROUPS := $(shell nix eval --raw .#nodeGroups)
+
+groups: ## List all deploy groups.
+	@echo "Groups: $(AVAILABLE_GROUPS)"
 
 check: ## Check if the flake is valid.
 	@bash -c "nix flake check --show-trace --all-systems"

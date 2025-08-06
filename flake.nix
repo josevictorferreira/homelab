@@ -59,6 +59,8 @@
         )
         hosts;
 
+      nodeGroups = builtins.concatStringsSep ", " (builtins.attrNames clusterConfig.nodeGroups);
+
       deployGroups = nixpkgs.lib.mapAttrs (_name: values: builtins.concatStringsSep ", " (builtins.map (v: ".#${v}") values)) clusterConfig.nodeGroups;
 
       checks = nixpkgs.lib.mapAttrs
