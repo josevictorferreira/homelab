@@ -41,7 +41,7 @@
       deploy.nodes = nixpkgs.lib.mapAttrs
         (hostName: hostCfg:
           let
-            isRemoteNeeded = hostCfg.system != builtins.currentSystem;
+            isRemoteNeeded = hostCfg.system != "x86_64-linux";
             sshUser = usersConfig.admin.username;
           in
           {
@@ -51,7 +51,7 @@
             remoteBuild = isRemoteNeeded;
 
             profiles.system = {
-              user = sshUser;
+              user = "root";
               path = deploy-rs.lib.${hostCfg.system}.activate.nixos self.nixosConfigurations.${hostName};
               autoRollback = true;
             };
@@ -59,7 +59,7 @@
         )
         hosts;
 
-      deployGroups = nixpkgs.lib.mapAttrs (_name: values: builtins.concatStringsSep " " (builtins.map (v: ".#${v}") values)) clusterConfig.nodeGroups;
+      deployGroups = nixpkgs.lib.mapAttrs (_name: values: builtins.concatStringsSep ", " (builtins.map (v: ".#${v}") values)) clusterConfig.nodeGroups;
 
       checks = nixpkgs.lib.mapAttrs
         (sys: deployLib:
