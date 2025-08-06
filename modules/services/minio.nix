@@ -7,8 +7,8 @@ in
   options.services.minioCustom = {
     enable = lib.mkEnableOption "Enable MinIO object storage service";
     dataDir = lib.mkOption {
-      type = lib.types.listOf lib.types.str;
-      default = [ "/backup/minio" ];
+      type = lib.types.str;
+      default = "/backup/minio";
       description = "Directories where MinIO will store its data.";
     };
     rootCredentialsFile = lib.mkOption {

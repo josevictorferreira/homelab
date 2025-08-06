@@ -16,7 +16,7 @@ in
 
   config = lib.mkIf cfg.enable {
     sops = {
-      defaultSopsFile = "${flakeRoot}/secrets/secrets.enc.yaml";
+      defaultSopsFile = "${flakeRoot}/secrets/cluster-secrets.enc.yaml";
       age.keyFile = "${config.users.users.${cfg.username}.home}/${defaultAgeKeyFile}";
     };
 
