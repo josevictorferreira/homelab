@@ -1,4 +1,4 @@
-{ lib, config, clusterConfig, hostName, ... }:
+{ lib, config, clusterConfig, hostName, commonsPath, ... }:
 
 let
   cfg = config.roles.k8sWorker;
@@ -8,9 +8,12 @@ in
     enable = lib.mkEnableOption "Enable Kubernetes worker node role";
   };
 
+  imports = [
+    "${commonsPath}/k8s-node-defaults.nix"
+  ];
+
   config = lib.mkIf cfg.enable {
-    networking.firewall.allowedTCPPorts = clusterConfig.portsTcpToExpose;
-    networking.firewall.allowedUDPPorts = clusterConfig.portsUdpToExpose;
+    k8sNodeDefaults.enable = true;
 
     services.k3s = {
       enable = true;
@@ -19,7 +22,7 @@ in
         "--node-name=${hostName}"
         "--node-label=node-group=worker"
       ];
-      tokenFile = clusterConfig.tokenFile;
+      tokenFile = config.sops.secrets.k3s_token.path;
       serverAddr = "https://${clusterConfig.ipAddress}:6443";
     };
   };
