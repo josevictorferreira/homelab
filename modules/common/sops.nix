@@ -25,11 +25,6 @@ in
       mode = "0400";
     };
 
-    sops.secrets."k3s_token" = {
-      owner = config.users.users.${cfg.username}.name;
-      mode = "0400";
-    };
-
     environment.variables.SOPS_AGE_KEY_FILE = "${config.users.users.${cfg.username}.home}/${defaultAgeKeyFile}";
   };
 }
