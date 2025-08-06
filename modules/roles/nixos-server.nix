@@ -10,13 +10,13 @@ in
   };
 
   imports = [
-    "${commonsPath}/nix.nix"
+    "${commonsPath}/nix-defaults.nix"
     "${commonsPath}/locale.nix"
     "${commonsPath}/static-ip.nix"
   ];
 
   config = lib.mkIf cfg.enable {
-    nix.enable = true;
+    nixDefaults.enable = true;
     locale.enable = true;
     networking.firewall.enable = false;
 
