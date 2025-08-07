@@ -71,12 +71,10 @@
         deploy-rs.lib;
 
       packages.${currentSystem}.k8sGenerate = (kubenix.evalModules.${currentSystem} {
-        module = import ./kubernetes/kubenix/kube-vip.nix {
-          inherit self;
-          lib = extendedLib;
+        module = import ./kubernetes/kubenix/kube-vip.nix;
+        specialArgs = {
           flake = self;
         };
-        specialArgs = { flake = self; };
       }).config.kubernetes.resultYAML;
     };
 }
