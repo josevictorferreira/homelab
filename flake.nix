@@ -70,7 +70,7 @@
           deployLib.deployChecks self.deploy)
         deploy-rs.lib;
 
-      packages.${currentSystem}.k8sGenerate = (kubenix.evalModules.${currentSystem} {
+      packages.${currentSystem}.genK8sManifests = (kubenix.evalModules.${currentSystem} {
         module = import ./kubernetes/kubenix/kube-vip.nix;
         specialArgs = {
           flake = self;
