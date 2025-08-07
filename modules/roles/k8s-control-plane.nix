@@ -8,6 +8,7 @@ let
   serverFlagList = [
     "--tls-san=${clusterConfig.ipAddress}"
     "--node-name=${hostName}"
+    "--secrets-encryption"
     "--disable-helm-controller"
     "--flannel-backend=none"
     "--disable=traefik,servicelb,network-policy,local-storage"
