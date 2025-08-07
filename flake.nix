@@ -5,11 +5,13 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
     sops-nix.url = "github:Mic92/sops-nix";
     deploy-rs.url = "github:serokell/deploy-rs";
+    kubenix.url = "github:hall/kubenix";
   };
 
-  outputs = { self, nixpkgs, sops-nix, deploy-rs, ... }@inputs:
+  outputs = { self, nixpkgs, sops-nix, deploy-rs, kubenix, ... }@inputs:
     let
       flakeRoot = ./.;
+      currentSystem = builtins.currentSystem or "x86_64-linux";
       commonsPath = "${flakeRoot}/modules/common";
       rolesPath = "${flakeRoot}/modules/roles";
       programsPath = "${flakeRoot}/modules/programs";
@@ -67,5 +69,10 @@
         (sys: deployLib:
           deployLib.deployChecks self.deploy)
         deploy-rs.lib;
+
+      kubenix = inputs.kubenix.packages.${currentSystem}.default.override {
+        module = import ./kubernetes/kubenix/base;
+        specialArgs = { flake = self; };
+      };
     };
 }
