@@ -70,8 +70,8 @@
           deployLib.deployChecks self.deploy)
         deploy-rs.lib;
 
-      kubenix = inputs.kubenix.packages.${currentSystem}.default.override {
-        module = import ./kubernetes/kubenix/base;
+      render = kubenix.packages.${currentSystem}.default.override {
+        module = import ./kubernetes/nix/base;
         specialArgs = { flake = self; };
       };
     };
