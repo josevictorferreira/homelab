@@ -1,7 +1,8 @@
-{ lib, pkgs, config, clusterConfig, usersConfig, ... }:
+{ lib, pkgs, config, clusterConfig, usersConfig, flakeRoot, ... }:
 
 let
   cfg = config.k8sNodeDefaults;
+  username = config.users.users.${usersConfig.admin.username}.name;
 in
 {
   options.k8sNodeDefaults = {
@@ -9,8 +10,8 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    sops.secrets."k3s_token" = {
-      owner = config.users.users.${usersConfig.admin.username}.name;
+    sops.secrets.k3s_token = {
+      owner = username;
       mode = "0400";
     };
 
