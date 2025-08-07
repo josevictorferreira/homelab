@@ -1,11 +1,16 @@
-{ ... }:
+{ kubenix, ... }:
 
 {
+  imports = with kubenix.modules; [
+    helm
+    k8s
+  ];
+
   kubernetes.resources = {
-    serviceaccounts."kube-vip" = {
+    serviceAccounts."kube-vip" = {
       metadata.namespace = "kube-system";
     };
-    clusterroles."system:kube-vip-role" = {
+    clusterRoles."system:kube-vip-role" = {
       metadata.annotations."rbac.authorization.kubernetes.io/autoupdate" = "true";
       rules = [
         { apiGroups = [ "" ]; resources = [ "services/status" ]; verbs = [ "update" ]; }
@@ -32,7 +37,7 @@
         { apiGroups = [ "" ]; resources = [ "pods" ]; verbs = [ "list" ]; }
       ];
     };
-    clusterrolebindings."system:kube-vip-binding" = {
+    clusterRoleBindings."system:kube-vip-binding" = {
       roleRef = {
         apiGroup = "rbac.authorization.k8s.io";
         kind = "ClusterRole";
