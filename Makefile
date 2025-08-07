@@ -8,7 +8,7 @@ groups: ## List all deploy groups.
 	@echo "Groups: $(AVAILABLE_GROUPS)"
 
 check: ## Check if the flake is valid.
-	@bash -c "nix flake check --show-trace --all-systems"
+	@bash -c "nix flake check --show-trace --all-systems --impure"
 
 ddeploy: ## Dry deploy.: HOST=$(HOSTNAME)
 	@nix run github:serokell/deploy-rs -- \
@@ -16,6 +16,7 @@ ddeploy: ## Dry deploy.: HOST=$(HOSTNAME)
 		--dry-activate \
 		.#$(HOST) \
     -- \
+    --impure \
     --show-trace
 
 deploy: ## Deploy.: HOST=$(HOSTNAME)
@@ -24,6 +25,7 @@ deploy: ## Deploy.: HOST=$(HOSTNAME)
 		--auto-rollback true \
 		.#$(HOST) \
     -- \
+    --impure \
     --show-trace
 
 gdeploy: ## Group deploy.: GROUP=$(GROUP)
