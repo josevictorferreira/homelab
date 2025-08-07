@@ -48,6 +48,5 @@
     };
     networking.useDHCP = false;
     networking.nameservers = config.networking.staticIP.nameservers;
-    networking.firewall.enable = false;
   };
 }
