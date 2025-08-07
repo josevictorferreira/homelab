@@ -19,6 +19,7 @@ in
       cilium-cli
       fluxcd
       ceph-client
+      vals
 
       (writeShellScriptBin "nuke-k3s" ''
         if [ "$EUID" -ne 0 ] ; then
