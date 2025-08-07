@@ -21,11 +21,18 @@ in
     ];
 
     boot.kernelModules = [
+      "ceph"
+      "rbd"
+      "nft-expr-counter"
       "ip6_tables"
       "ip6table_mangle"
       "ip6table_raw"
       "ip6table_filter"
     ];
+    boot.kernel.sysctl = {
+      "fs.inotify.max_user_instances" = 8192;
+      "fs.inotify.max_user_watches" = 524288;
+    };
 
     networking.enableIPv6 = true;
     networking.nat = {
