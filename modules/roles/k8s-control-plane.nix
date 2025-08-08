@@ -7,6 +7,8 @@ let
   ];
   serverFlagList = [
     "--tls-san=${clusterConfig.ipAddress}"
+    "--tls-san=10.10.10.200"
+    "--write-kubeconfig-mode \"0644\""
     "--node-name=${hostName}"
     "--disable-helm-controller"
     "--disable-kube-proxy"
@@ -47,6 +49,7 @@ in
       extraFlags = lib.concatStringsSep " " serverFlagList;
     } // lib.optionalAttrs (!cfg.isInit) {
       serverAddr = "https://${clusterConfig.ipAddress}:6443";
+    } // lib.optionalAttrs cfg.isInit {
       manifests = {
         cilium = {
           enable = true;
