@@ -38,6 +38,7 @@
         envoy.enabled = false;
         externalIPs.enabled = false;
         gatewayAPI.enabled = false;
+        rollOutCiliumPods = true;
         hubble = {
           relay.enabled = false;
           ui.enabled = false;
@@ -54,7 +55,8 @@
         spec = {
           blocks = [
             {
-              cidr = "10.10.10.100/32";
+              start = "10.10.10.100";
+              stop = "10.10.10.199";
             }
           ];
         };
