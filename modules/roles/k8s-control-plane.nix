@@ -4,17 +4,18 @@ let
   cfg = config.roles.k8sControlPlane;
   clusterInitFlags = [
     "--cluster-init"
-    "--write-kubeconfig=${config.sops.secrets.kubeconfig.path}"
+    "--https-listen-port=6444"
     "--write-kubeconfig-mode 0644"
   ];
   serverFlagList = [
     "--tls-san=${clusterConfig.ipAddress}"
-    "--tls-san=10.10.10.200"
     "--node-name=${hostName}"
     "--disable-helm-controller"
     "--disable-network-policy"
+    "--disable-cloud-controller"
+    "--disable-kube-proxy"
     "--flannel-backend=none"
-    "--disable=traefik,servicelb,local-storage"
+    "--disable=traefik,servicelb,local-storage,metrics-server"
     "--node-label=node-group=control-plane"
     "--etcd-expose-metrics=true"
     "--etcd-snapshot-schedule-cron='0 */12 * * *'"
@@ -41,8 +42,6 @@ in
 
   config = lib.mkIf cfg.enable {
     k8sNodeDefaults.enable = true;
-
-    sops.secrets.kubeconfig = { };
 
     services.k3s = {
       enable = true;
