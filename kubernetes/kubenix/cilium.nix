@@ -41,11 +41,7 @@
           relay.enabled = false;
           ui.enabled = false;
         };
-        # bgpControlPlane.secretsNamespace.create = false;
-        # tls.secretsNamespace.create = false;
-        # envoyConfig.secretsNamespace.create = false;
-        # ingressController.secretsNamespace.create = false;
-        # gatewayAPI.secretsNamespace.create = false;
+        ipv4NativeRoutingCIDR = "10.42.0.0/16";
         nodePort.enabled = true;
       };
     };
