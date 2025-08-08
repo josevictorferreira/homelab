@@ -1,4 +1,4 @@
-{ kubenix, ... }:
+{ lib, kubenix, ... }:
 
 {
   imports = with kubenix.modules; [
@@ -27,6 +27,7 @@
       includeCRDs = true;
       noHooks = true;
       values = {
+        namespaceOverride = "kube-system";
         kubeProxyReplacement = true;
         k8sServiceHost = "10.10.10.200";
         k8sServicePort = 6443;
@@ -40,6 +41,11 @@
           relay.enabled = false;
           ui.enabled = false;
         };
+        # bgpControlPlane.secretsNamespace.create = false;
+        # tls.secretsNamespace.create = false;
+        # envoyConfig.secretsNamespace.create = false;
+        # ingressController.secretsNamespace.create = false;
+        # gatewayAPI.secretsNamespace.create = false;
         nodePort.enabled = true;
       };
     };
