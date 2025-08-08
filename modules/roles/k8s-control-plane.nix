@@ -1,4 +1,4 @@
-{ lib, config, hostName, clusterConfig, usersConfig, commonsPath, k8sManifestsPath, ... }:
+{ lib, config, hostName, clusterConfig, commonsPath, k8sManifestsPath, ... }:
 
 let
   cfg = config.roles.k8sControlPlane;
@@ -42,10 +42,7 @@ in
   config = lib.mkIf cfg.enable {
     k8sNodeDefaults.enable = true;
 
-    sops.secrets.kubeconfig = {
-      owner = usersConfig.admin.username;
-      mode = "0400";
-    };
+    sops.secrets.kubeconfig = { };
 
     services.k3s = {
       enable = true;
@@ -75,11 +72,6 @@ in
           enable = true;
           target = "gotk-sync.yaml";
           source = "${k8sManifestsPath}/flux-system/gotk-sync.yaml";
-        };
-        flux-kustomization = {
-          enable = true;
-          target = "kustomization.yaml";
-          source = "${k8sManifestsPath}/flux-system/kustomization.yaml";
         };
       };
     };
