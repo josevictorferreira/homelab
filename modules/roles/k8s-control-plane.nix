@@ -1,4 +1,4 @@
-{ lib, config, hostName, clusterConfig, commonsPath, k8sManifestsPath, flakeRoot, ... }:
+{ lib, config, hostName, clusterConfig, usersConfig, commonsPath, k8sManifestsPath, ... }:
 
 let
   cfg = config.roles.k8sControlPlane;
@@ -42,10 +42,9 @@ in
   config = lib.mkIf cfg.enable {
     k8sNodeDefaults.enable = true;
 
-    sops.secrets."kube-config" = {
-      path = "/run/secrets/kube-config.yaml";
-      format = "binary";
-      sopsFile = "${flakeRoot}/secrets/kube-config.enc.yaml";
+    sops.secrets.kubeconfig = {
+      owner = usersConfig.admin.username;
+      mode = "0400";
     };
 
     services.k3s = {
