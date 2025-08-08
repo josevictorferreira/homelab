@@ -62,7 +62,7 @@
       deploy.nodes = nixpkgs.lib.mapAttrs
         (hostName: hostCfg:
           let
-            isRemoteNeeded = hostCfg.system != "x86_64-linux";
+            isRemoteNeeded = hostCfg.system != currentSystem;
             sshUser = usersConfig.admin.username;
           in
           {

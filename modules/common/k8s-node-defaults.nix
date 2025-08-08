@@ -19,7 +19,8 @@ in
       cilium-cli
       fluxcd
       ceph-client
-      bpftool
+      iptables
+      bpftools
       vals
 
       (writeShellScriptBin "nuke-k3s" ''
@@ -60,6 +61,7 @@ in
       "ceph"
       "rbd"
       "nfs"
+      "br_netfilter"
       "nft-expr-counter"
       "iptable_nat"
       "iptable_filter"
@@ -68,8 +70,11 @@ in
       "ip6table_mangle"
       "ip6table_raw"
       "ip6table_filter"
+      "ip_conntrack"
       "ip_vs"
       "ip_vs_rr"
+      "ip_vs_wrr"
+      "ip_vs_sh"
     ];
 
     boot.kernel.sysctl = {
