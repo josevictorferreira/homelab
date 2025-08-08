@@ -17,6 +17,7 @@
       rolesPath = "${flakeRoot}/modules/roles";
       programsPath = "${flakeRoot}/modules/programs";
       servicesPath = "${flakeRoot}/modules/services";
+      k8sManifestsPath = "${flakeRoot}/kubernetes/manifests";
       extendedLib = nixpkgs.lib.extend (selfLib: superLib: {
         strings = superLib.strings // (import ./lib/strings.nix { lib = superLib; });
       });
@@ -47,7 +48,7 @@
           system = hosts.${hostName}.system;
           specialArgs = {
             lib = extendedLib;
-            inherit self inputs hostName usersConfig flakeRoot commonsPath rolesPath programsPath servicesPath clusterConfig;
+            inherit self inputs hostName usersConfig flakeRoot commonsPath rolesPath programsPath servicesPath clusterConfig k8sManifestsPath;
             hostConfig = hosts.${hostName};
           };
           modules = [
