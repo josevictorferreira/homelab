@@ -96,8 +96,10 @@ rec {
   ];
 
   portsTcpToExpose = [
+    443
     2379
     2380
+    4240 # Cilium health
     6443
     6444
     10250
