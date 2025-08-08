@@ -1,4 +1,4 @@
-{ lib, config, hostName, clusterConfig, commonsPath, flakeRoot, ... }:
+{ lib, config, hostName, clusterConfig, commonsPath, k8sManifestsPath, ... }:
 
 let
   cfg = config.roles.k8sControlPlane;
@@ -54,12 +54,27 @@ in
         cilium = {
           enable = true;
           target = "cilium.yaml";
-          source = "${flakeRoot}/kubernetes/manifests/cilium.yaml";
+          source = "${k8sManifestsPath}/cilium.yaml";
         };
         kubeVip = {
           enable = true;
           target = "kube-vip.yaml";
-          source = "${flakeRoot}/kubernetes/manifests/kube-vip.yaml";
+          source = "${k8sManifestsPath}/kube-vip.yaml";
+        };
+        flux-components = {
+          enable = true;
+          target = "gotk-components.yaml";
+          source = "${k8sManifestsPath}/flux-system/gotk-components.yaml";
+        };
+        flux-sync = {
+          enable = true;
+          target = "gotk-sync.yaml";
+          source = "${k8sManifestsPath}/flux-system/gotk-sync.yaml";
+        };
+        flux-kustomization = {
+          enable = true;
+          target = "kustomization.yaml";
+          source = "${k8sManifestsPath}/flux-system/kustomization.yaml";
         };
       };
     };
