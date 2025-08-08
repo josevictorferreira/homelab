@@ -19,6 +19,7 @@ in
       cilium-cli
       fluxcd
       ceph-client
+      bpftool
       vals
 
       (writeShellScriptBin "nuke-k3s" ''
