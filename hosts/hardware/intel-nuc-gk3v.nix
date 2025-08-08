@@ -6,6 +6,7 @@
       (modulesPath + "/installer/scan/not-detected.nix")
     ];
 
+  boot.supportedFilesystems = [ "zfs" ];
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
   boot.initrd.availableKernelModules = [ "xhci_pci" "ahci" "usb_storage" "usbhid" "sd_mod" "sdhci_pci" ];
@@ -33,8 +34,6 @@
 
   fileSystems."/boot" =
     {
-      # device = "/dev/disk/by-uuid/DB80-829E";
-      # device = "/dev/disk/by-uuid/5440-F22C";
       device = "/dev/disk/by-partlabel/EFI";
       fsType = "vfat";
       options = [ "fmask=0022" "dmask=0022" ];
