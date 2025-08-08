@@ -7,17 +7,25 @@
   ];
 
   kubernetes = {
+    customTypes = {
+      ciliumloadbalancerippool = {
+        attrName = "ciliumloadbalancerippool";
+        group = "cilium.io";
+        version = "v2alpha1";
+        kind = "CiliumLoadBalancerIPPool";
+      };
+    };
+
     helm.releases."kube-vip" = {
       chart = kubenix.lib.helm.fetch
         {
           repo = "https://helm.cilium.io";
           chart = "cilium";
           version = "1.18.0";
-          sha256 = "sha256-3Wk4qeRkU/NgCrbilmvPIdeJVH+hvbDqbqgX5yqEjXM=";
+          sha256 = "sha256-km3mRsCk7NpbTJ8l8C52eweF+u9hqxIhEWALQ8LqN+0=";
         };
       includeCRDs = true;
       noHooks = true;
-      namespace = "kube-system";
       values = {
         kubeProxyReplacement = true;
         ipam.operator.clusterPoolIPv4PodCIDRList = "10.42.0.0/16";
@@ -34,17 +42,17 @@
     };
 
     resources = {
-      apiVersion = "cilium.io/v2alpha1";
-      kind = "CiliumClusterwideNetworkPolicy";
-      metadata = {
-        name = "lb-pool";
-      };
-      spec = {
-        blocks = [
-          {
-            cidr = "10.10.10.100/32";
-          }
-        ];
+      ciliumloadbalancerippool."lb-pool" = {
+        metadata = {
+          name = "lb-pool";
+        };
+        spec = {
+          blocks = [
+            {
+              cidr = "10.10.10.100/32";
+            }
+          ];
+        };
       };
     };
   };
