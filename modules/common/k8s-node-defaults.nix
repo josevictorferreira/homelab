@@ -44,9 +44,12 @@ in
         sleep 28
         /run/current-system/sw/bin/k3s-killall.sh
         systemctl stop k3s
+        KUBELET_PATH=$(mount | grep kubelet | cut -d' ' -f3);
+        /$/{KUBELET_PATH:+umount /$KUBELET_PATH/}
         sleep 2
-        rm -rf /var/lib/rancher/k3s/
-        rm -rf /var/lib/cni/networks/cbr0/
+        rm -rf /etc/rancher/{k3s,node};
+        rm -rf /var/lib/{rancher/k3s,kubelet,longhorn,etcd,cni}
+        rm -rf /var/lib/cni/networks/
         if [ -d /opt/k3s/data/temp ]; then
           rm -rf /opt/k3s/data/temp/*
         fi
