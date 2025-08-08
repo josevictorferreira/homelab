@@ -39,15 +39,17 @@ in
     "${commonsPath}/k8s-node-defaults.nix"
   ];
 
-  sops.secrets.kubeconfig = {
-    sopsFile = "${flakeRoot}/secrets/kubeconfig.enc.yaml";
-  };
-
   config = lib.mkIf cfg.enable {
     k8sNodeDefaults.enable = true;
 
+    sops.secrets."kube-config" = {
+      path = "/run/secrets/kube-config.yaml";
+      format = "binary";
+      sopsFile = "${flakeRoot}/secrets/kube-config.enc.yaml";
+    };
+
     services.k3s = {
-      enable = true;
+      enable = false;
       role = "server";
       tokenFile = config.sops.secrets.k3s_token.path;
       extraFlags = lib.concatStringsSep " " serverFlagList;
