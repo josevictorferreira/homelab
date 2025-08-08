@@ -1,4 +1,4 @@
-{ lib, config, hostName, clusterConfig, commonsPath, ... }:
+{ lib, config, hostName, clusterConfig, commonsPath, flakeRoot, ... }:
 
 let
   cfg = config.roles.k8sControlPlane;
@@ -8,7 +8,6 @@ let
   serverFlagList = [
     "--tls-san=${clusterConfig.ipAddress}"
     "--node-name=${hostName}"
-    "--secrets-encryption"
     "--disable-helm-controller"
     "--disable-kube-proxy"
     "--disable-network-policy"
@@ -48,6 +47,18 @@ in
       extraFlags = lib.concatStringsSep " " serverFlagList;
     } // lib.optionalAttrs (!cfg.isInit) {
       serverAddr = "https://${clusterConfig.ipAddress}:6443";
+      manifests = {
+        cilium = {
+          enable = true;
+          target = "cilium.yaml";
+          source = "${flakeRoot}/kubernetes/manifests/cilium.yaml";
+        };
+        kubeVip = {
+          enable = true;
+          target = "kube-vip.yaml";
+          source = "${flakeRoot}/kubernetes/manifests/kube-vip.yaml";
+        };
+      };
     };
 
     systemd.tmpfiles.rules = [
