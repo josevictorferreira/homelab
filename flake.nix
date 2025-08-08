@@ -71,7 +71,10 @@
         deploy-rs.lib;
 
       packages.${currentSystem}.genK8sManifests = (kubenix.evalModules.${currentSystem} {
-        module = import ./kubernetes/kubenix/cilium.nix;
+        modules = [
+          (import ./kubernetes/kubenix/kube-vip.nix)
+          (import ./kubernetes/kubenix/cilium.nix)
+        ];
         specialArgs = {
           clusterConfig = clusterConfig;
           flake = self;

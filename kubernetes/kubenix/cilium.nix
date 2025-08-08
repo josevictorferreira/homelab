@@ -16,7 +16,7 @@
       };
     };
 
-    helm.releases."kube-vip" = {
+    helm.releases."cilium" = {
       chart = kubenix.lib.helm.fetch
         {
           repo = "https://helm.cilium.io";
