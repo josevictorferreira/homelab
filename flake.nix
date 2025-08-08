@@ -12,6 +12,7 @@
     let
       flakeRoot = ./.;
       currentSystem = builtins.currentSystem or "x86_64-linux";
+      pkgs = import nixpkgs { system = currentSystem; };
       commonsPath = "${flakeRoot}/modules/common";
       rolesPath = "${flakeRoot}/modules/roles";
       programsPath = "${flakeRoot}/modules/programs";
@@ -22,6 +23,24 @@
       clusterConfig = (import ./config/cluster.nix { lib = extendedLib; });
       usersConfig = import ./config/users.nix;
       hosts = clusterConfig.hosts;
+      kubenixModules =
+        let
+          files = builtins.readDir ./kubernetes/kubenix;
+        in
+        nixpkgs.lib.filterAttrs
+          (name: type: type == "regular" && nixpkgs.lib.hasSuffix ".nix" name)
+          files;
+
+      evalModule = filePath:
+        (kubenix.evalModules.${currentSystem} {
+          modules = [
+            (import filePath)
+          ];
+          specialArgs = {
+            inherit kubenix;
+            clusterConfig = clusterConfig;
+          };
+        }).config.kubernetes.resultYAML;
 
       mkHost = hostName:
         nixpkgs.lib.nixosSystem {
@@ -70,15 +89,17 @@
           deployLib.deployChecks self.deploy)
         deploy-rs.lib;
 
-      packages.${currentSystem}.genK8sManifests = (kubenix.evalModules.${currentSystem} {
-        modules = [
-          (import ./kubernetes/kubenix/kube-vip.nix)
-          (import ./kubernetes/kubenix/cilium.nix)
-        ];
-        specialArgs = {
-          clusterConfig = clusterConfig;
-          flake = self;
-        };
-      }).config.kubernetes.resultYAML;
+      packages.${currentSystem}.gen-manifests =
+        pkgs.runCommand "gen-k8s-manifests" { } ''
+          mkdir -p $out
+          ${builtins.concatStringsSep "\n" (
+            nixpkgs.lib.mapAttrsToList
+              (fileName: _: ''
+                cp ${evalModule ./kubernetes/kubenix/${fileName}} \
+                    $out/${nixpkgs.lib.removeSuffix ".nix" fileName}.yaml
+          '')
+          kubenixModules
+          )}
+        '';
     };
 }
