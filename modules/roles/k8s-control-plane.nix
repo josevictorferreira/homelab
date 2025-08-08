@@ -1,17 +1,17 @@
-{ lib, config, hostName, clusterConfig, commonsPath, k8sManifestsPath, ... }:
+{ lib, config, hostName, clusterConfig, commonsPath, k8sManifestsPath, flakeRoot, ... }:
 
 let
   cfg = config.roles.k8sControlPlane;
   clusterInitFlags = [
     "--cluster-init"
+    "--write-kubeconfig=${config.sops.secrets.kubeconfig.path}"
+    "--write-kubeconfig-mode 0644"
   ];
   serverFlagList = [
     "--tls-san=${clusterConfig.ipAddress}"
     "--tls-san=10.10.10.200"
-    "--write-kubeconfig-mode \"0644\""
     "--node-name=${hostName}"
     "--disable-helm-controller"
-    "--disable-kube-proxy"
     "--disable-network-policy"
     "--flannel-backend=none"
     "--disable=traefik,servicelb,local-storage"
@@ -38,6 +38,10 @@ in
   imports = [
     "${commonsPath}/k8s-node-defaults.nix"
   ];
+
+  sops.secrets.kubeconfig = {
+    sopsFile = "${flakeRoot}/secrets/kubeconfig.enc.yaml";
+  };
 
   config = lib.mkIf cfg.enable {
     k8sNodeDefaults.enable = true;
