@@ -28,11 +28,14 @@
       noHooks = true;
       values = {
         kubeProxyReplacement = true;
+        k8sServiceHost = "10.10.10.200";
+        k8sServicePort = 6443;
         ipam.operator.clusterPoolIPv4PodCIDRList = "10.42.0.0/16";
         socketLB.enabled = false;
         envoy.enabled = false;
         externalIPs.enabled = false;
         gatewayAPI.enabled = false;
+        routingMode = "native";
         hubble = {
           relay.enabled = false;
           ui.enabled = false;
