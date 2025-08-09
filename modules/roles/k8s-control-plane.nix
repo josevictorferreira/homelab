@@ -43,6 +43,18 @@ in
   config = lib.mkIf cfg.enable {
     k8sNodeDefaults.enable = true;
 
+    sops.secrets.k3s_root_ca_pem = {
+      path = "/var/lib/rancher/k3s/server/tls/root-ca.pem";
+      owner = "root";
+      mode = "0400";
+    };
+
+    sops.secrets.k3s_root_ca_key = {
+      path = "/var/lib/rancher/k3s/server/tls/root-ca.key";
+      owner = "root";
+      mode = "0400";
+    };
+
     services.k3s = {
       enable = true;
       role = "server";
