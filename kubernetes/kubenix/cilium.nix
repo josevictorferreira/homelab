@@ -39,6 +39,11 @@
         externalIPs.enabled = false;
         gatewayAPI.enabled = false;
         rollOutCiliumPods = true;
+        operator = {
+          enabled = true;
+          rollOutPods = true;
+          replicas = 1;
+        };
         hubble = {
           relay.enabled = false;
           ui.enabled = false;
