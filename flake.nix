@@ -25,24 +25,10 @@
       clusterConfig = (import ./config/cluster.nix { lib = extendedLib; });
       usersConfig = import ./config/users.nix;
       hosts = clusterConfig.hosts;
-      kubenixModules =
-        let
-          files = builtins.readDir ./kubernetes/kubenix;
-        in
-        nixpkgs.lib.filterAttrs
-          (name: type: type == "regular" && nixpkgs.lib.hasSuffix ".nix" name)
-          files;
-
-      evalModule = filePath:
-        (kubenix.evalModules.${currentSystem} {
-          modules = [
-            (import filePath)
-          ];
-          specialArgs = {
-            inherit kubenix;
-            clusterConfig = clusterConfig;
-          };
-        }).config.kubernetes.resultYAML;
+      kubenixLib = import ./kubernetes/kubenix {
+        lib = extendedLib;
+        inherit kubenix clusterConfig;
+      };
 
       mkHost = hostName:
         nixpkgs.lib.nixosSystem {
@@ -95,16 +81,6 @@
         deploy-rs.lib;
 
       packages.${currentSystem}.gen-manifests =
-        pkgs.runCommand "gen-k8s-manifests" { } ''
-          mkdir -p $out
-          ${builtins.concatStringsSep "\n" (
-            nixpkgs.lib.mapAttrsToList
-              (fileName: _: ''
-                cp ${evalModule ./kubernetes/kubenix/${fileName}} \
-                    $out/${nixpkgs.lib.removeSuffix ".nix" fileName}.yaml
-          '')
-          kubenixModules
-          )}
-        '';
+        kubenixLib.mkRenderer currentSystem pkgs;
     };
 }
