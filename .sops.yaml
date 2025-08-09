@@ -9,3 +9,10 @@ creation_rules:
         - *josevictor
         - *josevictorferreira
         - *homelab
+  - path_regex: ^kubernetes/manifests/secrets/.*\.enc\.ya?ml$
+    encrypted_regex: '^(data|stringData)$'
+    key_groups:
+      - age:
+        - *josevictor
+        - *josevictorferreira
+        - *homelab
