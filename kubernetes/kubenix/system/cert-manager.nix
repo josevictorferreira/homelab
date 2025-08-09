@@ -1,4 +1,4 @@
-{ kubenix, ... }:
+{ kubenix, clusterConfig, ... }:
 
 let
   namespace = "cert-manager";
@@ -35,7 +35,7 @@ in
           repo = "https://charts.jetstack.io";
           chart = "cert-manager";
           version = "1.18.2";
-          sha256 = "sha256-km3mRsCk7NpbTJ8l8C52eweF+u9hqxIhEWALQ8LqN+0=";
+          sha256 = "sha256-vwe9ARF8VZ+Ntl1IR4TyNAXNmZU9+TNVVsnC+s+ZjQ0=";
         };
       includeCRDs = true;
       noHooks = true;
@@ -77,22 +77,25 @@ in
 
       certificate = builtins.listToAttrs (map
         (nms: {
-          name = "self-signed-ca-${nms}";
+          name = "wildcard-certificate-${nms}";
           value = {
             metadata = {
-              name = "self-signed-ca";
+              name = "wildcard-certificate";
               namespace = nms;
+              annotations = {
+                "cert-manager.io/issue-temporary-certificate" = "true";
+              };
             };
             spec = {
-              isCA = true;
-              commonName = "My Root CA";
-              secretName = "self-signed-ca";
-              duration = "8760h"; # 1 year
-              renewBefore = "360h"; # 15 days
-              privateKey = {
-                algorithm = "RSA";
-                size = 2048;
+              secretName = "wildcard-tls";
+              issuerRef = {
+                name = "cloudflare-issuer";
+                kind = "ClusterIssuer";
               };
+              dnsNames = [
+                "${clusterConfig.domain}"
+                "*.${clusterConfig.domain}"
+              ];
             };
           };
         })
