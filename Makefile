@@ -3,7 +3,8 @@
 .DEFAULT_GOAL := help
 
 AVAILABLE_GROUPS = $(shell nix eval --raw .#nodeGroups)
-CONTROL_PLANE = 10.10.10.250
+CONTROL_PLANE_IP = 10.10.10.200
+CLUSTER_IP = 10.10.10.250
 PORT = 6443
 USERNAME = josevictor
 REMOTE_KUBECONFIG = /etc/rancher/k3s/k3s.yaml
@@ -54,7 +55,7 @@ kubesync: ## Write kubeconfig from the cluster to kubectl config.
 	kubectl config delete-context "$(CLUSTER_NAME)" >/dev/null 2>&1 || true; \
 	tmpdir="$$(mktemp -d)"; \
 	tmpkc="$$tmpdir/k3s.yaml"; \
-	ssh -4 $(USERNAME)@$(CONTROL_PLANE) "sudo cat $(REMOTE_KUBECONFIG)" > "$$tmpkc"; \
+	ssh -4 $(USERNAME)@$(CONTROL_PLANE_IP) "sudo cat $(REMOTE_KUBECONFIG)" > "$$tmpkc"; \
 	oldctx="$$(KUBECONFIG="$$tmpkc" kubectl config current-context)"; \
 	oldcluster="$$(KUBECONFIG="$$tmpkc" kubectl config view --raw=true -o jsonpath='{.contexts[?(@.name=="'$$oldctx'")].context.cluster}')"; \
 	olduser="$$(KUBECONFIG="$$tmpkc" kubectl config view --raw=true -o jsonpath='{.contexts[?(@.name=="'$$oldctx'")].context.user}')"; \
@@ -66,7 +67,7 @@ kubesync: ## Write kubeconfig from the cluster to kubectl config.
   echo "$$clientkey_b64" | base64 -d >"$$tmpdir/client.key"; \
 	mkdir -p "$$(dirname "$(LOCAL_KUBECONFIG)")"; \
 	[ -f "$(LOCAL_KUBECONFIG)" ] && cp "$(LOCAL_KUBECONFIG)" "$(LOCAL_KUBECONFIG).bak" || true; \
-	KUBECONFIG="$(LOCAL_KUBECONFIG)" kubectl config set-cluster "$(CLUSTER_NAME)" --embed-certs=true --server="https://$(CONTROL_PLANE):$(PORT)" --certificate-authority="$$tmpdir/ca.crt"; \
+	KUBECONFIG="$(LOCAL_KUBECONFIG)" kubectl config set-cluster "$(CLUSTER_NAME)" --embed-certs=true --server="https://$(CLUSTER_IP):$(PORT)" --certificate-authority="$$tmpdir/ca.crt"; \
   KUBECONFIG="$(LOCAL_KUBECONFIG)" kubectl config set-credentials "$(USERNAME)" --embed-certs=true --client-certificate="$$tmpdir/client.crt" --client-key="$$tmpdir/client.key"; \
 	KUBECONFIG="$(LOCAL_KUBECONFIG)" kubectl config set-context "$(CLUSTER_NAME)" --cluster="$(CLUSTER_NAME)" --user="$(USERNAME)"; \
 	KUBECONFIG="$(LOCAL_KUBECONFIG)" kubectl config use-context "$(CLUSTER_NAME)" >/dev/null; \
