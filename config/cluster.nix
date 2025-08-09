@@ -13,6 +13,8 @@ rec {
 
   gateway = "10.10.10.1";
 
+  ingressAddress = "10.10.10.100";
+
   dnsServers = [
     "1.1.1.1"
     "8.8.8.8"

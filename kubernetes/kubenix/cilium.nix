@@ -18,6 +18,12 @@ in
         version = "v2alpha1";
         kind = "CiliumLoadBalancerIPPool";
       };
+      ciliuml2announcementpolicy = {
+        attrName = "ciliuml2announcementpolicy";
+        group = "cilium.io";
+        version = "v2alpha1";
+        kind = "CiliumL2AnnouncementPolicy";
+      };
     };
 
     helm.releases."cilium" = {
@@ -37,9 +43,24 @@ in
         k8sServicePort = 6443;
         socketLB.enabled = false;
         envoy.enabled = false;
-        externalIPs.enabled = true;
         gatewayAPI.enabled = false;
         rollOutCiliumPods = true;
+        l2announcements.enabled = true;
+        externalIPs.enabled = true;
+        ingressController = {
+          enabled = false;
+          default = true;
+          loadBalancerMode = "shared";
+          service = {
+            annotations = {
+              "io.cilium/lb-ipam-ips" = clusterConfig.ingressAddress;
+            };
+          };
+        };
+        k8sClientRateLimit = {
+          qps = 50;
+          burst = 200;
+        };
         operator = {
           enabled = true;
           rollOutPods = true;
@@ -65,6 +86,17 @@ in
               stop = "10.10.10.199";
             }
           ];
+        };
+      };
+      ciliuml2announcementpolicy."default-l2-announcement-policy" = {
+        metadata = {
+          name = "default-l2-announcement-policy";
+          namespace = "kube-system";
+        };
+        spec = {
+          enabled = true;
+          externalIPs = true;
+          loadBalancerIPs = true;
         };
       };
     };
