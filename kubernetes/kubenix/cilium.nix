@@ -29,7 +29,7 @@
       values = {
         namespaceOverride = "kube-system";
         kubeProxyReplacement = true;
-        k8sServiceHost = "10.10.10.200";
+        k8sServiceHost = clusterConfig.ipAddress;
         k8sServicePort = 6443;
         socketLB.enabled = false;
         envoy.enabled = false;
