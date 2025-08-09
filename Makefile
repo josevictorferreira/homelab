@@ -24,21 +24,21 @@ ddeploy: ## Dry deploy host.
 	nix run github:serokell/deploy-rs -- \
     --debug-logs \
 		--dry-activate \
-		.#$$(SEL) \
+		.#$$SEL \
     -- \
     --impure \
     --show-trace
 
 deploy: ## Deploy host.
-	@set -e; \
 	SEL="$$(printf '%s\n' $(AVAILABLE_NODES) \
     | tr -d '\r' \
 	  | fzf --prompt='host> ' --height=40% --border \
 	    --preview 'printf \"%s\n\" {}')"; \
+  echo "Deploying host: $$SEL"; \
 	nix run github:serokell/deploy-rs -- \
     --debug-logs \
 		--auto-rollback true \
-		.#$$(SEL) \
+		.#$$SEL \
     -- \
     --impure \
     --show-trace
