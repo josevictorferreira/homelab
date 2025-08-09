@@ -7,7 +7,7 @@ in
 rec {
   name = "ze-homelab";
 
-  domain = "ze.lab";
+  domain = "josevictor.me";
 
   ipAddress = "10.10.10.250";
 
