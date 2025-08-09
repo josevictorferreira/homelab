@@ -3,7 +3,7 @@
 .DEFAULT_GOAL := help
 
 AVAILABLE_GROUPS = $(shell nix eval --raw .#nodeGroups)
-CONTROL_PLANE = 10.10.10.200
+CONTROL_PLANE = 10.10.10.250
 PORT = 6443
 USERNAME = josevictor
 REMOTE_KUBECONFIG = /etc/rancher/k3s/k3s.yaml
