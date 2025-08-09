@@ -43,11 +43,11 @@ in
     {
       k8sNodeDefaults.enable = true;
 
-      fileSystems."/var/lib/rancher/k3s/server/manifests" = lib.mkIf cfg.isInit {
-        device = "tmpfs";
-        fsType = "tmpfs";
-        options = [ "mode=0700" "noexec" "nosuid" "nodev" "size=16M" ];
-      };
+      # fileSystems."/var/lib/rancher/k3s/server/manifests" = lib.mkIf cfg.isInit {
+      #   device = "tmpfs";
+      #   fsType = "tmpfs";
+      #   options = [ "mode=0700" "noexec" "nosuid" "nodev" "size=16M" ];
+      # };
 
       sops.secrets.k3s_root_ca_pem = lib.mkIf cfg.isInit {
         sopsFile = "${secretsPath}/k8s-secrets.enc.yaml";
