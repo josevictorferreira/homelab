@@ -1,5 +1,9 @@
 { kubenix, clusterConfig, ... }:
 
+let
+  controlPlaneNodeHostName = builtins.head clusterConfig.nodeGroups.k8sControlPlanes;
+  controlPlaneIpAddress = clusterConfig.hosts.${controlPlaneNodeHostName}.ipAddress;
+in
 {
   imports = with kubenix.modules; [
     helm
@@ -29,7 +33,7 @@
       values = {
         namespaceOverride = "kube-system";
         kubeProxyReplacement = true;
-        k8sServiceHost = clusterConfig.ipAddress;
+        k8sServiceHost = controlPlaneIpAddress;
         k8sServicePort = 6443;
         socketLB.enabled = false;
         envoy.enabled = false;
