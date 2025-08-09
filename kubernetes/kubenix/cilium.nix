@@ -94,7 +94,6 @@ in
           namespace = "kube-system";
         };
         spec = {
-          enabled = true;
           externalIPs = true;
           loadBalancerIPs = true;
         };
