@@ -2,7 +2,8 @@
 
 .DEFAULT_GOAL := help
 
-AVAILABLE_GROUPS = $(shell nix eval --raw .#nodeGroups)
+AVAILABLE_NODE_GROUPS = $(shell nix eval --raw .#listNodeGroups --read-only --quiet)
+AVAILABLE_NODES = $(shell nix eval --raw .#listNodes --read-only --quiet)
 CONTROL_PLANE_IP = 10.10.10.200
 CLUSTER_IP = 10.10.10.250
 PORT = 6443
@@ -11,39 +12,51 @@ REMOTE_KUBECONFIG = /etc/rancher/k3s/k3s.yaml
 LOCAL_KUBECONFIG = $(HOME)/.kube/config
 CLUSTER_NAME = ze-homelab
 
-groups: ## List all deploy groups.
-	@echo "Groups: $(AVAILABLE_GROUPS)"
-
 check: ## Check if the flake is valid.
 	@bash -c "nix flake check --show-trace --all-systems --impure"
 
-ddeploy: ## Dry deploy. HOST=$(HOSTNAME)
-	@nix run github:serokell/deploy-rs -- \
+ddeploy: ## Dry deploy host.
+	@set -e; \
+	SEL="$$(printf '%s\n' $(AVAILABLE_NODES) \
+    | tr -d '\r' \
+	  | fzf --prompt='host> ' --height=40% --border \
+	    --preview 'printf \"%s\n\" {}')"; \
+	nix run github:serokell/deploy-rs -- \
     --debug-logs \
 		--dry-activate \
-		.#$(HOST) \
+		.#$$(SEL) \
     -- \
     --impure \
     --show-trace
 
-deploy: ## Deploy. HOST=$(HOSTNAME)
-	@nix run github:serokell/deploy-rs -- \
+deploy: ## Deploy host.
+	@set -e; \
+	SEL="$$(printf '%s\n' $(AVAILABLE_NODES) \
+    | tr -d '\r' \
+	  | fzf --prompt='host> ' --height=40% --border \
+	    --preview 'printf \"%s\n\" {}')"; \
+	nix run github:serokell/deploy-rs -- \
     --debug-logs \
 		--auto-rollback true \
-		.#$(HOST) \
+		.#$$(SEL) \
     -- \
     --impure \
     --show-trace
 
-gdeploy: ## Group deploy. GROUP=$(GROUP)
-	@nix run github:serokell/deploy-rs -- \
-    --targets "$$(nix eval --raw .#deployGroups.$(GROUP))" \
+gdeploy: ## Deploy hosts that belong to a group.
+	@set -e; \
+	SEL="$$(printf '%s\n' $(AVAILABLE_NODE_GROUPS) \
+    | tr -d '\r' \
+	  | fzf --prompt='host> ' --height=40% --border \
+	    --preview 'printf \"%s\n\" {}')"; \
+	nix run github:serokell/deploy-rs -- \
+    --targets "$$(nix eval --raw .#deployGroups.$$(SEL))" \
     --auto-rollback true
 
 secrets: ## Edit the secrets files.
 	@set -e; \
 	SEL="$$(find ./secrets -type f -print0 \
-	  | fzf --read0 --prompt='secret> ' --height=40% --border \
+	  | fzf --prompt='secret> ' --height=40% --border \
 	    --preview 'command -v bat >/dev/null 2>&1 && bat --style=plain --color=always {} || head -n 200 {}')"; \
 	test -n "$$SEL" || { echo "No file selected."; exit 1; }; \
 	echo "Opening with sops: $$SEL"; \
