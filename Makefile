@@ -1,4 +1,4 @@
-.PHONY: groups check ddeploy deploy gdeploy secrets gmanifests kubesync help 
+.PHONY: check ddeploy deploy gdeploy secrets gmanifests kubesync help 
 
 .DEFAULT_GOAL := help
 
@@ -21,6 +21,7 @@ ddeploy: ## Dry deploy host.
     | tr -d '\r' \
 	  | fzf --prompt='host> ' --height=40% --border \
 	    --preview 'printf \"%s\n\" {}')"; \
+  echo "Deploying host: $$SEL"; \
 	nix run github:serokell/deploy-rs -- \
     --debug-logs \
 		--dry-activate \
@@ -30,6 +31,7 @@ ddeploy: ## Dry deploy host.
     --show-trace
 
 deploy: ## Deploy host.
+	@set -e; \
 	SEL="$$(printf '%s\n' $(AVAILABLE_NODES) \
     | tr -d '\r' \
 	  | fzf --prompt='host> ' --height=40% --border \
@@ -49,6 +51,7 @@ gdeploy: ## Deploy hosts that belong to a group.
     | tr -d '\r' \
 	  | fzf --prompt='host> ' --height=40% --border \
 	    --preview 'printf \"%s\n\" {}')"; \
+  echo "Deploying group: $$SEL"; \
 	nix run github:serokell/deploy-rs -- \
     --targets "$$(nix eval --raw .#deployGroups.$$(SEL))" \
     --auto-rollback true
