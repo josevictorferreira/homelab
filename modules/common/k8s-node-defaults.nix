@@ -1,4 +1,4 @@
-{ lib, pkgs, config, clusterConfig, usersConfig, flakeRoot, ... }:
+{ lib, pkgs, config, clusterConfig, usersConfig, secretsPath, ... }:
 
 let
   cfg = config.k8sNodeDefaults;
@@ -11,6 +11,7 @@ in
 
   config = lib.mkIf cfg.enable {
     sops.secrets.k3s_token = {
+      sopsFile = "${secretsPath}/k8s-secrets.enc.yaml";
       owner = username;
       mode = "0400";
     };
