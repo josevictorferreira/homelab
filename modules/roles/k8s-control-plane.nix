@@ -100,11 +100,6 @@ in
             target = "gotk-sync.yaml";
             source = "${k8sManifestsPath}/flux-system/gotk-sync.yaml";
           };
-          flux-kustomization = {
-            enable = true;
-            target = "kustomization.yaml";
-            source = "${k8sManifestsPath}/flux-system/kustomization.yaml";
-          };
         };
       };
 
