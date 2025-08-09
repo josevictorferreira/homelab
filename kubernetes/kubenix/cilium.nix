@@ -29,14 +29,12 @@
       values = {
         namespaceOverride = "kube-system";
         kubeProxyReplacement = true;
-        k8sServiceHost = clusterConfig.ipAddress;
+        k8sServiceHost = "10.10.10.200";
         k8sServicePort = 6443;
         routingMode = "native";
-        ipam.operator.clusterPoolIPv4PodCIDRList = "10.42.0.0/16";
-        ipv4NativeRoutingCIDR = "10.42.0.0/16";
         socketLB.enabled = false;
         envoy.enabled = false;
-        externalIPs.enabled = false;
+        externalIPs.enabled = true;
         gatewayAPI.enabled = false;
         rollOutCiliumPods = true;
         operator = {
@@ -48,7 +46,7 @@
           relay.enabled = false;
           ui.enabled = false;
         };
-        nodePort.enabled = false;
+        nodePort.enabled = true;
       };
     };
 
