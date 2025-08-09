@@ -31,7 +31,6 @@
         kubeProxyReplacement = true;
         k8sServiceHost = "10.10.10.200";
         k8sServicePort = 6443;
-        routingMode = "native";
         socketLB.enabled = false;
         envoy.enabled = false;
         externalIPs.enabled = true;
