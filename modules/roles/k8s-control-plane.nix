@@ -4,7 +4,6 @@ let
   cfg = config.roles.k8sControlPlane;
   clusterInitFlags = [
     "--cluster-init"
-    "--https-listen-port=6444"
     "--write-kubeconfig-mode 0644"
   ];
   serverFlagList = [

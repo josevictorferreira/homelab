@@ -18,7 +18,7 @@ in
   config = lib.mkIf cfg.enable {
     nixDefaults.enable = true;
     locale.enable = true;
-    networking.firewall.enable = true;
+    networking.firewall.enable = false;
 
     networking.hostName = hostName;
     networking.domain = clusterConfig.domain;
