@@ -21889,6 +21889,14 @@ spec:
       subresources:
         status: {}
 ---
+apiVersion: v1
+kind: Namespace
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.33'
+    kubenix/project-name: kubenix
+  name: cert-manager
+---
 apiVersion: admissionregistration.k8s.io/v1
 kind: MutatingWebhookConfiguration
 metadata:
