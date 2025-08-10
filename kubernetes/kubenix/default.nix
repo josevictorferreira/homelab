@@ -1,4 +1,3 @@
-# kubernetes/kubenix/default.nix
 { lib, kubenix, clusterConfig }:
 
 let
