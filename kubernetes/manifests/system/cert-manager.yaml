@@ -22215,42 +22215,6 @@ spec:
       serviceAccountName: cert-manager-webhook
 ---
 apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  annotations:
-    cert-manager.io/issue-temporary-certificate: 'true'
-    kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
-  name: wildcard-certificate
-  namespace: apps
-spec:
-  dnsNames:
-    - josevictor.me
-    - '*.josevictor.me'
-  issuerRef:
-    kind: ClusterIssuer
-    name: cloudflare-issuer
-  secretName: wildcard-tls
----
-apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  annotations:
-    cert-manager.io/issue-temporary-certificate: 'true'
-    kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
-  name: wildcard-certificate
-  namespace: monitoring
-spec:
-  dnsNames:
-    - josevictor.me
-    - '*.josevictor.me'
-  issuerRef:
-    kind: ClusterIssuer
-    name: cloudflare-issuer
-  secretName: wildcard-tls
----
-apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
   annotations:
