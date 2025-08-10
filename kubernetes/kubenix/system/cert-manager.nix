@@ -38,6 +38,12 @@ in
     };
 
     resources = {
+      namespaces.${namespace} = {
+        metadata = {
+          name = namespace;
+        };
+      };
+
       clusterissuer."cloudflare-issuer" = {
         metadata = {
           name = "cloudflare-issuer";
