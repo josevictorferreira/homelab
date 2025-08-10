@@ -20,6 +20,12 @@ in
       };
     };
     resources = {
+      namespaces.${namespace} = {
+        metadata = {
+          name = namespace;
+        };
+      };
+
       certificate."wildcard-certificate" = {
         metadata = {
           name = "wildcard-certificate";
