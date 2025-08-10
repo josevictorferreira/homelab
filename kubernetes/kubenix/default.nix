@@ -46,7 +46,7 @@ let
         (m:
           let dest = "${lib.removeSuffix ".nix" m.rel}.yaml";
           in ''
-            install -D ${evalModule system m.path} "$out/${dest}"
+            install -D -m 0755 ${evalModule system m.path} "$out/${dest}"
           ''
         )
         modules);
