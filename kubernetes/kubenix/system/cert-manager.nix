@@ -2,10 +2,6 @@
 
 let
   namespace = "cert-manager";
-  certificateNamespaces = [
-    "apps"
-    "monitoring"
-  ];
 in
 {
   imports = with kubenix.modules; [
@@ -20,12 +16,6 @@ in
         group = "cert-manager.io";
         version = "v1";
         kind = "ClusterIssuer";
-      };
-      certificate = {
-        attrName = "certificate";
-        group = "cert-manager.io";
-        version = "v1";
-        kind = "Certificate";
       };
     };
 
@@ -74,32 +64,6 @@ in
           };
         };
       };
-
-      certificate = builtins.listToAttrs (map
-        (nms: {
-          name = "wildcard-certificate-${nms}";
-          value = {
-            metadata = {
-              name = "wildcard-certificate";
-              namespace = nms;
-              annotations = {
-                "cert-manager.io/issue-temporary-certificate" = "true";
-              };
-            };
-            spec = {
-              secretName = "wildcard-tls";
-              issuerRef = {
-                name = "cloudflare-issuer";
-                kind = "ClusterIssuer";
-              };
-              dnsNames = [
-                "${clusterConfig.domain}"
-                "*.${clusterConfig.domain}"
-              ];
-            };
-          };
-        })
-        certificateNamespaces);
     };
   };
 }
