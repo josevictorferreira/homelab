@@ -5,11 +5,6 @@ let
   mainControlPlaneConfig = clusterConfig.hosts.${mainControlPlaneHost};
 in
 {
-  imports = with kubenix.modules; [
-    helm
-    k8s
-  ];
-
   kubernetes.helm.releases."kube-vip" = {
     chart = kubenix.lib.helm.fetch
       {

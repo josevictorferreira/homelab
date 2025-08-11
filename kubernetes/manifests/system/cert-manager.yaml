@@ -4,7 +4,7 @@ metadata:
   annotations:
     helm.sh/resource-policy: keep
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   labels:
     app: cert-manager
     app.kubernetes.io/instance: cert-manager
@@ -423,7 +423,7 @@ metadata:
   annotations:
     helm.sh/resource-policy: keep
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   labels:
     app: cert-manager
     app.kubernetes.io/instance: cert-manager
@@ -1548,7 +1548,7 @@ metadata:
   annotations:
     helm.sh/resource-policy: keep
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   labels:
     app: cert-manager
     app.kubernetes.io/instance: cert-manager
@@ -7297,7 +7297,7 @@ metadata:
   annotations:
     helm.sh/resource-policy: keep
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   labels:
     app: cert-manager
     app.kubernetes.io/instance: cert-manager
@@ -14420,7 +14420,7 @@ metadata:
   annotations:
     helm.sh/resource-policy: keep
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   labels:
     app: cert-manager
     app.kubernetes.io/component: crds
@@ -21541,7 +21541,7 @@ metadata:
   annotations:
     helm.sh/resource-policy: keep
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   labels:
     app: cert-manager
     app.kubernetes.io/component: crds
@@ -21894,7 +21894,7 @@ kind: Namespace
 metadata:
   annotations:
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   name: cert-manager
 ---
 apiVersion: admissionregistration.k8s.io/v1
@@ -21903,7 +21903,7 @@ metadata:
   annotations:
     cert-manager.io/inject-ca-from-secret: cert-manager/cert-manager-webhook-ca
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   labels:
     app: webhook
     app.kubernetes.io/component: webhook
@@ -21943,7 +21943,7 @@ metadata:
   annotations:
     cert-manager.io/inject-ca-from-secret: cert-manager/cert-manager-webhook-ca
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   labels:
     app: webhook
     app.kubernetes.io/component: webhook
@@ -21990,7 +21990,7 @@ kind: Deployment
 metadata:
   annotations:
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   labels:
     app: cert-manager
     app.kubernetes.io/component: controller
@@ -22071,7 +22071,7 @@ kind: Deployment
 metadata:
   annotations:
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   labels:
     app: cainjector
     app.kubernetes.io/component: cainjector
@@ -22133,7 +22133,7 @@ kind: Deployment
 metadata:
   annotations:
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   labels:
     app: webhook
     app.kubernetes.io/component: webhook
@@ -22227,7 +22227,7 @@ kind: ClusterIssuer
 metadata:
   annotations:
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   name: cloudflare-issuer
   namespace: cert-manager
 spec:
@@ -22247,7 +22247,7 @@ kind: Service
 metadata:
   annotations:
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   labels:
     app: webhook
     app.kubernetes.io/component: webhook
@@ -22276,7 +22276,7 @@ kind: ServiceAccount
 metadata:
   annotations:
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   labels:
     app: cert-manager
     app.kubernetes.io/component: controller
@@ -22294,7 +22294,7 @@ kind: ServiceAccount
 metadata:
   annotations:
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   labels:
     app: cainjector
     app.kubernetes.io/component: cainjector
@@ -22312,7 +22312,7 @@ kind: ServiceAccount
 metadata:
   annotations:
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   labels:
     app: webhook
     app.kubernetes.io/component: webhook
@@ -22329,7 +22329,7 @@ kind: ClusterRole
 metadata:
   annotations:
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   labels:
     app: cainjector
     app.kubernetes.io/component: cainjector
@@ -22403,7 +22403,7 @@ kind: ClusterRole
 metadata:
   annotations:
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   labels:
     app: cert-manager
     app.kubernetes.io/component: controller
@@ -22430,7 +22430,7 @@ kind: ClusterRole
 metadata:
   annotations:
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   labels:
     app: cert-manager
     app.kubernetes.io/component: cert-manager
@@ -22457,7 +22457,7 @@ kind: ClusterRole
 metadata:
   annotations:
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   labels:
     app: cert-manager
     app.kubernetes.io/component: controller
@@ -22532,7 +22532,7 @@ kind: ClusterRole
 metadata:
   annotations:
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   labels:
     app: cert-manager
     app.kubernetes.io/component: cert-manager
@@ -22581,7 +22581,7 @@ kind: ClusterRole
 metadata:
   annotations:
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   labels:
     app: cert-manager
     app.kubernetes.io/component: controller
@@ -22692,7 +22692,7 @@ kind: ClusterRole
 metadata:
   annotations:
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   labels:
     app: cert-manager
     app.kubernetes.io/component: controller
@@ -22744,7 +22744,7 @@ kind: ClusterRole
 metadata:
   annotations:
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   labels:
     app: cert-manager
     app.kubernetes.io/component: controller
@@ -22819,7 +22819,7 @@ kind: ClusterRole
 metadata:
   annotations:
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   labels:
     app: cert-manager
     app.kubernetes.io/component: controller
@@ -22871,7 +22871,7 @@ kind: ClusterRole
 metadata:
   annotations:
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   labels:
     app: cert-manager
     app.kubernetes.io/component: controller
@@ -22943,7 +22943,7 @@ kind: ClusterRole
 metadata:
   annotations:
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   labels:
     app: cert-manager
     app.kubernetes.io/component: controller
@@ -22992,7 +22992,7 @@ kind: ClusterRole
 metadata:
   annotations:
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   labels:
     app: cert-manager
     app.kubernetes.io/component: controller
@@ -23033,7 +23033,7 @@ kind: ClusterRole
 metadata:
   annotations:
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   labels:
     app: webhook
     app.kubernetes.io/component: webhook
@@ -23057,7 +23057,7 @@ kind: ClusterRoleBinding
 metadata:
   annotations:
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   labels:
     app: cainjector
     app.kubernetes.io/component: cainjector
@@ -23082,7 +23082,7 @@ kind: ClusterRoleBinding
 metadata:
   annotations:
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   labels:
     app: cert-manager
     app.kubernetes.io/component: cert-manager
@@ -23107,7 +23107,7 @@ kind: ClusterRoleBinding
 metadata:
   annotations:
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   labels:
     app: cert-manager
     app.kubernetes.io/component: controller
@@ -23132,7 +23132,7 @@ kind: ClusterRoleBinding
 metadata:
   annotations:
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   labels:
     app: cert-manager
     app.kubernetes.io/component: cert-manager
@@ -23157,7 +23157,7 @@ kind: ClusterRoleBinding
 metadata:
   annotations:
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   labels:
     app: cert-manager
     app.kubernetes.io/component: controller
@@ -23182,7 +23182,7 @@ kind: ClusterRoleBinding
 metadata:
   annotations:
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   labels:
     app: cert-manager
     app.kubernetes.io/component: controller
@@ -23207,7 +23207,7 @@ kind: ClusterRoleBinding
 metadata:
   annotations:
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   labels:
     app: cert-manager
     app.kubernetes.io/component: controller
@@ -23232,7 +23232,7 @@ kind: ClusterRoleBinding
 metadata:
   annotations:
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   labels:
     app: cert-manager
     app.kubernetes.io/component: controller
@@ -23257,7 +23257,7 @@ kind: ClusterRoleBinding
 metadata:
   annotations:
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   labels:
     app: cert-manager
     app.kubernetes.io/component: controller
@@ -23282,7 +23282,7 @@ kind: ClusterRoleBinding
 metadata:
   annotations:
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   labels:
     app: webhook
     app.kubernetes.io/component: webhook
@@ -23307,7 +23307,7 @@ kind: Role
 metadata:
   annotations:
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   labels:
     app: cainjector
     app.kubernetes.io/component: cainjector
@@ -23342,7 +23342,7 @@ kind: Role
 metadata:
   annotations:
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   labels:
     app: cert-manager
     app.kubernetes.io/component: controller
@@ -23368,7 +23368,7 @@ kind: Role
 metadata:
   annotations:
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   labels:
     app: webhook
     app.kubernetes.io/component: webhook
@@ -23403,7 +23403,7 @@ kind: Role
 metadata:
   annotations:
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   labels:
     app: cert-manager
     app.kubernetes.io/component: controller
@@ -23437,7 +23437,7 @@ kind: RoleBinding
 metadata:
   annotations:
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   labels:
     app: cainjector
     app.kubernetes.io/component: cainjector
@@ -23462,7 +23462,7 @@ kind: RoleBinding
 metadata:
   annotations:
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   labels:
     app: cert-manager
     app.kubernetes.io/component: controller
@@ -23487,7 +23487,7 @@ kind: RoleBinding
 metadata:
   annotations:
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   labels:
     app: webhook
     app.kubernetes.io/component: webhook
@@ -23512,7 +23512,7 @@ kind: RoleBinding
 metadata:
   annotations:
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   labels:
     app: cert-manager
     app.kubernetes.io/component: controller

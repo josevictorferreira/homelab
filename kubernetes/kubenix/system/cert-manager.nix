@@ -4,11 +4,6 @@ let
   namespace = "cert-manager";
 in
 {
-  imports = with kubenix.modules; [
-    helm
-    k8s
-  ];
-
   kubernetes = {
     customTypes = {
       clusterissuer = {

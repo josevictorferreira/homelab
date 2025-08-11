@@ -40,10 +40,28 @@ let
 
   secretsFor = secretName: "ref+sops://${k8sSecretsFile}#${secretName}";
 
+  baseModule = { kubenix, ... }: {
+    imports = with kubenix.modules; [
+      helm
+      k8s
+    ];
+
+    kubenix.project = clusterConfig.name;
+
+    kubernetes = {
+      version = "1.33";
+    };
+  };
+
   evalModule = system: filePath:
     (kubenix.evalModules.${system} {
-      modules = [ (import filePath) ];
-      specialArgs = { inherit kubenix clusterConfig secretsFor; };
+      modules = [
+        baseModule
+        (import filePath)
+      ];
+      specialArgs = {
+        inherit kubenix clusterConfig secretsFor;
+      };
     }).config.kubernetes.resultYAML;
 
   mkRenderer = system: pkgs:
