@@ -67,6 +67,7 @@ in
           replicas = 1;
         };
         hubble = {
+          enabled = false;
           relay.enabled = false;
           ui.enabled = false;
         };
