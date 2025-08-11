@@ -1,4 +1,4 @@
-{ kubenix, clusterConfig, ... }:
+{ kubenix, ... }:
 
 let
   namespace = "cert-manager";
