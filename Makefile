@@ -60,7 +60,7 @@ gdeploy: ## Deploy hosts that belong to a group.
 
 secrets: ## Edit the secrets files.
 	@set -e; \
-	SEL="$$(find ./secrets -type f -print0 \
+	SEL="$$(find secrets -type f \
 	  | nix run nixpkgs#fzf -- --prompt='secret> ' --height=40% --border \
 	    --preview 'command -v bat >/dev/null 2>&1 && bat --style=plain --color=always {} || head -n 200 {}')"; \
 	test -n "$$SEL" || { echo "No file selected."; exit 1; }; \

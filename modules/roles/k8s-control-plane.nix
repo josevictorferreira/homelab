@@ -41,7 +41,7 @@ in
 
   config = lib.mkIf cfg.enable
     {
-      k8sNodeDefaults.enable = false;
+      k8sNodeDefaults.enable = true;
 
       sops.secrets.k3s_root_ca_pem = lib.mkIf cfg.isInit {
         sopsFile = "${secretsPath}/k8s-secrets.enc.yaml";
@@ -74,7 +74,7 @@ in
       services.k3s = {
         enable = true;
         role = "server";
-        tokenFile = "/run/secrets/k3s_token";
+        tokenFile = config.sops.secrets.k3s_token.path;
         extraFlags = lib.concatStringsSep " " serverFlagList;
       } // lib.optionalAttrs (!cfg.isInit) {
         serverAddr = "https://${clusterConfig.ipAddress}:6443";
@@ -83,12 +83,12 @@ in
           cilium = {
             enable = true;
             target = "cilium.yaml";
-            source = "${k8sManifestsPath}/cilium.yaml";
+            source = "${k8sManifestsPath}/system/cilium.yaml";
           };
           kubeVip = {
             enable = true;
             target = "kube-vip.yaml";
-            source = "${k8sManifestsPath}/kube-vip.yaml";
+            source = "${k8sManifestsPath}/system/kube-vip.yaml";
           };
           flux-components = {
             enable = true;
