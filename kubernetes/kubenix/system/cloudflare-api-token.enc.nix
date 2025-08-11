@@ -1,4 +1,4 @@
-{ kubenix, secretsPath, ... }:
+{ kubenix, secretsFor, ... }:
 
 let
   namespace = "cert-manager";
@@ -9,20 +9,16 @@ in
     k8s
   ];
 
-  sops.secrets."cloudflare-api-token" = {
-    file = "${secretsPath}/k8s-secret.enc.yaml";
-    key = "cloudflare-api-token";
-    type = "string";
-  };
-
   kubernetes = {
-    resources."secrets.cloudflare-api-token" = {
-      metadata = {
-        name = "cloudflare-api-token";
-        namespace = namespace;
-      };
-      data = {
-        "cloudflare-api-token" = kubenix.lib.sops.getSecret "cloudflare-api-token";
+    resources = {
+      secrets."cloudflare-api-token" = {
+        type = "Opaque";
+        metadata = {
+          namespace = namespace;
+        };
+        data = {
+          "cloudflare-api-token" = secretsFor "cloudflare-api-token";
+        };
       };
     };
   };
