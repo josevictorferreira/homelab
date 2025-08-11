@@ -14,7 +14,7 @@ let
     "--disable-cloud-controller"
     "--disable-kube-proxy"
     "--flannel-backend=none"
-    "--disable=traefik,servicelb,local-storage,metrics-server"
+    "--disable=traefik,servicelb,local-storage"
     "--node-label=node-group=control-plane"
     "--etcd-expose-metrics=true"
     "--etcd-snapshot-schedule-cron='0 */12 * * *'"
@@ -41,7 +41,7 @@ in
 
   config = lib.mkIf cfg.enable
     {
-      k8sNodeDefaults.enable = true;
+      k8sNodeDefaults.enable = false;
 
       sops.secrets.k3s_root_ca_pem = lib.mkIf cfg.isInit {
         sopsFile = "${secretsPath}/k8s-secrets.enc.yaml";
@@ -74,7 +74,7 @@ in
       services.k3s = {
         enable = true;
         role = "server";
-        tokenFile = config.sops.secrets.k3s_token.path;
+        tokenFile = "/run/secrets/k3s_token";
         extraFlags = lib.concatStringsSep " " serverFlagList;
       } // lib.optionalAttrs (!cfg.isInit) {
         serverAddr = "https://${clusterConfig.ipAddress}:6443";
