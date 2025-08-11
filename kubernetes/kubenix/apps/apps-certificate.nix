@@ -1,14 +1,9 @@
-{ kubenix, clusterConfig, ... }:
+{ clusterConfig, ... }:
 
 let
   namespace = "apps";
 in
 {
-  imports = with kubenix.modules; [
-    helm
-    k8s
-  ];
-
   kubernetes = {
     namespace = namespace;
     customTypes = {

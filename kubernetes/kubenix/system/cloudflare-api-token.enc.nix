@@ -1,14 +1,9 @@
-{ kubenix, secretsFor, ... }:
+{ secretsFor, ... }:
 
 let
   namespace = "cert-manager";
 in
 {
-  imports = with kubenix.modules; [
-    helm
-    k8s
-  ];
-
   kubernetes = {
     resources = {
       secrets."cloudflare-api-token" = {
