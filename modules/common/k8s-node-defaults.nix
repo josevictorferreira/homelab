@@ -34,23 +34,13 @@ in
           y|Y|yes|Yes) echo "nuke k3s...";;
           *) exit 0;;
         esac
-        flux uninstall -s || true
-        kubectl delete deployments --all=true -A
-        kubectl delete statefulsets --all=true -A  
-        kubectl delete ns --all=true -A
-        kubectl get ns | tail -n +2 | cut -d ' ' -f 1 | xargs -I{} kubectl delete pods --all=true --force=true -n {}
-        timeout 10 kubectl delete crds --all || true
-        cilium uninstall || true
-        echo "wait until objects are deleted..."
-        sleep 28
         /run/current-system/sw/bin/k3s-killall.sh
-        systemctl stop k3s
+        systemctl disable k3s
         KUBELET_PATH=$(mount | grep kubelet | cut -d' ' -f3);
         /$/{KUBELET_PATH:+umount /$KUBELET_PATH/}
         sleep 2
-        rm -rf /etc/rancher/{k3s,node};
+        rm -rf /etc/rancher/{k3s,node}
         rm -rf /var/lib/{rancher/k3s,kubelet,longhorn,etcd,cni}
-        rm -rf /var/lib/cni/networks/
         if [ -d /opt/k3s/data/temp ]; then
           rm -rf /opt/k3s/data/temp/*
         fi
