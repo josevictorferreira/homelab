@@ -3,7 +3,7 @@ kind: Namespace
 metadata:
   annotations:
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   name: monitoring
   namespace: monitoring
 ---
@@ -13,7 +13,7 @@ metadata:
   annotations:
     cert-manager.io/issue-temporary-certificate: 'true'
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   name: wildcard-certificate
   namespace: monitoring
 spec:

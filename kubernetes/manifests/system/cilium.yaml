@@ -3,7 +3,7 @@ kind: Namespace
 metadata:
   annotations:
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/part-of: cilium
   name: cilium-secrets
@@ -13,7 +13,7 @@ kind: DaemonSet
 metadata:
   annotations:
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/name: cilium-agent
     app.kubernetes.io/part-of: cilium
@@ -463,7 +463,7 @@ kind: Deployment
 metadata:
   annotations:
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/name: cilium-operator
     app.kubernetes.io/part-of: cilium
@@ -594,7 +594,7 @@ kind: CiliumL2AnnouncementPolicy
 metadata:
   annotations:
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   name: default-l2-announcement-policy
   namespace: kube-system
 spec:
@@ -606,7 +606,7 @@ kind: CiliumLoadBalancerIPPool
 metadata:
   annotations:
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   name: lb-pool
 spec:
   blocks:
@@ -760,7 +760,7 @@ kind: ConfigMap
 metadata:
   annotations:
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   name: cilium-config
   namespace: kube-system
 ---
@@ -769,7 +769,7 @@ kind: ServiceAccount
 metadata:
   annotations:
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   name: cilium
   namespace: kube-system
 ---
@@ -778,7 +778,7 @@ kind: ServiceAccount
 metadata:
   annotations:
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   name: cilium-operator
   namespace: kube-system
 ---
@@ -787,7 +787,7 @@ kind: ClusterRole
 metadata:
   annotations:
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/part-of: cilium
   name: cilium
@@ -907,7 +907,7 @@ kind: ClusterRole
 metadata:
   annotations:
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/part-of: cilium
   name: cilium-operator
@@ -1129,7 +1129,7 @@ kind: ClusterRoleBinding
 metadata:
   annotations:
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/part-of: cilium
   name: cilium
@@ -1147,7 +1147,7 @@ kind: ClusterRoleBinding
 metadata:
   annotations:
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/part-of: cilium
   name: cilium-operator
@@ -1165,7 +1165,7 @@ kind: Role
 metadata:
   annotations:
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/part-of: cilium
   name: cilium-config-agent
@@ -1185,7 +1185,7 @@ kind: Role
 metadata:
   annotations:
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/part-of: cilium
   name: cilium-operator-tlsinterception-secrets
@@ -1206,7 +1206,7 @@ kind: Role
 metadata:
   annotations:
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/part-of: cilium
   name: cilium-tlsinterception-secrets
@@ -1226,7 +1226,7 @@ kind: RoleBinding
 metadata:
   annotations:
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/part-of: cilium
   name: cilium-config-agent
@@ -1245,7 +1245,7 @@ kind: RoleBinding
 metadata:
   annotations:
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/part-of: cilium
   name: cilium-operator-tlsinterception-secrets
@@ -1264,7 +1264,7 @@ kind: RoleBinding
 metadata:
   annotations:
     kubenix/k8s-version: '1.33'
-    kubenix/project-name: kubenix
+    kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/part-of: cilium
   name: cilium-tlsinterception-secrets
