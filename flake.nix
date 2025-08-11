@@ -27,7 +27,7 @@
       hosts = clusterConfig.hosts;
       kubenixLib = import ./kubernetes/kubenix {
         lib = extendedLib;
-        inherit kubenix clusterConfig;
+        inherit kubenix clusterConfig flakeRoot secretsPath;
       };
 
       mkHost = hostName:
@@ -82,5 +82,17 @@
 
       packages.${currentSystem}.gen-manifests =
         kubenixLib.mkRenderer currentSystem pkgs;
+
+      devShells.${currentSystem}.default = pkgs.mkShell {
+        buildInputs = with pkgs; [
+          git
+          gnumake
+          sops
+          fzf
+          jq
+          kubectl
+          vals
+        ];
+      };
     };
 }

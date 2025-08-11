@@ -1,6 +1,11 @@
-{ lib, kubenix, clusterConfig }:
+{ lib, kubenix, clusterConfig, flakeRoot, ... }:
 
 let
+  repoPathVariableName = "HOMELAB_REPO_PATH";
+  repoPathEnv = builtins.getEnv repoPathVariableName;
+  repoRoot = if repoPathEnv != "" then repoPathEnv else flakeRoot;
+  k8sSecretsFile = "${repoRoot}/secrets/k8s-secrets.enc.yaml";
+
   isModuleFile = name:
     lib.hasSuffix ".nix" name
     && name != "default.nix"
@@ -33,19 +38,25 @@ let
 
   modules = discover ./. "";
 
+  secretsFor = secretName: "ref+sops://${k8sSecretsFile}#${secretName}";
+
   evalModule = system: filePath:
     (kubenix.evalModules.${system} {
       modules = [ (import filePath) ];
-      specialArgs = { inherit kubenix clusterConfig; };
+      specialArgs = { inherit kubenix clusterConfig secretsFor; };
     }).config.kubernetes.resultYAML;
 
   mkRenderer = system: pkgs:
     let
       copyCmds = lib.concatStringsSep "\n" (map
         (m:
-          let dest = "${lib.removeSuffix ".nix" m.rel}.yaml";
-          in ''
+          let
+            dest = "${lib.removeSuffix ".nix" m.rel}.yaml";
+          in
+          ''
             install -D -m 0755 ${evalModule system m.path} "$out/${dest}"
+            chmod 0644 "$out/${dest}"
+            echo "Copied ${m.rel} to $out/${dest}"
           ''
         )
         modules);
