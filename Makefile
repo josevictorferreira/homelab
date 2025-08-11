@@ -21,7 +21,7 @@ ddeploy: ## Dry deploy host.
 	@set -e; \
 	SEL="$$(printf '%s\n' $(AVAILABLE_NODES) \
     | tr -d '\r' \
-	  | fzf --prompt='host> ' --height=40% --border \
+	  | nix run nixpkgs#fzf -- --prompt='host> ' --height=40% --border \
 	    --preview 'printf \"%s\n\" {}')"; \
   echo "Deploying host: $$SEL"; \
 	nix run github:serokell/deploy-rs -- \
@@ -36,7 +36,7 @@ deploy: ## Deploy host.
 	@set -e; \
 	SEL="$$(printf '%s\n' $(AVAILABLE_NODES) \
     | tr -d '\r' \
-	  | fzf --prompt='host> ' --height=40% --border \
+	  | nix run nixpkgs#fzf -- --prompt='host> ' --height=40% --border \
 	    --preview 'printf \"%s\n\" {}')"; \
   echo "Deploying host: $$SEL"; \
 	nix run github:serokell/deploy-rs -- \
@@ -51,7 +51,7 @@ gdeploy: ## Deploy hosts that belong to a group.
 	@set -e; \
 	SEL="$$(printf '%s\n' $(AVAILABLE_NODE_GROUPS) \
     | tr -d '\r' \
-	  | fzf --prompt='host> ' --height=40% --border \
+	  | nix run nixpkgs#fzf -- --prompt='host> ' --height=40% --border \
 	    --preview 'printf \"%s\n\" {}')"; \
   echo "Deploying group: $$SEL"; \
 	nix run github:serokell/deploy-rs -- \
@@ -61,7 +61,7 @@ gdeploy: ## Deploy hosts that belong to a group.
 secrets: ## Edit the secrets files.
 	@set -e; \
 	SEL="$$(find ./secrets -type f -print0 \
-	  | fzf --prompt='secret> ' --height=40% --border \
+	  | nix run nixpkgs#fzf -- --prompt='secret> ' --height=40% --border \
 	    --preview 'command -v bat >/dev/null 2>&1 && bat --style=plain --color=always {} || head -n 200 {}')"; \
 	test -n "$$SEL" || { echo "No file selected."; exit 1; }; \
 	echo "Opening with sops: $$SEL"; \
@@ -98,7 +98,7 @@ emanifests: ## Encrypt the .enc.yaml manifests using sops.
 	    echo "Skipping (already encrypted): $$f"; \
 	  else \
 	    echo "Encrypting $$f"; \
-	    sops --encrypt --in-place "$$f"; \
+	    nix run nixpkgs#sops -- --encrypt --in-place "$$f"; \
 	  fi; \
 	done
 
