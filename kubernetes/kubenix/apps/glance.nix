@@ -169,7 +169,7 @@ in
           enabled = true;
           data."glance.yml" = toYaml glanceConfig;
         };
-        persistence.config = {
+        persistence.glance = {
           type = "configMap";
           name = "glance";
           items = [
