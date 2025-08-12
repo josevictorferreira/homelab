@@ -6,6 +6,7 @@
       (modulesPath + "/installer/scan/not-detected.nix")
     ];
 
+  boot.supportedFilesystems = [ "zfs" ];
   boot.loader.grub.enable = false;
   boot.loader.generic-extlinux-compatible.enable = true;
 
