@@ -1,0 +1,175 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/controller: main
+    app.kubernetes.io/instance: glance
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: glance
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: glance
+  namespace: apps
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/controller: main
+      app.kubernetes.io/instance: glance
+      app.kubernetes.io/name: glance
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        checksum/configMaps: 2ffaa8279f9328cd5e31c161bb6c089666a4ec75766bc814ffcb397a9a3ac048
+      labels:
+        app.kubernetes.io/controller: main
+        app.kubernetes.io/instance: glance
+        app.kubernetes.io/name: glance
+    spec:
+      automountServiceAccountToken: true
+      containers:
+        - image: glanceapp/glance:v0.8.4
+          imagePullPolicy: IfNotPresent
+          name: main
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /app/glance.yml
+              name: config
+              readOnly: true
+              subPath: glance.yml
+      dnsPolicy: ClusterFirst
+      enableServiceLinks: false
+      hostIPC: false
+      hostNetwork: false
+      hostPID: false
+      serviceAccountName: default
+      volumes:
+        - configMap:
+            items:
+              - key: glance.yml
+                path: glance.yml
+            name: glance-config
+          name: config
+---
+apiVersion: v1
+data:
+  glance.yml: "pages:\n- columns:\n  - size: small\n    widgets:\n    - first-day-of-week:\
+    \ monday\n      type: calendar\n    - cache: 1m\n      headers:\n        Authorization:\
+    \ Bearer RANDOM_TOKEN\n      method: GET\n      template: \"<ul class=\\\"list\
+    \ list-gap-10 collapsible-container\\\" data-collapse-after=\\\"\\\n        7\\\
+    \">\\n  {{ range .JSON.Array \\\"response\\\" }}\\n    <li>\\n      {{\\\n   \
+    \     \\ $title := .String \\\"name\\\" }}\\n      {{ if gt (len $title) 50 }}\\\
+    n\\\n        \\        {{ $title = (slice $title 0 50) | printf \\\"%s...\\\"\
+    \ }}\\n   \\\n        \\   {{ end }}\\n      <a class=\\\"size-title-dynamic color-primary-if-not-visited\\\
+    \"\\\n        \\ href=\\\"{{ .String \\\"url\\\" }}\\\" target=\\\"_self\\\" rel=\\\
+    \"noopener noreferrer\\\"\\\n        >{{ $title }}</a>\\n      <ul class=\\\"\
+    list-horizontal-text\\\">\\n     \\\n        \\   <li style=\\\"color: {{ .String\
+    \ \\\"collection.color\\\" }};\\\">{{ .String\\\n        \\ \\\"collection.name\\\
+    \" }}</li>\\n        {{ $tags := .Array \\\"tags\\\" }}\\n\\\n        \\     \
+    \   {{ range $index, $tag := $tags }}\\n          <li>{{ .String\\\n        \\\
+    \ \\\"name\\\" }} </li>\\n        {{ end }}\\n      </ul>\\n    </li>\\n\\\n \
+    \       \\  {{ end }}\\n</ul>\\n\"\n      title: Bookmarks\n      type: custom-api\n\
+    \      url: http://10.10.10.103/api/v1/links\n  - size: full\n    widgets:\n \
+    \   - type: group\n      widgets:\n      - type: hacker-news\n      - type: lobsters\n\
+    \    - channels:\n      - UCHnyfMqiRRG1u-2MsSQLbXA\n      - UCR-DXc1voovS8nhAvccRZhg\n\
+    \      - UC1yNl2E66ZzKApQdRuTQ4tw\n      - UCpMcsdZf2KkAnfmxiq2MfMQ\n      - UC9PIn6-XuRKZ5HmYeu46AIw\n\
+    \      - UCqnYRbOnwVAWU6plY904eAg\n      type: videos\n    - type: group\n   \
+    \   widgets:\n      - show-thumbnails: true\n        subreddit: selfhosted\n \
+    \       type: reddit\n      - show-thumbnails: true\n        subreddit: minilab\n\
+    \        type: reddit\n      - show-thumbnails: true\n        subreddit: homelab\n\
+    \        type: reddit\n  - size: small\n    widgets:\n    - hour-format: 24h\n\
+    \      location: Londrina, Paraná, Brazil\n      type: weather\n      units: metric\n\
+    \    - markets:\n      - name: Bitcoin\n        symbol: BTC-USD\n      - name:\
+    \ Kaspa\n        symbol: KAS-USD\n      - name: Brazilian Real\n        symbol:\
+    \ USDBRL=X\n      type: markets\n    - cache: 1d\n      repositories:\n      -\
+    \ glanceapp/glance\n      - pi-hole/pi-hole\n      - grafana/grafana\n      -\
+    \ linkwarden/linkwarden\n      - drakkan/sftpgo\n      - binwiederhier/ntfy\n\
+    \      - louislam/uptime-kuma\n      - prowlarr/prowlarr\n      type: releases\n\
+    \  name: Home\ntheme:\n  background-color: 50 1 6\n  negative-color: 209 88 54\n\
+    \  primary-color: 24 97 58\n"
+kind: ConfigMap
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: glance
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: glance
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: glance
+  namespace: apps
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: glance
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: glance
+    app.kubernetes.io/service: glance
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: glance
+  namespace: apps
+spec:
+  loadBalancerIP: 10.10.10.127
+  ports:
+    - name: http
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    app.kubernetes.io/controller: main
+    app.kubernetes.io/instance: glance
+    app.kubernetes.io/name: glance
+  type: LoadBalancer
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: glance
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: glance
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: glance
+  namespace: apps
+spec:
+  ingressClassName: cilium
+  rules:
+    - host: glance.josevictor.me
+      http:
+        paths:
+          - backend:
+              service:
+                name: glance
+                port:
+                  number: 8080
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - glance.josevictor.me
+      secretName: wildcard-tls

@@ -1,4 +1,4 @@
-{ lib, clusterConfig, ... }:
+{ lib, clusterConfig, toYaml, ... }:
 
 let
   glanceConfig = {
@@ -26,7 +26,7 @@ let
                 method = "GET";
                 url = "http://${clusterConfig.loadBalancer.services.linkwarden}/api/v1/links";
                 headers = {
-                  Authorization = "Bearer {{ .Values.secret.linkwarden_api_key }}";
+                  Authorization = "Bearer RANDOM_TOKEN";
                 };
                 template = ''
                   <ul class="list list-gap-10 collapsible-container" data-collapse-after="7">
@@ -99,7 +99,7 @@ let
             widgets = [
               {
                 type = "weather";
-                location = "{{ .Values.secret.location}}";
+                location = "Londrina, Paraná, Brazil";
                 units = "metric";
                 "hour-format" = "24h";
               }
@@ -138,32 +138,55 @@ in
     args = {
       namespace = "apps";
       image = "glanceapp/glance:v0.8.4@sha256:6df86a7e8868d1eda21f35205134b1962c422957e42a0c44d4717c8e8f741b1a";
-      persistence.enabled = false;
       subdomain = "glance";
       port = 8080;
       values = {
-        service.main.ports = {
+        controllers.main.containers.main = {
+          image = {
+            repository = "glanceapp/glance";
+            tag = "v0.8.4";
+            pullPolicy = "IfNotPresent";
+          };
+          ports = [
+            {
+              name = "http";
+              containerPort = 8080;
+              protocol = "TCP";
+            }
+          ];
+        };
+        service.main = {
           type = "LoadBalancer";
           loadBalancerIP = clusterConfig.loadBalancer.services.glance;
-          http = {
-            enabled = true;
-            port = 8080;
+          ports = {
+            http = {
+              enabled = true;
+              port = 8080;
+            };
           };
         };
         configMaps.config = {
           enabled = true;
-          name = "config";
-          data."glance.yml" = lib.generators.toYAML { } glanceConfig;
+          data."glance.yml" = toYaml glanceConfig;
         };
-        advancedMounts = {
-          main.main = [
+        persistence.config = {
+          type = "configMap";
+          name = "glance-config";
+          items = [
             {
-              name = "config";
-              path = "/app/glance.yml";
-              readOnly = true;
-              subPath = "glance.yml";
+              key = "glance.yml";
+              path = "glance.yml";
             }
           ];
+          advancedMounts = {
+            main.main = [
+              {
+                path = "/app/glance.yml";
+                readOnly = true;
+                subPath = "glance.yml";
+              }
+            ];
+          };
         };
       };
     };
