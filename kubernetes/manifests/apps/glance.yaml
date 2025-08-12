@@ -43,7 +43,7 @@ spec:
               name: http
               protocol: TCP
           volumeMounts:
-            - mountPath: /app/glance.yml
+            - mountPath: /app/config/glance.yml
               name: config
               readOnly: true
               subPath: glance.yml

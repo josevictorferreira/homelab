@@ -181,7 +181,7 @@ in
           advancedMounts = {
             main.main = [
               {
-                path = "/app/glance.yml";
+                path = "/app/config/glance.yml";
                 readOnly = true;
                 subPath = "glance.yml";
               }
