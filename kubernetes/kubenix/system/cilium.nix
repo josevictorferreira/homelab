@@ -48,7 +48,7 @@ in
           loadBalancerMode = "shared";
           service = {
             annotations = {
-              "io.cilium/lb-ipam-ips" = clusterConfig.ingressAddress;
+              "io.cilium/lb-ipam-ips" = clusterConfig.loadBalancer.address;
             };
           };
         };
@@ -76,12 +76,7 @@ in
           name = "lb-pool";
         };
         spec = {
-          blocks = [
-            {
-              start = "10.10.10.100";
-              stop = "10.10.10.199";
-            }
-          ];
+          blocks = [ clusterConfig.loadBalancer.range ];
         };
       };
       ciliuml2announcementpolicy."default-l2-announcement-policy" = {
