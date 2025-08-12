@@ -44,7 +44,7 @@ spec:
               protocol: TCP
           volumeMounts:
             - mountPath: /app/config/glance.yml
-              name: config
+              name: glance
               readOnly: true
               subPath: glance.yml
       dnsPolicy: ClusterFirst
@@ -59,7 +59,7 @@ spec:
               - key: glance.yml
                 path: glance.yml
             name: glance
-          name: config
+          name: glance
 ---
 apiVersion: v1
 data:
