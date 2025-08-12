@@ -1,6 +1,7 @@
 { lib, config, hostName, hostConfig, clusterConfig, commonsPath, secretsPath, k8sManifestsPath, ... }:
 
 let
+  serviceEnabled = true;
   cfg = config.roles.k8sControlPlane;
   clusterInitFlags = [
     "--cluster-init"
@@ -84,7 +85,7 @@ in
       };
 
       services.k3s = {
-        enable = true;
+        enable = serviceEnabled;
         role = "server";
         tokenFile = if cfg.isInit then config.sops.secrets.k3s_token_init.path else config.sops.secrets.k3s_token.path;
         extraFlags = lib.concatStringsSep " " serverFlagList;
