@@ -6,6 +6,7 @@
       (modulesPath + "/installer/scan/not-detected.nix")
     ];
 
+  boot.supportedFilesystems = [ "zfs" ];
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
   boot.initrd.availableKernelModules = [ "xhci_pci" "nvme" "usb_storage" "usbhid" "sd_mod" ];
@@ -33,7 +34,6 @@
 
   fileSystems."/boot" =
     {
-      #device = "/dev/disk/by-uuid/2E6D-F4D0";
       device = "/dev/disk/by-partlabel/EFI";
       fsType = "vfat";
       options = [ "fmask=0022" "dmask=0022" ];
