@@ -1,7 +1,7 @@
 { lib, config, hostName, hostConfig, clusterConfig, commonsPath, secretsPath, k8sManifestsPath, ... }:
 
 let
-  serviceEnabled = true;
+  serviceEnabled = false;
   cfg = config.roles.k8sControlPlane;
   clusterInitFlags = [
     "--cluster-init"
