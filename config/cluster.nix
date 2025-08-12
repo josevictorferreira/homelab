@@ -9,6 +9,8 @@ rec {
 
   domain = "josevictor.me";
 
+  timeZone = "America/Sao_Paulo";
+
   ipAddress = "10.10.10.250";
 
   gateway = "10.10.10.1";

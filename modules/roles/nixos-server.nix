@@ -17,7 +17,10 @@ in
 
   config = lib.mkIf cfg.enable {
     nixDefaults.enable = true;
-    locale.enable = true;
+    locale = {
+      timeZone = clusterConfig.timeZone;
+      enable = true;
+    };
     networking.firewall.enable = false;
 
     networking.hostName = hostName;
