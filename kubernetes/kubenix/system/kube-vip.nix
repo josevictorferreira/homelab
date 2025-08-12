@@ -28,8 +28,6 @@ in
         svc_enable = "false";
         svc_election = "false";
         vip_leaderelection = "true";
-        KUBEVIP_IN_CLUSTER = "false";
-        KUBEVIP_KUBE_CONFIG = "/etc/rancher/k3s/k3s.yaml";
       };
     };
   };
