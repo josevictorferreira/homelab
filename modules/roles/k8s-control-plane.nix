@@ -124,10 +124,11 @@ in
       system.activationScripts.k3sReset = lib.mkIf (!config.services.k3s.enable) {
         supportsDryActivation = true;
         text = ''
+          systemctl stop k3s.service > /dev/null 2>&1 || true
           umount -R /var/lib/kubelet > /dev/null 2>&1 || true
           sleep 2
-          rm -rf /etc/rancher/{k3s,node}
-          rm -rf /var/lib/{rancher/k3s,kubelet,longhorn,etcd,cni}
+          rm -rf /etc/rancher/{k3s,node} > /dev/null 2>&1 || true
+          rm -rf /var/lib/{rancher/k3s,kubelet,longhorn,etcd,cni} > /dev/null 2>&1 || true
           if [ -d /opt/k3s/data/temp ]; then
             rm -rf /opt/k3s/data/temp/*
           fi
