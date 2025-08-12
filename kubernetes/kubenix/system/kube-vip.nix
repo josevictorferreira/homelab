@@ -28,17 +28,10 @@ in
         svc_enable = "false";
         svc_election = "false";
         vip_leaderelection = "true";
+        KUBEVIP_IN_CLUSTER = "false";
+        KUBEVIP_KUBE_CONFIG = "/etc/rancher/k3s/k3s.yaml";
       };
-      nodeSelector = {
-        "node-role.kubernetes.io/control-plane" = "";
-      };
-      tolerations = [
-        {
-          key = "node-role.kubernetes.io/control-plane";
-          operator = "Exists";
-          effect = "NoSchedule";
-        }
-      ];
     };
   };
 }
+
