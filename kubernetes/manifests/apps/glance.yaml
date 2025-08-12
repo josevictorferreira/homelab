@@ -27,7 +27,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/configMaps: 2ffaa8279f9328cd5e31c161bb6c089666a4ec75766bc814ffcb397a9a3ac048
+        checksum/configMaps: a2f99b5ad99f5d98b3552edbb85635fd4728387d2219687b767e882afb96e74c
       labels:
         app.kubernetes.io/controller: main
         app.kubernetes.io/instance: glance
@@ -82,21 +82,20 @@ data:
     \      url: http://10.10.10.103/api/v1/links\n  - size: full\n    widgets:\n \
     \   - type: group\n      widgets:\n      - type: hacker-news\n      - type: lobsters\n\
     \    - channels:\n      - UCHnyfMqiRRG1u-2MsSQLbXA\n      - UCR-DXc1voovS8nhAvccRZhg\n\
-    \      - UC1yNl2E66ZzKApQdRuTQ4tw\n      - UCpMcsdZf2KkAnfmxiq2MfMQ\n      - UC9PIn6-XuRKZ5HmYeu46AIw\n\
-    \      - UCqnYRbOnwVAWU6plY904eAg\n      type: videos\n    - type: group\n   \
-    \   widgets:\n      - show-thumbnails: true\n        subreddit: selfhosted\n \
-    \       type: reddit\n      - show-thumbnails: true\n        subreddit: minilab\n\
-    \        type: reddit\n      - show-thumbnails: true\n        subreddit: homelab\n\
-    \        type: reddit\n  - size: small\n    widgets:\n    - hour-format: 24h\n\
-    \      location: Londrina, Paraná, Brazil\n      type: weather\n      units: metric\n\
-    \    - markets:\n      - name: Bitcoin\n        symbol: BTC-USD\n      - name:\
-    \ Kaspa\n        symbol: KAS-USD\n      - name: Brazilian Real\n        symbol:\
-    \ USDBRL=X\n      type: markets\n    - cache: 1d\n      repositories:\n      -\
-    \ glanceapp/glance\n      - pi-hole/pi-hole\n      - grafana/grafana\n      -\
-    \ linkwarden/linkwarden\n      - drakkan/sftpgo\n      - binwiederhier/ntfy\n\
-    \      - louislam/uptime-kuma\n      - prowlarr/prowlarr\n      type: releases\n\
-    \  name: Home\ntheme:\n  background-color: 50 1 6\n  negative-color: 209 88 54\n\
-    \  primary-color: 24 97 58\n"
+    \      - UCpMcsdZf2KkAnfmxiq2MfMQ\n      - UC9PIn6-XuRKZ5HmYeu46AIw\n      - UCqnYRbOnwVAWU6plY904eAg\n\
+    \      type: videos\n    - type: group\n      widgets:\n      - show-thumbnails:\
+    \ true\n        subreddit: selfhosted\n        type: reddit\n      - show-thumbnails:\
+    \ true\n        subreddit: minilab\n        type: reddit\n      - show-thumbnails:\
+    \ true\n        subreddit: homelab\n        type: reddit\n  - size: small\n  \
+    \  widgets:\n    - hour-format: 24h\n      location: Londrina, Paraná, Brazil\n\
+    \      type: weather\n      units: metric\n    - markets:\n      - name: Bitcoin\n\
+    \        symbol: BTC-USD\n      - name: Kaspa\n        symbol: KAS-USD\n     \
+    \ - name: Brazilian Real\n        symbol: USDBRL=X\n      type: markets\n    -\
+    \ cache: 1d\n      repositories:\n      - glanceapp/glance\n      - pi-hole/pi-hole\n\
+    \      - grafana/grafana\n      - linkwarden/linkwarden\n      - drakkan/sftpgo\n\
+    \      - binwiederhier/ntfy\n      - louislam/uptime-kuma\n      - prowlarr/prowlarr\n\
+    \      type: releases\n  name: Home\ntheme:\n  background-color: 50 1 6\n  negative-color:\
+    \ 209 88 54\n  primary-color: 24 97 58\n"
 kind: ConfigMap
 metadata:
   annotations:

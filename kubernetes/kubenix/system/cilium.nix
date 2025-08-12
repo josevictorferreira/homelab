@@ -43,7 +43,7 @@ in
         l2announcements.enabled = true;
         externalIPs.enabled = true;
         ingressController = {
-          enabled = false;
+          enabled = true;
           default = true;
           loadBalancerMode = "shared";
           service = {
