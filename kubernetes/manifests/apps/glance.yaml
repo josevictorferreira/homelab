@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: '1.33'
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/controller: main
@@ -100,7 +100,7 @@ data:
 kind: ConfigMap
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: '1.33'
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/instance: glance
@@ -116,7 +116,7 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: '1.33'
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/instance: glance
@@ -145,7 +145,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: '1.33'
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/instance: glance

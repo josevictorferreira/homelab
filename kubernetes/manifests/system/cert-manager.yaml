@@ -3,7 +3,7 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     helm.sh/resource-policy: keep
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: '1.33'
     kubenix/project-name: ze-homelab
   labels:
     app: cert-manager
@@ -422,7 +422,7 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     helm.sh/resource-policy: keep
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: '1.33'
     kubenix/project-name: ze-homelab
   labels:
     app: cert-manager
@@ -1547,7 +1547,7 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     helm.sh/resource-policy: keep
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: '1.33'
     kubenix/project-name: ze-homelab
   labels:
     app: cert-manager
@@ -7296,7 +7296,7 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     helm.sh/resource-policy: keep
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: '1.33'
     kubenix/project-name: ze-homelab
   labels:
     app: cert-manager
@@ -14419,7 +14419,7 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     helm.sh/resource-policy: keep
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: '1.33'
     kubenix/project-name: ze-homelab
   labels:
     app: cert-manager
@@ -21540,7 +21540,7 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     helm.sh/resource-policy: keep
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: '1.33'
     kubenix/project-name: ze-homelab
   labels:
     app: cert-manager
@@ -21893,7 +21893,7 @@ apiVersion: v1
 kind: Namespace
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: '1.33'
     kubenix/project-name: ze-homelab
   name: cert-manager
 ---
@@ -21902,7 +21902,7 @@ kind: MutatingWebhookConfiguration
 metadata:
   annotations:
     cert-manager.io/inject-ca-from-secret: cert-manager/cert-manager-webhook-ca
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: '1.33'
     kubenix/project-name: ze-homelab
   labels:
     app: webhook
@@ -21942,7 +21942,7 @@ kind: ValidatingWebhookConfiguration
 metadata:
   annotations:
     cert-manager.io/inject-ca-from-secret: cert-manager/cert-manager-webhook-ca
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: '1.33'
     kubenix/project-name: ze-homelab
   labels:
     app: webhook
@@ -21989,7 +21989,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: '1.33'
     kubenix/project-name: ze-homelab
   labels:
     app: cert-manager
@@ -22070,7 +22070,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: '1.33'
     kubenix/project-name: ze-homelab
   labels:
     app: cainjector
@@ -22132,7 +22132,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: '1.33'
     kubenix/project-name: ze-homelab
   labels:
     app: webhook
@@ -22226,7 +22226,7 @@ apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: '1.33'
     kubenix/project-name: ze-homelab
   name: cloudflare-issuer
   namespace: cert-manager
@@ -22246,7 +22246,7 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: '1.33'
     kubenix/project-name: ze-homelab
   labels:
     app: webhook
@@ -22275,7 +22275,7 @@ automountServiceAccountToken: true
 kind: ServiceAccount
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: '1.33'
     kubenix/project-name: ze-homelab
   labels:
     app: cert-manager
@@ -22293,7 +22293,7 @@ automountServiceAccountToken: true
 kind: ServiceAccount
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: '1.33'
     kubenix/project-name: ze-homelab
   labels:
     app: cainjector
@@ -22311,7 +22311,7 @@ automountServiceAccountToken: true
 kind: ServiceAccount
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: '1.33'
     kubenix/project-name: ze-homelab
   labels:
     app: webhook
@@ -22328,7 +22328,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: '1.33'
     kubenix/project-name: ze-homelab
   labels:
     app: cainjector
@@ -22402,7 +22402,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: '1.33'
     kubenix/project-name: ze-homelab
   labels:
     app: cert-manager
@@ -22429,7 +22429,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: '1.33'
     kubenix/project-name: ze-homelab
   labels:
     app: cert-manager
@@ -22456,7 +22456,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: '1.33'
     kubenix/project-name: ze-homelab
   labels:
     app: cert-manager
@@ -22531,7 +22531,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: '1.33'
     kubenix/project-name: ze-homelab
   labels:
     app: cert-manager
@@ -22580,7 +22580,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: '1.33'
     kubenix/project-name: ze-homelab
   labels:
     app: cert-manager
@@ -22691,7 +22691,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: '1.33'
     kubenix/project-name: ze-homelab
   labels:
     app: cert-manager
@@ -22743,7 +22743,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: '1.33'
     kubenix/project-name: ze-homelab
   labels:
     app: cert-manager
@@ -22818,7 +22818,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: '1.33'
     kubenix/project-name: ze-homelab
   labels:
     app: cert-manager
@@ -22870,7 +22870,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: '1.33'
     kubenix/project-name: ze-homelab
   labels:
     app: cert-manager
@@ -22942,7 +22942,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: '1.33'
     kubenix/project-name: ze-homelab
   labels:
     app: cert-manager
@@ -22991,7 +22991,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: '1.33'
     kubenix/project-name: ze-homelab
   labels:
     app: cert-manager
@@ -23032,7 +23032,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: '1.33'
     kubenix/project-name: ze-homelab
   labels:
     app: webhook
@@ -23056,7 +23056,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: '1.33'
     kubenix/project-name: ze-homelab
   labels:
     app: cainjector
@@ -23081,7 +23081,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: '1.33'
     kubenix/project-name: ze-homelab
   labels:
     app: cert-manager
@@ -23106,7 +23106,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: '1.33'
     kubenix/project-name: ze-homelab
   labels:
     app: cert-manager
@@ -23131,7 +23131,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: '1.33'
     kubenix/project-name: ze-homelab
   labels:
     app: cert-manager
@@ -23156,7 +23156,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: '1.33'
     kubenix/project-name: ze-homelab
   labels:
     app: cert-manager
@@ -23181,7 +23181,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: '1.33'
     kubenix/project-name: ze-homelab
   labels:
     app: cert-manager
@@ -23206,7 +23206,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: '1.33'
     kubenix/project-name: ze-homelab
   labels:
     app: cert-manager
@@ -23231,7 +23231,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: '1.33'
     kubenix/project-name: ze-homelab
   labels:
     app: cert-manager
@@ -23256,7 +23256,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: '1.33'
     kubenix/project-name: ze-homelab
   labels:
     app: cert-manager
@@ -23281,7 +23281,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: '1.33'
     kubenix/project-name: ze-homelab
   labels:
     app: webhook
@@ -23306,7 +23306,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: '1.33'
     kubenix/project-name: ze-homelab
   labels:
     app: cainjector
@@ -23341,7 +23341,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: '1.33'
     kubenix/project-name: ze-homelab
   labels:
     app: cert-manager
@@ -23367,7 +23367,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: '1.33'
     kubenix/project-name: ze-homelab
   labels:
     app: webhook
@@ -23402,7 +23402,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: '1.33'
     kubenix/project-name: ze-homelab
   labels:
     app: cert-manager
@@ -23436,7 +23436,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: '1.33'
     kubenix/project-name: ze-homelab
   labels:
     app: cainjector
@@ -23461,7 +23461,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: '1.33'
     kubenix/project-name: ze-homelab
   labels:
     app: cert-manager
@@ -23486,7 +23486,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: '1.33'
     kubenix/project-name: ze-homelab
   labels:
     app: webhook
@@ -23511,7 +23511,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: '1.33'
     kubenix/project-name: ze-homelab
   labels:
     app: cert-manager
