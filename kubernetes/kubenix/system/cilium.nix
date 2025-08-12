@@ -59,7 +59,6 @@ in
         operator = {
           enabled = true;
           rollOutPods = true;
-          replicas = 1;
         };
         hubble = {
           enabled = false;

@@ -20,15 +20,27 @@ in
       config.address = clusterConfig.ipAddress;
       env = {
         vip_interface = mainControlPlaneConfig.interface;
-        vip_arp = true;
-        lb_enable = false;
-        lb_port = 6443;
-        vip_cidr = 32;
-        cp_enable = true;
-        svc_enable = true;
-        svc_election = true;
-        vip_leaderelection = true;
+        vip_arp = "true";
+        lb_enable = "true";
+        lb_port = "6443";
+        vip_cidr = "32";
+        cp_enable = "true";
+        svc_enable = "false";
+        svc_election = "false";
+        vip_leaderelection = "true";
+        KUBEVIP_IN_CLUSTER = "false";
+        KUBEVIP_KUBE_CONFIG = "/etc/rancher/k3s/k3s.yaml";
       };
+      nodeSelector = {
+        "node-role.kubernetes.io/control-plane" = "";
+      };
+      tolerations = [
+        {
+          key = "node-role.kubernetes.io/control-plane";
+          operator = "Exists";
+          effect = "NoSchedule";
+        }
+      ];
     };
   };
 }

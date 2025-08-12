@@ -1,4 +1,4 @@
-{ lib, config, hostName, clusterConfig, commonsPath, secretsPath, k8sManifestsPath, ... }:
+{ lib, config, hostName, hostConfig, clusterConfig, commonsPath, secretsPath, k8sManifestsPath, ... }:
 
 let
   cfg = config.roles.k8sControlPlane;
@@ -6,9 +6,13 @@ let
     "--cluster-init"
     "--write-kubeconfig-mode 0644"
   ];
+  initNodeHostName = builtins.head clusterConfig.nodeGroups.k8sControlPlanes;
+  initNodeConfig = clusterConfig.hosts.${initNodeHostName};
   serverFlagList = [
     "--tls-san=${clusterConfig.ipAddress}"
     "--node-name=${hostName}"
+    "--node-ip=${hostConfig.ipAddress}"
+    "--advertise-address=${hostConfig.ipAddress}"
     "--disable-helm-controller"
     "--disable-network-policy"
     "--disable-cloud-controller"
@@ -23,14 +27,16 @@ let
     "--etcd-arg=auto-compaction-mode=periodic"
     "--etcd-arg=auto-compaction-retention=30m"
     "--etcd-arg=snapshot-count=10000"
-  ] ++ (if cfg.isInit then clusterInitFlags else [ ]);
+  ] ++ (if cfg.isInit then clusterInitFlags else [ ])
+  ++ (lib.mapAttrsToList (name: value: "--tls-san=${value.ipAddress}") (lib.filterAttrs (name: value: builtins.elem "k8sControlPlane" value.roles) clusterConfig.hosts));
 in
 {
   options.roles.k8sControlPlane = {
     enable = lib.mkEnableOption "Enable Kubernetes control plane role";
     isInit = lib.mkOption {
       type = lib.types.bool;
-      default = (builtins.head clusterConfig.nodeGroups.k8sControlPlanes) == hostName;
+      default =
+        (initNodeHostName == hostName);
       description = "Whether this node is the initial control plane node";
     };
   };
@@ -42,6 +48,12 @@ in
   config = lib.mkIf cfg.enable
     {
       k8sNodeDefaults.enable = true;
+
+      sops.secrets.k3s_token_init = lib.mkIf cfg.isInit {
+        sopsFile = "${secretsPath}/k8s-secrets.enc.yaml";
+        owner = "root";
+        mode = "0400";
+      };
 
       sops.secrets.k3s_root_ca_pem = lib.mkIf cfg.isInit {
         sopsFile = "${secretsPath}/k8s-secrets.enc.yaml";
@@ -74,10 +86,10 @@ in
       services.k3s = {
         enable = true;
         role = "server";
-        tokenFile = config.sops.secrets.k3s_token.path;
+        tokenFile = if cfg.isInit then config.sops.secrets.k3s_token_init.path else config.sops.secrets.k3s_token.path;
         extraFlags = lib.concatStringsSep " " serverFlagList;
       } // lib.optionalAttrs (!cfg.isInit) {
-        serverAddr = "https://${clusterConfig.ipAddress}:6443";
+        serverAddr = "https://${initNodeConfig.ipAddress}:6443";
       } // lib.optionalAttrs cfg.isInit {
         manifests = {
           cilium = {
@@ -108,5 +120,20 @@ in
         "d /var/lib/rancher/k3s/agent/etc/cni/net.d 0751 root root - -"
         "L+ /etc/cni/net.d - - - - /var/lib/rancher/k3s/agent/etc/cni/net.d"
       ];
+
+      system.activationScripts.k3sReset = lib.mkIf (!config.services.k3s.enable) {
+        supportsDryActivation = true;
+        text = ''
+          umount -R /var/lib/kubelet > /dev/null 2>&1 || true
+          sleep 2
+          rm -rf /etc/rancher/{k3s,node}
+          rm -rf /var/lib/{rancher/k3s,kubelet,longhorn,etcd,cni}
+          if [ -d /opt/k3s/data/temp ]; then
+            rm -rf /opt/k3s/data/temp/*
+          fi
+          sync
+          echo -e "\n => reboot now to complete k3s cleanup!"
+        '';
+      };
     };
 }
