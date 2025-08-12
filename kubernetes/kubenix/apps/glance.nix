@@ -66,7 +66,6 @@ let
                 channels = [
                   "UCHnyfMqiRRG1u-2MsSQLbXA" # Veritasium
                   "UCR-DXc1voovS8nhAvccRZhg" # Jeff Geerling
-                  "UC1yNl2E66ZzKApQdRuTQ4tw" # Sabine Hossenfelder
                   "UCpMcsdZf2KkAnfmxiq2MfMQ" # Arvin Ash
                   "UC9PIn6-XuRKZ5HmYeu46AIw" # Barely Sociable
                   "UCqnYRbOnwVAWU6plY904eAg" # VULDAR

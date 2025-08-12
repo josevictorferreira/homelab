@@ -26,13 +26,13 @@ spec:
             - name: cp_enable
               value: 'true'
             - name: lb_enable
-              value: 'false'
+              value: 'true'
             - name: lb_port
               value: '6443'
             - name: svc_election
-              value: 'true'
+              value: 'false'
             - name: svc_enable
-              value: 'true'
+              value: 'false'
             - name: vip_arp
               value: 'true'
             - name: vip_cidr
@@ -55,6 +55,8 @@ spec:
               drop:
                 - ALL
       hostNetwork: true
+      nodeSelector:
+        node-role.kubernetes.io/control-plane: ''
       serviceAccountName: kube-vip
       tolerations:
         - effect: NoSchedule
