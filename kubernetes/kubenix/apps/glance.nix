@@ -171,7 +171,7 @@ in
         };
         persistence.config = {
           type = "configMap";
-          name = "config";
+          name = "glance";
           items = [
             {
               key = "glance.yml";
