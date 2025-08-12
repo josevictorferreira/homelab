@@ -44,6 +44,7 @@ let
     imports = with kubenix.modules; [
       helm
       k8s
+      ./_submodules/release.nix
     ];
 
     kubenix.project = clusterConfig.name;

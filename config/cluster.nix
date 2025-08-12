@@ -13,8 +13,6 @@ rec {
 
   gateway = "10.10.10.1";
 
-  ingressAddress = "10.10.10.100";
-
   dnsServers = [
     "1.1.1.1"
     "8.8.8.8"
@@ -89,6 +87,18 @@ rec {
     k8sServers = k8sControlPlanes ++ k8sWorkers;
     backupServers = filterHostsNamesWithRoles hosts "backup-server";
     nixosServers = filterHostsNamesWithRoles hosts "nixos-server";
+  };
+
+  loadBalancer = {
+    address = "10.10.10.100";
+    range = {
+      start = "10.10.10.100";
+      stop = "10.10.10.199";
+    };
+    services = {
+      linkwarden = "10.10.10.103";
+      glance = "10.10.10.127";
+    };
   };
 
   portsUdpToExpose = [
