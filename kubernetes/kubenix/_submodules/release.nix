@@ -1,4 +1,6 @@
-{ config, lib, pkgs, kubenix, clusterConfig, ... }: with lib; {
+{ config, lib, pkgs, kubenix, clusterConfig, ... }: with lib;
+
+{
   submodules.imports = [{
     module = { name, config, ... }:
       let cfg = config.submodule.args; in
@@ -115,10 +117,10 @@
           kubernetes.helm.releases.${config._module.args.name} = {
             inherit (cfg) namespace;
             chart = kubenix.lib.helm.fetch {
-              repo = "http://bjw-s.github.io/helm-charts/";
+              repo = "https://bjw-s-labs.github.io/helm-charts/";
               chart = "app-template";
               version = "4.2.0";
-              sha256 = "oIiBbYBcDlrg6LHXo38jg83s0BvSfo6rlvea2WASl54=";
+              sha256 = "sha256-JhHJmGrvpmdHfADfM4M4mby64cSH6HO6VpKmeQfngJA=";
             };
             values =
               let
@@ -136,9 +138,14 @@
                   service.main.ports.http.port = cfg.port;
                   ingress.main = {
                     enabled = cfg.subdomain != "";
+                    className = "cilium";
                     hosts = [{
                       host = "${cfg.subdomain}.${clusterConfig.domain}";
                       paths = [{ path = "/"; }];
+                    }];
+                    tls = [{
+                      secretName = "wildcard-tls";
+                      hosts = [ "${cfg.subdomain}.${clusterConfig.domain}" ];
                     }];
                   };
                 }

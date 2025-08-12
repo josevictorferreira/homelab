@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Namespace
 metadata:
   annotations:
-    kubenix/k8s-version: '1.33'
+    kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/part-of: cilium
@@ -12,7 +12,7 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   annotations:
-    kubenix/k8s-version: '1.33'
+    kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/name: cilium-agent
@@ -462,7 +462,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    kubenix/k8s-version: '1.33'
+    kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/name: cilium-operator
@@ -593,7 +593,7 @@ apiVersion: cilium.io/v2alpha1
 kind: CiliumL2AnnouncementPolicy
 metadata:
   annotations:
-    kubenix/k8s-version: '1.33'
+    kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   name: default-l2-announcement-policy
   namespace: kube-system
@@ -605,7 +605,7 @@ apiVersion: cilium.io/v2alpha1
 kind: CiliumLoadBalancerIPPool
 metadata:
   annotations:
-    kubenix/k8s-version: '1.33'
+    kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   name: lb-pool
 spec:
@@ -759,7 +759,7 @@ data:
 kind: ConfigMap
 metadata:
   annotations:
-    kubenix/k8s-version: '1.33'
+    kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   name: cilium-config
   namespace: kube-system
@@ -768,7 +768,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   annotations:
-    kubenix/k8s-version: '1.33'
+    kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   name: cilium
   namespace: kube-system
@@ -777,7 +777,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   annotations:
-    kubenix/k8s-version: '1.33'
+    kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   name: cilium-operator
   namespace: kube-system
@@ -786,7 +786,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   annotations:
-    kubenix/k8s-version: '1.33'
+    kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/part-of: cilium
@@ -906,7 +906,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   annotations:
-    kubenix/k8s-version: '1.33'
+    kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/part-of: cilium
@@ -1128,7 +1128,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   annotations:
-    kubenix/k8s-version: '1.33'
+    kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/part-of: cilium
@@ -1146,7 +1146,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   annotations:
-    kubenix/k8s-version: '1.33'
+    kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/part-of: cilium
@@ -1164,7 +1164,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   annotations:
-    kubenix/k8s-version: '1.33'
+    kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/part-of: cilium
@@ -1184,7 +1184,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   annotations:
-    kubenix/k8s-version: '1.33'
+    kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/part-of: cilium
@@ -1205,7 +1205,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   annotations:
-    kubenix/k8s-version: '1.33'
+    kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/part-of: cilium
@@ -1225,7 +1225,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   annotations:
-    kubenix/k8s-version: '1.33'
+    kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/part-of: cilium
@@ -1244,7 +1244,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   annotations:
-    kubenix/k8s-version: '1.33'
+    kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/part-of: cilium
@@ -1263,7 +1263,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   annotations:
-    kubenix/k8s-version: '1.33'
+    kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/part-of: cilium

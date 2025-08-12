@@ -1,4 +1,4 @@
-{ lib, kubenix, clusterConfig, flakeRoot, ... }:
+{ pkgs, lib, kubenix, clusterConfig, flakeRoot, ... }:
 
 let
   repoPathVariableName = "HOMELAB_REPO_PATH";
@@ -36,21 +36,30 @@ let
     in
     here ++ below;
 
-  modules = discover ./. "";
+  hasIgnoredSegment = rel:
+    let segs = lib.splitString "/" rel;
+    in builtins.any (seg: lib.hasPrefix "_" seg) segs;
+
+  modules =
+    let ds = discover ./. "";
+    in lib.filter (m: !(hasIgnoredSegment m.rel)) ds;
 
   secretsFor = secretName: "ref+sops://${k8sSecretsFile}#${secretName}";
+
+  toYaml = y: builtins.readFile ((pkgs.formats.yaml { }).generate "." y);
 
   baseModule = { kubenix, ... }: {
     imports = with kubenix.modules; [
       helm
       k8s
+      submodules
       ./_submodules/release.nix
     ];
 
     kubenix.project = clusterConfig.name;
 
     kubernetes = {
-      version = "1.33";
+      version = "1.32";
     };
   };
 
@@ -61,7 +70,7 @@ let
         (import filePath)
       ];
       specialArgs = {
-        inherit kubenix clusterConfig secretsFor;
+        inherit kubenix clusterConfig secretsFor toYaml;
       };
     }).config.kubernetes.resultYAML;
 

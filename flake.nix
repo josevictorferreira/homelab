@@ -27,7 +27,7 @@
       hosts = clusterConfig.hosts;
       kubenixLib = import ./kubernetes/kubenix {
         lib = extendedLib;
-        inherit kubenix clusterConfig flakeRoot secretsPath;
+        inherit pkgs kubenix clusterConfig flakeRoot secretsPath;
       };
 
       mkHost = hostName:
