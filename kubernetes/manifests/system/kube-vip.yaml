@@ -23,6 +23,10 @@ spec:
           env:
             - name: vip_address
               value: 10.10.10.250
+            - name: KUBEVIP_IN_CLUSTER
+              value: 'false'
+            - name: KUBEVIP_KUBE_CONFIG
+              value: /etc/rancher/k3s/k3s.yaml
             - name: cp_enable
               value: 'true'
             - name: lb_enable
