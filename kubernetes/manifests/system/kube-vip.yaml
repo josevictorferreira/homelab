@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   annotations:
-    kubenix/k8s-version: '1.33'
+    kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   name: kube-vip
   namespace: kube-system
@@ -63,7 +63,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   annotations:
-    kubenix/k8s-version: '1.33'
+    kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/instance: kube-vip
@@ -78,7 +78,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   annotations:
-    kubenix/k8s-version: '1.33'
+    kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
     rbac.authorization.kubernetes.io/autoupdate: 'true'
   name: kube-vip
@@ -112,7 +112,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   annotations:
-    kubenix/k8s-version: '1.33'
+    kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/instance: kube-vip
