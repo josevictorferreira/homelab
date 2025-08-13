@@ -1,4 +1,4 @@
-{ lib, config, hostName, hostConfig, clusterConfig, commonsPath, secretsPath, k8sManifestsPath, ... }:
+{ lib, pkgs, config, hostName, hostConfig, clusterConfig, commonsPath, secretsPath, k8sManifestsPath, ... }:
 
 let
   serviceEnabled = true;
@@ -97,13 +97,15 @@ in
             patchedCiliumYaml = lib.replaceStrings [ clusterConfig.ipAddress ]
               [ initNodeConfig.ipAddress ]
               rawCiliumYaml;
-            patchedCiliumFile = builtins.toFile "cilium.tmp.yaml" patchedCiliumYaml;
+            fromYAML = str:
+              lib.importJSON (pkgs.runCommand "yml" { nativeBuildInputs = [ pkgs.yq ]; } ''echo '\$\{escape ["'"] str}' | yq . > $out'');
+
           in
           {
             cilium = {
               enable = true;
               target = "cilium.yaml";
-              content = lib.importYAML patchedCiliumFile;
+              content = fromYAML patchedCiliumYaml;
             };
             kubeVip = {
               enable = true;
