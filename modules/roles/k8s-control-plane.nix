@@ -103,7 +103,7 @@ in
             cilium = {
               enable = true;
               target = "cilium.yaml";
-              content = lib.files.importYAML patchedCiliumFile;
+              content = lib.files.importMultiYAML patchedCiliumFile;
             };
             kubeVip = {
               enable = true;
