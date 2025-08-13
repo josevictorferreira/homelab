@@ -23,7 +23,7 @@ in
         vip_arp = "true";
         lb_enable = "true";
         lb_port = "6443";
-        vip_cidr = "32";
+        vip_subnet = "32";
         cp_enable = "true";
         svc_enable = "false";
         svc_election = "false";
