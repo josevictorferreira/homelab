@@ -69,6 +69,20 @@ in
         mode = "0400";
       };
 
+      sops.secrets.k3s_server_ca_key = lib.mkIf cfg.isInit {
+        sopsFile = "${secretsPath}/k8s-secrets.enc.yaml";
+        path = "/var/lib/rancher/k3s/server/tls/server-ca.key";
+        owner = "root";
+        mode = "0400";
+      };
+
+      sops.secrets.k3s_server_ca_crt = lib.mkIf cfg.isInit {
+        sopsFile = "${secretsPath}/k8s-secrets.enc.yaml";
+        path = "/var/lib/rancher/k3s/server/tls/server-ca.crt";
+        owner = "root";
+        mode = "0400";
+      };
+
       sops.secrets.sops_age_secret = lib.mkIf cfg.isInit {
         sopsFile = "${secretsPath}/k8s-secrets.enc.yaml";
         path = "/var/lib/rancher/k3s/server/manifests/sops-age-secret.yaml";
