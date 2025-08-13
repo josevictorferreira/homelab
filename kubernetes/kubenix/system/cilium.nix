@@ -34,7 +34,7 @@ in
       values = {
         namespaceOverride = "kube-system";
         kubeProxyReplacement = true;
-        k8sServiceHost = clusterConfig.ipAddress;
+        k8sServiceHost = controlPlaneIpAddress;
         k8sServicePort = 6443;
         socketLB.enabled = false;
         envoy.enabled = false;
