@@ -21,6 +21,7 @@
       secretsPath = "${flakeRoot}/secrets";
       extendedLib = nixpkgs.lib.extend (selfLib: superLib: {
         strings = superLib.strings // (import ./lib/strings.nix { lib = superLib; });
+        files = superLib // (import ./lib/files.nix { lib = superLib; pkgs = pkgs; });
       });
       clusterConfig = (import ./config/cluster.nix { lib = extendedLib; });
       usersConfig = import ./config/users.nix;
