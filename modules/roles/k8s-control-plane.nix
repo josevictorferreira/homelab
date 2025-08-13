@@ -97,15 +97,13 @@ in
             patchedCiliumYaml = lib.replaceStrings [ clusterConfig.ipAddress ]
               [ initNodeConfig.ipAddress ]
               rawCiliumYaml;
-            fromYAML = str:
-              lib.importJSON (pkgs.runCommand "yml" { nativeBuildInputs = [ pkgs.yq ]; } ''echo '\$\{escape ["'"] str}' | yq . > $out'');
-
+            patchedCiliumFile = pkgs.writeText "cilium-patched.yaml" patchedCiliumYaml;
           in
           {
             cilium = {
               enable = true;
               target = "cilium.yaml";
-              content = fromYAML patchedCiliumYaml;
+              content = lib.files.importYAML patchedCiliumFile;
             };
             kubeVip = {
               enable = true;
