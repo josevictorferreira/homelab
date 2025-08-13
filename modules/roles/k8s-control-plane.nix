@@ -1,7 +1,7 @@
 { lib, config, hostName, hostConfig, clusterConfig, commonsPath, secretsPath, k8sManifestsPath, ... }:
 
 let
-  serviceEnabled = true;
+  serviceEnabled = false;
   cfg = config.roles.k8sControlPlane;
   clusterInitFlags = [
     "--cluster-init"
@@ -28,8 +28,7 @@ let
     "--etcd-arg=auto-compaction-mode=periodic"
     "--etcd-arg=auto-compaction-retention=30m"
     "--etcd-arg=snapshot-count=10000"
-  ] ++ (if cfg.isInit then clusterInitFlags else [ ])
-  ++ (lib.mapAttrsToList (name: value: "--tls-san=${value.ipAddress}") (lib.filterAttrs (name: value: builtins.elem "k8sControlPlane" value.roles) clusterConfig.hosts));
+  ] ++ (if cfg.isInit then clusterInitFlags else [ ]);
 in
 {
   options.roles.k8sControlPlane = {
@@ -90,14 +89,14 @@ in
         tokenFile = if cfg.isInit then config.sops.secrets.k3s_token_init.path else config.sops.secrets.k3s_token.path;
         extraFlags = lib.concatStringsSep " " serverFlagList;
       } // lib.optionalAttrs (!cfg.isInit) {
-        serverAddr = "https://${initNodeConfig.ipAddress}:6443";
+        serverAddr = "https://${clusterConfig.ipAddress}:6443";
       } // lib.optionalAttrs cfg.isInit {
         manifests = {
-          cilium = {
-            enable = true;
-            target = "cilium.yaml";
-            source = "${k8sManifestsPath}/system/cilium.yaml";
-          };
+          # cilium = {
+          #   enable = true;
+          #   target = "cilium.yaml";
+          #   source = "${k8sManifestsPath}/system/cilium.yaml";
+          # };
           kubeVip = {
             enable = true;
             target = "kube-vip.yaml";
