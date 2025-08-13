@@ -59,7 +59,7 @@ let
     kubenix.project = clusterConfig.name;
 
     kubernetes = {
-      version = "1.33";
+      version = "1.32";
     };
   };
 
