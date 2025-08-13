@@ -1,7 +1,7 @@
 { lib, config, hostName, hostConfig, clusterConfig, commonsPath, secretsPath, k8sManifestsPath, ... }:
 
 let
-  serviceEnabled = false;
+  serviceEnabled = true;
   cfg = config.roles.k8sControlPlane;
   clusterInitFlags = [
     "--cluster-init"
@@ -92,11 +92,11 @@ in
         serverAddr = "https://${clusterConfig.ipAddress}:6443";
       } // lib.optionalAttrs cfg.isInit {
         manifests = {
-          # cilium = {
-          #   enable = true;
-          #   target = "cilium.yaml";
-          #   source = "${k8sManifestsPath}/system/cilium.yaml";
-          # };
+          cilium = {
+            enable = true;
+            target = "cilium.yaml";
+            source = "${k8sManifestsPath}/system/cilium.yaml";
+          };
           kubeVip = {
             enable = true;
             target = "kube-vip.yaml";
