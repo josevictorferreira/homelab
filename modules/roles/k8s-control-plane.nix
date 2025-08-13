@@ -91,28 +91,36 @@ in
       } // lib.optionalAttrs (!cfg.isInit) {
         serverAddr = "https://${clusterConfig.ipAddress}:6443";
       } // lib.optionalAttrs cfg.isInit {
-        manifests = {
-          cilium = {
-            enable = true;
-            target = "cilium.yaml";
-            source = "${k8sManifestsPath}/system/cilium.yaml";
+        manifests =
+          let
+            rawCiliumYaml = builtins.readFile "${k8sManifestsPath}/system/cilium.yaml";
+            patchedCiliumYaml = lib.replaceStrings [ clusterConfig.ipAddress ]
+              [ initNodeConfig.ipAddress ]
+              rawCiliumYaml;
+            patchedCiliumFile = builtins.toFile "cilium.tmp.yaml" patchedCiliumYaml;
+          in
+          {
+            cilium = {
+              enable = true;
+              target = "cilium.yaml";
+              content = lib.importYAML patchedCiliumFile;
+            };
+            kubeVip = {
+              enable = true;
+              target = "kube-vip.yaml";
+              source = "${k8sManifestsPath}/system/kube-vip.yaml";
+            };
+            flux-components = {
+              enable = true;
+              target = "gotk-components.yaml";
+              source = "${k8sManifestsPath}/flux-system/gotk-components.yaml";
+            };
+            flux-sync = {
+              enable = true;
+              target = "gotk-sync.yaml";
+              source = "${k8sManifestsPath}/flux-system/gotk-sync.yaml";
+            };
           };
-          kubeVip = {
-            enable = true;
-            target = "kube-vip.yaml";
-            source = "${k8sManifestsPath}/system/kube-vip.yaml";
-          };
-          flux-components = {
-            enable = true;
-            target = "gotk-components.yaml";
-            source = "${k8sManifestsPath}/flux-system/gotk-components.yaml";
-          };
-          flux-sync = {
-            enable = true;
-            target = "gotk-sync.yaml";
-            source = "${k8sManifestsPath}/flux-system/gotk-sync.yaml";
-          };
-        };
       };
 
       systemd.tmpfiles.rules = [
