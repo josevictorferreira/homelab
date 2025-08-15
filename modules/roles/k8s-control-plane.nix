@@ -1,4 +1,4 @@
-{ lib, pkgs, config, hostName, hostConfig, clusterConfig, commonsPath, servicesPath, secretsPath, k8sManifestsPath, ... }:
+{ lib, config, hostName, hostConfig, clusterConfig, commonsPath, servicesPath, secretsPath, k8sManifestsPath, ... }:
 
 let
   serviceEnabled = true;
@@ -8,7 +8,6 @@ let
     "--write-kubeconfig-mode 0644"
   ];
   initNodeHostName = builtins.head clusterConfig.nodeGroups.k8sControlPlanes;
-  initNodeConfig = clusterConfig.hosts.${initNodeHostName};
   serverFlagList = [
     "--https-listen-port=6444"
     "--tls-san=${clusterConfig.ipAddress}"
@@ -75,18 +74,11 @@ in
         serverAddr = "https://${clusterConfig.ipAddress}:6443";
       } // lib.optionalAttrs cfg.isInit {
         manifests =
-          let
-            rawCiliumYaml = builtins.readFile "${k8sManifestsPath}/system/cilium.yaml";
-            patchedCiliumYaml = lib.replaceStrings [ clusterConfig.ipAddress ]
-              [ initNodeConfig.ipAddress ]
-              rawCiliumYaml;
-            patchedCiliumFile = pkgs.writeText "cilium-patched.yaml" patchedCiliumYaml;
-          in
           {
             cilium = {
               enable = true;
               target = "cilium.yaml";
-              content = lib.files.importMultiYAML patchedCiliumFile;
+              source = "${k8sManifestsPath}/system/cilium.yaml";
             };
             flux-components = {
               enable = true;
