@@ -1,4 +1,4 @@
-{ lib, clusterConfig, toYaml, ... }:
+{ clusterConfig, toYaml, ... }:
 
 let
   glanceConfig = {
