@@ -19,9 +19,6 @@
             };
           };
         };
-        configMaps.config = {
-          enabled = false;
-        };
       };
     };
   };
