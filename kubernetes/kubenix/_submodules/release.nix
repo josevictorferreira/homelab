@@ -21,8 +21,9 @@
           };
 
           image = mkOption {
-            type = types.str;
-            description = "image name with tag";
+            type = types.attrsOf types.str;
+            default = { };
+            description = "image to use for the release";
           };
 
           subdomain = mkOption {
@@ -123,20 +124,11 @@
               sha256 = "sha256-JhHJmGrvpmdHfADfM4M4mby64cSH6HO6VpKmeQfngJA=";
             };
             values =
-              let
-                img = builtins.split ":" cfg.image;
-                repo = builtins.split "/" (builtins.elemAt img 0);
-                name = builtins.elemAt repo ((builtins.length repo) - 1);
-              in
               lib.mkMerge [
                 {
                   inherit (cfg) persistence;
                   controllers.main.containers.main = {
-                    image = {
-                      repository = builtins.elemAt img 0;
-                      tag = "${builtins.elemAt img 2}";
-                      pullPolicy = "IfNotPresent";
-                    };
+                    image = cfg.image;
                     ports = [
                       {
                         name = "http";
