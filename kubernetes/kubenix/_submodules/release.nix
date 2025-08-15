@@ -134,7 +134,7 @@
                   controllers.main.containers.main = {
                     image = {
                       repository = builtins.elemAt img 0;
-                      tag = builtins.elemAt img 2;
+                      tag = "${builtins.elemAt img 2}";
                       pullPolicy = "IfNotPresent";
                     };
                     ports = [
