@@ -5,7 +5,11 @@
     submodule = "release";
     args = {
       namespace = "apps";
-      image = "ghcr.io/josevictorferreira/libebooker:latest";
+      image = {
+        repository = "ghcr.io/josevictorferreira/libebooker";
+        tag = "latest";
+        pullPolicy = "IfNotPresent";
+      };
       subdomain = "libebooker";
       port = 9292;
       values = {

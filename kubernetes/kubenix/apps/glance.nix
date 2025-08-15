@@ -137,7 +137,11 @@ in
     submodule = "release";
     args = {
       namespace = "apps";
-      image = "glanceapp/glance:v0.8.4@sha256-6df86a7e8868d1eda21f35205134b1962c422957e42a0c44d4717c8e8f741b1a";
+      image = {
+        repository = "glanceapp/glance";
+        tag = "v0.8.4@sha256:6df86a7e8868d1eda21f35205134b1962c422957e42a0c44d4717c8e8f741b1a";
+        pullPolicy = "IfNotPresent";
+      };
       subdomain = "glance";
       port = 8080;
       values = {
