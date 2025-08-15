@@ -1,8 +1,8 @@
-{ config, lib, pkgs, kubenix, clusterConfig, ... }: with lib;
+{ lib, kubenix, clusterConfig, ... }: with lib;
 
 {
   submodules.imports = [{
-    module = { name, config, ... }:
+    module = { config, ... }:
       let cfg = config.submodule.args; in
       {
         imports = with kubenix.modules; [
@@ -131,9 +131,19 @@
               lib.mkMerge [
                 {
                   inherit (cfg) persistence;
-                  image = {
-                    repository = builtins.elemAt img 0;
-                    tag = builtins.elemAt img 2;
+                  controllers.main.containers.main = {
+                    image = {
+                      repository = builtins.elemAt img 0;
+                      tag = builtins.elemAt img 2;
+                      pullPolicy = "IfNotPresent";
+                    };
+                    ports = [
+                      {
+                        name = "http";
+                        containerPort = cfg.port;
+                        protocol = "TCP";
+                      }
+                    ];
                   };
                   service.main.ports.http.port = cfg.port;
                   ingress.main = {
@@ -158,7 +168,7 @@
                   };
                   configMaps.config = {
                     enabled = true;
-                    data."config.yml" = builtins.readFile ((pkgs.formats.yaml { }).generate "." cfg.config);
+                    data."config.yml" = lib.generators.toYAML { } cfg.config;
                   };
                 })
                 cfg.values

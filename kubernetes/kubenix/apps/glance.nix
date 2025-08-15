@@ -1,4 +1,4 @@
-{ clusterConfig, toYaml, ... }:
+{ lib, clusterConfig, ... }:
 
 let
   glanceConfig = {
@@ -140,20 +140,6 @@ in
       subdomain = "glance";
       port = 8080;
       values = {
-        controllers.main.containers.main = {
-          image = {
-            repository = "glanceapp/glance";
-            tag = "v0.8.4";
-            pullPolicy = "IfNotPresent";
-          };
-          ports = [
-            {
-              name = "http";
-              containerPort = 8080;
-              protocol = "TCP";
-            }
-          ];
-        };
         service.main = {
           type = "LoadBalancer";
           loadBalancerIP = clusterConfig.loadBalancer.services.glance;
@@ -166,7 +152,7 @@ in
         };
         configMaps.config = {
           enabled = true;
-          data."glance.yml" = toYaml glanceConfig;
+          data."glance.yml" = lib.generators.toYAML { } glanceConfig;
         };
         persistence.glance = {
           type = "configMap";
