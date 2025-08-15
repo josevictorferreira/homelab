@@ -1,4 +1,4 @@
-{ lib, pkgs, config, hostName, hostConfig, clusterConfig, commonsPath, secretsPath, k8sManifestsPath, ... }:
+{ lib, pkgs, config, hostName, hostConfig, clusterConfig, commonsPath, servicesPath, secretsPath, k8sManifestsPath, ... }:
 
 let
   serviceEnabled = true;
@@ -10,6 +10,7 @@ let
   initNodeHostName = builtins.head clusterConfig.nodeGroups.k8sControlPlanes;
   initNodeConfig = clusterConfig.hosts.${initNodeHostName};
   serverFlagList = [
+    "--https-listen-port=6444"
     "--tls-san=${clusterConfig.ipAddress}"
     "--node-name=${hostName}"
     "--node-ip=${hostConfig.ipAddress}"
@@ -43,31 +44,13 @@ in
 
   imports = [
     "${commonsPath}/k8s-node-defaults.nix"
+    "${servicesPath}/haproxy.nix"
+    "${servicesPath}/keepalived.nix"
   ];
 
   config = lib.mkIf cfg.enable
     {
       k8sNodeDefaults.enable = true;
-
-      sops.secrets.k3s_token_init = lib.mkIf cfg.isInit {
-        sopsFile = "${secretsPath}/k8s-secrets.enc.yaml";
-        owner = "root";
-        mode = "0400";
-      };
-
-      sops.secrets.k3s_root_ca_pem = lib.mkIf cfg.isInit {
-        sopsFile = "${secretsPath}/k8s-secrets.enc.yaml";
-        path = "/var/lib/rancher/k3s/server/tls/root-ca.pem";
-        owner = "root";
-        mode = "0400";
-      };
-
-      sops.secrets.k3s_root_ca_key = lib.mkIf cfg.isInit {
-        sopsFile = "${secretsPath}/k8s-secrets.enc.yaml";
-        path = "/var/lib/rancher/k3s/server/tls/root-ca.key";
-        owner = "root";
-        mode = "0400";
-      };
 
       sops.secrets.sops_age_secret = lib.mkIf cfg.isInit {
         sopsFile = "${secretsPath}/k8s-secrets.enc.yaml";
@@ -86,7 +69,7 @@ in
       services.k3s = {
         enable = serviceEnabled;
         role = "server";
-        tokenFile = if cfg.isInit then config.sops.secrets.k3s_token_init.path else config.sops.secrets.k3s_token.path;
+        tokenFile = config.sops.secrets.k3s_token.path;
         extraFlags = lib.concatStringsSep " " serverFlagList;
       } // lib.optionalAttrs (!cfg.isInit) {
         serverAddr = "https://${clusterConfig.ipAddress}:6443";
@@ -104,11 +87,6 @@ in
               enable = true;
               target = "cilium.yaml";
               content = lib.files.importMultiYAML patchedCiliumFile;
-            };
-            kubeVip = {
-              enable = true;
-              target = "kube-vip.yaml";
-              source = "${k8sManifestsPath}/system/kube-vip.yaml";
             };
             flux-components = {
               enable = true;
