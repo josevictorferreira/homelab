@@ -1,9 +1,9 @@
-{ pkgs, lib, kubenix, clusterConfig, flakeRoot, ... }:
+{ lib, flake, clusterConfig, kubenix, ... }:
 
 let
   repoPathVariableName = "HOMELAB_REPO_PATH";
   repoPathEnv = builtins.getEnv repoPathVariableName;
-  repoRoot = if repoPathEnv != "" then repoPathEnv else flakeRoot;
+  repoRoot = if repoPathEnv != "" then repoPathEnv else flake.flakeRoot;
   k8sSecretsFile = "${repoRoot}/secrets/k8s-secrets.enc.yaml";
 
   isModuleFile = name:
@@ -46,8 +46,6 @@ let
 
   secretsFor = secretName: "ref+sops://${k8sSecretsFile}#${secretName}";
 
-  toYaml = y: builtins.readFile ((pkgs.formats.yaml { }).generate "." y);
-
   baseModule = { kubenix, ... }: {
     imports = with kubenix.modules; [
       helm
@@ -67,10 +65,10 @@ let
     (kubenix.evalModules.${system} {
       modules = [
         baseModule
-        (import filePath)
+        filePath
       ];
       specialArgs = {
-        inherit kubenix clusterConfig secretsFor toYaml;
+        inherit flake kubenix clusterConfig secretsFor;
       };
     }).config.kubernetes.resultYAML;
 
