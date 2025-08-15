@@ -100,6 +100,7 @@ rec {
     services = {
       linkwarden = "10.10.10.103";
       glance = "10.10.10.127";
+      libebooker = "10.10.10.123";
     };
   };
 
