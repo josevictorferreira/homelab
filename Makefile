@@ -41,7 +41,7 @@ deploy: ## Deploy host.
   echo "Deploying host: $$SEL"; \
 	nix run github:serokell/deploy-rs -- \
     --debug-logs \
-		--auto-rollback false \
+		--auto-rollback true \
 		.#$$SEL \
     -- \
     --impure \
