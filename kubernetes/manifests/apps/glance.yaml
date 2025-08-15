@@ -27,7 +27,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/configMaps: a2f99b5ad99f5d98b3552edbb85635fd4728387d2219687b767e882afb96e74c
+        checksum/configMaps: 0c1a20b57935eb5c1f1963f6a052ff1cae072db37230722b256065da0b4c6b3f
       labels:
         app.kubernetes.io/controller: main
         app.kubernetes.io/instance: glance
@@ -35,7 +35,7 @@ spec:
     spec:
       automountServiceAccountToken: true
       containers:
-        - image: glanceapp/glance:v0.8.4
+        - image: glanceapp/glance:v0.8.4@sha256
           imagePullPolicy: IfNotPresent
           name: main
           ports:
@@ -63,39 +63,20 @@ spec:
 ---
 apiVersion: v1
 data:
-  glance.yml: "pages:\n- columns:\n  - size: small\n    widgets:\n    - first-day-of-week:\
-    \ monday\n      type: calendar\n    - cache: 1m\n      headers:\n        Authorization:\
-    \ Bearer RANDOM_TOKEN\n      method: GET\n      template: \"<ul class=\\\"list\
-    \ list-gap-10 collapsible-container\\\" data-collapse-after=\\\"\\\n        7\\\
-    \">\\n  {{ range .JSON.Array \\\"response\\\" }}\\n    <li>\\n      {{\\\n   \
-    \     \\ $title := .String \\\"name\\\" }}\\n      {{ if gt (len $title) 50 }}\\\
-    n\\\n        \\        {{ $title = (slice $title 0 50) | printf \\\"%s...\\\"\
-    \ }}\\n   \\\n        \\   {{ end }}\\n      <a class=\\\"size-title-dynamic color-primary-if-not-visited\\\
-    \"\\\n        \\ href=\\\"{{ .String \\\"url\\\" }}\\\" target=\\\"_self\\\" rel=\\\
-    \"noopener noreferrer\\\"\\\n        >{{ $title }}</a>\\n      <ul class=\\\"\
-    list-horizontal-text\\\">\\n     \\\n        \\   <li style=\\\"color: {{ .String\
-    \ \\\"collection.color\\\" }};\\\">{{ .String\\\n        \\ \\\"collection.name\\\
-    \" }}</li>\\n        {{ $tags := .Array \\\"tags\\\" }}\\n\\\n        \\     \
-    \   {{ range $index, $tag := $tags }}\\n          <li>{{ .String\\\n        \\\
-    \ \\\"name\\\" }} </li>\\n        {{ end }}\\n      </ul>\\n    </li>\\n\\\n \
-    \       \\  {{ end }}\\n</ul>\\n\"\n      title: Bookmarks\n      type: custom-api\n\
-    \      url: http://10.10.10.103/api/v1/links\n  - size: full\n    widgets:\n \
-    \   - type: group\n      widgets:\n      - type: hacker-news\n      - type: lobsters\n\
-    \    - channels:\n      - UCHnyfMqiRRG1u-2MsSQLbXA\n      - UCR-DXc1voovS8nhAvccRZhg\n\
-    \      - UCpMcsdZf2KkAnfmxiq2MfMQ\n      - UC9PIn6-XuRKZ5HmYeu46AIw\n      - UCqnYRbOnwVAWU6plY904eAg\n\
-    \      type: videos\n    - type: group\n      widgets:\n      - show-thumbnails:\
-    \ true\n        subreddit: selfhosted\n        type: reddit\n      - show-thumbnails:\
-    \ true\n        subreddit: minilab\n        type: reddit\n      - show-thumbnails:\
-    \ true\n        subreddit: homelab\n        type: reddit\n  - size: small\n  \
-    \  widgets:\n    - hour-format: 24h\n      location: Londrina, Paraná, Brazil\n\
-    \      type: weather\n      units: metric\n    - markets:\n      - name: Bitcoin\n\
-    \        symbol: BTC-USD\n      - name: Kaspa\n        symbol: KAS-USD\n     \
-    \ - name: Brazilian Real\n        symbol: USDBRL=X\n      type: markets\n    -\
-    \ cache: 1d\n      repositories:\n      - glanceapp/glance\n      - pi-hole/pi-hole\n\
-    \      - grafana/grafana\n      - linkwarden/linkwarden\n      - drakkan/sftpgo\n\
-    \      - binwiederhier/ntfy\n      - louislam/uptime-kuma\n      - prowlarr/prowlarr\n\
-    \      type: releases\n  name: Home\ntheme:\n  background-color: 50 1 6\n  negative-color:\
-    \ 209 88 54\n  primary-color: 24 97 58\n"
+  glance.yml: '{"pages":[{"columns":[{"size":"small","widgets":[{"first-day-of-week":"monday","type":"calendar"},{"cache":"1m","headers":{"Authorization":"Bearer
+    RANDOM_TOKEN"},"method":"GET","template":"<ul class=\"list list-gap-10 collapsible-container\"
+    data-collapse-after=\"7\">\n  {{ range .JSON.Array \"response\" }}\n    <li>\n      {{
+    $title := .String \"name\" }}\n      {{ if gt (len $title) 50 }}\n        {{ $title
+    = (slice $title 0 50) | printf \"%s...\" }}\n      {{ end }}\n      <a class=\"size-title-dynamic
+    color-primary-if-not-visited\" href=\"{{ .String \"url\" }}\" target=\"_self\"
+    rel=\"noopener noreferrer\">{{ $title }}</a>\n      <ul class=\"list-horizontal-text\">\n        <li
+    style=\"color: {{ .String \"collection.color\" }};\">{{ .String \"collection.name\"
+    }}</li>\n        {{ $tags := .Array \"tags\" }}\n        {{ range $index, $tag
+    := $tags }}\n          <li>{{ .String \"name\" }} </li>\n        {{ end }}\n      </ul>\n    </li>\n  {{
+    end }}\n</ul>\n","title":"Bookmarks","type":"custom-api","url":"http://10.10.10.103/api/v1/links"}]},{"size":"full","widgets":[{"type":"group","widgets":[{"type":"hacker-news"},{"type":"lobsters"}]},{"channels":["UCOuGATIAbd2DvzJmUgXn2IQ","UCHnyfMqiRRG1u-2MsSQLbXA","UCR-DXc1voovS8nhAvccRZhg","UCpMcsdZf2KkAnfmxiq2MfMQ","UC9PIn6-XuRKZ5HmYeu46AIw","UCqnYRbOnwVAWU6plY904eAg"],"type":"videos"},{"type":"group","widgets":[{"show-thumbnails":true,"subreddit":"selfhosted","type":"reddit"},{"show-thumbnails":true,"subreddit":"minilab","type":"reddit"},{"show-thumbnails":true,"subreddit":"homelab","type":"reddit"}]}]},{"size":"small","widgets":[{"hour-format":"24h","location":"Londrina,
+    Paraná, Brazil","type":"weather","units":"metric"},{"markets":[{"name":"Bitcoin","symbol":"BTC-USD"},{"name":"Kaspa","symbol":"KAS-USD"},{"name":"Brazilian
+    Real","symbol":"USDBRL=X"}],"type":"markets"},{"cache":"1d","repositories":["glanceapp/glance","pi-hole/pi-hole","grafana/grafana","linkwarden/linkwarden","drakkan/sftpgo","binwiederhier/ntfy","louislam/uptime-kuma","prowlarr/prowlarr"],"type":"releases"}]}],"name":"Home"}],"theme":{"background-color":"50
+    1 6","negative-color":"209 88 54","primary-color":"24 97 58"}}'
 kind: ConfigMap
 metadata:
   annotations:
