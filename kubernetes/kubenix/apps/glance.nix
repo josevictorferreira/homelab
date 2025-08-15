@@ -64,6 +64,7 @@ let
               {
                 type = "videos";
                 channels = [
+                  "UCOuGATIAbd2DvzJmUgXn2IQ" # Network Chuck
                   "UCHnyfMqiRRG1u-2MsSQLbXA" # Veritasium
                   "UCR-DXc1voovS8nhAvccRZhg" # Jeff Geerling
                   "UCpMcsdZf2KkAnfmxiq2MfMQ" # Arvin Ash
