@@ -119,58 +119,58 @@ in
             confirmation = "yes-really-destroy-data";
             sanitizeDisks.method = "quick";
           };
-          cephBlockPools = [
-            {
-              name = "replicapool";
-              spec = {
-                failureDomain = "host";
+        };
+        cephBlockPools = [
+          {
+            name = "replicapool";
+            spec = {
+              failureDomain = "host";
+              replicated.size = 3;
+            };
+            storageClass = {
+              enabled = true;
+              name = "rook-ceph-block";
+              isDefault = true;
+              alllowVolumeExpansion = true;
+              reclaimPolicy = "Delete";
+            };
+          }
+        ];
+        cephFileSystems = [
+          {
+            name = "ceph-filesystem";
+            spec = {
+              metadataPool.replicated.size = 3;
+              dataPools = [{
                 replicated.size = 3;
-              };
-              storageClass = {
-                enabled = true;
-                name = "rook-ceph-block";
-                isDefault = true;
-                alllowVolumeExpansion = true;
-                reclaimPolicy = "Delete";
-              };
-            }
-          ];
-          cephFileSystems = [
-            {
-              name = "ceph-filesystem";
-              spec = {
-                metadataPool.replicated.size = 3;
-                dataPools = [{
-                  replicated.size = 3;
-                }];
-                metadataServer.activeCount = 1;
-              };
-              storageClass = {
-                enabled = true;
-                name = "rook-ceph-filesystem";
-                pool = "data0";
-                reclaimPolicy = "Delete";
-                allowVolumeExpansion = true;
-              };
-            }
-          ];
+              }];
+              metadataServer.activeCount = 1;
+            };
+            storageClass = {
+              enabled = true;
+              name = "rook-ceph-filesystem";
+              pool = "data0";
+              reclaimPolicy = "Delete";
+              allowVolumeExpansion = true;
+            };
+          }
+        ];
 
-          ingress.dashboard = {
-            enabled = true;
-            ingressClassName = "cilium";
-            host = {
-              name = "ceph.${domain}";
-              path = "/";
-            };
-            tls = [
-              {
-                hosts = [ "ceph.${domain}" ];
-                secretName = "wildcard-tls";
-              }
-            ];
-            annotations = {
-              "cert-manager.io/cluster-issuer" = "cloudflare-issuer";
-            };
+        ingress.dashboard = {
+          enabled = true;
+          ingressClassName = "cilium";
+          host = {
+            name = "ceph.${domain}";
+            path = "/";
+          };
+          tls = [
+            {
+              hosts = [ "ceph.${domain}" ];
+              secretName = "wildcard-tls";
+            }
+          ];
+          annotations = {
+            "cert-manager.io/cluster-issuer" = "cloudflare-issuer";
           };
         };
       };
