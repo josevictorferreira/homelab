@@ -2,7 +2,6 @@
 
 let
   filterHostsWithRoles = hosts: role: (lib.attrsets.filterAttrs (name: value: builtins.elem role value.roles) hosts);
-  filterHostsNamesWithRoles = hosts: role: (builtins.attrNames (filterHostsWithRoles hosts role));
 in
 rec {
   name = "ze-homelab";
@@ -39,9 +38,15 @@ rec {
       machine = "intel-nuc-gk3v";
       interface = "enp1s0";
       mac = "68:1D:EF:30:C1:03";
+      storageDevices = [
+        "/dev/disk/by-partlabel/CEPH_OSD_NVME"
+        "/dev/disk/by-partlabel/CEPH_OSD_SATA"
+      ];
       roles = [
         "nixos-server"
         "system-admin"
+        "k8s-server"
+        "k8s-storage"
         "k8s-control-plane"
       ];
     };
@@ -54,6 +59,8 @@ rec {
       roles = [
         "nixos-server"
         "system-admin"
+        "k8s-server"
+        "k8s-storage"
         "k8s-control-plane"
       ];
     };
@@ -66,6 +73,8 @@ rec {
       roles = [
         "nixos-server"
         "system-admin"
+        "k8s-server"
+        "k8s-storage"
         "k8s-worker"
       ];
     };
@@ -78,17 +87,29 @@ rec {
       roles = [
         "nixos-server"
         "system-admin"
+        "k8s-server"
+        "k8s-storage"
         "k8s-control-plane"
       ];
     };
   };
 
-  nodeGroups = rec {
-    k8sControlPlanes = filterHostsNamesWithRoles hosts "k8s-control-plane";
-    k8sWorkers = filterHostsNamesWithRoles hosts "k8s-worker";
-    k8sServers = k8sControlPlanes ++ k8sWorkers;
-    backupServers = filterHostsNamesWithRoles hosts "backup-server";
-    nixosServers = filterHostsNamesWithRoles hosts "nixos-server";
+  nodeGroup = {
+    k8sControlPlanes = filterHostsWithRoles hosts "k8s-control-plane";
+    k8sWorkers = filterHostsWithRoles hosts "k8s-worker";
+    k8sServers = filterHostsWithRoles hosts "k8s-server";
+    k8sStorages = filterHostsWithRoles hosts "k8s-storage";
+    backupServers = filterHostsWithRoles hosts "backup-server";
+    nixosServers = filterHostsWithRoles hosts "nixos-server";
+  };
+
+  nodeGroupHostNames = {
+    k8sControlPlanes = builtins.attrNames nodeGroup.k8sControlPlanes;
+    k8sWorkers = builtins.attrNames nodeGroup.k8sWorkers;
+    k8sServers = builtins.attrNames nodeGroup.k8sServers;
+    k8sStorages = builtins.attrNames nodeGroup.k8sStorages;
+    backupServers = builtins.attrNames nodeGroup.backupServers;
+    nixosServers = builtins.attrNames nodeGroup.nixosServers;
   };
 
   loadBalancer = {

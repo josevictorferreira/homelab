@@ -73,9 +73,9 @@
 
       listNodes = builtins.concatStringsSep "\n" (builtins.attrNames hosts);
 
-      listNodeGroups = builtins.concatStringsSep "\n" (builtins.attrNames clusterConfig.nodeGroups);
+      listNodeGroups = builtins.concatStringsSep "\n" (builtins.attrNames clusterConfig.nodeGroupHostNames);
 
-      deployGroups = (builtins.mapAttrs (_: values: (builtins.concatStringsSep " " (builtins.map (v: "--targets='.#${v}'") values))) clusterConfig.nodeGroups);
+      deployGroups = (builtins.mapAttrs (_: values: (builtins.concatStringsSep " " (builtins.map (v: "--targets='.#${v}'") values))) clusterConfig.nodeGroupHostNames);
 
       checks = nixpkgs.lib.mapAttrs
         (sys: deployLib:
