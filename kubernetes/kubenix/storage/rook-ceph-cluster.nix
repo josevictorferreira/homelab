@@ -66,9 +66,22 @@ in
       includeCRDs = true;
       noHooks = true;
       values = {
+        toolbox = {
+          enabled = true;
+          resources = {
+            requests.cpu = "50m";
+            requests.memory = "64Mi";
+          };
+        };
         cephClusterSpec = {
           mon.count = 3;
+          mon.allowMultiplePerNode = true;
           dashboard.enabled = true;
+          placement.all = {
+            tolerations = [
+              { key = "node-role.kubernetes.io/control-plane"; operator = "Exists"; effect = "NoSchedule"; }
+            ];
+          };
           resources = {
             mgr = {
               limits.memory = "1Gi";
@@ -115,11 +128,12 @@ in
             useAllDevices = false;
             nodes = storageNodesList;
           };
-          cleanupPolicy = {
-            confirmation = "yes-really-destroy-data";
-            sanitizeDisks.method = "quick";
-          };
+          # cleanupPolicy = {
+          #   confirmation = "yes-really-destroy-data";
+          #   sanitizeDisks.method = "quick";
+          # };
         };
+
         cephBlockPools = [
           {
             name = "replicapool";
@@ -136,6 +150,7 @@ in
             };
           }
         ];
+
         cephFileSystems = [
           {
             name = "ceph-filesystem";
