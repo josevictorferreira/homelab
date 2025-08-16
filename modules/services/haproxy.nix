@@ -8,7 +8,7 @@ let
       in
       "${name} ${host.ipAddress}:6444"
     )
-    clusterConfig.nodeGroups.k8sControlPlanes;
+    clusterConfig.nodeGroupHostNames.k8sControlPlanes;
 in
 {
   services.haproxy = {
