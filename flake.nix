@@ -48,8 +48,8 @@
         };
     in
     {
-      nixosConfigurations = nixpkgs.lib.mapAttrs (hostName: _system: mkHost hostName) hosts // {
-        recovery-iso = nixpkgs.lib.nixosSystem {
+      nixosConfigurations = nixpkgs.lib.mergeAttrs (nixpkgs.lib.mapAttrs (hostName: _system: mkHost hostName) hosts) {
+        "recovery-iso" = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
           modules = [ ./templates/nixos-recovery-iso.nix ];
         };

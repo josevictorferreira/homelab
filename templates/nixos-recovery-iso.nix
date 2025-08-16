@@ -1,8 +1,8 @@
-{ pkgs, ... }:
+{ pkgs, modulesPath, ... }:
 
 {
   imports = [
-    "${pkgs.path}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
+    (modulesPath + "/installer/cd-dvd/installation-cd-minimal.nix")
   ];
 
   networking.hostName = "homelab-recovery";
@@ -11,34 +11,44 @@
   networking.networkmanager.enable = false;
 
   networking.useDHCP = false;
-  networking.dhcpcd.enable = true;
-  networking.dhcpcd.extraConfig = ''
-    interface en*
-    interface eth*
-
-    static ip_address=10.10.10.240/24
-    static routers=10.10.10.1
-    static domain_name_servers=10.10.10.1 1.1.1.1 9.9.9.9
-  '';
+  networking.interfaces.enp1s0 = {
+    mtu = 1500;
+    ipv4.addresses = [{
+      address = "10.10.10.240";
+      prefixLength = 24;
+    }];
+    useDHCP = false;
+  };
+  networking.defaultGateway = {
+    address = "10.10.10.1";
+    interface = "enp1s0";
+  };
+  networking.nameservers = [
+    "1.1.1.1"
+    "8.8.8.8"
+  ];
+  networking.firewall.enable = false;
 
   services.openssh = {
     enable = true;
     settings = {
       PermitRootLogin = "prohibit-password";
       PasswordAuthentication = false;
-      KbdInteractiveAuthentication = false;
-      UseDNS = false;
     };
     openFirewall = true;
   };
 
   users.users.root.openssh.authorizedKeys.keys = [
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPAXdWHFx9UwUOXlapiVD0mzM0KL9VsMlblMAc46D9PV josevictor@josevictor-nixos"
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOVNsxVT6rzeyqZVlJVdQgKEzK2z0fOFNRZMAvQvBxbX josevictorferreira@macos-macbook"
   ];
 
   users.users.rescue = {
     isNormalUser = true;
     extraGroups = [ "wheel" ];
     openssh.authorizedKeys.keys = [
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPAXdWHFx9UwUOXlapiVD0mzM0KL9VsMlblMAc46D9PV josevictor@josevictor-nixos"
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOVNsxVT6rzeyqZVlJVdQgKEzK2z0fOFNRZMAvQvBxbX josevictorferreira@macos-macbook"
     ];
   };
   security.sudo.wheelNeedsPassword = false;
@@ -63,7 +73,6 @@
     cryptsetup
     zfs
     nfs-utils
-    smbclient
     iproute2
     iputils
     ethtool
@@ -75,10 +84,9 @@
     rclone
     sops
     age
-    kubectl
-    helm
-    k9s
   ];
 
   isoImage.appendToMenuLabel = " (Homelab Rescue)";
+
+  nix.settings.trusted-users = [ "root" "@wheel" ];
 }

@@ -1,4 +1,4 @@
-.PHONY: check ddeploy deploy gdeploy secrets vmanifests emanifests gmanifests manifests kubesync help 
+.PHONY: check ddeploy deploy gdeploy secrets vmanifests emanifests gmanifests manifests kubesync wiso help 
 
 .DEFAULT_GOAL := help
 
@@ -147,7 +147,31 @@ kubesync: ## Write kubeconfig from the cluster to kubectl config.
 	KUBECONFIG="$(LOCAL_KUBECONFIG)" kubectl config use-context "$(CLUSTER_NAME)" >/dev/null; \
 	chmod 600 "$(LOCAL_KUBECONFIG)"; \
 	rm -rf "$$tmpdir"; \
-	echo "OK: cluster/user/context written → $(LOCAL_KUBECONFIG)"; \
+	echo "OK: cluster/user/context written → $(LOCAL_KUBECONFIG)";
+
+wiso: ## Build the recovery ISO, formats the USB drive and writes the ISO to it.
+	@set -euo pipefail; \
+  if [ -d result/iso ]; then \
+    echo "Recovery ISO already built. Skipping build."; \
+  else \
+    nix build .#nixosConfigurations.recovery-iso.config.system.build.isoImage; \
+    echo "Building recovery ISO..."; \
+  fi; \
+  ISO="$$(readlink -f result/iso/recovery-iso-*.iso)"; \
+  DEV="$(readlink -f /dev/disk/by-id/usb-*)"; \
+  echo "Recovery ISO: $$ISO"; \
+  if [ -z "$$DEV" ]; then \
+    echo "No USB drive found. Please connect a USB drive and try again."; \
+    exit 1; \
+  fi; \
+  sudo sgdisk --zap-all "$$DEV"; \
+  sudo wipefs -a "$$DEV"; \
+  sudo blkdiscard -f "$$DEV"; \
+  sudo dd if="$$ISO" of="$$DEV" bs=4M status=progress conv=fsync; \
+  sync; \
+  echo "Recovery ISO written to $$DEV"; \
+  sudo eject "$DEV" 2>/dev/null || true; \
+  echo "Done. You can now boot from the USB drive.";
 
 help: ## Show this help.
 	@printf "Usage: make [target]\n\nTARGETS:\n"; grep -F "##" $(MAKEFILE_LIST) | grep -Fv "grep -F" | grep -Fv "printf " | sed -e 's/\\$$//' | sed -e 's/##//' | column -t -s ":" | sed -e 's/^/    /'; printf "\n"
