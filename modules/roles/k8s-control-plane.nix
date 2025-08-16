@@ -7,7 +7,7 @@ let
     "--cluster-init"
     "--write-kubeconfig-mode 0644"
   ];
-  initNodeHostName = builtins.head clusterConfig.nodeGroups.k8sControlPlanes;
+  initNodeHostName = builtins.head clusterConfig.nodeGroupHostNames.k8sControlPlanes;
   serverFlagList = [
     "--https-listen-port=6444"
     "--tls-san=${clusterConfig.ipAddress}"

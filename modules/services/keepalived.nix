@@ -1,7 +1,7 @@
 { lib, hostName, hostConfig, clusterConfig, ... }:
 
 let
-  isMaster = hostName == builtins.head (clusterConfig.nodeGroups.k8sControlPlanes);
+  isMaster = hostName == builtins.head (clusterConfig.nodeGroupHostNames.k8sControlPlanes);
 in
 {
   services.keepalived = {

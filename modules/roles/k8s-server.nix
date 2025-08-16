@@ -1,12 +1,12 @@
-{ lib, pkgs, config, clusterConfig, usersConfig, secretsPath, ... }:
+{ lib, config, pkgs, secretsPath, usersConfig, clusterConfig, ... }:
 
 let
-  cfg = config.k8sNodeDefaults;
+  cfg = config.roles.k8sServer;
   username = config.users.users.${usersConfig.admin.username}.name;
 in
 {
-  options.k8sNodeDefaults = {
-    enable = lib.mkEnableOption "Enable base configurations for k3s nodes";
+  options.roles.k8sServer = {
+    enable = lib.mkEnableOption "Enable the node to be a Kubernetes server node";
   };
 
   config = lib.mkIf cfg.enable {
@@ -19,8 +19,6 @@ in
     environment.systemPackages = with pkgs; [
       cilium-cli
       fluxcd
-      ceph
-      ceph-client
       iptables
       bpftools
       vals
@@ -54,10 +52,6 @@ in
     ];
 
     boot.kernelModules = [
-      "ceph"
-      "rbd"
-      "lvm"
-      "nfs"
       "br_netfilter"
       "nft-expr-counter"
       "iptable_nat"
@@ -73,10 +67,6 @@ in
       "ip_vs_wrr"
       "ip_vs_sh"
     ];
-
-    systemd.services.containerd.serviceConfig = {
-      LimitNOFILE = lib.mkForce null;
-    };
 
     boot.kernel.sysctl = {
       "fs.inotify.max_user_instances" = 8192;
