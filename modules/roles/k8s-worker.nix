@@ -13,8 +13,6 @@ in
   ];
 
   config = lib.mkIf cfg.enable {
-    k8sNodeDefaults.enable = true;
-
     services.k3s = {
       enable = true;
       role = "agent";
