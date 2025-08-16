@@ -178,7 +178,6 @@ homelab-reborn main !1 > tree
 ├── Makefile
 ├── modules
 │   ├── common
-│   │   ├── k8s-node-defaults.nix
 │   │   ├── locale.nix
 │   │   ├── nix.nix
 │   │   ├── sops.nix
@@ -191,6 +190,8 @@ homelab-reborn main !1 > tree
 │   │   └── zsh.nix
 │   ├── roles
 │   │   ├── backup-server.nix
+│   │   ├── k8s-server.nix
+│   │   ├── k8s-storage.nix
 │   │   ├── k8s-control-plane.nix
 │   │   ├── k8s-worker.nix
 │   │   ├── nixos-server.nix
