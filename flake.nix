@@ -48,7 +48,12 @@
         };
     in
     {
-      nixosConfigurations = nixpkgs.lib.mapAttrs (hostName: _system: mkHost hostName) hosts;
+      nixosConfigurations = nixpkgs.lib.mapAttrs (hostName: _system: mkHost hostName) hosts // {
+        recovery-iso = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          modules = [ ./templates/nixos-recovery-iso.nix ];
+        };
+      };
 
       deploy.nodes = nixpkgs.lib.mapAttrs
         (hostName: hostCfg:
