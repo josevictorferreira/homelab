@@ -128,11 +128,49 @@ in
             useAllDevices = false;
             nodes = storageNodesList;
           };
-          # cleanupPolicy = {
-          #   confirmation = "yes-really-destroy-data";
-          #   sanitizeDisks.method = "quick";
-          # };
         };
+
+        cephObjectStores = [
+          {
+            name = "ceph-objectstore";
+            spec = {
+              metadataPool.replicated.size = 3;
+              dataPool.replicated.size = 3;
+              gateway = {
+                instances = 1;
+                port = 80;
+                resources = {
+                  limits.memory = "1Gi";
+                  requests.cpu = "50m";
+                  requests.memory = "64Mi";
+                };
+              };
+            };
+            storageClass = {
+              enabled = true;
+              name = "rook-ceph-objectstore";
+              reclaimPolicy = "Delete";
+              allowVolumeExpansion = true;
+            };
+            ingress = {
+              enabled = true;
+              ingressClassName = "cilium";
+              host = {
+                name = "cephobjectstore.${domain}";
+                path = "/";
+              };
+              tls = [
+                {
+                  hosts = [ "cephobjectstore.${domain}" ];
+                  secretName = "wildcard-tls";
+                }
+              ];
+              annotations = {
+                "cert-manager.io/cluster-issuer" = "cloudflare-issuer";
+              };
+            };
+          }
+        ];
 
         cephBlockPools = [
           {
