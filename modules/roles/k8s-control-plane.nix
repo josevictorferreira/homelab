@@ -1,4 +1,4 @@
-{ lib, config, hostName, hostConfig, clusterConfig, commonsPath, servicesPath, secretsPath, k8sManifestsPath, ... }:
+{ lib, config, hostName, hostConfig, clusterConfig, servicesPath, secretsPath, k8sManifestsPath, ... }:
 
 let
   serviceEnabled = false;
@@ -42,7 +42,6 @@ in
   };
 
   imports = [
-    "${commonsPath}/k8s-node-defaults.nix"
     "${servicesPath}/haproxy.nix"
     "${servicesPath}/keepalived.nix"
   ];
