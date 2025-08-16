@@ -56,7 +56,9 @@ rec {
       machine = "intel-nuc-t9plus";
       interface = "enp1s0";
       mac = "68:1D:EF:3B:71:4E";
-      storageDevices = [ ];
+      storageDevices = [
+        "/dev/disk/by-partlabel/CEPH_OSD_NVME"
+      ];
       roles = [
         "nixos-server"
         "system-admin"
@@ -71,7 +73,10 @@ rec {
       machine = "intel-nuc-gk3v";
       interface = "enp1s0";
       mac = "68:1D:EF:3E:30:37";
-      storageDevices = [ ];
+      storageDevices = [
+        "/dev/disk/by-partlabel/CEPH_OSD_NVME"
+        "/dev/disk/by-partlabel/CEPH_OSD_SATA"
+      ];
       roles = [
         "nixos-server"
         "system-admin"
@@ -86,7 +91,9 @@ rec {
       machine = "amd-ryzen-beelink-eqr5";
       interface = "enp1s0";
       mac = "B0:41:6F:16:1F:72";
-      storageDevices = [ ];
+      storageDevices = [
+        "/dev/disk/by-partlabel/CEPH_OSD_NVME"
+      ];
       roles = [
         "nixos-server"
         "system-admin"
