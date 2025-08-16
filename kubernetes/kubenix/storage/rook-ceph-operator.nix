@@ -8,7 +8,7 @@
           repo = "https://charts.rook.io/release";
           chart = "rook-ceph";
           version = "1.17.7";
-          sha256 = "sha256-km3mRsCk7NpbTJ8l8C52eweF+u9hqxIhEWALQ8LqN+0=";
+          sha256 = "sha256-UZdN6Z4Rr8N1BMWmD6IgyTOzPoKRhvjJYh+Y3vY3kEY=";
         };
       namespace = "rook-ceph";
       includeCRDs = true;

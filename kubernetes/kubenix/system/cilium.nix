@@ -1,9 +1,5 @@
 { kubenix, clusterConfig, ... }:
 
-let
-  controlPlaneNodeHostName = builtins.head clusterConfig.nodeGroups.k8sControlPlanes;
-  controlPlaneIpAddress = clusterConfig.hosts.${controlPlaneNodeHostName}.ipAddress;
-in
 {
   kubernetes = {
     customTypes = {
