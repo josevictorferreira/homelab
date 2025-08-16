@@ -1,5 +1,8 @@
 { kubenix, ... }:
 
+let
+  namespace = "rook-ceph";
+in
 {
   kubernetes = {
     helm.releases."rook-ceph-operator" = {
@@ -10,7 +13,7 @@
           version = "1.17.7";
           sha256 = "sha256-UZdN6Z4Rr8N1BMWmD6IgyTOzPoKRhvjJYh+Y3vY3kEY=";
         };
-      namespace = "rook-ceph";
+      namespace = namespace;
       includeCRDs = true;
       noHooks = true;
       values = {
@@ -58,6 +61,14 @@
             readOnly = true;
           }
         ];
+      };
+    };
+
+    resources = {
+      namespaces.${namespace} = {
+        metadata = {
+          name = namespace;
+        };
       };
     };
   };
