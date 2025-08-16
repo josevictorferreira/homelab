@@ -1,6 +1,7 @@
 { lib, config, clusterConfig, hostName, ... }:
 
 let
+  serviceEnabled = true;
   cfg = config.roles.k8sWorker;
 in
 {
@@ -10,7 +11,7 @@ in
 
   config = lib.mkIf cfg.enable {
     services.k3s = {
-      enable = true;
+      enable = serviceEnabled;
       role = "agent";
       extraFlags = toString [
         "--node-name=${hostName}"
