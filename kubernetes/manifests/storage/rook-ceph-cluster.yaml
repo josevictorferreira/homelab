@@ -87,58 +87,56 @@ spec:
       limits:
         memory: 1Gi
       requests:
-        cpu: 500m
-        memory: 100Mi
+        cpu: 50m
+        memory: 64Mi
     crashcollector:
       limits:
         memory: 60Mi
       requests:
-        cpu: 100m
+        cpu: 50m
         memory: 60Mi
     exporter:
       limits:
         memory: 128Mi
       requests:
         cpu: 50m
-        memory: 50Mi
+        memory: 64Mi
     logcollector:
       limits:
         memory: 1Gi
       requests:
-        cpu: 100m
-        memory: 100Mi
+        cpu: 50m
+        memory: 64Mi
     mgr:
       limits:
         memory: 1Gi
       requests:
-        cpu: 500m
-        memory: 512Mi
+        cpu: 50m
+        memory: 64Mi
     mgr-sidecar:
       limits:
         memory: 100Mi
       requests:
-        cpu: 100m
+        cpu: 50m
         memory: 40Mi
     mon:
       limits:
         memory: 2Gi
       requests:
-        cpu: 1000m
-        memory: 1Gi
+        cpu: 50m
+        memory: 64Mi
     osd:
       limits:
         memory: 4Gi
       requests:
-        cpu: 1000m
-        memory: 4Gi
+        cpu: 50m
+        memory: 64Mi
     prepareosd:
       requests:
-        cpu: 500m
+        cpu: 50m
         memory: 50Mi
   skipUpgradeChecks: false
   storage:
-    dashboard:
-      enabled: true
     nodes:
       - devices:
           - name: /dev/disk/by-partlabel/CEPH_OSD_NVME
@@ -154,49 +152,6 @@ spec:
           - name: /dev/disk/by-partlabel/CEPH_OSD_NVME
           - name: /dev/disk/by-partlabel/CEPH_OSD_SATA
         name: lab-gamma-wk
-    resources:
-      cleanup:
-        requests:
-          cpu: 50m
-          memory: 64Mi
-      crashcollector:
-        requests:
-          cpu: 50m
-          memory: 60Mi
-      exporter:
-        requests:
-          cpu: 50m
-          memory: 64Mi
-      logcollector:
-        requests:
-          cpu: 50m
-          memory: 64Mi
-      mgr:
-        limits:
-          memory: 1Gi
-        requests:
-          cpu: 50m
-          memory: 64Mi
-      mgr-sidecar:
-        requests:
-          cpu: 50m
-          memory: 40Mi
-      mon:
-        limits:
-          memory: 2Gi
-        requests:
-          cpu: 50m
-          memory: 64Mi
-      osd:
-        limits:
-          memory: 4Gi
-        requests:
-          cpu: 50m
-          memory: 64Mi
-      prepareosd:
-        requests:
-          cpu: 50m
-          memory: 50Mi
     useAllDevices: false
     useAllNodes: false
   upgradeOSDRequiresHealthyPGs: false
