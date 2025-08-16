@@ -115,6 +115,10 @@ in
               };
             };
           };
+          cleanupPolicy = {
+            confirmation = "yes-really-destroy-data";
+            sanitizeDisks.method = "quick";
+          };
           cephBlockPools = [
             {
               name = "replicapool";
