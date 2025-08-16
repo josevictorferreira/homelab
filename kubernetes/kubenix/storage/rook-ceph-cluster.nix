@@ -62,6 +62,47 @@ in
             useAllDevices = true;
           };
           dashboard.enabled = true;
+          resources = {
+            mgr = {
+              limits.memory = "1Gi";
+              requests.cpu = "50m";
+              requests.memory = "64Mi";
+            };
+            mon = {
+              limits.memory = "2Gi";
+              requests.cpu = "50m";
+              requests.memory = "64Mi";
+            };
+            osd = {
+              limits.memory = "4Gi";
+              requests.cpu = "50m";
+              requests.memory = "64Mi";
+            };
+            prepareosd = {
+              requests.cpu = "50m";
+              requests.memory = "50Mi";
+            };
+            "mgr-sidecar" = {
+              requests.cpu = "50m";
+              requests.memory = "40Mi";
+            };
+            crashcollector = {
+              requests.cpu = "50m";
+              requests.memory = "60Mi";
+            };
+            logcollector = {
+              requests.cpu = "50m";
+              requests.memory = "64Mi";
+            };
+            cleanup = {
+              requests.cpu = "50m";
+              requests.memory = "64Mi";
+            };
+            exporter = {
+              requests.cpu = "50m";
+              requests.memory = "64Mi";
+            };
+          };
         };
         cephBlockPools = [
           {
