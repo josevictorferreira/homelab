@@ -1,9 +1,9 @@
-{ lib, flake, clusterConfig, kubenix, ... }:
+{ lib, flake, clusterConfig, kubenix, flakeRoot, ... }:
 
 let
   repoPathVariableName = "HOMELAB_REPO_PATH";
   repoPathEnv = builtins.getEnv repoPathVariableName;
-  repoRoot = if repoPathEnv != "" then repoPathEnv else flake.flakeRoot;
+  repoRoot = if repoPathEnv != "" then repoPathEnv else flakeRoot;
   k8sSecretsFile = "${repoRoot}/secrets/k8s-secrets.enc.yaml";
 
   isModuleFile = name:
