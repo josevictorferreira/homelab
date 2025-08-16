@@ -87,53 +87,53 @@ spec:
       limits:
         memory: 1Gi
       requests:
-        cpu: 500m
-        memory: 100Mi
+        cpu: 50m
+        memory: 64Mi
     crashcollector:
       limits:
         memory: 60Mi
       requests:
-        cpu: 100m
+        cpu: 50m
         memory: 60Mi
     exporter:
       limits:
         memory: 128Mi
       requests:
         cpu: 50m
-        memory: 50Mi
+        memory: 64Mi
     logcollector:
       limits:
         memory: 1Gi
       requests:
-        cpu: 100m
-        memory: 100Mi
+        cpu: 50m
+        memory: 64Mi
     mgr:
       limits:
         memory: 1Gi
       requests:
-        cpu: 500m
-        memory: 512Mi
+        cpu: 50m
+        memory: 64Mi
     mgr-sidecar:
       limits:
         memory: 100Mi
       requests:
-        cpu: 100m
+        cpu: 50m
         memory: 40Mi
     mon:
       limits:
         memory: 2Gi
       requests:
-        cpu: 1000m
-        memory: 1Gi
+        cpu: 50m
+        memory: 64Mi
     osd:
       limits:
         memory: 4Gi
       requests:
-        cpu: 1000m
-        memory: 4Gi
+        cpu: 50m
+        memory: 64Mi
     prepareosd:
       requests:
-        cpu: 500m
+        cpu: 50m
         memory: 50Mi
   skipUpgradeChecks: false
   storage:
