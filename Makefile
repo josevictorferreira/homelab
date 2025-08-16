@@ -54,8 +54,10 @@ gdeploy: ## Deploy hosts that belong to a group.
 	  | nix run nixpkgs#fzf -- --prompt='host> ' --height=40% --border \
 	    --preview 'printf \"%s\n\" {}')"; \
   echo "Deploying group: $$SEL"; \
+  targets="$$(nix eval --raw .#deployGroups.$$SEL)"; \
+  echo "Targets: $$targets"; \
 	nix run github:serokell/deploy-rs -- \
-    --targets "$$(nix eval --raw .#deployGroups.$$(SEL))" \
+    --targets .#deployGroups.$$SEL \
     --auto-rollback true
 
 secrets: ## Edit the secrets files.
