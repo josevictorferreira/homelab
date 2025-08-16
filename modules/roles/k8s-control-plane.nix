@@ -1,7 +1,7 @@
 { lib, config, hostName, hostConfig, clusterConfig, commonsPath, servicesPath, secretsPath, k8sManifestsPath, ... }:
 
 let
-  serviceEnabled = true;
+  serviceEnabled = false;
   cfg = config.roles.k8sControlPlane;
   clusterInitFlags = [
     "--cluster-init"
@@ -49,8 +49,6 @@ in
 
   config = lib.mkIf cfg.enable
     {
-      k8sNodeDefaults.enable = true;
-
       sops.secrets.sops_age_secret = lib.mkIf cfg.isInit {
         sopsFile = "${secretsPath}/k8s-secrets.enc.yaml";
         path = "/var/lib/rancher/k3s/server/manifests/sops-age-secret.yaml";
