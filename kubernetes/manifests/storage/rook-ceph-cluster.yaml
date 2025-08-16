@@ -308,27 +308,47 @@ metadata:
   namespace: rook-ceph
 spec:
   dataPool:
-    erasureCoded:
-      codingChunks: 1
-      dataChunks: 2
-    failureDomain: host
-    parameters:
-      bulk: 'true'
+    replicated:
+      size: 3
   gateway:
     instances: 1
     port: 80
-    priorityClassName: system-cluster-critical
     resources:
       limits:
-        memory: 2Gi
-      requests:
-        cpu: 1000m
         memory: 1Gi
+      requests:
+        cpu: 50m
+        memory: 64Mi
   metadataPool:
-    failureDomain: host
     replicated:
       size: 3
-  preservePoolsOnDelete: true
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: cloudflare-issuer
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: ceph-objectstore
+  namespace: rook-ceph
+spec:
+  ingressClassName: cilium
+  rules:
+    - host: cephobjectstore.josevictor.me
+      http:
+        paths:
+          - backend:
+              service:
+                name: rook-ceph-rgw-ceph-objectstore
+                port:
+                  number: 80
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - cephobjectstore.josevictor.me
+      secretName: wildcard-tls
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -356,22 +376,6 @@ spec:
     - hosts:
         - ceph.josevictor.me
       secretName: wildcard-tls
----
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
-  annotations:
-    kubenix/k8s-version: '1.32'
-    kubenix/project-name: ze-homelab
-  name: ceph-bucket
-  namespace: rook-ceph
-parameters:
-  objectStoreName: ceph-objectstore
-  objectStoreNamespace: rook-ceph
-  region: us-east-1
-provisioner: rook-ceph.ceph.rook.io/bucket
-reclaimPolicy: Delete
-volumeBindingMode: Immediate
 ---
 allowVolumeExpansion: true
 apiVersion: storage.k8s.io/v1
@@ -405,5 +409,20 @@ parameters:
   fsName: ceph-filesystem
   pool: ceph-filesystem-data0
 provisioner: rook-ceph.cephfs.csi.ceph.com
+reclaimPolicy: Delete
+volumeBindingMode: Immediate
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: rook-ceph-objectstore
+  namespace: rook-ceph
+parameters:
+  objectStoreName: ceph-objectstore
+  objectStoreNamespace: rook-ceph
+provisioner: rook-ceph.ceph.rook.io/bucket
 reclaimPolicy: Delete
 volumeBindingMode: Immediate
