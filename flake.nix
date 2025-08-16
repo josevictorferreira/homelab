@@ -29,7 +29,7 @@
       kubenixLib = import ./kubernetes/kubenix {
         flake = self;
         lib = extendedLib;
-        inherit pkgs kubenix clusterConfig;
+        inherit pkgs kubenix clusterConfig flakeRoot secretsPath;
       };
 
       mkHost = hostName:
@@ -75,7 +75,7 @@
 
       listNodeGroups = builtins.concatStringsSep "\n" (builtins.attrNames clusterConfig.nodeGroups);
 
-      deployGroups = nixpkgs.lib.mapAttrs (_name: values: builtins.concatStringsSep ", " (builtins.map (v: ".#${v}") values)) clusterConfig.nodeGroups;
+      deployGroups = (builtins.mapAttrs (_: values: (builtins.concatStringsSep ", " (builtins.map (v: ".#${v}") values))) clusterConfig.nodeGroups);
 
       checks = nixpkgs.lib.mapAttrs
         (sys: deployLib:

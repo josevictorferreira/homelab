@@ -19,10 +19,12 @@ in
     environment.systemPackages = with pkgs; [
       cilium-cli
       fluxcd
+      ceph
       ceph-client
       iptables
       bpftools
       vals
+      util-linux
 
       (writeShellScriptBin "nuke-k3s" ''
         if [ "$EUID" -ne 0 ] ; then
@@ -54,6 +56,7 @@ in
     boot.kernelModules = [
       "ceph"
       "rbd"
+      "lvm"
       "nfs"
       "br_netfilter"
       "nft-expr-counter"
@@ -70,6 +73,10 @@ in
       "ip_vs_wrr"
       "ip_vs_sh"
     ];
+
+    systemd.services.containerd.serviceConfig = {
+      LimitNOFILE = lib.mkForce null;
+    };
 
     boot.kernel.sysctl = {
       "fs.inotify.max_user_instances" = 8192;
