@@ -56,9 +56,11 @@ gdeploy: ## Deploy hosts that belong to a group.
   echo "Deploying group: $$SEL"; \
   targets="$$(nix eval --raw .#deployGroups.$$SEL)"; \
   echo "Targets: $$targets"; \
-	nix run github:serokell/deploy-rs -- \
-    --targets .#deployGroups.$$SEL \
-    --auto-rollback true
+  make check; \
+	eval "nix run github:serokell/deploy-rs -- \
+	  --skip-checks \
+	  --auto-rollback true \
+	  $$targets"
 
 secrets: ## Edit the secrets files.
 	@set -e; \
