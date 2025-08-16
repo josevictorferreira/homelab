@@ -6,13 +6,50 @@ let
 in
 {
   kubernetes = {
+    customTypes = {
+      cephblockpool = {
+        attrName = "cephblockpool";
+        group = "ceph.rook.io";
+        version = "v1";
+        kind = "CephBlockPool";
+      };
+
+      cephcluster = {
+        attrName = "cephcluster";
+        group = "ceph.rook.io";
+        version = "v1";
+        kind = "CephCluster";
+      };
+
+      cephfilesystem = {
+        attrName = "cephfilesystem";
+        group = "ceph.rook.io";
+        version = "v1";
+        kind = "CephFilesystem";
+      };
+
+      cephfilesystemsubvolumegroup = {
+        attrName = "cephfilesystemsubvolumegroup";
+        group = "ceph.rook.io";
+        version = "v1";
+        kind = "CephFilesystemSubVolumeGroup";
+      };
+
+      cephobjectstore = {
+        attrName = "cephobjectstore";
+        group = "ceph.rook.io";
+        version = "v1";
+        kind = "CephObjectStore";
+      };
+    };
+
     helm.releases."rook-ceph-cluster" = {
       chart = kubenix.lib.helm.fetch
         {
           repo = "https://charts.rook.io/release";
           chart = "rook-ceph-cluster";
           version = "1.17.7";
-          sha256 = "sha256-UZdN6Z4Rr8N1BMWmD6IgyTOzPoKRhvjJYh+Y3vY3kEY=";
+          sha256 = "sha256-/TIeOE0BlivSAn4Wg3rS20IfTrfbSrybz/oLYfD3aSQ=";
         };
       namespace = namespace;
       includeCRDs = true;
@@ -69,7 +106,12 @@ in
             name = "ceph.${domain}";
             path = "/";
           };
-          tls = true;
+          tls = [
+            {
+              hosts = [ "ceph.${domain}" ];
+              secretName = "wildcard-tls";
+            }
+          ];
           annotations = {
             "cert-manager.io/cluster-issuer" = "cloudflare-issuer";
           };
