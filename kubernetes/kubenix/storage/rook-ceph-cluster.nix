@@ -3,7 +3,7 @@
 let
   namespace = "rook-ceph";
   domain = clusterConfig.domain;
-  storageNodes = clusterConfig.nodeGroup.k8sStorage;
+  storageNodes = clusterConfig.nodeGroup.k8sStorages;
   storageNodesList = lib.mapAttrsToList
     (name: attrs: {
       name = name;

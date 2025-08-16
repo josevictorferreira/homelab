@@ -1,4 +1,4 @@
-{ lib, config, clusterConfig, hostName, commonsPath, ... }:
+{ lib, config, clusterConfig, hostName, ... }:
 
 let
   cfg = config.roles.k8sWorker;
@@ -7,10 +7,6 @@ in
   options.roles.k8sWorker = {
     enable = lib.mkEnableOption "Enable Kubernetes worker node role";
   };
-
-  imports = [
-    "${commonsPath}/k8s-node-defaults.nix"
-  ];
 
   config = lib.mkIf cfg.enable {
     services.k3s = {
