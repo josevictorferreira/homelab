@@ -44,7 +44,8 @@
           loadbalancerMode = "shared";
           service = {
             annotations = {
-              "io.cilium/lb-ipam-ips" = clusterConfig.loadBalancer.address;
+              "lbipam.cilium.io/ips" = clusterConfig.loadBalancer.address;
+              "lbipam.cilium.io/sharing-key" = "cilium-ingress";
             };
           };
         };
