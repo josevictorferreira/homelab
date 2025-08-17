@@ -1,7 +1,7 @@
 { kubenix, lib, clusterConfig, clusterLib, ... }:
 
 let
-  dnsHosts = lib.mapAttrsToList (serviceName: ipAddress: "${ipAddress} ${serviceName}.${clusterConfig.domain}") clusterConfig.loadBalancer.services;
+  dnsHosts = lib.mapAttrsToList (serviceName: ipAddress: "${clusterConfig.loadBalancer.address} ${serviceName}.${clusterConfig.domain}") clusterConfig.loadBalancer.services;
   dnsHostsStr = lib.concatStringsSep ";" dnsHosts;
 in
 {
