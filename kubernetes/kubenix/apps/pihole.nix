@@ -47,7 +47,7 @@ in
         serviceDns = {
           mixedService = true;
           type = "LoadBalancer";
-          annotations = clusterConfig.lib.serviceIpFor "pihole-dns";
+          annotations = clusterConfig.lib.serviceIpFor "pihole";
         };
         serviceDhcp.enabled = false;
         admin = {
