@@ -41,7 +41,7 @@
         ingressController = {
           enabled = true;
           default = true;
-          loadBalancerMode = "shared";
+          loadbalancerMode = "shared";
           service = {
             annotations = {
               "io.cilium/lb-ipam-ips" = clusterConfig.loadBalancer.address;
