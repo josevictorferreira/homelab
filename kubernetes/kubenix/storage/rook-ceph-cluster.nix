@@ -224,14 +224,9 @@ in
             name = "ceph.${domain}";
             path = "/";
           };
-          tls = [
-            {
-              hosts = [ "ceph.${domain}" ];
-              secretName = "wildcard-tls";
-            }
-          ];
           annotations = {
             "cert-manager.io/cluster-issuer" = "cloudflare-issuer";
+            "ingress.cilium.io/tls-passthrough" = "enabled";
           };
         };
       };
