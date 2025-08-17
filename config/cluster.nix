@@ -123,7 +123,7 @@ rec {
   };
 
   loadBalancer = {
-    address = "10.10.10.100";
+    address = "10.10.10.110";
     range = {
       start = "10.10.10.100";
       stop = "10.10.10.199";
@@ -132,6 +132,7 @@ rec {
       linkwarden = "10.10.10.103";
       glance = "10.10.10.127";
       libebooker = "10.10.10.123";
+      pihole = "10.10.10.100";
     };
   };
 
