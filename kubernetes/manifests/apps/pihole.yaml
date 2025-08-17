@@ -1,0 +1,282 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app: pihole
+    app.kubernetes.io/name: pihole
+    chart: pihole-2.34.0
+    heritage: Helm
+    release: pihole
+  name: pihole
+spec:
+  replicas: 3
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: pihole
+      release: pihole
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        checksum.config.adlists: 25de9bcdaaba91a981cc4d6e9929c7ec78fb3f52da46e84577bbd95277dc175
+        checksum.config.blacklist: 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546
+        checksum.config.dnsmasqConfig: 851240dca99d13e31aa24a231889e45afe0b23f3d895f4b7cf0ae4a107ef1dc
+        checksum.config.regex: 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546
+        checksum.config.staticDhcpConfig: 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546
+        checksum.config.whitelist: 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546
+      labels:
+        app: pihole
+        app.kubernetes.io/name: pihole
+        release: pihole
+    spec:
+      containers:
+        - env:
+            - name: FTLCONF_webserver_port
+              value: '80'
+            - name: VIRTUAL_HOST
+              value: pihole.local
+            - name: FTLCONF_misc_etc_dnsmasq_d
+              value: 'true'
+            - name: FTLCONF_webserver_api_password
+              valueFrom:
+                secretKeyRef:
+                  key: password
+                  name: pihole-admin
+            - name: FTLCONF_dns_listeningMode
+              value: all
+            - name: FTLCONF_dns_upstreams
+              value: 1.1.1.1;1.0.0.1
+            - name: FTLCONF_dns_hosts
+              value: 10.10.10.127 glance.josevictor.me;10.10.10.123 libebooker.josevictor.me;10.10.10.103
+                linkwarden.josevictor.me;10.10.10.100 pihole.josevictor.me
+          image: pihole/pihole:2025.07.0@sha256:da0216f6ee64c36dd9cae8576d3ec8c8f7436d6f5fb504a8f58bdda913647db5
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - curl --silent http://localhost/api/info/login | jq 'if (.dns | not)
+                  then halt_error(1) end'
+            failureThreshold: 10
+            initialDelaySeconds: 60
+            timeoutSeconds: 5
+          name: pihole
+          ports:
+            - containerPort: 80
+              name: http
+              protocol: TCP
+            - containerPort: 53
+              name: dns
+              protocol: TCP
+            - containerPort: 53
+              name: dns-udp
+              protocol: UDP
+            - containerPort: 443
+              name: https
+              protocol: TCP
+            - containerPort: 67
+              name: client-udp
+              protocol: UDP
+          readinessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - curl --silent http://localhost/api/info/login | jq 'if (.dns | not)
+                  then halt_error(1) end'
+            failureThreshold: 10
+            initialDelaySeconds: 60
+            timeoutSeconds: 5
+          resources: {}
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - mountPath: /etc/pihole
+              name: config
+            - mountPath: /etc/dnsmasq.d/02-custom.conf
+              name: custom-dnsmasq
+              subPath: 02-custom.conf
+            - mountPath: /etc/addn-hosts
+              name: custom-dnsmasq
+              subPath: addn-hosts
+            - mountPath: /etc/pihole/adlists.list
+              name: adlists
+              subPath: adlists.list
+      dnsConfig:
+        nameservers:
+          - 127.0.0.1
+          - 1.1.1.1
+          - 8.8.8.8
+      dnsPolicy: None
+      hostNetwork: false
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: pihole
+        - configMap:
+            defaultMode: 420
+            name: pihole-custom-dnsmasq
+          name: custom-dnsmasq
+        - configMap:
+            defaultMode: 420
+            name: pihole-adlists
+          name: adlists
+---
+apiVersion: v1
+data:
+  adlists.list: 'https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/pro.plus.txt
+
+    '
+kind: ConfigMap
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app: pihole
+    chart: pihole-2.34.0
+    heritage: Helm
+    release: pihole
+  name: pihole-adlists
+---
+apiVersion: v1
+data:
+  02-custom.conf: 'addn-hosts=/etc/addn-hosts
+
+    dhcp-option=6,10.10.10.100
+
+    '
+  05-pihole-custom-cname.conf: ''
+  addn-hosts: ''
+kind: ConfigMap
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app: pihole
+    chart: pihole-2.34.0
+    heritage: Helm
+    release: pihole
+  name: pihole-custom-dnsmasq
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app: pihole
+    chart: pihole-2.34.0
+    component: ''
+    heritage: Helm
+    release: pihole
+  name: pihole
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 500Mi
+  storageClassName: rook-ceph-filesystem
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app: pihole
+    app.kubernetes.io/name: pihole
+    chart: pihole-2.34.0
+    heritage: Helm
+    release: pihole
+  name: pihole-dns
+spec:
+  externalTrafficPolicy: Local
+  loadBalancerIP: 10.10.10.100
+  ports:
+    - name: dns
+      port: 53
+      protocol: TCP
+      targetPort: dns
+    - name: dns-udp
+      port: 53
+      protocol: UDP
+      targetPort: dns-udp
+  selector:
+    app: pihole
+    release: pihole
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app: pihole
+    app.kubernetes.io/name: pihole
+    chart: pihole-2.34.0
+    heritage: Helm
+    release: pihole
+  name: pihole-web
+spec:
+  externalTrafficPolicy: Local
+  loadBalancerIP: 10.10.10.100
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: http
+    - name: https
+      port: 443
+      protocol: TCP
+      targetPort: https
+  selector:
+    app: pihole
+    release: pihole
+  type: LoadBalancer
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: cloudflare-issuer
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app: pihole
+    chart: pihole-2.34.0
+    heritage: Helm
+    release: pihole
+  name: pihole
+spec:
+  ingressClassName: cilium
+  rules:
+    - host: pihole.josevictor.me
+      http:
+        paths:
+          - backend:
+              service:
+                name: pihole-web
+                port:
+                  name: http
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - pihole.josevictor.me
+      secretName: wildcard-tls
