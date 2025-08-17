@@ -9,10 +9,10 @@ in
     helm.releases."pihole" = {
       chart = kubenix.lib.helm.fetch
         {
-          repo = "https://mojo2600.github.io/pihole-kubernetes/";
+          repo = "https://mojo2600.github.io/pihole-kubernetes";
           chart = "pihole";
           version = "2.34.0";
-          sha256 = "sha256-km3mRsCk7NpbTJ8l8C52eweF+u9hqxIhEWALQ8LqN+0=";
+          sha256 = "sha256-nhvifpDdM8MoxF43cJAi6o+il2BbHX+udVAvvm1PukM=";
         };
       includeCRDs = true;
       noHooks = true;
@@ -76,8 +76,8 @@ in
           hosts = [ "pihole.${clusterConfig.domain}" ];
         };
         monitoring = {
-          podMonitor.enabled = true;
-          sidecar.enabled = true;
+          podMonitor.enabled = false;
+          sidecar.enabled = false;
         };
       };
     };
