@@ -68,6 +68,7 @@ let
         filePath
       ];
       specialArgs = {
+        clusterLib = clusterConfig.lib;
         inherit flake kubenix clusterConfig secretsFor;
       };
     }).config.kubernetes.resultYAML;

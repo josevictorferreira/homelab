@@ -98,6 +98,8 @@ metadata:
   annotations:
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
+    lbipam.cilium.io/ips: 10.10.10.127
+    lbipam.cilium.io/sharing-key: glance
   labels:
     app.kubernetes.io/instance: glance
     app.kubernetes.io/managed-by: Helm
@@ -109,7 +111,6 @@ metadata:
   name: glance
   namespace: apps
 spec:
-  loadBalancerIP: 10.10.10.127
   ports:
     - name: http
       port: 8080
