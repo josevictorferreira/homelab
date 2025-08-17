@@ -156,12 +156,12 @@ in
               enabled = true;
               ingressClassName = "cilium";
               host = {
-                name = "cephobjectstore.${domain}";
+                name = "objectstore.${domain}";
                 path = "/";
               };
               tls = [
                 {
-                  hosts = [ "cephobjectstore.${domain}" ];
+                  hosts = [ "objectstore.${domain}" ];
                   secretName = "wildcard-tls";
                 }
               ];
