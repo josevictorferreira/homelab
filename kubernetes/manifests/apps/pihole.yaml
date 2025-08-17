@@ -52,11 +52,15 @@ spec:
                   key: password
                   name: pihole-admin
             - name: FTLCONF_dns_hosts
-              value: '10.10.10.110 glance.josevictor.me
+              value: '10.10.10.110 ceph.josevictor.me
+
+                10.10.10.110 glance.josevictor.me
 
                 10.10.10.110 libebooker.josevictor.me
 
                 10.10.10.110 linkwarden.josevictor.me
+
+                10.10.10.110 objectstore.josevictor.me
 
                 10.10.10.110 pihole.josevictor.me'
             - name: FTLCONF_dns_listeningMode
