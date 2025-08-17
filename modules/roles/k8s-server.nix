@@ -1,4 +1,4 @@
-{ lib, config, pkgs, secretsPath, usersConfig, clusterConfig, ... }:
+{ lib, config, pkgs, secretsPath, usersConfig, ... }:
 
 let
   cfg = config.roles.k8sServer;
@@ -79,7 +79,20 @@ in
       enableIPv6 = true;
     };
 
-    networking.firewall.allowedTCPPorts = clusterConfig.portsTcpToExpose;
-    networking.firewall.allowedUDPPorts = clusterConfig.portsUdpToExpose;
+    networking.firewall.allowedTCPPorts = [
+      443
+      2379
+      2380
+      4240
+      6443
+      6444
+      8472
+      10250
+    ];
+    networking.firewall.allowedUDPPorts = [
+      8472
+      51820
+      51821
+    ];
   };
 }
