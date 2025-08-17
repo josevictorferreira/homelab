@@ -33,10 +33,10 @@ in
           nameservers = [ "127.0.0.1" ] ++ clusterConfig.dnsServers;
         };
         privileged = true;
-        ftl = {
-          dns_listeningMode = "ALL";
-          dns_hosts = dnsHostsStr;
-        };
+        # ftl = {
+        #   dns_listeningMode = "ALL";
+        #   dns_hosts = dnsHostsStr;
+        # };
         adlists = [
           "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/pro.plus.txt"
         ];
