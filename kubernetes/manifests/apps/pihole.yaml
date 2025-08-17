@@ -29,7 +29,7 @@ spec:
       annotations:
         checksum.config.adlists: 25de9bcdaaba91a981cc4d6e9929c7ec78fb3f52da46e84577bbd95277dc175
         checksum.config.blacklist: 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546
-        checksum.config.dnsmasqConfig: 851240dca99d13e31aa24a231889e45afe0b23f3d895f4b7cf0ae4a107ef1dc
+        checksum.config.dnsmasqConfig: 31496ff464b397d41e8bd13fd56d8196ab2b97982356497b8210240f66381e9
         checksum.config.regex: 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546
         checksum.config.staticDhcpConfig: 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546
         checksum.config.whitelist: 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546
@@ -43,7 +43,7 @@ spec:
             - name: FTLCONF_webserver_port
               value: '80'
             - name: VIRTUAL_HOST
-              value: pihole.local
+              value: pihole.josevictor.me
             - name: FTLCONF_misc_etc_dnsmasq_d
               value: 'true'
             - name: FTLCONF_webserver_api_password
@@ -154,8 +154,6 @@ apiVersion: v1
 data:
   02-custom.conf: 'addn-hosts=/etc/addn-hosts
 
-    dhcp-option=6,10.10.10.100
-
     '
   05-pihole-custom-cname.conf: ''
   addn-hosts: ''
@@ -200,6 +198,8 @@ metadata:
   annotations:
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
+    lbipam.cilium.io/ips: 10.10.10.100
+    lbipam.cilium.io/sharing-key: pihole
   labels:
     app: pihole
     app.kubernetes.io/name: pihole
@@ -210,7 +210,6 @@ metadata:
   namespace: apps
 spec:
   externalTrafficPolicy: Local
-  loadBalancerIP: 10.10.10.100
   ports:
     - name: dns
       port: 53
@@ -231,6 +230,8 @@ metadata:
   annotations:
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
+    lbipam.cilium.io/ips: 10.10.10.100
+    lbipam.cilium.io/sharing-key: pihole
   labels:
     app: pihole
     app.kubernetes.io/name: pihole
@@ -241,7 +242,6 @@ metadata:
   namespace: apps
 spec:
   externalTrafficPolicy: Local
-  loadBalancerIP: 10.10.10.100
   ports:
     - name: http
       port: 80

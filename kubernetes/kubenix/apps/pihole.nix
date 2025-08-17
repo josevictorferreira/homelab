@@ -23,7 +23,7 @@ in
           tag = "2025.07.0@sha256:da0216f6ee64c36dd9cae8576d3ec8c8f7436d6f5fb504a8f58bdda913647db5";
           pullPolicy = "IfNotPresent";
         };
-        virtualHost = "pihole.local";
+        virtualHost = "pihole.${clusterConfig.domain}";
         replicaCount = 3;
         DNS1 = "1.1.1.1";
         DNS2 = "1.0.0.1";
@@ -42,12 +42,18 @@ in
         ];
         serviceWeb = {
           type = "LoadBalancer";
-          loadBalancerIP = clusterConfig.loadBalancer.services.pihole;
+          annotations = {
+            "lbipam.cilium.io/ips" = clusterConfig.loadBalancer.services.pihole;
+            "lbipam.cilium.io/sharing-key" = "pihole";
+          };
         };
         serviceDns = {
           mixedService = true;
           type = "LoadBalancer";
-          loadBalancerIP = clusterConfig.loadBalancer.services.pihole;
+          annotations = {
+            "lbipam.cilium.io/ips" = clusterConfig.loadBalancer.services.pihole;
+            "lbipam.cilium.io/sharing-key" = "pihole";
+          };
         };
         serviceDhcp.enabled = false;
         admin = {
