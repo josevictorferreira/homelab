@@ -206,8 +206,6 @@ in
               reclaimPolicy = "Delete";
               allowVolumeExpansion = true;
               parameters = {
-                "fsName" = "ceph-filesystem";
-                "pool" = "ceph-filesystem-data0";
                 "csi.storage.k8s.io/provisioner-secret-name" = "rook-csi-cephfs-provisioner";
                 "csi.storage.k8s.io/provisioner-secret-namespace" = namespace;
                 "csi.storage.k8s.io/controller-expand-secret-name" = "rook-csi-cephfs-provisioner";
