@@ -1,4 +1,4 @@
-{ kubenix, lib, clusterConfig, ... }:
+{ kubenix, lib, clusterConfig, clusterLib, ... }:
 
 let
   dnsHosts = lib.mapAttrsToList (serviceName: ipAddress: "${ipAddress} ${serviceName}.${clusterConfig.domain}") clusterConfig.loadBalancer.services;
@@ -42,12 +42,12 @@ in
         ];
         serviceWeb = {
           type = "LoadBalancer";
-          annotations = clusterConfig.lib.serviceIpFor "pihole";
+          annotations = clusterLib.serviceIpFor "pihole";
         };
         serviceDns = {
           mixedService = true;
           type = "LoadBalancer";
-          annotations = clusterConfig.lib.serviceIpFor "pihole";
+          annotations = clusterLib.serviceIpFor "pihole";
         };
         serviceDhcp.enabled = false;
         admin = {

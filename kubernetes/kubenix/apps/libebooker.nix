@@ -1,4 +1,4 @@
-{ clusterConfig, ... }:
+{ clusterLib, ... }:
 
 {
   submodules.instances.libebooker = {
@@ -15,7 +15,7 @@
       values = {
         service.main = {
           type = "LoadBalancer";
-          loadBalancerIP = clusterConfig.loadBalancer.services.libebooker;
+          annotations = clusterLib.serviceIpFor "libebooker";
           ports = {
             http = {
               enabled = true;
