@@ -1,4 +1,4 @@
-{ lib, clusterConfig, ... }:
+{ lib, clusterConfig, clusterLib, ... }:
 
 let
   glanceConfig = {
@@ -147,7 +147,7 @@ in
       values = {
         service.main = {
           type = "LoadBalancer";
-          loadBalancerIP = clusterConfig.loadBalancer.services.glance;
+          annotations = clusterLib.serviceIpFor "glance";
           ports = {
             http = {
               enabled = true;

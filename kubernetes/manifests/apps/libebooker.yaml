@@ -53,6 +53,8 @@ metadata:
   annotations:
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
+    lbipam.cilium.io/ips: 10.10.10.123
+    lbipam.cilium.io/sharing-key: libebooker
   labels:
     app.kubernetes.io/instance: libebooker
     app.kubernetes.io/managed-by: Helm
@@ -64,7 +66,6 @@ metadata:
   name: libebooker
   namespace: apps
 spec:
-  loadBalancerIP: 10.10.10.123
   ports:
     - name: http
       port: 9292
