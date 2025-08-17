@@ -16,6 +16,7 @@ in
         };
       includeCRDs = true;
       noHooks = true;
+      namespace = "apps";
       values = {
         image = {
           repository = "pihole/pihole";
