@@ -15,12 +15,12 @@ in
       util-linux
       parted
       gptfdisk
+      lvm2
     ];
 
     boot.kernelModules = [
       "ceph"
       "rbd"
-      "lvm"
       "nfs"
     ];
 
