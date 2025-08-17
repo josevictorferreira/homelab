@@ -2,7 +2,6 @@
 
 let
   dnsHosts = lib.mapAttrsToList (serviceName: ipAddress: "${clusterConfig.loadBalancer.address} ${serviceName}.${clusterConfig.domain}") clusterConfig.loadBalancer.services;
-  dnsHostsStr = lib.concatStringsSep ";" dnsHosts;
 in
 {
   kubernetes = {
@@ -33,9 +32,8 @@ in
           nameservers = [ "127.0.0.1" ] ++ clusterConfig.dnsServers;
         };
         privileged = true;
-        ftl = {
-          dns_listeningMode = "ALL";
-          dns_hosts = dnsHostsStr;
+        extraEnvVars = {
+          "FTLCONF_dns_hosts" = lib.concatStringsSep "\n" dnsHosts;
         };
         adlists = [
           "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/pro.plus.txt"
