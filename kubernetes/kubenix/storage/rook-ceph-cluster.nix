@@ -77,6 +77,7 @@ in
           mon.count = 3;
           mon.allowMultiplePerNode = true;
           dashboard.enabled = true;
+          dashboard.ssl = false;
           placement.all = {
             tolerations = [
               { key = "node-role.kubernetes.io/control-plane"; operator = "Exists"; effect = "NoSchedule"; }
@@ -224,9 +225,14 @@ in
             name = "ceph.${domain}";
             path = "/";
           };
+          tls = [
+            {
+              hosts = [ "ceph.${domain}" ];
+              secretName = "wildcard-tls";
+            }
+          ];
           annotations = {
             "cert-manager.io/cluster-issuer" = "cloudflare-issuer";
-            "ingress.cilium.io/tls-passthrough" = "enabled";
           };
         };
       };
