@@ -138,7 +138,7 @@ spec:
     disable: false
   dashboard:
     enabled: true
-    ssl: true
+    ssl: false
   dataDirHostPath: /var/lib/rook
   disruptionManagement:
     managePodBudgets: true
@@ -355,7 +355,6 @@ kind: Ingress
 metadata:
   annotations:
     cert-manager.io/cluster-issuer: cloudflare-issuer
-    ingress.cilium.io/tls-passthrough: enabled
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   name: rook-ceph-dashboard
@@ -370,9 +369,13 @@ spec:
               service:
                 name: rook-ceph-mgr-dashboard
                 port:
-                  name: https-dashboard
+                  name: http-dashboard
             path: /
             pathType: Prefix
+  tls:
+    - hosts:
+        - ceph.josevictor.me
+      secretName: wildcard-tls
 ---
 allowVolumeExpansion: true
 apiVersion: storage.k8s.io/v1
