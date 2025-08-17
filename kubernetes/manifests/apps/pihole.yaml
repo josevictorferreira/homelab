@@ -11,6 +11,7 @@ metadata:
     heritage: Helm
     release: pihole
   name: pihole
+  namespace: apps
 spec:
   replicas: 3
   revisionHistoryLimit: 10
@@ -147,6 +148,7 @@ metadata:
     heritage: Helm
     release: pihole
   name: pihole-adlists
+  namespace: apps
 ---
 apiVersion: v1
 data:
@@ -168,6 +170,7 @@ metadata:
     heritage: Helm
     release: pihole
   name: pihole-custom-dnsmasq
+  namespace: apps
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -182,6 +185,7 @@ metadata:
     heritage: Helm
     release: pihole
   name: pihole
+  namespace: apps
 spec:
   accessModes:
     - ReadWriteMany
@@ -203,6 +207,7 @@ metadata:
     heritage: Helm
     release: pihole
   name: pihole-dns
+  namespace: apps
 spec:
   externalTrafficPolicy: Local
   loadBalancerIP: 10.10.10.100
@@ -233,6 +238,7 @@ metadata:
     heritage: Helm
     release: pihole
   name: pihole-web
+  namespace: apps
 spec:
   externalTrafficPolicy: Local
   loadBalancerIP: 10.10.10.100
@@ -263,6 +269,7 @@ metadata:
     heritage: Helm
     release: pihole
   name: pihole
+  namespace: apps
 spec:
   ingressClassName: cilium
   rules:
