@@ -42,18 +42,12 @@ in
         ];
         serviceWeb = {
           type = "LoadBalancer";
-          annotations = {
-            "lbipam.cilium.io/ips" = clusterConfig.loadBalancer.services.pihole;
-            "lbipam.cilium.io/sharing-key" = "pihole";
-          };
+          annotations = clusterConfig.lib.serviceIpFor "pihole";
         };
         serviceDns = {
           mixedService = true;
           type = "LoadBalancer";
-          annotations = {
-            "lbipam.cilium.io/ips" = clusterConfig.loadBalancer.services.pihole;
-            "lbipam.cilium.io/sharing-key" = "pihole";
-          };
+          annotations = clusterConfig.lib.serviceIpFor "pihole-dns";
         };
         serviceDhcp.enabled = false;
         admin = {

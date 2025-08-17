@@ -136,20 +136,7 @@ rec {
     };
   };
 
-  portsUdpToExpose = [
-    8472
-    51820
-    51821
-  ];
-
-  portsTcpToExpose = [
-    443
-    2379
-    2380
-    4240 # Cilium health
-    6443
-    6444
-    8472
-    10250
-  ];
+  lib = (import ./../lib/k8s.nix {
+    inherit lib loadBalancer hosts domain;
+  });
 }
