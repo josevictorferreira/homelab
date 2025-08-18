@@ -1,4 +1,4 @@
-{ secretsFor, ... }:
+{ clusterLib, ... }:
 
 let
   namespace = "cert-manager";
@@ -12,7 +12,7 @@ in
           namespace = namespace;
         };
         data = {
-          "cloudflare-api-token" = secretsFor "cloudflare-api-token";
+          "cloudflare-api-token" = clusterLib.secretsFor "cloudflare_api_token";
         };
       };
     };
