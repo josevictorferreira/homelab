@@ -1,4 +1,4 @@
-.PHONY: check ddeploy deploy gdeploy secrets vmanifests emanifests gmanifests manifests kubesync wiso help 
+.PHONY: check ddeploy deploy gdeploy secrets vmanifests umanifests emanifests gmanifests manifests kubesync wiso help 
 
 .DEFAULT_GOAL := help
 
@@ -13,6 +13,9 @@ USERNAME = josevictor
 REMOTE_KUBECONFIG = /etc/rancher/k3s/k3s.yaml
 LOCAL_KUBECONFIG = $(HOME)/.kube/config
 CLUSTER_NAME = ze-homelab
+MANIFESTS_DIR ?= kubernetes/manifests
+ENC_GLOB := \( -name '*.enc.yaml' -o -name '*.enc.yml' \)
+CHECKSUM_DIR  ?= .checksums/gen
 
 check: ## Check if the flake is valid.
 	@bash -c "nix flake check --show-trace --all-systems --impure"
@@ -77,8 +80,10 @@ umanifests: ## Restore unchanged *.enc.yaml files to the encrypted version in gi
 	find "$(MANIFESTS_DIR)" -mindepth 2 -type f $(ENC_GLOB) \
 	  -not -path '$(MANIFESTS_DIR)/flux-system/*' -print0 | \
 	while IFS= read -r -d '' f; do \
-	  key="$${f//\//_}"; \
-	  cfile="$(CHECKSUM_DIR)/$$key"; \
+	  key_prefix=$$(printf '%s' "$$f" | sed -E 's/\.enc\.ya?ml$$//' | tr '/' '_'); \
+    echo "$$key_prefix"; \
+	  cfile="$(CHECKSUM_DIR)/$$key_prefix.sha256"; \
+    echo "$$cfile"; \
 	  new_sum=$$(sha256sum "$$f" | cut -d' ' -f1); \
 	  old_sum=$$(cat "$$cfile" 2>/dev/null || true); \
 	  if [ "$$new_sum" = "$$old_sum" ]; then \
