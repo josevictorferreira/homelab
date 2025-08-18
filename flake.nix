@@ -29,6 +29,7 @@
       kubenixLib = import ./kubernetes/kubenix {
         flake = self;
         lib = extendedLib;
+        k8sConfig = (import ./config/k8s.nix { flakeRoot = flakeRoot; lib = extendedLib; clusterConfig = clusterConfig; });
         inherit pkgs kubenix clusterConfig flakeRoot secretsPath;
       };
 

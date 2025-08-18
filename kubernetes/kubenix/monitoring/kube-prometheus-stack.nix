@@ -1,4 +1,4 @@
-{ lib, kubenix, clusterLib, ... }:
+{ lib, kubenix, k8sLib, ... }:
 
 let
   namespace = "monitoring";
@@ -31,14 +31,14 @@ in
             size = "10Gi";
             finalizers = [ "kubernetes.io/pvc-protection" ];
           };
-          service = clusterLib.plainServiceFor "grafana";
+          service = k8sLib.plainServiceFor "grafana";
           serviceMonitor.enabled = true;
           admin = {
             existingSecret = "grafana-admin";
             userKey = "ADMIN_USER";
             passwordKey = "ADMIN_PASSWORD";
           };
-          ingress = clusterLib.ingressDomainFor "grafana";
+          ingress = k8sLib.ingressDomainFor "grafana";
         };
         prometheusOperator = {
           enabled = true;

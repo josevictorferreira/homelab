@@ -1,7 +1,7 @@
-{ kubenix, lib, clusterConfig, clusterLib, ... }:
+{ kubenix, lib, clusterConfig, k8sConfig, k8sLib, ... }:
 
 let
-  dnsHosts = lib.mapAttrsToList (serviceName: ipAddress: "${clusterConfig.loadBalancer.address} ${serviceName}.${clusterConfig.domain}") clusterConfig.loadBalancer.services;
+  dnsHosts = lib.mapAttrsToList (serviceName: ipAddress: "${k8sConfig.loadBalancer.address} ${serviceName}.${clusterConfig.domain}") clusterConfig.loadBalancer.services;
 in
 {
   kubernetes = {
@@ -40,12 +40,12 @@ in
         ];
         serviceWeb = {
           type = "LoadBalancer";
-          annotations = clusterLib.serviceIpFor "pihole";
+          annotations = k8sLib.serviceIpFor "pihole";
         };
         serviceDns = {
           mixedService = true;
           type = "LoadBalancer";
-          annotations = clusterLib.serviceIpFor "pihole";
+          annotations = k8sLib.serviceIpFor "pihole";
         };
         serviceDhcp.enabled = false;
         admin = {

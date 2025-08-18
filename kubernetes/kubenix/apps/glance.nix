@@ -1,4 +1,4 @@
-{ lib, clusterConfig, clusterLib, ... }:
+{ lib, k8sConfig, k8sLib, ... }:
 
 let
   glanceConfig = {
@@ -24,7 +24,7 @@ let
                 title = "Bookmarks";
                 cache = "1m";
                 method = "GET";
-                url = "http://${clusterConfig.loadBalancer.services.linkwarden}/api/v1/links";
+                url = "http://${k8sConfig.loadBalancer.services.linkwarden}/api/v1/links";
                 headers = {
                   Authorization = "Bearer RANDOM_TOKEN";
                 };
@@ -147,7 +147,7 @@ in
       values = {
         service.main = {
           type = "LoadBalancer";
-          annotations = clusterLib.serviceIpFor "glance";
+          annotations = k8sLib.serviceIpFor "glance";
           ports = {
             http = {
               enabled = true;

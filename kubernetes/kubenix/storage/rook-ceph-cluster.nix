@@ -1,8 +1,8 @@
-{ kubenix, lib, clusterConfig, ... }:
+{ kubenix, lib, clusterConfig, k8sConfig, ... }:
 
 let
-  namespace = "rook-ceph";
-  domain = clusterConfig.domain;
+  namespace = k8sConfig.namespaces.storage;
+  domain = k8sConfig.domain;
   storageNodes = clusterConfig.nodeGroup.k8sStorages;
   storageNodesList = lib.mapAttrsToList
     (name: attrs: {

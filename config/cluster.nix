@@ -1,4 +1,4 @@
-{ lib, flakeRoot, ... }:
+{ lib, ... }:
 
 let
   filterHostsWithRoles = hosts: role: (lib.attrsets.filterAttrs (name: value: builtins.elem role value.roles) hosts);
@@ -121,25 +121,4 @@ rec {
     backupServers = builtins.attrNames nodeGroup.backupServers;
     nixosServers = builtins.attrNames nodeGroup.nixosServers;
   };
-
-  loadBalancer = {
-    address = "10.10.10.110";
-    range = {
-      start = "10.10.10.100";
-      stop = "10.10.10.199";
-    };
-    services = {
-      linkwarden = "10.10.10.103";
-      glance = "10.10.10.127";
-      libebooker = "10.10.10.123";
-      pihole = "10.10.10.100";
-      objectstore = "10.10.10.106";
-      ceph = "10.10.10.105";
-      grafana = "10.10.10.190";
-    };
-  };
-
-  lib = (import ./../lib/k8s.nix {
-    inherit lib loadBalancer hosts domain flakeRoot;
-  });
 }
