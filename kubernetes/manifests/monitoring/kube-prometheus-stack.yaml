@@ -91771,11 +91771,8 @@ spec:
             - --config-reloader-memory-limit=0
             - --thanos-default-base-image=quay.io/thanos/thanos:v0.39.2
             - --secret-field-selector=type!=kubernetes.io/dockercfg,type!=kubernetes.io/service-account-token,type!=helm.sh/release.v1
-            - --web.enable-tls=true
-            - --web.cert-file=/cert/cert
-            - --web.key-file=/cert/key
-            - --web.listen-address=:10250
-            - --web.tls-min-version=VersionTLS13
+            - --web.enable-tls=false
+            - --web.listen-address=:8080
           env:
             - name: GOGC
               value: '30'
@@ -91785,22 +91782,22 @@ spec:
             failureThreshold: 3
             httpGet:
               path: /healthz
-              port: https
-              scheme: HTTPS
+              port: http
+              scheme: HTTP
             initialDelaySeconds: 0
             periodSeconds: 10
             successThreshold: 1
             timeoutSeconds: 1
           name: kube-prometheus-stack
           ports:
-            - containerPort: 10250
-              name: https
+            - containerPort: 8080
+              name: http
           readinessProbe:
             failureThreshold: 3
             httpGet:
               path: /healthz
-              port: https
-              scheme: HTTPS
+              port: http
+              scheme: HTTP
             initialDelaySeconds: 0
             periodSeconds: 10
             successThreshold: 1
@@ -91812,10 +91809,6 @@ spec:
               drop:
                 - ALL
             readOnlyRootFilesystem: true
-          volumeMounts:
-            - mountPath: /cert
-              name: tls-secret
-              readOnly: true
       securityContext:
         fsGroup: 65534
         runAsGroup: 65534
@@ -91825,11 +91818,6 @@ spec:
           type: RuntimeDefault
       serviceAccountName: kube-prometheus-stack-operator
       terminationGracePeriodSeconds: 30
-      volumes:
-        - name: tls-secret
-          secret:
-            defaultMode: 420
-            secretName: kube-prometheus-stack-admission
 ---
 apiVersion: v1
 data:
@@ -94722,9 +94710,9 @@ metadata:
   namespace: monitoring
 spec:
   ports:
-    - name: https
-      port: 443
-      targetPort: https
+    - name: http
+      port: 8080
+      targetPort: http
   selector:
     app: kube-prometheus-stack-operator
     release: kube-prometheus-stack
@@ -98822,15 +98810,7 @@ metadata:
 spec:
   endpoints:
     - honorLabels: true
-      port: https
-      scheme: https
-      tlsConfig:
-        ca:
-          secret:
-            key: ca
-            name: kube-prometheus-stack-admission
-            optional: false
-        serverName: kube-prometheus-stack-operator
+      port: http
   namespaceSelector:
     matchNames:
       - monitoring
