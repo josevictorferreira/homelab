@@ -1,4 +1,4 @@
-{ clusterLib, ... }:
+{ k8sLib, ... }:
 
 let
   namespace = "monitoring";
@@ -12,8 +12,8 @@ in
           namespace = namespace;
         };
         data = {
-          "ADMIN_USER" = clusterLib.secretsFor "grafana_admin_username";
-          "ADMIN_PASSWORD" = clusterLib.secretsFor "grafana_admin_password";
+          "ADMIN_USER" = k8sLib.secretsFor "grafana_admin_username";
+          "ADMIN_PASSWORD" = k8sLib.secretsFor "grafana_admin_password";
         };
       };
     };

@@ -1,4 +1,4 @@
-{ lib, flake, clusterConfig, kubenix, flakeRoot, ... }:
+{ lib, flake, clusterConfig, k8sConfig, kubenix, flakeRoot, ... }:
 
 let
   isModuleFile = name:
@@ -44,14 +44,14 @@ let
       helm
       k8s
       submodules
-      ./_types
+      ./_types.nix
       ./_submodules/release.nix
     ];
 
     kubenix.project = clusterConfig.name;
 
     kubernetes = {
-      version = "1.32";
+      version = k8sConfig.kubernetesVersion;
     };
   };
 
@@ -62,8 +62,8 @@ let
         filePath
       ];
       specialArgs = {
-        clusterLib = clusterConfig.lib;
-        inherit flake kubenix clusterConfig flakeRoot;
+        k8sLib = k8sConfig.lib;
+        inherit flake kubenix clusterConfig k8sConfig flakeRoot;
       };
     }).config.kubernetes.resultYAML;
 

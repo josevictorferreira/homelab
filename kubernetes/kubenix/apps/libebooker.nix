@@ -1,4 +1,4 @@
-{ clusterLib, ... }:
+{ k8sLib, ... }:
 
 {
   submodules.instances.libebooker = {
@@ -15,7 +15,7 @@
       values = {
         service.main = {
           type = "LoadBalancer";
-          annotations = clusterLib.serviceIpFor "libebooker";
+          annotations = k8sLib.serviceIpFor "libebooker";
           ports = {
             http = {
               enabled = true;

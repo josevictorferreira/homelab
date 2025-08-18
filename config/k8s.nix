@@ -1,0 +1,41 @@
+{ lib, clusterConfig, flakeRoot, ... }:
+
+let
+  externalLib = lib;
+in
+rec {
+  name = clusterConfig.name;
+
+  domain = clusterConfig.domain;
+
+  kubernetesVersion = "1.32";
+
+  loadBalancer = {
+    address = "10.10.10.110";
+    range = {
+      start = "10.10.10.100";
+      stop = "10.10.10.199";
+    };
+    services = {
+      linkwarden = "10.10.10.103";
+      glance = "10.10.10.127";
+      libebooker = "10.10.10.123";
+      pihole = "10.10.10.100";
+      objectstore = "10.10.10.106";
+      ceph = "10.10.10.105";
+      grafana = "10.10.10.190";
+    };
+  };
+
+  namespaces = {
+    monitoring = "monitoring";
+    certificate = "cert-manager";
+    apps = "apps";
+    storage = "rook-ceph";
+  };
+
+  lib = (import ./../lib/k8s.nix {
+    lib = externalLib;
+    inherit flakeRoot domain loadBalancer namespaces clusterConfig;
+  });
+}
