@@ -1,4 +1,4 @@
-{ clusterLib, ... }:
+{ k8sLib, ... }:
 
 let
   namespace = "apps";
@@ -12,7 +12,7 @@ in
           namespace = namespace;
         };
         data = {
-          "password" = clusterLib.secretsFor "pihole_admin_password";
+          "password" = k8sLib.secretsFor "pihole_admin_password";
         };
       };
     };

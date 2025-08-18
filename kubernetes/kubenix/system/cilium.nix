@@ -1,4 +1,4 @@
-{ kubenix, clusterConfig, ... }:
+{ kubenix, clusterConfig, k8sConfig, ... }:
 
 {
   kubernetes = {
@@ -29,7 +29,7 @@
           loadbalancerMode = "shared";
           service = {
             annotations = {
-              "lbipam.cilium.io/ips" = clusterConfig.loadBalancer.address;
+              "lbipam.cilium.io/ips" = k8sConfig.loadBalancer.address;
               "lbipam.cilium.io/sharing-key" = "cilium-ingress";
             };
           };
@@ -57,7 +57,7 @@
           name = "lb-pool";
         };
         spec = {
-          blocks = [ clusterConfig.loadBalancer.range ];
+          blocks = [ k8sConfig.loadBalancer.range ];
         };
       };
       ciliuml2announcementpolicy."default-l2-announcement-policy" = {
