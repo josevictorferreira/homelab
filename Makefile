@@ -15,7 +15,7 @@ LOCAL_KUBECONFIG = $(HOME)/.kube/config
 CLUSTER_NAME = ze-homelab
 MANIFESTS_DIR ?= kubernetes/manifests
 ENC_GLOB := \( -name '*.enc.yaml' -o -name '*.enc.yml' \)
-CHECKSUM_DIR  ?= .checksums/gen
+CHECKSUM_DIR  ?= .checksums
 
 check: ## Check if the flake is valid.
 	@bash -c "nix flake check --show-trace --all-systems --impure"
