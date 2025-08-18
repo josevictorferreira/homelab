@@ -78,7 +78,7 @@ in
                 spec = {
                   storageClassName = "rook-ceph-block";
                   accessModes = [ "ReadWriteOnce" ];
-                  resources.request.storage = "25Gi";
+                  resources.requests.storage = "25Gi";
                 };
               };
             };
