@@ -97,6 +97,13 @@
         version = "v1";
         kind = "ServiceMonitor";
       };
+
+      podmonitor = {
+        attrName = "podmonitor";
+        group = "monitoring.coreos.com";
+        version = "v1";
+        kind = "PodMonitor";
+      };
     };
   };
 }
