@@ -1,4 +1,4 @@
-{ lib }:
+{ lib, flakeRoot, ... }:
 
 let
   filterHostsWithRoles = hosts: role: (lib.attrsets.filterAttrs (name: value: builtins.elem role value.roles) hosts);
@@ -135,10 +135,11 @@ rec {
       pihole = "10.10.10.100";
       objectstore = "10.10.10.106";
       ceph = "10.10.10.105";
+      grafana = "10.10.10.190";
     };
   };
 
   lib = (import ./../lib/k8s.nix {
-    inherit lib loadBalancer hosts domain;
+    inherit lib loadBalancer hosts domain flakeRoot;
   });
 }
