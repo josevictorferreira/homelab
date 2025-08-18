@@ -1,25 +1,54 @@
-{ kubenix, clusterLib, ... }:
+{ lib, kubenix, clusterLib, ... }:
 
 let
   namespace = "monitoring";
 in
 {
   kubernetes = {
+    customTypes = {
+      alertmanager = {
+        attrName = "alertmanager";
+        group = "monitoring.coreos.com";
+        version = "v1";
+        kind = "Alertmanager";
+      };
+      prometheus = {
+        attrName = "prometheus";
+        group = "monitoring.coreos.com";
+        version = "v1";
+        kind = "Prometheus";
+      };
+      prometheusrule = {
+        attrName = "prometheusrule";
+        group = "monitoring.coreos.com";
+        version = "v1";
+        kind = "PrometheusRule";
+      };
+      servicemonitor = {
+        attrName = "servicemonitor";
+        group = "monitoring.coreos.com";
+        version = "v1";
+        kind = "ServiceMonitor";
+      };
+    };
     helm.releases."kube-prometheus-stack" = {
       chart = kubenix.lib.helm.fetch
         {
-          repo = "oci://ghcr.io/prometheus-community/charts";
+          repo = "https://prometheus-community.github.io/helm-charts";
           chart = "kube-prometheus-stack";
           version = "76.4.0";
-          sha256 = "sha256-km3mRsCk7NpbTJ8l8C52eweF+u9hqxIhEWALQ8LqN+0=";
+          sha256 = "sha256-8I29zkZDYOAJ5eodRbl52KA6SdilVsaLWIDDCRZPe7I=";
         };
       includeCRDs = true;
       namespace = namespace;
       noHooks = true;
       values = {
+        namespaceOverride = namespace;
         crds.enabled = true;
+        kubeProxy.enabled = false;
         grafana = {
           enabled = true;
+          namespace = namespace;
           persistence = {
             enabled = true;
             type = "pvc";
@@ -54,6 +83,28 @@ in
               };
             };
           };
+        };
+      };
+    };
+    resources = {
+      services."kube-prometheus-stack-coredns" = {
+        metadata = {
+          namespace = lib.mkForce "kube-system";
+        };
+      };
+      services."kube-prometheus-stack-kube-etcd" = {
+        metadata = {
+          namespace = lib.mkForce "kube-system";
+        };
+      };
+      services."kube-prometheus-stack-kube-scheduler" = {
+        metadata = {
+          namespace = lib.mkForce "kube-system";
+        };
+      };
+      services."kube-prometheus-stack-kube-controller-manager" = {
+        metadata = {
+          namespace = lib.mkForce "kube-system";
         };
       };
     };

@@ -35,7 +35,6 @@ rec {
           "${serviceName}.${domain}"
         ];
         secretName = "wildcard-tls";
-        targetLabel = "instance";
       }
     ];
   };
