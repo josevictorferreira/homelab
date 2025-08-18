@@ -44,6 +44,7 @@ let
       helm
       k8s
       submodules
+      ./_types
       ./_submodules/release.nix
     ];
 

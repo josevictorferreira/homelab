@@ -6,14 +6,6 @@ in
 {
   kubernetes = {
     namespace = namespace;
-    customTypes = {
-      certificate = {
-        attrName = "certificate";
-        group = "cert-manager.io";
-        version = "v1";
-        kind = "Certificate";
-      };
-    };
     resources = {
       namespaces.${namespace} = {
         metadata = {

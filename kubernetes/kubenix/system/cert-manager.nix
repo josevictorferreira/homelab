@@ -5,14 +5,6 @@ let
 in
 {
   kubernetes = {
-    customTypes = {
-      clusterissuer = {
-        attrName = "clusterissuer";
-        group = "cert-manager.io";
-        version = "v1";
-        kind = "ClusterIssuer";
-      };
-    };
 
     helm.releases."cert-manager" = {
       chart = kubenix.lib.helm.fetch
