@@ -5,32 +5,6 @@ let
 in
 {
   kubernetes = {
-    customTypes = {
-      alertmanager = {
-        attrName = "alertmanager";
-        group = "monitoring.coreos.com";
-        version = "v1";
-        kind = "Alertmanager";
-      };
-      prometheus = {
-        attrName = "prometheus";
-        group = "monitoring.coreos.com";
-        version = "v1";
-        kind = "Prometheus";
-      };
-      prometheusrule = {
-        attrName = "prometheusrule";
-        group = "monitoring.coreos.com";
-        version = "v1";
-        kind = "PrometheusRule";
-      };
-      servicemonitor = {
-        attrName = "servicemonitor";
-        group = "monitoring.coreos.com";
-        version = "v1";
-        kind = "ServiceMonitor";
-      };
-    };
     helm.releases."kube-prometheus-stack" = {
       chart = kubenix.lib.helm.fetch
         {

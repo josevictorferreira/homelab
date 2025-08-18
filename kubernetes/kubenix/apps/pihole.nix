@@ -75,8 +75,8 @@ in
           hosts = [ "pihole.${clusterConfig.domain}" ];
         };
         monitoring = {
-          podMonitor.enabled = false;
-          sidecar.enabled = false;
+          podMonitor.enabled = true;
+          sidecar.enabled = true;
         };
       };
     };

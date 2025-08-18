@@ -2,21 +2,6 @@
 
 {
   kubernetes = {
-    customTypes = {
-      ciliumloadbalancerippool = {
-        attrName = "ciliumloadbalancerippool";
-        group = "cilium.io";
-        version = "v2alpha1";
-        kind = "CiliumLoadBalancerIPPool";
-      };
-      ciliuml2announcementpolicy = {
-        attrName = "ciliuml2announcementpolicy";
-        group = "cilium.io";
-        version = "v2alpha1";
-        kind = "CiliumL2AnnouncementPolicy";
-      };
-    };
-
     helm.releases."cilium" = {
       chart = kubenix.lib.helm.fetch
         {
