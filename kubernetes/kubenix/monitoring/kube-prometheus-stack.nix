@@ -66,6 +66,10 @@ in
           };
           ingress = clusterLib.ingressDomainFor "grafana";
         };
+        prometheusOperator = {
+          enabled = true;
+          tls.enabled = false;
+        };
         prometheus = {
           enabled = true;
           prometheusSpec = {
