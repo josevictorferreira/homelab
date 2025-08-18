@@ -17,43 +17,6 @@ let
 in
 {
   kubernetes = {
-    customTypes = {
-      cephblockpool = {
-        attrName = "cephblockpool";
-        group = "ceph.rook.io";
-        version = "v1";
-        kind = "CephBlockPool";
-      };
-
-      cephcluster = {
-        attrName = "cephcluster";
-        group = "ceph.rook.io";
-        version = "v1";
-        kind = "CephCluster";
-      };
-
-      cephfilesystem = {
-        attrName = "cephfilesystem";
-        group = "ceph.rook.io";
-        version = "v1";
-        kind = "CephFilesystem";
-      };
-
-      cephfilesystemsubvolumegroup = {
-        attrName = "cephfilesystemsubvolumegroup";
-        group = "ceph.rook.io";
-        version = "v1";
-        kind = "CephFilesystemSubVolumeGroup";
-      };
-
-      cephobjectstore = {
-        attrName = "cephobjectstore";
-        group = "ceph.rook.io";
-        version = "v1";
-        kind = "CephObjectStore";
-      };
-    };
-
     helm.releases."rook-ceph-cluster" = {
       chart = kubenix.lib.helm.fetch
         {
