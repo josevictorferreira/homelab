@@ -40,6 +40,30 @@ spec:
     spec:
       containers:
         - env:
+            - name: PIHOLE_HOSTNAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: PIHOLE_PORT
+              value: '80'
+            - name: PIHOLE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: password
+                  name: pihole-admin
+          image: ekofr/pihole-exporter:v1.0.0
+          imagePullPolicy: IfNotPresent
+          name: exporter
+          ports:
+            - containerPort: 9617
+              name: prometheus
+              protocol: TCP
+          resources:
+            limits:
+              memory: 128Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        - env:
             - name: FTLCONF_webserver_port
               value: '80'
             - name: VIRTUAL_HOST
@@ -230,6 +254,10 @@ spec:
       port: 53
       protocol: UDP
       targetPort: dns-udp
+    - name: prometheus
+      port: 9617
+      protocol: TCP
+      targetPort: prometheus
   selector:
     app: pihole
     release: pihole
@@ -266,6 +294,32 @@ spec:
     app: pihole
     release: pihole
   type: LoadBalancer
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app: pihole
+    chart: pihole-2.34.0
+    heritage: Helm
+    release: pihole
+  name: pihole-prometheus-exporter
+  namespace: apps
+spec:
+  jobLabel: pihole-prometheus-exporter
+  namespaceSelector:
+    matchNames:
+      - apps
+  podMetricsEndpoints:
+    - path: /metrics
+      port: prometheus
+  selector:
+    matchLabels:
+      app: pihole
+      release: pihole
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
