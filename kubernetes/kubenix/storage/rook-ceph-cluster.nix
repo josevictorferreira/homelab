@@ -186,6 +186,16 @@ in
               isDefault = true;
               allowVolumeExpansion = true;
               reclaimPolicy = "Delete";
+              parameters = {
+                imageFormat = "2";
+                imageFeatures = "layering";
+                "csi.storage.k8s.io/provisioner-secret-name" = "rook-csi-rbd-provisioner";
+                "csi.storage.k8s.io/provisioner-secret-namespace" = namespace;
+                "csi.storage.k8s.io/controller-expand-secret-name" = "rook-csi-rbd-provisioner";
+                "csi.storage.k8s.io/controller-expand-secret-namespace" = namespace;
+                "csi.storage.k8s.io/node-stage-secret-name" = "rook-csi-rbd-node";
+                "csi.storage.k8s.io/node-stage-secret-namespace" = namespace;
+              };
             };
           }
         ];
