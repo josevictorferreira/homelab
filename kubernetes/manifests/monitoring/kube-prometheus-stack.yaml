@@ -95055,7 +95055,7 @@ spec:
         accessModes:
           - ReadWriteOnce
         resources:
-          request:
+          requests:
             storage: 25Gi
         storageClassName: rook-ceph-block
   tsdb:
