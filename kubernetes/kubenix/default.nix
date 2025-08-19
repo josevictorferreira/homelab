@@ -1,4 +1,4 @@
-{ lib, kubenix, labConfig, ... }:
+{ lib, kubenix, homelab, ... }:
 
 let
   isModuleFile = name:
@@ -46,7 +46,7 @@ let
         filePath
       ];
       specialArgs = {
-        inherit labConfig kubenix;
+        inherit homelab kubenix;
       };
     }).config.kubernetes.resultYAML;
 

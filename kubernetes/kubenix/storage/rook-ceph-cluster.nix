@@ -1,9 +1,9 @@
-{ lib, kubenix, labConfig, ... }:
+{ lib, kubenix, homelab, ... }:
 
 let
-  namespace = labConfig.kubernetes.namespaces.storage;
-  domain = labConfig.cluster.domain;
-  storageNodes = labConfig.cluster.nodeGroup.k8sStorages;
+  namespace = homelab.kubernetes.namespaces.storage;
+  domain = homelab.cluster.domain;
+  storageNodes = homelab.cluster.nodeGroup.k8sStorages;
   storageNodesList = lib.mapAttrsToList
     (name: attrs: {
       name = name;

@@ -1,7 +1,7 @@
-{ lib, kubenix, labConfig, ... }:
+{ lib, kubenix, homelab, ... }:
 
 let
-  namespace = labConfig.kubernetes.namespaces.monitoring;
+  namespace = homelab.kubernetes.namespaces.monitoring;
 in
 {
   kubernetes = {
