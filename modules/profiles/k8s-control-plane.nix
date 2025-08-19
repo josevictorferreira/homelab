@@ -2,11 +2,11 @@
 
 let
   serviceEnabled = true;
-  clusterConfig = config.homelab.cluster;
-  kubernetesConfig = config.homelab.kubernetes;
-  servicesPath = config.homelab.project.paths.services;
-  secretsPath = config.homelab.project.paths.secrets;
-  k8sManifestsPath = config.homelab.project.paths.kubernetes;
+  clusterConfig = homelab.cluster;
+  kubernetesConfig = homelab.kubernetes;
+  servicesPath = homelab.paths.services;
+  secretsPath = homelab.paths.secrets;
+  k8sManifestsPath = homelab.paths.kubernetes;
   cfg = config.profiles."k8s-control-plane";
   clusterInitFlags = [
     "--cluster-init"

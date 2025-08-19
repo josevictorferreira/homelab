@@ -2,9 +2,9 @@
 
 let
   cfg = config.roles.systemAdmin;
-  usersConfig = config.homelab.users;
-  commonsPath = config.homelab.project.paths.commons;
-  programsPath = config.homelab.project.paths.programs;
+  usersConfig = homelab.users;
+  commonsPath = homelab.paths.commons;
+  programsPath = homelab.paths.programs;
 in
 {
   options.roles.systemAdmin = {

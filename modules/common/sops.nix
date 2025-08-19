@@ -2,7 +2,7 @@
 
 let
   cfg = config.sops;
-  secretsPath = config.homelab.project.paths.secrets;
+  secretsPath = homelab.paths.secrets;
   defaultAgeKeyFile = ".config/sops/age/keys.txt";
 in
 {
