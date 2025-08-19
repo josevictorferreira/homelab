@@ -5,9 +5,9 @@ let
   repoPathEnv = builtins.getEnv repoPathVariableName;
   repoPathFromFile = ./..;
   repoRoot = if repoPathEnv != "" then repoPathEnv else repoPathFromFile;
-  users = import ./users.nix;
-  cluster = import ./cluster.nix;
-  kubernetes = import ./kubernetes.nix;
+  users = (import ./users.nix { inherit lib; });
+  cluster = (import ./cluster.nix { inherit lib; });
+  kubernetes = (import ./kubernetes.nix { inherit lib; });
   homelab = {
     name = "ze-homelab";
 

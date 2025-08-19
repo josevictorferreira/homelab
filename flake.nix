@@ -36,7 +36,8 @@
           };
           myKubeLib = import ./lib/kubenix.nix {
             lib = extendedLib;
-            inherit pkgs homelab;
+            homelab = (evalLab system).homelab;
+            inherit pkgs;
           };
         in
         kubenix // { lib = upstreamLib // myKubeLib; };
@@ -45,7 +46,7 @@
         import ./kubernetes/kubenix {
           lib = extendedLib;
           kubenix = kubenixFor system;
-          inherit homelab;
+          homelab = (evalLab system).homelab;
         };
 
       mkHost = hostName:
@@ -54,11 +55,10 @@
           specialArgs = {
             lib = extendedLib;
             hostConfig = homelab.cluster.hosts.${hostName};
-            inherit self inputs hostName;
+            inherit self inputs hostName homelab;
           };
           modules = [
             sops-nix.nixosModules.sops
-            ./config
             ./hosts
           ];
         };
