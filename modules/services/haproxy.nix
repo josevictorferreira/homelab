@@ -1,4 +1,4 @@
-{ lib, ... }:
+{ lib, homelab, ... }:
 
 let
   clusterConfig = homelab.cluster;

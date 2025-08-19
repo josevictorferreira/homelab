@@ -1,4 +1,4 @@
-{ lib, config, pkgs, hostName, ... }:
+{ lib, config, pkgs, hostName, homelab, ... }:
 
 let
   cfg = config.profiles."backup-server";

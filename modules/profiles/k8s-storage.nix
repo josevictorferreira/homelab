@@ -1,4 +1,4 @@
-{ lib, config, pkgs, ... }:
+{ lib, config, pkgs, homelab, ... }:
 
 let
   cfg = config.profiles."k8s-storage";
