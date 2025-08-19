@@ -1,7 +1,7 @@
 { lib, ... }:
 
 let
-  clusterConfig = clusterConfig.homelab.cluster;
+  clusterConfig = homelab.cluster;
   controlPlanes = builtins.map
     (name:
       let
