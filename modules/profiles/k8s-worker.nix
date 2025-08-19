@@ -18,7 +18,7 @@ in
         "--node-label=node-group=worker"
       ];
       tokenFile = config.sops.secrets.k3s_token.path;
-      serverAddr = "https://${config.homelab.kubernetes.vipAddress}:6443";
+      serverAddr = "https://${homelab.kubernetes.vipAddress}:6443";
     };
   };
 }

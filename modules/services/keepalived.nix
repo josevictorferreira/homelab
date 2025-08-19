@@ -1,8 +1,8 @@
 { lib, config, hostName, hostConfig, ... }:
 
 let
-  clusterConfig = config.homelab.cluster;
-  kubernetesConfig = config.homelab.kubernetes;
+  clusterConfig = homelab.cluster;
+  kubernetesConfig = homelab.kubernetes;
   isMaster = hostName == builtins.head (clusterConfig.nodeGroupHostNames.k8sControlPlanes);
 in
 {

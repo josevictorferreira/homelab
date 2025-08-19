@@ -2,8 +2,8 @@
 
 let
   cfg = config.profiles."k8s-server";
-  usersConfig = config.homelab.users;
-  secretsPath = config.homelab.project.paths.secrets;
+  usersConfig = homelab.users;
+  secretsPath = homelab.paths.secrets;
   username = config.users.users.${usersConfig.admin.username}.name;
 in
 {

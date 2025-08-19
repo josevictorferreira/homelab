@@ -2,8 +2,8 @@
 
 let
   cfg = config.profiles."backup-server";
-  servicesPath = config.homelab.project.paths.services;
-  wolMachines = lib.attrsets.filterAttrs (name: _: name != hostName) config.homelab.cluster.clusterConfig.hosts;
+  servicesPath = homelab.paths.services;
+  wolMachines = lib.attrsets.filterAttrs (name: _: name != hostName) homelab.cluster.clusterConfig.hosts;
   wolMachinesList = lib.attrValues
     (lib.mapAttrs (name: value: value // { inherit name; })
       wolMachines);

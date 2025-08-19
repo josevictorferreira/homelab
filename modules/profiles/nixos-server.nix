@@ -2,8 +2,8 @@
 
 let
   cfg = config.roles.nixosServer;
-  clusterConfig = config.homelab.cluster;
-  commonsPath = config.homelab.project.paths.commons;
+  clusterConfig = homelab.cluster;
+  commonsPath = homelab.paths.commons;
 in
 
 {
