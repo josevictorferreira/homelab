@@ -1,4 +1,4 @@
-{ lib, kubenix, labConfig, ... }: with lib;
+{ lib, kubenix, homelab, ... }: with lib;
 
 {
   submodules.imports = [{
@@ -142,12 +142,12 @@
                     enabled = cfg.subdomain != "";
                     className = "cilium";
                     hosts = [{
-                      host = "${cfg.subdomain}.${labConfig.cluster.domain}";
+                      host = "${cfg.subdomain}.${homelab.cluster.domain}";
                       paths = [{ path = "/"; }];
                     }];
                     tls = [{
                       secretName = "wildcard-tls";
-                      hosts = [ "${cfg.subdomain}.${labConfig.cluster.domain}" ];
+                      hosts = [ "${cfg.subdomain}.${homelab.cluster.domain}" ];
                     }];
                   };
                 }

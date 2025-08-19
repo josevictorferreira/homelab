@@ -1,7 +1,7 @@
-{ kubenix, labConfig, ... }:
+{ kubenix, homelab, ... }:
 
 let
-  namespace = labConfig.kubernetes.namespaces.applications;
+  namespace = homelab.kubernetes.namespaces.applications;
 in
 {
   submodules.instances.libebooker = {

@@ -1,4 +1,4 @@
-{ lib, kubenix, labConfig, ... }:
+{ lib, kubenix, homelab, ... }:
 
 let
   glanceConfig = {
@@ -24,7 +24,7 @@ let
                 title = "Bookmarks";
                 cache = "1m";
                 method = "GET";
-                url = "http://${labConfig.kubernetes.loadBalancer.services.linkwarden}/api/v1/links";
+                url = "http://${homelab.kubernetes.loadBalancer.services.linkwarden}/api/v1/links";
                 headers = {
                   Authorization = "Bearer RANDOM_TOKEN";
                 };

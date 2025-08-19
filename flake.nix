@@ -20,7 +20,7 @@
         let lib = (pkgsFor system).lib;
         in (lib.evalModules { modules = [ ./config ]; }).config;
 
-      labConfig = (evalLab "x86_64-linux").homelab;
+      project = (evalLab "x86_64-linux").homelab;
 
       extendedLib = nixpkgs.lib.extend (selfLib: superLib: {
         strings = (superLib.strings or { }) // (import ./lib/strings.nix { lib = superLib; });
@@ -36,7 +36,7 @@
           };
           myKubeLib = import ./lib/kubenix.nix {
             lib = extendedLib;
-            inherit pkgs labConfig;
+            inherit pkgs project;
           };
         in
         kubenix // { lib = upstreamLib // myKubeLib; };
@@ -45,15 +45,15 @@
         import ./kubernetes/kubenix {
           lib = extendedLib;
           kubenix = kubenixFor system;
-          inherit labConfig;
+          inherit project;
         };
 
       mkHost = hostName:
         nixpkgs.lib.nixosSystem {
-          system = labConfig.cluster.hosts.${hostName}.system;
+          system = project.cluster.hosts.${hostName}.system;
           specialArgs = {
             lib = extendedLib;
-            hostConfig = labConfig.cluster.hosts.${hostName};
+            hostConfig = project.cluster.hosts.${hostName};
             inherit self inputs hostName;
           };
           modules = [
@@ -64,7 +64,7 @@
         };
     in
     {
-      nixosConfigurations = nixpkgs.lib.mergeAttrs (nixpkgs.lib.mapAttrs (hostName: _system: mkHost hostName) labConfig.cluster.hosts) {
+      nixosConfigurations = nixpkgs.lib.mergeAttrs (nixpkgs.lib.mapAttrs (hostName: _system: mkHost hostName) project.cluster.hosts) {
         "recovery-iso" = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
           modules = [ ./templates/nixos-recovery-iso.nix ];
@@ -75,7 +75,7 @@
         (hostName: hostCfg:
           let
             isRemoteNeeded = hostCfg.system != "x86_64-linux";
-            sshUser = labConfig.users.admin.username;
+            sshUser = project.users.admin.username;
           in
           {
             hostname = hostCfg.ipAddress;
@@ -90,13 +90,13 @@
             };
           }
         )
-        labConfig.cluster.hosts;
+        project.cluster.hosts;
 
-      listNodes = builtins.concatStringsSep "\n" (builtins.attrNames labConfig.cluster.hosts);
+      listNodes = builtins.concatStringsSep "\n" (builtins.attrNames project.cluster.hosts);
 
-      listNodeGroups = builtins.concatStringsSep "\n" (builtins.attrNames labConfig.cluster.nodeGroupHostNames);
+      listNodeGroups = builtins.concatStringsSep "\n" (builtins.attrNames project.cluster.nodeGroupHostNames);
 
-      deployGroups = (builtins.mapAttrs (_: values: (builtins.concatStringsSep " " (builtins.map (v: "--targets='.#${v}'") values))) labConfig.cluster.nodeGroupHostNames);
+      deployGroups = (builtins.mapAttrs (_: values: (builtins.concatStringsSep " " (builtins.map (v: "--targets='.#${v}'") values))) project.cluster.nodeGroupHostNames);
 
       checks = nixpkgs.lib.mapAttrs
         (sys: deployLib:
