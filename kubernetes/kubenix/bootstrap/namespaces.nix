@@ -4,7 +4,8 @@ let
   namespacesList = builtins.attrValues labConfig.kubernetes.namespaces;
   namespacesResources = builtins.map
     (namespace: {
-      namespace = {
+      name = namespace;
+      value = {
         metadata = {
           name = namespace;
         };
@@ -15,7 +16,7 @@ in
 {
   kubernetes = {
     resources = {
-      namespaces = namespacesResources;
+      namespaces = builtins.listToAttrs namespacesResources;
     };
   };
 }

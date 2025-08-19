@@ -10,7 +10,7 @@
 
   outputs = { self, nixpkgs, sops-nix, deploy-rs, kubenix, ... }@inputs:
     let
-      systems = [ "x86_64-linux" "aarch64-linux" ];
+      systems = [ "x86_64-linux" "aarch64-linux" "aarch64-darwin" ];
 
       forAllSystems = f: nixpkgs.lib.genAttrs systems (system: f system);
 
@@ -23,19 +23,30 @@
       labConfig = (evalLab "x86_64-linux").homelab;
 
       extendedLib = nixpkgs.lib.extend (selfLib: superLib: {
-        strings = superLib.strings // (import ./lib/strings.nix { lib = superLib; });
-        files = superLib // (import ./lib/files.nix { lib = superLib; pkgs = nixpkgs.pkgs; });
+        strings = (superLib.strings or { }) // (import ./lib/strings.nix { lib = superLib; });
+        files = (superLib.files or { }) // (import ./lib/files.nix { lib = superLib; pkgs = null; });
       });
 
-      kubenixLib = (import ./kubernetes/kubenix {
-        flake = self;
-        lib = extendedLib;
-        pkgs = nixpkgs.pkgs;
-        kubenix = kubenix.extend (selfLib: superLib: {
-          lib = superLib // (import "${labConfig.project.paths.lib}/kubenix.nix" { lib = superLib; });
-        });
-        inherit labConfig;
-      });
+      kubenixFor = system:
+        let
+          pkgs = pkgsFor system;
+          upstreamLib = import (kubenix + "/lib/default.nix") {
+            lib = extendedLib;
+            inherit pkgs;
+          };
+          myKubeLib = import ./lib/kubenix.nix {
+            lib = extendedLib;
+            inherit pkgs labConfig;
+          };
+        in
+        kubenix // { lib = upstreamLib // myKubeLib; };
+
+      kubenixBundleFor = system:
+        import ./kubernetes/kubenix {
+          lib = extendedLib;
+          kubenix = kubenixFor system;
+          inherit labConfig;
+        };
 
       mkHost = hostName:
         nixpkgs.lib.nixosSystem {
@@ -93,7 +104,7 @@
         deploy-rs.lib;
 
       packages = forAllSystems (system: {
-        gen-manifests = kubenixLib.mkRenderer system (pkgsFor system);
+        gen-manifests = (kubenixBundleFor system).mkRenderer system (pkgsFor system);
       });
     };
 }
