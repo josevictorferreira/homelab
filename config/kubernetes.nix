@@ -1,12 +1,7 @@
-{ lib, clusterConfig, flakeRoot, ... }:
+{ ... }:
 
-let
-  externalLib = lib;
-in
-rec {
-  name = clusterConfig.name;
-
-  domain = clusterConfig.domain;
+{
+  vipAddress = "10.10.10.250";
 
   kubernetesVersion = "1.32";
 
@@ -30,12 +25,7 @@ rec {
   namespaces = {
     monitoring = "monitoring";
     certificate = "cert-manager";
-    apps = "apps";
+    applications = "apps";
     storage = "rook-ceph";
   };
-
-  lib = (import ./../lib/k8s.nix {
-    lib = externalLib;
-    inherit flakeRoot domain loadBalancer namespaces clusterConfig;
-  });
 }

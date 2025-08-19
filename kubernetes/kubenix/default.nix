@@ -1,4 +1,4 @@
-{ lib, flake, clusterConfig, k8sConfig, kubenix, flakeRoot, ... }:
+{ lib, kubenix, labConfig, ... }:
 
 let
   isModuleFile = name:
@@ -39,31 +39,14 @@ let
     let ds = discover ./. "";
     in lib.filter (m: !(hasIgnoredSegment m.rel)) ds;
 
-  baseModule = { kubenix, ... }: {
-    imports = with kubenix.modules; [
-      helm
-      k8s
-      submodules
-      ./_types.nix
-      ./_submodules/release.nix
-    ];
-
-    kubenix.project = clusterConfig.name;
-
-    kubernetes = {
-      version = k8sConfig.kubernetesVersion;
-    };
-  };
-
   evalModule = system: filePath:
     (kubenix.evalModules.${system} {
       modules = [
-        baseModule
+        ./_base.nix
         filePath
       ];
       specialArgs = {
-        k8sLib = k8sConfig.lib;
-        inherit flake kubenix clusterConfig k8sConfig flakeRoot;
+        inherit labConfig kubenix;
       };
     }).config.kubernetes.resultYAML;
 

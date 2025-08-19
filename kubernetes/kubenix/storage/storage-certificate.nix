@@ -1,7 +1,7 @@
-{ clusterConfig, ... }:
+{ labConfig, ... }:
 
 let
-  namespace = "rook-ceph";
+  namespace = labConfig.kubernetes.namespaces.storage;
 in
 {
   kubernetes = {
@@ -22,8 +22,8 @@ in
             kind = "ClusterIssuer";
           };
           dnsNames = [
-            "${clusterConfig.domain}"
-            "*.${clusterConfig.domain}"
+            "${labConfig.cluster.domain}"
+            "*.${labConfig.cluster.domain}"
           ];
         };
       };

@@ -1,7 +1,7 @@
-{ k8sLib, ... }:
+{ kubenix, labConfig, ... }:
 
 let
-  namespace = "apps";
+  namespace = labConfig.kubernetes.namespaces.applications;
 in
 {
   kubernetes = {
@@ -12,7 +12,7 @@ in
           namespace = namespace;
         };
         data = {
-          "password" = k8sLib.secretsFor "pihole_admin_password";
+          "password" = kubenix.lib.secretsFor "pihole_admin_password";
         };
       };
     };

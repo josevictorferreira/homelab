@@ -1,7 +1,7 @@
-{ k8sLib, ... }:
+{ labConfig, kubenix, ... }:
 
 let
-  namespace = "monitoring";
+  namespace = labConfig.kubernetes.namespaces.monitoring;
 in
 {
   kubernetes = {
@@ -12,8 +12,8 @@ in
           namespace = namespace;
         };
         data = {
-          "ADMIN_USER" = k8sLib.secretsFor "grafana_admin_username";
-          "ADMIN_PASSWORD" = k8sLib.secretsFor "grafana_admin_password";
+          "ADMIN_USER" = kubenix.lib.secretsFor "grafana_admin_username";
+          "ADMIN_PASSWORD" = kubenix.lib.secretsFor "grafana_admin_password";
         };
       };
     };

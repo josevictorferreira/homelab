@@ -1,20 +1,20 @@
-{ hostConfig, lib, rolesPath, ... }:
+{ labConfig, hostConfig, ... }:
 
 let
 
-  importRoles =
-    builtins.map (role: "${rolesPath}/${role}.nix") hostConfig.roles;
+  importProfiles =
+    builtins.map (profile: "${labConfig.project.paths.profiles}/${profile}.nix") hostConfig.roles;
 
-  mkRole = roleName: {
-    name = lib.strings.toLowerCamelCase roleName;
+  mkProfile = profileName: {
+    name = profileName;
     value = { enable = true; };
   };
 
-  roleAttrList = builtins.map mkRole hostConfig.roles;
+  profileAttrList = builtins.map mkProfile hostConfig.roles;
 in
 {
   imports =
-    [ ./hardware/${hostConfig.machine}.nix ] ++ importRoles;
+    [ ./hardware/${hostConfig.machine}.nix ] ++ importProfiles;
 
-  roles = builtins.listToAttrs roleAttrList;
+  profiles = builtins.listToAttrs profileAttrList;
 }
