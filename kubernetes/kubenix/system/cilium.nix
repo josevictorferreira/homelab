@@ -1,4 +1,4 @@
-{ kubenix, clusterConfig, k8sConfig, ... }:
+{ kubenix, labConfig, ... }:
 
 {
   kubernetes = {
@@ -15,7 +15,7 @@
       values = {
         namespaceOverride = "kube-system";
         kubeProxyReplacement = true;
-        k8sServiceHost = clusterConfig.ipAddress;
+        k8sServiceHost = labConfig.kubernetes.vipAddress;
         k8sServicePort = 6443;
         socketLB.enabled = false;
         envoy.enabled = false;
@@ -29,7 +29,7 @@
           loadbalancerMode = "shared";
           service = {
             annotations = {
-              "lbipam.cilium.io/ips" = k8sConfig.loadBalancer.address;
+              "lbipam.cilium.io/ips" = labConfig.kubernetes.loadBalancer.address;
               "lbipam.cilium.io/sharing-key" = "cilium-ingress";
             };
           };
@@ -57,7 +57,7 @@
           name = "lb-pool";
         };
         spec = {
-          blocks = [ k8sConfig.loadBalancer.range ];
+          blocks = [ labConfig.kubernetes.loadBalancer.range ];
         };
       };
       ciliuml2announcementpolicy."default-l2-announcement-policy" = {

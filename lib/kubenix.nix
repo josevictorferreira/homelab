@@ -1,16 +1,13 @@
-{ loadBalancer, domain, flakeRoot, ... }:
+{ labConfig, ... }:
 
 let
-  repoPathVariableName = "HOMELAB_REPO_PATH";
-  repoPathEnv = builtins.getEnv repoPathVariableName;
-  repoRoot = if repoPathEnv != "" then repoPathEnv else flakeRoot;
-  k8sSecretsFile = "${repoRoot}/secrets/k8s-secrets.enc.yaml";
+  k8sSecretsFile = "${labConfig.project.paths.secrets}/k8s-secrets.enc.yaml";
 in
 rec {
   secretsFor = secretName: "ref+sops://${k8sSecretsFile}#${secretName}";
 
   serviceIpFor = serviceName: {
-    "lbipam.cilium.io/ips" = loadBalancer.services.${serviceName};
+    "lbipam.cilium.io/ips" = labConfig.kubernetes.loadBalancer.services.${serviceName};
     "lbipam.cilium.io/sharing-key" = serviceName;
   };
 
@@ -27,12 +24,12 @@ rec {
       "cert-manager.io/cluster-issuer" = "cloudflare-issuer";
     };
     hosts = [
-      "${serviceName}.${domain}"
+      "${serviceName}.${labConfig.cluster.domain}"
     ];
     tls = [
       {
         hosts = [
-          "${serviceName}.${domain}"
+          "${serviceName}.${labConfig.cluster.domain}"
         ];
         secretName = "wildcard-tls";
       }
