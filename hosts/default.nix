@@ -1,4 +1,4 @@
-{ config, hostConfig, ... }:
+{ hostConfig, homelab, ... }:
 
 let
   importProfiles =
