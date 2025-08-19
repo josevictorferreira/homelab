@@ -43,10 +43,11 @@
           specialArgs = {
             lib = extendedLib;
             hostConfig = labConfig.cluster.hosts.${hostName};
-            inherit self inputs hostName labConfig;
+            inherit self inputs hostName;
           };
           modules = [
             sops-nix.nixosModules.sops
+            ./config
             ./hosts
           ];
         };
