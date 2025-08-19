@@ -13,7 +13,7 @@ let
 
     paths = rec {
       root = repoRoot;
-      commons = "${root}/modules/commons";
+      commons = "${root}/modules/common";
       profiles = "${root}/modules/profiles";
       programs = "${root}/modules/programs";
       services = "${root}/modules/services";
