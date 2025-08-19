@@ -1,9 +1,8 @@
-{ labConfig, hostConfig, ... }:
+{ config, hostConfig, ... }:
 
 let
-
   importProfiles =
-    builtins.map (profile: "${labConfig.project.paths.profiles}/${profile}.nix") hostConfig.roles;
+    builtins.map (profile: "${config.homelab.project.paths.profiles}/${profile}.nix") hostConfig.roles;
 
   mkProfile = profileName: {
     name = profileName;
