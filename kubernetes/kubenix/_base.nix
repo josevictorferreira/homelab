@@ -1,4 +1,4 @@
-{ kubenix, labConfig, ... }: {
+{ kubenix, homelab, ... }: {
   imports = [
     kubenix.modules.helm
     kubenix.modules.k8s
@@ -7,10 +7,10 @@
     ./_submodules/release.nix
   ];
 
-  kubenix.project = labConfig.project.name;
+  kubenix.project = homelab.name;
 
   kubernetes = {
-    version = labConfig.kubernetes.version;
+    version = homelab.kubernetes.version;
   };
 }
 

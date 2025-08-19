@@ -1,7 +1,7 @@
-{ labConfig, ... }:
+{ homelab, ... }:
 
 let
-  namespace = labConfig.kubernetes.namespaces.storage;
+  namespace = homelab.kubernetes.namespaces.storage;
 in
 {
   kubernetes = {
@@ -22,8 +22,8 @@ in
             kind = "ClusterIssuer";
           };
           dnsNames = [
-            "${labConfig.cluster.domain}"
-            "*.${labConfig.cluster.domain}"
+            "${homelab.cluster.domain}"
+            "*.${homelab.cluster.domain}"
           ];
         };
       };

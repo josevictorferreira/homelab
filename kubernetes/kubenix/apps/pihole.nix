@@ -1,8 +1,8 @@
-{ lib, kubenix, labConfig, ... }:
+{ lib, kubenix, homelab, ... }:
 
 let
-  domain = labConfig.cluster.domain;
-  dnsHosts = lib.mapAttrsToList (serviceName: ipAddress: "${labConfig.kubernetes.loadBalancer.address} ${serviceName}.${domain}") labConfig.kubernetes.loadBalancer.services;
+  domain = homelab.cluster.domain;
+  dnsHosts = lib.mapAttrsToList (serviceName: ipAddress: "${homelab.kubernetes.loadBalancer.address} ${serviceName}.${domain}") homelab.kubernetes.loadBalancer.services;
 in
 {
   kubernetes = {
@@ -30,7 +30,7 @@ in
         podDnsConfig = {
           enabled = true;
           policy = "None";
-          nameservers = [ "127.0.0.1" ] ++ labConfig.cluster.dnsServers;
+          nameservers = [ "127.0.0.1" ] ++ homelab.cluster.dnsServers;
         };
         privileged = true;
         extraEnvVars = {

@@ -1,7 +1,7 @@
-{ labConfig, ... }:
+{ homelab, ... }:
 
 let
-  namespacesList = builtins.attrValues labConfig.kubernetes.namespaces;
+  namespacesList = builtins.attrValues homelab.kubernetes.namespaces;
   namespacesResources = builtins.map
     (namespace: {
       name = namespace;
