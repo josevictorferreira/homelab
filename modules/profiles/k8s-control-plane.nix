@@ -1,8 +1,13 @@
-{ lib, config, hostName, hostConfig, clusterConfig, servicesPath, secretsPath, k8sManifestsPath, ... }:
+{ lib, config, hostName, hostConfig, ... }:
 
 let
   serviceEnabled = true;
-  cfg = config.roles.k8sControlPlane;
+  clusterConfig = config.homelab.cluster;
+  kubernetesConfig = config.homelab.kubernetes;
+  servicesPath = config.homelab.project.paths.services;
+  secretsPath = config.homelab.project.paths.secrets;
+  k8sManifestsPath = config.homelab.project.paths.kubernetes;
+  cfg = config.profiles."k8s-control-plane";
   clusterInitFlags = [
     "--cluster-init"
     "--write-kubeconfig-mode 0644"
@@ -10,7 +15,7 @@ let
   initNodeHostName = builtins.head clusterConfig.nodeGroupHostNames.k8sControlPlanes;
   serverFlagList = [
     "--https-listen-port=6444"
-    "--tls-san=${clusterConfig.ipAddress}"
+    "--tls-san=${kubernetesConfig.vipAddress}"
     "--node-name=${hostName}"
     "--node-ip=${hostConfig.ipAddress}"
     "--advertise-address=${hostConfig.ipAddress}"
@@ -31,7 +36,7 @@ let
   ] ++ (if cfg.isInit then clusterInitFlags else [ ]);
 in
 {
-  options.roles.k8sControlPlane = {
+  options.profiles."k8s-control-plane" = {
     enable = lib.mkEnableOption "Enable Kubernetes control plane role";
     isInit = lib.mkOption {
       type = lib.types.bool;
@@ -68,7 +73,7 @@ in
         tokenFile = config.sops.secrets.k3s_token.path;
         extraFlags = lib.concatStringsSep " " serverFlagList;
       } // lib.optionalAttrs (!cfg.isInit) {
-        serverAddr = "https://${clusterConfig.ipAddress}:6443";
+        serverAddr = "https://${kubernetesConfig.vipAddress}:6443";
       } // lib.optionalAttrs cfg.isInit {
         manifests =
           {

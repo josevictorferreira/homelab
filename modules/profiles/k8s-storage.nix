@@ -1,10 +1,10 @@
 { lib, config, pkgs, ... }:
 
 let
-  cfg = config.roles.k8sStorage;
+  cfg = config.profiles."k8s-storage";
 in
 {
-  options.roles.k8sStorage = {
+  options.profiles."k8s-storage" = {
     enable = lib.mkEnableOption "Enable the node to be a Kubernetes storage node";
   };
 

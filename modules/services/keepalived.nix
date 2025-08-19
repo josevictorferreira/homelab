@@ -1,6 +1,8 @@
-{ lib, hostName, hostConfig, clusterConfig, ... }:
+{ lib, config, hostName, hostConfig, ... }:
 
 let
+  clusterConfig = config.homelab.cluster;
+  kubernetesConfig = config.homelab.kubernetes;
   isMaster = hostName == builtins.head (clusterConfig.nodeGroupHostNames.k8sControlPlanes);
 in
 {
@@ -13,7 +15,7 @@ in
       virtualRouterId = 51;
       state = lib.mkDefault (if isMaster then "MASTER" else "BACKUP");
       priority = lib.mkDefault (if isMaster then 150 else 100);
-      virtualIps = [{ addr = "${clusterConfig.ipAddress}/24"; dev = hostConfig.interface; }];
+      virtualIps = [{ addr = "${kubernetesConfig.vipAddress}/24"; dev = hostConfig.interface; }];
       trackScripts = [ "haproxy-up" ];
     };
 

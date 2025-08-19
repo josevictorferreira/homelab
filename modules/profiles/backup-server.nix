@@ -1,14 +1,15 @@
-{ lib, config, pkgs, servicesPath, hostName, clusterConfig, ... }:
+{ lib, config, pkgs, hostName, ... }:
 
 let
-  cfg = config.roles.backupServer;
-  wolMachines = lib.attrsets.filterAttrs (name: _: name != hostName) clusterConfig.hosts;
+  cfg = config.profiles."backup-server";
+  servicesPath = config.homelab.project.paths.services;
+  wolMachines = lib.attrsets.filterAttrs (name: _: name != hostName) config.homelab.cluster.clusterConfig.hosts;
   wolMachinesList = lib.attrValues
     (lib.mapAttrs (name: value: value // { inherit name; })
       wolMachines);
 in
 {
-  options.roles.backupServer = {
+  options.profiles."backup-server" = {
     enable = lib.mkEnableOption "Enable backup target role";
   };
 
