@@ -1,3 +1,5 @@
+{ ... }:
+
 {
   admin = {
     name = "Jose Victor Ferreira";

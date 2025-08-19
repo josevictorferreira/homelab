@@ -1,13 +1,13 @@
 { lib, config, pkgs, homelab, ... }:
 
 let
-  cfg = config.roles.systemAdmin;
+  cfg = config.profiles."system-admin";
   usersConfig = homelab.users;
   commonsPath = homelab.paths.commons;
   programsPath = homelab.paths.programs;
 in
 {
-  options.roles.systemAdmin = {
+  options.profiles."system-admin" = {
     enable = lib.mkEnableOption "Admin tools for the cluster admin user";
   };
 
