@@ -1,4 +1,4 @@
-{ lib, config, hostName, ... }:
+{ lib, config, hostName, homelab, ... }:
 
 let
   serviceEnabled = true;

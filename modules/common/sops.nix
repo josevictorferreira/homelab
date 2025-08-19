@@ -1,4 +1,4 @@
-{ lib, config, ... }:
+{ lib, config, homelab, ... }:
 
 let
   cfg = config.sops;

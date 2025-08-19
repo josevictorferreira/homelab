@@ -8,7 +8,7 @@ let
   users = import ./users.nix;
   cluster = import ./cluster.nix;
   kubernetes = import ./kubernetes.nix;
-  project = {
+  homelab = {
     name = "ze-homelab";
 
     paths = rec {
@@ -24,18 +24,18 @@ let
       config = "${root}/config";
       lib = "${root}/lib";
     };
-    inherit project users cluster kubernetes;
+    inherit users cluster kubernetes;
   };
 in
 {
-  options.project = lib.mkOption {
+  options.homelab = lib.mkOption {
     type = t.attrs;
-    description = "Unified homelab project configurations (cluster + k8s + users).";
+    description = "Unified homelab homelab configurations (cluster + k8s + users).";
   };
 
   config =
     {
-      project = project;
-      _module.args.project = project;
+      homelab = homelab;
+      _module.args.homelab = homelab;
     };
 }
