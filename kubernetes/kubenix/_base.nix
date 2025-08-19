@@ -1,8 +1,8 @@
 { kubenix, labConfig, ... }: {
   imports = [
-    kubenix.helm
-    kubenix.k8s
-    kubenix.submodules
+    kubenix.modules.helm
+    kubenix.modules.k8s
+    kubenix.modules.submodules
     ./_types.nix
     ./_submodules/release.nix
   ];

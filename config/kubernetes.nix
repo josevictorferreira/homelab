@@ -3,7 +3,7 @@
 {
   vipAddress = "10.10.10.250";
 
-  kubernetesVersion = "1.32";
+  version = "1.32";
 
   loadBalancer = {
     address = "10.10.10.110";

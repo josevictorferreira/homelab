@@ -19,7 +19,7 @@ in
     kubenix = "${root}/kubenix";
     manifests = "${kubernetes}/manifests";
     secrets = "${root}/secrets";
-    lib = "${root}/lib";
     config = "${root}/config";
+    lib = "${root}/lib";
   };
 }

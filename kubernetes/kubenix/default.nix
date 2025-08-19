@@ -72,5 +72,5 @@ let
     '';
 in
 {
-  inherit modules evalModule mkRenderer;
+  inherit mkRenderer;
 }
