@@ -1,11 +1,11 @@
-{ lib, config, clusterConfig, hostName, ... }:
+{ lib, config, hostName, ... }:
 
 let
   serviceEnabled = true;
-  cfg = config.roles.k8sWorker;
+  cfg = config.profiles."k8s-worker";
 in
 {
-  options.roles.k8sWorker = {
+  options.profiles."k8s-worker" = {
     enable = lib.mkEnableOption "Enable Kubernetes worker node role";
   };
 
@@ -18,7 +18,7 @@ in
         "--node-label=node-group=worker"
       ];
       tokenFile = config.sops.secrets.k3s_token.path;
-      serverAddr = "https://${clusterConfig.ipAddress}:6443";
+      serverAddr = "https://${config.homelab.kubernetes.vipAddress}:6443";
     };
   };
 }
