@@ -1,13 +1,13 @@
 { lib, config, hostName, homelab, ... }:
 
 let
-  cfg = config.roles.nixosServer;
+  cfg = config.profiles."nixos-server";
   clusterConfig = homelab.cluster;
   commonsPath = homelab.paths.commons;
 in
 
 {
-  options.roles.nixosServer = {
+  options.profiles."nixos-server" = {
     enable = lib.mkEnableOption "Enable default nix machine configurations";
   };
 
