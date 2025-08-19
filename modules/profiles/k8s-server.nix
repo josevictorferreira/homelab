@@ -1,11 +1,13 @@
-{ lib, config, pkgs, secretsPath, usersConfig, ... }:
+{ lib, config, pkgs, ... }:
 
 let
-  cfg = config.roles.k8sServer;
+  cfg = config.profiles."k8s-server";
+  usersConfig = config.homelab.users;
+  secretsPath = config.homelab.project.paths.secrets;
   username = config.users.users.${usersConfig.admin.username}.name;
 in
 {
-  options.roles.k8sServer = {
+  options.profiles."k8s-server" = {
     enable = lib.mkEnableOption "Enable the node to be a Kubernetes server node";
   };
 

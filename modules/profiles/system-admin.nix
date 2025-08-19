@@ -1,7 +1,10 @@
-{ lib, config, pkgs, usersConfig, commonsPath, programsPath, ... }:
+{ lib, config, pkgs, ... }:
 
 let
   cfg = config.roles.systemAdmin;
+  usersConfig = config.homelab.users;
+  commonsPath = config.homelab.project.paths.commons;
+  programsPath = config.homelab.project.paths.programs;
 in
 {
   options.roles.systemAdmin = {

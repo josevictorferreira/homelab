@@ -1,7 +1,9 @@
-{ lib, config, hostName, clusterConfig, commonsPath, ... }:
+{ lib, config, hostName, ... }:
 
 let
   cfg = config.roles.nixosServer;
+  clusterConfig = config.homelab.cluster;
+  commonsPath = config.homelab.project.paths.commons;
 in
 
 {
