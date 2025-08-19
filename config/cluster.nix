@@ -4,13 +4,9 @@ let
   filterHostsWithRoles = hosts: role: (lib.attrsets.filterAttrs (name: value: builtins.elem role value.roles) hosts);
 in
 rec {
-  name = "ze-homelab";
-
   domain = "josevictor.me";
 
   timeZone = "America/Sao_Paulo";
-
-  ipAddress = "10.10.10.250";
 
   gateway = "10.10.10.1";
 

@@ -1,7 +1,7 @@
-{ kubenix, ... }:
+{ kubenix, labConfig, ... }:
 
 let
-  namespace = "rook-ceph";
+  namespace = labConfig.kubernetes.namespaces.storage;
 in
 {
   kubernetes = {

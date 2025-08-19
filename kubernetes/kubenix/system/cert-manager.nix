@@ -1,7 +1,7 @@
-{ kubenix, ... }:
+{ kubenix, labConfig, ... }:
 
 let
-  namespace = "cert-manager";
+  namespace = labConfig.kubernetes.namespaces.certificate;
 in
 {
   kubernetes = {

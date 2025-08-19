@@ -1,4 +1,4 @@
-{ lib, k8sConfig, k8sLib, ... }:
+{ lib, kubenix, labConfig, ... }:
 
 let
   glanceConfig = {
@@ -24,7 +24,7 @@ let
                 title = "Bookmarks";
                 cache = "1m";
                 method = "GET";
-                url = "http://${k8sConfig.loadBalancer.services.linkwarden}/api/v1/links";
+                url = "http://${labConfig.kubernetes.loadBalancer.services.linkwarden}/api/v1/links";
                 headers = {
                   Authorization = "Bearer RANDOM_TOKEN";
                 };
@@ -147,7 +147,7 @@ in
       values = {
         service.main = {
           type = "LoadBalancer";
-          annotations = k8sLib.serviceIpFor "glance";
+          annotations = kubenix.lib.serviceIpFor "glance";
           ports = {
             http = {
               enabled = true;

@@ -1,7 +1,8 @@
-{ kubenix, lib, clusterConfig, k8sConfig, k8sLib, ... }:
+{ lib, kubenix, labConfig, ... }:
 
 let
-  dnsHosts = lib.mapAttrsToList (serviceName: ipAddress: "${k8sConfig.loadBalancer.address} ${serviceName}.${clusterConfig.domain}") clusterConfig.loadBalancer.services;
+  domain = labConfig.cluster.domain;
+  dnsHosts = lib.mapAttrsToList (serviceName: ipAddress: "${labConfig.kubernetes.loadBalancer.address} ${serviceName}.${domain}") labConfig.kubernetes.loadBalancer.services;
 in
 {
   kubernetes = {
@@ -22,14 +23,14 @@ in
           tag = "2025.07.0@sha256:da0216f6ee64c36dd9cae8576d3ec8c8f7436d6f5fb504a8f58bdda913647db5";
           pullPolicy = "IfNotPresent";
         };
-        virtualHost = "pihole.${clusterConfig.domain}";
+        virtualHost = "pihole.${domain}";
         replicaCount = 3;
         DNS1 = "1.1.1.1";
         DNS2 = "1.0.0.1";
         podDnsConfig = {
           enabled = true;
           policy = "None";
-          nameservers = [ "127.0.0.1" ] ++ clusterConfig.dnsServers;
+          nameservers = [ "127.0.0.1" ] ++ labConfig.cluster.dnsServers;
         };
         privileged = true;
         extraEnvVars = {
@@ -40,12 +41,12 @@ in
         ];
         serviceWeb = {
           type = "LoadBalancer";
-          annotations = k8sLib.serviceIpFor "pihole";
+          annotations = kubenix.lib.serviceIpFor "pihole";
         };
         serviceDns = {
           mixedService = true;
           type = "LoadBalancer";
-          annotations = k8sLib.serviceIpFor "pihole";
+          annotations = kubenix.lib.serviceIpFor "pihole";
         };
         serviceDhcp.enabled = false;
         admin = {
@@ -68,11 +69,11 @@ in
           };
           tls = [
             {
-              hosts = [ "pihole.${clusterConfig.domain}" ];
+              hosts = [ "pihole.${domain}" ];
               secretName = "wildcard-tls";
             }
           ];
-          hosts = [ "pihole.${clusterConfig.domain}" ];
+          hosts = [ "pihole.${domain}" ];
         };
         monitoring = {
           podMonitor.enabled = true;

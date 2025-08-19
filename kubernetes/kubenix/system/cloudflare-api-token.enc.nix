@@ -1,7 +1,7 @@
-{ k8sLib, ... }:
+{ kubenix, labConfig, ... }:
 
 let
-  namespace = "cert-manager";
+  namespace = labConfig.kubernetes.namespaces.certificate;
 in
 {
   kubernetes = {
@@ -12,7 +12,7 @@ in
           namespace = namespace;
         };
         data = {
-          "cloudflare-api-token" = k8sLib.secretsFor "cloudflare_api_token";
+          "cloudflare-api-token" = kubenix.lib.secretsFor "cloudflare_api_token";
         };
       };
     };

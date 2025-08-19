@@ -1,10 +1,13 @@
-{ k8sLib, ... }:
+{ kubenix, labConfig, ... }:
 
+let
+  namespace = labConfig.kubernetes.namespaces.applications;
+in
 {
   submodules.instances.libebooker = {
     submodule = "release";
     args = {
-      namespace = "apps";
+      namespace = namespace;
       image = {
         repository = "ghcr.io/josevictorferreira/libebooker";
         tag = "latest";
@@ -15,7 +18,7 @@
       values = {
         service.main = {
           type = "LoadBalancer";
-          annotations = k8sLib.serviceIpFor "libebooker";
+          annotations = kubenix.lib.serviceIpFor "libebooker";
           ports = {
             http = {
               enabled = true;

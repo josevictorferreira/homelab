@@ -10,46 +10,49 @@
 
   outputs = { self, nixpkgs, sops-nix, deploy-rs, kubenix, ... }@inputs:
     let
-      flakeRoot = ./.;
-      currentSystem = builtins.currentSystem or "x86_64-linux";
-      pkgs = import nixpkgs { system = currentSystem; };
-      commonsPath = "${flakeRoot}/modules/common";
-      rolesPath = "${flakeRoot}/modules/roles";
-      programsPath = "${flakeRoot}/modules/programs";
-      servicesPath = "${flakeRoot}/modules/services";
-      k8sManifestsPath = "${flakeRoot}/kubernetes/manifests";
-      secretsPath = "${flakeRoot}/secrets";
+      systems = [ "x86_64-linux" "aarch64-linux" ];
+
+      forAllSystems = f: nixpkgs.lib.genAttrs systems (system: f system);
+
+      pkgsFor = s: import nixpkgs { system = s; };
+
+      evalLab = system:
+        let lib = (pkgsFor system).lib;
+        in (lib.evalModules { modules = [ ./config ]; }).config;
+
+      labConfig = (evalLab "x86_64-linux").homelab;
+
       extendedLib = nixpkgs.lib.extend (selfLib: superLib: {
         strings = superLib.strings // (import ./lib/strings.nix { lib = superLib; });
-        files = superLib // (import ./lib/files.nix { lib = superLib; pkgs = pkgs; });
+        files = superLib // (import ./lib/files.nix { lib = superLib; pkgs = nixpkgs.pkgs; });
       });
-      clusterConfig = (import ./config/cluster.nix { lib = extendedLib; inherit flakeRoot; });
-      usersConfig = import ./config/users.nix;
-      hosts = clusterConfig.hosts;
-      kubenixLib = import ./kubernetes/kubenix {
+
+      kubenixLib = (import ./kubernetes/kubenix {
         flake = self;
         lib = extendedLib;
-        k8sConfig = (import ./config/k8s.nix { flakeRoot = flakeRoot; lib = extendedLib; clusterConfig = clusterConfig; });
-        inherit pkgs kubenix clusterConfig flakeRoot secretsPath;
-      };
+        pkgs = nixpkgs.pkgs;
+        kubenix = kubenix.extend (selfLib: superLib: {
+          lib = superLib // (import "${labConfig.project.paths.lib}/kubenix.nix" { lib = superLib; });
+        });
+        inherit labConfig;
+      });
 
       mkHost = hostName:
         nixpkgs.lib.nixosSystem {
-          system = hosts.${hostName}.system;
+          system = labConfig.cluster.hosts.${hostName}.system;
           specialArgs = {
             lib = extendedLib;
-            inherit flakeRoot commonsPath rolesPath programsPath servicesPath k8sManifestsPath secretsPath;
-            inherit self inputs hostName usersConfig clusterConfig;
-            hostConfig = hosts.${hostName};
+            hostConfig = labConfig.cluster.hosts.${hostName};
+            inherit self inputs hostName labConfig;
           };
           modules = [
             sops-nix.nixosModules.sops
-            ./hosts/default.nix
+            ./hosts
           ];
         };
     in
     {
-      nixosConfigurations = nixpkgs.lib.mergeAttrs (nixpkgs.lib.mapAttrs (hostName: _system: mkHost hostName) hosts) {
+      nixosConfigurations = nixpkgs.lib.mergeAttrs (nixpkgs.lib.mapAttrs (hostName: _system: mkHost hostName) labConfig.cluster.hosts) {
         "recovery-iso" = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
           modules = [ ./templates/nixos-recovery-iso.nix ];
@@ -59,8 +62,8 @@
       deploy.nodes = nixpkgs.lib.mapAttrs
         (hostName: hostCfg:
           let
-            isRemoteNeeded = hostCfg.system != currentSystem;
-            sshUser = usersConfig.admin.username;
+            isRemoteNeeded = hostCfg.system != "x86_64-linux";
+            sshUser = labConfig.users.admin.username;
           in
           {
             hostname = hostCfg.ipAddress;
@@ -75,32 +78,21 @@
             };
           }
         )
-        hosts;
+        labConfig.cluster.hosts;
 
-      listNodes = builtins.concatStringsSep "\n" (builtins.attrNames hosts);
+      listNodes = builtins.concatStringsSep "\n" (builtins.attrNames labConfig.cluster.hosts);
 
-      listNodeGroups = builtins.concatStringsSep "\n" (builtins.attrNames clusterConfig.nodeGroupHostNames);
+      listNodeGroups = builtins.concatStringsSep "\n" (builtins.attrNames labConfig.cluster.nodeGroupHostNames);
 
-      deployGroups = (builtins.mapAttrs (_: values: (builtins.concatStringsSep " " (builtins.map (v: "--targets='.#${v}'") values))) clusterConfig.nodeGroupHostNames);
+      deployGroups = (builtins.mapAttrs (_: values: (builtins.concatStringsSep " " (builtins.map (v: "--targets='.#${v}'") values))) labConfig.cluster.nodeGroupHostNames);
 
       checks = nixpkgs.lib.mapAttrs
         (sys: deployLib:
           deployLib.deployChecks self.deploy)
         deploy-rs.lib;
 
-      packages.${currentSystem}.gen-manifests =
-        kubenixLib.mkRenderer currentSystem pkgs;
-
-      devShells.${currentSystem}.default = pkgs.mkShell {
-        buildInputs = with pkgs; [
-          git
-          gnumake
-          sops
-          fzf
-          jq
-          kubectl
-          vals
-        ];
-      };
+      packages = forAllSystems (system: {
+        gen-manifests = kubenixLib.mkRenderer system (pkgsFor system);
+      });
     };
 }
