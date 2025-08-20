@@ -10,56 +10,33 @@
 
   outputs = { self, nixpkgs, sops-nix, deploy-rs, kubenix, ... }@inputs:
     let
-      systems = [ "x86_64-linux" "aarch64-linux" "aarch64-darwin" ];
+      currentSystem = builtins.currentSystem or "x86_64-linux";
 
-      forAllSystems = f: nixpkgs.lib.genAttrs systems (system: f system);
-
-      pkgsFor = s: import nixpkgs { system = s; };
-
-      evalLab = system:
-        let lib = (pkgsFor system).lib;
-        in (lib.evalModules { modules = [ ./config ]; }).config;
-
-      homelab = (evalLab "x86_64-linux").homelab;
+      pkgs = import nixpkgs { system = currentSystem; };
 
       extendedLib = nixpkgs.lib.extend (selfLib: superLib: {
-        strings = (superLib.strings or { }) // (import ./lib/strings.nix { lib = superLib; });
-        files = (superLib.files or { }) // (import ./lib/files.nix { lib = superLib; pkgs = null; });
+        strings = superLib.strings // (import ./lib/strings.nix { lib = superLib; });
+        files = superLib // (import ./lib/files.nix { lib = superLib; pkgs = pkgs; });
       });
 
-      kubenixFor = system:
-        let
-          pkgs = pkgsFor system;
-          upstreamLib = import (kubenix + "/lib/default.nix") {
-            lib = extendedLib;
-            inherit pkgs;
-          };
-          myKubeLib = import ./lib/kubenix.nix {
-            lib = extendedLib;
-            homelab = (evalLab system).homelab;
-            inherit pkgs;
-          };
-        in
-        kubenix // { lib = upstreamLib // myKubeLib; };
+      homelab = (import ./config { lib = extendedLib; });
 
-      kubenixBundleFor = system:
-        import ./kubernetes/kubenix {
-          lib = extendedLib;
-          kubenix = kubenixFor system;
-          homelab = (evalLab system).homelab;
-        };
+      kubenixModule = import ./kubernetes/kubenix {
+        lib = extendedLib;
+        inherit pkgs kubenix homelab;
+      };
 
       mkHost = hostName:
         nixpkgs.lib.nixosSystem {
           system = homelab.cluster.hosts.${hostName}.system;
           specialArgs = {
             lib = extendedLib;
-            hostConfig = homelab.cluster.hosts.${hostName};
+            hostConfig = homelab.hosts.${hostName};
             inherit self inputs hostName homelab;
           };
           modules = [
             sops-nix.nixosModules.sops
-            ./hosts
+            ./hosts/default.nix
           ];
         };
     in
@@ -74,7 +51,7 @@
       deploy.nodes = nixpkgs.lib.mapAttrs
         (hostName: hostCfg:
           let
-            isRemoteNeeded = hostCfg.system != "x86_64-linux";
+            isRemoteNeeded = hostCfg.system != currentSystem;
             sshUser = homelab.users.admin.username;
           in
           {
@@ -103,8 +80,7 @@
           deployLib.deployChecks self.deploy)
         deploy-rs.lib;
 
-      packages = forAllSystems (system: {
-        gen-manifests = (kubenixBundleFor system).mkRenderer system (pkgsFor system);
-      });
+      packages.${currentSystem}.gen-manifests =
+        kubenixModule.mkRenderer currentSystem pkgs;
     };
 }
