@@ -43,32 +43,34 @@
         };
       };
 
-      deploy.nodes = nixpkgs.lib.mapAttrs
-        (hostName: hostCfg:
-          let
-            isRemoteNeeded = hostCfg.system != currentSystem;
-            sshUser = homelab.users.admin.username;
-          in
-          {
-            hostname = hostCfg.ipAddress;
-            sshUser = sshUser;
-            fastConnection = true;
-            remoteBuild = isRemoteNeeded;
+      deploy = {
+        nodes = nixpkgs.lib.mapAttrs
+          (hostName: hostCfg:
+            let
+              isRemoteNeeded = hostCfg.system != currentSystem;
+              sshUser = homelab.users.admin.username;
+            in
+            {
+              hostname = hostCfg.ipAddress;
+              sshUser = sshUser;
+              fastConnection = true;
+              remoteBuild = isRemoteNeeded;
 
-            profiles.system = {
-              user = "root";
-              path = deploy-rs.lib.${hostCfg.system}.activate.nixos self.nixosConfigurations.${hostName};
-              autoRollback = true;
-            };
-          }
-        )
-        homelab.nodes.hosts;
+              profiles.system = {
+                user = "root";
+                path = deploy-rs.lib.${hostCfg.system}.activate.nixos self.nixosConfigurations.${hostName};
+                autoRollback = true;
+              };
+            }
+          )
+          homelab.nodes.hosts;
+      };
 
       nodesList = builtins.concatStringsSep "\n" (builtins.attrNames homelab.nodes.hosts);
 
       nodeGroupsList = builtins.concatStringsSep "\n" homelab.nodes.groups;
 
-      deployGroups = (builtins.mapAttrs (_: values: (builtins.concatStringsSep " " (builtins.map (v: "--targets='.#${v}'") values))) homelab.nodes.nodeGroupHostNames);
+      deployGroups = (builtins.mapAttrs (_: values: (builtins.concatStringsSep " " (builtins.map (v: "--targets='.#${v}'") values.names))) homelab.nodes.group);
 
       checks = nixpkgs.lib.mapAttrs
         (sys: deployLib:
