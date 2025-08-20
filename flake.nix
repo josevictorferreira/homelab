@@ -64,9 +64,9 @@
         )
         homelab.nodes.hosts;
 
-      listNodes = builtins.concatStringsSep "\n" (builtins.attrNames homelab.nodes.hosts);
+      nodesList = builtins.concatStringsSep "\n" (builtins.attrNames homelab.nodes.hosts);
 
-      listNodeGroups = builtins.concatStringsSep "\n" (builtins.attrNames homelab.nodes.nodeGroupHostNames);
+      nodeGroupsList = builtins.concatStringsSep "\n" homelab.nodes.groups;
 
       deployGroups = (builtins.mapAttrs (_: values: (builtins.concatStringsSep " " (builtins.map (v: "--targets='.#${v}'") values))) homelab.nodes.nodeGroupHostNames);
 

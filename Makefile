@@ -1,11 +1,11 @@
-.PHONY: check ddeploy deploy gdeploy secrets vmanifests umanifests emanifests gmanifests manifests kubesync wiso help 
+.PHONY: lgroups check ddeploy deploy gdeploy secrets vmanifests umanifests emanifests gmanifests manifests kubesync wusbiso help 
 
 .DEFAULT_GOAL := help
 
 MAKEFLAGS += --no-print-directory
 
-AVAILABLE_NODE_GROUPS = $(shell nix eval --raw .#listNodeGroups --read-only --quiet)
-AVAILABLE_NODES = $(shell nix eval --raw .#listNodes --read-only --quiet)
+AVAILABLE_NODE_GROUPS = $(shell nix eval --raw .#nodeGroupsList --read-only --quiet)
+AVAILABLE_NODES = $(shell nix eval --raw .#nodesList --read-only --quiet)
 CONTROL_PLANE_IP = 10.10.10.200
 CLUSTER_IP = 10.10.10.250
 PORT = 6443
@@ -16,6 +16,9 @@ CLUSTER_NAME = ze-homelab
 MANIFESTS_DIR ?= kubernetes/manifests
 ENC_GLOB := \( -name '*.enc.yaml' -o -name '*.enc.yml' \)
 CHECKSUM_DIR  ?= .checksums
+
+lgroups: ## List available node groups.
+	@printf '%s\n' $(AVAILABLE_NODE_GROUPS)
 
 check: ## Check if the flake is valid.
 	@bash -c "nix flake check --show-trace --all-systems --impure"
@@ -178,7 +181,7 @@ kubesync: ## Write kubeconfig from the cluster to kubectl config.
 	rm -rf "$$tmpdir"; \
 	echo "OK: cluster/user/context written → $(LOCAL_KUBECONFIG)";
 
-wiso: ## Build the recovery ISO, formats the USB drive and writes the ISO to it.
+wusbiso: ## Build the recovery ISO, formats the USB drive and writes the ISO to it.
 	@set -euo pipefail; \
   if [ -d result/iso ]; then \
     echo "Recovery ISO already built. Skipping build."; \
