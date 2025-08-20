@@ -26,7 +26,7 @@
           system = homelab.cluster.hosts.${hostName}.system;
           specialArgs = {
             lib = pkgs.lib;
-            hostConfig = homelab.hosts.${hostName};
+            hostConfig = homelab.cluster.hosts.${hostName};
             inherit self inputs hostName homelab;
           };
           modules = [
