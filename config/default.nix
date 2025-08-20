@@ -12,6 +12,17 @@ in
 {
   name = "ze-homelab";
 
+  domain = "josevictor.me";
+
+  timeZone = "America/Sao_Paulo";
+
+  gateway = "10.10.10.1";
+
+  dnsServers = [
+    "1.1.1.1"
+    "8.8.8.8"
+  ];
+
   paths = rec {
     root = repoRoot;
     commons = "${root}/modules/common";

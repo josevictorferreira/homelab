@@ -142,12 +142,12 @@
                     enabled = cfg.subdomain != "";
                     className = "cilium";
                     hosts = [{
-                      host = "${cfg.subdomain}.${homelab.cluster.domain}";
+                      host = "${cfg.subdomain}.${homelab.domain}";
                       paths = [{ path = "/"; }];
                     }];
                     tls = [{
                       secretName = "wildcard-tls";
-                      hosts = [ "${cfg.subdomain}.${homelab.cluster.domain}" ];
+                      hosts = [ "${cfg.subdomain}.${homelab.domain}" ];
                     }];
                   };
                 }
