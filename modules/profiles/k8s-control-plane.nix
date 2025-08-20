@@ -2,20 +2,15 @@
 
 let
   serviceEnabled = true;
-  clusterConfig = homelab.cluster;
-  kubernetesConfig = homelab.kubernetes;
-  servicesPath = homelab.paths.services;
-  secretsPath = homelab.paths.secrets;
-  k8sManifestsPath = homelab.paths.kubernetes;
   cfg = config.profiles."k8s-control-plane";
   clusterInitFlags = [
     "--cluster-init"
     "--write-kubeconfig-mode 0644"
   ];
-  initNodeHostName = builtins.head clusterConfig.nodeGroupHostNames.k8sControlPlanes;
+  initNodeHostName = builtins.head homelab.nodes.nodeGroupHostNames.k8sControlPlanes;
   serverFlagList = [
     "--https-listen-port=6444"
-    "--tls-san=${kubernetesConfig.vipAddress}"
+    "--tls-san=${homelab.kubernetes.vipAddress}"
     "--node-name=${hostName}"
     "--node-ip=${hostConfig.ipAddress}"
     "--advertise-address=${hostConfig.ipAddress}"
@@ -47,21 +42,21 @@ in
   };
 
   imports = [
-    "${servicesPath}/haproxy.nix"
-    "${servicesPath}/keepalived.nix"
+    "${homelab.paths.services}/haproxy.nix"
+    "${homelab.paths.services}/keepalived.nix"
   ];
 
   config = lib.mkIf cfg.enable
     {
       sops.secrets.sops_age_secret = lib.mkIf cfg.isInit {
-        sopsFile = "${secretsPath}/k8s-secrets.enc.yaml";
+        sopsFile = "${homelab.paths.secrets}/k8s-secrets.enc.yaml";
         path = "/var/lib/rancher/k3s/server/manifests/sops-age-secret.yaml";
         owner = "root";
         mode = "0400";
       };
 
       sops.secrets.flux_system_secret = lib.mkIf cfg.isInit {
-        sopsFile = "${secretsPath}/k8s-secrets.enc.yaml";
+        sopsFile = "${homelab.paths.secrets}/k8s-secrets.enc.yaml";
         path = "/var/lib/rancher/k3s/server/manifests/flux-system-secret.yaml";
         owner = "root";
         mode = "0400";
@@ -73,24 +68,24 @@ in
         tokenFile = config.sops.secrets.k3s_token.path;
         extraFlags = lib.concatStringsSep " " serverFlagList;
       } // lib.optionalAttrs (!cfg.isInit) {
-        serverAddr = "https://${kubernetesConfig.vipAddress}:6443";
+        serverAddr = "https://${homelab.kubernetes.vipAddress}:6443";
       } // lib.optionalAttrs cfg.isInit {
         manifests =
           {
             cilium = {
               enable = true;
               target = "cilium.yaml";
-              source = "${k8sManifestsPath}/system/cilium.yaml";
+              source = "${homelab.paths.manifests}/system/cilium.yaml";
             };
             flux-components = {
               enable = true;
               target = "gotk-components.yaml";
-              source = "${k8sManifestsPath}/flux-system/gotk-components.yaml";
+              source = "${homelab.paths.manifests}/flux-system/gotk-components.yaml";
             };
             flux-sync = {
               enable = true;
               target = "gotk-sync.yaml";
-              source = "${k8sManifestsPath}/flux-system/gotk-sync.yaml";
+              source = "${homelab.paths.manifests}/flux-system/gotk-sync.yaml";
             };
           };
       };

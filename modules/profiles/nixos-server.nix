@@ -2,8 +2,6 @@
 
 let
   cfg = config.profiles."nixos-server";
-  clusterConfig = homelab.cluster;
-  commonsPath = homelab.paths.commons;
 in
 
 {
@@ -12,9 +10,9 @@ in
   };
 
   imports = [
-    "${commonsPath}/nix.nix"
-    "${commonsPath}/locale.nix"
-    "${commonsPath}/static-ip.nix"
+    "${homelab.paths.commons}/nix.nix"
+    "${homelab.paths.commons}/locale.nix"
+    "${homelab.paths.commons}/static-ip.nix"
   ];
 
   config = lib.mkIf cfg.enable {
@@ -33,8 +31,8 @@ in
 
     networking.staticIP = {
       enable = true;
-      interface = clusterConfig.hosts.${hostName}.interface;
-      address = clusterConfig.hosts.${hostName}.ipAddress;
+      interface = homelab.nodes.hosts.${hostName}.interface;
+      address = homelab.nodes.hosts.${hostName}.ipAddress;
       prefixLength = 24;
       gateway = homelab.gateway;
       nameservers = [ homelab.kubernetes.loadBalancer.services.pihole ] ++ homelab.dnsServers;
