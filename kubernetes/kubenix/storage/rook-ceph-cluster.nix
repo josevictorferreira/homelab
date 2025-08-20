@@ -11,7 +11,7 @@ let
         (device: {
           name = device;
         })
-        attrs.storageDevices;
+        attrs.disks;
     })
     storageNodes;
 in

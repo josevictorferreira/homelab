@@ -23,7 +23,7 @@ rec {
       machine = "intel-nuc-gk3v";
       interface = "enp1s0";
       mac = "68:1D:EF:30:C1:03";
-      storageDevices = [
+      disks = [
         "/dev/disk/by-partlabel/CEPH_OSD_NVME"
         "/dev/disk/by-partlabel/CEPH_OSD_SATA"
       ];
@@ -41,7 +41,7 @@ rec {
       machine = "intel-nuc-t9plus";
       interface = "enp1s0";
       mac = "68:1D:EF:3B:71:4E";
-      storageDevices = [
+      disks = [
         "/dev/disk/by-partlabel/CEPH_OSD_NVME"
       ];
       roles = [
@@ -58,7 +58,7 @@ rec {
       machine = "intel-nuc-gk3v";
       interface = "enp1s0";
       mac = "68:1D:EF:3E:30:37";
-      storageDevices = [
+      disks = [
         "/dev/disk/by-partlabel/CEPH_OSD_NVME"
         "/dev/disk/by-partlabel/CEPH_OSD_SATA"
       ];
@@ -76,7 +76,7 @@ rec {
       machine = "amd-ryzen-beelink-eqr5";
       interface = "enp1s0";
       mac = "B0:41:6F:16:1F:72";
-      storageDevices = [
+      disks = [
         "/dev/disk/by-partlabel/CEPH_OSD_NVME"
       ];
       roles = [
