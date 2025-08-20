@@ -33,7 +33,7 @@ let
 
   nodesConfigType = t.submodule {
     options = {
-      hosts = mkOption { type = t.attrsOf nodeHostsType; description = "Map of all node host configurations."; };
+      hosts = mkOption { type = t.attrsOf nodeHostType; description = "Map of all node host configurations."; };
       groups = mkOption { type = t.listOf t.str; description = "List of all node group names."; default = [ ]; };
       group = mkOption { type = t.attrsOf nodeGroupType; description = "Map of all node group configurations."; };
     };
@@ -51,8 +51,6 @@ let
       };
     };
   };
-
-  usersConfigType = mkOption { type = t.attrsOf userType; description = "Map of all user configurations."; };
 
   loadBalancerType = t.submodule {
     options = {
@@ -94,6 +92,7 @@ let
             profiles = mkOption { type = t.str; description = "Path to configuration profiles."; };
             programs = mkOption { type = t.str; description = "Path to program modules."; };
             services = mkOption { type = t.str; description = "Path to service modules."; };
+            kubernetes = mkOption { type = t.str; description = "Path to Kubernetes folder."; };
             kubenix = mkOption { type = t.str; description = "Path to Kubenix configuration."; };
             manifests = mkOption { type = t.str; description = "Path to Kubernetes manifests."; };
             secrets = mkOption { type = t.str; description = "Path to secrets storage."; };
@@ -103,7 +102,7 @@ let
         description = "Paths used in the homelab configuration.";
         default = { };
       };
-      users = mkOption { type = usersConfigType; description = "Map of all user configurations."; };
+      users = mkOption { type = t.attrsOf userType; description = "Map of all user configurations."; };
       nodes = mkOption { type = nodesConfigType; description = "Configuration for all nodes in the homelab."; };
       kubernetes = mkOption { type = kubernetesConfigType; description = "Kubernetes cluster configuration."; };
     };

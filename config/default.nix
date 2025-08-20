@@ -30,7 +30,8 @@ in
       profiles = "${root}/modules/profiles";
       programs = "${root}/modules/programs";
       services = "${root}/modules/services";
-      kubenix = "${root}/kubenix";
+      kubernetes = "${root}/kubernetes";
+      kubenix = "${kubernetes}/kubenix";
       manifests = "${kubernetes}/manifests";
       secrets = "${root}/secrets";
       config = "${root}/config";
