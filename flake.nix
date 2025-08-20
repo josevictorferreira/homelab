@@ -14,15 +14,10 @@
 
       pkgs = import nixpkgs { system = currentSystem; };
 
-      extendedLib = nixpkgs.lib.extend (selfLib: superLib: {
-        strings = superLib.strings // (import ./lib/strings.nix { lib = superLib; });
-        files = superLib // (import ./lib/files.nix { lib = superLib; pkgs = pkgs; });
-      });
-
-      homelab = (import ./config { lib = extendedLib; });
+      homelab = (import ./config { lib = pkgs.lib; });
 
       kubenixModule = import ./kubernetes/kubenix {
-        lib = extendedLib;
+        lib = pkgs.lib;
         inherit pkgs kubenix homelab;
       };
 
@@ -30,7 +25,7 @@
         nixpkgs.lib.nixosSystem {
           system = homelab.cluster.hosts.${hostName}.system;
           specialArgs = {
-            lib = extendedLib;
+            lib = pkgs.lib;
             hostConfig = homelab.hosts.${hostName};
             inherit self inputs hostName homelab;
           };
