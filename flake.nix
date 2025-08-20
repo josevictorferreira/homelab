@@ -12,22 +12,32 @@
     let
       currentSystem = builtins.currentSystem or "x86_64-linux";
 
+      lib = nixpkgs.lib;
+
       pkgs = import nixpkgs { system = currentSystem; };
 
-      homelab = (import ./config { lib = pkgs.lib; }).config.homelab;
+      homelabEval = lib.evalModules {
+        modules = [
+          ./modules/homelab-options.nix
+          ./config/default.nix
+        ];
+        specialArgs = {
+          inherit lib;
+        };
+      };
+
+      homelab = homelabEval.config.homelab;
 
       kubenixModule = import ./kubernetes/kubenix {
-        lib = pkgs.lib;
-        inherit pkgs kubenix homelab;
+        inherit lib pkgs kubenix homelab;
       };
 
       mkHost = hostName:
-        nixpkgs.lib.nixosSystem {
+        lib.nixosSystem {
           system = homelab.nodes.hosts.${hostName}.system;
           specialArgs = {
-            lib = pkgs.lib;
             hostConfig = homelab.nodes.hosts.${hostName};
-            inherit self inputs hostName homelab;
+            inherit lib self inputs hostName homelab;
           };
           modules = [
             sops-nix.nixosModules.sops
@@ -36,15 +46,15 @@
         };
     in
     {
-      nixosConfigurations = nixpkgs.lib.mergeAttrs (nixpkgs.lib.mapAttrs (hostName: _system: mkHost hostName) homelab.nodes.hosts) {
-        "recovery-iso" = nixpkgs.lib.nixosSystem {
+      nixosConfigurations = lib.mergeAttrs (lib.mapAttrs (hostName: _system: mkHost hostName) homelab.nodes.hosts) {
+        "recovery-iso" = lib.nixosSystem {
           system = "x86_64-linux";
           modules = [ ./hosts/nixos-recovery-iso.nix ];
         };
       };
 
       deploy = {
-        nodes = nixpkgs.lib.mapAttrs
+        nodes = lib.mapAttrs
           (hostName: hostCfg:
             let
               isRemoteNeeded = hostCfg.system != currentSystem;
@@ -72,7 +82,7 @@
 
       deployGroups = (builtins.mapAttrs (_: values: (builtins.concatStringsSep " " (builtins.map (v: "--targets='.#${v}'") values.names))) homelab.nodes.group);
 
-      checks = nixpkgs.lib.mapAttrs
+      checks = lib.mapAttrs
         (sys: deployLib:
           deployLib.deployChecks self.deploy)
         deploy-rs.lib;
