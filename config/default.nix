@@ -10,32 +10,38 @@ let
   kubernetes = (import ./kubernetes.nix { inherit lib; });
 in
 {
-  name = "ze-homelab";
-
-  domain = "josevictor.me";
-
-  timeZone = "America/Sao_Paulo";
-
-  gateway = "10.10.10.1";
-
-  dnsServers = [
-    "1.1.1.1"
-    "8.8.8.8"
+  imports = [
+    ./modules/homelab-options.nix
   ];
 
-  paths = rec {
-    root = repoRoot;
-    commons = "${root}/modules/common";
-    profiles = "${root}/modules/profiles";
-    programs = "${root}/modules/programs";
-    services = "${root}/modules/services";
-    kubernetes = "${root}/kubernetes";
-    kubenix = "${root}/kubenix";
-    manifests = "${kubernetes}/manifests";
-    secrets = "${root}/secrets";
-    config = "${root}/config";
-    lib = "${root}/lib";
-  };
+  config.homelab = {
+    name = "ze-homelab";
 
-  inherit users nodes kubernetes;
+    domain = "josevictor.me";
+
+    timeZone = "America/Sao_Paulo";
+
+    gateway = "10.10.10.1";
+
+    dnsServers = [
+      "1.1.1.1"
+      "8.8.8.8"
+    ];
+
+    paths = rec {
+      root = repoRoot;
+      commons = "${root}/modules/common";
+      profiles = "${root}/modules/profiles";
+      programs = "${root}/modules/programs";
+      services = "${root}/modules/services";
+      kubernetes = "${root}/kubernetes";
+      kubenix = "${root}/kubenix";
+      manifests = "${kubernetes}/manifests";
+      secrets = "${root}/secrets";
+      config = "${root}/config";
+      lib = "${root}/lib";
+    };
+
+    inherit users nodes kubernetes;
+  };
 }
