@@ -36,8 +36,8 @@ in
             kind = "ClusterIssuer";
           };
           dnsNames = [
-            "${homelab.cluster.domain}"
-            "*.${homelab.cluster.domain}"
+            "${homelab.domain}"
+            "*.${homelab.domain}"
           ];
         };
       };

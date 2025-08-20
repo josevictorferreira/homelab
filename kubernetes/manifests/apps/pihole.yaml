@@ -92,7 +92,7 @@ spec:
             - name: FTLCONF_dns_listeningMode
               value: all
             - name: FTLCONF_dns_upstreams
-              value: 1.1.1.1;1.0.0.1
+              value: 1.1.1.1;8.8.8.8
           image: pihole/pihole:2025.07.0@sha256:da0216f6ee64c36dd9cae8576d3ec8c8f7436d6f5fb504a8f58bdda913647db5
           imagePullPolicy: IfNotPresent
           livenessProbe:

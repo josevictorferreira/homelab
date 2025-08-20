@@ -20,14 +20,14 @@ in
   config = lib.mkIf cfg.enable {
     nixDefaults.enable = true;
     locale = {
-      timeZone = clusterConfig.timeZone;
+      timeZone = homelab.timeZone;
       enable = true;
     };
     networking.firewall.enable = false;
 
     networking.hostName = hostName;
-    networking.domain = clusterConfig.domain;
-    networking.fqdn = "${hostName}.${clusterConfig.domain}";
+    networking.domain = homelab.domain;
+    networking.fqdn = "${hostName}.${homelab.domain}";
     networking.hostId = lib.mkDefault
       (builtins.substring 0 8 (builtins.hashString "sha1" hostName));
 
@@ -36,8 +36,8 @@ in
       interface = clusterConfig.hosts.${hostName}.interface;
       address = clusterConfig.hosts.${hostName}.ipAddress;
       prefixLength = 24;
-      gateway = clusterConfig.gateway;
-      nameservers = clusterConfig.dnsServers;
+      gateway = homelab.gateway;
+      nameservers = [ homelab.kubernetes.loadBalancer.services.pihole ] ++ homelab.dnsServers;
     };
 
     services.earlyoom.enable = true;
