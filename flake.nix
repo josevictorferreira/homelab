@@ -14,7 +14,7 @@
 
       pkgs = import nixpkgs { system = currentSystem; };
 
-      homelab = (import ./config { lib = pkgs.lib; });
+      homelab = (import ./config { lib = pkgs.lib; }).config.homelab;
 
       kubenixModule = import ./kubernetes/kubenix {
         lib = pkgs.lib;
