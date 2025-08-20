@@ -1,6 +1,6 @@
 { lib, ... }:
+
 let
-  t = lib.types;
   repoPathVariableName = "HOMELAB_REPO_PATH";
   repoPathEnv = builtins.getEnv repoPathVariableName;
   repoPathFromFile = ./..;
@@ -8,34 +8,23 @@ let
   users = (import ./users.nix { inherit lib; });
   cluster = (import ./cluster.nix { inherit lib; });
   kubernetes = (import ./kubernetes.nix { inherit lib; });
-  homelab = {
-    name = "ze-homelab";
-
-    paths = rec {
-      root = repoRoot;
-      commons = "${root}/modules/common";
-      profiles = "${root}/modules/profiles";
-      programs = "${root}/modules/programs";
-      services = "${root}/modules/services";
-      kubernetes = "${root}/kubernetes";
-      kubenix = "${root}/kubenix";
-      manifests = "${kubernetes}/manifests";
-      secrets = "${root}/secrets";
-      config = "${root}/config";
-      lib = "${root}/lib";
-    };
-    inherit users cluster kubernetes;
-  };
 in
 {
-  options.homelab = lib.mkOption {
-    type = t.attrs;
-    description = "Unified homelab homelab configurations (cluster + k8s + users).";
+  name = "ze-homelab";
+
+  paths = rec {
+    root = repoRoot;
+    commons = "${root}/modules/common";
+    profiles = "${root}/modules/profiles";
+    programs = "${root}/modules/programs";
+    services = "${root}/modules/services";
+    kubernetes = "${root}/kubernetes";
+    kubenix = "${root}/kubenix";
+    manifests = "${kubernetes}/manifests";
+    secrets = "${root}/secrets";
+    config = "${root}/config";
+    lib = "${root}/lib";
   };
 
-  config =
-    {
-      homelab = homelab;
-      _module.args.homelab = homelab;
-    };
+  inherit users cluster kubernetes;
 }
