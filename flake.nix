@@ -39,7 +39,7 @@
       nixosConfigurations = nixpkgs.lib.mergeAttrs (nixpkgs.lib.mapAttrs (hostName: _system: mkHost hostName) homelab.cluster.hosts) {
         "recovery-iso" = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
-          modules = [ ./templates/nixos-recovery-iso.nix ];
+          modules = [ ./hosts/nixos-recovery-iso.nix ];
         };
       };
 
