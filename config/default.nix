@@ -6,7 +6,7 @@ let
   repoPathFromFile = ./..;
   repoRoot = if repoPathEnv != "" then repoPathEnv else repoPathFromFile;
   users = (import ./users.nix { inherit lib; });
-  cluster = (import ./cluster.nix { inherit lib; });
+  nodes = (import ./nodes.nix { inherit lib; });
   kubernetes = (import ./kubernetes.nix { inherit lib; });
 in
 {
@@ -37,5 +37,5 @@ in
     lib = "${root}/lib";
   };
 
-  inherit users cluster kubernetes;
+  inherit users nodes kubernetes;
 }

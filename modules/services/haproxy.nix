@@ -1,15 +1,14 @@
 { lib, homelab, ... }:
 
 let
-  clusterConfig = homelab.cluster;
   controlPlanes = builtins.map
     (name:
       let
-        host = clusterConfig.hosts.${name};
+        host = homelab.nodes.hosts.${name};
       in
       "${name} ${host.ipAddress}:6444"
     )
-    clusterConfig.nodeGroupHostNames.k8sControlPlanes;
+    homelab.nodes.nodeGroupHostNames.k8sControlPlanes;
 in
 {
   services.haproxy = {

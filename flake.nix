@@ -23,10 +23,10 @@
 
       mkHost = hostName:
         nixpkgs.lib.nixosSystem {
-          system = homelab.cluster.hosts.${hostName}.system;
+          system = homelab.nodes.hosts.${hostName}.system;
           specialArgs = {
             lib = pkgs.lib;
-            hostConfig = homelab.cluster.hosts.${hostName};
+            hostConfig = homelab.nodes.hosts.${hostName};
             inherit self inputs hostName homelab;
           };
           modules = [
@@ -36,7 +36,7 @@
         };
     in
     {
-      nixosConfigurations = nixpkgs.lib.mergeAttrs (nixpkgs.lib.mapAttrs (hostName: _system: mkHost hostName) homelab.cluster.hosts) {
+      nixosConfigurations = nixpkgs.lib.mergeAttrs (nixpkgs.lib.mapAttrs (hostName: _system: mkHost hostName) homelab.nodes.hosts) {
         "recovery-iso" = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
           modules = [ ./hosts/nixos-recovery-iso.nix ];
@@ -62,13 +62,13 @@
             };
           }
         )
-        homelab.cluster.hosts;
+        homelab.nodes.hosts;
 
-      listNodes = builtins.concatStringsSep "\n" (builtins.attrNames homelab.cluster.hosts);
+      listNodes = builtins.concatStringsSep "\n" (builtins.attrNames homelab.nodes.hosts);
 
-      listNodeGroups = builtins.concatStringsSep "\n" (builtins.attrNames homelab.cluster.nodeGroupHostNames);
+      listNodeGroups = builtins.concatStringsSep "\n" (builtins.attrNames homelab.nodes.nodeGroupHostNames);
 
-      deployGroups = (builtins.mapAttrs (_: values: (builtins.concatStringsSep " " (builtins.map (v: "--targets='.#${v}'") values))) homelab.cluster.nodeGroupHostNames);
+      deployGroups = (builtins.mapAttrs (_: values: (builtins.concatStringsSep " " (builtins.map (v: "--targets='.#${v}'") values))) homelab.nodes.nodeGroupHostNames);
 
       checks = nixpkgs.lib.mapAttrs
         (sys: deployLib:
