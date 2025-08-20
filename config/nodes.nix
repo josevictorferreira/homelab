@@ -1,7 +1,7 @@
 { lib, ... }:
 
 let
-  filterHostsWithRoles = hosts: role: (lib.attrsets.filterAttrs (name: value: builtins.elem role value.roles) hosts);
+  filterByRoles = hosts: role: (lib.attrsets.filterAttrs (name: value: builtins.elem role value.roles) hosts);
 in
 rec {
   hosts = {
@@ -89,21 +89,22 @@ rec {
     };
   };
 
-  nodeGroup = {
-    k8sControlPlanes = filterHostsWithRoles hosts "k8s-control-plane";
-    k8sWorkers = filterHostsWithRoles hosts "k8s-worker";
-    k8sServers = filterHostsWithRoles hosts "k8s-server";
-    k8sStorages = filterHostsWithRoles hosts "k8s-storage";
-    backupServers = filterHostsWithRoles hosts "backup-server";
-    nixosServers = filterHostsWithRoles hosts "nixos-server";
-  };
+  groups = [
+    "k8s-control-plane"
+    "k8s-worker"
+    "k8s-server"
+    "k8s-storage"
+    "backup-server"
+    "nixos-server"
+  ];
 
-  nodeGroupHostNames = {
-    k8sControlPlanes = builtins.attrNames nodeGroup.k8sControlPlanes;
-    k8sWorkers = builtins.attrNames nodeGroup.k8sWorkers;
-    k8sServers = builtins.attrNames nodeGroup.k8sServers;
-    k8sStorages = builtins.attrNames nodeGroup.k8sStorages;
-    backupServers = builtins.attrNames nodeGroup.backupServers;
-    nixosServers = builtins.attrNames nodeGroup.nixosServers;
-  };
+  group = lib.listToAttrs (map
+    (role: {
+      name = role;
+      value = rec {
+        configs = filterByRoles hosts role;
+        names = lib.attrNames configs;
+      };
+    })
+    groups);
 }

@@ -1,7 +1,7 @@
 { lib, hostName, hostConfig, homelab, ... }:
 
 let
-  isMaster = hostName == builtins.head (homelab.nodes.nodeGroupHostNames.k8sControlPlanes);
+  isMaster = hostName == builtins.head (homelab.nodes.group."k8s-control-plane".names);
 in
 {
   services.keepalived = {
