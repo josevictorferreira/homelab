@@ -1,4 +1,4 @@
-{ lib, kubenix, homelab, ... }:
+{ lib, pkgs, kubenix, homelab, ... }:
 
 let
   isModuleFile = name:
@@ -39,6 +39,16 @@ let
     let ds = discover ./. "";
     in lib.filter (m: !(hasIgnoredSegment m.rel)) ds;
 
+  upstreamLib = import (kubenix + "/lib/default.nix") {
+    inherit lib pkgs;
+  };
+
+  myKubenixLib = import ./_lib.nix { inherit homelab; };
+
+  kubenixModule = kubenix // {
+    lib = upstreamLib // myKubenixLib;
+  };
+
   evalModule = system: filePath:
     (kubenix.evalModules.${system} {
       modules = [
@@ -46,7 +56,8 @@ let
         filePath
       ];
       specialArgs = {
-        inherit homelab kubenix;
+        kubenix = kubenixModule;
+        inherit homelab;
       };
     }).config.kubernetes.resultYAML;
 
