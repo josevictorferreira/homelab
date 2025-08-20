@@ -8,7 +8,7 @@ let
       in
       "${name} ${host.ipAddress}:6444"
     )
-    homelab.nodes.nodeGroupHostNames.k8sControlPlanes;
+    homelab.nodes.group."k8s-control-plane".names;
 in
 {
   services.haproxy = {

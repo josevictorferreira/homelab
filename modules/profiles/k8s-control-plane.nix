@@ -7,7 +7,7 @@ let
     "--cluster-init"
     "--write-kubeconfig-mode 0644"
   ];
-  initNodeHostName = builtins.head homelab.nodes.nodeGroupHostNames.k8sControlPlanes;
+  initNodeHostName = builtins.head homelab.nodes.group."k8s-control-plane".names;
   serverFlagList = [
     "--https-listen-port=6444"
     "--tls-san=${homelab.kubernetes.vipAddress}"
