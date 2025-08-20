@@ -2,7 +2,7 @@
 
 let
   namespace = homelab.kubernetes.namespaces.storage;
-  domain = homelab.cluster.domain;
+  domain = homelab.domain;
   storageNodes = homelab.cluster.nodeGroup.k8sStorages;
   storageNodesList = lib.mapAttrsToList
     (name: attrs: {

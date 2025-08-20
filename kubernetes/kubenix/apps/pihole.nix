@@ -1,7 +1,7 @@
 { lib, kubenix, homelab, ... }:
 
 let
-  domain = homelab.cluster.domain;
+  domain = homelab.domain;
   dnsHosts = lib.mapAttrsToList (serviceName: ipAddress: "${homelab.kubernetes.loadBalancer.address} ${serviceName}.${domain}") homelab.kubernetes.loadBalancer.services;
 in
 {
@@ -25,12 +25,12 @@ in
         };
         virtualHost = "pihole.${domain}";
         replicaCount = 3;
-        DNS1 = "1.1.1.1";
-        DNS2 = "1.0.0.1";
+        DNS1 = builtins.elemAt homelab.dnsServers 0;
+        DNS2 = builtins.elemAt homelab.dnsServers 1;
         podDnsConfig = {
           enabled = true;
           policy = "None";
-          nameservers = [ "127.0.0.1" ] ++ homelab.cluster.dnsServers;
+          nameservers = [ "127.0.0.1" ] ++ homelab.dnsServers;
         };
         privileged = true;
         extraEnvVars = {

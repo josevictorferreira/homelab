@@ -4,17 +4,6 @@ let
   filterHostsWithRoles = hosts: role: (lib.attrsets.filterAttrs (name: value: builtins.elem role value.roles) hosts);
 in
 rec {
-  domain = "josevictor.me";
-
-  timeZone = "America/Sao_Paulo";
-
-  gateway = "10.10.10.1";
-
-  dnsServers = [
-    "1.1.1.1"
-    "8.8.8.8"
-  ];
-
   hosts = {
     lab-pi-bk = {
       ipAddress = "10.10.10.209";

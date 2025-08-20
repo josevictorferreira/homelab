@@ -24,12 +24,12 @@ rec {
       "cert-manager.io/cluster-issuer" = "cloudflare-issuer";
     };
     hosts = [
-      "${serviceName}.${homelab.cluster.domain}"
+      "${serviceName}.${homelab.domain}"
     ];
     tls = [
       {
         hosts = [
-          "${serviceName}.${homelab.cluster.domain}"
+          "${serviceName}.${homelab.domain}"
         ];
         secretName = "wildcard-tls";
       }
