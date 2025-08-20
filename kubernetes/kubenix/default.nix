@@ -39,18 +39,14 @@ let
     let ds = discover ./. "";
     in lib.filter (m: !(hasIgnoredSegment m.rel)) ds;
 
-  upstreamLib = import (kubenix + "/lib/default.nix") {
-    inherit lib pkgs;
-  };
-
-  myKubenixLib = import ./_lib.nix { inherit homelab; };
-
   kubenixModule = kubenix // {
-    lib = upstreamLib // myKubenixLib;
+    lib = (import (kubenix + "/lib/default.nix") {
+      inherit lib pkgs;
+    }) // (import ./_lib.nix { inherit homelab; });
   };
 
   evalModule = system: filePath:
-    (kubenix.evalModules.${system} {
+    (kubenixModule.evalModules.${system} {
       modules = [
         ./_base.nix
         filePath
