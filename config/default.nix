@@ -10,10 +10,6 @@ let
   kubernetes = (import ./kubernetes.nix { inherit lib; });
 in
 {
-  imports = [
-    ./modules/homelab-options.nix
-  ];
-
   config.homelab = {
     name = "ze-homelab";
 
@@ -34,12 +30,10 @@ in
       profiles = "${root}/modules/profiles";
       programs = "${root}/modules/programs";
       services = "${root}/modules/services";
-      kubernetes = "${root}/kubernetes";
       kubenix = "${root}/kubenix";
       manifests = "${kubernetes}/manifests";
       secrets = "${root}/secrets";
       config = "${root}/config";
-      lib = "${root}/lib";
     };
 
     inherit users nodes kubernetes;
