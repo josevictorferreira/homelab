@@ -47,6 +47,7 @@ in
         persistence = {
           config = {
             enabled = true;
+            mountPath = "/config";
             size = "1Gi";
             storageClass = "rook-ceph-block";
             targetSelector = {
@@ -56,8 +57,9 @@ in
               };
             };
           };
-          customDefinitions = {
+          "custom-definitions" = {
             enabled = true;
+            mountPath = "/config/Definitions/Custom";
             size = "1Gi";
             storageClass = "rook-ceph-block";
             targetSelector = {
@@ -67,9 +69,10 @@ in
               };
             };
           };
-          secretCustomIndexer = {
+          "secret-custom-indexer" = {
             enabled = true;
             type = "secret";
+            mountPath = "/config/Definitions/Custom/custom-indexer.yml";
             objectName = "prowlarr-custom-definitions";
             expandObjectName = false;
             option = false;
@@ -80,21 +83,24 @@ in
           };
         };
 
-        ingress.main = { primary = true; } // (kubenix.lib.ingressDomainFor "prowlarr");
-
-        metrics = {
+        ingress.main = {
           enabled = true;
-          type = "servicemonitor";
-          endpoints = [
+          primary = true;
+          ingressClassName = "cilium";
+          annotations = {
+            "cert-manager.io/cluster-issuer" = "cloudflare-issuer";
+          };
+          hosts = [
+            { host = "prowlarr.${homelab.domain}"; }
+          ];
+          tls = [
             {
-              port = "metrics";
-              path = "/metrics";
+              hosts = [
+                "prowlarr.${homelab.domain}"
+              ];
+              secretName = "wildcard-tls";
             }
           ];
-          targetSelector = "main";
-          prometheusRule = {
-            enabled = false;
-          };
         };
 
         workload.main.podSpec = {
