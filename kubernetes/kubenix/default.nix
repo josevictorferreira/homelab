@@ -42,7 +42,7 @@ let
   kubenixModule = kubenix // {
     lib = (import (kubenix + "/lib/default.nix") {
       inherit lib pkgs;
-    }) // (import ./_lib.nix { inherit homelab; });
+    }) // (import ./_lib { inherit pkgs homelab; });
   };
 
   evalModule = system: filePath:
