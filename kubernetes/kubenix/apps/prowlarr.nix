@@ -57,29 +57,23 @@ in
               };
             };
           };
-          "custom-definitions" = {
-            enabled = true;
-            mountPath = "/config/Definitions/Custom";
-            size = "1Gi";
-            storageClass = "rook-ceph-block";
-            targetSelector = {
-              main = {
-                main = { mountPath = "/config/Definitions/Custom"; };
-                exportarr = { mountPath = "/config/Definitions/Custom"; readOnly = true; };
-              };
-            };
-          };
           "prowlarr-custom-definitions" = {
             enabled = true;
             type = "secret";
             mountPath = "/config/Definitions/Custom";
             objectName = "prowlarr-custom-definitions";
             expandObjectName = false;
-            option = false;
+            optional = false;
             defaultMode = "0777";
             items = [
               { key = "custom-indexer"; path = "custom-indexer.yml"; }
             ];
+            targetSelector = {
+              main = {
+                main = { mountPath = "/config/Definitions/Custom"; };
+                exportarr = { mountPath = "/config/Definitions/Custom"; readOnly = true; };
+              };
+            };
           };
         };
 
