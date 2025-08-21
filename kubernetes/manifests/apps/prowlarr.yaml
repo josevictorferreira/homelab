@@ -32,7 +32,7 @@ spec:
         checksum/configmaps: e3a9697d882b62fa6f79bd3364b55f7a4b7b4f6cc374b6916075e5d59fef20c4
         checksum/mariadb: 09c85576cb45b1eecd1467732b11ea8fa3363b0105c465f02a6ad64991521d52
         checksum/mongodb: 09c85576cb45b1eecd1467732b11ea8fa3363b0105c465f02a6ad64991521d52
-        checksum/persistence: 030742c8ca444d4701aec13b13d68325f15ea51a9ac888dade6b8e62eb6f8f9f
+        checksum/persistence: 3c1d6c37efe1431c14b717081862fd3781adad0d4d3fd796b38d2ff3dc2b9a72
         checksum/redis: 013343a028cbb3f7e08f4ba7522702dd98e52632c688641074b0b1db3df29894
         checksum/secrets: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
         checksum/services: 209fbe54ab4cb7d132d8619768fad07a6901826a29bbf6ddcb7cd4a85b470aed
@@ -255,9 +255,6 @@ spec:
             - mountPath: /dev/shm
               name: devshm
               readOnly: false
-            - mountPath: /config/Definitions/Custom/custom-indexer.yml
-              name: secret-custom-indexer
-              readOnly: false
             - mountPath: /shared
               name: shared
               readOnly: false
@@ -328,12 +325,12 @@ spec:
         - name: custom-definitions
           persistentVolumeClaim:
             claimName: prowlarr-custom-definitions
-        - name: secret-custom-indexer
+        - name: prowlarr-custom-definitions
           secret:
             defaultMode: 511
             items:
               - key: custom-indexer
-                path: /config/Definitions/Custom/custom-indexer.yml
+                path: custom-indexer.yml
             optional: false
             secretName: prowlarr-custom-definitions
 ---
