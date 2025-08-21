@@ -21889,14 +21889,6 @@ spec:
       subresources:
         status: {}
 ---
-apiVersion: v1
-kind: Namespace
-metadata:
-  annotations:
-    kubenix/k8s-version: '1.32'
-    kubenix/project-name: ze-homelab
-  name: cert-manager
----
 apiVersion: admissionregistration.k8s.io/v1
 kind: MutatingWebhookConfiguration
 metadata:
@@ -22221,6 +22213,78 @@ spec:
         seccompProfile:
           type: RuntimeDefault
       serviceAccountName: cert-manager-webhook
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  annotations:
+    cert-manager.io/issue-temporary-certificate: 'true'
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: wildcard-certificate
+  namespace: apps
+spec:
+  dnsNames:
+    - josevictor.me
+    - '*.josevictor.me'
+  issuerRef:
+    kind: ClusterIssuer
+    name: cloudflare-issuer
+  secretName: wildcard-tls
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  annotations:
+    cert-manager.io/issue-temporary-certificate: 'true'
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: wildcard-certificate
+  namespace: cert-manager
+spec:
+  dnsNames:
+    - josevictor.me
+    - '*.josevictor.me'
+  issuerRef:
+    kind: ClusterIssuer
+    name: cloudflare-issuer
+  secretName: wildcard-tls
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  annotations:
+    cert-manager.io/issue-temporary-certificate: 'true'
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: wildcard-certificate
+  namespace: monitoring
+spec:
+  dnsNames:
+    - josevictor.me
+    - '*.josevictor.me'
+  issuerRef:
+    kind: ClusterIssuer
+    name: cloudflare-issuer
+  secretName: wildcard-tls
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  annotations:
+    cert-manager.io/issue-temporary-certificate: 'true'
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: wildcard-certificate
+  namespace: rook-ceph
+spec:
+  dnsNames:
+    - josevictor.me
+    - '*.josevictor.me'
+  issuerRef:
+    kind: ClusterIssuer
+    name: cloudflare-issuer
+  secretName: wildcard-tls
 ---
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
