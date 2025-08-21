@@ -29,6 +29,7 @@ let
     "--etcd-arg=auto-compaction-retention=30m"
     "--etcd-arg=snapshot-count=10000"
   ] ++ (if cfg.isInit then clusterInitFlags else [ ]);
+  bootstrapManifestFiles = builtins.attrNames (builtins.readDir "${homelab.paths.manifests}/bootstrap");
 in
 {
   options.profiles."k8s-control-plane" = {
@@ -71,6 +72,19 @@ in
         serverAddr = "https://${homelab.kubernetes.vipAddress}:6443";
       } // lib.optionalAttrs cfg.isInit {
         manifests =
+          builtins.listToAttrs
+            (
+              map
+                (fileName: {
+                  name = fileName;
+                  value = {
+                    enable = true;
+                    target = fileName;
+                    source = "${homelab.paths.manifests}/bootstrap/${fileName}";
+                  };
+                })
+                bootstrapManifestFiles
+            ) //
           {
             cilium = {
               enable = true;
