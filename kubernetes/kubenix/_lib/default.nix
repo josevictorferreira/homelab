@@ -1,11 +1,9 @@
-{ pkgs, homelab, ... }:
+{ homelab, ... }:
 
 let
   k8sSecretsFile = "${homelab.paths.secrets}/k8s-secrets.enc.yaml";
 in
 rec {
-  helmOciFetch = pkgs.callPackage ./helm-oci-fetch.nix { };
-
   secretsFor = secretName: "ref+sops://${k8sSecretsFile}#${secretName}";
 
   serviceIpFor = serviceName: {
