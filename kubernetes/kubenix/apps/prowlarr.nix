@@ -69,16 +69,16 @@ in
               };
             };
           };
-          "secret-custom-indexer" = {
+          "prowlarr-custom-definitions" = {
             enabled = true;
             type = "secret";
-            mountPath = "/config/Definitions/Custom/custom-indexer.yml";
+            mountPath = "/config/Definitions/Custom";
             objectName = "prowlarr-custom-definitions";
             expandObjectName = false;
             option = false;
             defaultMode = "0777";
             items = [
-              { key = "custom-indexer"; path = "/config/Definitions/Custom/custom-indexer.yml"; }
+              { key = "custom-indexer"; path = "custom-indexer.yml"; }
             ];
           };
         };
