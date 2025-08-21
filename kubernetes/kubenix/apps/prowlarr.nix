@@ -5,7 +5,7 @@ let
 in
 {
   kubernetes = {
-    helm.releases."pihole" = {
+    helm.releases."prowlarr" = {
       chart = kubenix.lib.helm.fetch
         {
           repo = "oci://tccr.io/truecharts/prowlarr";
