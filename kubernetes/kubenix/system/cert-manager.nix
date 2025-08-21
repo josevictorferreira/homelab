@@ -2,10 +2,35 @@
 
 let
   namespace = homelab.kubernetes.namespaces.certificate;
+  namespacesList = builtins.attrValues homelab.kubernetes.namespaces;
+  certificatesResources = builtins.map
+    (namespace: {
+      name = "${namespace}-wildcard-certificate";
+      value = {
+        metadata = {
+          name = "wildcard-certificate";
+          namespace = namespace;
+          annotations = {
+            "cert-manager.io/issue-temporary-certificate" = "true";
+          };
+        };
+        spec = {
+          secretName = "wildcard-tls";
+          issuerRef = {
+            name = "cloudflare-issuer";
+            kind = "ClusterIssuer";
+          };
+          dnsNames = [
+            "${homelab.domain}"
+            "*.${homelab.domain}"
+          ];
+        };
+      };
+    })
+    namespacesList;
 in
 {
   kubernetes = {
-
     helm.releases."cert-manager" = {
       chart = kubenix.lib.helm.fetch
         {
@@ -25,12 +50,6 @@ in
     };
 
     resources = {
-      namespaces.${namespace} = {
-        metadata = {
-          name = namespace;
-        };
-      };
-
       clusterissuer."cloudflare-issuer" = {
         metadata = {
           name = "cloudflare-issuer";
@@ -57,6 +76,8 @@ in
           };
         };
       };
+
+      certificate = builtins.listToAttrs certificatesResources;
     };
   };
 }
