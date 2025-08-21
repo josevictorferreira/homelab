@@ -3,7 +3,7 @@
     kubenix.modules.helm
     kubenix.modules.k8s
     kubenix.modules.submodules
-    ./_types.nix
+    ./_crds.nix
     ./_submodules/release.nix
   ];
 
