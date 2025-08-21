@@ -17262,14 +17262,6 @@ spec:
       subresources:
         status: {}
 ---
-apiVersion: v1
-kind: Namespace
-metadata:
-  annotations:
-    kubenix/k8s-version: '1.32'
-    kubenix/project-name: ze-homelab
-  name: rook-ceph
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:

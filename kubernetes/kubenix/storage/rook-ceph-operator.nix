@@ -63,13 +63,5 @@ in
         ];
       };
     };
-
-    resources = {
-      namespaces.${namespace} = {
-        metadata = {
-          name = namespace;
-        };
-      };
-    };
   };
 }
