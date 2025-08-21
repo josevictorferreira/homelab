@@ -8,12 +8,12 @@ in
     helm.releases."prowlarr" = {
       chart = kubenix.lib.helm.fetch
         {
-          repo = "oci://tccr.io/truecharts/prowlarr";
+          chartUrl = "oci://tccr.io/truecharts/prowlarr";
           chart = "prowlarr";
           version = "20.4.2";
-          sha256 = "sha256-nhvifpDdM8MoxF43cJAi6o+il2BbHX+udVAvvm1PukM=";
+          sha256 = "sha256-YzN+udEKXR4P73M3sQ6RkRlLhNUunD/jv8C9Ve+Qsoo=";
         };
-      includeCRDs = false;
+      includeCRDs = true;
       noHooks = true;
       namespace = k8s.namespaces.applications;
       values = {
@@ -80,7 +80,7 @@ in
           };
         };
 
-        ingress = kubenix.lib.ingressDomainFor "prowlarr";
+        ingress.main = { primary = true; } // (kubenix.lib.ingressDomainFor "prowlarr");
 
         metrics = {
           enabled = true;
@@ -97,41 +97,37 @@ in
           };
         };
 
-        workload = {
-          main = {
-            podSpec = {
-              containers = {
-                main = {
-                  probes = {
-                    liveness = { path = "/ping"; };
-                    readiness = { path = "/ping"; };
-                    startup = { type = "tcp"; };
-                  };
-                  env = {
-                    PROWLARR__SERVER__PORT = "9696";
-                    PROWLARR__AUTH__REQUIRED = "DisabledForLocalAddresses";
-                    PROWLARR__APP__THEME = "dark";
-                    PROWLARR__APP__INSTANCENAME = "Prowlarr";
-                    PROWLARR__LOG__LEVEL = "info";
-                    PROWLARR__UPDATE__BRANCH = "develop";
-                  };
-                };
-                exportarr = {
-                  enabled = true;
-                  imageSelector = "exportarrImage";
-                  args = [ "prowlarr" ];
-                  probes = {
-                    liveness = { enabled = true; type = "http"; path = "/healthz"; port = 9697; };
-                    readiness = { enabled = true; type = "http"; path = "/healthz"; port = 9697; };
-                    startup = { enabled = true; type = "http"; path = "/healthz"; port = 9697; };
-                  };
-                  env = {
-                    INTERFACE = "0.0.0.0";
-                    PORT = "9697";
-                    URL = "http://localhost:9696";
-                    CONFIG = "/config/config.xml";
-                  };
-                };
+        workload.main.podSpec = {
+          containers = {
+            main = {
+              probes = {
+                liveness = { path = "/ping"; };
+                readiness = { path = "/ping"; };
+                startup = { type = "tcp"; };
+              };
+              env = {
+                PROWLARR__SERVER__PORT = "9696";
+                PROWLARR__AUTH__REQUIRED = "DisabledForLocalAddresses";
+                PROWLARR__APP__THEME = "dark";
+                PROWLARR__APP__INSTANCENAME = "Prowlarr";
+                PROWLARR__LOG__LEVEL = "info";
+                PROWLARR__UPDATE__BRANCH = "develop";
+              };
+            };
+            exportarr = {
+              enabled = true;
+              imageSelector = "exportarrImage";
+              args = [ "prowlarr" ];
+              probes = {
+                liveness = { enabled = true; type = "http"; path = "/healthz"; port = 9697; };
+                readiness = { enabled = true; type = "http"; path = "/healthz"; port = 9697; };
+                startup = { enabled = true; type = "http"; path = "/healthz"; port = 9697; };
+              };
+              env = {
+                INTERFACE = "0.0.0.0";
+                PORT = "9697";
+                URL = "http://localhost:9696";
+                CONFIG = "/config/config.xml";
               };
             };
           };
