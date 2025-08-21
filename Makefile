@@ -15,6 +15,7 @@ LOCAL_KUBECONFIG = $(HOME)/.kube/config
 CLUSTER_NAME = ze-homelab
 MANIFESTS_DIR ?= kubernetes/manifests
 ENC_GLOB := \( -name '*.enc.yaml' -o -name '*.enc.yml' \)
+LOCK_FILE ?= manifests.lock
 CHECKSUM_DIR  ?= .checksums
 
 lgroups: ## List available node groups.
@@ -77,18 +78,17 @@ secrets: ## Edit the secrets files.
 	echo "Opening with sops: $$SEL"; \
 	sops "$$SEL"
 
-umanifests: ## Restore unchanged *.enc.yaml files to the encrypted version in git.
+umanifests: ## Restore unchanged *.enc.yaml files to the encrypted version in git, tracking checksums in a single lock file.
 	@set -euo pipefail; \
-	mkdir -p "$(CHECKSUM_DIR)"; \
+	LOCK_FILE="$(LOCK_FILE)"; \
+	touch "$$LOCK_FILE"; \
+	tmp="$${LOCK_FILE}.tmp"; \
+	: > "$$tmp"; \
 	find "$(MANIFESTS_DIR)" -mindepth 2 -type f $(ENC_GLOB) \
 	  -not -path '$(MANIFESTS_DIR)/flux-system/*' -print0 | \
 	while IFS= read -r -d '' f; do \
-	  key_prefix=$$(printf '%s' "$$f" | sed -E 's/\.enc\.ya?ml$$//' | tr '/' '_'); \
-    echo "$$key_prefix"; \
-	  cfile="$(CHECKSUM_DIR)/$$key_prefix.sha256"; \
-    echo "$$cfile"; \
 	  new_sum=$$(sha256sum "$$f" | cut -d' ' -f1); \
-	  old_sum=$$(cat "$$cfile" 2>/dev/null || true); \
+	  old_sum=$$(awk -v p="$$f" 'BEGIN{FS="\t"} $$1==p {print $$2}' "$$LOCK_FILE" || true); \
 	  if [ "$$new_sum" = "$$old_sum" ]; then \
 	    if git ls-files --error-unmatch "$$f" >/dev/null 2>&1; then \
 	      git checkout -- "$$f"; \
@@ -99,8 +99,9 @@ umanifests: ## Restore unchanged *.enc.yaml files to the encrypted version in gi
 	  else \
 	    echo "Changed: $$f"; \
 	  fi; \
-	  printf '%s\n' "$$new_sum" > "$$cfile"; \
-	done
+	  printf '%s\t%s\n' "$$f" "$$new_sum" >> "$$tmp"; \
+	done; \
+	mv "$$tmp" "$$LOCK_FILE"
 
 vmanifests: ## Replace secrets in .enc.yaml manifests using vals.
 	@set -euo pipefail; \
