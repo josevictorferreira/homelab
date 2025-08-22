@@ -130,7 +130,6 @@ in
               { name = "mon-endpoints"; mountPath = "/etc/rook"; }
               { name = "ceph-config"; mountPath = "/etc/ceph"; }
               { name = "ceph-admin-secret"; mountPath = "/var/lib/rook-ceph-mon"; readOnly = true; }
-              { name = "ceph-username"; mountPath = "/var/run/ceph"; readOnly = true; }
               { name = "export"; mountPath = "/etc/ganesha"; readOnly = true; }
             ];
           }];
