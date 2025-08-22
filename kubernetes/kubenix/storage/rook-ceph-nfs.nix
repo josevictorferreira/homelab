@@ -12,7 +12,10 @@ in
 {
   kubernetes.resources = {
     cephnfs.${nfsName} = {
-      namespace = namespace;
+      metadata = {
+        name = nfsName;
+        namespace = namespace;
+      };
       spec = {
         server = {
           active = 1;
@@ -31,12 +34,13 @@ in
 
     services."nfs" = {
       metadata = {
+        name = "nfs";
         annotations = {
           "lbipam.cilium.io/ips" = lbIP;
           "lbipam.cilium.io/sharing-key" = "nfs";
         };
+        namespace = namespace;
       };
-      namespace = namespace;
       spec = {
         type = "LoadBalancer";
         externalTrafficPolicy = "Local";
@@ -51,8 +55,11 @@ in
       };
     };
 
-    configmaps."ceph-nfs-export-${nfsName}" = {
-      namespace = namespace;
+    configMaps."ceph-nfs-export-${nfsName}" = {
+      metadata = {
+        name = "ceph-nfs-export-${nfsName}";
+        namespace = namespace;
+      };
       data."export.json" = builtins.toJSON {
         path = cephfsPath;
         pseudo = pseudo;
@@ -69,7 +76,10 @@ in
     };
 
     jobs."ceph-nfs-export-apply-${nfsName}" = {
-      namespace = namespace;
+      metadata = {
+        name = "ceph-nfs-export-apply-${nfsName}";
+        namespace = namespace;
+      };
       spec = {
         backoffLimit = 3;
         ttlSecondsAfterFinished = 3600;
@@ -105,9 +115,8 @@ in
                 EOF
                 # idempotent: apply (create or update) the export JSON
                 cluster='${nfsName}'
-                ceph -c "$CEPH_CONFIG" nfs export apply "$cluster" -i /etc/ganesha/export.json
-                # print final state
-                jq -r .pseudo /etc/ganesha/export.json | xargs -I{} ceph -c "$CEPH_CONFIG" nfs export info "$cluster" {}
+                pseudo=$(grep -oP '"pseudo"\s*:\s*"\K[^"]+' /etc/ganesha/export.json)
+                ceph -c "$CEPH_CONFIG" nfs export info "$cluster" "$pseudo"
               ''
             ];
             volumeMounts = [

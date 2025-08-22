@@ -1,0 +1,165 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: ceph-nfs-export-apply-homelab-nfs
+  namespace: rook-ceph
+spec:
+  backoffLimit: 3
+  template:
+    spec:
+      containers:
+        - command:
+            - /bin/bash
+            - -lc
+            - 'set -euo pipefail
+
+              CEPH_CONFIG="/etc/ceph/ceph.conf"
+
+              MON_CONFIG="/etc/rook/mon-endpoints"
+
+              KEYRING_FILE="/etc/ceph/keyring"
+
+              # build ceph.conf from rook’s mon endpoints (same approach as toolbox)
+
+              endpoints=$(cat \$\{MON_CONFIG\})
+
+              mon_endpoints=$(echo "$endpoints" | sed ''s/[a-z0-9_-]\+=//g'')
+
+              mkdir -p /etc/ceph
+
+              cat > "$CEPH_CONFIG" <<EOF
+
+              [global]
+
+              mon_host = \$\{mon_endpoints\}
+
+              [client.admin]
+
+              keyring = \$\{KEYRING_FILE\}
+
+              EOF
+
+              ceph_secret=$(cat /var/lib/rook-ceph-mon/secret.keyring)
+
+              username=$(cat /var/run/ceph/ceph-username)
+
+              cat > "$KEYRING_FILE" <<EOF
+
+              [\$\{username\}]
+
+              key = \$\{ceph_secret\}
+
+              EOF
+
+              # idempotent: apply (create or update) the export JSON
+
+              cluster=''homelab-nfs''
+
+              pseudo=$(grep -oP ''"pseudo"\s*:\s*"\K[^"]+'' /etc/ganesha/export.json)
+
+              ceph -c "$CEPH_CONFIG" nfs export info "$cluster" "$pseudo"
+
+              '
+          image: quay.io/ceph/ceph:v19
+          name: apply
+          volumeMounts:
+            - mountPath: /etc/rook
+              name: mon-endpoints
+            - mountPath: /etc/ceph
+              name: ceph-config
+            - mountPath: /var/lib/rook-ceph-mon
+              name: ceph-admin-secret
+              readOnly: true
+            - mountPath: /var/run/ceph
+              name: ceph-username
+              readOnly: true
+            - mountPath: /etc/ganesha
+              name: export
+              readOnly: true
+      restartPolicy: OnFailure
+      serviceAccountName: rook-ceph-default
+      volumes:
+        - configMap:
+            items:
+              - key: data
+                path: mon-endpoints
+            name: rook-ceph-mon-endpoints
+          name: mon-endpoints
+        - emptyDir: {}
+          name: ceph-config
+        - name: ceph-admin-secret
+          secret:
+            items:
+              - key: ceph-secret
+                path: secret.keyring
+            secretName: rook-ceph-mon
+        - name: ceph-username
+          secret:
+            items:
+              - key: ceph-username
+                path: ceph-username
+            secretName: rook-ceph-mon
+        - configMap:
+            name: ceph-nfs-export-homelab-nfs
+          name: export
+  ttlSecondsAfterFinished: 3600
+---
+apiVersion: ceph.rook.io/v1
+kind: CephNFS
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: homelab-nfs
+  namespace: rook-ceph
+spec:
+  server:
+    active: 1
+    placement:
+      tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+          operator: Exists
+    resources:
+      limits:
+        memory: 512Mi
+      requests:
+        cpu: 50m
+        memory: 64Mi
+---
+apiVersion: v1
+data:
+  export.json: '{"access_type":"RW","clients":[{"access_type":"RW","addresses":["10.10.10.0/24"]}],"fsal":{"fs_name":"ceph-filesystem","name":"CEPH"},"path":"/","protocols":[4],"pseudo":"/homelab","security_label":false,"squash":"root_squash","transports":["TCP"]}'
+kind: ConfigMap
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: ceph-nfs-export-homelab-nfs
+  namespace: rook-ceph
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+    lbipam.cilium.io/ips: 10.10.10.150
+    lbipam.cilium.io/sharing-key: nfs
+  name: nfs
+  namespace: rook-ceph
+spec:
+  externalTrafficPolicy: Local
+  ports:
+    - name: nfs
+      port: 2049
+      protocol: TCP
+      targetPort: 2049
+  selector:
+    app: rook-ceph-nfs
+    ceph_daemon_type: nfs
+    ceph_nfs: homelab-nfs-a
+  type: LoadBalancer
