@@ -43,7 +43,9 @@ in
       };
       spec = {
         type = "LoadBalancer";
-        externalTrafficPolicy = "Local";
+        externalTrafficPolicy = "Cluster";
+        ipFamilyPolicy = "SingleStack";
+        ipFamilies = [ "IPv4" ];
         selector = {
           "app" = "rook-ceph-nfs";
           "ceph_daemon_type" = "nfs";
@@ -51,6 +53,7 @@ in
         };
         ports = [
           { name = "nfs"; port = 2049; targetPort = 2049; protocol = "TCP"; }
+          { name = "nfs-udp"; port = 2049; targetPort = 2049; protocol = "UDP"; }
         ];
       };
     };
