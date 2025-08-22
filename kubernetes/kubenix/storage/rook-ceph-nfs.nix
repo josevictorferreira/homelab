@@ -37,19 +37,15 @@ in
         name = "nfs";
         annotations = {
           "lbipam.cilium.io/ips" = lbIP;
-          "lbipam.cilium.io/sharing-key" = "nfs";
         };
         namespace = namespace;
       };
       spec = {
         type = "LoadBalancer";
         externalTrafficPolicy = "Cluster";
-        ipFamilyPolicy = "SingleStack";
-        ipFamilies = [ "IPv4" ];
         selector = {
-          "app" = "rook-ceph-nfs";
-          "ceph_daemon_type" = "nfs";
-          "ceph_nfs" = "${nfsName}-a";
+          app = "rook-ceph-nfs";
+          ceph_daemon_type = "nfs";
         };
         ports = [
           { name = "nfs"; port = 2049; targetPort = 2049; protocol = "TCP"; }

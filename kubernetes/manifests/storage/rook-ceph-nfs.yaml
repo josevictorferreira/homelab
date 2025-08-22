@@ -153,14 +153,10 @@ metadata:
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
     lbipam.cilium.io/ips: 10.10.10.150
-    lbipam.cilium.io/sharing-key: nfs
   name: nfs
   namespace: rook-ceph
 spec:
   externalTrafficPolicy: Cluster
-  ipFamilies:
-    - IPv4
-  ipFamilyPolicy: SingleStack
   ports:
     - name: nfs
       port: 2049
@@ -173,5 +169,4 @@ spec:
   selector:
     app: rook-ceph-nfs
     ceph_daemon_type: nfs
-    ceph_nfs: homelab-nfs-a
   type: LoadBalancer
