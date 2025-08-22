@@ -64,6 +64,7 @@ in
         path = cephfsPath;
         pseudo = pseudo;
         access_type = "RW";
+        squash = "root_squash";
         security_label = false;
         protocols = [ 4 ];
         transports = [ "TCP" ];
@@ -118,6 +119,9 @@ in
                 [$username]
                 key = $ceph_secret
                 EOF
+
+                echo "Ceph configuration:"
+                cat /etc/ganesha/export.json
 
                 ceph -c "$CEPH_CONFIG" mgr module enable nfs || true
                 cluster='${nfsName}'
