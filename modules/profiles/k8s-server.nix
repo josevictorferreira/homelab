@@ -81,6 +81,8 @@ in
       enableIPv6 = true;
     };
 
+    networking.firewall.trustedInterfaces = [ "cilium_host" "cilium_net" ];
+
     networking.firewall.allowedTCPPorts = [
       443
       2379
