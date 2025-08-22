@@ -85,9 +85,6 @@ spec:
             - mountPath: /var/lib/rook-ceph-mon
               name: ceph-admin-secret
               readOnly: true
-            - mountPath: /var/run/ceph
-              name: ceph-username
-              readOnly: true
             - mountPath: /etc/ganesha
               name: export
               readOnly: true
