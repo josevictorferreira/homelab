@@ -90,8 +90,10 @@ in
       6444
       8472
       10250
+      2049 ## NFS
     ];
     networking.firewall.allowedUDPPorts = [
+      2049 ## NFS
       8472
       51820
       51821
