@@ -77,6 +77,13 @@
         kind = "CephObjectStore";
       };
 
+      cephnfs = {
+        attrName = "cephnfs";
+        group = "ceph.rook.io";
+        version = "v1";
+        kind = "CephNFS";
+      };
+
       prometheus = {
         attrName = "prometheus";
         group = "monitoring.coreos.com";
