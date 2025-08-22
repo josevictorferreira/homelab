@@ -94,29 +94,36 @@ in
               "-lc"
               ''
                 set -euo pipefail
-                CEPH_CONFIG="/etc/ceph/ceph.conf"
-                MON_CONFIG="/etc/rook/mon-endpoints"
-                KEYRING_FILE="/etc/ceph/keyring"
-                # build ceph.conf from rook’s mon endpoints (same approach as toolbox)
-                endpoints=$(cat \$\{MON_CONFIG\})
+                CEPH_CONFIG=/etc/ceph/ceph.conf
+                MON_CONFIG=/etc/rook/mon-endpoints
+                KEYRING_FILE=/etc/ceph/keyring
+
+                endpoints=$(cat "$MON_CONFIG")
                 mon_endpoints=$(echo "$endpoints" | sed 's/[a-z0-9_-]\+=//g')
                 mkdir -p /etc/ceph
                 cat > "$CEPH_CONFIG" <<EOF
                 [global]
-                mon_host = \$\{mon_endpoints\}
+                mon_host = $mon_endpoints
                 [client.admin]
-                keyring = \$\{KEYRING_FILE\}
+                keyring = $KEYRING_FILE
                 EOF
-                ceph_secret=$(cat /var/lib/rook-ceph-mon/secret.keyring)
-                username=$(cat /var/run/ceph/ceph-username)
+
+                if   [ -f /var/lib/rook-ceph-mon/ceph-secret ];  then ceph_secret=$(cat /var/lib/rook-ceph-mon/ceph-secret)
+                elif [ -f /var/lib/rook-ceph-mon/admin-secret ]; then ceph_secret=$(cat /var/lib/rook-ceph-mon/admin-secret)
+                else echo "No ceph admin secret found in rook-ceph-mon"; exit 2; fi
+
+                if [ -f /var/lib/rook-ceph-mon/ceph-username ]; then username=$(cat /var/lib/rook-ceph-mon/ceph-username)
+                else username=client.admin; fi
+
                 cat > "$KEYRING_FILE" <<EOF
-                [\$\{username\}]
-                key = \$\{ceph_secret\}
+                [$username]
+                key = $ceph_secret
                 EOF
-                # idempotent: apply (create or update) the export JSON
+
+                ceph -c "$CEPH_CONFIG" mgr module enable nfs || true
                 cluster='${nfsName}'
-                pseudo=$(grep -oP '"pseudo"\s*:\s*"\K[^"]+' /etc/ganesha/export.json)
-                ceph -c "$CEPH_CONFIG" nfs export info "$cluster" "$pseudo"
+                ceph -c "$CEPH_CONFIG" nfs export apply "$cluster" -i /etc/ganesha/export.json
+                ceph -c "$CEPH_CONFIG" nfs export ls "$cluster" --detailed
               ''
             ];
             volumeMounts = [
@@ -130,8 +137,7 @@ in
           volumes = [
             { name = "mon-endpoints"; configMap = { name = "rook-ceph-mon-endpoints"; items = [{ key = "data"; path = "mon-endpoints"; }]; }; }
             { name = "ceph-config"; emptyDir = { }; }
-            { name = "ceph-admin-secret"; secret = { secretName = "rook-ceph-mon"; items = [{ key = "ceph-secret"; path = "secret.keyring"; }]; }; }
-            { name = "ceph-username"; secret = { secretName = "rook-ceph-mon"; items = [{ key = "ceph-username"; path = "ceph-username"; }]; }; }
+            { name = "ceph-admin-secret"; secret = { secretName = "rook-ceph-mon"; }; }
             { name = "export"; configMap = { name = "ceph-nfs-export-${nfsName}"; }; }
           ];
         };
