@@ -61,16 +61,16 @@ in
         namespace = namespace;
       };
       data."export.json" = builtins.toJSON {
+        access_type = "RW";
         path = cephfsPath;
         pseudo = pseudo;
-        access_type = "RW";
-        squash = "root_squash";
+        squash = "root";
         security_label = false;
         protocols = [ 4 ];
         transports = [ "TCP" ];
         fsal = { name = "CEPH"; fs_name = cephfs; };
         clients = [
-          { addresses = allowedCIDRs; access_type = "RW"; }
+          { addresses = allowedCIDRs; access_type = "RW"; squash = "root"; }
         ];
       };
     };
