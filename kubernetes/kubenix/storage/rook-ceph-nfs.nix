@@ -64,7 +64,7 @@ in
         path = cephfsPath;
         pseudo = pseudo;
         access_type = "RW";
-        squash = "Root_Squash";
+        squash = "RootSquash";
         security_label = false;
         protocols = [ 4 ];
         transports = [ "TCP" ];
