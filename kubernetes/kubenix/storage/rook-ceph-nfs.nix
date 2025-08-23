@@ -70,15 +70,13 @@ in
           clients = [
             { addresses = allowedCIDRs; access_type = "RW"; squash = "no_root_squash"; }
           ];
-          nfsv4 = {
-            only_numeric_owners = true;
-            delegations = false;
-            minor_versions = [ 0 1 2 ];
-            recovery_backend = "rados_cluster";
-          };
         };
         "cluster.conf" = ''
-          NFSV4 { Minor_Versions = 0,1,2; }
+          NFSv4 {
+            Minor_Versions = 0,1,2;
+            Delegations = false;
+            RecoveryBackend = rados_cluster;
+          }
         '';
       };
     };

@@ -47,6 +47,7 @@ in
           mixedService = true;
           type = "LoadBalancer";
           annotations = kubenix.lib.serviceIpFor "pihole";
+          externalTrafficPolicy = "Cluster";
         };
         serviceDhcp.enabled = false;
         admin = {
