@@ -124,10 +124,22 @@ in
 
                 ceph -c "$CEPH_CONFIG" mgr module enable nfs || true
                 cluster='${nfsName}'
-                ceph -c "$CEPH_CONFIG" nfs cluster config set "$cluster" NFSV4 "Minor_Versions = 0,1,2;"
-                ceph -c "$CEPH_CONFIG" nfs cluster config set "$cluster" NFS_CORE_PARAM "NFS_Protocols = 4;"
+
+                cat > /etc/ganesha/cluster.conf <<'CONF'
+                NFS_CORE_PARAM {
+                  NFS_Protocols = 4;
+                }
+                NFSV4 {
+                  Minor_Versions = 0,1,2;
+                }
+                CONF
+
+                ceph -c "$CEPH_CONFIG" nfs cluster config set "$cluster" -i /etc/ganesha/cluster.conf
                 ceph -c "$CEPH_CONFIG" nfs cluster config refresh "$cluster"
+
                 ceph -c "$CEPH_CONFIG" nfs export apply "$cluster" -i /etc/ganesha/export.json
+
+                ceph -c "$CEPH_CONFIG" nfs cluster config get "$cluster" || true
                 ceph -c "$CEPH_CONFIG" nfs export ls "$cluster" --detailed
               ''
             ];
