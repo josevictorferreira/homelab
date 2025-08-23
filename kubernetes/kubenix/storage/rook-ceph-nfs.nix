@@ -57,24 +57,29 @@ in
         name = "ceph-nfs-export-${nfsName}";
         namespace = namespace;
       };
-      data."export.json" = builtins.toJSON {
-        access_type = "RW";
-        path = cephfsPath;
-        pseudo = pseudo;
-        squash = "no_root_squash";
-        security_label = false;
-        protocols = [ 4 ];
-        transports = [ "TCP" ];
-        fsal = { name = "CEPH"; fs_name = cephfs; };
-        clients = [
-          { addresses = allowedCIDRs; access_type = "RW"; squash = "no_root_squash"; }
-        ];
-        nfsv4 = {
-          only_numeric_owners = true;
-          delegations = false;
-          minor_versions = [ 0 1 2 ];
-          recovery_backend = "rados_cluster";
+      data = {
+        "export.json" = builtins.toJSON {
+          access_type = "RW";
+          path = cephfsPath;
+          pseudo = pseudo;
+          squash = "no_root_squash";
+          security_label = false;
+          protocols = [ 4 ];
+          transports = [ "TCP" ];
+          fsal = { name = "CEPH"; fs_name = cephfs; };
+          clients = [
+            { addresses = allowedCIDRs; access_type = "RW"; squash = "no_root_squash"; }
+          ];
+          nfsv4 = {
+            only_numeric_owners = true;
+            delegations = false;
+            minor_versions = [ 0 1 2 ];
+            recovery_backend = "rados_cluster";
+          };
         };
+        "cluster.conf" = ''
+          NFSV4 { Minor_Versions = 0,1,2; }
+        '';
       };
     };
 
@@ -128,10 +133,11 @@ in
                 cluster='${nfsName}'
 
                 ceph -c "$CEPH_CONFIG" nfs export apply "$cluster" -i /etc/ganesha/export.json
+                ceph -c "$CEPH_CONFIG" nfs cluster config set "$cluster" -i /etc/ganesha/cluster.conf
                 
                 echo "Current NFS-Ganesha configuration:"
                 echo "---"
-                ceph -c "$CEPH_CONFIG" nfs cluster config get "$cluster" || true
+                ceph -c "$CEPH_CONFIG" nfs cluster config get "$cluster"
                 echo "---"
                 ceph -c "$CEPH_CONFIG" nfs export ls "$cluster" --detailed
                 echo "---"
