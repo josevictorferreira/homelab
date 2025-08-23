@@ -69,15 +69,13 @@ spec:
               ceph -c "$CEPH_CONFIG" mgr module enable nfs || true
 
 
-              echo "Ceph export configuration:"
-
-              cat /etc/ganesha/export.json
-
-
               cluster=''homelab-nfs''
 
 
               ceph -c "$CEPH_CONFIG" nfs export apply "$cluster" -i /etc/ganesha/export.json
+
+
+              ceph nfs cluster config refresh "$cluster"
 
 
               ceph -c "$CEPH_CONFIG" nfs cluster config get "$cluster" || true
@@ -142,7 +140,7 @@ spec:
 ---
 apiVersion: v1
 data:
-  export.json: '{"access_type":"RW","clients":[{"access_type":"RW","addresses":["10.10.10.0/24"],"squash":"root"}],"fsal":{"fs_name":"ceph-filesystem","name":"CEPH"},"nfs_v4":{"minor_versions":[0,1,2]},"path":"/","protocols":[4],"pseudo":"/homelab","security_label":false,"squash":"root","transports":["TCP"]}'
+  export.json: '{"access_type":"RW","clients":[{"access_type":"RW","addresses":["10.10.10.0/24"],"squash":"root"}],"fsal":{"fs_name":"ceph-filesystem","name":"CEPH"},"nfsv4":{"minor_versions":[0,1,2]},"path":"/","protocols":[4],"pseudo":"/homelab","security_label":false,"squash":"root","transports":["TCP"]}'
 kind: ConfigMap
 metadata:
   annotations:
