@@ -71,7 +71,7 @@ in
         clients = [
           { addresses = allowedCIDRs; access_type = "RW"; squash = "root"; }
         ];
-        nfs_v4 = {
+        nfsv4 = {
           minor_versions = [ 0 1 2 ];
         };
       };
@@ -124,12 +124,11 @@ in
 
                 ceph -c "$CEPH_CONFIG" mgr module enable nfs || true
 
-                echo "Ceph export configuration:"
-                cat /etc/ganesha/export.json
-
                 cluster='${nfsName}'
 
                 ceph -c "$CEPH_CONFIG" nfs export apply "$cluster" -i /etc/ganesha/export.json
+
+                ceph nfs cluster config refresh "$cluster"
 
                 ceph -c "$CEPH_CONFIG" nfs cluster config get "$cluster" || true
                 ceph -c "$CEPH_CONFIG" nfs export ls "$cluster" --detailed
