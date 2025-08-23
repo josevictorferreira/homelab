@@ -18,7 +18,7 @@ in
       };
       spec = {
         server = {
-          active = 1;
+          active = 2;
           resources = {
             requests = { cpu = "50m"; memory = "64Mi"; };
             limits = { memory = "512Mi"; };
@@ -124,6 +124,9 @@ in
 
                 ceph -c "$CEPH_CONFIG" mgr module enable nfs || true
                 cluster='${nfsName}'
+                ceph -c "$CEPH_CONFIG" nfs cluster config set "$cluster" NFSV4 "Minor_Versions = 0,1,2;"
+                ceph -c "$CEPH_CONFIG" nfs cluster config set "$cluster" NFS_CORE_PARAM "NFS_Protocols = 4;"
+                ceph -c "$CEPH_CONFIG" nfs cluster config refresh "$cluster"
                 ceph -c "$CEPH_CONFIG" nfs export apply "$cluster" -i /etc/ganesha/export.json
                 ceph -c "$CEPH_CONFIG" nfs export ls "$cluster" --detailed
               ''
