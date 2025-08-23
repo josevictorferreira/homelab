@@ -71,7 +71,7 @@ in
             { addresses = allowedCIDRs; access_type = "RW"; squash = "no_root_squash"; }
           ];
         };
-        "cluster.conf" = ''
+        "userconf-nfs.${nfsName}" = ''
           NFSv4 {
             Minor_Versions = 0,1,2;
             Delegations = false;
@@ -131,7 +131,8 @@ in
                 cluster='${nfsName}'
 
                 ceph -c "$CEPH_CONFIG" nfs export apply "$cluster" -i /etc/ganesha/export.json
-                ceph -c "$CEPH_CONFIG" nfs cluster config set "$cluster" -i /etc/ganesha/cluster.conf
+
+                rados -p .nfs -N ${nfsName} put userconf-nfs.${nfsName}-nfs /etc/ganesha/userconf-nfs.${nfsName}
                 
                 echo "Current NFS-Ganesha configuration:"
                 echo "---"
