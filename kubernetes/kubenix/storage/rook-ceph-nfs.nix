@@ -17,7 +17,7 @@ in
       };
       spec = {
         server = {
-          active = 1;
+          active = 2;
           resources = {
             requests = { cpu = "50m"; memory = "64Mi"; };
             limits = { memory = "512Mi"; };
@@ -40,7 +40,7 @@ in
       };
       spec = {
         type = "LoadBalancer";
-        externalTrafficPolicy = "Cluster";
+        externalTrafficPolicy = "Local";
         selector = {
           app = "rook-ceph-nfs";
           ceph_daemon_type = "nfs";
@@ -61,16 +61,19 @@ in
         access_type = "RW";
         path = cephfsPath;
         pseudo = pseudo;
-        squash = "root";
+        squash = "no_root_squash";
         security_label = false;
         protocols = [ 4 ];
         transports = [ "TCP" ];
         fsal = { name = "CEPH"; fs_name = cephfs; };
         clients = [
-          { addresses = allowedCIDRs; access_type = "RW"; squash = "root"; }
+          { addresses = allowedCIDRs; access_type = "RW"; squash = "no_root_squash"; }
         ];
         nfsv4 = {
+          only_numeric_owners = true;
+          delegations = false;
           minor_versions = [ 0 1 2 ];
+          recovery_backend = "rados_cluster";
         };
       };
     };
