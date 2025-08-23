@@ -54,71 +54,37 @@ in
       };
     };
 
+    configMaps."ceph-nfs-export-${nfsName}" = {
+      metadata = {
+        name = "ceph-nfs-export-${nfsName}";
+        namespace = namespace;
+      };
+      data."export.json" = builtins.toJSON {
+        access_type = "RW";
+        path = cephfsPath;
+        pseudo = pseudo;
+        squash = "root";
+        security_label = false;
+        protocols = [ 4 ];
+        transports = [ "TCP" ];
+        fsal = { name = "CEPH"; fs_name = cephfs; };
+        clients = [
+          { addresses = allowedCIDRs; access_type = "RW"; squash = "root"; }
+        ];
+      };
+    };
+
     configMaps."ceph-nfs-ganesha-config-${nfsName}" = {
       metadata = {
         name = "ceph-nfs-ganesha-config-${nfsName}";
         namespace = namespace;
       };
       data."ganesha-config.conf" = ''
-        NFS_CORE_PARAM {
-                Enable_NLM = false;
-                Enable_RQUOTA = false;
-                Protocols = 4;
-                allow_set_io_flusher_fail = true;
-        }
-
-        MDCACHE {
-                Dir_Chunk = 0;
-        }
-
-        EXPORT_DEFAULTS {
-                Attr_Expiration_Time = 0;
-        }
-
-        EXPORT {
-                Access_Type = RW;
-                Path = "${cephfsPath}";
-                Pseudo = "${pseudo}";
-                Squash = No_Root_Squash;
-                Security_Label = false;
-                Protocols = 4;
-                Transports = TCP;
-                FSAL {
-                        Name = CEPH;
-                        FS_Name = "${cephfs}";
-                }
-                CLIENTS {
-                  Addresses = ${builtins.concatStringsSep " " allowedCIDRs};
-                  Access_Type = RW;
-                  Squash = No_Root_Squash;
-                }
-        }
-
         NFSv4 {
                 Delegations = false;
                 RecoveryBackend = "rados_cluster";
                 Minor_Versions = 0, 1, 2;
         }
-
-        RADOS_KV {
-                ceph_conf = "/etc/ceph/ceph.conf";
-                userid = nfs-ganesha.${nfsName}.a;
-                nodeid = ${nfsName}.a;
-                pool = ".nfs";
-                namespace = "${nfsName}";
-        }
-
-        RADOS_URLS {
-                ceph_conf = "/etc/ceph/ceph.conf";
-                userid = nfs-ganesha.${nfsName}.a;
-                watch_url = "rados://.nfs/${nfsName}/conf-nfs.${nfsName}";
-        }
-
-        RGW {
-                name = "client.nfs-ganesha.${nfsName}.a";
-        }
-
-        %url    rados://.nfs/${nfsName}/conf-nfs.${nfsName}
       '';
     };
 
@@ -172,6 +138,8 @@ in
                 cluster='${nfsName}'
 
                 ceph -c "$CEPH_CONFIG" nfs cluster config set "$cluster" -i /etc/ganesha/config/ganesha-config.conf || true
+
+                ceph -c "$CEPH_CONFIG" nfs export apply "$cluster" -i /etc/ganesha/export.json
                 
                 echo "Current NFS-Ganesha configuration:"
                 echo "---"
@@ -185,6 +153,7 @@ in
               { name = "mon-endpoints"; mountPath = "/etc/rook"; }
               { name = "ceph-config"; mountPath = "/etc/ceph"; }
               { name = "ceph-admin-secret"; mountPath = "/var/lib/rook-ceph-mon"; readOnly = true; }
+              { name = "export"; mountPath = "/etc/ganesha"; readOnly = true; }
               { name = "ganesha-config"; mountPath = "/etc/ganesha/config"; readOnly = true; }
             ];
           }];
@@ -192,6 +161,7 @@ in
             { name = "mon-endpoints"; configMap = { name = "rook-ceph-mon-endpoints"; items = [{ key = "data"; path = "mon-endpoints"; }]; }; }
             { name = "ceph-config"; emptyDir = { }; }
             { name = "ceph-admin-secret"; secret = { secretName = "rook-ceph-mon"; }; }
+            { name = "export"; configMap = { name = "ceph-nfs-export-${nfsName}"; }; }
             { name = "ganesha-config"; configMap = { name = "ceph-nfs-ganesha-config-${nfsName}"; }; }
           ];
         };
