@@ -72,7 +72,7 @@ spec:
               cluster=''homelab-nfs''
 
 
-              ceph -c "$CEPH_CONFIG" nfs cluster set "$cluster" -i /etc/ganesha/config/ganesha-config.conf
+              ceph -c "$CEPH_CONFIG" nfs cluster config set "$cluster" -i /etc/ganesha/config/ganesha-config.conf
               || true
 
 

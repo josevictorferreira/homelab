@@ -175,7 +175,7 @@ in
 
                 cluster='${nfsName}'
 
-                ceph -c "$CEPH_CONFIG" nfs cluster set "$cluster" -i /etc/ganesha/config/ganesha-config.conf || true
+                ceph -c "$CEPH_CONFIG" nfs cluster config set "$cluster" -i /etc/ganesha/config/ganesha-config.conf || true
 
                 ceph -c "$CEPH_CONFIG" nfs export apply "$cluster" -i /etc/ganesha/export.json
                 
