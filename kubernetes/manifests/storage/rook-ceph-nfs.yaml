@@ -76,9 +76,6 @@ spec:
               || true
 
 
-              ceph -c "$CEPH_CONFIG" nfs export apply "$cluster" -i /etc/ganesha/export.json
-
-
               echo "Current NFS-Ganesha configuration:"
 
               echo "---"
@@ -102,9 +99,6 @@ spec:
             - mountPath: /var/lib/rook-ceph-mon
               name: ceph-admin-secret
               readOnly: true
-            - mountPath: /etc/ganesha
-              name: export
-              readOnly: true
             - mountPath: /etc/ganesha/config
               name: ganesha-config
               readOnly: true
@@ -122,9 +116,6 @@ spec:
         - name: ceph-admin-secret
           secret:
             secretName: rook-ceph-mon
-        - configMap:
-            name: ceph-nfs-export-homelab-nfs
-          name: export
         - configMap:
             name: ceph-nfs-ganesha-config-homelab-nfs
           name: ganesha-config
@@ -155,26 +146,21 @@ spec:
 ---
 apiVersion: v1
 data:
-  export.json: '{"access_type":"RW","clients":[{"access_type":"RW","addresses":["10.10.10.0/24"],"squash":"root"}],"fsal":{"fs_name":"ceph-filesystem","name":"CEPH"},"nfsv4":{"minor_versions":[0,1,2]},"path":"/","protocols":[4],"pseudo":"/homelab","security_label":false,"squash":"root","transports":["TCP"]}'
-kind: ConfigMap
-metadata:
-  annotations:
-    kubenix/k8s-version: '1.32'
-    kubenix/project-name: ze-homelab
-  name: ceph-nfs-export-homelab-nfs
-  namespace: rook-ceph
----
-apiVersion: v1
-data:
   ganesha-config.conf: "NFS_CORE_PARAM {\n        Enable_NLM = false;\n        Enable_RQUOTA\
     \ = false;\n        Protocols = 4;\n        allow_set_io_flusher_fail = true;\n\
     }\n\nMDCACHE {\n        Dir_Chunk = 0;\n}\n\nEXPORT_DEFAULTS {\n        Attr_Expiration_Time\
-    \ = 0;\n}\n\nNFSv4 {\n        Delegations = false;\n        RecoveryBackend =\
-    \ \"rados_cluster\";\n        Minor_Versions = 0, 1, 2;\n}\n\nRADOS_KV {\n   \
-    \     ceph_conf = \"/etc/ceph/ceph.conf\";\n        userid = nfs-ganesha.homelab-nfs.a;\n\
-    \        nodeid = homelab-nfs.a;\n        pool = \".nfs\";\n        namespace\
-    \ = \"homelab-nfs\";\n}\n\nRADOS_URLS {\n        ceph_conf = \"/etc/ceph/ceph.conf\"\
-    ;\n        userid = nfs-ganesha.homelab-nfs.a;\n        watch_url = \"rados://.nfs/homelab-nfs/conf-nfs.homelab-nfs\"\
+    \ = 0;\n}\n\nEXPORT {\n        Access_Type = RW;\n        Path = \"/\";\n    \
+    \    Pseudo = \"/homelab\";\n        Squash = No_Root_Squash;\n        Security_Label\
+    \ = false;\n        Protocols = 4;\n        Transports = TCP;\n        FSAL {\n\
+    \                Name = CEPH;\n                FS_Name = \"ceph-filesystem\";\n\
+    \        }\n        CLIENTS {\n          Addresses = 10.10.10.0/24;\n        \
+    \  Access_Type = RW;\n          Squash = No_Root_Squash;\n        }\n}\n\nNFSv4\
+    \ {\n        Delegations = false;\n        RecoveryBackend = \"rados_cluster\"\
+    ;\n        Minor_Versions = 0, 1, 2;\n}\n\nRADOS_KV {\n        ceph_conf = \"\
+    /etc/ceph/ceph.conf\";\n        userid = nfs-ganesha.homelab-nfs.a;\n        nodeid\
+    \ = homelab-nfs.a;\n        pool = \".nfs\";\n        namespace = \"homelab-nfs\"\
+    ;\n}\n\nRADOS_URLS {\n        ceph_conf = \"/etc/ceph/ceph.conf\";\n        userid\
+    \ = nfs-ganesha.homelab-nfs.a;\n        watch_url = \"rados://.nfs/homelab-nfs/conf-nfs.homelab-nfs\"\
     ;\n}\n\nRGW {\n        name = \"client.nfs-ganesha.homelab-nfs.a\";\n}\n\n%url\
     \    rados://.nfs/homelab-nfs/conf-nfs.homelab-nfs\n"
 kind: ConfigMap
