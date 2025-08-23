@@ -18,7 +18,7 @@ in
       };
       spec = {
         server = {
-          active = 4;
+          active = 1;
           resources = {
             requests = { cpu = "50m"; memory = "64Mi"; };
             limits = { memory = "512Mi"; };
@@ -71,21 +71,10 @@ in
         clients = [
           { addresses = allowedCIDRs; access_type = "RW"; squash = "root"; }
         ];
+        nfsv4 = {
+          minor_versions = [ 0 1 2 ];
+        };
       };
-    };
-
-    configMaps."ceph-nfs-ganesha-config-${nfsName}" = {
-      metadata = {
-        name = "ceph-nfs-ganesha-config-${nfsName}";
-        namespace = namespace;
-      };
-      data."ganesha-config.conf" = ''
-        NFSv4 {
-                Delegations = false;
-                RecoveryBackend = "rados_cluster";
-                Minor_Versions = 0, 1, 2;
-        }
-      '';
     };
 
     jobs."ceph-nfs-export-apply-${nfsName}" = {
@@ -137,8 +126,6 @@ in
 
                 cluster='${nfsName}'
 
-                ceph -c "$CEPH_CONFIG" nfs cluster config set "$cluster" -i /etc/ganesha/config/ganesha-config.conf || true
-
                 ceph -c "$CEPH_CONFIG" nfs export apply "$cluster" -i /etc/ganesha/export.json
                 
                 echo "Current NFS-Ganesha configuration:"
@@ -154,7 +141,6 @@ in
               { name = "ceph-config"; mountPath = "/etc/ceph"; }
               { name = "ceph-admin-secret"; mountPath = "/var/lib/rook-ceph-mon"; readOnly = true; }
               { name = "export"; mountPath = "/etc/ganesha"; readOnly = true; }
-              { name = "ganesha-config"; mountPath = "/etc/ganesha/config"; readOnly = true; }
             ];
           }];
           volumes = [
@@ -162,7 +148,6 @@ in
             { name = "ceph-config"; emptyDir = { }; }
             { name = "ceph-admin-secret"; secret = { secretName = "rook-ceph-mon"; }; }
             { name = "export"; configMap = { name = "ceph-nfs-export-${nfsName}"; }; }
-            { name = "ganesha-config"; configMap = { name = "ceph-nfs-ganesha-config-${nfsName}"; }; }
           ];
         };
       };
