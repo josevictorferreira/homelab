@@ -7,7 +7,7 @@ let
   cephfs = "ceph-filesystem";
   cephfsPath = "/";
   allowedCIDRs = [ "10.10.10.0/24" ];
-  lbIP = homelab.kubernetes.loadBalancer.services."homelab-nfs";
+  lbIP = homelab.kubernetes.loadBalancer.services.${nfsName};
 in
 {
   kubernetes.resources = {
@@ -71,11 +71,57 @@ in
             { addresses = allowedCIDRs; access_type = "RW"; squash = "no_root_squash"; }
           ];
         };
-        "userconf-nfs.${nfsName}" = ''
+        "conf-nfs.${nfsName}" = ''
+          NFS_CORE_PARAM {
+                  Enable_NLM = false;
+                  Enable_RQUOTA = false;
+                  Protocols = 4;
+                  allow_set_io_flusher_fail = true;
+          }
+
+          MDCACHE {
+                  Dir_Chunk = 0;
+          }
+
+          EXPORT_DEFAULTS {
+                  Attr_Expiration_Time = 0;
+          }
+
+          EXPORT {
+                  Access_Type = RW;
+                  Path = "${cephfsPath}";
+                  Pseudo = "${pseudo}";
+                  Squash = No_Root_Squash;
+                  Security_Label = false;
+                  Protocols = 4;
+                  Transports = TCP;
+                  FSAL {
+                          Name = CEPH;
+                          FS_Name = "${cephfs}";
+                  }
+                  CLIENTS {
+                    Addresses = ${builtins.concatStringsSep " " allowedCIDRs};
+                    Access_Type = RW;
+                    Squash = No_Root_Squash;
+                  }
+          }
+
           NFSv4 {
-            Minor_Versions = 0,1,2;
-            Delegations = false;
-            RecoveryBackend = rados_cluster;
+                  Delegations = false;
+                  RecoveryBackend = "rados_cluster";
+                  Minor_Versions = 0, 1, 2;
+          }
+
+          RADOS_KV {
+                  ceph_conf = "/etc/ceph/ceph.conf";
+                  userid = nfs-ganesha.${nfsName}.a;
+                  nodeid = ${nfsName}.a;
+                  pool = ".nfs";
+                  namespace = "${nfsName}";
+          }
+
+          RGW {
+                  name = "client.nfs-ganesha.${nfsName}.a";
           }
         '';
       };
@@ -132,7 +178,7 @@ in
 
                 ceph -c "$CEPH_CONFIG" nfs export apply "$cluster" -i /etc/ganesha/export.json
 
-                rados -p .nfs -N ${nfsName} put userconf-nfs.${nfsName}-nfs /etc/ganesha/userconf-nfs.${nfsName}
+                rados -p .nfs -N ${nfsName} put conf-nfs.${nfsName} /etc/ganesha/conf-nfs.${nfsName}
                 
                 echo "Current NFS-Ganesha configuration:"
                 echo "---"
