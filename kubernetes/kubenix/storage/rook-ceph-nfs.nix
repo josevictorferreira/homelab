@@ -5,7 +5,7 @@ let
   nfsName = "homelab-nfs";
   pseudo = "/homelab";
   cephfs = "ceph-filesystem";
-  cephfsPath = "/shared";
+  cephfsPath = "/";
   allowedCIDRs = [ "10.10.10.0/24" ];
   lbIP = homelab.kubernetes.loadBalancer.services."homelab-nfs";
 in
