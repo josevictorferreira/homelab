@@ -18,7 +18,7 @@ in
       };
       spec = {
         server = {
-          active = 2;
+          active = 4;
           resources = {
             requests = { cpu = "50m"; memory = "64Mi"; };
             limits = { memory = "512Mi"; };
@@ -77,6 +77,55 @@ in
       };
     };
 
+    configMaps."ceph-nfs-ganesha-config-${nfsName}" = {
+      metadata = {
+        name = "ceph-nfs-ganesha-config-${nfsName}";
+        namespace = namespace;
+      };
+      data."ganesha-config.conf" = ''
+        NFS_CORE_PARAM {
+                Enable_NLM = false;
+                Enable_RQUOTA = false;
+                Protocols = 4;
+                allow_set_io_flusher_fail = true;
+        }
+
+        MDCACHE {
+                Dir_Chunk = 0;
+        }
+
+        EXPORT_DEFAULTS {
+                Attr_Expiration_Time = 0;
+        }
+
+        NFSv4 {
+                Delegations = false;
+                RecoveryBackend = "rados_cluster";
+                Minor_Versions = 0, 1, 2;
+        }
+
+        RADOS_KV {
+                ceph_conf = "/etc/ceph/ceph.conf";
+                userid = nfs-ganesha.${nfsName}.a;
+                nodeid = ${nfsName}.a;
+                pool = ".nfs";
+                namespace = "${nfsName}";
+        }
+
+        RADOS_URLS {
+                ceph_conf = "/etc/ceph/ceph.conf";
+                userid = nfs-ganesha.${nfsName}.a;
+                watch_url = "rados://.nfs/${nfsName}/conf-nfs.${nfsName}";
+        }
+
+        RGW {
+                name = "client.nfs-ganesha.${nfsName}.a";
+        }
+
+        %url    rados://.nfs/${nfsName}/conf-nfs.${nfsName}
+      '';
+    };
+
     jobs."ceph-nfs-export-apply-${nfsName}" = {
       metadata = {
         name = "ceph-nfs-export-apply-${nfsName}";
@@ -126,12 +175,16 @@ in
 
                 cluster='${nfsName}'
 
+                ceph -c "$CEPH_CONFIG" nfs cluster set "$cluster" -i /etc/ganesha/config/ganesha-config.conf || true
+
                 ceph -c "$CEPH_CONFIG" nfs export apply "$cluster" -i /etc/ganesha/export.json
-
-                ceph nfs cluster config refresh "$cluster"
-
+                
+                echo "Current NFS-Ganesha configuration:"
+                echo "---"
                 ceph -c "$CEPH_CONFIG" nfs cluster config get "$cluster" || true
+                echo "---"
                 ceph -c "$CEPH_CONFIG" nfs export ls "$cluster" --detailed
+                echo "---"
               ''
             ];
             volumeMounts = [
@@ -139,6 +192,7 @@ in
               { name = "ceph-config"; mountPath = "/etc/ceph"; }
               { name = "ceph-admin-secret"; mountPath = "/var/lib/rook-ceph-mon"; readOnly = true; }
               { name = "export"; mountPath = "/etc/ganesha"; readOnly = true; }
+              { name = "ganesha-config"; mountPath = "/etc/ganesha/config"; readOnly = true; }
             ];
           }];
           volumes = [
@@ -146,6 +200,7 @@ in
             { name = "ceph-config"; emptyDir = { }; }
             { name = "ceph-admin-secret"; secret = { secretName = "rook-ceph-mon"; }; }
             { name = "export"; configMap = { name = "ceph-nfs-export-${nfsName}"; }; }
+            { name = "ganesha-config"; configMap = { name = "ceph-nfs-ganesha-config-${nfsName}"; }; }
           ];
         };
       };
