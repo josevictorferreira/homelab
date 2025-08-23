@@ -72,6 +72,14 @@ in
           { addresses = allowedCIDRs; access_type = "RW"; squash = "root"; }
         ];
       };
+      data."cluster.confg" = ''
+        NFS_CORE_PARAM {
+          NFS_Protocols = 4;
+        }
+        NFSV4 {
+          Minor_Versions = 0,1,2;
+        }
+      '';
     };
 
     jobs."ceph-nfs-export-apply-${nfsName}" = {
@@ -119,20 +127,15 @@ in
                 key = $ceph_secret
                 EOF
 
-                echo "Ceph configuration:"
+                ceph -c "$CEPH_CONFIG" mgr module enable nfs || true
+
+                echo "Ceph ganesha cluster configuration:"
+                cat /etc/ganesha/cluster.conf
+
+                echo "Ceph export configuration:"
                 cat /etc/ganesha/export.json
 
-                ceph -c "$CEPH_CONFIG" mgr module enable nfs || true
                 cluster='${nfsName}'
-
-                cat > /etc/ganesha/cluster.conf <<'CONF'
-                NFS_CORE_PARAM {
-                  NFS_Protocols = 4;
-                }
-                NFSV4 {
-                  Minor_Versions = 0,1,2;
-                }
-                CONF
 
                 ceph -c "$CEPH_CONFIG" nfs cluster config set "$cluster" -i /etc/ganesha/cluster.conf
                 ceph -c "$CEPH_CONFIG" nfs cluster config refresh "$cluster"
