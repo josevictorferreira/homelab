@@ -5,15 +5,14 @@ let
   nfsName = "homelab-nfs";
   pseudo = "/homelab";
   cephfs = "ceph-filesystem";
-  cephfsPath = "/";
+  cephfsPath = "/shared";
   allowedCIDRs = [ "10.10.10.0/24" ];
-  lbIP = homelab.kubernetes.loadBalancer.services.nfs;
+  lbIP = homelab.kubernetes.loadBalancer.services."homelab-nfs";
 in
 {
   kubernetes.resources = {
     cephnfs.${nfsName} = {
       metadata = {
-        name = nfsName;
         namespace = namespace;
       };
       spec = {
@@ -32,9 +31,8 @@ in
       };
     };
 
-    services."nfs" = {
+    services.${nfsName} = {
       metadata = {
-        name = "nfs";
         annotations = {
           "lbipam.cilium.io/ips" = lbIP;
         };
