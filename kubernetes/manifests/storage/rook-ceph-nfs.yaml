@@ -69,22 +69,12 @@ spec:
               ceph -c "$CEPH_CONFIG" mgr module enable nfs || true
 
 
-              echo "Ceph ganesha cluster configuration:"
-
-              cat /etc/ganesha/cluster.conf
-
-
               echo "Ceph export configuration:"
 
               cat /etc/ganesha/export.json
 
 
               cluster=''homelab-nfs''
-
-
-              ceph -c "$CEPH_CONFIG" nfs cluster config set "$cluster" -i /etc/ganesha/cluster.conf
-
-              ceph -c "$CEPH_CONFIG" nfs cluster config refresh "$cluster"
 
 
               ceph -c "$CEPH_CONFIG" nfs export apply "$cluster" -i /etc/ganesha/export.json
@@ -152,9 +142,7 @@ spec:
 ---
 apiVersion: v1
 data:
-  cluster.confg: "NFS_CORE_PARAM {\n  NFS_Protocols = 4;\n}\nNFSV4 {\n  Minor_Versions\
-    \ = 0,1,2;\n}\n"
-  export.json: '{"access_type":"RW","clients":[{"access_type":"RW","addresses":["10.10.10.0/24"],"squash":"root"}],"fsal":{"fs_name":"ceph-filesystem","name":"CEPH"},"path":"/","protocols":[4],"pseudo":"/homelab","security_label":false,"squash":"root","transports":["TCP"]}'
+  export.json: '{"access_type":"RW","clients":[{"access_type":"RW","addresses":["10.10.10.0/24"],"squash":"root"}],"fsal":{"fs_name":"ceph-filesystem","name":"CEPH"},"nfs_v4":{"minor_versions":[0,1,2]},"path":"/","protocols":[4],"pseudo":"/homelab","security_label":false,"squash":"root","transports":["TCP"]}'
 kind: ConfigMap
 metadata:
   annotations:
