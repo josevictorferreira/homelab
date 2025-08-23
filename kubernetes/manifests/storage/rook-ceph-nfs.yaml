@@ -14,26 +14,87 @@ spec:
         - command:
             - /bin/bash
             - -lc
-            - "set -euo pipefail\nCEPH_CONFIG=/etc/ceph/ceph.conf\nMON_CONFIG=/etc/rook/mon-endpoints\n\
-              KEYRING_FILE=/etc/ceph/keyring\n\nendpoints=$(cat \"$MON_CONFIG\")\n\
-              mon_endpoints=$(echo \"$endpoints\" | sed 's/[a-z0-9_-]\\+=//g')\nmkdir\
-              \ -p /etc/ceph\ncat > \"$CEPH_CONFIG\" <<EOF\n[global]\nmon_host = $mon_endpoints\n\
-              [client.admin]\nkeyring = $KEYRING_FILE\nEOF\n\nif   [ -f /var/lib/rook-ceph-mon/ceph-secret\
-              \ ];  then ceph_secret=$(cat /var/lib/rook-ceph-mon/ceph-secret)\nelif\
-              \ [ -f /var/lib/rook-ceph-mon/admin-secret ]; then ceph_secret=$(cat\
-              \ /var/lib/rook-ceph-mon/admin-secret)\nelse echo \"No ceph admin secret\
-              \ found in rook-ceph-mon\"; exit 2; fi\n\nif [ -f /var/lib/rook-ceph-mon/ceph-username\
-              \ ]; then username=$(cat /var/lib/rook-ceph-mon/ceph-username)\nelse\
-              \ username=client.admin; fi\n\ncat > \"$KEYRING_FILE\" <<EOF\n[$username]\n\
-              key = $ceph_secret\nEOF\n\necho \"Ceph configuration:\"\ncat /etc/ganesha/export.json\n\
-              \nceph -c \"$CEPH_CONFIG\" mgr module enable nfs || true\ncluster='homelab-nfs'\n\
-              \ncat > /etc/ganesha/cluster.conf <<'CONF'\nNFS_CORE_PARAM {\n  NFS_Protocols\
-              \ = 4;\n}\nNFSV4 {\n  Minor_Versions = 0,1,2;\n}\nCONF\n\nceph -c \"\
-              $CEPH_CONFIG\" nfs cluster config set \"$cluster\" -i /etc/ganesha/cluster.conf\n\
-              ceph -c \"$CEPH_CONFIG\" nfs cluster config refresh \"$cluster\"\n\n\
-              ceph -c \"$CEPH_CONFIG\" nfs export apply \"$cluster\" -i /etc/ganesha/export.json\n\
-              \nceph -c \"$CEPH_CONFIG\" nfs cluster config get \"$cluster\" || true\n\
-              ceph -c \"$CEPH_CONFIG\" nfs export ls \"$cluster\" --detailed\n"
+            - 'set -euo pipefail
+
+              CEPH_CONFIG=/etc/ceph/ceph.conf
+
+              MON_CONFIG=/etc/rook/mon-endpoints
+
+              KEYRING_FILE=/etc/ceph/keyring
+
+
+              endpoints=$(cat "$MON_CONFIG")
+
+              mon_endpoints=$(echo "$endpoints" | sed ''s/[a-z0-9_-]\+=//g'')
+
+              mkdir -p /etc/ceph
+
+              cat > "$CEPH_CONFIG" <<EOF
+
+              [global]
+
+              mon_host = $mon_endpoints
+
+              [client.admin]
+
+              keyring = $KEYRING_FILE
+
+              EOF
+
+
+              if   [ -f /var/lib/rook-ceph-mon/ceph-secret ];  then ceph_secret=$(cat
+              /var/lib/rook-ceph-mon/ceph-secret)
+
+              elif [ -f /var/lib/rook-ceph-mon/admin-secret ]; then ceph_secret=$(cat
+              /var/lib/rook-ceph-mon/admin-secret)
+
+              else echo "No ceph admin secret found in rook-ceph-mon"; exit 2; fi
+
+
+              if [ -f /var/lib/rook-ceph-mon/ceph-username ]; then username=$(cat
+              /var/lib/rook-ceph-mon/ceph-username)
+
+              else username=client.admin; fi
+
+
+              cat > "$KEYRING_FILE" <<EOF
+
+              [$username]
+
+              key = $ceph_secret
+
+              EOF
+
+
+              ceph -c "$CEPH_CONFIG" mgr module enable nfs || true
+
+
+              echo "Ceph ganesha cluster configuration:"
+
+              cat /etc/ganesha/cluster.conf
+
+
+              echo "Ceph export configuration:"
+
+              cat /etc/ganesha/export.json
+
+
+              cluster=''homelab-nfs''
+
+
+              ceph -c "$CEPH_CONFIG" nfs cluster config set "$cluster" -i /etc/ganesha/cluster.conf
+
+              ceph -c "$CEPH_CONFIG" nfs cluster config refresh "$cluster"
+
+
+              ceph -c "$CEPH_CONFIG" nfs export apply "$cluster" -i /etc/ganesha/export.json
+
+
+              ceph -c "$CEPH_CONFIG" nfs cluster config get "$cluster" || true
+
+              ceph -c "$CEPH_CONFIG" nfs export ls "$cluster" --detailed
+
+              '
           image: quay.io/ceph/ceph:v19
           name: apply
           volumeMounts:
@@ -91,6 +152,8 @@ spec:
 ---
 apiVersion: v1
 data:
+  cluster.confg: "NFS_CORE_PARAM {\n  NFS_Protocols = 4;\n}\nNFSV4 {\n  Minor_Versions\
+    \ = 0,1,2;\n}\n"
   export.json: '{"access_type":"RW","clients":[{"access_type":"RW","addresses":["10.10.10.0/24"],"squash":"root"}],"fsal":{"fs_name":"ceph-filesystem","name":"CEPH"},"path":"/","protocols":[4],"pseudo":"/homelab","security_label":false,"squash":"root","transports":["TCP"]}'
 kind: ConfigMap
 metadata:
