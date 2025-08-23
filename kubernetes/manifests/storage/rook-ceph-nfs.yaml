@@ -72,10 +72,6 @@ spec:
               cluster=''homelab-nfs''
 
 
-              ceph -c "$CEPH_CONFIG" nfs cluster config set "$cluster" -i /etc/ganesha/config/ganesha-config.conf
-              || true
-
-
               ceph -c "$CEPH_CONFIG" nfs export apply "$cluster" -i /etc/ganesha/export.json
 
 
@@ -105,9 +101,6 @@ spec:
             - mountPath: /etc/ganesha
               name: export
               readOnly: true
-            - mountPath: /etc/ganesha/config
-              name: ganesha-config
-              readOnly: true
       restartPolicy: OnFailure
       serviceAccountName: rook-ceph-default
       volumes:
@@ -125,9 +118,6 @@ spec:
         - configMap:
             name: ceph-nfs-export-homelab-nfs
           name: export
-        - configMap:
-            name: ceph-nfs-ganesha-config-homelab-nfs
-          name: ganesha-config
   ttlSecondsAfterFinished: 3600
 ---
 apiVersion: ceph.rook.io/v1
@@ -140,7 +130,7 @@ metadata:
   namespace: rook-ceph
 spec:
   server:
-    active: 4
+    active: 1
     placement:
       tolerations:
         - effect: NoSchedule
@@ -155,25 +145,13 @@ spec:
 ---
 apiVersion: v1
 data:
-  export.json: '{"access_type":"RW","clients":[{"access_type":"RW","addresses":["10.10.10.0/24"],"squash":"root"}],"fsal":{"fs_name":"ceph-filesystem","name":"CEPH"},"path":"/","protocols":[4],"pseudo":"/homelab","security_label":false,"squash":"root","transports":["TCP"]}'
+  export.json: '{"access_type":"RW","clients":[{"access_type":"RW","addresses":["10.10.10.0/24"],"squash":"root"}],"fsal":{"fs_name":"ceph-filesystem","name":"CEPH"},"nfsv4":{"minor_versions":[0,1,2]},"path":"/","protocols":[4],"pseudo":"/homelab","security_label":false,"squash":"root","transports":["TCP"]}'
 kind: ConfigMap
 metadata:
   annotations:
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   name: ceph-nfs-export-homelab-nfs
-  namespace: rook-ceph
----
-apiVersion: v1
-data:
-  ganesha-config.conf: "NFSv4 {\n        Delegations = false;\n        RecoveryBackend\
-    \ = \"rados_cluster\";\n        Minor_Versions = 0, 1, 2;\n}\n"
-kind: ConfigMap
-metadata:
-  annotations:
-    kubenix/k8s-version: '1.32'
-    kubenix/project-name: ze-homelab
-  name: ceph-nfs-ganesha-config-homelab-nfs
   namespace: rook-ceph
 ---
 apiVersion: v1
