@@ -147,10 +147,9 @@ spec:
 ---
 apiVersion: v1
 data:
-  cluster.conf: 'NFSV4 { Minor_Versions = 0,1,2; }
-
-    '
-  export.json: '{"access_type":"RW","clients":[{"access_type":"RW","addresses":["10.10.10.0/24"],"squash":"no_root_squash"}],"fsal":{"fs_name":"ceph-filesystem","name":"CEPH"},"nfsv4":{"delegations":false,"minor_versions":[0,1,2],"only_numeric_owners":true,"recovery_backend":"rados_cluster"},"path":"/","protocols":[4],"pseudo":"/homelab","security_label":false,"squash":"no_root_squash","transports":["TCP"]}'
+  cluster.conf: "NFSv4 {\n  Minor_Versions = 0,1,2;\n  Delegations = false;\n  RecoveryBackend\
+    \ = rados_cluster;\n}\n"
+  export.json: '{"access_type":"RW","clients":[{"access_type":"RW","addresses":["10.10.10.0/24"],"squash":"no_root_squash"}],"fsal":{"fs_name":"ceph-filesystem","name":"CEPH"},"path":"/","protocols":[4],"pseudo":"/homelab","security_label":false,"squash":"no_root_squash","transports":["TCP"]}'
 kind: ConfigMap
 metadata:
   annotations:

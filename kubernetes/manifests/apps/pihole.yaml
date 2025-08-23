@@ -248,7 +248,7 @@ metadata:
   name: pihole-dns
   namespace: apps
 spec:
-  externalTrafficPolicy: Local
+  externalTrafficPolicy: Cluster
   ports:
     - name: dns
       port: 53
