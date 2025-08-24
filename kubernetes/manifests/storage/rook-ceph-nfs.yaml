@@ -115,7 +115,7 @@ metadata:
   name: homelab-nfs
   namespace: rook-ceph
 spec:
-  externalTrafficPolicy: Local
+  externalTrafficPolicy: Cluster
   ports:
     - name: nfs
       port: 2049
