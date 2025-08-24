@@ -116,10 +116,11 @@ spec:
     spec:
       containers:
         - args:
-            - "set -euo pipefail\nNS='rook-ceph'\nCLUSTER='homelab-nfs'\n\nCM=\"$(kubectl\
-              \ -n \"$NS\" get cm -l app=rook-ceph-nfs,rook_cluster=\"$CLUSTER\" -o\
-              \ name | head -n1 || true)\"\nfor i in {1..90}; do\n  [ -n \"$CM\" ]\
-              \ && break || { sleep 2; CM=\"$(kubectl -n \"$NS\" get cm -l app=rook-ceph-nfs,rook_cluster=\"\
+            - "set -euo pipefail\nNS='rook-ceph'\nCLUSTER='homelab-nfs'\n\nexport\
+              \ PATH=/opt/bitnami/kubectl/bin/kubectl:$PATH\n\nCM=\"$(kubectl -n \"\
+              $NS\" get cm -l app=rook-ceph-nfs,rook_cluster=\"$CLUSTER\" -o name\
+              \ | head -n1 || true)\"\nfor i in {1..90}; do\n  [ -n \"$CM\" ] && break\
+              \ || { sleep 2; CM=\"$(kubectl -n \"$NS\" get cm -l app=rook-ceph-nfs,rook_cluster=\"\
               $CLUSTER\" -o name | head -n1 || true)\"; }\ndone\nif [ -z \"$CM\" ];\
               \ then\n  CM=\"$(kubectl -n \"$NS\" get cm -l app=rook-ceph-nfs -o name\
               \ | grep -i ganesha | head -n1 || true)\"\nfi\n[ -z \"$CM\" ] && { echo\
