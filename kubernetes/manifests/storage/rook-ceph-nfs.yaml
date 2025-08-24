@@ -102,6 +102,54 @@ spec:
           name: export
   ttlSecondsAfterFinished: 3600
 ---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: patch-ganesha-cm-homelab-nfs
+  namespace: rook-ceph
+spec:
+  backoffLimit: 2
+  template:
+    spec:
+      containers:
+        - args:
+            - "set -euo pipefail\nNS='rook-ceph'\nCLUSTER='homelab-nfs'\n\nCM=\"$(kubectl\
+              \ -n \"$NS\" get cm -l app=rook-ceph-nfs,rook_cluster=\"$CLUSTER\" -o\
+              \ name | head -n1 || true)\"\nfor i in {1..90}; do\n  [ -n \"$CM\" ]\
+              \ && break || { sleep 2; CM=\"$(kubectl -n \"$NS\" get cm -l app=rook-ceph-nfs,rook_cluster=\"\
+              $CLUSTER\" -o name | head -n1 || true)\"; }\ndone\nif [ -z \"$CM\" ];\
+              \ then\n  CM=\"$(kubectl -n \"$NS\" get cm -l app=rook-ceph-nfs -o name\
+              \ | grep -i ganesha | head -n1 || true)\"\nfi\n[ -z \"$CM\" ] && { echo\
+              \ \"ERROR: ganesha ConfigMap not found\"; exit 1; }\necho \"Patching\
+              \ $CM in $NS\"\n\ntmp=\"$(mktemp)\"\nkubectl -n \"$NS\" get \"$CM\"\
+              \ -o jsonpath='{.data.ganesha\\.conf}' > \"$tmp\"\n\nif grep -q 'NFSv4'\
+              \ \"$tmp\" && grep -q 'Minor_Versions[[:space:]]*=[[:space:]]*0,1,2'\
+              \ \"$tmp\"; then\n  echo \"Minor_Versions already 0,1,2; skipping patch.\"\
+              \nelse\n  sed -i '0,/NFSv4[[:space:]]*{/{:a;N;/}/!ba;s/Minor_Versions[[:space:]]*=[[:space:]]*[0-9,\
+              \ ]\\\\+/Minor_Versions = 0,1,2/}' \"$tmp\"\n\n  esc=\"$(sed -e 's/\\\
+              \\/\\\\\\\\/g' -e 's/\"/\\\\\"/g' -e ':a;N;$!ba;s/\\n/\\\\n/g' \"$tmp\"\
+              )\"\n\n  kubectl -n \"$NS\" patch \"$CM\" --type='json' \\\n    -p \"\
+              [{\\\"op\\\":\\\"replace\\\",\\\"path\\\":\\\"/data/ganesha.conf\\\"\
+              ,\\\"value\\\":\\\"$esc\\\"}]\"\n  echo \"ConfigMap patched.\"\nfi\n\
+              \nDEP=\"$(kubectl -n \"$NS\" get deploy -l app=rook-ceph-nfs,rook_cluster=\"\
+              $CLUSTER\",ceph_daemon_type=nfs -o name | head -n1 || true)\"\nif [\
+              \ -z \"$DEP\" ]; then\n  DEP=\"$(kubectl -n \"$NS\" get deploy -l app=rook-ceph-nfs\
+              \ -o name | head -n1 || true)\"\nfi\n[ -z \"$DEP\" ] && { echo \"WARN:\
+              \ deployment not found; skipping restart\"; exit 0; }\n\nkubectl -n\
+              \ \"$NS\" rollout restart \"$DEP\"\nkubectl -n \"$NS\" rollout status\
+              \  \"$DEP\"\necho \"Done.\"\n"
+          command:
+            - /bin/bash
+            - -lc
+          image: bitnami/kubectl:1.30
+          name: patch
+      restartPolicy: OnFailure
+      serviceAccountName: rook-ceph-default
+  ttlSecondsAfterFinished: 3600
+---
 apiVersion: ceph.rook.io/v1
 kind: CephNFS
 metadata:
@@ -127,7 +175,7 @@ spec:
 ---
 apiVersion: v1
 data:
-  export.json: '{"access_type":"RW","clients":[{"access_type":"RW","addresses":["10.10.10.0/24"],"squash":"no_root_squash"}],"fsal":{"fs_name":"ceph-filesystem","name":"CEPH"},"path":"/","protocols":[3,4],"pseudo":"/homelab","security_label":false,"squash":"no_root_squash","transports":["TCP"]}'
+  export.json: '{"access_type":"RW","clients":[{"access_type":"RW","addresses":["10.10.10.0/24"],"squash":"no_root_squash"}],"fsal":{"fs_name":"ceph-filesystem","name":"CEPH"},"path":"/","protocols":[4],"pseudo":"/homelab","security_label":false,"squash":"no_root_squash","transports":["TCP"]}'
 kind: ConfigMap
 metadata:
   annotations:
@@ -148,7 +196,7 @@ metadata:
 spec:
   externalTrafficPolicy: Cluster
   ports:
-    - name: nfs
+    - name: nfs-tcp
       port: 2049
       protocol: TCP
       targetPort: 2049
@@ -156,23 +204,53 @@ spec:
       port: 2049
       protocol: UDP
       targetPort: 2049
-    - name: mountd-tcp
-      port: 20048
-      protocol: TCP
-      targetPort: 20048
-    - name: mountd-udp
-      port: 20048
-      protocol: UDP
-      targetPort: 20048
-    - name: rpcbind-tcp
-      port: 111
-      protocol: TCP
-      targetPort: 111
-    - name: rpcbind-udp
-      port: 111
-      protocol: UDP
-      targetPort: 111
   selector:
     app: rook-ceph-nfs
     ceph_daemon_type: nfs
   type: LoadBalancer
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: patch-ganesha-cm-role
+  namespace: rook-ceph
+rules:
+  - apiGroups:
+      - ''
+    resources:
+      - configmaps
+    verbs:
+      - get
+      - list
+      - watch
+      - patch
+  - apiGroups:
+      - apps
+    resources:
+      - deployments
+    verbs:
+      - get
+      - list
+      - watch
+      - update
+      - patch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: patch-ganesha-cm-rb
+  namespace: rook-ceph
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: patch-ganesha-cm-role
+subjects:
+  - kind: ServiceAccount
+    name: rook-ceph-default
+    namespace: rook-ceph
