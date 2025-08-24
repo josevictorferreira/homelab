@@ -157,13 +157,13 @@ spec:
       protocol: UDP
       targetPort: 2049
     - name: mountd-tcp
-      port: 2048
+      port: 20048
       protocol: TCP
-      targetPort: 2048
+      targetPort: 20048
     - name: mountd-udp
-      port: 2048
+      port: 20048
       protocol: UDP
-      targetPort: 2048
+      targetPort: 20048
     - name: rpcbind-tcp
       port: 111
       protocol: TCP
