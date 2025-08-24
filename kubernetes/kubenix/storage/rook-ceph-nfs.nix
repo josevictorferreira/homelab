@@ -7,7 +7,7 @@ let
   cephfs = "ceph-filesystem";
   cephfsPath = "/";
   allowedCIDRs = [ "10.10.10.0/24" ];
-  lbIP = homelab.kubernetes.loadBalancer.services.${nfsName};
+  lbIP = homelab.kubernetes.loadBalancer.services."homelab-nfs";
 in
 {
   kubernetes.resources = {
@@ -40,7 +40,7 @@ in
       };
       spec = {
         type = "LoadBalancer";
-        externalTrafficPolicy = "Cluster";
+        externalTrafficPolicy = "Local";
         selector = {
           app = "rook-ceph-nfs";
           ceph_daemon_type = "nfs";
@@ -52,26 +52,48 @@ in
       };
     };
 
-    configMaps."ceph-nfs-userconf-${nfsName}" = {
-      metadata = { name = "ceph-nfs-userconf-${nfsName}"; namespace = namespace; };
-      data.userconf = ''
-        NFSv4 {
-          Minor_Versions = 0,1,2;
-          Delegations = false;
-          RecoveryBackend = rados_cluster;
-        }
-      '';
+    configMaps."ceph-nfs-export-${nfsName}" = {
+      metadata = {
+        name = "ceph-nfs-export-${nfsName}";
+        namespace = namespace;
+      };
+      data = {
+        "export.json" = builtins.toJSON {
+          access_type = "RW";
+          path = cephfsPath;
+          pseudo = pseudo;
+          squash = "no_root_squash";
+          security_label = false;
+          protocols = [ 4 ];
+          transports = [ "TCP" ];
+          fsal = { name = "CEPH"; fs_name = cephfs; };
+          clients = [
+            { addresses = allowedCIDRs; access_type = "RW"; squash = "no_root_squash"; }
+          ];
+        };
+        "userconf" = ''
+          NFSv4 {
+            Minor_Versions = 0,1,2;
+            Delegations = false;
+            RecoveryBackend = rados_cluster;
+          }
+        '';
+      };
     };
 
-    jobs."ceph-nfs-userconf-apply-${nfsName}" = {
-      metadata = { name = "ceph-nfs-userconf-apply-${nfsName}"; namespace = namespace; };
+    jobs."ceph-nfs-export-apply-${nfsName}" = {
+      metadata = {
+        name = "ceph-nfs-export-apply-${nfsName}";
+        namespace = namespace;
+      };
       spec = {
         backoffLimit = 3;
         ttlSecondsAfterFinished = 3600;
         template.spec = {
           restartPolicy = "OnFailure";
+          serviceAccountName = "rook-ceph-default";
           containers = [{
-            name = "apply-userconf";
+            name = "apply";
             image = "quay.io/ceph/ceph:v19";
             command = [
               "/bin/bash"
@@ -79,7 +101,6 @@ in
               ''
                 set -euo pipefail
 
-                # ----- bootstrap ceph CLI (same as your export job) -----
                 CEPH_CONFIG=/etc/ceph/ceph.conf
                 MON_CONFIG=/etc/rook/mon-endpoints
                 KEYRING_FILE=/etc/ceph/keyring
@@ -101,16 +122,13 @@ in
                 key = $ceph_secret
                 EOF
 
-                # ----- objects we manage -----
                 cluster='${nfsName}'
                 ns="$cluster"
                 obj_conf="conf-nfs.$cluster"
                 obj_user="userconf-nfs.$cluster"
 
-                # 2a) Write/replace user config object from ConfigMap
                 rados -p .nfs -N "$ns" put "$obj_user" /etc/ganesha/userconf
 
-                # 2b) Ensure conf-nfs includes it (append if missing; create if absent)
                 tmp=$(mktemp)
                 if rados -p .nfs -N "$ns" get "$obj_conf" "$tmp" 2>/dev/null; then
                   if ! grep -q "$obj_user" "$tmp"; then
@@ -122,7 +140,6 @@ in
                   rados -p .nfs -N "$ns" put "$obj_conf" "$tmp"
                 fi
 
-                echo "---- conf-nfs.$cluster (head) ----"
                 head -n 100 "$tmp" || true
               ''
             ];
@@ -130,20 +147,14 @@ in
               { name = "mon-endpoints"; mountPath = "/etc/rook"; }
               { name = "ceph-config"; mountPath = "/etc/ceph"; }
               { name = "ceph-admin-secret"; mountPath = "/var/lib/rook-ceph-mon"; readOnly = true; }
-              { name = "userconf"; mountPath = "/etc/ganesha"; } # provides /etc/ganesha/userconf
+              { name = "export"; mountPath = "/etc/ganesha"; readOnly = true; }
             ];
           }];
           volumes = [
-            {
-              name = "mon-endpoints";
-              configMap = { name = "rook-ceph-mon-endpoints"; items = [{ key = "data"; path = "mon-endpoints"; }]; };
-            }
+            { name = "mon-endpoints"; configMap = { name = "rook-ceph-mon-endpoints"; items = [{ key = "data"; path = "mon-endpoints"; }]; }; }
             { name = "ceph-config"; emptyDir = { }; }
             { name = "ceph-admin-secret"; secret = { secretName = "rook-ceph-mon"; }; }
-            {
-              name = "userconf";
-              configMap = { name = "ceph-nfs-userconf-${nfsName}"; items = [{ key = "userconf"; path = "userconf"; }]; };
-            }
+            { name = "export"; configMap = { name = "ceph-nfs-export-${nfsName}"; }; }
           ];
         };
       };
