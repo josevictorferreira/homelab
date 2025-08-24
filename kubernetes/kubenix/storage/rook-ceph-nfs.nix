@@ -179,6 +179,8 @@ in
                 NS='${namespace}'
                 CLUSTER='${nfsName}'
 
+                export PATH=/opt/bitnami/kubectl/bin/kubectl:$PATH
+
                 CM="$(kubectl -n "$NS" get cm -l app=rook-ceph-nfs,rook_cluster="$CLUSTER" -o name | head -n1 || true)"
                 for i in {1..90}; do
                   [ -n "$CM" ] && break || { sleep 2; CM="$(kubectl -n "$NS" get cm -l app=rook-ceph-nfs,rook_cluster="$CLUSTER" -o name | head -n1 || true)"; }
