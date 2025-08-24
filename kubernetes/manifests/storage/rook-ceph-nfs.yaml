@@ -156,6 +156,22 @@ spec:
       port: 2049
       protocol: UDP
       targetPort: 2049
+    - name: mountd-tcp
+      port: 2048
+      protocol: TCP
+      targetPort: 2048
+    - name: mountd-udp
+      port: 2048
+      protocol: UDP
+      targetPort: 2048
+    - name: rpcbind-tcp
+      port: 111
+      protocol: TCP
+      targetPort: 111
+    - name: rpcbind-udp
+      port: 111
+      protocol: UDP
+      targetPort: 111
   selector:
     app: rook-ceph-nfs
     ceph_daemon_type: nfs
