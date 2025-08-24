@@ -17,7 +17,7 @@ in
       };
       spec = {
         server = {
-          active = 2;
+          active = 1;
           resources = {
             requests = { cpu = "50m"; memory = "64Mi"; };
             limits = { memory = "512Mi"; };

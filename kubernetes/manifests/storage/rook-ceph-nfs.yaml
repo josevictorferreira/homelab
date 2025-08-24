@@ -112,7 +112,7 @@ metadata:
   namespace: rook-ceph
 spec:
   server:
-    active: 2
+    active: 1
     placement:
       tolerations:
         - effect: NoSchedule
