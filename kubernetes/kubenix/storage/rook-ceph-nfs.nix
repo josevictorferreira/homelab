@@ -78,6 +78,110 @@ in
       };
     };
 
+    configMaps."rook-ceph-nfs-${nfsName}-a" = {
+      metadata = {
+        name = "rook-ceph-nfs-${nfsName}-a";
+        namespace = namespace;
+        labels = {
+          "app" = "rook-ceph-nfs";
+          "ceph_nfs" = nfsName;
+          "ceph_daemon_id" = "${nfsName}-a";
+          "ceph_daemon_type" = "nfs";
+          "rook_cluster" = "rook-ceph";
+          "instance" = "a";
+          "nfs" = "${nfsName}-a";
+        };
+      };
+      data.config = ''
+        NFS_CORE_PARAM {
+          Enable_NLM = false;
+          Enable_RQUOTA = false;
+          MNT_PORT = 20048;
+          Protocols = 3, 4;
+        }
+        MDCACHE {
+          Dir_Chunk = 0;
+        }
+        EXPORT_DEFAULTS {
+          Attr_Expiration_Time = 0;
+        }
+        NFSv4 {
+          Delegations = false;
+          RecoveryBackend = "rados_cluster";
+          Minor_Versions = 0, 1, 2;
+        }
+        RADOS_KV {
+          ceph_conf = "/etc/ceph/ceph.conf";
+          userid = nfs-ganesha.homelab-nfs.a;
+          nodeid = homelab-nfs.a;
+          pool = ".nfs";
+          namespace = "homelab-nfs";
+        }
+        RADOS_URLS {
+          ceph_conf = "/etc/ceph/ceph.conf";
+          userid = nfs-ganesha.homelab-nfs.a;
+          watch_url = "rados://.nfs/homelab-nfs/conf-nfs.homelab-nfs";
+        }
+        RGW {
+          name = "client.nfs-ganesha.homelab-nfs.a";
+        }
+
+        %url  rados://.nfs/homelab-nfs/conf-nfs.homelab-nfs
+      '';
+    };
+
+    configMaps."rook-ceph-nfs-${nfsName}-b" = {
+      metadata = {
+        name = "rook-ceph-nfs-${nfsName}-b";
+        namespace = namespace;
+        labels = {
+          "app" = "rook-ceph-nfs";
+          "ceph_nfs" = nfsName;
+          "ceph_daemon_id" = "${nfsName}-b";
+          "ceph_daemon_type" = "nfs";
+          "rook_cluster" = "rook-ceph";
+          "instance" = "b";
+          "nfs" = "${nfsName}-b";
+        };
+      };
+      data.config = ''
+        NFS_CORE_PARAM {
+          Enable_NLM = false;
+          Enable_RQUOTA = false;
+          MNT_PORT = 20048;
+          Protocols = 3, 4;
+        }
+        MDCACHE {
+          Dir_Chunk = 0;
+        }
+        EXPORT_DEFAULTS {
+          Attr_Expiration_Time = 0;
+        }
+        NFSv4 {
+          Delegations = false;
+          RecoveryBackend = "rados_cluster";
+          Minor_Versions = 0, 1, 2;
+        }
+        RADOS_KV {
+          ceph_conf = "/etc/ceph/ceph.conf";
+          userid = nfs-ganesha.homelab-nfs.b;
+          nodeid = homelab-nfs.b;
+          pool = ".nfs";
+          namespace = "homelab-nfs";
+        }
+        RADOS_URLS {
+          ceph_conf = "/etc/ceph/ceph.conf";
+          userid = nfs-ganesha.homelab-nfs.b;
+          watch_url = "rados://.nfs/homelab-nfs/conf-nfs.homelab-nfs";
+        }
+        RGW {
+          name = "client.nfs-ganesha.homelab-nfs.b";
+        }
+
+        %url  rados://.nfs/homelab-nfs/conf-nfs.homelab-nfs
+      '';
+    };
+
     jobs."ceph-nfs-export-apply-${nfsName}" = {
       metadata = {
         name = "ceph-nfs-export-apply-${nfsName}";
