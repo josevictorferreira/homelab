@@ -46,12 +46,8 @@ in
           ceph_daemon_type = "nfs";
         };
         ports = [
-          { name = "nfs"; port = 2049; targetPort = 2049; protocol = "TCP"; }
+          { name = "nfs-tcp"; port = 2049; targetPort = 2049; protocol = "TCP"; }
           { name = "nfs-udp"; port = 2049; targetPort = 2049; protocol = "UDP"; }
-          { name = "mountd-tcp"; port = 20048; targetPort = 20048; protocol = "TCP"; }
-          { name = "mountd-udp"; port = 20048; targetPort = 20048; protocol = "UDP"; }
-          { name = "rpcbind-tcp"; port = 111; targetPort = 111; protocol = "TCP"; }
-          { name = "rpcbind-udp"; port = 111; targetPort = 111; protocol = "UDP"; }
         ];
       };
     };
@@ -68,7 +64,7 @@ in
           pseudo = pseudo;
           squash = "no_root_squash";
           security_label = false;
-          protocols = [ 3 4 ];
+          protocols = [ 4 ];
           transports = [ "TCP" ];
           fsal = { name = "CEPH"; fs_name = cephfs; };
           clients = [
@@ -142,5 +138,88 @@ in
         };
       };
     };
+
+    roles."patch-ganesha-cm-role" = {
+      metadata = { name = "patch-ganesha-cm-role"; namespace = namespace; };
+      rules = [
+        {
+          apiGroups = [ "" ];
+          resources = [ "configmaps" ];
+          verbs = [ "get" "list" "watch" "patch" ];
+        }
+        {
+          apiGroups = [ "apps" ];
+          resources = [ "deployments" ];
+          verbs = [ "get" "list" "watch" "update" "patch" ];
+        }
+      ];
+    };
+
+    roleBindings."patch-ganesha-cm-rb" = {
+      metadata = { name = "patch-ganesha-cm-rb"; namespace = namespace; };
+      roleRef = { apiGroup = "rbac.authorization.k8s.io"; kind = "Role"; name = "patch-ganesha-cm-role"; };
+      subjects = [{ kind = "ServiceAccount"; name = "rook-ceph-default"; namespace = namespace; }];
+    };
+
+    jobs."patch-ganesha-cm-${nfsName}" = {
+      metadata = { name = "patch-ganesha-cm-${nfsName}"; namespace = namespace; };
+      spec = {
+        backoffLimit = 2;
+        ttlSecondsAfterFinished = 3600;
+        template.spec = {
+          restartPolicy = "OnFailure";
+          serviceAccountName = "rook-ceph-default";
+          containers = [{
+            name = "patch";
+            image = "bitnami/kubectl:1.30";
+            command = [ "/bin/bash" "-lc" ];
+            args = [
+              ''
+                set -euo pipefail
+                NS='${namespace}'
+                CLUSTER='${nfsName}'
+
+                CM="$(kubectl -n "$NS" get cm -l app=rook-ceph-nfs,rook_cluster="$CLUSTER" -o name | head -n1 || true)"
+                for i in {1..90}; do
+                  [ -n "$CM" ] && break || { sleep 2; CM="$(kubectl -n "$NS" get cm -l app=rook-ceph-nfs,rook_cluster="$CLUSTER" -o name | head -n1 || true)"; }
+                done
+                if [ -z "$CM" ]; then
+                  CM="$(kubectl -n "$NS" get cm -l app=rook-ceph-nfs -o name | grep -i ganesha | head -n1 || true)"
+                fi
+                [ -z "$CM" ] && { echo "ERROR: ganesha ConfigMap not found"; exit 1; }
+                echo "Patching $CM in $NS"
+
+                tmp="$(mktemp)"
+                kubectl -n "$NS" get "$CM" -o jsonpath='{.data.ganesha\.conf}' > "$tmp"
+
+                if grep -q 'NFSv4' "$tmp" && grep -q 'Minor_Versions[[:space:]]*=[[:space:]]*0,1,2' "$tmp"; then
+                  echo "Minor_Versions already 0,1,2; skipping patch."
+                else
+                  sed -i '0,/NFSv4[[:space:]]*{/{:a;N;/}/!ba;s/Minor_Versions[[:space:]]*=[[:space:]]*[0-9, ]\\+/Minor_Versions = 0,1,2/}' "$tmp"
+
+                  esc="$(sed -e 's/\\/\\\\/g' -e 's/"/\\"/g' -e ':a;N;$!ba;s/\n/\\n/g' "$tmp")"
+
+                  kubectl -n "$NS" patch "$CM" --type='json' \
+                    -p "[{\"op\":\"replace\",\"path\":\"/data/ganesha.conf\",\"value\":\"$esc\"}]"
+                  echo "ConfigMap patched."
+                fi
+
+                DEP="$(kubectl -n "$NS" get deploy -l app=rook-ceph-nfs,rook_cluster="$CLUSTER",ceph_daemon_type=nfs -o name | head -n1 || true)"
+                if [ -z "$DEP" ]; then
+                  DEP="$(kubectl -n "$NS" get deploy -l app=rook-ceph-nfs -o name | head -n1 || true)"
+                fi
+                [ -z "$DEP" ] && { echo "WARN: deployment not found; skipping restart"; exit 0; }
+
+                kubectl -n "$NS" rollout restart "$DEP"
+                kubectl -n "$NS" rollout status  "$DEP"
+                echo "Done."
+              ''
+            ];
+          }];
+        };
+      };
+    };
+
+
   };
 }
