@@ -40,7 +40,7 @@ in
       };
       spec = {
         type = "LoadBalancer";
-        externalTrafficPolicy = "Local";
+        externalTrafficPolicy = "Cluster";
         selector = {
           app = "rook-ceph-nfs";
           ceph_daemon_type = "nfs";
