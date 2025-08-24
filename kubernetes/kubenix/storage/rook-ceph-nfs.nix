@@ -183,9 +183,9 @@ in
 
                 export PATH=/opt/bitnami/kubectl/bin:$PATH
 
-                CM="$(kubectl -n "$NS" get cm -l app=rook-ceph-nfs -o name | grep -i ganesha | head -n1 || true)"
+                CM="$(kubectl -n "$NS" get cm -l app=rook-ceph-nfs -o name | grep -i rook-ceph | head -n1 || true)"
 
-                [ -z "$CM" ] && { echo "ERROR: ganesha ConfigMap not found"; exit 1; }
+                [ -z "$CM" ] && { echo "ERROR: rook-ceph ganesha ConfigMap not found"; exit 1; }
 
                 echo "Patching $CM in $NS"
 
