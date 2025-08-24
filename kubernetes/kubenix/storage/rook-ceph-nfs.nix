@@ -48,6 +48,10 @@ in
         ports = [
           { name = "nfs"; port = 2049; targetPort = 2049; protocol = "TCP"; }
           { name = "nfs-udp"; port = 2049; targetPort = 2049; protocol = "UDP"; }
+          { name = "mountd-tcp"; port = 2048; targetPort = 2048; protocol = "TCP"; }
+          { name = "mountd-udp"; port = 2048; targetPort = 2048; protocol = "UDP"; }
+          { name = "rpcbind-tcp"; port = 111; targetPort = 111; protocol = "TCP"; }
+          { name = "rpcbind-udp"; port = 111; targetPort = 111; protocol = "UDP"; }
         ];
       };
     };
