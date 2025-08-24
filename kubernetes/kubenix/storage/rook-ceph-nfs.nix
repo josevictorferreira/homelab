@@ -62,13 +62,15 @@ in
           access_type = "RW";
           path = cephfsPath;
           pseudo = pseudo;
-          squash = "no_root_squash";
+          squash = "all_squash";
+          anonuid = 1000;
+          anongid = 100;
           security_label = false;
           protocols = [ 4 ];
           transports = [ "TCP" ];
           fsal = { name = "CEPH"; fs_name = cephfs; };
           clients = [
-            { addresses = allowedCIDRs; access_type = "RW"; squash = "no_root_squash"; }
+            { addresses = allowedCIDRs; access_type = "RW"; squash = "all_squash"; }
           ];
         };
       };
