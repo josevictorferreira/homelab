@@ -64,20 +64,13 @@ in
           pseudo = pseudo;
           squash = "no_root_squash";
           security_label = false;
-          protocols = [ 4 ];
+          protocols = [ 3 4 ];
           transports = [ "TCP" ];
           fsal = { name = "CEPH"; fs_name = cephfs; };
           clients = [
             { addresses = allowedCIDRs; access_type = "RW"; squash = "no_root_squash"; }
           ];
         };
-        "userconf" = ''
-          NFSv4 {
-            Minor_Versions = 0, 1, 2;
-            Delegations = false;
-            RecoveryBackend = "rados_cluster";
-          }
-        '';
       };
     };
 
@@ -127,25 +120,6 @@ in
                 cluster='${nfsName}'
 
                 ceph -c "$CEPH_CONFIG" nfs export apply "$cluster" -i /etc/ganesha/export.json
-
-                ns="$cluster"
-                obj_conf="conf-nfs.$cluster"
-                obj_user="userconf-nfs.$cluster"
-
-                rados -p .nfs -N "$ns" put "$obj_user" /etc/ganesha/userconf
-
-                tmp=$(mktemp)
-                if rados -p .nfs -N "$ns" get "$obj_conf" "$tmp" 2>/dev/null; then
-                  if ! grep -q "$obj_user" "$tmp"; then
-                    echo "%url \"rados://.nfs/$ns/$obj_user\"" >> "$tmp"
-                    rados -p .nfs -N "$ns" put "$obj_conf" "$tmp"
-                  fi
-                else
-                  printf '%%url "rados://.nfs/%s/%s"\n' "$ns" "$obj_user" > "$tmp"
-                  rados -p .nfs -N "$ns" put "$obj_conf" "$tmp"
-                fi
-
-                head -n 100 "$tmp" || true
               ''
             ];
             volumeMounts = [
