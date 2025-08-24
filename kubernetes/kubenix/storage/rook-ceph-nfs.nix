@@ -181,14 +181,10 @@ in
 
                 export PATH=/opt/bitnami/kubectl/bin:$PATH
 
-                CM="$(kubectl -n "$NS" get cm -l app=rook-ceph-nfs,rook_cluster="$CLUSTER" -o name | head -n1 || true)"
-                for i in {1..90}; do
-                  [ -n "$CM" ] && break || { sleep 2; CM="$(kubectl -n "$NS" get cm -l app=rook-ceph-nfs,rook_cluster="$CLUSTER" -o name | head -n1 || true)"; }
-                done
-                if [ -z "$CM" ]; then
-                  CM="$(kubectl -n "$NS" get cm -l app=rook-ceph-nfs -o name | grep -i rook-ceph | head -n1 || true)"
-                fi
+                CM="$(kubectl -n "$NS" get cm -l app=rook-ceph-nfs -o name | grep -i ganesha | head -n1 || true)"
+
                 [ -z "$CM" ] && { echo "ERROR: ganesha ConfigMap not found"; exit 1; }
+
                 echo "Patching $CM in $NS"
 
                 tmp="$(mktemp)"
