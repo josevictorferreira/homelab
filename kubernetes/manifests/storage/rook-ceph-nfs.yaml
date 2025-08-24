@@ -171,7 +171,7 @@ spec:
 ---
 apiVersion: v1
 data:
-  export.json: '{"access_type":"RW","anongid":100,"anonuid":1000,"clients":[{"access_type":"RW","addresses":["10.10.10.0/24"],"squash":"all_squash"}],"fsal":{"fs_name":"ceph-filesystem","name":"CEPH"},"path":"/","protocols":[4],"pseudo":"/homelab","security_label":false,"squash":"all_squash","transports":["TCP"]}'
+  export.json: '{"access_type":"RW","anongid":2002,"anonuid":2002,"clients":[{"access_type":"RW","addresses":["10.10.10.0/24"],"squash":"all_squash"}],"fsal":{"fs_name":"ceph-filesystem","name":"CEPH"},"path":"/","protocols":[4],"pseudo":"/homelab","security_label":false,"squash":"all_squash","transports":["TCP"]}'
 kind: ConfigMap
 metadata:
   annotations:
