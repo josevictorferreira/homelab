@@ -118,16 +118,11 @@ spec:
         - args:
             - "set -euo pipefail\nNS='rook-ceph'\nCLUSTER='homelab-nfs'\n\nexport\
               \ PATH=/opt/bitnami/kubectl/bin:$PATH\n\nCM=\"$(kubectl -n \"$NS\" get\
-              \ cm -l app=rook-ceph-nfs,rook_cluster=\"$CLUSTER\" -o name | head -n1\
-              \ || true)\"\nfor i in {1..90}; do\n  [ -n \"$CM\" ] && break || { sleep\
-              \ 2; CM=\"$(kubectl -n \"$NS\" get cm -l app=rook-ceph-nfs,rook_cluster=\"\
-              $CLUSTER\" -o name | head -n1 || true)\"; }\ndone\nif [ -z \"$CM\" ];\
-              \ then\n  CM=\"$(kubectl -n \"$NS\" get cm -l app=rook-ceph-nfs -o name\
-              \ | grep -i rook-ceph | head -n1 || true)\"\nfi\n[ -z \"$CM\" ] && {\
-              \ echo \"ERROR: ganesha ConfigMap not found\"; exit 1; }\necho \"Patching\
-              \ $CM in $NS\"\n\ntmp=\"$(mktemp)\"\nkubectl -n \"$NS\" get \"$CM\"\
-              \ -o jsonpath='{.data.ganesha\\.conf}' > \"$tmp\"\n\nif grep -q 'NFSv4'\
-              \ \"$tmp\" && grep -q 'Minor_Versions[[:space:]]*=[[:space:]]*0,1,2'\
+              \ cm -l app=rook-ceph-nfs -o name | grep -i ganesha | head -n1 || true)\"\
+              \n\n[ -z \"$CM\" ] && { echo \"ERROR: ganesha ConfigMap not found\"\
+              ; exit 1; }\n\necho \"Patching $CM in $NS\"\n\ntmp=\"$(mktemp)\"\nkubectl\
+              \ -n \"$NS\" get \"$CM\" -o jsonpath='{.data.ganesha\\.conf}' > \"$tmp\"\
+              \n\nif grep -q 'NFSv4' \"$tmp\" && grep -q 'Minor_Versions[[:space:]]*=[[:space:]]*0,1,2'\
               \ \"$tmp\"; then\n  echo \"Minor_Versions already 0,1,2; skipping patch.\"\
               \nelse\n  sed -i '0,/NFSv4[[:space:]]*{/{:a;N;/}/!ba;s/Minor_Versions[[:space:]]*=[[:space:]]*[0-9,\
               \ ]\\\\+/Minor_Versions = 0,1,2/}' \"$tmp\"\n\n  esc=\"$(sed -e 's/\\\
@@ -176,7 +171,7 @@ spec:
 ---
 apiVersion: v1
 data:
-  export.json: '{"access_type":"RW","clients":[{"access_type":"RW","addresses":["10.10.10.0/24"],"squash":"no_root_squash"}],"fsal":{"fs_name":"ceph-filesystem","name":"CEPH"},"path":"/","protocols":[4],"pseudo":"/homelab","security_label":false,"squash":"no_root_squash","transports":["TCP"]}'
+  export.json: '{"access_type":"RW","anongid":100,"anonuid":1000,"clients":[{"access_type":"RW","addresses":["10.10.10.0/24"],"squash":"all_squash"}],"fsal":{"fs_name":"ceph-filesystem","name":"CEPH"},"path":"/","protocols":[4],"pseudo":"/homelab","security_label":false,"squash":"all_squash","transports":["TCP"]}'
 kind: ConfigMap
 metadata:
   annotations:
