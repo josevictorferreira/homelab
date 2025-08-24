@@ -25,9 +25,11 @@ spec:
               \ found\"; exit 2; fi\nif [ -f /var/lib/rook-ceph-mon/ceph-username\
               \ ]; then username=$(cat /var/lib/rook-ceph-mon/ceph-username); else\
               \ username=client.admin; fi\ncat > \"$KEYRING_FILE\" <<EOF\n[$username]\n\
-              key = $ceph_secret\nEOF\n\ncluster='homelab-nfs'\nns=\"$cluster\"\n\
-              obj_conf=\"conf-nfs.$cluster\"\nobj_user=\"userconf-nfs.$cluster\"\n\
-              \nrados -p .nfs -N \"$ns\" put \"$obj_user\" /etc/ganesha/userconf\n\
+              key = $ceph_secret\nEOF\n\nceph -c \"$CEPH_CONFIG\" mgr module enable\
+              \ nfs || true\n\ncluster='homelab-nfs'\n\nceph -c \"$CEPH_CONFIG\" nfs\
+              \ export apply \"$cluster\" -i /etc/ganesha/export.json\n\nns=\"$cluster\"\
+              \nobj_conf=\"conf-nfs.$cluster\"\nobj_user=\"userconf-nfs.$cluster\"\
+              \n\nrados -p .nfs -N \"$ns\" put \"$obj_user\" /etc/ganesha/userconf\n\
               \ntmp=$(mktemp)\nif rados -p .nfs -N \"$ns\" get \"$obj_conf\" \"$tmp\"\
               \ 2>/dev/null; then\n  if ! grep -q \"$obj_user\" \"$tmp\"; then\n \
               \   echo \"%url \\\"rados://.nfs/$ns/$obj_user\\\"\" >> \"$tmp\"\n \

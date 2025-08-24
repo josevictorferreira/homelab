@@ -122,7 +122,12 @@ in
                 key = $ceph_secret
                 EOF
 
+                ceph -c "$CEPH_CONFIG" mgr module enable nfs || true
+
                 cluster='${nfsName}'
+
+                ceph -c "$CEPH_CONFIG" nfs export apply "$cluster" -i /etc/ganesha/export.json
+
                 ns="$cluster"
                 obj_conf="conf-nfs.$cluster"
                 obj_user="userconf-nfs.$cluster"
