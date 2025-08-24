@@ -63,8 +63,8 @@ in
           path = cephfsPath;
           pseudo = pseudo;
           squash = "all_squash";
-          anonuid = 1000;
-          anongid = 100;
+          anonuid = 2002;
+          anongid = 2002;
           security_label = false;
           protocols = [ 4 ];
           transports = [ "TCP" ];
