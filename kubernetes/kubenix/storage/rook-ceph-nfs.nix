@@ -73,9 +73,9 @@ in
         };
         "userconf" = ''
           NFSv4 {
-            Minor_Versions = 0,1,2;
+            Minor_Versions = 0, 1, 2;
             Delegations = false;
-            RecoveryBackend = rados_cluster;
+            RecoveryBackend = "rados_cluster";
           }
         '';
       };
