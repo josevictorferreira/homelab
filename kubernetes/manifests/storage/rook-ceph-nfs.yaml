@@ -123,8 +123,8 @@ spec:
               \ 2; CM=\"$(kubectl -n \"$NS\" get cm -l app=rook-ceph-nfs,rook_cluster=\"\
               $CLUSTER\" -o name | head -n1 || true)\"; }\ndone\nif [ -z \"$CM\" ];\
               \ then\n  CM=\"$(kubectl -n \"$NS\" get cm -l app=rook-ceph-nfs -o name\
-              \ | grep -i ganesha | head -n1 || true)\"\nfi\n[ -z \"$CM\" ] && { echo\
-              \ \"ERROR: ganesha ConfigMap not found\"; exit 1; }\necho \"Patching\
+              \ | grep -i rook-ceph | head -n1 || true)\"\nfi\n[ -z \"$CM\" ] && {\
+              \ echo \"ERROR: ganesha ConfigMap not found\"; exit 1; }\necho \"Patching\
               \ $CM in $NS\"\n\ntmp=\"$(mktemp)\"\nkubectl -n \"$NS\" get \"$CM\"\
               \ -o jsonpath='{.data.ganesha\\.conf}' > \"$tmp\"\n\nif grep -q 'NFSv4'\
               \ \"$tmp\" && grep -q 'Minor_Versions[[:space:]]*=[[:space:]]*0,1,2'\
