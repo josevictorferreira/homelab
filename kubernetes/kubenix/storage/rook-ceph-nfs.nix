@@ -149,7 +149,7 @@ in
                 }
                 JSON
 
-                ceph -c "$CEPH_CONFIG" nfs export apply "$cluster" -i /etc/ganesha/export.json
+                ceph -c "$CEPH_CONFIG" nfs export apply "$cluster" -i /tmp/export.json
               ''
             ];
             volumeMounts = [
