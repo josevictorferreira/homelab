@@ -163,7 +163,7 @@ metadata:
   name: homelab-nfs
   namespace: rook-ceph
 spec:
-  externalTrafficPolicy: Cluster
+  externalTrafficPolicy: Local
   ports:
     - name: nfs-tcp
       port: 2049
@@ -176,7 +176,7 @@ spec:
   selector:
     app: rook-ceph-nfs
     ceph_daemon_type: nfs
-  type: LoadBalancer
+  type: NodePort
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role

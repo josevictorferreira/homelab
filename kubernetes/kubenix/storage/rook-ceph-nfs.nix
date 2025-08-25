@@ -39,8 +39,8 @@ in
         namespace = namespace;
       };
       spec = {
-        type = "LoadBalancer";
-        externalTrafficPolicy = "Cluster";
+        type = "NodePort";
+        externalTrafficPolicy = "Local";
         selector = {
           app = "rook-ceph-nfs";
           ceph_daemon_type = "nfs";
