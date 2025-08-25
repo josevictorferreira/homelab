@@ -34,17 +34,18 @@ spec:
               \ 0 --uid 2002 --gid 2002 --mode 2775 || true\n\nSUBVOL_PATH=\"$(ceph\
               \ -c \"$CEPH_CONFIG\" fs subvolume getpath \"$FS\" \"$SUBVOL_NAME\"\
               \ --group_name \"$SUBVOL_GROUP\")\"\n\ncluster='homelab-nfs'\n\ncat\
-              \ > /tmp/export.json <<JSON\n{\n  \"export_id\": 1,\n  \"access_type\"\
-              : \"RW\",\n  \"path\": \"$SUBVOL_PATH\",\n  \"pseudo\": \"/homelab\"\
-              ,\n  \"squash\": \"no_root_squash\",\n  \"manage_gids\": true,\n  \"\
-              security_label\": false,\n  \"protocols\": [4],\n  \"transports\": [\"\
-              TCP\"],\n  \"fsal\": { \"name\": \"CEPH\", \"fs_name\": \"ceph-filesystem\"\
-              \ },\n  \"clients\": [\n    {\n      \"addresses\": $(printf '%s\\n'\
-              \ '[\"10.10.10.0/24\"]'),\n      \"access_type\": \"RW\",\n      \"\
-              squash\": \"no_root_squash\",\n    }\n  ]\n}\nJSON\n\nceph -c \"$CEPH_CONFIG\"\
-              \ nfs export apply \"$cluster\" -i /tmp/export.json\n\n# Show the information\
-              \ about the NFS export\nceph -c \"$CEPH_CONFIG\" nfs export info \"\
-              $cluster\" \"/homelab\"\n"
+              \ > /tmp/export.json <<JSON\n{\n  \"export_id\": 1,\n  \"path\": \"\
+              $SUBVOL_PATH\",\n  \"pseudo\": \"/homelab\",\n  \"access_type\": \"\
+              RW\",\n  \"squash\": \"no_root_squash\",\n  \"protocols\": [4],\n  \"\
+              transports\": [\"TCP\"],\n  \"fsal\": {\n    \"name\": \"CEPH\",\n \
+              \   \"fs_name\": \"ceph-filesystem\"\n  },\n  \"clients\": [\n    {\n\
+              \      \"addresses\": $(printf '%s\\n' '[\"10.10.10.0/24\"]'),\n   \
+              \   \"access_type\": \"RW\",\n      \"squash\": \"no_root_squash\"\n\
+              \    }\n  ]\n}\nJSON\n\nceph -c \"$CEPH_CONFIG\" nfs export apply \"\
+              $cluster\" -i /tmp/export.json\n\n# Show the information about the NFS\
+              \ export\nceph -c \"$CEPH_CONFIG\" nfs export info \"$cluster\" \"/homelab\"\
+              \n\necho \"All exports for cluster $cluster:\"\nceph -c \"$CEPH_CONFIG\"\
+              \ nfs export ls \"$cluster\"\n"
           image: quay.io/ceph/ceph:v19
           name: apply
           volumeMounts:
@@ -90,26 +91,26 @@ spec:
               \ cm -l app=rook-ceph-nfs -o name | grep -i rook-ceph | head -n1 ||\
               \ true)\"\n\n[ -z \"$CM\" ] && { echo \"ERROR: rook-ceph ganesha ConfigMap\
               \ not found\"; exit 1; }\n\necho \"Patching $CM in $NS\"\n\ntmp=\"$(mktemp)\"\
-              \nkubectl -n \"$NS\" get \"$CM\" -o jsonpath='{.data.ganesha\\.conf}'\
-              \ > \"$tmp\"\n\ncat > \"$tmp.new\" <<'GANESHA_EOF'\nNFS_CORE_PARAM {\n\
-              \    Enable_NLM = false;\n    Enable_RQUOTA = false;\n    Protocols\
-              \ = 4;\n    NFS_Port = 2049;\n    HAProxy_Hosts = 127.0.0.1;\n    _9P_TCP_Port\
-              \ = 564;\n    _9P_RDMA_Port = 5640;\n    Heartbeat_Freq = 0;\n    Recovery_Backend\
+              \nkubectl -n \"$NS\" get \"$CM\" -o jsonpath='{.data.config}' > \"$tmp\"\
+              \n\ncat > \"$tmp.new\" <<'GANESHA_EOF'\nNFS_CORE_PARAM {\n    Enable_NLM\
+              \ = false;\n    Enable_RQUOTA = false;\n    Protocols = 4;\n    NFS_Port\
+              \ = 2049;\n    HAProxy_Hosts = 127.0.0.1;\n    _9P_TCP_Port = 564;\n\
+              \    _9P_RDMA_Port = 5640;\n    Heartbeat_Freq = 0;\n    Recovery_Backend\
               \ = rados_cluster;\n    Minor_Versions = 0, 1, 2;\n}\n\nNFSv4 {\n  \
               \  Graceless = true;\n    Minor_Versions = 1, 2;\n    RecoveryRoot =\
               \ \"/var/lib/nfs/ganesha\";\n    IdmapConf = \"/etc/idmapd.conf\";\n\
               }\n\nNFS_KRB5 {\n    Active_krb5 = false;\n}\n\nEXPORT_DEFAULTS {\n\
-              \    Protocols = 4;\n    Transports = TCP;\n    Path = /;\n    Pseudo\
-              \ = /;\n    Access_Type = RW;\n    Attr_Expiration_Time = 0;\n    Squash\
-              \ = no_root_squash;\n    Manage_Gids = false;\n}\n\n%url    rados://rook-ceph/rook-ceph/ceph-nfs.homelab-nfs\n\
+              \    Protocols = 4;\n    Transports = TCP;\n    Access_Type = RW;\n\
+              \    Attr_Expiration_Time = 0;\n    Squash = no_root_squash;\n    Manage_Gids\
+              \ = false;\n}\n\n%url    rados://rook-ceph/rook-ceph/ceph-nfs.homelab-nfs\n\
               \nLOG {\n    default_log_level = WARN;\n    Components {\n        ALL\
               \ = WARN;\n    }\n}\nGANESHA_EOF\n\nesc=\"$(sed -e 's/\\\\/\\\\\\\\\
               /g' -e 's/\"/\\\\\"/g' -e ':a;N;$!ba;s/\\n/\\\\n/g' \"$tmp.new\")\"\n\
               \nkubectl -n \"$NS\" patch \"$CM\" --type='json' \\\n  -p \"[{\\\"op\\\
-              \":\\\"replace\\\",\\\"path\\\":\\\"/data/ganesha.conf\\\",\\\"value\\\
-              \":\\\"$esc\\\"}]\"\n\necho \"ConfigMap patched.\"\n\nkubectl -n \"\
-              $NS\" rollout restart \"$DEP\"\nkubectl -n \"$NS\" rollout status  \"\
-              $DEP\"\necho \"Done.\"\n"
+              \":\\\"replace\\\",\\\"path\\\":\\\"/data/config\\\",\\\"value\\\":\\\
+              \"$esc\\\"}]\"\n\necho \"ConfigMap patched.\"\n\nkubectl -n \"$NS\"\
+              \ rollout restart \"$DEP\"\nkubectl -n \"$NS\" rollout status  \"$DEP\"\
+              \necho \"Done.\"\n"
           command:
             - /bin/bash
             - -lc
