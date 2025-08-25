@@ -141,14 +141,12 @@ in
               { name = "mon-endpoints"; mountPath = "/etc/rook"; }
               { name = "ceph-config"; mountPath = "/etc/ceph"; }
               { name = "ceph-admin-secret"; mountPath = "/var/lib/rook-ceph-mon"; readOnly = true; }
-              { name = "export"; mountPath = "/etc/ganesha"; readOnly = true; }
             ];
           }];
           volumes = [
             { name = "mon-endpoints"; configMap = { name = "rook-ceph-mon-endpoints"; items = [{ key = "data"; path = "mon-endpoints"; }]; }; }
             { name = "ceph-config"; emptyDir = { }; }
             { name = "ceph-admin-secret"; secret = { secretName = "rook-ceph-mon"; }; }
-            { name = "export"; configMap = { name = "ceph-nfs-export-${nfsName}"; }; }
           ];
         };
       };
