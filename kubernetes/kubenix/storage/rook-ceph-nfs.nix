@@ -5,7 +5,6 @@ let
   nfsName = "homelab-nfs";
   pseudo = "/homelab";
   cephfs = "ceph-filesystem";
-  cephfsPath = "/shared";
   allowedCIDRs = [ "10.10.10.0/24" ];
   lbIP = homelab.kubernetes.loadBalancer.services."homelab-nfs";
 in
@@ -39,7 +38,8 @@ in
         namespace = namespace;
       };
       spec = {
-        type = "NodePort";
+        type = "LoadBalancer";
+        loadBalancerIP = lbIP;
         externalTrafficPolicy = "Cluster";
         selector = {
           app = "rook-ceph-nfs";
@@ -47,33 +47,7 @@ in
         };
         ports = [
           { name = "nfs-tcp"; port = 2049; targetPort = 2049; protocol = "TCP"; }
-          { name = "nfs-udp"; port = 2049; targetPort = 2049; protocol = "UDP"; }
         ];
-      };
-    };
-
-    configMaps."ceph-nfs-export-${nfsName}" = {
-      metadata = {
-        name = "ceph-nfs-export-${nfsName}";
-        namespace = namespace;
-      };
-      data = {
-        "export.json" = builtins.toJSON {
-          access_type = "RW";
-          path = cephfsPath;
-          pseudo = pseudo;
-          squash = "all_squash";
-          anonuid = 2002;
-          anongid = 2002;
-          security_label = false;
-          sec_type = [ "sys" ];
-          protocols = [ 4 ];
-          transports = [ "TCP" ];
-          fsal = { name = "CEPH"; fs_name = cephfs; };
-          clients = [
-            { addresses = allowedCIDRs; access_type = "RW"; squash = "all_squash"; }
-          ];
-        };
       };
     };
 
@@ -134,15 +108,12 @@ in
 
                 cat > /tmp/export.json <<JSON
                 {
+                  "export_id": 1,
                   "access_type": "RW",
                   "path": "$SUBVOL_PATH",
                   "pseudo": "${pseudo}",
-                  "squash": "none",
-                  "anonuid": 2002,
-                  "anongid": 2002,
+                  "squash": "no_root_squash",
                   "manage_gids": true,
-                  "sec_type": ["sys"],
-                  "sectype": ["sys"],
                   "security_label": false,
                   "protocols": [4],
                   "transports": ["TCP"],
@@ -151,9 +122,7 @@ in
                     {
                       "addresses": $(printf '%s\n' '${builtins.toJSON allowedCIDRs}'),
                       "access_type": "RW",
-                      "squash": "none",
-                      "sec_type": ["sys"],
-                      "sectype": ["sys"]
+                      "squash": "no_root_squash",
                     }
                   ]
                 }
@@ -169,14 +138,12 @@ in
               { name = "mon-endpoints"; mountPath = "/etc/rook"; }
               { name = "ceph-config"; mountPath = "/etc/ceph"; }
               { name = "ceph-admin-secret"; mountPath = "/var/lib/rook-ceph-mon"; readOnly = true; }
-              { name = "export"; mountPath = "/etc/ganesha"; readOnly = true; }
             ];
           }];
           volumes = [
             { name = "mon-endpoints"; configMap = { name = "rook-ceph-mon-endpoints"; items = [{ key = "data"; path = "mon-endpoints"; }]; }; }
             { name = "ceph-config"; emptyDir = { }; }
             { name = "ceph-admin-secret"; secret = { secretName = "rook-ceph-mon"; }; }
-            { name = "export"; configMap = { name = "ceph-nfs-export-${nfsName}"; }; }
           ];
         };
       };
@@ -233,23 +200,58 @@ in
                 tmp="$(mktemp)"
                 kubectl -n "$NS" get "$CM" -o jsonpath='{.data.ganesha\.conf}' > "$tmp"
 
-                if grep -q 'NFSv4' "$tmp" && grep -q 'Minor_Versions[[:space:]]*=[[:space:]]*0,1,2' "$tmp"; then
-                  echo "Minor_Versions already 0,1,2; skipping patch."
-                else
-                  sed -i '0,/NFSv4[[:space:]]*{/{:a;N;/}/!ba;s/Minor_Versions[[:space:]]*=[[:space:]]*[0-9, ]\\+/Minor_Versions = 0,1,2/}' "$tmp"
+                cat > "$tmp.new" <<'GANESHA_EOF'
+                NFS_CORE_PARAM {
+                    Enable_NLM = false;
+                    Enable_RQUOTA = false;
+                    Protocols = 4;
+                    NFS_Port = 2049;
+                    HAProxy_Hosts = 127.0.0.1;
+                    _9P_TCP_Port = 564;
+                    _9P_RDMA_Port = 5640;
+                    Heartbeat_Freq = 0;
+                    Recovery_Backend = rados_cluster;
+                    Minor_Versions = 0, 1, 2;
+                }
 
-                  esc="$(sed -e 's/\\/\\\\/g' -e 's/"/\\"/g' -e ':a;N;$!ba;s/\n/\\n/g' "$tmp")"
+                NFSv4 {
+                    Graceless = true;
+                    Minor_Versions = 1, 2;
+                    RecoveryRoot = "/var/lib/nfs/ganesha";
+                    IdmapConf = "/etc/idmapd.conf";
+                }
 
-                  kubectl -n "$NS" patch "$CM" --type='json' \
-                    -p "[{\"op\":\"replace\",\"path\":\"/data/ganesha.conf\",\"value\":\"$esc\"}]"
-                  echo "ConfigMap patched."
-                fi
+                NFS_KRB5 {
+                    Active_krb5 = false;
+                }
 
-                DEP="$(kubectl -n "$NS" get deploy -l app=rook-ceph-nfs,rook_cluster="$CLUSTER",ceph_daemon_type=nfs -o name | head -n1 || true)"
-                if [ -z "$DEP" ]; then
-                  DEP="$(kubectl -n "$NS" get deploy -l app=rook-ceph-nfs -o name | head -n1 || true)"
-                fi
-                [ -z "$DEP" ] && { echo "WARN: deployment not found; skipping restart"; exit 0; }
+                EXPORT_DEFAULTS {
+                    Protocols = 4;
+                    Transports = TCP;
+                    Path = /;
+                    Pseudo = /;
+                    Access_Type = RW;
+                    Attr_Expiration_Time = 0;
+                    Squash = no_root_squash;
+                    Manage_Gids = false;
+                }
+
+                %url    rados://rook-ceph/${namespace}/ceph-nfs.${nfsName}
+
+                LOG {
+                    default_log_level = WARN;
+                    Components {
+                        ALL = WARN;
+                    }
+                }
+                GANESHA_EOF
+
+                esc="$(sed -e 's/\\/\\\\/g' -e 's/"/\\"/g' -e ':a;N;$!ba;s/\n/\\n/g' "$tmp.new")"
+
+                kubectl -n "$NS" patch "$CM" --type='json' \
+                  -p "[{\"op\":\"replace\",\"path\":\"/data/ganesha.conf\",\"value\":\"$esc\"}]"
+                
+                echo "ConfigMap patched."
 
                 kubectl -n "$NS" rollout restart "$DEP"
                 kubectl -n "$NS" rollout status  "$DEP"
