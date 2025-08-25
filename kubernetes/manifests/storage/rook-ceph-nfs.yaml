@@ -14,7 +14,8 @@ spec:
         - command:
             - /bin/bash
             - -lc
-            - "set -euo pipefail\n\nCEPH_CONFIG=/etc/ceph/ceph.conf\nMON_CONFIG=/etc/rook/mon-endpoints\n\
+            - "set -euo pipefail\nSUBVOL_GROUP='nfs-exports'\nSUBVOL_NAME='homelab-nfs'\n\
+              FS='ceph-filesystem'\n\nCEPH_CONFIG=/etc/ceph/ceph.conf\nMON_CONFIG=/etc/rook/mon-endpoints\n\
               KEYRING_FILE=/etc/ceph/keyring\nendpoints=$(cat \"$MON_CONFIG\")\nmon_endpoints=$(echo\
               \ \"$endpoints\" | sed 's/[a-z0-9_-]\\+=//g')\nmkdir -p /etc/ceph\n\
               cat > \"$CEPH_CONFIG\" <<EOF\n[global]\nmon_host = $mon_endpoints\n\
@@ -26,14 +27,21 @@ spec:
               \ ]; then username=$(cat /var/lib/rook-ceph-mon/ceph-username); else\
               \ username=client.admin; fi\ncat > \"$KEYRING_FILE\" <<EOF\n[$username]\n\
               key = $ceph_secret\nEOF\n\nceph -c \"$CEPH_CONFIG\" mgr module enable\
-              \ nfs || true\n\nexport EXPORT_PATH='/shared'\nif [ \"$EXPORT_PATH\"\
-              \ != \"/\" ]; then\n  if command -v cephfs-shell >/dev/null 2>&1; then\n\
-              \    cephfs-shell -c \"$CEPH_CONFIG\" -n \"$username\" -- \\\n     \
-              \ \"mkdir -p $EXPORT_PATH\" \\\n      -- \"chown 2002:2002 $EXPORT_PATH\"\
-              \ \\\n      -- \"chmod 2775 $EXPORT_PATH\"\n  else\n    echo \"cephfs-shell\
-              \ not available in image; aborting to avoid touching /\"\n    exit 3\n\
-              \  fi\nfi\n\ncluster='homelab-nfs'\n\nceph -c \"$CEPH_CONFIG\" nfs export\
-              \ apply \"$cluster\" -i /etc/ganesha/export.json\n"
+              \ nfs || true\nceph -c \"$CEPH_CONFIG\" mgr module enable volumes ||\
+              \ true\n\nceph -c \"$CEPH_CONFIG\" fs subvolumegroup create \"$FS\"\
+              \ \"$SUBVOL_GROUP\" || true\nceph -c \"$CEPH_CONFIG\" fs subvolume create\
+              \ \"$FS\" \"$SUBVOL_NAME\" \\\n  --group_name \"$SUBVOL_GROUP\" --size\
+              \ 0 --uid 2002 --gid 2002 --mode 2775 || true\n\nSUBVOL_PATH=\"$(ceph\
+              \ -c \"$CEPH_CONFIG\" fs subvolume getpath \"$FS\" \"$SUBVOL_NAME\"\
+              \ --group_name \"$SUBVOL_GROUP\")\"\n\ncluster='homelab-nfs'\n\ncat\
+              \ > /tmp/export.json <<JSON\n{\n  \"access_type\": \"RW\",\n  \"path\"\
+              : \"$SUBVOL_PATH\",\n  \"pseudo\": \"/homelab\",\n  \"squash\": \"all_squash\"\
+              ,\n  \"anonuid\": 2002,\n  \"anongid\": 2002,\n  \"security_label\"\
+              : false,\n  \"protocols\": [4],\n  \"transports\": [\"TCP\"],\n  \"\
+              fsal\": { \"name\": \"CEPH\", \"fs_name\": \"ceph-filesystem\" },\n\
+              \  \"clients\": [\n    { \"addresses\": $(printf '%s\\n' '[\"10.10.10.0/24\"\
+              ]'), \"access_type\": \"RW\", \"squash\": \"all_squash\" }\n  ]\n}\n\
+              JSON\n\nceph -c \"$CEPH_CONFIG\" nfs export apply \"$cluster\" -i /etc/ganesha/export.json\n"
           image: quay.io/ceph/ceph:v19
           name: apply
           volumeMounts:

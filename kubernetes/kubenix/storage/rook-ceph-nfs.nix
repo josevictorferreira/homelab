@@ -95,6 +95,9 @@ in
               "-lc"
               ''
                 set -euo pipefail
+                SUBVOL_GROUP='nfs-exports'
+                SUBVOL_NAME='${nfsName}'
+                FS='${cephfs}'
 
                 CEPH_CONFIG=/etc/ceph/ceph.conf
                 MON_CONFIG=/etc/rook/mon-endpoints
@@ -118,21 +121,33 @@ in
                 EOF
 
                 ceph -c "$CEPH_CONFIG" mgr module enable nfs || true
+                ceph -c "$CEPH_CONFIG" mgr module enable volumes || true
 
-                export EXPORT_PATH='${cephfsPath}'
-                if [ "$EXPORT_PATH" != "/" ]; then
-                  if command -v cephfs-shell >/dev/null 2>&1; then
-                    cephfs-shell -c "$CEPH_CONFIG" -n "$username" -- \
-                      "mkdir -p $EXPORT_PATH" \
-                      -- "chown 2002:2002 $EXPORT_PATH" \
-                      -- "chmod 2775 $EXPORT_PATH"
-                  else
-                    echo "cephfs-shell not available in image; aborting to avoid touching /"
-                    exit 3
-                  fi
-                fi
+                ceph -c "$CEPH_CONFIG" fs subvolumegroup create "$FS" "$SUBVOL_GROUP" || true
+                ceph -c "$CEPH_CONFIG" fs subvolume create "$FS" "$SUBVOL_NAME" \
+                  --group_name "$SUBVOL_GROUP" --size 0 --uid 2002 --gid 2002 --mode 2775 || true
+
+                SUBVOL_PATH="$(ceph -c "$CEPH_CONFIG" fs subvolume getpath "$FS" "$SUBVOL_NAME" --group_name "$SUBVOL_GROUP")"
 
                 cluster='${nfsName}'
+
+                cat > /tmp/export.json <<JSON
+                {
+                  "access_type": "RW",
+                  "path": "$SUBVOL_PATH",
+                  "pseudo": "${pseudo}",
+                  "squash": "all_squash",
+                  "anonuid": 2002,
+                  "anongid": 2002,
+                  "security_label": false,
+                  "protocols": [4],
+                  "transports": ["TCP"],
+                  "fsal": { "name": "CEPH", "fs_name": "${cephfs}" },
+                  "clients": [
+                    { "addresses": $(printf '%s\n' '${builtins.toJSON allowedCIDRs}'), "access_type": "RW", "squash": "all_squash" }
+                  ]
+                }
+                JSON
 
                 ceph -c "$CEPH_CONFIG" nfs export apply "$cluster" -i /etc/ganesha/export.json
               ''
