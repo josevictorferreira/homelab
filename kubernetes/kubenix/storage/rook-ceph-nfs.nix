@@ -159,6 +159,9 @@ in
                 JSON
 
                 ceph -c "$CEPH_CONFIG" nfs export apply "$cluster" -i /tmp/export.json
+
+                # Show the information about the NFS export
+                ceph -c "$CEPH_CONFIG" nfs export info "$cluster"
               ''
             ];
             volumeMounts = [

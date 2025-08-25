@@ -43,7 +43,9 @@ spec:
               \   \"addresses\": $(printf '%s\\n' '[\"10.10.10.0/24\"]'),\n      \"\
               access_type\": \"RW\",\n      \"squash\": \"all_squash\",\n      \"\
               sec_type\": [\"sys\"],\n      \"sectype\": [\"sys\"]\n    }\n  ]\n}\n\
-              JSON\n\nceph -c \"$CEPH_CONFIG\" nfs export apply \"$cluster\" -i /tmp/export.json\n"
+              JSON\n\nceph -c \"$CEPH_CONFIG\" nfs export apply \"$cluster\" -i /tmp/export.json\n\
+              \n# Show the information about the NFS export\nceph -c \"$CEPH_CONFIG\"\
+              \ nfs export info \"$cluster\"\n"
           image: quay.io/ceph/ceph:v19
           name: apply
           volumeMounts:
