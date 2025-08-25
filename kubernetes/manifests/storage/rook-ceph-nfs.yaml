@@ -104,12 +104,11 @@ spec:
               \    Attr_Expiration_Time = 0;\n    Squash = no_root_squash;\n    Manage_Gids\
               \ = false;\n}\n\n%url    rados://rook-ceph/rook-ceph/ceph-nfs.homelab-nfs\n\
               \nLOG {\n    default_log_level = WARN;\n    Components {\n        ALL\
-              \ = WARN;\n    }\n}\nGANESHA_EOF\n\nesc=\"$(sed -e 's/\\\\/\\\\\\\\\
-              /g' -e 's/\"/\\\\\"/g' -e ':a;N;$!ba;s/\\n/\\\\n/g' \"$tmp.new\")\"\n\
-              \nkubectl -n \"$NS\" patch \"$CM\" --type='merge' -p \"{\\\"data\\\"\
-              :{\\\"config\\\":\\\"$esc\\\"}}\"\n\necho \"ConfigMap patched.\"\n\n\
-              kubectl -n \"$NS\" rollout restart \"$DEP\"\nkubectl -n \"$NS\" rollout\
-              \ status  \"$DEP\"\necho \"Done.\"\n"
+              \ = WARN;\n    }\n}\nGANESHA_EOF\n\nNEW_CONFIG=\"$(cat \"$tmp.new\"\
+              )\"\n\nkubectl -n \"$NS\" patch \"$CM\" --type='merge' -p \"{\\\"data\\\
+              \":{\\\"config\\\":\\\"$NEW_CONFIG\\\"}}\"\n\necho \"ConfigMap patched.\"\
+              \n\nkubectl -n \"$NS\" rollout restart \"$DEP\"\nkubectl -n \"$NS\"\
+              \ rollout status  \"$DEP\"\necho \"Done.\"\n"
           command:
             - /bin/bash
             - -lc
