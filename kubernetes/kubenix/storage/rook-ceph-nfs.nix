@@ -47,7 +47,107 @@ in
         };
         ports = [
           { name = "nfs-tcp"; port = 2049; targetPort = 2049; protocol = "TCP"; }
+          { name = "nfs-udp"; port = 2049; targetPort = 2049; protocol = "UDP"; }
         ];
+      };
+    };
+
+    configMaps = {
+      "${nfsName}-export" = {
+        metadata = {
+          name = "${nfsName}-export";
+          namespace = namespace;
+        };
+        data."export.json" = builtins.toJSON {
+          export_id = 1;
+          access_type = "RW";
+          path = "/exported/path"; # Placeholder, will be replaced in job
+          pseudo = pseudo;
+          squash = "no_root_squash";
+          manage_gids = true;
+          security_label = false;
+          protocols = [ 4 ];
+          transports = [ "TCP" ];
+          sectype = [ "none" ];
+          fsal = {
+            name = "CEPH";
+            fs_name = cephfs;
+          };
+          clients = [
+            {
+              addresses = allowedCIDRs;
+              access_type = "RW";
+              squash = "no_root_squash";
+              sectype = [ "none" ];
+            }
+          ];
+        };
+      };
+      "${nfsName}-ganesha-config" = {
+        metadata = {
+          name = "${nfsName}-ganesha-config";
+          namespace = namespace;
+          labels = {
+            app = "rook-ceph-nfs";
+            rook_cluster = nfsName;
+            ceph_daemon_type = "nfs";
+          };
+        };
+        data = {
+          "ganesha.conf" = ''
+            NFS_CORE_PARAM {
+              Enable_NLM = false;
+              Enable_RQUOTA = false;
+              Protocols = 4;
+              NFS_Port = 2049;
+              HAProxy_Hosts = 127.0.0.1;
+              allow_set_io_flusher_fail = true;
+            }
+
+            MDCACHE {
+              Dir_Chunk = 0;
+            }
+
+            NFSv4 {
+              Graceless = true;
+              Delegations = false;
+              RecoveryBackend = "rados_cluster";
+              Minor_Versions = 0, 1, 2;
+            }
+
+            NFS_KRB5 {
+              Active_krb5 = false;
+            }
+
+            RADOS_KV {
+              ceph_conf = "/etc/ceph/ceph.conf";
+              userid = nfs-ganesha.${nfsName}.a;
+              nodeid = homelab-nfs.a;
+              pool = ".nfs";
+              namespace = "${nfsName}";
+            }
+
+            RADOS_URLS {
+              ceph_conf = "/etc/ceph/ceph.conf";
+              userid = nfs-ganesha.homelab-nfs.a;
+              watch_url = "rados://.nfs/homelab-nfs/conf-nfs.homelab-nfs";
+            }
+
+            RGW {
+              name = "client.nfs-ganesha.homelab-nfs.a";
+            }
+
+            LOG {
+              default_log_level = WARN;
+              Components {
+                ALL = WARN;
+                NFS_STARTUP = INFO;
+              }
+            }
+
+            %url	rados://.nfs/homelab-nfs/conf-nfs.homelab-nfs
+          '';
+        };
       };
     };
 
@@ -106,34 +206,13 @@ in
 
                 cluster='${nfsName}'
 
-                cat > /tmp/export.json <<JSON
-                {
-                  "export_id": 1,
-                  "access_type": "RW",
-                  "path": "$SUBVOL_PATH",
-                  "pseudo": "${pseudo}",
-                  "squash": "no_root_squash",
-                  "manage_gids": true,
-                  "security_label": false,
-                  "protocols": [4],
-                  "transports": ["TCP"],
-                  "fsal": {
-                    "name": "CEPH",
-                    "fs_name": "${cephfs}"
-                  },
-                  "clients": [
-                    {
-                      "addresses": $(printf '%s\n' '${builtins.toJSON allowedCIDRs}'),
-                      "access_type": "RW",
-                      "squash": "no_root_squash"
-                    }
-                  ]
-                }
-                JSON
+                awk '{
+                  gsub(/"teste":[[:space:]]*"[^"]*"/, "\"path\": \"$SUBVOL_PATH\"");
+                  print
+                }' /etc/ganesha/export.json > /tmp/export.json
 
                 ceph -c "$CEPH_CONFIG" nfs export apply "$cluster" -i /tmp/export.json
 
-                # Show the information about the NFS export
                 ceph -c "$CEPH_CONFIG" nfs export info "$cluster" "${pseudo}"
               ''
             ];
@@ -141,12 +220,14 @@ in
               { name = "mon-endpoints"; mountPath = "/etc/rook"; }
               { name = "ceph-config"; mountPath = "/etc/ceph"; }
               { name = "ceph-admin-secret"; mountPath = "/var/lib/rook-ceph-mon"; readOnly = true; }
+              { name = "${nfsName}-export"; mountPath = "/etc/ganesha"; readOnly = true; }
             ];
           }];
           volumes = [
             { name = "mon-endpoints"; configMap = { name = "rook-ceph-mon-endpoints"; items = [{ key = "data"; path = "mon-endpoints"; }]; }; }
             { name = "ceph-config"; emptyDir = { }; }
             { name = "ceph-admin-secret"; secret = { secretName = "rook-ceph-mon"; }; }
+            { name = "${nfsName}-export"; configMap = { name = "${nfsName}-export"; }; }
           ];
         };
       };
@@ -191,29 +272,22 @@ in
                 set -euo pipefail
                 NS='${namespace}'
                 CLUSTER='${nfsName}'
+                CM=""
 
                 export PATH=/opt/bitnami/kubectl/bin:$PATH
 
-                CM="$(kubectl -n "$NS" get cm -l app=rook-ceph-nfs -o name | grep -i rook-ceph | head -n1 || true)"
+                for i in {1..10}; do
+                  if [ -n "$CM" ]; then break; fi
+                  echo "Waiting for rook-ceph-nfs ConfigMap..."
+                  sleep 6
+                  CM="$(kubectl -n "$NS" get cm -l app=rook-ceph-nfs -o name | grep -i rook-ceph | head -n1 || true)"
+                done
 
                 [ -z "$CM" ] && { echo "ERROR: rook-ceph ganesha ConfigMap not found"; exit 1; }
 
                 echo "Patching $CM in $NS"
 
-                tmp="$(mktemp)"
-                kubectl -n "$NS" get "$CM" -o jsonpath='{.data.ganesha\.conf}' > "$tmp"
-
-                if grep -q 'NFSv4' "$tmp" && grep -q 'Minor_Versions[[:space:]]*=[[:space:]]*0,1,2' "$tmp"; then
-                  echo "Minor_Versions already 0,1,2; skipping patch."
-                else
-                  sed -i '0,/NFSv4[[:space:]]*{/{:a;N;/}/!ba;s/Minor_Versions[[:space:]]*=[[:space:]]*[0-9, ]\\+/Minor_Versions = 0,1,2/}' "$tmp"
-
-                  esc="$(sed -e 's/\\/\\\\/g' -e 's/"/\\"/g' -e ':a;N;$!ba;s/\n/\\n/g' "$tmp")"
-
-                  kubectl -n "$NS" patch "$CM" --type='json' \
-                    -p "[{\"op\":\"replace\",\"path\":\"/data/ganesha.conf\",\"value\":\"$esc\"}]"
-                  echo "ConfigMap patched."
-                fi
+                kubectl -n "$NS" patch "$CM" --type merge -p '{"data":{"ganesha.conf": "'"$(cat /tmp/ganesha.conf | sed 's/"/\\"/g' | tr '\n' ' ')"'"}}'
 
                 DEP="$(kubectl -n "$NS" get deploy -l app=rook-ceph-nfs,rook_cluster="$CLUSTER",ceph_daemon_type=nfs -o name | head -n1 || true)"
                 if [ -z "$DEP" ]; then
@@ -226,7 +300,13 @@ in
                 echo "Done."
               ''
             ];
+            volumeMounts = [
+              { name = "${nfsName}-ganesha-config"; mountPath = "/tmp"; readOnly = true; }
+            ];
           }];
+          volumes = [
+            { name = "${nfsName}-ganesha-config"; configMap = { name = "${nfsName}-ganesha-config"; }; }
+          ];
         };
       };
     };
