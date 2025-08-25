@@ -248,9 +248,9 @@ in
                 }
                 GANESHA_EOF
 
-                esc="$(sed -e 's/\\/\\\\/g' -e 's/"/\\"/g' -e ':a;N;$!ba;s/\n/\\n/g' "$tmp.new")"
+                NEW_CONFIG="$(cat "$tmp.new")"
 
-                kubectl -n "$NS" patch "$CM" --type='merge' -p "{\"data\":{\"config\":\"$esc\"}}"
+                kubectl -n "$NS" patch "$CM" --type='merge' -p "{\"data\":{\"config\":\"$NEW_CONFIG\"}}"
               
                 echo "ConfigMap patched."
 
