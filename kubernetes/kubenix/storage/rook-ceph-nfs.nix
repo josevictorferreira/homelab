@@ -207,7 +207,7 @@ in
                 cluster='${nfsName}'
 
                 awk '{
-                  gsub(/"teste":[[:space:]]*"[^"]*"/, "\"path\": \"$SUBVOL_PATH\"");
+                  gsub(/"path":[[:space:]]*"[^"]*"/, "\"path\": \"$SUBVOL_PATH\"");
                   print
                 }' /etc/ganesha/export.json > /tmp/export.json
 
@@ -287,7 +287,7 @@ in
 
                 echo "Patching $CM in $NS"
 
-                kubectl -n "$NS" patch "$CM" --type merge -p '{"data":{"ganesha.conf": "'"$(cat /tmp/ganesha.conf | sed 's/"/\\"/g' | tr '\n' ' ')"'"}}'
+                kubectl -n "$NS" patch "$CM" --type merge -p '{"data":{"ganesha.conf": "'"$(cat /tmp/ganesha.conf | sed 's/"/\\"/g' | tr '\n' ' ' | tr  '\t' ' ')"'"}}'
 
                 DEP="$(kubectl -n "$NS" get deploy -l app=rook-ceph-nfs,rook_cluster="$CLUSTER",ceph_daemon_type=nfs -o name | head -n1 || true)"
                 if [ -z "$DEP" ]; then
