@@ -92,7 +92,7 @@ spec:
               \ true)\"\n\n[ -z \"$CM\" ] && { echo \"ERROR: rook-ceph ganesha ConfigMap\
               \ not found\"; exit 1; }\n\necho \"Patching $CM in $NS\"\n\ntmp=\"$(mktemp)\"\
               \nkubectl -n \"$NS\" get \"$CM\" -o jsonpath='{.data.config}' > \"$tmp\"\
-              \n\ncat > \"$tmp.new\" <<'GANESHA_EOF'\nNFS_CORE_PARAM {\n    Enable_NLM\
+              \n\ncat > /tmp/ganesha.conf <<'GANESHA_EOF'\nNFS_CORE_PARAM {\n    Enable_NLM\
               \ = false;\n    Enable_RQUOTA = false;\n    Protocols = 4;\n    NFS_Port\
               \ = 2049;\n    HAProxy_Hosts = 127.0.0.1;\n    _9P_TCP_Port = 564;\n\
               \    _9P_RDMA_Port = 5640;\n    Heartbeat_Freq = 0;\n    Recovery_Backend\
@@ -104,11 +104,13 @@ spec:
               \    Attr_Expiration_Time = 0;\n    Squash = no_root_squash;\n    Manage_Gids\
               \ = false;\n}\n\n%url    rados://rook-ceph/rook-ceph/ceph-nfs.homelab-nfs\n\
               \nLOG {\n    default_log_level = WARN;\n    Components {\n        ALL\
-              \ = WARN;\n    }\n}\nGANESHA_EOF\n\nNEW_CONFIG=\"$(cat \"$tmp.new\"\
-              )\"\n\nkubectl -n \"$NS\" patch \"$CM\" --type='merge' -p \"{\\\"data\\\
-              \":{\\\"config\\\":\\\"$NEW_CONFIG\\\"}}\"\n\necho \"ConfigMap patched.\"\
-              \n\nkubectl -n \"$NS\" rollout restart \"$DEP\"\nkubectl -n \"$NS\"\
-              \ rollout status  \"$DEP\"\necho \"Done.\"\n"
+              \ = WARN;\n    }\n}\nGANESHA_EOF\n\nNEW_DATA=\"$(kubectl create configmap\
+              \ temp \\\n  --from-file=config=/tmp/ganesha.conf \\\n  --dry-run=client\
+              \ -o jsonpath='{.data.config}')\"\n\nkubectl -n \"$NS\" patch \"$CM\"\
+              \ --type='merge' -p \"{\\\"data\\\":{\\\"config\\\":\\\"$NEW_DATA\\\"\
+              }}\"\n\necho \"ConfigMap patched.\"\n\nkubectl -n \"$NS\" rollout restart\
+              \ \"$DEP\"\nkubectl -n \"$NS\" rollout status  \"$DEP\"\necho \"Done.\"\
+              \n"
           command:
             - /bin/bash
             - -lc
