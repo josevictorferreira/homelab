@@ -137,11 +137,12 @@ in
                   "access_type": "RW",
                   "path": "$SUBVOL_PATH",
                   "pseudo": "${pseudo}",
-                  "squash": "all_squash",
+                  "squash": "none",
                   "anonuid": 2002,
                   "anongid": 2002,
                   "manage_gids": true,
                   "sec_type": ["sys"],
+                  "sectype": ["sys"],
                   "security_label": false,
                   "protocols": [4],
                   "transports": ["TCP"],
@@ -150,7 +151,7 @@ in
                     {
                       "addresses": $(printf '%s\n' '${builtins.toJSON allowedCIDRs}'),
                       "access_type": "RW",
-                      "squash": "all_squash",
+                      "squash": "none",
                       "sec_type": ["sys"],
                       "sectype": ["sys"]
                     }
@@ -161,7 +162,7 @@ in
                 ceph -c "$CEPH_CONFIG" nfs export apply "$cluster" -i /tmp/export.json
 
                 # Show the information about the NFS export
-                ceph -c "$CEPH_CONFIG" nfs export info "$cluster"
+                ceph -c "$CEPH_CONFIG" nfs export info "$cluster" "${pseudo}"
               ''
             ];
             volumeMounts = [
