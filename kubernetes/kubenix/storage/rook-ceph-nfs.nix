@@ -125,7 +125,7 @@ in
                     {
                       "addresses": $(printf '%s\n' '${builtins.toJSON allowedCIDRs}'),
                       "access_type": "RW",
-                      "squash": "no_root_squash",
+                      "squash": "no_root_squash"
                     }
                   ]
                 }
