@@ -204,7 +204,7 @@ in
                 tmp="$(mktemp)"
                 kubectl -n "$NS" get "$CM" -o jsonpath='{.data.config}' > "$tmp"
 
-                cat > "$tmp.new" <<'GANESHA_EOF'
+                cat > /tmp/ganesha.conf <<'GANESHA_EOF'
                 NFS_CORE_PARAM {
                     Enable_NLM = false;
                     Enable_RQUOTA = false;
@@ -248,9 +248,11 @@ in
                 }
                 GANESHA_EOF
 
-                NEW_CONFIG="$(cat "$tmp.new")"
+                NEW_DATA="$(kubectl create configmap temp \
+                  --from-file=config=/tmp/ganesha.conf \
+                  --dry-run=client -o jsonpath='{.data.config}')"
 
-                kubectl -n "$NS" patch "$CM" --type='merge' -p "{\"data\":{\"config\":\"$NEW_CONFIG\"}}"
+                kubectl -n "$NS" patch "$CM" --type='merge' -p "{\"data\":{\"config\":\"$NEW_DATA\"}}"
               
                 echo "ConfigMap patched."
 
