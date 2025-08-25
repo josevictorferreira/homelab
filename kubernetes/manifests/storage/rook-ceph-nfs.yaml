@@ -36,14 +36,14 @@ spec:
               \ --group_name \"$SUBVOL_GROUP\")\"\n\ncluster='homelab-nfs'\n\ncat\
               \ > /tmp/export.json <<JSON\n{\n  \"access_type\": \"RW\",\n  \"path\"\
               : \"$SUBVOL_PATH\",\n  \"pseudo\": \"/homelab\",\n  \"squash\": \"all_squash\"\
-              ,\n  \"anonuid\": 2002,\n  \"anongid\": 2002,\n  \"anonymous_uid\":\
-              \ 2002,\n  \"anonymous_gid\": 2002,\n  \"manage_gids\": true,\n  \"\
-              sec_type\": [\"sys\"],\n  \"security_label\": false,\n  \"protocols\"\
+              ,\n  \"anonuid\": 2002,\n  \"anongid\": 2002,\n  \"manage_gids\": true,\n\
+              \  \"sec_type\": [\"sys\"],\n  \"security_label\": false,\n  \"protocols\"\
               : [4],\n  \"transports\": [\"TCP\"],\n  \"fsal\": { \"name\": \"CEPH\"\
-              , \"fs_name\": \"ceph-filesystem\" },\n  \"clients\": [\n    { \"addresses\"\
-              : $(printf '%s\\n' '[\"10.10.10.0/24\"]'), \"access_type\": \"RW\",\
-              \ \"squash\": \"all_squash\" }\n  ]\n}\nJSON\n\nceph -c \"$CEPH_CONFIG\"\
-              \ nfs export apply \"$cluster\" -i /tmp/export.json\n"
+              , \"fs_name\": \"ceph-filesystem\" },\n  \"clients\": [\n    {\n   \
+              \   \"addresses\": $(printf '%s\\n' '[\"10.10.10.0/24\"]'),\n      \"\
+              access_type\": \"RW\",\n      \"squash\": \"all_squash\",\n      \"\
+              sec_type\": [\"sys\"],\n      \"sectype\": [\"sys\"]\n    }\n  ]\n}\n\
+              JSON\n\nceph -c \"$CEPH_CONFIG\" nfs export apply \"$cluster\" -i /tmp/export.json\n"
           image: quay.io/ceph/ceph:v19
           name: apply
           volumeMounts:

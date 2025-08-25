@@ -140,8 +140,6 @@ in
                   "squash": "all_squash",
                   "anonuid": 2002,
                   "anongid": 2002,
-                  "anonymous_uid": 2002,
-                  "anonymous_gid": 2002,
                   "manage_gids": true,
                   "sec_type": ["sys"],
                   "security_label": false,
@@ -149,7 +147,13 @@ in
                   "transports": ["TCP"],
                   "fsal": { "name": "CEPH", "fs_name": "${cephfs}" },
                   "clients": [
-                    { "addresses": $(printf '%s\n' '${builtins.toJSON allowedCIDRs}'), "access_type": "RW", "squash": "all_squash" }
+                    {
+                      "addresses": $(printf '%s\n' '${builtins.toJSON allowedCIDRs}'),
+                      "access_type": "RW",
+                      "squash": "all_squash",
+                      "sec_type": ["sys"],
+                      "sectype": ["sys"]
+                    }
                   ]
                 }
                 JSON
