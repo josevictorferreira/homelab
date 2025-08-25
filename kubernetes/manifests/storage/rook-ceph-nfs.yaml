@@ -55,9 +55,6 @@ spec:
             - mountPath: /var/lib/rook-ceph-mon
               name: ceph-admin-secret
               readOnly: true
-            - mountPath: /etc/ganesha
-              name: export
-              readOnly: true
       restartPolicy: OnFailure
       serviceAccountName: rook-ceph-default
       volumes:
@@ -72,9 +69,6 @@ spec:
         - name: ceph-admin-secret
           secret:
             secretName: rook-ceph-mon
-        - configMap:
-            name: ceph-nfs-export-homelab-nfs
-          name: export
   ttlSecondsAfterFinished: 3600
 ---
 apiVersion: batch/v1
