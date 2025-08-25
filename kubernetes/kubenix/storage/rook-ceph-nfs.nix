@@ -207,7 +207,7 @@ in
                 cluster='${nfsName}'
 
                 awk '{
-                  gsub(/"path":[[:space:]]*"[^"]*"/, "\"path\": \"$SUBVOL_PATH\"");
+                  gsub(/"path":[[:space:]]*"[^"]*"/, "\"path\": \"$$SUBVOL_PATH\"");
                   print
                 }' /etc/ganesha/export.json > /tmp/export.json
 

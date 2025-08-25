@@ -35,7 +35,7 @@ spec:
               \ -c \"$CEPH_CONFIG\" fs subvolume getpath \"$FS\" \"$SUBVOL_NAME\"\
               \ --group_name \"$SUBVOL_GROUP\")\"\n\ncluster='homelab-nfs'\n\nawk\
               \ '{\n  gsub(/\"path\":[[:space:]]*\"[^\"]*\"/, \"\\\"path\\\": \\\"\
-              $SUBVOL_PATH\\\"\");\n  print\n}' /etc/ganesha/export.json > /tmp/export.json\n\
+              $$SUBVOL_PATH\\\"\");\n  print\n}' /etc/ganesha/export.json > /tmp/export.json\n\
               \nceph -c \"$CEPH_CONFIG\" nfs export apply \"$cluster\" -i /tmp/export.json\n\
               \nceph -c \"$CEPH_CONFIG\" nfs export info \"$cluster\" \"/homelab\"\
               \n"
