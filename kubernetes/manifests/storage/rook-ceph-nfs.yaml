@@ -41,7 +41,7 @@ spec:
               fsal\": { \"name\": \"CEPH\", \"fs_name\": \"ceph-filesystem\" },\n\
               \  \"clients\": [\n    { \"addresses\": $(printf '%s\\n' '[\"10.10.10.0/24\"\
               ]'), \"access_type\": \"RW\", \"squash\": \"all_squash\" }\n  ]\n}\n\
-              JSON\n\nceph -c \"$CEPH_CONFIG\" nfs export apply \"$cluster\" -i /etc/ganesha/export.json\n"
+              JSON\n\nceph -c \"$CEPH_CONFIG\" nfs export apply \"$cluster\" -i /tmp/export.json\n"
           image: quay.io/ceph/ceph:v19
           name: apply
           volumeMounts:
