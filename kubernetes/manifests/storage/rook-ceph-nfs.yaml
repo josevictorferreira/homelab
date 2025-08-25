@@ -1,0 +1,229 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: ceph-nfs-export-apply-homelab-nfs
+  namespace: rook-ceph
+spec:
+  backoffLimit: 3
+  template:
+    spec:
+      containers:
+        - command:
+            - /bin/bash
+            - -lc
+            - "set -euo pipefail\nSUBVOL_GROUP='nfs-exports'\nSUBVOL_NAME='homelab-nfs'\n\
+              FS='ceph-filesystem'\n\nCEPH_CONFIG=/etc/ceph/ceph.conf\nMON_CONFIG=/etc/rook/mon-endpoints\n\
+              KEYRING_FILE=/etc/ceph/keyring\nendpoints=$(cat \"$MON_CONFIG\")\nmon_endpoints=$(echo\
+              \ \"$endpoints\" | sed 's/[a-z0-9_-]\\+=//g')\nmkdir -p /etc/ceph\n\
+              cat > \"$CEPH_CONFIG\" <<EOF\n[global]\nmon_host = $mon_endpoints\n\
+              [client.admin]\nkeyring = $KEYRING_FILE\nEOF\nif   [ -f /var/lib/rook-ceph-mon/ceph-secret\
+              \ ];  then ceph_secret=$(cat /var/lib/rook-ceph-mon/ceph-secret)\nelif\
+              \ [ -f /var/lib/rook-ceph-mon/admin-secret ]; then ceph_secret=$(cat\
+              \ /var/lib/rook-ceph-mon/admin-secret)\nelse echo \"No ceph admin secret\
+              \ found\"; exit 2; fi\nif [ -f /var/lib/rook-ceph-mon/ceph-username\
+              \ ]; then username=$(cat /var/lib/rook-ceph-mon/ceph-username); else\
+              \ username=client.admin; fi\ncat > \"$KEYRING_FILE\" <<EOF\n[$username]\n\
+              key = $ceph_secret\nEOF\n\nceph -c \"$CEPH_CONFIG\" mgr module enable\
+              \ nfs || true\nceph -c \"$CEPH_CONFIG\" mgr module enable volumes ||\
+              \ true\n\nceph -c \"$CEPH_CONFIG\" fs subvolumegroup create \"$FS\"\
+              \ \"$SUBVOL_GROUP\" || true\nceph -c \"$CEPH_CONFIG\" fs subvolume create\
+              \ \"$FS\" \"$SUBVOL_NAME\" \\\n  --group_name \"$SUBVOL_GROUP\" --size\
+              \ 0 --uid 2002 --gid 2002 --mode 2775 || true\n\nSUBVOL_PATH=\"$(ceph\
+              \ -c \"$CEPH_CONFIG\" fs subvolume getpath \"$FS\" \"$SUBVOL_NAME\"\
+              \ --group_name \"$SUBVOL_GROUP\")\"\n\ncluster='homelab-nfs'\n\ncat\
+              \ > /tmp/export.json <<JSON\n{\n  \"access_type\": \"RW\",\n  \"path\"\
+              : \"$SUBVOL_PATH\",\n  \"pseudo\": \"/homelab\",\n  \"squash\": \"none\"\
+              ,\n  \"anonuid\": 2002,\n  \"anongid\": 2002,\n  \"manage_gids\": true,\n\
+              \  \"sec_type\": [\"sys\"],\n  \"sectype\": [\"sys\"],\n  \"security_label\"\
+              : false,\n  \"protocols\": [4],\n  \"transports\": [\"TCP\"],\n  \"\
+              fsal\": { \"name\": \"CEPH\", \"fs_name\": \"ceph-filesystem\" },\n\
+              \  \"clients\": [\n    {\n      \"addresses\": $(printf '%s\\n' '[\"\
+              10.10.10.0/24\"]'),\n      \"access_type\": \"RW\",\n      \"squash\"\
+              : \"none\",\n      \"sec_type\": [\"sys\"],\n      \"sectype\": [\"\
+              sys\"]\n    }\n  ]\n}\nJSON\n\nceph -c \"$CEPH_CONFIG\" nfs export apply\
+              \ \"$cluster\" -i /tmp/export.json\n\n# Show the information about the\
+              \ NFS export\nceph -c \"$CEPH_CONFIG\" nfs export info \"$cluster\"\
+              \ \"/homelab\"\n"
+          image: quay.io/ceph/ceph:v19
+          name: apply
+          volumeMounts:
+            - mountPath: /etc/rook
+              name: mon-endpoints
+            - mountPath: /etc/ceph
+              name: ceph-config
+            - mountPath: /var/lib/rook-ceph-mon
+              name: ceph-admin-secret
+              readOnly: true
+            - mountPath: /etc/ganesha
+              name: export
+              readOnly: true
+      restartPolicy: OnFailure
+      serviceAccountName: rook-ceph-default
+      volumes:
+        - configMap:
+            items:
+              - key: data
+                path: mon-endpoints
+            name: rook-ceph-mon-endpoints
+          name: mon-endpoints
+        - emptyDir: {}
+          name: ceph-config
+        - name: ceph-admin-secret
+          secret:
+            secretName: rook-ceph-mon
+        - configMap:
+            name: ceph-nfs-export-homelab-nfs
+          name: export
+  ttlSecondsAfterFinished: 3600
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: patch-ganesha-cm-homelab-nfs
+  namespace: rook-ceph
+spec:
+  backoffLimit: 2
+  template:
+    spec:
+      containers:
+        - args:
+            - "set -euo pipefail\nNS='rook-ceph'\nCLUSTER='homelab-nfs'\n\nexport\
+              \ PATH=/opt/bitnami/kubectl/bin:$PATH\n\nCM=\"$(kubectl -n \"$NS\" get\
+              \ cm -l app=rook-ceph-nfs -o name | grep -i rook-ceph | head -n1 ||\
+              \ true)\"\n\n[ -z \"$CM\" ] && { echo \"ERROR: rook-ceph ganesha ConfigMap\
+              \ not found\"; exit 1; }\n\necho \"Patching $CM in $NS\"\n\ntmp=\"$(mktemp)\"\
+              \nkubectl -n \"$NS\" get \"$CM\" -o jsonpath='{.data.ganesha\\.conf}'\
+              \ > \"$tmp\"\n\nif grep -q 'NFSv4' \"$tmp\" && grep -q 'Minor_Versions[[:space:]]*=[[:space:]]*0,1,2'\
+              \ \"$tmp\"; then\n  echo \"Minor_Versions already 0,1,2; skipping patch.\"\
+              \nelse\n  sed -i '0,/NFSv4[[:space:]]*{/{:a;N;/}/!ba;s/Minor_Versions[[:space:]]*=[[:space:]]*[0-9,\
+              \ ]\\\\+/Minor_Versions = 0,1,2/}' \"$tmp\"\n\n  esc=\"$(sed -e 's/\\\
+              \\/\\\\\\\\/g' -e 's/\"/\\\\\"/g' -e ':a;N;$!ba;s/\\n/\\\\n/g' \"$tmp\"\
+              )\"\n\n  kubectl -n \"$NS\" patch \"$CM\" --type='json' \\\n    -p \"\
+              [{\\\"op\\\":\\\"replace\\\",\\\"path\\\":\\\"/data/ganesha.conf\\\"\
+              ,\\\"value\\\":\\\"$esc\\\"}]\"\n  echo \"ConfigMap patched.\"\nfi\n\
+              \nDEP=\"$(kubectl -n \"$NS\" get deploy -l app=rook-ceph-nfs,rook_cluster=\"\
+              $CLUSTER\",ceph_daemon_type=nfs -o name | head -n1 || true)\"\nif [\
+              \ -z \"$DEP\" ]; then\n  DEP=\"$(kubectl -n \"$NS\" get deploy -l app=rook-ceph-nfs\
+              \ -o name | head -n1 || true)\"\nfi\n[ -z \"$DEP\" ] && { echo \"WARN:\
+              \ deployment not found; skipping restart\"; exit 0; }\n\nkubectl -n\
+              \ \"$NS\" rollout restart \"$DEP\"\nkubectl -n \"$NS\" rollout status\
+              \  \"$DEP\"\necho \"Done.\"\n"
+          command:
+            - /bin/bash
+            - -lc
+          image: bitnami/kubectl:1.30
+          name: patch
+      restartPolicy: OnFailure
+      serviceAccountName: rook-ceph-default
+  ttlSecondsAfterFinished: 3600
+---
+apiVersion: ceph.rook.io/v1
+kind: CephNFS
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: homelab-nfs
+  namespace: rook-ceph
+spec:
+  server:
+    active: 1
+    placement:
+      tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+          operator: Exists
+    resources:
+      limits:
+        memory: 512Mi
+      requests:
+        cpu: 50m
+        memory: 64Mi
+---
+apiVersion: v1
+data:
+  export.json: '{"access_type":"RW","anongid":2002,"anonuid":2002,"clients":[{"access_type":"RW","addresses":["10.10.10.0/24"],"squash":"all_squash"}],"fsal":{"fs_name":"ceph-filesystem","name":"CEPH"},"path":"/shared","protocols":[4],"pseudo":"/homelab","sec_type":["sys"],"security_label":false,"squash":"all_squash","transports":["TCP"]}'
+kind: ConfigMap
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: ceph-nfs-export-homelab-nfs
+  namespace: rook-ceph
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+    lbipam.cilium.io/ips: 10.10.10.150
+  name: homelab-nfs
+  namespace: rook-ceph
+spec:
+  externalTrafficPolicy: Cluster
+  ports:
+    - name: nfs-tcp
+      port: 2049
+      protocol: TCP
+      targetPort: 2049
+    - name: nfs-udp
+      port: 2049
+      protocol: UDP
+      targetPort: 2049
+  selector:
+    app: rook-ceph-nfs
+    ceph_daemon_type: nfs
+  type: NodePort
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: patch-ganesha-cm-role
+  namespace: rook-ceph
+rules:
+  - apiGroups:
+      - ''
+    resources:
+      - configmaps
+    verbs:
+      - get
+      - list
+      - watch
+      - patch
+  - apiGroups:
+      - apps
+    resources:
+      - deployments
+    verbs:
+      - get
+      - list
+      - watch
+      - update
+      - patch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: patch-ganesha-cm-rb
+  namespace: rook-ceph
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: patch-ganesha-cm-role
+subjects:
+  - kind: ServiceAccount
+    name: rook-ceph-default
+    namespace: rook-ceph
