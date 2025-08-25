@@ -250,8 +250,7 @@ in
 
                 esc="$(sed -e 's/\\/\\\\/g' -e 's/"/\\"/g' -e ':a;N;$!ba;s/\n/\\n/g' "$tmp.new")"
 
-                kubectl -n "$NS" patch "$CM" --type='json' \
-                  -p "[{\"op\":\"replace\",\"path\":\"/data/config\",\"value\":\"$esc\"}]"
+                kubectl -n "$NS" patch "$CM" --type='merge' -p "{\"data\":{\"config\":\"$esc\"}}"
               
                 echo "ConfigMap patched."
 
