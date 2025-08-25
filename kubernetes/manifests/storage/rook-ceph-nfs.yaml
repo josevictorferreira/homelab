@@ -34,11 +34,11 @@ spec:
               \ 0 --uid 2002 --gid 2002 --mode 2775 || true\n\nSUBVOL_PATH=\"$(ceph\
               \ -c \"$CEPH_CONFIG\" fs subvolume getpath \"$FS\" \"$SUBVOL_NAME\"\
               \ --group_name \"$SUBVOL_GROUP\")\"\n\ncluster='homelab-nfs'\n\nawk\
-              \ '{\n  gsub(/\"path\":[[:space:]]*\"[^\"]*\"/, \"\\\"path\\\": \\\"\
-              $$SUBVOL_PATH\\\"\");\n  print\n}' /etc/ganesha/export.json > /tmp/export.json\n\
-              \nceph -c \"$CEPH_CONFIG\" nfs export apply \"$cluster\" -i /tmp/export.json\n\
-              \nceph -c \"$CEPH_CONFIG\" nfs export info \"$cluster\" \"/homelab\"\
-              \n"
+              \ -v newval=\"$SUBVOL_PATH\" '{\n  gsub(/\"path\":[[:space:]]*\"[^\"\
+              ]*\"/, \"\\\"path\\\": \\\"\" newval \"\\\"\");\n  print\n}' /etc/ganesha/export.json\
+              \ > /tmp/export.json\n\nceph -c \"$CEPH_CONFIG\" nfs export apply \"\
+              $cluster\" -i /tmp/export.json\n\nceph -c \"$CEPH_CONFIG\" nfs export\
+              \ info \"$cluster\" \"/homelab\"\n"
           image: quay.io/ceph/ceph:v19
           name: apply
           volumeMounts:
@@ -92,7 +92,7 @@ spec:
               \ -o name | grep -i rook-ceph | head -n1 || true)\"\ndone\n\n[ -z \"\
               $CM\" ] && { echo \"ERROR: rook-ceph ganesha ConfigMap not found\";\
               \ exit 1; }\n\necho \"Patching $CM in $NS\"\n\nkubectl -n \"$NS\" patch\
-              \ \"$CM\" --type merge -p '{\"data\":{\"ganesha.conf\": \"'\"$(cat /tmp/ganesha.conf\
+              \ \"$CM\" --type merge -p '{\"data\":{\"config\": \"'\"$(cat /tmp/ganesha.conf\
               \ | sed 's/\"/\\\\\"/g' | tr '\\n' ' ' | tr  '\\t' ' ')\"'\"}}'\n\n\
               DEP=\"$(kubectl -n \"$NS\" get deploy -l app=rook-ceph-nfs,rook_cluster=\"\
               $CLUSTER\",ceph_daemon_type=nfs -o name | head -n1 || true)\"\nif [\
