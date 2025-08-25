@@ -5,7 +5,7 @@ let
   nfsName = "homelab-nfs";
   pseudo = "/homelab";
   cephfs = "ceph-filesystem";
-  cephfsPath = "/";
+  cephfsPath = "/shared";
   allowedCIDRs = [ "10.10.10.0/24" ];
   lbIP = homelab.kubernetes.loadBalancer.services."homelab-nfs";
 in
@@ -118,6 +118,19 @@ in
                 EOF
 
                 ceph -c "$CEPH_CONFIG" mgr module enable nfs || true
+
+                export EXPORT_PATH='${cephfsPath}'
+                if [ "$EXPORT_PATH" != "/" ]; then
+                  if command -v cephfs-shell >/dev/null 2>&1; then
+                    cephfs-shell -c "$CEPH_CONFIG" -n "$username" -- \
+                      "mkdir -p $EXPORT_PATH" \
+                      -- "chown 2002:2002 $EXPORT_PATH" \
+                      -- "chmod 2775 $EXPORT_PATH"
+                  else
+                    echo "cephfs-shell not available in image; aborting to avoid touching /"
+                    exit 3
+                  fi
+                fi
 
                 cluster='${nfsName}'
 

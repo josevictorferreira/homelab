@@ -14,62 +14,26 @@ spec:
         - command:
             - /bin/bash
             - -lc
-            - 'set -euo pipefail
-
-
-              CEPH_CONFIG=/etc/ceph/ceph.conf
-
-              MON_CONFIG=/etc/rook/mon-endpoints
-
-              KEYRING_FILE=/etc/ceph/keyring
-
-              endpoints=$(cat "$MON_CONFIG")
-
-              mon_endpoints=$(echo "$endpoints" | sed ''s/[a-z0-9_-]\+=//g'')
-
-              mkdir -p /etc/ceph
-
-              cat > "$CEPH_CONFIG" <<EOF
-
-              [global]
-
-              mon_host = $mon_endpoints
-
-              [client.admin]
-
-              keyring = $KEYRING_FILE
-
-              EOF
-
-              if   [ -f /var/lib/rook-ceph-mon/ceph-secret ];  then ceph_secret=$(cat
-              /var/lib/rook-ceph-mon/ceph-secret)
-
-              elif [ -f /var/lib/rook-ceph-mon/admin-secret ]; then ceph_secret=$(cat
-              /var/lib/rook-ceph-mon/admin-secret)
-
-              else echo "No ceph admin secret found"; exit 2; fi
-
-              if [ -f /var/lib/rook-ceph-mon/ceph-username ]; then username=$(cat
-              /var/lib/rook-ceph-mon/ceph-username); else username=client.admin; fi
-
-              cat > "$KEYRING_FILE" <<EOF
-
-              [$username]
-
-              key = $ceph_secret
-
-              EOF
-
-
-              ceph -c "$CEPH_CONFIG" mgr module enable nfs || true
-
-
-              cluster=''homelab-nfs''
-
-
-              ceph -c "$CEPH_CONFIG" nfs export apply "$cluster" -i /etc/ganesha/export.json
-
-              '
+            - "set -euo pipefail\n\nCEPH_CONFIG=/etc/ceph/ceph.conf\nMON_CONFIG=/etc/rook/mon-endpoints\n\
+              KEYRING_FILE=/etc/ceph/keyring\nendpoints=$(cat \"$MON_CONFIG\")\nmon_endpoints=$(echo\
+              \ \"$endpoints\" | sed 's/[a-z0-9_-]\\+=//g')\nmkdir -p /etc/ceph\n\
+              cat > \"$CEPH_CONFIG\" <<EOF\n[global]\nmon_host = $mon_endpoints\n\
+              [client.admin]\nkeyring = $KEYRING_FILE\nEOF\nif   [ -f /var/lib/rook-ceph-mon/ceph-secret\
+              \ ];  then ceph_secret=$(cat /var/lib/rook-ceph-mon/ceph-secret)\nelif\
+              \ [ -f /var/lib/rook-ceph-mon/admin-secret ]; then ceph_secret=$(cat\
+              \ /var/lib/rook-ceph-mon/admin-secret)\nelse echo \"No ceph admin secret\
+              \ found\"; exit 2; fi\nif [ -f /var/lib/rook-ceph-mon/ceph-username\
+              \ ]; then username=$(cat /var/lib/rook-ceph-mon/ceph-username); else\
+              \ username=client.admin; fi\ncat > \"$KEYRING_FILE\" <<EOF\n[$username]\n\
+              key = $ceph_secret\nEOF\n\nceph -c \"$CEPH_CONFIG\" mgr module enable\
+              \ nfs || true\n\nexport EXPORT_PATH='/shared'\nif [ \"$EXPORT_PATH\"\
+              \ != \"/\" ]; then\n  if command -v cephfs-shell >/dev/null 2>&1; then\n\
+              \    cephfs-shell -c \"$CEPH_CONFIG\" -n \"$username\" -- \\\n     \
+              \ \"mkdir -p $EXPORT_PATH\" \\\n      -- \"chown 2002:2002 $EXPORT_PATH\"\
+              \ \\\n      -- \"chmod 2775 $EXPORT_PATH\"\n  else\n    echo \"cephfs-shell\
+              \ not available in image; aborting to avoid touching /\"\n    exit 3\n\
+              \  fi\nfi\n\ncluster='homelab-nfs'\n\nceph -c \"$CEPH_CONFIG\" nfs export\
+              \ apply \"$cluster\" -i /etc/ganesha/export.json\n"
           image: quay.io/ceph/ceph:v19
           name: apply
           volumeMounts:
@@ -171,7 +135,7 @@ spec:
 ---
 apiVersion: v1
 data:
-  export.json: '{"access_type":"RW","anongid":2002,"anonuid":2002,"clients":[{"access_type":"RW","addresses":["10.10.10.0/24"],"squash":"all_squash"}],"fsal":{"fs_name":"ceph-filesystem","name":"CEPH"},"path":"/","protocols":[4],"pseudo":"/homelab","security_label":false,"squash":"all_squash","transports":["TCP"]}'
+  export.json: '{"access_type":"RW","anongid":2002,"anonuid":2002,"clients":[{"access_type":"RW","addresses":["10.10.10.0/24"],"squash":"all_squash"}],"fsal":{"fs_name":"ceph-filesystem","name":"CEPH"},"path":"/shared","protocols":[4],"pseudo":"/homelab","security_label":false,"squash":"all_squash","transports":["TCP"]}'
 kind: ConfigMap
 metadata:
   annotations:
