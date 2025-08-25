@@ -151,9 +151,9 @@ in
       };
     };
 
-    jobs."ceph-nfs-export-apply-${nfsName}" = {
+    jobs."${nfsName}-export-apply" = {
       metadata = {
-        name = "ceph-nfs-export-apply-${nfsName}";
+        name = "${nfsName}-export-apply";
         namespace = namespace;
       };
       spec = {
@@ -233,8 +233,8 @@ in
       };
     };
 
-    roles."patch-ganesha-cm-role" = {
-      metadata = { name = "patch-ganesha-cm-role"; namespace = namespace; };
+    roles."${nfsName}-ganesha-conf-patch-role" = {
+      metadata = { name = "${nfsName}-ganesha-conf-patch-role"; namespace = namespace; };
       rules = [
         {
           apiGroups = [ "" ];
@@ -249,14 +249,14 @@ in
       ];
     };
 
-    roleBindings."patch-ganesha-cm-rb" = {
-      metadata = { name = "patch-ganesha-cm-rb"; namespace = namespace; };
-      roleRef = { apiGroup = "rbac.authorization.k8s.io"; kind = "Role"; name = "patch-ganesha-cm-role"; };
+    roleBindings."${nfsName}-ganesha-conf-patch-rb" = {
+      metadata = { name = "${nfsName}-ganesha-conf-patch-rb"; namespace = namespace; };
+      roleRef = { apiGroup = "rbac.authorization.k8s.io"; kind = "Role"; name = "${nfsName}-ganesha-conf-patch-role"; };
       subjects = [{ kind = "ServiceAccount"; name = "rook-ceph-default"; namespace = namespace; }];
     };
 
-    jobs."patch-ganesha-cm-${nfsName}" = {
-      metadata = { name = "patch-ganesha-cm-${nfsName}"; namespace = namespace; };
+    jobs."${nfsName}-ganesha-conf-patch" = {
+      metadata = { name = "${nfsName}-ganesha-conf-patch"; namespace = namespace; };
       spec = {
         backoffLimit = 2;
         ttlSecondsAfterFinished = 3600;

@@ -4,7 +4,7 @@ metadata:
   annotations:
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
-  name: ceph-nfs-export-apply-homelab-nfs
+  name: homelab-nfs-export-apply
   namespace: rook-ceph
 spec:
   backoffLimit: 3
@@ -77,7 +77,7 @@ metadata:
   annotations:
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
-  name: patch-ganesha-cm-homelab-nfs
+  name: homelab-nfs-ganesha-conf-patch
   namespace: rook-ceph
 spec:
   backoffLimit: 2
@@ -210,7 +210,7 @@ metadata:
   annotations:
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
-  name: patch-ganesha-cm-role
+  name: homelab-nfs-ganesha-conf-patch-role
   namespace: rook-ceph
 rules:
   - apiGroups:
@@ -239,12 +239,12 @@ metadata:
   annotations:
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
-  name: patch-ganesha-cm-rb
+  name: homelab-nfs-ganesha-conf-patch-rb
   namespace: rook-ceph
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: patch-ganesha-cm-role
+  name: homelab-nfs-ganesha-conf-patch-role
 subjects:
   - kind: ServiceAccount
     name: rook-ceph-default
