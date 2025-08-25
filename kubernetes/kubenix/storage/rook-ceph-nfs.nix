@@ -109,20 +109,21 @@ in
                 cat > /tmp/export.json <<JSON
                 {
                   "export_id": 1,
-                  "access_type": "RW",
                   "path": "$SUBVOL_PATH",
                   "pseudo": "${pseudo}",
+                  "access_type": "RW",
                   "squash": "no_root_squash",
-                  "manage_gids": true,
-                  "security_label": false,
                   "protocols": [4],
                   "transports": ["TCP"],
-                  "fsal": { "name": "CEPH", "fs_name": "${cephfs}" },
+                  "fsal": {
+                    "name": "CEPH",
+                    "fs_name": "${cephfs}"
+                  },
                   "clients": [
                     {
                       "addresses": $(printf '%s\n' '${builtins.toJSON allowedCIDRs}'),
                       "access_type": "RW",
-                      "squash": "no_root_squash",
+                      "squash": "no_root_squash"
                     }
                   ]
                 }
@@ -132,6 +133,9 @@ in
 
                 # Show the information about the NFS export
                 ceph -c "$CEPH_CONFIG" nfs export info "$cluster" "${pseudo}"
+
+                echo "All exports for cluster $cluster:"
+                ceph -c "$CEPH_CONFIG" nfs export ls "$cluster"
               ''
             ];
             volumeMounts = [
@@ -198,7 +202,7 @@ in
                 echo "Patching $CM in $NS"
 
                 tmp="$(mktemp)"
-                kubectl -n "$NS" get "$CM" -o jsonpath='{.data.ganesha\.conf}' > "$tmp"
+                kubectl -n "$NS" get "$CM" -o jsonpath='{.data.config}' > "$tmp"
 
                 cat > "$tmp.new" <<'GANESHA_EOF'
                 NFS_CORE_PARAM {
@@ -228,8 +232,6 @@ in
                 EXPORT_DEFAULTS {
                     Protocols = 4;
                     Transports = TCP;
-                    Path = /;
-                    Pseudo = /;
                     Access_Type = RW;
                     Attr_Expiration_Time = 0;
                     Squash = no_root_squash;
@@ -249,8 +251,8 @@ in
                 esc="$(sed -e 's/\\/\\\\/g' -e 's/"/\\"/g' -e ':a;N;$!ba;s/\n/\\n/g' "$tmp.new")"
 
                 kubectl -n "$NS" patch "$CM" --type='json' \
-                  -p "[{\"op\":\"replace\",\"path\":\"/data/ganesha.conf\",\"value\":\"$esc\"}]"
-                
+                  -p "[{\"op\":\"replace\",\"path\":\"/data/config\",\"value\":\"$esc\"}]"
+              
                 echo "ConfigMap patched."
 
                 kubectl -n "$NS" rollout restart "$DEP"
