@@ -66,6 +66,7 @@ in
           anonuid = 2002;
           anongid = 2002;
           security_label = false;
+          sec_type = [ "sys" ];
           protocols = [ 4 ];
           transports = [ "TCP" ];
           fsal = { name = "CEPH"; fs_name = cephfs; };
@@ -142,6 +143,7 @@ in
                   "anonymous_uid": 2002,
                   "anonymous_gid": 2002,
                   "manage_gids": true,
+                  "sec_type": ["sys"],
                   "security_label": false,
                   "protocols": [4],
                   "transports": ["TCP"],

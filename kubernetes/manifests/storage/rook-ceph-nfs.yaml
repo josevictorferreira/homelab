@@ -38,11 +38,12 @@ spec:
               : \"$SUBVOL_PATH\",\n  \"pseudo\": \"/homelab\",\n  \"squash\": \"all_squash\"\
               ,\n  \"anonuid\": 2002,\n  \"anongid\": 2002,\n  \"anonymous_uid\":\
               \ 2002,\n  \"anonymous_gid\": 2002,\n  \"manage_gids\": true,\n  \"\
-              security_label\": false,\n  \"protocols\": [4],\n  \"transports\": [\"\
-              TCP\"],\n  \"fsal\": { \"name\": \"CEPH\", \"fs_name\": \"ceph-filesystem\"\
-              \ },\n  \"clients\": [\n    { \"addresses\": $(printf '%s\\n' '[\"10.10.10.0/24\"\
-              ]'), \"access_type\": \"RW\", \"squash\": \"all_squash\" }\n  ]\n}\n\
-              JSON\n\nceph -c \"$CEPH_CONFIG\" nfs export apply \"$cluster\" -i /tmp/export.json\n"
+              sec_type\": [\"sys\"],\n  \"security_label\": false,\n  \"protocols\"\
+              : [4],\n  \"transports\": [\"TCP\"],\n  \"fsal\": { \"name\": \"CEPH\"\
+              , \"fs_name\": \"ceph-filesystem\" },\n  \"clients\": [\n    { \"addresses\"\
+              : $(printf '%s\\n' '[\"10.10.10.0/24\"]'), \"access_type\": \"RW\",\
+              \ \"squash\": \"all_squash\" }\n  ]\n}\nJSON\n\nceph -c \"$CEPH_CONFIG\"\
+              \ nfs export apply \"$cluster\" -i /tmp/export.json\n"
           image: quay.io/ceph/ceph:v19
           name: apply
           volumeMounts:
@@ -144,7 +145,7 @@ spec:
 ---
 apiVersion: v1
 data:
-  export.json: '{"access_type":"RW","anongid":2002,"anonuid":2002,"clients":[{"access_type":"RW","addresses":["10.10.10.0/24"],"squash":"all_squash"}],"fsal":{"fs_name":"ceph-filesystem","name":"CEPH"},"path":"/shared","protocols":[4],"pseudo":"/homelab","security_label":false,"squash":"all_squash","transports":["TCP"]}'
+  export.json: '{"access_type":"RW","anongid":2002,"anonuid":2002,"clients":[{"access_type":"RW","addresses":["10.10.10.0/24"],"squash":"all_squash"}],"fsal":{"fs_name":"ceph-filesystem","name":"CEPH"},"path":"/shared","protocols":[4],"pseudo":"/homelab","sec_type":["sys"],"security_label":false,"squash":"all_squash","transports":["TCP"]}'
 kind: ConfigMap
 metadata:
   annotations:
