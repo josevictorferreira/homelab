@@ -136,14 +136,18 @@ in
                   "access_type": "RW",
                   "path": "$SUBVOL_PATH",
                   "pseudo": "${pseudo}",
-                  "squash": "root_squash",
+                  "squash": "all_squash",
+                  "anonuid": 2002,
+                  "anongid": 2002,
+                  "anonymous_uid": 2002,
+                  "anonymous_gid": 2002,
                   "manage_gids": true,
                   "security_label": false,
                   "protocols": [4],
                   "transports": ["TCP"],
                   "fsal": { "name": "CEPH", "fs_name": "${cephfs}" },
                   "clients": [
-                    { "addresses": $(printf '%s\n' '${builtins.toJSON allowedCIDRs}'), "access_type": "RW", "squash": "root_squash" }
+                    { "addresses": $(printf '%s\n' '${builtins.toJSON allowedCIDRs}'), "access_type": "RW", "squash": "all_squash" }
                   ]
                 }
                 JSON
