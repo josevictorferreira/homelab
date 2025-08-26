@@ -137,14 +137,6 @@ in
               watch_url = "rados://.nfs/${nfsName}/conf-nfs.${nfsName}";
             }
 
-            LOG {
-              default_log_level = WARN;
-              Components {
-                ALL = WARN;
-                NFS_STARTUP = INFO;
-              }
-            }
-
             %url	rados://.nfs/${nfsName}/conf-nfs.${nfsName}
 
           '';
