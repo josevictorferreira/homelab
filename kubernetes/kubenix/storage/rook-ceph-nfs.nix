@@ -118,20 +118,6 @@ in
               KeytabPath = "";
             }
 
-            EXPORT {
-              Export_Id = 1;
-              Path = /;
-              Pseudo = "${pseudo}";
-              Access_Type = RW;
-              Manage_Gids = true;
-              Squash = No_Root_Squash;
-              SecType = none;
-              FSAL {
-                Name = CEPH;
-                Filesystem = "${cephfs}";
-              }
-            }
-
             RADOS_KV {
               ceph_conf = "/etc/ceph/ceph.conf";
               userid = nfs-ganesha.homelab-nfs.a;
@@ -151,6 +137,8 @@ in
                 NFS_STARTUP = INFO;
               }
             }
+
+            %url rados://.nfs/homelab-nfs/export
           '';
         };
       };
