@@ -69,7 +69,7 @@ in
             {
               addresses = allowedCIDRs;
               access_type = "RW";
-              squash = "no_root_squash";
+              squash = "all";
               protocols = [ 4 ];
               sectype = [ "sys" ];
             }
@@ -92,7 +92,7 @@ in
               Enable_NLM = false;
               Enable_RQUOTA = false;
               Protocols = 4;
-              Bind_addr = "0.0.0.0";
+              Bind_addr = 0.0.0.0;
               NFS_Port = 2049;
             }
 
@@ -130,7 +130,7 @@ in
 
             RADOS_URLS {
               ceph_conf = "/etc/ceph/ceph.conf";
-              userid = nfs-ganesha.${nfsName}.a;
+              userid = "nfs-ganesha.${nfsName}.a";
               watch_url = "rados://.nfs/${nfsName}/conf-nfs.${nfsName}";
             }
 
@@ -148,7 +148,7 @@ in
               }
             }
 
-            %url	rados://.nfs/${nfsName}/conf-nfs.${nfsName}
+            %url	"rados://.nfs/${nfsName}/conf-nfs.${nfsName}"
 
           '';
         };
