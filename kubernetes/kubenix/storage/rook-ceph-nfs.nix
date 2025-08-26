@@ -61,6 +61,8 @@ in
           security_label = false;
           access_type = "RW";
           squash = "all";
+          anonuid = 1000;
+          anongid = 100;
           fsal = {
             name = "CEPH";
             fs_name = cephfs;
