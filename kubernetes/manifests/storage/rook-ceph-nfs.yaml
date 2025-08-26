@@ -189,11 +189,11 @@ metadata:
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
     lbipam.cilium.io/ips: 10.10.10.150
+    lbipam.cilium.io/sharing-key: homelab-nfs
   name: homelab-nfs
   namespace: rook-ceph
 spec:
   externalTrafficPolicy: Cluster
-  loadBalancerIP: 10.10.10.150
   ports:
     - name: nfs-tcp
       port: 2049
@@ -206,7 +206,6 @@ spec:
   selector:
     app: rook-ceph-nfs
     ceph_daemon_type: nfs
-    ceph_nfs: homelab-nfs
   type: LoadBalancer
 ---
 apiVersion: rbac.authorization.k8s.io/v1
