@@ -155,13 +155,8 @@ metadata:
 apiVersion: v1
 data:
   ganesha.conf: "NFS_CORE_PARAM {\n  Enable_NLM = false;\n  Enable_RQUOTA = false;\n\
-<<<<<<< HEAD
-    \  Protocols = 4;\n  NFS_Port = 2049;\n  Bind_Addr = 0.0.0.0;\n}\n\nMDCACHE {\n\
-    \  Dir_Chunk = 0;\n}\n\nNFSv4 {\n  Graceless = true;\n  Delegations = false;\n\
-=======
     \  Protocols = 4;\n  NFS_Port = 2050;\n  Bind_Addr = 0.0.0.0;\n}\n\nMDCACHE {\n\
-    \  Dir_Chunk = 0;\n}\n\nNFSv4 {\n  Graceless = false;\n  Delegations = false;\n\
->>>>>>> a42398d (updated nfs)
+    \  Dir_Chunk = 0;\n}\n\nNFSv4 {\n  Graceless = true;\n  Delegations = false;\n\
     \  Minor_Versions = 0;\n  Allow_Numeric_Owners = true;\n  Only_Numeric_Owners\
     \ = false;\n}\n\nNFS_KRB5 { Active_krb5 = false; }\n\nEXPORT_DEFAULTS {\n  Attr_Expiration_Time\
     \ = 0;\n  Protocols = 4;\n  Transports = TCP;\n  Access_Type = RW;\n  Squash =\
@@ -172,17 +167,10 @@ data:
     \ = \"/homelab-storage\";\n  Protocols = 4;\n  Transports = TCP;\n  Access_Type\
     \ = RW;\n  Squash = No_Root_Squash;\n  Manage_Gids = true;\n  Sectype = sys;\n\
     \n  FSAL {\n    Name = \"CEPH\";\n    Filesystem = \"ceph-filesystem\";\n    User_Id\
-<<<<<<< HEAD
-    \ = \"nfs-ganesha.homelab-nfs.a\";\n  }\n\n  CLIENT {\n    Clients = 10.10.10.0/24;\n\
-    \    Protocols = 4;\n    Squash = No_Root_Squash;\n  }\n\n  LOG {\n    Default_Log_Level\
-    \ = DEBUG;\n    Components {\n      FSAL_CEPH = DEBUG;\n      NFS4 = DEBUG;\n\
-    \      EXPORT = DEBUG;\n    }\n  }\n}\n\n"
-=======
     \ = \"nfs-ganesha.homelab-nfs.a\";\n  }\n\n  CLIENT {\n    Clients = *;\n    Protocols\
     \ = 4;\n    Squash = No_Root_Squash;\n  }\n\n  LOG {\n    default_log_level =\
     \ WARN;\n    Components {\n      ALL = WARN;\n      NFS_STARTUP = INFO;\n    }\n\
     \  }\n\n"
->>>>>>> a42398d (updated nfs)
 kind: ConfigMap
 metadata:
   annotations:
@@ -211,17 +199,6 @@ spec:
     - name: nfs-tcp
       port: 2049
       protocol: TCP
-<<<<<<< HEAD
-      targetPort: 2049
-    - name: nfs-udp
-      port: 2049
-      protocol: UDP
-      targetPort: 2049
-  selector:
-    app: rook-ceph-nfs
-    ceph_daemon_type: nfs
-  type: LoadBalancer
-=======
       targetPort: 2050
     - name: nfs-udp
       port: 2049
@@ -231,7 +208,6 @@ spec:
     app: rook-ceph-nfs
     ceph_daemon_type: nfs
   type: NodePort
->>>>>>> a42398d (updated nfs)
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
