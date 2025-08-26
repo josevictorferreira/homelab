@@ -100,7 +100,6 @@ in
               Enable_RQUOTA = false;
               Protocols = 4;
               NFS_Port = 2049;
-              HAProxy_Hosts = 127.0.0.1;
               allow_set_io_flusher_fail = true;
             }
 
@@ -109,7 +108,7 @@ in
             }
 
             NFSv4 {
-              Graceless = true;
+              Graceless = false;
               Delegations = false;
               RecoveryBackend = "rados_cluster";
               Minor_Versions = 0, 1, 2;
@@ -125,12 +124,6 @@ in
               nodeid = homelab-nfs.a;
               pool = ".nfs";
               namespace = "${nfsName}";
-            }
-
-            RADOS_URLS {
-              ceph_conf = "/etc/ceph/ceph.conf";
-              userid = nfs-ganesha.homelab-nfs.a;
-              watch_url = "rados://.nfs/homelab-nfs/conf-nfs.homelab-nfs";
             }
 
             RGW {
