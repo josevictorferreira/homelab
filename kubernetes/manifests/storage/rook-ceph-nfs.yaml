@@ -197,10 +197,12 @@ spec:
   externalTrafficPolicy: Cluster
   ports:
     - name: nfs-tcp
+      nodePort: 30325
       port: 2049
       protocol: TCP
       targetPort: 2049
     - name: nfs-udp
+      nodePort: 30326
       port: 2049
       protocol: UDP
       targetPort: 2049
