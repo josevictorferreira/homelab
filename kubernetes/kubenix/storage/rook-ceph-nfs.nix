@@ -126,11 +126,22 @@ in
               Manage_Gids = true;
               Squash = No_Root_Squash;
               SecType = none;
-              Clients = "*";
               FSAL {
                 Name = CEPH;
                 Filesystem = "${cephfs}";
               }
+            }
+
+            RADOS_KV {
+              ceph_conf = "/etc/ceph/ceph.conf";
+              userid = nfs-ganesha.homelab-nfs.a;
+              nodeid = homelab-nfs.a;
+              pool = ".nfs";
+              namespace = "nfs-ganesha";
+            }
+
+            RGW {
+              name = "client.nfs-ganesha.homelab-nfs.a";
             }
 
             LOG {
