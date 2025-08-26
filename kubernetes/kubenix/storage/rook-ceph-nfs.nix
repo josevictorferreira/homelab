@@ -42,8 +42,8 @@ in
           ceph_daemon_type = "nfs";
         };
         ports = [
-          { name = "nfs-tcp"; port = 2049; targetPort = 2049; protocol = "TCP"; }
-          { name = "nfs-udp"; port = 2049; targetPort = 2049; protocol = "UDP"; }
+          { name = "nfs-tcp"; nodePort = 30325; port = 2049; targetPort = 2049; protocol = "TCP"; }
+          { name = "nfs-udp"; nodePort = 30326; port = 2049; targetPort = 2049; protocol = "UDP"; }
         ];
       };
     };
