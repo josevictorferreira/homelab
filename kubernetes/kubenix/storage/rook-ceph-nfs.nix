@@ -108,8 +108,7 @@ in
             NFSv4 {
               Graceless = false;
               Delegations = false;
-              RecoveryBackend = "none";
-              Minor_Versions = 0, 1, 2;
+              Minor_Versions = 0;
             }
 
             NFS_KRB5 {
