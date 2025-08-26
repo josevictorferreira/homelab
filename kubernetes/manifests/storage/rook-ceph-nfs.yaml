@@ -168,8 +168,9 @@ data:
     \ = RW;\n  Squash = No_Root_Squash;\n  Manage_Gids = true;\n  Sectype = sys;\n\
     \n  FSAL {\n    Name = \"CEPH\";\n    Filesystem = \"ceph-filesystem\";\n    User_Id\
     \ = \"nfs-ganesha.homelab-nfs.a\";\n  }\n\n  CLIENT {\n    Clients = 10.10.10.0/24;\n\
-    \    Protocols = 4;\n    Squash = No_Root_Squash;\n  }\n\n  LOG {\n    Default_log_level\
-    \ = FULL_DEBUG;\n    COMPONENTS {\n      ALL = FULL_DEBUG;\n    }\n  }\n}\n\n"
+    \    Protocols = 4;\n    Squash = No_Root_Squash;\n  }\n\n  LOG {\n    Default_Log_Level\
+    \ = DEBUG;\n    Components {\n      FSAL_CEPH = DEBUG;\n      NFS4 = DEBUG;\n\
+    \      EXPORT = DEBUG;\n    }\n  }\n}\n\n"
 kind: ConfigMap
 metadata:
   annotations:
