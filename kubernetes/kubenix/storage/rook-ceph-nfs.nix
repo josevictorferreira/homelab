@@ -151,13 +151,17 @@ in
               FSAL {
                 Name = "CEPH";
                 Filesystem = "ceph-filesystem";
-                User_Id = "nfs-ganesha.homelab-nfs.a";
+                User_Id = "nfs-ganesha.${nfsName}.a";
               }
 
               CLIENT {
                 Clients = 10.10.10.0/24;
                 Protocols = 4;
                 Squash = No_Root_Squash;
+              }
+
+              LOG {
+                Default_Log_Level = FULL_DEBUG;
               }
             }
 
