@@ -97,6 +97,7 @@ in
               Protocols = 4;
               Bind_addr = 0.0.0.0;
               NFS_Port = 2049;
+              Log_Level = DEBUG;
             }
 
             MDCACHE { Dir_Chunk = 0; }

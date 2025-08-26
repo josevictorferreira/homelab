@@ -155,9 +155,9 @@ metadata:
 apiVersion: v1
 data:
   ganesha.conf: "NFS_CORE_PARAM {\n  Enable_NLM = false;\n  Enable_RQUOTA = false;\n\
-    \  Protocols = 4;\n  Bind_addr = 0.0.0.0;\n  NFS_Port = 2049;\n}\n\nMDCACHE {\
-    \ Dir_Chunk = 0; }\n\nNFSv4 {\n  Graceless = true;\n  Delegations = false;\n \
-    \ Minor_Versions = 0, 1, 2;\n  Allow_Numeric_Owners = true;\n  Only_Numeric_Owners\
+    \  Protocols = 4;\n  Bind_addr = 0.0.0.0;\n  NFS_Port = 2049;\n  Log_Level = DEBUG;\n\
+    }\n\nMDCACHE { Dir_Chunk = 0; }\n\nNFSv4 {\n  Graceless = true;\n  Delegations\
+    \ = false;\n  Minor_Versions = 0, 1, 2;\n  Allow_Numeric_Owners = true;\n  Only_Numeric_Owners\
     \ = true;\n}\n\nNFS_KRB5 { Active_krb5 = false; }\n\nEXPORT_DEFAULTS {\n  Attr_Expiration_Time\
     \ = 0;\n  Protocols = 4;\n  Transports = TCP;\n  Access_Type = RW;\n  Squash =\
     \ All_Squash;\n  Manage_Gids = true;\n  Anonymous_uid = 2002;\n  Anonymous_gid\
