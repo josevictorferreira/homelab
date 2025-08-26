@@ -140,8 +140,7 @@ in
               Access_Type = RW;
               Squash = No_Root_Squash;
               Manage_Gids = true;
-              Sectype = sys;
-              Sec = sys;
+              SecType = "sys";
 
               FSAL {
                 Name = "CEPH";
@@ -152,9 +151,9 @@ in
               CLIENT {
                 Clients = *;
                 Protocols = 4;
+                Access_Type = RW;
+                SecType = "sys";
                 Squash = No_Root_Squash;
-                Sectype = sys;
-                Sec = sys;
               }
 
               LOG {
