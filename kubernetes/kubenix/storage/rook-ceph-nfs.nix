@@ -94,7 +94,7 @@ in
               Enable_NLM = false;
               Enable_RQUOTA = false;
               Protocols = 4;
-              Bind_addr = 127.0.0.1;
+              Bind_addr = 10.10.10.150;
               NFS_Port = 2049;
             }
 
