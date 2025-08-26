@@ -59,6 +59,8 @@ in
           path = "/exported/path"; # Placeholder, will be replaced in job
           pseudo = pseudo;
           security_label = false;
+          access_type = "RW";
+          squash = "all";
           fsal = {
             name = "CEPH";
             fs_name = cephfs;
@@ -90,7 +92,7 @@ in
               Enable_NLM = false;
               Enable_RQUOTA = false;
               Protocols = 4;
-              Bind_addr = "0.0.0.0"
+              Bind_addr = "0.0.0.0";
               NFS_Port = 2049;
             }
 
