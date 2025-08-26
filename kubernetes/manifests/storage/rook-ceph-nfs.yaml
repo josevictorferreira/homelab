@@ -143,7 +143,7 @@ spec:
 ---
 apiVersion: v1
 data:
-  export.json: '{"access_type":"RW","clients":[{"access_type":"RW","addresses":["10.10.10.0/24"],"squash":"no_root_squash"}],"export_id":1,"fsal":{"fs_name":"ceph-filesystem","name":"CEPH"},"manage_gids":true,"path":"/exported/path","protocols":[4],"pseudo":"/homelab","sectype":["sys"],"security_label":false,"squash":"no_root_squash","transports":["TCP"]}'
+  export.json: '{"clients":[{"access_type":"RW","addresses":["10.10.10.0/24"],"protocols":[4],"sectype":["sys"],"squash":"no_root_squash"}],"export_id":100,"fsal":{"fs_name":"ceph-filesystem","name":"CEPH","user_id":"nfs-ganesha.homelab-nfs.a"},"path":"/exported/path","pseudo":"/homelab","security_label":false}'
 kind: ConfigMap
 metadata:
   annotations:
@@ -155,23 +155,21 @@ metadata:
 apiVersion: v1
 data:
   ganesha.conf: "NFS_CORE_PARAM {\n  Enable_NLM = false;\n  Enable_RQUOTA = false;\n\
-    \  Protocols = 4;\n}\n\nMDCACHE { Dir_Chunk = 0; }\n\nNFSv4 {\n  Graceless = true;\n\
-    \  Delegations = false;\n  Minor_Versions = 0;\n  Allow_Numeric_Owners = true;\n\
-    \  Only_Numeric_Owners = true;\n}\n\nNFS_KRB5 { Active_krb5 = false; }\n\nEXPORT_DEFAULTS\
-    \ {\n  Attr_Expiration_Time = 0;\n  Protocols = 4;\n  Transports = TCP;\n  Access_Type\
-    \ = RW;\n  Squash = No_Root_Squash;\n  Manage_Gids = false;\n  Anonymous_uid =\
-    \ 1000;\n  Anonymous_gid = 100;\n}\n\nRADOS_KV {\n  ceph_conf = \"/etc/ceph/ceph.conf\"\
+    \  Protocols = 4;\n  Bind_addr = \"0.0.0.0\"\n  NFS_Port = 2049;\n}\n\nMDCACHE\
+    \ { Dir_Chunk = 0; }\n\nNFSv4 {\n  Graceless = true;\n  Delegations = false;\n\
+    \  Minor_Versions = 0;\n  Allow_Numeric_Owners = true;\n  Only_Numeric_Owners\
+    \ = true;\n}\n\nNFS_KRB5 { Active_krb5 = false; }\n\nEXPORT_DEFAULTS {\n  Attr_Expiration_Time\
+    \ = 0;\n  Protocols = 4;\n  Transports = TCP;\n  Access_Type = RW;\n  Squash =\
+    \ All;\n  Manage_Gids = true;\n  Anonymous_uid = 1000;\n  Anonymous_gid = 100;\n\
+    \  SecType = \"sys\";\n}\n\nRADOS_KV {\n  ceph_conf = \"/etc/ceph/ceph.conf\"\
     ;\n  userid = \"nfs-ganesha.homelab-nfs.a\";\n  nodeid = \"homelab-nfs.a\";\n\
-    \  pool = \".nfs\";\n  namespace = \"homelab-nfs\";\n}\n\nCEPH { Ceph_Conf = \"\
-    /etc/ceph/ceph.conf\"; }\n\nLOG {\n  default_log_level = INFO;\n  Components {\n\
-    \    ALL = INFO;\n    FSAL = DEBUG;\n    NFS4 = DEBUG;\n    EXPORT = DEBUG;\n\
-    \    DISPATCH = DEBUG;\n    RADOS = DEBUG;\n  }\n}\n\nEXPORT {\n  Export_Id =\
-    \ 1;\n  Path = \"/\";\n  Pseudo = \"/homelab-storage\";\n  Protocols = 4;\n  Transports\
-    \ = TCP;\n  Access_Type = RW;\n  Squash = All;\n  Manage_Gids = true;\n  SecType\
-    \ = \"sys\";\n\n  FSAL {\n    Name = \"CEPH\";\n    Filesystem = \"ceph-filesystem\"\
-    ;\n    User_Id = \"nfs-ganesha.homelab-nfs.a\";\n  }\n\n  CLIENT {\n    Clients\
-    \ = *;\n    Protocols = 4;\n    Access_Type = RW;\n    SecType = \"sys\";\n  \
-    \  Squash = All;\n  }\n}\n\n"
+    \  pool = \".nfs\";\n  namespace = \"homelab-nfs\";\n}\n\nRADOS_URLS {\n  ceph_conf\
+    \ = \"/etc/ceph/ceph.conf\";\n  userid = nfs-ganesha.homelab-nfs.a;\n  watch_url\
+    \ = \"rados://.nfs/homelab-nfs/conf-nfs.homelab-nfs\";\n}\n\nCEPH { Ceph_Conf\
+    \ = \"/etc/ceph/ceph.conf\"; }\n\nLOG {\n  default_log_level = INFO;\n  Components\
+    \ {\n    ALL = INFO;\n    FSAL = DEBUG;\n    NFS4 = DEBUG;\n    EXPORT = DEBUG;\n\
+    \    DISPATCH = DEBUG;\n    RADOS = DEBUG;\n  }\n}\n\n%url\trados://.nfs/homelab-nfs/conf-nfs.homelab-nfs\n\
+    \n"
 kind: ConfigMap
 metadata:
   annotations:

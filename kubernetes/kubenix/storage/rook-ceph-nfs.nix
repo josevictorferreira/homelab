@@ -55,25 +55,22 @@ in
           namespace = namespace;
         };
         data."export.json" = builtins.toJSON {
-          export_id = 1;
-          access_type = "RW";
+          export_id = 100;
           path = "/exported/path"; # Placeholder, will be replaced in job
           pseudo = pseudo;
-          squash = "no_root_squash";
-          manage_gids = true;
           security_label = false;
-          protocols = [ 4 ];
-          transports = [ "TCP" ];
-          sectype = [ "sys" ];
           fsal = {
             name = "CEPH";
             fs_name = cephfs;
+            user_id = "nfs-ganesha.${nfsName}.a";
           };
           clients = [
             {
               addresses = allowedCIDRs;
               access_type = "RW";
               squash = "no_root_squash";
+              protocols = [ 4 ];
+              sectype = [ "sys" ];
             }
           ];
         };
@@ -94,6 +91,8 @@ in
               Enable_NLM = false;
               Enable_RQUOTA = false;
               Protocols = 4;
+              Bind_addr = "0.0.0.0"
+              NFS_Port = 2049;
             }
 
             MDCACHE { Dir_Chunk = 0; }
@@ -113,10 +112,11 @@ in
               Protocols = 4;
               Transports = TCP;
               Access_Type = RW;
-              Squash = No_Root_Squash;
-              Manage_Gids = false;
+              Squash = All;
+              Manage_Gids = true;
               Anonymous_uid = 1000;
               Anonymous_gid = 100;
+              SecType = "sys";
             }
 
             RADOS_KV {
@@ -125,6 +125,12 @@ in
               nodeid = "${nfsName}.a";
               pool = ".nfs";
               namespace = "${nfsName}";
+            }
+
+            RADOS_URLS {
+              ceph_conf = "/etc/ceph/ceph.conf";
+              userid = nfs-ganesha.${nfsName}.a;
+              watch_url = "rados://.nfs/${nfsName}/conf-nfs.${nfsName}";
             }
 
             CEPH { Ceph_Conf = "/etc/ceph/ceph.conf"; }
@@ -141,31 +147,7 @@ in
               }
             }
 
-            EXPORT {
-              Export_Id = 1;
-              Path = "/";
-              Pseudo = "/homelab-storage";
-              Protocols = 4;
-              Transports = TCP;
-              Access_Type = RW;
-              Squash = All;
-              Manage_Gids = true;
-              SecType = "sys";
-
-              FSAL {
-                Name = "CEPH";
-                Filesystem = "ceph-filesystem";
-                User_Id = "nfs-ganesha.${nfsName}.a";
-              }
-
-              CLIENT {
-                Clients = *;
-                Protocols = 4;
-                Access_Type = RW;
-                SecType = "sys";
-                Squash = All;
-              }
-            }
+            %url	rados://.nfs/${nfsName}/conf-nfs.${nfsName}
 
           '';
         };
