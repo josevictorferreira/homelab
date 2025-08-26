@@ -44,6 +44,7 @@ in
         selector = {
           app = "rook-ceph-nfs";
           ceph_daemon_type = "nfs";
+          ceph_nfs = "${nfsName}";
         };
         ports = [
           { name = "nfs-tcp"; port = 2049; targetPort = 2049; protocol = "TCP"; }
@@ -97,6 +98,8 @@ in
               Enable_NLM = false;
               Enable_RQUOTA = false;
               Protocols = 4;
+              NFS_Port = 2049;
+              Bind_Addr = 0.0.0.0;
             }
 
             MDCACHE {
@@ -142,6 +145,7 @@ in
               Access_Type = RW;
               Squash = No_Root_Squash;
               Manage_Gids = true;
+              Sectype = sys;
 
               FSAL {
                 Name = "CEPH";
@@ -150,8 +154,8 @@ in
               }
 
               CLIENT {
-                Clients = *;
-                Access_Type = RW;
+                Clients = 10.10.10.0/24;
+                Protocols = 4;
                 Squash = No_Root_Squash;
               }
             }
