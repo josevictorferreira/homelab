@@ -143,7 +143,7 @@ spec:
 ---
 apiVersion: v1
 data:
-  export.json: '{"access_type":"RW","anon_gid":2002,"anon_uid":2002,"clients":[{"access_type":"RW","addresses":["10.10.10.0/24"],"protocols":[4],"sectype":["sys"],"squash":"all_squash"}],"export_id":1,"fsal":{"fs_name":"ceph-filesystem","name":"CEPH"},"manage_gids":true,"path":"/exported/path","pseudo":"/homelab","security_label":false,"squash":"all_squash"}'
+  export.json: '{"access_type":"RW","clients":[{"access_type":"RW","addresses":["10.10.10.0/24"],"protocols":[4],"sectype":["sys"],"squash":"all_squash"}],"export_id":1,"fsal":{"fs_name":"ceph-filesystem","name":"CEPH"},"path":"/exported/path","pseudo":"/homelab","security_label":false,"squash":"all_squash"}'
 kind: ConfigMap
 metadata:
   annotations:
@@ -166,8 +166,8 @@ data:
     \  pool = \".nfs\";\n  namespace = \"homelab-nfs\";\n}\n\nRADOS_URLS {\n  ceph_conf\
     \ = \"/etc/ceph/ceph.conf\";\n  userid = \"nfs-ganesha.homelab-nfs.a\";\n  watch_url\
     \ = \"rados://.nfs/homelab-nfs/conf-nfs.homelab-nfs\";\n}\n\nCEPH { Ceph_Conf\
-    \ = \"/etc/ceph/ceph.conf\"; }\n\nLOG {\n  default_log_level = INFO;\n  Components\
-    \ {\n    ALL = INFO;\n    FSAL = DEBUG;\n    NFS4 = DEBUG;\n    EXPORT = DEBUG;\n\
+    \ = \"/etc/ceph/ceph.conf\"; }\n\nLOG {\n  default_log_level = DEBUG;\n  Components\
+    \ {\n    ALL = DEBUG;\n    FSAL = DEBUG;\n    NFS4 = DEBUG;\n    EXPORT = DEBUG;\n\
     \    DISPATCH = DEBUG;\n    RADOS = DEBUG;\n  }\n}\n\n%url\t\"rados://.nfs/homelab-nfs/conf-nfs.homelab-nfs\"\
     \n\n"
 kind: ConfigMap
