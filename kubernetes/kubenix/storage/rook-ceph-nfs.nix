@@ -115,6 +115,8 @@ in
               Access_Type = RW;
               Squash = No_Root_Squash;
               Manage_Gids = false;
+              Anonymous_uid = 1000;
+              Anonymous_gid = 100;
             }
 
             RADOS_KV {
