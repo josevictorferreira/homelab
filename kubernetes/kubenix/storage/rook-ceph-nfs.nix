@@ -125,8 +125,8 @@ in
 
             RADOS_KV {
               ceph_conf = "/etc/ceph/ceph.conf";
-              userid = client.nfs-ganesha.${nfsName}.a;
-              nodeid = ${nfsName}.a;
+              userid = "client.nfs-ganesha.${nfsName}.a";
+              nodeid = "${nfsName}.a";
               pool = ".nfs";
               namespace = "${nfsName}";
             }
