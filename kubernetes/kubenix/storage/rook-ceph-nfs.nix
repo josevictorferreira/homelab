@@ -138,7 +138,7 @@ in
               }
             }
 
-            %url rados://.nfs/homelab-nfs/export
+            %url "rados://.nfs/homelab-nfs/export-1"
           '';
         };
       };
