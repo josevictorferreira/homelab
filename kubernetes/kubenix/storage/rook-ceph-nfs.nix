@@ -103,7 +103,7 @@ in
             }
 
             NFSv4 {
-              Graceless = true;
+              Graceless = false;
               Delegations = false;
               Minor_Versions = 0;
               Allow_Numeric_Owners = true;
@@ -141,6 +141,7 @@ in
               Squash = No_Root_Squash;
               Manage_Gids = true;
               Sectype = sys;
+              Sec = sys;
 
               FSAL {
                 Name = "CEPH";
@@ -152,6 +153,8 @@ in
                 Clients = *;
                 Protocols = 4;
                 Squash = No_Root_Squash;
+                Sectype = sys;
+                Sec = sys;
               }
 
               LOG {
