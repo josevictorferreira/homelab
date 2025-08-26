@@ -42,8 +42,8 @@ in
           ceph_daemon_type = "nfs";
         };
         ports = [
-          { name = "nfs-tcp"; port = 2049; targetPort = 2050; protocol = "TCP"; }
-          { name = "nfs-udp"; port = 2049; targetPort = 2050; protocol = "UDP"; }
+          { name = "nfs-tcp"; port = 2049; targetPort = 2049; protocol = "TCP"; }
+          { name = "nfs-udp"; port = 2049; targetPort = 2049; protocol = "UDP"; }
         ];
       };
     };
@@ -94,13 +94,9 @@ in
               Enable_NLM = false;
               Enable_RQUOTA = false;
               Protocols = 4;
-              NFS_Port = 2050;
-              Bind_Addr = 0.0.0.0;
             }
 
-            MDCACHE {
-              Dir_Chunk = 0;
-            }
+            MDCACHE { Dir_Chunk = 0; }
 
             NFSv4 {
               Graceless = true;
@@ -164,7 +160,6 @@ in
                 NFS_STARTUP = INFO;
               }
             }
-
           '';
         };
       };
