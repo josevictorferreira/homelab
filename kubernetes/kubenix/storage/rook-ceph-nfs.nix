@@ -94,7 +94,7 @@ in
               Enable_NLM = false;
               Enable_RQUOTA = false;
               Protocols = 4;
-              Bind_addr = 10.10.10.150;
+              Bind_addr = 0.0.0.0;
               NFS_Port = 2049;
             }
 
@@ -152,14 +152,6 @@ in
                 Access_Type = RW;
                 SecType = "sys";
                 Squash = No_Root_Squash;
-              }
-            }
-
-            LOG {
-              default_log_level = DEBUG;
-              Components {
-                ALL = DEBUG;
-                NFS_STARTUP = DEBUG;
               }
             }
           '';
