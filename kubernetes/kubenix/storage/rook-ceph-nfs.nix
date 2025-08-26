@@ -104,7 +104,7 @@ in
             NFSv4 {
               Graceless = true;
               Delegations = false;
-              Minor_Versions = 0;
+              Minor_Versions = 0, 1, 2;
               Allow_Numeric_Owners = true;
               Only_Numeric_Owners = true;
             }
