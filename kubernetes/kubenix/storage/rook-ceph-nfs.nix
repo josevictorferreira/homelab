@@ -103,7 +103,7 @@ in
               Delegations = false;
               Minor_Versions = 0;
               Allow_Numeric_Owners = true;
-              Only_Numeric_Owners = false;
+              Only_Numeric_Owners = true;
             }
 
             NFS_KRB5 { Active_krb5 = false; }
@@ -146,7 +146,7 @@ in
               Protocols = 4;
               Transports = TCP;
               Access_Type = RW;
-              Squash = No_Root_Squash;
+              Squash = All;
               Manage_Gids = true;
               SecType = "sys";
 
@@ -161,7 +161,7 @@ in
                 Protocols = 4;
                 Access_Type = RW;
                 SecType = "sys";
-                Squash = No_Root_Squash;
+                Squash = All;
               }
             }
 
