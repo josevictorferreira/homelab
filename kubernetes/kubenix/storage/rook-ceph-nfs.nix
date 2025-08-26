@@ -113,7 +113,6 @@ in
               Minor_Versions = 0;
               Allow_Numeric_Owners = true;
               Only_Numeric_Owners = false;
-              RecoveryBackend = "rados_cluster";
             }
 
             NFS_KRB5 { Active_krb5 = false; }
