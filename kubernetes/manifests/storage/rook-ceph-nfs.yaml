@@ -143,7 +143,7 @@ spec:
 ---
 apiVersion: v1
 data:
-  export.json: '{"clients":[{"access_type":"RW","addresses":["10.10.10.0/24"],"protocols":[4],"sectype":["sys"],"squash":"no_root_squash"}],"export_id":1,"fsal":{"fs_name":"ceph-filesystem","name":"CEPH"},"path":"/exported/path","pseudo":"/homelab","security_label":false}'
+  export.json: '{"access_type":"RW","clients":[{"access_type":"RW","addresses":["10.10.10.0/24"],"protocols":[4],"sectype":["sys"],"squash":"no_root_squash"}],"export_id":1,"fsal":{"fs_name":"ceph-filesystem","name":"CEPH"},"path":"/exported/path","pseudo":"/homelab","security_label":false,"squash":"all"}'
 kind: ConfigMap
 metadata:
   annotations:
@@ -155,7 +155,7 @@ metadata:
 apiVersion: v1
 data:
   ganesha.conf: "NFS_CORE_PARAM {\n  Enable_NLM = false;\n  Enable_RQUOTA = false;\n\
-    \  Protocols = 4;\n  Bind_addr = \"0.0.0.0\"\n  NFS_Port = 2049;\n}\n\nMDCACHE\
+    \  Protocols = 4;\n  Bind_addr = \"0.0.0.0\";\n  NFS_Port = 2049;\n}\n\nMDCACHE\
     \ { Dir_Chunk = 0; }\n\nNFSv4 {\n  Graceless = true;\n  Delegations = false;\n\
     \  Minor_Versions = 0;\n  Allow_Numeric_Owners = true;\n  Only_Numeric_Owners\
     \ = true;\n}\n\nNFS_KRB5 { Active_krb5 = false; }\n\nEXPORT_DEFAULTS {\n  Attr_Expiration_Time\
