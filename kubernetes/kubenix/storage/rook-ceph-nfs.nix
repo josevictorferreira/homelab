@@ -103,7 +103,7 @@ in
             }
 
             NFSv4 {
-              Graceless = false;
+              Graceless = true;
               Delegations = false;
               Minor_Versions = 0;
               Allow_Numeric_Owners = true;
@@ -155,7 +155,10 @@ in
               }
 
               LOG {
-                Default_Log_Level = FULL_DEBUG;
+                Default_log_level = FULL_DEBUG;
+                COMPONENTS {
+                  ALL = FULL_DEBUG;
+                }
               }
             }
 
