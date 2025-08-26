@@ -109,10 +109,28 @@ in
               Graceless = false;
               Delegations = false;
               Minor_Versions = 0;
+              Allow_Numeric_Owners = true;
+              Only_Numeric_Owners = false;
             }
 
             NFS_KRB5 {
               Active_krb5 = false;
+              KeytabPath = "";
+            }
+
+            EXPORT {
+              Export_Id = 1;
+              Path = /;
+              Pseudo = "${pseudo}";
+              Access_Type = RW;
+              Manage_Gids = true;
+              Squash = No_Root_Squash;
+              SecType = none;
+              Clients = "*";
+              FSAL {
+                Name = CEPH;
+                Filesystem = "${cephfs}";
+              }
             }
 
             LOG {
