@@ -156,7 +156,7 @@ apiVersion: v1
 data:
   ganesha.conf: "NFS_CORE_PARAM {\n  Enable_NLM = false;\n  Enable_RQUOTA = false;\n\
     \  Protocols = 4;\n  NFS_Port = 2050;\n  Bind_Addr = 0.0.0.0;\n}\n\nMDCACHE {\n\
-    \  Dir_Chunk = 0;\n}\n\nNFSv4 {\n  Graceless = false;\n  Delegations = false;\n\
+    \  Dir_Chunk = 0;\n}\n\nNFSv4 {\n  Graceless = true;\n  Delegations = false;\n\
     \  Minor_Versions = 0;\n  Allow_Numeric_Owners = true;\n  Only_Numeric_Owners\
     \ = false;\n}\n\nNFS_KRB5 { Active_krb5 = false; }\n\nEXPORT_DEFAULTS {\n  Attr_Expiration_Time\
     \ = 0;\n  Protocols = 4;\n  Transports = TCP;\n  Access_Type = RW;\n  Squash =\
