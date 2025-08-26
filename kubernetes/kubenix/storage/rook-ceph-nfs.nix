@@ -42,8 +42,8 @@ in
           ceph_daemon_type = "nfs";
         };
         ports = [
-          { name = "nfs"; nodePort = 30325; port = 2049; targetPort = 2049; protocol = "TCP"; }
-          { name = "nfs"; nodePort = 30326; port = 2049; targetPort = 2049; protocol = "UDP"; }
+          { name = "nfs"; nodePort = 30325; port = 2049; targetPort = 2050; protocol = "TCP"; }
+          { name = "nfs"; nodePort = 30326; port = 2049; targetPort = 2050; protocol = "UDP"; }
         ];
       };
     };
@@ -94,8 +94,7 @@ in
               Enable_NLM = false;
               Enable_RQUOTA = false;
               Protocols = 4;
-              Bind_addr = 0.0.0.0;
-              NFS_Port = 2049;
+              NFS_Port = 2050;
             }
 
             MDCACHE { Dir_Chunk = 0; }
@@ -129,6 +128,18 @@ in
 
             CEPH { Ceph_Conf = "/etc/ceph/ceph.conf"; }
 
+            LOG {
+              default_log_level = INFO;
+              Components {
+                ALL = INFO;
+                FSAL = DEBUG;
+                NFS4 = DEBUG;
+                EXPORT = DEBUG;
+                DISPATCH = DEBUG;
+                RADOS = DEBUG;
+              }
+            }
+
             EXPORT {
               Export_Id = 1;
               Path = "/";
@@ -154,6 +165,7 @@ in
                 Squash = No_Root_Squash;
               }
             }
+
           '';
         };
       };
