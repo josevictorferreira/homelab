@@ -163,9 +163,9 @@ data:
     \ No_Root_Squash;\n  Manage_Gids = false;\n}\n\nRADOS_KV {\n  ceph_conf = \"/etc/ceph/ceph.conf\"\
     ;\n  userid = \"nfs-ganesha.homelab-nfs.a\";\n  nodeid = \"homelab-nfs.a\";\n\
     \  pool = \".nfs\";\n  namespace = \"homelab-nfs\";\n}\n\nRADOS_URLS {\n  ceph_conf\
-    \ = \"/etc/ceph/ceph.conf\";\n  userid = \"nfs-ganesha.homelab-nfs.a\";\n  watch_url\
-    \ = \"rados://.nfs/homelab-nfs/conf-nfs.homelab-nfs\";\n}\n\n%url    \"rados://.nfs/homelab-nfs/conf-nfs.homelab-nfs\"\
-    \n\n"
+    \ = \"/etc/ceph/ceph.conf\";\n  userid = \"client.nfs-ganesha.homelab-nfs.a\"\
+    ;\n  watch_url = \"rados://.nfs/homelab-nfs/conf-nfs.homelab-nfs\";\n}\n\n%url\
+    \    \"rados://.nfs/homelab-nfs/conf-nfs.homelab-nfs\"\n\n"
 kind: ConfigMap
 metadata:
   annotations:
