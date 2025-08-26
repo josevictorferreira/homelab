@@ -62,7 +62,6 @@ in
           fsal = {
             name = "CEPH";
             fs_name = cephfs;
-            user_id = "nfs-ganesha.${nfsName}.a";
           };
           clients = [
             {
