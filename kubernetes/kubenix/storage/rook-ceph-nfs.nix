@@ -125,11 +125,20 @@ in
 
             RADOS_KV {
               ceph_conf = "/etc/ceph/ceph.conf";
-              userid = "client.nfs-ganesha.${nfsName}.a";
+              userid = "nfs-ganesha.${nfsName}.a";
               nodeid = "${nfsName}.a";
               pool = ".nfs";
               namespace = "${nfsName}";
             }
+
+            RADOS_URLS {
+              ceph_conf = "/etc/ceph/ceph.conf";
+              userid = "nfs-ganesha.${nfsName}.a";
+              watch_url = "rados://.nfs/${nfsName}/conf-nfs.${nfsName}";
+            }
+
+            %url    "rados://.nfs/${nfsName}/conf-nfs.${nfsName}"
+
           '';
         };
       };
