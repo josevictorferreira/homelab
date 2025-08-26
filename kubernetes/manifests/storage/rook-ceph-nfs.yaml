@@ -159,18 +159,19 @@ data:
     \  Delegations = false;\n  Minor_Versions = 0;\n  Allow_Numeric_Owners = true;\n\
     \  Only_Numeric_Owners = true;\n}\n\nNFS_KRB5 { Active_krb5 = false; }\n\nEXPORT_DEFAULTS\
     \ {\n  Attr_Expiration_Time = 0;\n  Protocols = 4;\n  Transports = TCP;\n  Access_Type\
-    \ = RW;\n  Squash = No_Root_Squash;\n  Manage_Gids = false;\n}\n\nRADOS_KV {\n\
-    \  ceph_conf = \"/etc/ceph/ceph.conf\";\n  userid = \"nfs-ganesha.homelab-nfs.a\"\
-    ;\n  nodeid = \"homelab-nfs.a\";\n  pool = \".nfs\";\n  namespace = \"homelab-nfs\"\
-    ;\n}\n\nCEPH { Ceph_Conf = \"/etc/ceph/ceph.conf\"; }\n\nLOG {\n  default_log_level\
-    \ = INFO;\n  Components {\n    ALL = INFO;\n    FSAL = DEBUG;\n    NFS4 = DEBUG;\n\
-    \    EXPORT = DEBUG;\n    DISPATCH = DEBUG;\n    RADOS = DEBUG;\n  }\n}\n\nEXPORT\
-    \ {\n  Export_Id = 1;\n  Path = \"/\";\n  Pseudo = \"/homelab-storage\";\n  Protocols\
-    \ = 4;\n  Transports = TCP;\n  Access_Type = RW;\n  Squash = All;\n  Manage_Gids\
-    \ = true;\n  SecType = \"sys\";\n\n  FSAL {\n    Name = \"CEPH\";\n    Filesystem\
-    \ = \"ceph-filesystem\";\n    User_Id = \"nfs-ganesha.homelab-nfs.a\";\n  }\n\n\
-    \  CLIENT {\n    Clients = *;\n    Protocols = 4;\n    Access_Type = RW;\n   \
-    \ SecType = \"sys\";\n    Squash = All;\n  }\n}\n\n"
+    \ = RW;\n  Squash = No_Root_Squash;\n  Manage_Gids = false;\n  Anonymous_uid =\
+    \ 1000;\n  Anonymous_gid = 100;\n}\n\nRADOS_KV {\n  ceph_conf = \"/etc/ceph/ceph.conf\"\
+    ;\n  userid = \"nfs-ganesha.homelab-nfs.a\";\n  nodeid = \"homelab-nfs.a\";\n\
+    \  pool = \".nfs\";\n  namespace = \"homelab-nfs\";\n}\n\nCEPH { Ceph_Conf = \"\
+    /etc/ceph/ceph.conf\"; }\n\nLOG {\n  default_log_level = INFO;\n  Components {\n\
+    \    ALL = INFO;\n    FSAL = DEBUG;\n    NFS4 = DEBUG;\n    EXPORT = DEBUG;\n\
+    \    DISPATCH = DEBUG;\n    RADOS = DEBUG;\n  }\n}\n\nEXPORT {\n  Export_Id =\
+    \ 1;\n  Path = \"/\";\n  Pseudo = \"/homelab-storage\";\n  Protocols = 4;\n  Transports\
+    \ = TCP;\n  Access_Type = RW;\n  Squash = All;\n  Manage_Gids = true;\n  SecType\
+    \ = \"sys\";\n\n  FSAL {\n    Name = \"CEPH\";\n    Filesystem = \"ceph-filesystem\"\
+    ;\n    User_Id = \"nfs-ganesha.homelab-nfs.a\";\n  }\n\n  CLIENT {\n    Clients\
+    \ = *;\n    Protocols = 4;\n    Access_Type = RW;\n    SecType = \"sys\";\n  \
+    \  Squash = All;\n  }\n}\n\n"
 kind: ConfigMap
 metadata:
   annotations:
