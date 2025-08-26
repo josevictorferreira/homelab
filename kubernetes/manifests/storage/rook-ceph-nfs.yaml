@@ -155,19 +155,18 @@ metadata:
 apiVersion: v1
 data:
   ganesha.conf: "NFS_CORE_PARAM {\n  Enable_NLM = false;\n  Enable_RQUOTA = false;\n\
-    \  Protocols = 4;\n  allow_set_io_flusher_fail = true;\n}\n\nMDCACHE {\n  Dir_Chunk\
-    \ = 0;\n}\n\nNFSv4 {\n  Graceless = false;\n  Delegations = false;\n  Minor_Versions\
-    \ = 0;\n  Allow_Numeric_Owners = true;\n  Only_Numeric_Owners = false;\n  RecoveryBackend\
-    \ = \"rados_cluster\";\n}\n\nNFS_KRB5 {\n  Active_krb5 = false;\n  KeytabPath\
-    \ = \"\";\n}\n\nEXPORT_DEFAULTS {\n  Attr_Expiration_Time = 0;\n  Protocols =\
-    \ 4;\n  Transports = TCP;\n  Access_Type = RW;\n  Squash = No_Root_Squash;\n \
-    \ Manage_Gids = false;\n}\n\nRGW {\n  name = \"client.nfs-ganesha.homelab-nfs.a\"\
-    ;\n}\n\nRADOS_KV {\n  ceph_conf = \"/etc/ceph/ceph.conf\";\n  userid = nfs-ganesha.homelab-nfs.a;\n\
-    \  nodeid = homelab-nfs.a;\n  pool = \".nfs\";\n  namespace = \"homelab-nfs\"\
-    ;\n}\n\nRADOS_URLS {\n  ceph_conf = \"/etc/ceph/ceph.conf\";\n  userid = nfs-ganesha.homelab-nfs.a;\n\
-    \  watch_url = \"rados://.nfs/homelab-nfs/conf-nfs.homelab-nfs\";\n}\n\nLOG {\n\
-    \  default_log_level = WARN;\n  Components {\n    ALL = WARN;\n    NFS_STARTUP\
-    \ = INFO;\n  }\n}\n\n%url\trados://.nfs/homelab-nfs/conf-nfs.homelab-nfs\n\n"
+    \  Protocols = 4;\n}\n\nMDCACHE {\n  Dir_Chunk = 0;\n}\n\nNFSv4 {\n  Graceless\
+    \ = false;\n  Delegations = false;\n  Minor_Versions = 0;\n  Allow_Numeric_Owners\
+    \ = true;\n  Only_Numeric_Owners = false;\n  RecoveryBackend = \"rados_cluster\"\
+    ;\n}\n\nNFS_KRB5 { Active_krb5 = false; }\n\nEXPORT_DEFAULTS {\n  Attr_Expiration_Time\
+    \ = 0;\n  Protocols = 4;\n  Transports = TCP;\n  Access_Type = RW;\n  Squash =\
+    \ No_Root_Squash;\n  Manage_Gids = false;\n}\n\nRADOS_KV {\n  ceph_conf = \"/etc/ceph/ceph.conf\"\
+    ;\n  userid = \"client.nfs-ganesha.homelab-nfs.a\";\n  nodeid = homelab-nfs.a;\n\
+    \  pool = \".nfs\";\n  namespace = \"homelab-nfs\";\n}\n\nRADOS_URLS {\n  ceph_conf\
+    \ = \"/etc/ceph/ceph.conf\";\n  userid = nfs-ganesha.homelab-nfs.a;\n  watch_url\
+    \ = \"rados://.nfs/homelab-nfs/conf-nfs.homelab-nfs\";\n}\n\nLOG {\n  default_log_level\
+    \ = WARN;\n  Components {\n    ALL = WARN;\n    NFS_STARTUP = INFO;\n  }\n}\n\n\
+    %url\trados://.nfs/homelab-nfs/conf-nfs.homelab-nfs\n\n"
 kind: ConfigMap
 metadata:
   annotations:
@@ -196,10 +195,6 @@ spec:
     - name: nfs-tcp
       port: 2049
       protocol: TCP
-      targetPort: 2049
-    - name: nfs-udp
-      port: 2049
-      protocol: UDP
       targetPort: 2049
   selector:
     app: rook-ceph-nfs

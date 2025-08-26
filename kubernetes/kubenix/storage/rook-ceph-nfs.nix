@@ -47,7 +47,6 @@ in
         };
         ports = [
           { name = "nfs-tcp"; port = 2049; targetPort = 2049; protocol = "TCP"; }
-          { name = "nfs-udp"; port = 2049; targetPort = 2049; protocol = "UDP"; }
         ];
       };
     };
@@ -98,7 +97,6 @@ in
               Enable_NLM = false;
               Enable_RQUOTA = false;
               Protocols = 4;
-              allow_set_io_flusher_fail = true;
             }
 
             MDCACHE {
@@ -114,10 +112,7 @@ in
               RecoveryBackend = "rados_cluster";
             }
 
-            NFS_KRB5 {
-              Active_krb5 = false;
-              KeytabPath = "";
-            }
+            NFS_KRB5 { Active_krb5 = false; }
 
             EXPORT_DEFAULTS {
               Attr_Expiration_Time = 0;
@@ -128,22 +123,18 @@ in
               Manage_Gids = false;
             }
 
-            RGW {
-              name = "client.nfs-ganesha.homelab-nfs.a";
-            }
-
             RADOS_KV {
               ceph_conf = "/etc/ceph/ceph.conf";
-              userid = nfs-ganesha.homelab-nfs.a;
-              nodeid = homelab-nfs.a;
+              userid = "client.nfs-ganesha.${nfsName}.a";
+              nodeid = ${nfsName}.a;
               pool = ".nfs";
-              namespace = "homelab-nfs";
+              namespace = "${nfsName}";
             }
 
             RADOS_URLS {
               ceph_conf = "/etc/ceph/ceph.conf";
-              userid = nfs-ganesha.homelab-nfs.a;
-              watch_url = "rados://.nfs/homelab-nfs/conf-nfs.homelab-nfs";
+              userid = nfs-ganesha.${nfsName}.a;
+              watch_url = "rados://.nfs/${nfsName}/conf-nfs.${nfsName}";
             }
 
             LOG {
@@ -154,7 +145,7 @@ in
               }
             }
 
-            %url	rados://.nfs/homelab-nfs/conf-nfs.homelab-nfs
+            %url	rados://.nfs/${nfsName}/conf-nfs.${nfsName}
 
           '';
         };
