@@ -42,8 +42,8 @@ in
           ceph_daemon_type = "nfs";
         };
         ports = [
-          { name = "nfs"; nodePort = 30325; port = 2049; targetPort = 2050; protocol = "TCP"; }
-          { name = "nfs"; nodePort = 30326; port = 2049; targetPort = 2050; protocol = "UDP"; }
+          { name = "nfs"; nodePort = 30325; port = 2049; targetPort = 2049; protocol = "TCP"; }
+          { name = "nfs"; nodePort = 30326; port = 2049; targetPort = 2049; protocol = "UDP"; }
         ];
       };
     };
@@ -94,7 +94,6 @@ in
               Enable_NLM = false;
               Enable_RQUOTA = false;
               Protocols = 4;
-              NFS_Port = 2050;
             }
 
             MDCACHE { Dir_Chunk = 0; }
