@@ -68,7 +68,7 @@ in
           security_label = false;
           protocols = [ 4 ];
           transports = [ "TCP" ];
-          sectype = [ "none" ];
+          sectype = [ "sys" ];
           fsal = {
             name = "CEPH";
             fs_name = cephfs;
@@ -78,7 +78,6 @@ in
               addresses = allowedCIDRs;
               access_type = "RW";
               squash = "no_root_squash";
-              sectype = [ "none" ];
             }
           ];
         };
@@ -99,6 +98,7 @@ in
               Enable_NLM = false;
               Enable_RQUOTA = false;
               Protocols = 4;
+              allow_set_io_flusher_fail = true;
             }
 
             MDCACHE {
