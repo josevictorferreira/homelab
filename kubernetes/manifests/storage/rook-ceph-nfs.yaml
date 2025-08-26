@@ -158,13 +158,11 @@ data:
     \  Protocols = 4;\n}\n\nMDCACHE {\n  Dir_Chunk = 0;\n}\n\nNFSv4 {\n  Graceless\
     \ = false;\n  Delegations = false;\n  Minor_Versions = 0;\n  Allow_Numeric_Owners\
     \ = true;\n  Only_Numeric_Owners = false;\n}\n\nNFS_KRB5 {\n  Active_krb5 = false;\n\
-    \  KeytabPath = \"\";\n}\n\nEXPORT {\n  Export_Id = 1;\n  Path = /;\n  Pseudo\
-    \ = \"/homelab\";\n  Access_Type = RW;\n  Manage_Gids = true;\n  Squash = No_Root_Squash;\n\
-    \  SecType = none;\n  FSAL {\n    Name = CEPH;\n    Filesystem = \"ceph-filesystem\"\
-    ;\n  }\n}\n\nRADOS_KV {\n  ceph_conf = \"/etc/ceph/ceph.conf\";\n  userid = nfs-ganesha.homelab-nfs.a;\n\
-    \  nodeid = homelab-nfs.a;\n  pool = \".nfs\";\n  namespace = \"nfs-ganesha\"\
-    ;\n}\n\nRGW {\n  name = \"client.nfs-ganesha.homelab-nfs.a\";\n}\n\nLOG {\n  default_log_level\
-    \ = WARN;\n  Components {\n    ALL = WARN;\n    NFS_STARTUP = INFO;\n  }\n}\n"
+    \  KeytabPath = \"\";\n}\n\nRADOS_KV {\n  ceph_conf = \"/etc/ceph/ceph.conf\"\
+    ;\n  userid = nfs-ganesha.homelab-nfs.a;\n  nodeid = homelab-nfs.a;\n  pool =\
+    \ \".nfs\";\n  namespace = \"nfs-ganesha\";\n}\n\nRGW {\n  name = \"client.nfs-ganesha.homelab-nfs.a\"\
+    ;\n}\n\nLOG {\n  default_log_level = WARN;\n  Components {\n    ALL = WARN;\n\
+    \    NFS_STARTUP = INFO;\n  }\n}\n\n%url rados://.nfs/homelab-nfs/export\n"
 kind: ConfigMap
 metadata:
   annotations:
