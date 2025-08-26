@@ -155,10 +155,9 @@ metadata:
 apiVersion: v1
 data:
   ganesha.conf: "NFS_CORE_PARAM {\n  Enable_NLM = false;\n  Enable_RQUOTA = false;\n\
-    \  Protocols = 4;\n  allow_set_io_flusher_fail = true;\n}\n\nMDCACHE {\n  Dir_Chunk\
-    \ = 0;\n}\n\nNFSv4 {\n  Graceless = false;\n  Delegations = false;\n  RecoveryBackend\
-    \ = \"none\";\n  Minor_Versions = 0, 1, 2;\n}\n\nNFS_KRB5 {\n  Active_krb5 = false;\n\
-    }\n\nRGW {\n  name = \"client.nfs-ganesha.homelab-nfs.a\";\n}\n\nLOG {\n  default_log_level\
+    \  Protocols = 4;\n}\n\nMDCACHE {\n  Dir_Chunk = 0;\n}\n\nNFSv4 {\n  Graceless\
+    \ = false;\n  Delegations = false;\n  RecoveryBackend = \"none\";\n  Minor_Versions\
+    \ = 0, 1, 2;\n}\n\nNFS_KRB5 {\n  Active_krb5 = false;\n}\n\nLOG {\n  default_log_level\
     \ = WARN;\n  Components {\n    ALL = WARN;\n    NFS_STARTUP = INFO;\n  }\n}\n"
 kind: ConfigMap
 metadata:
