@@ -99,7 +99,6 @@ in
               Enable_NLM = false;
               Enable_RQUOTA = false;
               Protocols = 4;
-              NFS_Port = 2049;
               allow_set_io_flusher_fail = true;
             }
 
@@ -110,20 +109,12 @@ in
             NFSv4 {
               Graceless = false;
               Delegations = false;
-              RecoveryBackend = "rados_cluster";
+              RecoveryBackend = "none";
               Minor_Versions = 0, 1, 2;
             }
 
             NFS_KRB5 {
               Active_krb5 = false;
-            }
-
-            RADOS_KV {
-              ceph_conf = "/etc/ceph/ceph.conf";
-              userid = nfs-ganesha.${nfsName}.a;
-              nodeid = homelab-nfs.a;
-              pool = ".nfs";
-              namespace = "${nfsName}";
             }
 
             RGW {
@@ -137,8 +128,6 @@ in
                 NFS_STARTUP = INFO;
               }
             }
-
-            %url	rados://.nfs/homelab-nfs/conf-nfs.homelab-nfs
           '';
         };
       };
