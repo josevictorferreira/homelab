@@ -131,13 +131,30 @@ in
               namespace = "${nfsName}";
             }
 
-            RADOS_URLS {
-              ceph_conf = "/etc/ceph/ceph.conf";
-              userid = "client.nfs-ganesha.${nfsName}.a";
-              watch_url = "rados://.nfs/${nfsName}/conf-nfs.${nfsName}";
-            }
+            CEPH { Ceph_Conf = "/etc/ceph/ceph.conf"; }
 
-            %url    "rados://.nfs/${nfsName}/conf-nfs.${nfsName}"
+            EXPORT {
+              Export_Id = 1;
+              Path = "/";
+              Pseudo = "/homelab-storage";
+              Protocols = 4;
+              Transports = TCP;
+              Access_Type = RW;
+              Squash = No_Root_Squash;
+              Manage_Gids = true;
+
+              FSAL {
+                Name = "CEPH";
+                Filesystem = "ceph-filesystem";
+                User_Id = "nfs-ganesha.homelab-nfs.a";
+              }
+
+              CLIENT {
+                Clients = "10.10.10.0/24";
+                Access_Type = RW;
+                Squash = No_Root_Squash;
+              }
+            }
 
           '';
         };
