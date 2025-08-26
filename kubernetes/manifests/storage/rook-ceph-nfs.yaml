@@ -164,9 +164,8 @@ data:
     ;\n  userid = \"client.nfs-ganesha.homelab-nfs.a\";\n  nodeid = homelab-nfs.a;\n\
     \  pool = \".nfs\";\n  namespace = \"homelab-nfs\";\n}\n\nRADOS_URLS {\n  ceph_conf\
     \ = \"/etc/ceph/ceph.conf\";\n  userid = nfs-ganesha.homelab-nfs.a;\n  watch_url\
-    \ = \"rados://.nfs/homelab-nfs/conf-nfs.homelab-nfs\";\n}\n\nLOG {\n  default_log_level\
-    \ = WARN;\n  Components {\n    ALL = WARN;\n    NFS_STARTUP = INFO;\n  }\n}\n\n\
-    %url\trados://.nfs/homelab-nfs/conf-nfs.homelab-nfs\n\n"
+    \ = \"rados://.nfs/homelab-nfs/conf-nfs.homelab-nfs\";\n}\n\n%url\trados://.nfs/homelab-nfs/conf-nfs.homelab-nfs\n\
+    \n"
 kind: ConfigMap
 metadata:
   annotations:
