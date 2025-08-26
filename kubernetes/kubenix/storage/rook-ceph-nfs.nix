@@ -155,9 +155,11 @@ in
               }
 
               LOG {
-                Default_log_level = FULL_DEBUG;
-                COMPONENTS {
-                  ALL = FULL_DEBUG;
+                Default_Log_Level = DEBUG;
+                Components {
+                  FSAL_CEPH = DEBUG;
+                  NFS4 = DEBUG;
+                  EXPORT = DEBUG;
                 }
               }
             }
