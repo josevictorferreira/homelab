@@ -99,7 +99,6 @@ in
               Enable_NLM = false;
               Enable_RQUOTA = false;
               Protocols = 4;
-              allow_set_io_flusher_fail = true;
             }
 
             MDCACHE {
@@ -115,10 +114,6 @@ in
 
             NFS_KRB5 {
               Active_krb5 = false;
-            }
-
-            RGW {
-              name = "client.nfs-ganesha.homelab-nfs.a";
             }
 
             LOG {
