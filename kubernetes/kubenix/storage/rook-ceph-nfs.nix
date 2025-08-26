@@ -138,7 +138,8 @@ in
               }
             }
 
-            %url "rados://.nfs/homelab-nfs/export-1"
+            %url	rados://.nfs/homelab-nfs/conf-nfs.homelab-nfs
+
           '';
         };
       };
