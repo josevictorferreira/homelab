@@ -165,11 +165,11 @@ data:
     \  pool = \".nfs\";\n  namespace = \"homelab-nfs\";\n}\n\nCEPH { Ceph_Conf = \"\
     /etc/ceph/ceph.conf\"; }\n\nEXPORT {\n  Export_Id = 1;\n  Path = \"/\";\n  Pseudo\
     \ = \"/homelab-storage\";\n  Protocols = 4;\n  Transports = TCP;\n  Access_Type\
-    \ = RW;\n  Squash = No_Root_Squash;\n  Manage_Gids = true;\n  Sectype = sys;\n\
-    \  Sec = sys;\n\n  FSAL {\n    Name = \"CEPH\";\n    Filesystem = \"ceph-filesystem\"\
-    ;\n    User_Id = \"nfs-ganesha.homelab-nfs.a\";\n  }\n\n  CLIENT {\n    Clients\
-    \ = *;\n    Protocols = 4;\n    Squash = No_Root_Squash;\n    Sectype = sys;\n\
-    \    Sec = sys;\n  }\n\n  LOG {\n    default_log_level = WARN;\n    Components\
+    \ = RW;\n  Squash = No_Root_Squash;\n  Manage_Gids = true;\n  SecType = \"sys\"\
+    ;\n\n  FSAL {\n    Name = \"CEPH\";\n    Filesystem = \"ceph-filesystem\";\n \
+    \   User_Id = \"nfs-ganesha.homelab-nfs.a\";\n  }\n\n  CLIENT {\n    Clients =\
+    \ *;\n    Protocols = 4;\n    Access_Type = RW;\n    SecType = \"sys\";\n    Squash\
+    \ = No_Root_Squash;\n  }\n\n  LOG {\n    default_log_level = WARN;\n    Components\
     \ {\n      ALL = WARN;\n      NFS_STARTUP = INFO;\n    }\n  }\n\n"
 kind: ConfigMap
 metadata:
