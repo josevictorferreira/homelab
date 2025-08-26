@@ -99,7 +99,6 @@ in
               Enable_NLM = false;
               Enable_RQUOTA = false;
               Protocols = 4;
-              RecoveryBackend = "rados_cluster";
             }
 
             MDCACHE {
@@ -112,6 +111,7 @@ in
               Minor_Versions = 0;
               Allow_Numeric_Owners = true;
               Only_Numeric_Owners = false;
+              RecoveryBackend = "rados_cluster";
             }
 
             NFS_KRB5 {
