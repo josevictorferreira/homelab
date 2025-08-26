@@ -35,7 +35,7 @@ in
         namespace = namespace;
       };
       spec = {
-        type = "NodePort";
+        type = "LoadBalancer";
         externalTrafficPolicy = "Cluster";
         selector = {
           app = "rook-ceph-nfs";
@@ -154,10 +154,10 @@ in
             }
 
             LOG {
-              default_log_level = WARN;
+              default_log_level = DEBUG;
               Components {
-                ALL = WARN;
-                NFS_STARTUP = INFO;
+                ALL = DEBUG;
+                NFS_STARTUP = DEBUG;
               }
             }
           '';
