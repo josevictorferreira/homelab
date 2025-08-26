@@ -99,6 +99,7 @@ in
               Enable_NLM = false;
               Enable_RQUOTA = false;
               Protocols = 4;
+              RecoveryBackend = "rados_cluster";
             }
 
             MDCACHE {
@@ -118,12 +119,31 @@ in
               KeytabPath = "";
             }
 
+            EXPORT_DEFAULTS {
+              Attr_Expiration_Time = 0;
+              Protocols = 4;
+              Transports = TCP;
+              Access_Type = RW;
+              Squash = No_Root_Squash;
+              Manage_Gids = false;
+            }
+
+            RGW {
+              name = "client.nfs-ganesha.homelab-nfs.a";
+            }
+
             RADOS_KV {
               ceph_conf = "/etc/ceph/ceph.conf";
               userid = nfs-ganesha.homelab-nfs.a;
               nodeid = homelab-nfs.a;
               pool = ".nfs";
               namespace = "homelab-nfs";
+            }
+
+            RADOS_URLS {
+              ceph_conf = "/etc/ceph/ceph.conf";
+              userid = nfs-ganesha.homelab-nfs.a;
+              watch_url = "rados://.nfs/homelab-nfs/conf-nfs.homelab-nfs";
             }
 
             LOG {
