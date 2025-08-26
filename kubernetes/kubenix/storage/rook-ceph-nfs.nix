@@ -155,14 +155,15 @@ in
                 SecType = "sys";
                 Squash = No_Root_Squash;
               }
+            }
 
-              LOG {
-                default_log_level = WARN;
-                Components {
-                  ALL = WARN;
-                  NFS_STARTUP = INFO;
-                }
+            LOG {
+              default_log_level = WARN;
+              Components {
+                ALL = WARN;
+                NFS_STARTUP = INFO;
               }
+            }
 
           '';
         };
