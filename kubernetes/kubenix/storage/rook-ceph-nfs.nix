@@ -134,7 +134,7 @@ in
               }
             }
 
-            %url	rados:\/\/.nfs\/homelab-nfs\/conf-nfs.homelab-nfs
+            %url	rados://.nfs/homelab-nfs/conf-nfs.homelab-nfs
 
           '';
         };
