@@ -18,7 +18,7 @@ in
           active = 1;
           resources = {
             requests = { cpu = "50m"; memory = "64Mi"; };
-            limits = { memory = "512Mi"; };
+            limits = { memory = "1Gi"; };
           };
           placement = {
             tolerations = [
