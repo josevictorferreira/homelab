@@ -55,7 +55,7 @@ in
           namespace = namespace;
         };
         data."export.json" = builtins.toJSON {
-          export_id = 100;
+          export_id = 1;
           path = "/exported/path"; # Placeholder, will be replaced in job
           pseudo = pseudo;
           security_label = false;

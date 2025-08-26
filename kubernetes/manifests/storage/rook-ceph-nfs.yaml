@@ -143,7 +143,7 @@ spec:
 ---
 apiVersion: v1
 data:
-  export.json: '{"clients":[{"access_type":"RW","addresses":["10.10.10.0/24"],"protocols":[4],"sectype":["sys"],"squash":"no_root_squash"}],"export_id":100,"fsal":{"fs_name":"ceph-filesystem","name":"CEPH","user_id":"nfs-ganesha.homelab-nfs.a"},"path":"/exported/path","pseudo":"/homelab","security_label":false}'
+  export.json: '{"clients":[{"access_type":"RW","addresses":["10.10.10.0/24"],"protocols":[4],"sectype":["sys"],"squash":"no_root_squash"}],"export_id":1,"fsal":{"fs_name":"ceph-filesystem","name":"CEPH","user_id":"nfs-ganesha.homelab-nfs.a"},"path":"/exported/path","pseudo":"/homelab","security_label":false}'
 kind: ConfigMap
 metadata:
   annotations:
