@@ -48,6 +48,7 @@ in
         };
         ports = [
           { name = "nfs-tcp"; port = 2049; targetPort = 2049; protocol = "TCP"; }
+          { name = "nfs-udp"; port = 2049; targetPort = 2049; protocol = "UDP"; }
         ];
       };
     };
