@@ -60,9 +60,10 @@ in
           pseudo = pseudo;
           security_label = false;
           access_type = "RW";
-          squash = "all";
-          anonuid = 1000;
-          anongid = 100;
+          squash = "all_squash";
+          anon_uid = 2002;
+          anon_gid = 2002;
+          manage_gids = true;
           fsal = {
             name = "CEPH";
             fs_name = cephfs;
@@ -71,7 +72,7 @@ in
             {
               addresses = allowedCIDRs;
               access_type = "RW";
-              squash = "all";
+              squash = "all_squash";
               protocols = [ 4 ];
               sectype = [ "sys" ];
             }
@@ -115,10 +116,10 @@ in
               Protocols = 4;
               Transports = TCP;
               Access_Type = RW;
-              Squash = All;
+              Squash = All_Squash;
               Manage_Gids = true;
-              Anonymous_uid = 1000;
-              Anonymous_gid = 100;
+              Anonymous_uid = 2002;
+              Anonymous_gid = 2002;
               SecType = "sys";
             }
 
