@@ -35,15 +35,15 @@ in
         namespace = namespace;
       };
       spec = {
-        type = "LoadBalancer";
+        type = "NodePort";
         externalTrafficPolicy = "Cluster";
         selector = {
           app = "rook-ceph-nfs";
           ceph_daemon_type = "nfs";
         };
         ports = [
-          { name = "nfs-tcp"; port = 2049; targetPort = 2049; protocol = "TCP"; }
-          { name = "nfs-udp"; port = 2049; targetPort = 2049; protocol = "UDP"; }
+          { name = "nfs-tcp"; port = 2049; targetPort = 2050; protocol = "TCP"; }
+          { name = "nfs-udp"; port = 2049; targetPort = 2050; protocol = "UDP"; }
         ];
       };
     };
@@ -94,7 +94,7 @@ in
               Enable_NLM = false;
               Enable_RQUOTA = false;
               Protocols = 4;
-              NFS_Port = 2049;
+              NFS_Port = 2050;
               Bind_Addr = 0.0.0.0;
             }
 
@@ -149,20 +149,18 @@ in
               }
 
               CLIENT {
-                Clients = 10.10.10.0/24;
+                Clients = *;
                 Protocols = 4;
                 Squash = No_Root_Squash;
               }
 
               LOG {
-                Default_Log_Level = DEBUG;
+                default_log_level = WARN;
                 Components {
-                  FSAL_CEPH = DEBUG;
-                  NFS4 = DEBUG;
-                  EXPORT = DEBUG;
+                  ALL = WARN;
+                  NFS_STARTUP = INFO;
                 }
               }
-            }
 
           '';
         };
