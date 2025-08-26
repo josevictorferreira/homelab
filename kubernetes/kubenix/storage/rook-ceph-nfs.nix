@@ -61,9 +61,6 @@ in
           security_label = false;
           access_type = "RW";
           squash = "all_squash";
-          anon_uid = 2002;
-          anon_gid = 2002;
-          manage_gids = true;
           fsal = {
             name = "CEPH";
             fs_name = cephfs;
@@ -141,9 +138,9 @@ in
             CEPH { Ceph_Conf = "/etc/ceph/ceph.conf"; }
 
             LOG {
-              default_log_level = INFO;
+              default_log_level = DEBUG;
               Components {
-                ALL = INFO;
+                ALL = DEBUG;
                 FSAL = DEBUG;
                 NFS4 = DEBUG;
                 EXPORT = DEBUG;
