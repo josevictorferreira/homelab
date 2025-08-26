@@ -155,10 +155,10 @@ metadata:
 apiVersion: v1
 data:
   ganesha.conf: "NFS_CORE_PARAM {\n  Enable_NLM = false;\n  Enable_RQUOTA = false;\n\
-    \  Protocols = 4;\n  Bind_addr = 10.10.10.150;\n  NFS_Port = 2049;\n}\n\nMDCACHE\
-    \ { Dir_Chunk = 0; }\n\nNFSv4 {\n  Graceless = true;\n  Delegations = false;\n\
-    \  Minor_Versions = 0;\n  Allow_Numeric_Owners = true;\n  Only_Numeric_Owners\
-    \ = false;\n}\n\nNFS_KRB5 { Active_krb5 = false; }\n\nEXPORT_DEFAULTS {\n  Attr_Expiration_Time\
+    \  Protocols = 4;\n  Bind_addr = 0.0.0.0;\n  NFS_Port = 2049;\n}\n\nMDCACHE {\
+    \ Dir_Chunk = 0; }\n\nNFSv4 {\n  Graceless = true;\n  Delegations = false;\n \
+    \ Minor_Versions = 0;\n  Allow_Numeric_Owners = true;\n  Only_Numeric_Owners =\
+    \ false;\n}\n\nNFS_KRB5 { Active_krb5 = false; }\n\nEXPORT_DEFAULTS {\n  Attr_Expiration_Time\
     \ = 0;\n  Protocols = 4;\n  Transports = TCP;\n  Access_Type = RW;\n  Squash =\
     \ No_Root_Squash;\n  Manage_Gids = false;\n}\n\nRADOS_KV {\n  ceph_conf = \"/etc/ceph/ceph.conf\"\
     ;\n  userid = \"nfs-ganesha.homelab-nfs.a\";\n  nodeid = \"homelab-nfs.a\";\n\
@@ -169,8 +169,7 @@ data:
     ;\n\n  FSAL {\n    Name = \"CEPH\";\n    Filesystem = \"ceph-filesystem\";\n \
     \   User_Id = \"nfs-ganesha.homelab-nfs.a\";\n  }\n\n  CLIENT {\n    Clients =\
     \ *;\n    Protocols = 4;\n    Access_Type = RW;\n    SecType = \"sys\";\n    Squash\
-    \ = No_Root_Squash;\n  }\n}\n\nLOG {\n  default_log_level = DEBUG;\n  Components\
-    \ {\n    ALL = DEBUG;\n    NFS_STARTUP = DEBUG;\n  }\n}\n"
+    \ = No_Root_Squash;\n  }\n}\n"
 kind: ConfigMap
 metadata:
   annotations:
