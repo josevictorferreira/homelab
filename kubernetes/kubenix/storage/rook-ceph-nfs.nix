@@ -1,4 +1,4 @@
-{ homelab, ... }:
+{ kubenix, homelab, ... }:
 
 let
   namespace = homelab.kubernetes.namespaces.storage;
@@ -6,7 +6,6 @@ let
   pseudo = "/homelab";
   cephfs = "ceph-filesystem";
   allowedCIDRs = [ "10.10.10.0/24" ];
-  lbIP = homelab.kubernetes.loadBalancer.services."homelab-nfs";
 in
 {
   kubernetes.resources = {
@@ -32,19 +31,15 @@ in
 
     services.${nfsName} = {
       metadata = {
-        annotations = {
-          "lbipam.cilium.io/ips" = lbIP;
-        };
+        annotations = kubenix.lib.serviceIpFor nfsName;
         namespace = namespace;
       };
       spec = {
         type = "LoadBalancer";
-        loadBalancerIP = lbIP;
         externalTrafficPolicy = "Cluster";
         selector = {
           app = "rook-ceph-nfs";
           ceph_daemon_type = "nfs";
-          ceph_nfs = "${nfsName}";
         };
         ports = [
           { name = "nfs-tcp"; port = 2049; targetPort = 2049; protocol = "TCP"; }
