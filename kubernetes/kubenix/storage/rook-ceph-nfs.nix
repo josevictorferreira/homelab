@@ -103,7 +103,7 @@ in
             }
 
             NFSv4 {
-              Graceless = false;
+              Graceless = true;
               Delegations = false;
               Minor_Versions = 0;
               Allow_Numeric_Owners = true;
