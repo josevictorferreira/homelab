@@ -150,7 +150,7 @@ in
               }
 
               CLIENT {
-                Clients = "10.10.10.0/24";
+                Clients = *;
                 Access_Type = RW;
                 Squash = No_Root_Squash;
               }

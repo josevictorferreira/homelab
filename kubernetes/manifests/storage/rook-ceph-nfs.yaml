@@ -167,8 +167,8 @@ data:
     \ = \"/homelab-storage\";\n  Protocols = 4;\n  Transports = TCP;\n  Access_Type\
     \ = RW;\n  Squash = No_Root_Squash;\n  Manage_Gids = true;\n\n  FSAL {\n    Name\
     \ = \"CEPH\";\n    Filesystem = \"ceph-filesystem\";\n    User_Id = \"nfs-ganesha.homelab-nfs.a\"\
-    ;\n  }\n\n  CLIENT {\n    Clients = \"10.10.10.0/24\";\n    Access_Type = RW;\n\
-    \    Squash = No_Root_Squash;\n  }\n}\n\n"
+    ;\n  }\n\n  CLIENT {\n    Clients = *;\n    Access_Type = RW;\n    Squash = No_Root_Squash;\n\
+    \  }\n}\n\n"
 kind: ConfigMap
 metadata:
   annotations:
