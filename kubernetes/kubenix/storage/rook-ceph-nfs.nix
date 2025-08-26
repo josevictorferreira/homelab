@@ -94,6 +94,8 @@ in
               Enable_NLM = false;
               Enable_RQUOTA = false;
               Protocols = 4;
+              Bind_addr = 127.0.0.1;
+              NFS_Port = 2049;
             }
 
             MDCACHE { Dir_Chunk = 0; }
