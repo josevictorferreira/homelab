@@ -123,11 +123,7 @@ in
               userid = nfs-ganesha.homelab-nfs.a;
               nodeid = homelab-nfs.a;
               pool = ".nfs";
-              namespace = "nfs-ganesha";
-            }
-
-            RGW {
-              name = "client.nfs-ganesha.homelab-nfs.a";
+              namespace = "homelab-nfs";
             }
 
             LOG {
