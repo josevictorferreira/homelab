@@ -95,6 +95,7 @@ in
               Bind_addr = 0.0.0.0;
               NFS_Port = 2049;
               Log_Level = DEBUG;
+              allow_set_io_flusher_fail = true;
             }
 
             MDCACHE { Dir_Chunk = 0; }
