@@ -81,9 +81,10 @@ in
 
             NFSv4 {
               Minor_Versions = 0, 1, 2;
-              Allow_Numeric_Owners = true;
               Only_Numeric_Owners = true;
             }
+
+            NFS_KRB5 { Active_krb5 = false; }
 
             EXPORT_DEFAULTS {
               Squash = All_Squash;
@@ -146,11 +147,26 @@ in
                 ceph -c "$CEPH_CONFIG" mgr module enable rook || true
                 ceph -c "$CEPH_CONFIG" orch set backend rook || true
 
-                ceph -c "$CEPH_CONFIG" fs subvolumegroup create "$FS" "$SUBVOL_GROUP" || true
-                ceph -c "$CEPH_CONFIG" fs subvolume create "$FS" "$SUBVOL_NAME" \
-                  --group_name "$SUBVOL_GROUP" --size 0 --uid 2002 --gid 2002 --mode 2775 || true
+                if ! SUBVOL_PATH="$(
+                  ceph -c "$CEPH_CONFIG" fs subvolume getpath "$FS" "$SUBVOL_NAME" --group_name "$SUBVOL_GROUP" 2>/dev/null
+                )"; then
+                  echo "Creating subvolume group and subvolume..."
+                  if ! ceph -c "$CEPH_CONFIG" fs subvolumegroup ls "$FS" -f json 2>/dev/null \
+                      | grep -q "\"name\"[[:space:]]*:[[:space:]]*\"$SUBVOL_GROUP\""; then
+                    echo "Creating subvolume group $SUBVOL_GROUP in filesystem $FS"
+                    ceph -c "$CEPH_CONFIG" fs subvolumegroup create "$FS" "$SUBVOL_GROUP"
+                  fi
 
-                SUBVOL_PATH="$(ceph -c "$CEPH_CONFIG" fs subvolume getpath "$FS" "$SUBVOL_NAME" --group_name "$SUBVOL_GROUP")"
+                  if ! ceph -c "$CEPH_CONFIG" fs subvolume info "$FS" "$SUBVOL_NAME" --group_name "$SUBVOL_GROUP" >/dev/null 2>&1; then
+                    echo "Creating subvolume $SUBVOL_NAME in group $SUBVOL_GROUP"
+                    ceph -c "$CEPH_CONFIG" fs subvolume create "$FS" "$SUBVOL_NAME" \
+                      --group_name "$SUBVOL_GROUP" --size 0 --uid 2002 --gid 2002 --mode 2775
+                  fi
+
+                  SUBVOL_PATH="$(ceph -c "$CEPH_CONFIG" fs subvolume getpath "$FS" "$SUBVOL_NAME" --group_name "$SUBVOL_GROUP")"
+                fi
+
+                echo "Subvolume path: $SUBVOL_PATH"
 
                 cluster='${nfsName}'
 
