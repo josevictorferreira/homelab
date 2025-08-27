@@ -11,6 +11,11 @@ let
   ];
   customGaneshaConf = ''
 
+    MDCACHE {
+      Dir_Chunk = 0;
+      Cache_FDs = false;
+    }
+
     NFSv4 {
       Delegations = false;
       RecoveryBackend = "rados_cluster";
