@@ -45,19 +45,20 @@ spec:
               \ fs subvolume getpath \"$FS\" \"$SUBVOL_NAME\" --group_name \"$SUBVOL_GROUP\"\
               )\"\nfi\n\necho \"Subvolume path: $SUBVOL_PATH\"\n\ncluster='homelab-nfs'\n\
               \nawk -v newval=\"$SUBVOL_PATH\" '{\n  gsub(/\"path\":[[:space:]]*\"\
-              [^\"]*\"/, \"\\\"path\\\": \\\"\" newval \"\\\"\");\n  print\n}' /tmp/export.json\
+              [^\"]*\"/, \"\\\"path\\\": \\\"\" newval \"\\\"\");\n  print\n}' /tmp/ganesha/export.json\
               \ > /tmp/export_final.json\n\nceph -c \"$CEPH_CONFIG\" nfs export apply\
               \ \"$cluster\" -i /tmp/export_final.json\nceph -c \"$CEPH_CONFIG\" nfs\
               \ cluster config reset \"$cluster\" || true\nceph -c \"$CEPH_CONFIG\"\
-              \ nfs cluster config set \"$cluster\" -i /tmp/custom.ganesha.conf\n\n\
-              echo \"--- CUSTOM CONFIGURATIONS ---\"\nrados -p .nfs --namespace homelab-nfs\
-              \ get \"conf-nfs.homelab-nfs\"     /tmp/conf-nfs     || true\nrados\
-              \ -p .nfs --namespace homelab-nfs get \"export-1\"                /tmp/export-1\
-              \     || true\nrados -p .nfs --namespace homelab-nfs get \"userconf-nfs.homelab-nfs\"\
-              \ /tmp/userconf-nfs || true\n\ncat /tmp/conf-nfs     || echo \"(conf-nfs\
-              \ not found)\"\ncat /tmp/export-1     || echo \"(export-1 not found)\"\
-              \ncat /tmp/userconf-nfs || echo \"(userconf-nfs not found)\"\n\nceph\
-              \ -c \"$CEPH_CONFIG\" orch set backend \"\" || true\n"
+              \ nfs cluster config set \"$cluster\" -i /tmp/ganesha/custom.ganesha.conf\n\
+              \necho \"--- CUSTOM CONFIGURATIONS ---\"\nrados -p .nfs --namespace\
+              \ homelab-nfs get \"conf-nfs.homelab-nfs\"     /tmp/conf-nfs     ||\
+              \ true\nrados -p .nfs --namespace homelab-nfs get \"export-1\"     \
+              \           /tmp/export-1     || true\nrados -p .nfs --namespace homelab-nfs\
+              \ get \"userconf-nfs.homelab-nfs\" /tmp/userconf-nfs || true\n\ncat\
+              \ /tmp/conf-nfs     || echo \"(conf-nfs not found)\"\ncat /tmp/export-1\
+              \     || echo \"(export-1 not found)\"\ncat /tmp/userconf-nfs || echo\
+              \ \"(userconf-nfs not found)\"\n\nceph -c \"$CEPH_CONFIG\" orch set\
+              \ backend \"\" || true\n"
           image: quay.io/ceph/ceph:v19
           name: apply
           volumeMounts:
@@ -68,7 +69,7 @@ spec:
             - mountPath: /var/lib/rook-ceph-mon
               name: ceph-admin-secret
               readOnly: true
-            - mountPath: /tmp
+            - mountPath: /tmp/ganesha
               name: homelab-nfs-ganesha-custom-config
               readOnly: true
       restartPolicy: OnFailure
