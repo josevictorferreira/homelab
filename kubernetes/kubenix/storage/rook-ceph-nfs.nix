@@ -3,9 +3,9 @@
 let
   namespace = homelab.kubernetes.namespaces.storage;
   nfsName = "homelab-nfs";
-  pseudo = "/homelab-storage";
+  pseudo = "/${nfsName}";
   cephfs = "ceph-filesystem";
-  exportId = 1;
+  exportId = 10;
   allowedCIDRs = [
     "10.10.10.0/24"
     "10.0.0.0/24"
