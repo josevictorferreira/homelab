@@ -313,6 +313,7 @@ in
               echo "Patching $CM in ${namespace}..."
 
               kubectl -n ${namespace} patch "$CM" --type merge -p '{"data":{"config": "'"${genGaneshaConfForNode nodeId}"'"}}'
+
             '';
             rolloutRestartFor = nodeId: ''
               echo "Restarting deployment for node ID ${nodeId}..."
@@ -320,6 +321,7 @@ in
               [ -z "$DEP" ] && { echo "WARN: deployment not found; skipping restart"; exit 0; }
               kubectl -n ${namespace} rollout restart "$DEP"
               kubectl -n ${namespace} rollout status  "$DEP"
+
             '';
           in
           {
@@ -338,9 +340,9 @@ in
 
                   export PATH=/opt/bitnami/kubectl/bin:$PATH
 
-                  ${builtins.concatStringsSep "\n" (map (nodeId: (patchConfigMapFor nodeId)) nodesIds)}
+                  ${builtins.concatStringsSep "" (map (nodeId: (patchConfigMapFor nodeId)) nodesIds)}
 
-                  ${builtins.concatStringsSep "\n" (map (nodeId: (rolloutRestartFor nodeId)) nodesIds)}
+                  ${builtins.concatStringsSep "" (map (nodeId: (rolloutRestartFor nodeId)) nodesIds)}
 
                   echo "Done."
                 ''
