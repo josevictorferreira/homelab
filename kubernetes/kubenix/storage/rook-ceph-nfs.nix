@@ -11,6 +11,7 @@ let
     "10.0.0.0/24"
   ];
   customGaneshaConf = ''
+
     NFSv4 {
       Delegations = false;
       RecoveryBackend = "rados_cluster";
@@ -31,6 +32,7 @@ let
       Anonymous_gid = 2002;
       SecType = "sys";
     }
+
   '';
   exportConf = {
     export_id = exportId;
