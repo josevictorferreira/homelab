@@ -34,7 +34,7 @@ let
       SecType = "sys";
     }
 
-    \n\n
+
   '';
   exportConf = {
     export_id = 10;
@@ -77,7 +77,7 @@ in
               { key = "node-role.kubernetes.io/control-plane"; operator = "Exists"; effect = "NoSchedule"; }
             ];
           };
-          logLevel = "NIV_INFO";
+          logLevel = "NIV_FULL_DEBUG";
         };
       };
     };
