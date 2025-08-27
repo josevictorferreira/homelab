@@ -60,10 +60,10 @@ spec:
               :{\"fs_name\":\"ceph-filesystem\",\"name\":\"CEPH\"},\"manage_gids\"\
               :true,\"path\":\"/exported/path\",\"protocols\":[4],\"pseudo\":\"/homelab-nfs\"\
               ,\"sectype\":[\"sys\"],\"security_label\":false,\"squash\":\"all_squash\"\
-              }\" > /tmp/ganesha/export.json\n\nawk -v newval=\"$SUBVOL_PATH\" '{\n\
-              \  gsub(/\"path\":[[:space:]]*\"[^\"]*\"/, \"\\\"path\\\": \\\"\" newval\
-              \ \"\\\"\");\n  print\n}' /tmp/ganesha/export.json > /tmp/export_final.json\n\
-              \nceph -c \"$CEPH_CONFIG\" nfs export apply \"$CLUSTER\" -i /tmp/export_final.json\n\
+              }\" > /tmp/export.json\n\nawk -v newval=\"$SUBVOL_PATH\" '{\n  gsub(/\"\
+              path\":[[:space:]]*\"[^\"]*\"/, \"\\\"path\\\": \\\"\" newval \"\\\"\
+              \");\n  print\n}' /tmp/export.json > /tmp/export_final.json\n\nceph\
+              \ -c \"$CEPH_CONFIG\" nfs export apply \"$CLUSTER\" -i /tmp/export_final.json\n\
               \nrados -p .nfs --namespace $NFSNS get \"conf-nfs.$CLUSTER\"     /tmp/conf-nfs\
               \                || true\nrados -p .nfs --namespace $NFSNS get \"export-$EXPORT_ID\"\
               \     /tmp/export-$$EXPORT_ID     || true\n\necho \"---------------------------\
