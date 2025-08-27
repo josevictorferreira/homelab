@@ -141,12 +141,12 @@ spec:
               ;\n  userid = \"nfs-ganesha.homelab-nfs.a\";\n  watch_url = \"rados://.nfs/homelab-nfs/conf-nfs.homelab-nfs\"\
               ;\n}\n\nRGW { name = \"client.nfs-ganesha.homelab-nfs.a\"; }\n\n%url\
               \    rados://.nfs/homelab-nfs/conf-nfs.homelab-nfs\n\n\"'\"}}'\n\n\n\
-              echo \"Restarting deployment for node ID a...\"\nDEP=\"$(kubectl -n\
+              \necho \"Restarting deployment for node ID a...\"\nDEP=\"$(kubectl -n\
               \ rook-ceph get deploy -l app=rook-ceph-nfs,instance=a -o name | grep\
               \ -i rook-ceph | head -n1 || true)\"\n[ -z \"$DEP\" ] && { echo \"WARN:\
               \ deployment not found; skipping restart\"; exit 0; }\nkubectl -n rook-ceph\
               \ rollout restart \"$DEP\"\nkubectl -n rook-ceph rollout status  \"\
-              $DEP\"\n\n\necho \"Done.\"\n"
+              $DEP\"\n\n\n\necho \"Done.\"\n"
           command:
             - /bin/bash
             - -lc
