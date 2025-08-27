@@ -55,6 +55,10 @@ let
     manage_gids = true;
     anonymous_uid = 2002;
     anonymous_gid = 2002;
+    anon_uid = 2002;
+    anon_gid = 2002;
+    anonuid = 2002;
+    anongid = 2002;
     squash = "all_squash";
     sectype = [ "sys" ];
     fsal = {
@@ -66,8 +70,12 @@ let
         addresses = allowedCIDRs;
         access_type = "RW";
         squash = "all_squash";
-        protocols = [ 3 4 ];
-        sectype = [ "sys" ];
+        anonymous_uid = 2002;
+        anonymous_gid = 2002;
+        anon_uid = 2002;
+        anon_gid = 2002;
+        anonuid = 2002;
+        anongid = 2002;
       }
     ];
   };
@@ -110,6 +118,14 @@ in
         ports = [
           { name = "nfs-tcp"; nodePort = 30325; port = 2049; targetPort = 2049; protocol = "TCP"; }
           { name = "nfs-udp"; nodePort = 30326; port = 2049; targetPort = 2049; protocol = "UDP"; }
+          { name = "rpcbind-tcp"; port = 111; targetPort = 111; protocol = "TCP"; }
+          { name = "rpcbind-udp"; port = 111; targetPort = 111; protocol = "UDP"; }
+          { name = "mountd-tcp"; port = 20048; targetPort = 20048; protocol = "TCP"; }
+          { name = "mountd-udp"; port = 20048; targetPort = 20048; protocol = "UDP"; }
+          { name = "nlm-tcp"; port = 32803; targetPort = 32803; protocol = "TCP"; }
+          { name = "nlm-udp"; port = 32803; targetPort = 32803; protocol = "UDP"; }
+          { name = "rquota-tcp"; port = 875; targetPort = 875; protocol = "TCP"; }
+          { name = "rquota-udp"; port = 875; targetPort = 875; protocol = "UDP"; }
         ];
       };
     };
