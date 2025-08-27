@@ -202,10 +202,9 @@ in
                 echo "---"
                 cat /tmp/userconf-nfs || echo "(userconf-nfs not found)"
 
-                echo "Restarting NFS Ganesha..."
+                echo "Restarting NFS Ganesha grace..."
                 ganesha-rados-grace --pool .nfs --ns ${nfsName} add ${nfsName} || true
                 ganesha-rados-grace --pool .nfs --ns ${nfsName} start ${nfsName} || true
-                ceph -c "$CEPH_CONFIG" orchestrator restart nfs.${nfsName} || true
 
                 echo "Removing orchestrator backend..."
                 ceph -c "$CEPH_CONFIG" orch set backend "" || true
