@@ -9,35 +9,41 @@ let
     "10.10.10.0/24"
     "10.0.0.0/24"
   ];
+  # customGaneshaConf = ''
+  #
+  #   MDCACHE {
+  #     Dir_Chunk = 0;
+  #     Cache_FDs = false;
+  #   }
+  #
+  #   NFSv4 {
+  #     Delegations = false;
+  #     RecoveryBackend = "rados_cluster";
+  #     Minor_Versions = 0, 1, 2;
+  #     Only_Numeric_Owners = true;
+  #   }
+  # 
+  #   NFS_KRB5 { Active_krb5 = false; }
+  #
+  #   CEPH { ceph_conf = "/etc/ceph/ceph.conf"; }
+  # 
+  #   EXPORT_DEFAULTS {
+  #     Attr_Expiration_Time = 0;
+  #     Protocols = 4;
+  #     Transports = TCP;
+  #     Access_Type = RW;
+  #     Squash = All_Squash;
+  #     Manage_Gids = true;
+  #     Anonymous_uid = 2002;
+  #     Anonymous_gid = 2002;
+  #     SecType = "sys";
+  #   }
+  # '';
   customGaneshaConf = ''
 
-    MDCACHE {
-      Dir_Chunk = 0;
-      Cache_FDs = false;
-    }
-
-    NFSv4 {
-      Delegations = false;
-      RecoveryBackend = "rados_cluster";
-      Minor_Versions = 0, 1, 2;
-      Only_Numeric_Owners = true;
-    }
-  
     NFS_KRB5 { Active_krb5 = false; }
 
     CEPH { ceph_conf = "/etc/ceph/ceph.conf"; }
-  
-    EXPORT_DEFAULTS {
-      Attr_Expiration_Time = 0;
-      Protocols = 4;
-      Transports = TCP;
-      Access_Type = RW;
-      Squash = All_Squash;
-      Manage_Gids = true;
-      Anonymous_uid = 2002;
-      Anonymous_gid = 2002;
-      SecType = "sys";
-    }
   '';
   exportConf = {
     export_id = 10;
@@ -45,6 +51,10 @@ let
     pseudo = pseudo;
     security_label = false;
     access_type = "RW";
+    protocols = [ 3 4 ];
+    manage_gids = true;
+    anonymous_uid = 2002;
+    anonymous_gid = 2002;
     squash = "all_squash";
     sectype = [ "sys" ];
     fsal = {
@@ -56,7 +66,7 @@ let
         addresses = allowedCIDRs;
         access_type = "RW";
         squash = "all_squash";
-        protocols = [ 4 ];
+        protocols = [ 3 4 ];
         sectype = [ "sys" ];
       }
     ];
@@ -80,7 +90,7 @@ in
               { key = "node-role.kubernetes.io/control-plane"; operator = "Exists"; effect = "NoSchedule"; }
             ];
           };
-          logLevel = "NIV_DEBUG";
+          logLevel = "NIV_INFO";
         };
       };
     };
