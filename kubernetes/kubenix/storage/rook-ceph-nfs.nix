@@ -77,10 +77,21 @@ in
                 access_type = "RW";
                 squash = "all_squash";
                 protocols = [ 4 ];
+                sectype = [ "sys" ];
               }
             ];
           };
           "custom.ganesha.conf" = ''
+
+            NFS_CORE_PARAM {
+              Enable_NLM = false;
+              Enable_RQUOTA = false;
+              Protocols = 4;
+              Bind_addr = 0.0.0.0;
+              NFS_Port = 2049;
+              Log_Level = DEBUG;
+              allow_set_io_flusher_fail = true;
+            }
           
             NFSv4 {
               Graceless = true;
@@ -91,13 +102,19 @@ in
             }
           
             NFS_KRB5 { Active_krb5 = false; }
+
+            CEPH { Ceph_Conf = "/etc/ceph/ceph.conf"; }
           
             EXPORT_DEFAULTS {
-              Attr_Expiration_Time = 1;
+              Attr_Expiration_Time = 0;
+              Protocols = 4;
+              Transports = TCP;
+              Access_Type = RW;
+              Squash = All_Squash;
               Manage_Gids = true;
               Anonymous_uid = 2002;
               Anonymous_gid = 2002;
-              SecType = sys;
+              SecType = "sys";
             }
           
           '';

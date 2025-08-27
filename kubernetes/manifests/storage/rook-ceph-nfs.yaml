@@ -117,12 +117,16 @@ spec:
 ---
 apiVersion: v1
 data:
-  custom.ganesha.conf: "\nNFSv4 {\n  Graceless = true;\n  Delegations = false;\n \
-    \ RecoveryBackend = \"rados_cluster\";\n  Minor_Versions = 0, 1, 2;\n  Only_Numeric_Owners\
-    \ = true;\n}\n\nNFS_KRB5 { Active_krb5 = false; }\n\nEXPORT_DEFAULTS {\n  Attr_Expiration_Time\
-    \ = 1;\n  Manage_Gids = true;\n  Anonymous_uid = 2002;\n  Anonymous_gid = 2002;\n\
-    \  SecType = sys;\n}\n\n"
-  export.json: '{"access_type":"RW","clients":[{"access_type":"RW","addresses":"*","protocols":[4],"squash":"all_squash"}],"export_id":1,"fsal":{"fs_name":"ceph-filesystem","name":"CEPH"},"path":"/exported/path","pseudo":"/homelab","sectype":["sys"],"security_label":false,"squash":"all_squash"}'
+  custom.ganesha.conf: "\nNFS_CORE_PARAM {\n  Enable_NLM = false;\n  Enable_RQUOTA\
+    \ = false;\n  Protocols = 4;\n  Bind_addr = 0.0.0.0;\n  NFS_Port = 2049;\n  Log_Level\
+    \ = DEBUG;\n  allow_set_io_flusher_fail = true;\n}\n\nNFSv4 {\n  Graceless = true;\n\
+    \  Delegations = false;\n  RecoveryBackend = \"rados_cluster\";\n  Minor_Versions\
+    \ = 0, 1, 2;\n  Only_Numeric_Owners = true;\n}\n\nNFS_KRB5 { Active_krb5 = false;\
+    \ }\n\nCEPH { Ceph_Conf = \"/etc/ceph/ceph.conf\"; }\n\nEXPORT_DEFAULTS {\n  Attr_Expiration_Time\
+    \ = 0;\n  Protocols = 4;\n  Transports = TCP;\n  Access_Type = RW;\n  Squash =\
+    \ All_Squash;\n  Manage_Gids = true;\n  Anonymous_uid = 2002;\n  Anonymous_gid\
+    \ = 2002;\n  SecType = \"sys\";\n}\n\n"
+  export.json: '{"access_type":"RW","clients":[{"access_type":"RW","addresses":"*","protocols":[4],"sectype":["sys"],"squash":"all_squash"}],"export_id":1,"fsal":{"fs_name":"ceph-filesystem","name":"CEPH"},"path":"/exported/path","pseudo":"/homelab","sectype":["sys"],"security_label":false,"squash":"all_squash"}'
 kind: ConfigMap
 metadata:
   annotations:
