@@ -143,7 +143,7 @@ data:
     CEPH { ceph_conf = "/etc/ceph/ceph.conf"; }
 
     '
-  export.json: '{"access_type":"RW","anonymous_gid":2002,"anonymous_uid":2002,"clients":[{"access_type":"RW","addresses":["10.10.10.0/24","10.0.0.0/24"],"protocols":[3,4],"sectype":["sys"],"squash":"all_squash"}],"export_id":10,"fsal":{"fs_name":"ceph-filesystem","name":"CEPH"},"manage_gids":true,"path":"/exported/path","protocols":[3,4],"pseudo":"/homelab-nfs","sectype":["sys"],"security_label":false,"squash":"all_squash"}'
+  export.json: '{"access_type":"RW","anon_gid":2002,"anon_uid":2002,"anongid":2002,"anonuid":2002,"anonymous_gid":2002,"anonymous_uid":2002,"clients":[{"access_type":"RW","addresses":["10.10.10.0/24","10.0.0.0/24"],"anon_gid":2002,"anon_uid":2002,"anongid":2002,"anonuid":2002,"anonymous_gid":2002,"anonymous_uid":2002,"squash":"all_squash"}],"export_id":10,"fsal":{"fs_name":"ceph-filesystem","name":"CEPH"},"manage_gids":true,"path":"/exported/path","protocols":[3,4],"pseudo":"/homelab-nfs","sectype":["sys"],"security_label":false,"squash":"all_squash"}'
 kind: ConfigMap
 metadata:
   annotations:
@@ -175,6 +175,38 @@ spec:
       port: 2049
       protocol: UDP
       targetPort: 2049
+    - name: rpcbind-tcp
+      port: 111
+      protocol: TCP
+      targetPort: 111
+    - name: rpcbind-udp
+      port: 111
+      protocol: UDP
+      targetPort: 111
+    - name: mountd-tcp
+      port: 20048
+      protocol: TCP
+      targetPort: 20048
+    - name: mountd-udp
+      port: 20048
+      protocol: UDP
+      targetPort: 20048
+    - name: nlm-tcp
+      port: 32803
+      protocol: TCP
+      targetPort: 32803
+    - name: nlm-udp
+      port: 32803
+      protocol: UDP
+      targetPort: 32803
+    - name: rquota-tcp
+      port: 875
+      protocol: TCP
+      targetPort: 875
+    - name: rquota-udp
+      port: 875
+      protocol: UDP
+      targetPort: 875
   selector:
     app: rook-ceph-nfs
     ceph_daemon_type: nfs
