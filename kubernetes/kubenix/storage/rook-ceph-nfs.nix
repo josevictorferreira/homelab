@@ -25,6 +25,7 @@ in
               { key = "node-role.kubernetes.io/control-plane"; operator = "Exists"; effect = "NoSchedule"; }
             ];
           };
+          logLevel = "NIV_DEBUG";
         };
       };
     };
@@ -49,72 +50,42 @@ in
     };
 
     configMaps = {
-      "${nfsName}-export" = {
+      "${nfsName}-ganesha-custom-config" = {
         metadata = {
           name = "${nfsName}-export";
           namespace = namespace;
         };
-        data."export.json" = builtins.toJSON {
-          export_id = 1;
-          path = "/exported/path"; # Placeholder, will be replaced in job
-          pseudo = pseudo;
-          security_label = false;
-          access_type = "RW";
-          squash = "all_squash";
-          fsal = {
-            name = "CEPH";
-            fs_name = cephfs;
-          };
-          clients = [
-            {
-              addresses = allowedCIDRs;
-              access_type = "RW";
-              squash = "all_squash";
-              protocols = [ 4 ];
-              sectype = [ "sys" ];
-            }
-          ];
-        };
-      };
-      "${nfsName}-ganesha-config" = {
-        metadata = {
-          name = "${nfsName}-ganesha-config";
-          namespace = namespace;
-          labels = {
-            app = "rook-ceph-nfs";
-            rook_cluster = nfsName;
-            ceph_daemon_type = "nfs";
-          };
-        };
         data = {
-          "ganesha.conf" = ''
-            NFS_CORE_PARAM {
-              Enable_NLM = false;
-              Enable_RQUOTA = false;
-              Protocols = 4;
-              Bind_addr = 0.0.0.0;
-              NFS_Port = 2049;
-              Log_Level = DEBUG;
-              allow_set_io_flusher_fail = true;
-            }
-
-            MDCACHE { Dir_Chunk = 0; }
+          "export.json" = builtins.toJSON {
+            export_id = 1;
+            path = "/exported/path";
+            pseudo = pseudo;
+            security_label = false;
+            access_type = "RW";
+            squash = "all_squash";
+            fsal = {
+              name = "CEPH";
+              fs_name = cephfs;
+            };
+            clients = [
+              {
+                addresses = allowedCIDRs;
+                access_type = "RW";
+                squash = "all_squash";
+                protocols = [ 4 ];
+                sectype = [ "sys" ];
+              }
+            ];
+          };
+          "custom.ganesha.conf" = ''
 
             NFSv4 {
-              Graceless = true;
-              Delegations = false;
               Minor_Versions = 0, 1, 2;
               Allow_Numeric_Owners = true;
               Only_Numeric_Owners = true;
             }
 
-            NFS_KRB5 { Active_krb5 = false; }
-
             EXPORT_DEFAULTS {
-              Attr_Expiration_Time = 0;
-              Protocols = 4;
-              Transports = TCP;
-              Access_Type = RW;
               Squash = All_Squash;
               Manage_Gids = true;
               Anonymous_uid = 2002;
@@ -122,44 +93,14 @@ in
               SecType = "sys";
             }
 
-            RADOS_KV {
-              ceph_conf = "/etc/ceph/ceph.conf";
-              userid = "nfs-ganesha.${nfsName}.a";
-              nodeid = "${nfsName}.a";
-              pool = ".nfs";
-              namespace = "${nfsName}";
-            }
-
-            RADOS_URLS {
-              ceph_conf = "/etc/ceph/ceph.conf";
-              userid = "nfs-ganesha.${nfsName}.a";
-              watch_url = "rados://.nfs/${nfsName}/conf-nfs.${nfsName}";
-            }
-
-            CEPH { Ceph_Conf = "/etc/ceph/ceph.conf"; }
-
-            LOG {
-              default_log_level = DEBUG;
-              Components {
-                ALL = DEBUG;
-                FSAL = DEBUG;
-                NFS4 = DEBUG;
-                EXPORT = DEBUG;
-                DISPATCH = DEBUG;
-                RADOS = DEBUG;
-              }
-            }
-
-            %url	"rados://.nfs/${nfsName}/conf-nfs.${nfsName}"
-
           '';
         };
       };
     };
 
-    jobs."${nfsName}-export-apply" = {
+    jobs."${nfsName}-ganesha-config-patcher" = {
       metadata = {
-        name = "${nfsName}-export-apply";
+        name = "${nfsName}-ganesha-config-patcher";
         namespace = namespace;
       };
       spec = {
@@ -203,6 +144,8 @@ in
 
                 ceph -c "$CEPH_CONFIG" mgr module enable nfs || true
                 ceph -c "$CEPH_CONFIG" mgr module enable volumes || true
+                ceph -c "$CEPH_CONFIG" mgr module enable rook || true
+                ceph -c "$CEPH_CONFIG" orch set backend rook || true
 
                 ceph -c "$CEPH_CONFIG" fs subvolumegroup create "$FS" "$SUBVOL_GROUP" || true
                 ceph -c "$CEPH_CONFIG" fs subvolume create "$FS" "$SUBVOL_NAME" \
@@ -218,105 +161,36 @@ in
                 }' /etc/ganesha/export.json > /tmp/export.json
 
                 ceph -c "$CEPH_CONFIG" nfs export apply "$cluster" -i /tmp/export.json
+                ceph -c "$CEPH_CONFIG" nfs cluster config set "$cluster" /etc/ganesha/custom.ganesha.conf
 
-                ceph -c "$CEPH_CONFIG" nfs export info "$cluster" "${pseudo}"
+                echo "--- CUSTOM CONFIGURATIONS ---"
+                rados -p .nfs --namespace ${nfsName} get "conf-nfs.${nfsName}"     /tmp/conf-nfs     || true
+                rados -p .nfs --namespace ${nfsName} get "export-1"                /tmp/export-1     || true
+                rados -p .nfs --namespace ${nfsName} get "userconf-nfs.${nfsName}" /tmp/userconf-nfs || true
+
+                cat /tmp/conf-nfs     || echo "(conf-nfs not found)"
+                cat /tmp/export-1     || echo "(export-1 not found)"
+                cat /tmp/userconf-nfs || echo "(userconf-nfs not found)"
+
+                ceph -c "$CEPH_CONFIG" orch set backend "" || true
               ''
             ];
             volumeMounts = [
               { name = "mon-endpoints"; mountPath = "/etc/rook"; }
               { name = "ceph-config"; mountPath = "/etc/ceph"; }
               { name = "ceph-admin-secret"; mountPath = "/var/lib/rook-ceph-mon"; readOnly = true; }
-              { name = "${nfsName}-export"; mountPath = "/etc/ganesha"; readOnly = true; }
+              { name = "${nfsName}-ganesha-custom-config"; mountPath = "/etc/ganesha"; readOnly = true; }
             ];
           }];
           volumes = [
             { name = "mon-endpoints"; configMap = { name = "rook-ceph-mon-endpoints"; items = [{ key = "data"; path = "mon-endpoints"; }]; }; }
             { name = "ceph-config"; emptyDir = { }; }
             { name = "ceph-admin-secret"; secret = { secretName = "rook-ceph-mon"; }; }
-            { name = "${nfsName}-export"; configMap = { name = "${nfsName}-export"; }; }
+            { name = "${nfsName}-ganesha-custom-config"; configMap = { name = "${nfsName}-ganesha-custom-config"; }; }
           ];
         };
       };
     };
-
-    roles."${nfsName}-ganesha-conf-patch-role" = {
-      metadata = { name = "${nfsName}-ganesha-conf-patch-role"; namespace = namespace; };
-      rules = [
-        {
-          apiGroups = [ "" ];
-          resources = [ "configmaps" ];
-          verbs = [ "get" "list" "watch" "patch" ];
-        }
-        {
-          apiGroups = [ "apps" ];
-          resources = [ "deployments" ];
-          verbs = [ "get" "list" "watch" "update" "patch" ];
-        }
-      ];
-    };
-
-    roleBindings."${nfsName}-ganesha-conf-patch-rb" = {
-      metadata = { name = "${nfsName}-ganesha-conf-patch-rb"; namespace = namespace; };
-      roleRef = { apiGroup = "rbac.authorization.k8s.io"; kind = "Role"; name = "${nfsName}-ganesha-conf-patch-role"; };
-      subjects = [{ kind = "ServiceAccount"; name = "rook-ceph-default"; namespace = namespace; }];
-    };
-
-    jobs."${nfsName}-ganesha-conf-patch" = {
-      metadata = { name = "${nfsName}-ganesha-conf-patch"; namespace = namespace; };
-      spec = {
-        backoffLimit = 2;
-        ttlSecondsAfterFinished = 3600;
-        template.spec = {
-          restartPolicy = "OnFailure";
-          serviceAccountName = "rook-ceph-default";
-          containers = [{
-            name = "patch";
-            image = "bitnami/kubectl:1.30";
-            command = [ "/bin/bash" "-lc" ];
-            args = [
-              ''
-                set -euo pipefail
-                NS='${namespace}'
-                CLUSTER='${nfsName}'
-                CM=""
-
-                export PATH=/opt/bitnami/kubectl/bin:$PATH
-
-                for i in {1..10}; do
-                  if [ -n "$CM" ]; then break; fi
-                  echo "Waiting for rook-ceph-nfs ConfigMap..."
-                  sleep 6
-                  CM="$(kubectl -n "$NS" get cm -l app=rook-ceph-nfs -o name | grep -i rook-ceph | head -n1 || true)"
-                done
-
-                [ -z "$CM" ] && { echo "ERROR: rook-ceph ganesha ConfigMap not found"; exit 1; }
-
-                echo "Patching $CM in $NS"
-
-                kubectl -n "$NS" patch "$CM" --type merge -p '{"data":{"config": "'"$(cat /tmp/ganesha.conf | sed 's/"/\\"/g' | tr '\n' ' ' | tr  '\t' ' ')"'"}}'
-
-                DEP="$(kubectl -n "$NS" get deploy -l app=rook-ceph-nfs,rook_cluster="$CLUSTER",ceph_daemon_type=nfs -o name | head -n1 || true)"
-                if [ -z "$DEP" ]; then
-                  DEP="$(kubectl -n "$NS" get deploy -l app=rook-ceph-nfs -o name | head -n1 || true)"
-                fi
-                [ -z "$DEP" ] && { echo "WARN: deployment not found; skipping restart"; exit 0; }
-
-                kubectl -n "$NS" rollout restart "$DEP"
-                kubectl -n "$NS" rollout status  "$DEP"
-                echo "Done."
-              ''
-            ];
-            volumeMounts = [
-              { name = "${nfsName}-ganesha-config"; mountPath = "/tmp"; readOnly = true; }
-            ];
-          }];
-          volumes = [
-            { name = "${nfsName}-ganesha-config"; configMap = { name = "${nfsName}-ganesha-config"; }; }
-          ];
-        };
-      };
-    };
-
 
   };
 }
