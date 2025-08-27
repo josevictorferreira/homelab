@@ -192,13 +192,13 @@ in
 
                 echo "--- CUSTOM CONFIGURATIONS ---"
                 rados -p .nfs --namespace ${nfsName} get "conf-nfs.${nfsName}"     /tmp/conf-nfs     || true
-                rados -p .nfs --namespace ${nfsName} get "export-${exportId}"                /tmp/export-1     || true
+                rados -p .nfs --namespace ${nfsName} get "export-${toString exportId}"                /tmp/export-1     || true
                 rados -p .nfs --namespace ${nfsName} get "userconf-nfs.${nfsName}" /tmp/userconf-nfs || true
 
                 echo "--- CONTENTS ---"
                 cat /tmp/conf-nfs     || echo "(conf-nfs not found)"
                 echo "---"
-                cat /tmp/export-${exportId}     || echo "(export-${nfsName} not found)"
+                cat /tmp/export-${toString exportId}     || echo "(export-${nfsName} not found)"
                 echo "---"
                 cat /tmp/userconf-nfs || echo "(userconf-nfs not found)"
 
