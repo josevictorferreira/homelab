@@ -3,7 +3,7 @@
 let
   namespace = homelab.kubernetes.namespaces.storage;
   nfsName = "homelab-nfs";
-  pseudo = "/homelab";
+  pseudo = "/homelab-storage";
   cephfs = "ceph-filesystem";
   allowedCIDRs = [
     "10.10.10.0/24"
@@ -60,7 +60,7 @@ in
         };
         data = {
           "export.json" = builtins.toJSON {
-            export_id = 1;
+            export_id = 1000;
             path = "/exported/path";
             pseudo = pseudo;
             security_label = false;
