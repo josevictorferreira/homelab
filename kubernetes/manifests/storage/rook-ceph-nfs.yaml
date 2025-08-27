@@ -46,21 +46,18 @@ spec:
               )\"\nfi\n\necho \"Subvolume path: $SUBVOL_PATH\"\n\ncluster='homelab-nfs'\n\
               \nawk -v newval=\"$SUBVOL_PATH\" '{\n  gsub(/\"path\":[[:space:]]*\"\
               [^\"]*\"/, \"\\\"path\\\": \\\"\" newval \"\\\"\");\n  print\n}' /etc/ganesha/export.json\
-              \ > /tmp/export_1.json\n\nawk -v newval=\"$SUBVOL_PATH\" '{\n  gsub(/\"\
-              cmount_path\":[[:space:]]*\"[^\"]*\"/, \"\\\"cmount_path\\\": \\\"\"\
-              \ newval \"\\\"\");\n  print\n}' /tmp/export_1.json > /tmp/export.json\n\
-              \nceph -c \"$CEPH_CONFIG\" nfs export apply \"$cluster\" -i /tmp/export.json\n\
-              ceph -c \"$CEPH_CONFIG\" nfs cluster config reset \"$cluster\" || true\n\
-              ceph -c \"$CEPH_CONFIG\" nfs cluster config set \"$cluster\" -i /etc/ganesha/custom.ganesha.conf\n\
-              \necho \"--- CUSTOM CONFIGURATIONS ---\"\nrados -p .nfs --namespace\
-              \ homelab-nfs get \"conf-nfs.homelab-nfs\"     /tmp/conf-nfs     ||\
-              \ true\nrados -p .nfs --namespace homelab-nfs get \"export-1\"     \
-              \           /tmp/export-1     || true\nrados -p .nfs --namespace homelab-nfs\
-              \ get \"userconf-nfs.homelab-nfs\" /tmp/userconf-nfs || true\n\ncat\
-              \ /tmp/conf-nfs     || echo \"(conf-nfs not found)\"\ncat /tmp/export-1\
-              \     || echo \"(export-1 not found)\"\ncat /tmp/userconf-nfs || echo\
-              \ \"(userconf-nfs not found)\"\n\nceph -c \"$CEPH_CONFIG\" orch set\
-              \ backend \"\" || true\n"
+              \ > /tmp/export_1.json\n\nceph -c \"$CEPH_CONFIG\" nfs export apply\
+              \ \"$cluster\" -i /tmp/export.json\nceph -c \"$CEPH_CONFIG\" nfs cluster\
+              \ config reset \"$cluster\" || true\nceph -c \"$CEPH_CONFIG\" nfs cluster\
+              \ config set \"$cluster\" -i /etc/ganesha/custom.ganesha.conf\n\necho\
+              \ \"--- CUSTOM CONFIGURATIONS ---\"\nrados -p .nfs --namespace homelab-nfs\
+              \ get \"conf-nfs.homelab-nfs\"     /tmp/conf-nfs     || true\nrados\
+              \ -p .nfs --namespace homelab-nfs get \"export-1\"                /tmp/export-1\
+              \     || true\nrados -p .nfs --namespace homelab-nfs get \"userconf-nfs.homelab-nfs\"\
+              \ /tmp/userconf-nfs || true\n\ncat /tmp/conf-nfs     || echo \"(conf-nfs\
+              \ not found)\"\ncat /tmp/export-1     || echo \"(export-1 not found)\"\
+              \ncat /tmp/userconf-nfs || echo \"(userconf-nfs not found)\"\n\nceph\
+              \ -c \"$CEPH_CONFIG\" orch set backend \"\" || true\n"
           image: quay.io/ceph/ceph:v19
           name: apply
           volumeMounts:
@@ -104,7 +101,7 @@ metadata:
 spec:
   server:
     active: 1
-    logLevel: NIV_FULL_DEBUG
+    logLevel: NIV_INFO
     placement:
       tolerations:
         - effect: NoSchedule
@@ -122,9 +119,9 @@ data:
   custom.ganesha.conf: "\nNFSv4 {\n  Delegations = false;\n  RecoveryBackend = \"\
     rados_cluster\";\n  Minor_Versions = 0, 1, 2;\n  Only_Numeric_Owners = true;\n\
     }\n\nNFS_KRB5 { Active_krb5 = false; }\n\nEXPORT_DEFAULTS {\n  Attr_Expiration_Time\
-    \ = 0;\n  Manage_Gids = true;\n  Anonymous_uid = 2002;\n  Anonymous_gid = 2002;\n\
+    \ = 1;\n  Manage_Gids = true;\n  Anonymous_uid = 2002;\n  Anonymous_gid = 2002;\n\
     \  SecType = \"sys\";\n}\n\n"
-  export.json: '{"access_type":"RW","clients":[{"access_type":"RW","addresses":"*","protocols":[4],"sectype":["sys"],"squash":"all_squash"}],"export_id":1,"fsal":{"cmount_path":"/","fs_name":"ceph-filesystem","name":"CEPH"},"path":"/exported/path","pseudo":"/homelab","security_label":false,"squash":"all_squash"}'
+  export.json: '{"access_type":"RW","clients":[{"access_type":"RW","addresses":"*","protocols":[4],"sectype":["sys"],"squash":"all_squash"}],"export_id":1,"fsal":{"fs_name":"ceph-filesystem","name":"CEPH"},"path":"/exported/path","pseudo":"/homelab","security_label":false,"squash":"all_squash"}'
 kind: ConfigMap
 metadata:
   annotations:

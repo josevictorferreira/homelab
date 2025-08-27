@@ -28,7 +28,7 @@ in
               { key = "node-role.kubernetes.io/control-plane"; operator = "Exists"; effect = "NoSchedule"; }
             ];
           };
-          logLevel = "NIV_FULL_DEBUG";
+          logLevel = "NIV_INFO";
         };
       };
     };
@@ -69,7 +69,6 @@ in
             fsal = {
               name = "CEPH";
               fs_name = cephfs;
-              cmount_path = "/";
             };
             clients = [
               {
@@ -93,7 +92,7 @@ in
             NFS_KRB5 { Active_krb5 = false; }
 
             EXPORT_DEFAULTS {
-              Attr_Expiration_Time = 0;
+              Attr_Expiration_Time = 1;
               Manage_Gids = true;
               Anonymous_uid = 2002;
               Anonymous_gid = 2002;
@@ -180,11 +179,6 @@ in
                   gsub(/"path":[[:space:]]*"[^"]*"/, "\"path\": \"" newval "\"");
                   print
                 }' /etc/ganesha/export.json > /tmp/export_1.json
-
-                awk -v newval="$SUBVOL_PATH" '{
-                  gsub(/"cmount_path":[[:space:]]*"[^"]*"/, "\"cmount_path\": \"" newval "\"");
-                  print
-                }' /tmp/export_1.json > /tmp/export.json
 
                 ceph -c "$CEPH_CONFIG" nfs export apply "$cluster" -i /tmp/export.json
                 ceph -c "$CEPH_CONFIG" nfs cluster config reset "$cluster" || true
