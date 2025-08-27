@@ -184,7 +184,7 @@ in
                 awk -v newval="$SUBVOL_PATH" '{
                   gsub(/"cmount_path":[[:space:]]*"[^"]*"/, "\"cmount_path\": \"" newval "\"");
                   print
-                }' /export_1.json > /tmp/export.json
+                }' /tmp/export_1.json > /tmp/export.json
 
                 ceph -c "$CEPH_CONFIG" nfs export apply "$cluster" -i /tmp/export.json
                 ceph -c "$CEPH_CONFIG" nfs cluster config reset "$cluster" || true
