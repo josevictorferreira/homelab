@@ -192,7 +192,7 @@ in
 
                 echo "--- CUSTOM CONFIGURATIONS ---"
                 rados -p .nfs --namespace ${nfsName} get "conf-nfs.${nfsName}"     /tmp/conf-nfs     || true
-                rados -p .nfs --namespace ${nfsName} get "export-${toString exportId}"                /tmp/export-1     || true
+                rados -p .nfs --namespace ${nfsName} get "export-${toString exportId}"                /tmp/export-${toString exportId}     || true
                 rados -p .nfs --namespace ${nfsName} get "userconf-nfs.${nfsName}" /tmp/userconf-nfs || true
 
                 echo "--- CONTENTS ---"
@@ -205,7 +205,7 @@ in
                 echo "Restarting NFS Ganesha..."
                 ganesha-rados-grace --pool .nfs --ns ${nfsName} add ${nfsName} || true
                 ganesha-rados-grace --pool .nfs --ns ${nfsName} start ${nfsName} || true
-                ceph -c "$CEPH_CONFIG" orch restart nfs.${nfsName} || true
+                ceph -c "$CEPH_CONFIG" orchestrator restart nfs.${nfsName} || true
 
                 echo "Removing orchestrator backend..."
                 ceph -c "$CEPH_CONFIG" orch set backend "" || true
