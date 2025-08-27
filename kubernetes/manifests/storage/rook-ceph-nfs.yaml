@@ -48,6 +48,7 @@ spec:
               [^\"]*\"/, \"\\\"path\\\": \\\"\" newval \"\\\"\");\n  print\n}' /etc/ganesha/export.json\
               \ > /tmp/export.json\n\nceph -c \"$CEPH_CONFIG\" nfs export apply \"\
               $cluster\" -i /tmp/export.json\nceph -c \"$CEPH_CONFIG\" nfs cluster\
+              \ config reset \"$cluster\" || true\nceph -c \"$CEPH_CONFIG\" nfs cluster\
               \ config set \"$cluster\" -i /etc/ganesha/custom.ganesha.conf\n\necho\
               \ \"--- CUSTOM CONFIGURATIONS ---\"\nrados -p .nfs --namespace homelab-nfs\
               \ get \"conf-nfs.homelab-nfs\"     /tmp/conf-nfs     || true\nrados\
