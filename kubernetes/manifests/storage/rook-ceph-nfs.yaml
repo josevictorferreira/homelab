@@ -14,8 +14,9 @@ spec:
         - command:
             - /bin/bash
             - -lc
-            - "set -euo pipefail\nSUBVOL_GROUP='nfs-exports'\nSUBVOL_NAME='homelab-nfs'\n\
-              FS='ceph-filesystem'\n\nCEPH_CONFIG=/etc/ceph/ceph.conf\nMON_CONFIG=/etc/rook/mon-endpoints\n\
+            - "set -euo pipefail\nEXPORT_ID=0\nSUBVOL_GROUP='nfs-exports'\nSUBVOL_NAME='homelab-nfs'\n\
+              FS='ceph-filesystem'\nCLUSTER='homelab-nfs'\nNFSNS='homelab-nfs'\nRADOS_POOL='.nfs'\n\
+              \nCEPH_CONFIG=/etc/ceph/ceph.conf\nMON_CONFIG=/etc/rook/mon-endpoints\n\
               KEYRING_FILE=/etc/ceph/keyring\nendpoints=$(cat \"$MON_CONFIG\")\nmon_endpoints=$(echo\
               \ \"$endpoints\" | sed 's/[a-z0-9_-]\\+=//g')\nmkdir -p /etc/ceph\n\
               cat > \"$CEPH_CONFIG\" <<EOF\n[global]\nmon_host = $mon_endpoints\n\
@@ -28,8 +29,21 @@ spec:
               \ username=client.admin; fi\ncat > \"$KEYRING_FILE\" <<EOF\n[$username]\n\
               key = $ceph_secret\nEOF\n\nceph -c \"$CEPH_CONFIG\" mgr module enable\
               \ nfs || true\nceph -c \"$CEPH_CONFIG\" mgr module enable rook || true\n\
-              ceph -c \"$CEPH_CONFIG\" orch set backend rook || true\n\nif ! SUBVOL_PATH=\"\
-              $(\n  ceph -c \"$CEPH_CONFIG\" fs subvolume getpath \"$FS\" \"$SUBVOL_NAME\"\
+              ceph -c \"$CEPH_CONFIG\" orch set backend rook || true\n\nfor SUFFIX\
+              \ in a b c d; do\n  ID=\"client.nfs-ganesha.$${CLUSTER}.$${SUFFIX}\"\
+              \n  ceph -c \"$CEPH_CONFIG\" auth get-or-create \"$ID\" \\\n    mon\
+              \ 'allow r' \\\n    mgr 'allow rw' \\\n    osd \"allow rw pool=$${RADOS_POOL}\
+              \ namespace=$${NFSNS}\" >/dev/null || true\ndone\nfor ID in $(ceph -c\
+              \ \"$CEPH_CONFIG\" auth ls | awk '/client\\.nfs-ganesha\\.'\"$CLUSTER\"\
+              '\\./{print $1}'); do\n  ceph -c \"$CEPH_CONFIG\" auth caps \"$ID\"\
+              \ \\\n    mon 'allow r' \\\n    mgr 'allow rw' \\\n    osd \"allow rw\
+              \ pool=$${RADOS_POOL} namespace=$${NFSNS}\" || true\ndone\nfor ID in\
+              \ $(ceph -c \"$CEPH_CONFIG\" auth ls | awk '/client\\.nfs\\.'\"$CLUSTER\"\
+              '\\.'\"$FS\"'\\./{print $1}'); do\n  ceph -c \"$CEPH_CONFIG\" auth caps\
+              \ \"$ID\" \\\n    mon 'allow r' \\\n    mgr 'allow rw' \\\n    mds 'allow\
+              \ rw' \\\n    osd \"allow rw tag cephfs data=$${FS}, allow rw pool=$${RADOS_POOL}\
+              \ namespace=$${NFSNS}\" || true\ndone\n\nif ! SUBVOL_PATH=\"$(\n  ceph\
+              \ -c \"$CEPH_CONFIG\" fs subvolume getpath \"$FS\" \"$SUBVOL_NAME\"\
               \ --group_name \"$SUBVOL_GROUP\" 2>/dev/null\n)\"; then\n  echo \"Creating\
               \ subvolume group and subvolume...\"\n  if ! ceph -c \"$CEPH_CONFIG\"\
               \ fs subvolumegroup ls \"$FS\" -f json 2>/dev/null \\\n      | grep\
@@ -43,26 +57,28 @@ spec:
               \ \\\n      --group_name \"$SUBVOL_GROUP\" --size 0 --uid 2002 --gid\
               \ 2002 --mode 2775\n  fi\n\n  SUBVOL_PATH=\"$(ceph -c \"$CEPH_CONFIG\"\
               \ fs subvolume getpath \"$FS\" \"$SUBVOL_NAME\" --group_name \"$SUBVOL_GROUP\"\
-              )\"\nfi\n\necho \"Subvolume path: $SUBVOL_PATH\"\n\ncluster='homelab-nfs'\n\
-              \nawk -v newval=\"$SUBVOL_PATH\" '{\n  gsub(/\"path\":[[:space:]]*\"\
-              [^\"]*\"/, \"\\\"path\\\": \\\"\" newval \"\\\"\");\n  print\n}' /tmp/ganesha/export.json\
+              )\"\nfi\n\necho \"Subvolume path: $SUBVOL_PATH\"\n\nawk -v newval=\"\
+              $SUBVOL_PATH\" '{\n  gsub(/\"path\":[[:space:]]*\"[^\"]*\"/, \"\\\"\
+              path\\\": \\\"\" newval \"\\\"\");\n  print\n}' /tmp/ganesha/export.json\
               \ > /tmp/export_final.json\n\nceph -c \"$CEPH_CONFIG\" nfs export apply\
-              \ \"$cluster\" -i /tmp/export_final.json\nceph -c \"$CEPH_CONFIG\" nfs\
-              \ cluster config reset \"$cluster\" || true\nceph -c \"$CEPH_CONFIG\"\
-              \ nfs cluster config set \"$cluster\" -i /tmp/ganesha/custom.ganesha.conf\n\
-              \necho \"--- CUSTOM CONFIGURATIONS ---\"\nrados -p .nfs --namespace\
-              \ homelab-nfs get \"conf-nfs.homelab-nfs\"     /tmp/conf-nfs     ||\
-              \ true\nrados -p .nfs --namespace homelab-nfs get \"export-10\"    \
-              \            /tmp/export-10     || true\nrados -p .nfs --namespace homelab-nfs\
-              \ get \"userconf-nfs.homelab-nfs\" /tmp/userconf-nfs || true\n\necho\
-              \ \"--- CONTENTS ---\"\ncat /tmp/conf-nfs     || echo \"(conf-nfs not\
-              \ found)\"\necho \"---\"\ncat /tmp/export-10     || echo \"(export-homelab-nfs\
-              \ not found)\"\necho \"---\"\ncat /tmp/userconf-nfs || echo \"(userconf-nfs\
-              \ not found)\"\n\necho \"Restarting NFS Ganesha grace...\"\nganesha-rados-grace\
-              \ --pool .nfs --ns homelab-nfs add homelab-nfs || true\nganesha-rados-grace\
-              \ --pool .nfs --ns homelab-nfs start homelab-nfs || true\n\necho \"\
-              Removing orchestrator backend...\"\nceph -c \"$CEPH_CONFIG\" orch set\
-              \ backend \"\" || true\n"
+              \ \"$CLUSTER\" -i /tmp/export_final.json\nceph -c \"$CEPH_CONFIG\" nfs\
+              \ cluster config reset \"$CLUSTER\" || true\nceph -c \"$CEPH_CONFIG\"\
+              \ nfs cluster config set \"$CLUSTER\" -i /tmp/ganesha/custom.ganesha.conf\n\
+              \nrados -p .nfs --namespace $NFSNS get \"conf-nfs.$CLUSTER\"     /tmp/conf-nfs\
+              \                || true\nrados -p .nfs --namespace $NFSNS get \"export-$EXPORT_ID\"\
+              \     \"/tmp/export-$EXPORT_ID\"     || true\nrados -p .nfs --namespace\
+              \ $NFSNS get \"userconf-nfs.$CLUSTER\" /tmp/userconf-nfs           \
+              \ || true\n\necho \"--------------------------- CONTENTS -----------------------------\"\
+              \ncat /tmp/conf-nfs                || echo \"(conf-nfs not found)\"\n\
+              echo \"------------------------------------------------------------------\"\
+              \ncat \"/tmp/export-$EXPORT_ID\"     || echo \"(export-$CLUSTER not\
+              \ found)\"\necho \"------------------------------------------------------------------\"\
+              \ncat /tmp/userconf-nfs            || echo \"(userconf-nfs not found)\"\
+              \n\necho \"Restarting NFS Ganesha grace...\"\n\nfor SUFFIX in a b c\
+              \ d; do\n  ganesha-rados-grace --pool .nfs --ns \"$NFSNS\" add \"$CLUSTER-$SUFFIX\"\
+              \   || true\n  ganesha-rados-grace --pool .nfs --ns \"$NFSNS\" start\
+              \ \"$CLUSTER-$SUFFIX\" || true\nend\n\necho \"Removing orchestrator\
+              \ backend...\"\nceph -c \"$CEPH_CONFIG\" orch set backend \"\" || true\n"
           image: quay.io/ceph/ceph:v19
           name: apply
           volumeMounts:
@@ -127,7 +143,7 @@ data:
     \ = 0;\n  Protocols = 4;\n  Transports = TCP;\n  Access_Type = RW;\n  Squash =\
     \ All_Squash;\n  Manage_Gids = true;\n  Anonymous_uid = 2002;\n  Anonymous_gid\
     \ = 2002;\n  SecType = \"sys\";\n}\n\n"
-  export.json: '{"access_type":"RW","clients":[{"access_type":"RW","addresses":["10.10.10.0/24","10.0.0.0/24"],"protocols":[4],"sectype":["sys"],"squash":"all_squash"}],"export_id":10,"fsal":{"fs_name":"ceph-filesystem","name":"CEPH"},"path":"/exported/path","pseudo":"/homelab-nfs","sectype":["sys"],"security_label":false,"squash":"all_squash"}'
+  export.json: '{"access_type":"RW","clients":[{"access_type":"RW","addresses":["10.10.10.0/24","10.0.0.0/24"],"protocols":[4],"sectype":["sys"],"squash":"all_squash"}],"export_id":0,"fsal":{"fs_name":"ceph-filesystem","name":"CEPH"},"path":"/exported/path","pseudo":"/homelab-nfs","sectype":["sys"],"security_label":false,"squash":"all_squash"}'
 kind: ConfigMap
 metadata:
   annotations:
