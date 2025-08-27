@@ -52,7 +52,7 @@ in
     configMaps = {
       "${nfsName}-ganesha-custom-config" = {
         metadata = {
-          name = "${nfsName}-export";
+          name = "${nfsName}-ganesha-custom-config";
           namespace = namespace;
         };
         data = {
