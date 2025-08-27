@@ -227,10 +227,12 @@ in
                 for SUFFIX in a b c d; do
                   ganesha-rados-grace --pool .nfs --ns "$NFSNS" add "$${CLUSTER}-$${SUFFIX}"   || true
                   ganesha-rados-grace --pool .nfs --ns "$NFSNS" start "$${CLUSTER}-$${SUFFIX}" || true
-                end
+                done
 
                 echo "Removing orchestrator backend..."
                 ceph -c "$CEPH_CONFIG" orch set backend "" || true
+
+                echo "DONE."
               ''
             ];
             volumeMounts = [
