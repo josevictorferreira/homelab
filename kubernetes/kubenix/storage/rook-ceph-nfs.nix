@@ -178,7 +178,7 @@ in
                 awk -v newval="$SUBVOL_PATH" '{
                   gsub(/"path":[[:space:]]*"[^"]*"/, "\"path\": \"" newval "\"");
                   print
-                }' /etc/ganesha/export.json > /tmp/export_1.json
+                }' /etc/ganesha/export.json > /tmp/export.json
 
                 ceph -c "$CEPH_CONFIG" nfs export apply "$cluster" -i /tmp/export.json
                 ceph -c "$CEPH_CONFIG" nfs cluster config reset "$cluster" || true
