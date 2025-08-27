@@ -14,7 +14,7 @@ spec:
         - command:
             - /bin/bash
             - -lc
-            - "set -euo pipefail\nEXPORT_ID=0\nSUBVOL_GROUP='nfs-exports'\nSUBVOL_NAME='homelab-nfs'\n\
+            - "set -euo pipefail\nEXPORT_ID=10\nSUBVOL_GROUP='nfs-exports'\nSUBVOL_NAME='homelab-nfs'\n\
               FS='ceph-filesystem'\nCLUSTER='homelab-nfs'\nNFSNS='homelab-nfs'\nRADOS_POOL='.nfs'\n\
               \nCEPH_CONFIG=/etc/ceph/ceph.conf\nMON_CONFIG=/etc/rook/mon-endpoints\n\
               KEYRING_FILE=/etc/ceph/keyring\nendpoints=$(cat \"$MON_CONFIG\")\nmon_endpoints=$(echo\
@@ -63,7 +63,7 @@ spec:
               \ nfs cluster config set \"$CLUSTER\" -i /tmp/ganesha/custom.ganesha.conf\n\
               \nrados -p .nfs --namespace $NFSNS get \"conf-nfs.$CLUSTER\"     /tmp/conf-nfs\
               \                || true\nrados -p .nfs --namespace $NFSNS get \"export-$EXPORT_ID\"\
-              \     \"/tmp/export-$EXPORT_ID\"     || true\nrados -p .nfs --namespace\
+              \     /tmp/export-$$EXPORT_ID     || true\nrados -p .nfs --namespace\
               \ $NFSNS get \"userconf-nfs.$CLUSTER\" /tmp/userconf-nfs           \
               \ || true\n\necho \"--------------------------- CONTENTS -----------------------------\"\
               \ncat /tmp/conf-nfs                || echo \"(conf-nfs not found)\"\n\
@@ -72,7 +72,8 @@ spec:
               \ found)\"\necho \"------------------------------------------------------------------\"\
               \ncat /tmp/userconf-nfs            || echo \"(userconf-nfs not found)\"\
               \n\necho \"Restarting NFS Ganesha grace...\"\n\nfor SUFFIX in a b c\
-              \ d; do\n  ganesha-rados-grace --pool .nfs --ns \"$NFSNS\" add \"$CLUSTER-$SUFFIX\"\
+              \ d; do\n  echo \"Restarting ganesha-rados-grace for $CLUSTER-$SUFFIX\"\
+              \n  ganesha-rados-grace --pool .nfs --ns \"$NFSNS\" add \"$CLUSTER-$SUFFIX\"\
               \   || true\n  ganesha-rados-grace --pool .nfs --ns \"$NFSNS\" start\
               \ \"$CLUSTER-$SUFFIX\" || true\nend\n\necho \"Removing orchestrator\
               \ backend...\"\nceph -c \"$CEPH_CONFIG\" orch set backend \"\" || true\n"
@@ -140,7 +141,7 @@ data:
     \ = 0;\n  Protocols = 4;\n  Transports = TCP;\n  Access_Type = RW;\n  Squash =\
     \ All_Squash;\n  Manage_Gids = true;\n  Anonymous_uid = 2002;\n  Anonymous_gid\
     \ = 2002;\n  SecType = \"sys\";\n}\n\n"
-  export.json: '{"access_type":"RW","clients":[{"access_type":"RW","addresses":["10.10.10.0/24","10.0.0.0/24"],"protocols":[4],"sectype":["sys"],"squash":"all_squash"}],"export_id":0,"fsal":{"fs_name":"ceph-filesystem","name":"CEPH"},"path":"/exported/path","pseudo":"/homelab-nfs","sectype":["sys"],"security_label":false,"squash":"all_squash"}'
+  export.json: '{"access_type":"RW","clients":[{"access_type":"RW","addresses":["10.10.10.0/24","10.0.0.0/24"],"protocols":[4],"sectype":["sys"],"squash":"all_squash"}],"export_id":10,"fsal":{"fs_name":"ceph-filesystem","name":"CEPH"},"path":"/exported/path","pseudo":"/homelab-nfs","sectype":["sys"],"security_label":false,"squash":"all_squash"}'
 kind: ConfigMap
 metadata:
   annotations:
