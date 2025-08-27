@@ -68,7 +68,7 @@ let
   '';
   exportConf = {
     export_id = 10;
-    path = "/exported/path";
+    path = "__SUBVOL_PATH__";
     pseudo = pseudo;
     security_label = false;
     access_type = "RW";
@@ -223,12 +223,9 @@ in
 
                 echo "Subvolume path: $SUBVOL_PATH"
 
-                echo "${builtins.toJSON exportConf}" > /tmp/export.json
-
-                awk -v newval="$SUBVOL_PATH" '{
-                  gsub(/"path":[[:space:]]*"[^"]*"/, "\"path\": \"" newval "\"");
-                  print
-                }' /tmp/export.json > /tmp/export_final.json
+                EXPORT_JSON='${builtins.toJSON exportConf}'
+                EXPORT_JSON="$${EXPORT_JSON/__SUBVOL_PATH__/$SUBVOL_PATH}"
+                printf '%s' "$EXPORT_JSON" > /tmp/export_final.json
 
                 ceph -c "$CEPH_CONFIG" nfs export apply "$CLUSTER" -i /tmp/export_final.json
 
@@ -297,6 +294,9 @@ in
         ttlSecondsAfterFinished = 3600;
         template.spec =
           let
+            jsonPatchFor = nodeId: builtins.toJSON {
+              data = { config = genGaneshaConfForNode nodeId; };
+            };
             patchConfigMapFor = nodeId: ''
               echo "Starting patch routine for node ID ${nodeId}..."
               CM=""
@@ -312,7 +312,7 @@ in
 
               echo "Patching $CM in ${namespace}..."
 
-              kubectl -n ${namespace} patch "$CM" --type merge -p '{"data":{"config": "'"${genGaneshaConfForNode nodeId}"'"}}'
+              kubectl -n ${namespace} patch "$CM" --type merge -p '${jsonPatchFor nodeId}'
 
             '';
             rolloutRestartFor = nodeId: ''
