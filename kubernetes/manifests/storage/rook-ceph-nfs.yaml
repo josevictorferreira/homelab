@@ -14,7 +14,7 @@ spec:
         - command:
             - /bin/bash
             - -lc
-            - "set -euo pipefail\nEXPORT_ID=0\nSUBVOL_GROUP='nfs-exports'\nSUBVOL_NAME='homelab-nfs'\n\
+            - "set -euo pipefail\nEXPORT_ID=10\nSUBVOL_GROUP='nfs-exports'\nSUBVOL_NAME='homelab-nfs'\n\
               FS='ceph-filesystem'\nCLUSTER='homelab-nfs'\nNFSNS='homelab-nfs'\nRADOS_POOL='.nfs'\n\
               \nCEPH_CONFIG=/etc/ceph/ceph.conf\nMON_CONFIG=/etc/rook/mon-endpoints\n\
               KEYRING_FILE=/etc/ceph/keyring\nendpoints=$(cat \"$MON_CONFIG\")\nmon_endpoints=$(echo\
@@ -140,8 +140,9 @@ data:
     }\n\nNFS_KRB5 { Active_krb5 = false; }\n\nCEPH { ceph_conf = \"/etc/ceph/ceph.conf\"\
     ; }\n\nEXPORT_DEFAULTS {\n  Attr_Expiration_Time = 0;\n  Protocols = 4;\n  Transports\
     \ = TCP;\n  Access_Type = RW;\n  Squash = All_Squash;\n  Manage_Gids = true;\n\
-    \  Anonymous_uid = 2002;\n  Anonymous_gid = 2002;\n  SecType = \"sys\";\n}\n\n"
-  export.json: '{"access_type":"RW","clients":[{"access_type":"RW","addresses":"*","protocols":[4],"sectype":["sys"],"squash":"all_squash"}],"export_id":0,"fsal":{"fs_name":"ceph-filesystem","name":"CEPH"},"path":"/exported/path","pseudo":"/homelab-nfs","sectype":["sys"],"security_label":false,"squash":"all_squash"}'
+    \  Anonymous_uid = 2002;\n  Anonymous_gid = 2002;\n  SecType = \"sys\";\n}\n\n\
+    \\n\\n\n"
+  export.json: '{"access_type":"RW","clients":[{"access_type":"RW","addresses":["10.10.10.0/24","10.0.0.0/24"],"protocols":[4],"sectype":["sys"],"squash":"all_squash"}],"export_id":10,"fsal":{"fs_name":"ceph-filesystem","name":"CEPH"},"path":"/exported/path","pseudo":"/homelab-nfs","sectype":["sys"],"security_label":false,"squash":"all_squash"}'
 kind: ConfigMap
 metadata:
   annotations:
