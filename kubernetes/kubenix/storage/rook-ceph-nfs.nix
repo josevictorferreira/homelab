@@ -80,6 +80,8 @@ in
           "custom.ganesha.conf" = ''
 
             NFSv4 {
+              Delegations = false;
+              RecoveryBackend = "rados_cluster";
               Minor_Versions = 0, 1, 2;
               Only_Numeric_Owners = true;
             }
@@ -87,7 +89,7 @@ in
             NFS_KRB5 { Active_krb5 = false; }
 
             EXPORT_DEFAULTS {
-              Squash = All_Squash;
+              Attr_Expiration_Time = 0;
               Manage_Gids = true;
               Anonymous_uid = 2002;
               Anonymous_gid = 2002;
