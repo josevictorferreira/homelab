@@ -33,8 +33,6 @@ let
       Anonymous_gid = 2002;
       SecType = "sys";
     }
-
-
   '';
   exportConf = {
     export_id = 10;
@@ -77,7 +75,7 @@ in
               { key = "node-role.kubernetes.io/control-plane"; operator = "Exists"; effect = "NoSchedule"; }
             ];
           };
-          logLevel = "NIV_FULL_DEBUG";
+          logLevel = "NIV_DEBUG";
         };
       };
     };
