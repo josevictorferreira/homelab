@@ -154,8 +154,6 @@ data:
 
     EXPORT_DEFAULTS { Anonymous_gid = 2002; }
 
-    }
-
     '
   export.json: '{"access_type":"RW","clients":[{"access_type":"RW","addresses":["10.10.10.0/24","10.0.0.0/24"],"squash":"all_squash"}],"export_id":10,"fsal":{"fs_name":"ceph-filesystem","name":"CEPH"},"manage_gids":true,"path":"/exported/path","protocols":[4],"pseudo":"/homelab-nfs","sectype":["sys"],"security_label":false,"squash":"all_squash"}'
 kind: ConfigMap

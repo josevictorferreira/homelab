@@ -22,7 +22,6 @@ let
     CEPH { ceph_conf = "/etc/ceph/ceph.conf"; }
   
     EXPORT_DEFAULTS { Anonymous_gid = 2002; }
-    }
   '';
   exportConf = {
     export_id = 10;
