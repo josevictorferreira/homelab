@@ -53,7 +53,7 @@ spec:
               \necho \"--- CUSTOM CONFIGURATIONS ---\"\nrados -p .nfs --namespace\
               \ homelab-nfs get \"conf-nfs.homelab-nfs\"     /tmp/conf-nfs     ||\
               \ true\nrados -p .nfs --namespace homelab-nfs get \"export-10\"    \
-              \            /tmp/export-1     || true\nrados -p .nfs --namespace homelab-nfs\
+              \            /tmp/export-10     || true\nrados -p .nfs --namespace homelab-nfs\
               \ get \"userconf-nfs.homelab-nfs\" /tmp/userconf-nfs || true\n\necho\
               \ \"--- CONTENTS ---\"\ncat /tmp/conf-nfs     || echo \"(conf-nfs not\
               \ found)\"\necho \"---\"\ncat /tmp/export-10     || echo \"(export-homelab-nfs\
@@ -61,9 +61,9 @@ spec:
               \ not found)\"\n\necho \"Restarting NFS Ganesha...\"\nganesha-rados-grace\
               \ --pool .nfs --ns homelab-nfs add homelab-nfs || true\nganesha-rados-grace\
               \ --pool .nfs --ns homelab-nfs start homelab-nfs || true\nceph -c \"\
-              $CEPH_CONFIG\" orch restart nfs.homelab-nfs || true\n\necho \"Removing\
-              \ orchestrator backend...\"\nceph -c \"$CEPH_CONFIG\" orch set backend\
-              \ \"\" || true\n"
+              $CEPH_CONFIG\" orchestrator restart nfs.homelab-nfs || true\n\necho\
+              \ \"Removing orchestrator backend...\"\nceph -c \"$CEPH_CONFIG\" orch\
+              \ set backend \"\" || true\n"
           image: quay.io/ceph/ceph:v19
           name: apply
           volumeMounts:
