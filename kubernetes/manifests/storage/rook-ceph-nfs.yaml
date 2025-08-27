@@ -137,13 +137,27 @@ apiVersion: v1
 data:
   custom.ganesha.conf: '
 
+    NFS_Core_Param  { Protocols = 3, 4; }
+
+
+    MDCACHE { Cache_FDs = false; }
+
+
+    NFSv4 { Minor_Versions = 0, 1, 2; }
+
+
     NFS_KRB5 { Active_krb5 = false; }
 
 
     CEPH { ceph_conf = "/etc/ceph/ceph.conf"; }
 
+
+    EXPORT_DEFAULTS { Anonymous_gid = 2002; }
+
+    }
+
     '
-  export.json: '{"access_type":"RW","anon_gid":2002,"anon_uid":2002,"anongid":2002,"anonuid":2002,"anonymous_gid":2002,"anonymous_uid":2002,"clients":[{"access_type":"RW","addresses":["10.10.10.0/24","10.0.0.0/24"],"anon_gid":2002,"anon_uid":2002,"anongid":2002,"anonuid":2002,"anonymous_gid":2002,"anonymous_uid":2002,"squash":"all_squash"}],"export_id":10,"fsal":{"fs_name":"ceph-filesystem","name":"CEPH"},"manage_gids":true,"path":"/exported/path","protocols":[3,4],"pseudo":"/homelab-nfs","sectype":["sys"],"security_label":false,"squash":"all_squash"}'
+  export.json: '{"access_type":"RW","clients":[{"access_type":"RW","addresses":["10.10.10.0/24","10.0.0.0/24"],"squash":"all_squash"}],"export_id":10,"fsal":{"fs_name":"ceph-filesystem","name":"CEPH"},"manage_gids":true,"path":"/exported/path","protocols":[4],"pseudo":"/homelab-nfs","sectype":["sys"],"security_label":false,"squash":"all_squash"}'
 kind: ConfigMap
 metadata:
   annotations:
