@@ -143,7 +143,6 @@ in
                 EOF
 
                 ceph -c "$CEPH_CONFIG" mgr module enable nfs || true
-                ceph -c "$CEPH_CONFIG" mgr module enable volumes || true
                 ceph -c "$CEPH_CONFIG" mgr module enable rook || true
                 ceph -c "$CEPH_CONFIG" orch set backend rook || true
 
@@ -161,7 +160,7 @@ in
                 }' /etc/ganesha/export.json > /tmp/export.json
 
                 ceph -c "$CEPH_CONFIG" nfs export apply "$cluster" -i /tmp/export.json
-                ceph -c "$CEPH_CONFIG" nfs cluster config set "$cluster" /etc/ganesha/custom.ganesha.conf
+                ceph -c "$CEPH_CONFIG" nfs cluster config set "$cluster" -i /etc/ganesha/custom.ganesha.conf
 
                 echo "--- CUSTOM CONFIGURATIONS ---"
                 rados -p .nfs --namespace ${nfsName} get "conf-nfs.${nfsName}"     /tmp/conf-nfs     || true
