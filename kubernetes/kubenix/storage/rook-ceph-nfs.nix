@@ -5,7 +5,10 @@ let
   nfsName = "homelab-nfs";
   pseudo = "/homelab";
   cephfs = "ceph-filesystem";
-  allowedCIDRs = [ "10.10.10.0/24" ];
+  allowedCIDRs = [
+    "10.0.0.0/24"
+    "10.10.10.0/24"
+  ];
 in
 {
   kubernetes.resources = {
