@@ -223,12 +223,12 @@ in
 
                 echo "Subvolume path: $SUBVOL_PATH"
 
-                echo "${builtins.toJSON exportConf}" > /tmp/ganesha/export.json
+                echo "${builtins.toJSON exportConf}" > /tmp/export.json
 
                 awk -v newval="$SUBVOL_PATH" '{
                   gsub(/"path":[[:space:]]*"[^"]*"/, "\"path\": \"" newval "\"");
                   print
-                }' /tmp/ganesha/export.json > /tmp/export_final.json
+                }' /tmp/export.json > /tmp/export_final.json
 
                 ceph -c "$CEPH_CONFIG" nfs export apply "$CLUSTER" -i /tmp/export_final.json
 
