@@ -19,6 +19,8 @@ let
     }
   
     NFS_KRB5 { Active_krb5 = false; }
+
+    CEPH { ceph_conf = "/etc/ceph/ceph.conf"; }
   
     EXPORT_DEFAULTS {
       Attr_Expiration_Time = 0;
