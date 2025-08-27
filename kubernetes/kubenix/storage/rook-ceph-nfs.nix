@@ -34,7 +34,7 @@ let
 
   '';
   exportConf = {
-    export_id = 0;
+    export_id = 10;
     path = "/exported/path";
     pseudo = pseudo;
     security_label = false;
@@ -213,7 +213,7 @@ in
                 ceph -c "$CEPH_CONFIG" nfs cluster config set "$CLUSTER" -i /tmp/ganesha/custom.ganesha.conf
 
                 rados -p .nfs --namespace $NFSNS get "conf-nfs.$CLUSTER"     /tmp/conf-nfs                || true
-                rados -p .nfs --namespace $NFSNS get "export-$EXPORT_ID"     "/tmp/export-$EXPORT_ID"     || true
+                rados -p .nfs --namespace $NFSNS get "export-$EXPORT_ID"     /tmp/export-$$EXPORT_ID     || true
                 rados -p .nfs --namespace $NFSNS get "userconf-nfs.$CLUSTER" /tmp/userconf-nfs            || true
 
                 echo "--------------------------- CONTENTS -----------------------------"
@@ -226,6 +226,7 @@ in
                 echo "Restarting NFS Ganesha grace..."
 
                 for SUFFIX in a b c d; do
+                  echo "Restarting ganesha-rados-grace for $CLUSTER-$SUFFIX"
                   ganesha-rados-grace --pool .nfs --ns "$NFSNS" add "$CLUSTER-$SUFFIX"   || true
                   ganesha-rados-grace --pool .nfs --ns "$NFSNS" start "$CLUSTER-$SUFFIX" || true
                 end
