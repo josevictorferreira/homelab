@@ -179,11 +179,11 @@ in
                 awk -v newval="$SUBVOL_PATH" '{
                   gsub(/"path":[[:space:]]*"[^"]*"/, "\"path\": \"" newval "\"");
                   print
-                }' /tmp/export.json > /tmp/export_final.json
+                }' /tmp/ganesha/export.json > /tmp/export_final.json
 
                 ceph -c "$CEPH_CONFIG" nfs export apply "$cluster" -i /tmp/export_final.json
                 ceph -c "$CEPH_CONFIG" nfs cluster config reset "$cluster" || true
-                ceph -c "$CEPH_CONFIG" nfs cluster config set "$cluster" -i /tmp/custom.ganesha.conf
+                ceph -c "$CEPH_CONFIG" nfs cluster config set "$cluster" -i /tmp/ganesha/custom.ganesha.conf
 
                 echo "--- CUSTOM CONFIGURATIONS ---"
                 rados -p .nfs --namespace ${nfsName} get "conf-nfs.${nfsName}"     /tmp/conf-nfs     || true
@@ -201,7 +201,7 @@ in
               { name = "mon-endpoints"; mountPath = "/etc/rook"; }
               { name = "ceph-config"; mountPath = "/etc/ceph"; }
               { name = "ceph-admin-secret"; mountPath = "/var/lib/rook-ceph-mon"; readOnly = true; }
-              { name = "${nfsName}-ganesha-custom-config"; mountPath = "/tmp"; readOnly = true; }
+              { name = "${nfsName}-ganesha-custom-config"; mountPath = "/tmp/ganesha"; readOnly = true; }
             ];
           }];
           volumes = [
