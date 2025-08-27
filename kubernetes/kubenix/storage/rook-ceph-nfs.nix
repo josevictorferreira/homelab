@@ -156,7 +156,7 @@ in
 
                 ceph -c "$CEPH_CONFIG" mgr module enable nfs || true
                 ceph -c "$CEPH_CONFIG" mgr module enable rook || true
-                cep -c "$CEPH_CONFIG" orch set backend rook || true
+                ceph -c "$CEPH_CONFIG" orch set backend rook || true
 
                 if ! SUBVOL_PATH="$(
                   ceph -c "$CEPH_CONFIG" fs subvolume getpath "$FS" "$SUBVOL_NAME" --group_name "$SUBVOL_GROUP" 2>/dev/null

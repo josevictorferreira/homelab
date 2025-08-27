@@ -28,7 +28,7 @@ spec:
               \ username=client.admin; fi\ncat > \"$KEYRING_FILE\" <<EOF\n[$username]\n\
               key = $ceph_secret\nEOF\n\nceph -c \"$CEPH_CONFIG\" mgr module enable\
               \ nfs || true\nceph -c \"$CEPH_CONFIG\" mgr module enable rook || true\n\
-              cep -c \"$CEPH_CONFIG\" orch set backend rook || true\n\nif ! SUBVOL_PATH=\"\
+              ceph -c \"$CEPH_CONFIG\" orch set backend rook || true\n\nif ! SUBVOL_PATH=\"\
               $(\n  ceph -c \"$CEPH_CONFIG\" fs subvolume getpath \"$FS\" \"$SUBVOL_NAME\"\
               \ --group_name \"$SUBVOL_GROUP\" 2>/dev/null\n)\"; then\n  echo \"Creating\
               \ subvolume group and subvolume...\"\n  if ! ceph -c \"$CEPH_CONFIG\"\
