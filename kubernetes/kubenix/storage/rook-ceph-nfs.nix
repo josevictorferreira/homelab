@@ -5,10 +5,55 @@ let
   nfsName = "homelab-nfs";
   pseudo = "/homelab-storage";
   cephfs = "ceph-filesystem";
+  exportId = 1;
   allowedCIDRs = [
     "10.10.10.0/24"
     "10.0.0.0/24"
   ];
+  customGaneshaConf = ''
+    NFSv4 {
+      Delegations = false;
+      RecoveryBackend = "rados_cluster";
+      Minor_Versions = 0, 1, 2;
+      Only_Numeric_Owners = true;
+    }
+  
+    NFS_KRB5 { Active_krb5 = false; }
+  
+    EXPORT_DEFAULTS {
+      Attr_Expiration_Time = 0;
+      Protocols = 4;
+      Transports = TCP;
+      Access_Type = RW;
+      Squash = All_Squash;
+      Manage_Gids = true;
+      Anonymous_uid = 2002;
+      Anonymous_gid = 2002;
+      SecType = "sys";
+    }
+  '';
+  exportConf = {
+    export_id = exportId;
+    path = "/exported/path";
+    pseudo = pseudo;
+    security_label = false;
+    access_type = "RW";
+    squash = "all_squash";
+    sectype = [ "sys" ];
+    fsal = {
+      name = "CEPH";
+      fs_name = cephfs;
+    };
+    clients = [
+      {
+        addresses = allowedCIDRs;
+        access_type = "RW";
+        squash = "all_squash";
+        protocols = [ 4 ];
+        sectype = [ "sys" ];
+      }
+    ];
+  };
 in
 {
   kubernetes.resources = {
@@ -46,8 +91,8 @@ in
           ceph_daemon_type = "nfs";
         };
         ports = [
-          { name = "nfs"; nodePort = 30325; port = 2049; targetPort = 2049; protocol = "TCP"; }
-          { name = "nfs"; nodePort = 30326; port = 2049; targetPort = 2049; protocol = "UDP"; }
+          { name = "nfs-tcp"; nodePort = 30325; port = 2049; targetPort = 2049; protocol = "TCP"; }
+          { name = "nfs-udp"; nodePort = 30326; port = 2049; targetPort = 2049; protocol = "UDP"; }
         ];
       };
     };
@@ -59,65 +104,8 @@ in
           namespace = namespace;
         };
         data = {
-          "export.json" = builtins.toJSON {
-            export_id = 1000;
-            path = "/exported/path";
-            pseudo = pseudo;
-            security_label = false;
-            access_type = "RW";
-            squash = "all_squash";
-            sectype = [ "sys" ];
-            fsal = {
-              name = "CEPH";
-              fs_name = cephfs;
-            };
-            clients = [
-              {
-                addresses = "*";
-                access_type = "RW";
-                squash = "all_squash";
-                protocols = [ 4 ];
-                sectype = [ "sys" ];
-              }
-            ];
-          };
-          "custom.ganesha.conf" = ''
-
-            NFS_CORE_PARAM {
-              Enable_NLM = false;
-              Enable_RQUOTA = false;
-              Protocols = 4;
-              Bind_addr = 0.0.0.0;
-              NFS_Port = 2049;
-              Log_Level = DEBUG;
-              allow_set_io_flusher_fail = true;
-            }
-          
-            NFSv4 {
-              Graceless = true;
-              Delegations = false;
-              RecoveryBackend = "rados_cluster";
-              Minor_Versions = 0, 1, 2;
-              Only_Numeric_Owners = true;
-            }
-          
-            NFS_KRB5 { Active_krb5 = false; }
-
-            CEPH { Ceph_Conf = "/etc/ceph/ceph.conf"; }
-          
-            EXPORT_DEFAULTS {
-              Attr_Expiration_Time = 0;
-              Protocols = 4;
-              Transports = TCP;
-              Access_Type = RW;
-              Squash = All_Squash;
-              Manage_Gids = true;
-              Anonymous_uid = 2002;
-              Anonymous_gid = 2002;
-              SecType = "sys";
-            }
-          
-          '';
+          "custom.ganesha.conf" = customGaneshaConf;
+          "export.json" = builtins.toJSON exportConf;
         };
       };
     };
@@ -168,7 +156,7 @@ in
 
                 ceph -c "$CEPH_CONFIG" mgr module enable nfs || true
                 ceph -c "$CEPH_CONFIG" mgr module enable rook || true
-                ceph -c "$CEPH_CONFIG" orch set backend rook || true
+                cep -c "$CEPH_CONFIG" orch set backend rook || true
 
                 if ! SUBVOL_PATH="$(
                   ceph -c "$CEPH_CONFIG" fs subvolume getpath "$FS" "$SUBVOL_NAME" --group_name "$SUBVOL_GROUP" 2>/dev/null
@@ -204,13 +192,22 @@ in
 
                 echo "--- CUSTOM CONFIGURATIONS ---"
                 rados -p .nfs --namespace ${nfsName} get "conf-nfs.${nfsName}"     /tmp/conf-nfs     || true
-                rados -p .nfs --namespace ${nfsName} get "export-1"                /tmp/export-1     || true
+                rados -p .nfs --namespace ${nfsName} get "export-${exportId}"                /tmp/export-1     || true
                 rados -p .nfs --namespace ${nfsName} get "userconf-nfs.${nfsName}" /tmp/userconf-nfs || true
 
+                echo "--- CONTENTS ---"
                 cat /tmp/conf-nfs     || echo "(conf-nfs not found)"
-                cat /tmp/export-1     || echo "(export-1 not found)"
+                echo "---"
+                cat /tmp/export-${exportId}     || echo "(export-${nfsName} not found)"
+                echo "---"
                 cat /tmp/userconf-nfs || echo "(userconf-nfs not found)"
 
+                echo "Restarting NFS Ganesha..."
+                ganesha-rados-grace --pool .nfs --ns ${nfsName} add ${nfsName} || true
+                ganesha-rados-grace --pool .nfs --ns ${nfsName} start ${nfsName} || true
+                ceph -c "$CEPH_CONFIG" orch restart nfs.${nfsName} || true
+
+                echo "Removing orchestrator backend..."
                 ceph -c "$CEPH_CONFIG" orch set backend "" || true
               ''
             ];
