@@ -28,7 +28,7 @@ in
               { key = "node-role.kubernetes.io/control-plane"; operator = "Exists"; effect = "NoSchedule"; }
             ];
           };
-          logLevel = "NIV_WARN";
+          logLevel = "NIV_INFO";
         };
       };
     };
@@ -66,6 +66,7 @@ in
             security_label = false;
             access_type = "RW";
             squash = "all_squash";
+            sectype = [ "sys" ];
             fsal = {
               name = "CEPH";
               fs_name = cephfs;
@@ -76,13 +77,13 @@ in
                 access_type = "RW";
                 squash = "all_squash";
                 protocols = [ 4 ];
-                sectype = [ "sys" ];
               }
             ];
           };
           "custom.ganesha.conf" = ''
           
             NFSv4 {
+              Graceless = true;
               Delegations = false;
               RecoveryBackend = "rados_cluster";
               Minor_Versions = 0, 1, 2;
@@ -96,7 +97,7 @@ in
               Manage_Gids = true;
               Anonymous_uid = 2002;
               Anonymous_gid = 2002;
-              SecType = "sys";
+              SecType = sys;
             }
           
           '';
