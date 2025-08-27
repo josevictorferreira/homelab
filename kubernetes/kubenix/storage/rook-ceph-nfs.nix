@@ -5,7 +5,6 @@ let
   nfsName = "homelab-nfs";
   pseudo = "/${nfsName}";
   cephfs = "ceph-filesystem";
-  exportId = 10;
   allowedCIDRs = [
     "10.10.10.0/24"
     "10.0.0.0/24"
@@ -35,7 +34,7 @@ let
 
   '';
   exportConf = {
-    export_id = exportId;
+    export_id = 0;
     path = "/exported/path";
     pseudo = pseudo;
     security_label = false;
@@ -131,9 +130,13 @@ in
               "-lc"
               ''
                 set -euo pipefail
+                EXPORT_ID=${toString exportConf.export_id}
                 SUBVOL_GROUP='nfs-exports'
                 SUBVOL_NAME='${nfsName}'
                 FS='${cephfs}'
+                CLUSTER='${nfsName}'
+                NFSNS='${nfsName}'
+                RADOS_POOL='.nfs'
 
                 CEPH_CONFIG=/etc/ceph/ceph.conf
                 MON_CONFIG=/etc/rook/mon-endpoints
@@ -160,6 +163,27 @@ in
                 ceph -c "$CEPH_CONFIG" mgr module enable rook || true
                 ceph -c "$CEPH_CONFIG" orch set backend rook || true
 
+                for SUFFIX in a b c d; do
+                  ID="client.nfs-ganesha.$${CLUSTER}.$${SUFFIX}"
+                  ceph -c "$CEPH_CONFIG" auth get-or-create "$ID" \
+                    mon 'allow r' \
+                    mgr 'allow rw' \
+                    osd "allow rw pool=$${RADOS_POOL} namespace=$${NFSNS}" >/dev/null || true
+                done
+                for ID in $(ceph -c "$CEPH_CONFIG" auth ls | awk '/client\.nfs-ganesha\.'"$CLUSTER"'\./{print $1}'); do
+                  ceph -c "$CEPH_CONFIG" auth caps "$ID" \
+                    mon 'allow r' \
+                    mgr 'allow rw' \
+                    osd "allow rw pool=$${RADOS_POOL} namespace=$${NFSNS}" || true
+                done
+                for ID in $(ceph -c "$CEPH_CONFIG" auth ls | awk '/client\.nfs\.'"$CLUSTER"'\.'"$FS"'\./{print $1}'); do
+                  ceph -c "$CEPH_CONFIG" auth caps "$ID" \
+                    mon 'allow r' \
+                    mgr 'allow rw' \
+                    mds 'allow rw' \
+                    osd "allow rw tag cephfs data=$${FS}, allow rw pool=$${RADOS_POOL} namespace=$${NFSNS}" || true
+                done
+
                 if ! SUBVOL_PATH="$(
                   ceph -c "$CEPH_CONFIG" fs subvolume getpath "$FS" "$SUBVOL_NAME" --group_name "$SUBVOL_GROUP" 2>/dev/null
                 )"; then
@@ -181,32 +205,32 @@ in
 
                 echo "Subvolume path: $SUBVOL_PATH"
 
-                cluster='${nfsName}'
-
                 awk -v newval="$SUBVOL_PATH" '{
                   gsub(/"path":[[:space:]]*"[^"]*"/, "\"path\": \"" newval "\"");
                   print
                 }' /tmp/ganesha/export.json > /tmp/export_final.json
 
-                ceph -c "$CEPH_CONFIG" nfs export apply "$cluster" -i /tmp/export_final.json
-                ceph -c "$CEPH_CONFIG" nfs cluster config reset "$cluster" || true
-                ceph -c "$CEPH_CONFIG" nfs cluster config set "$cluster" -i /tmp/ganesha/custom.ganesha.conf
+                ceph -c "$CEPH_CONFIG" nfs export apply "$CLUSTER" -i /tmp/export_final.json
+                ceph -c "$CEPH_CONFIG" nfs cluster config reset "$CLUSTER" || true
+                ceph -c "$CEPH_CONFIG" nfs cluster config set "$CLUSTER" -i /tmp/ganesha/custom.ganesha.conf
 
-                echo "--- CUSTOM CONFIGURATIONS ---"
-                rados -p .nfs --namespace ${nfsName} get "conf-nfs.${nfsName}"     /tmp/conf-nfs     || true
-                rados -p .nfs --namespace ${nfsName} get "export-${toString exportId}"                /tmp/export-${toString exportId}     || true
-                rados -p .nfs --namespace ${nfsName} get "userconf-nfs.${nfsName}" /tmp/userconf-nfs || true
+                rados -p .nfs --namespace $NFSNS get "conf-nfs.$CLUSTER"     /tmp/conf-nfs                || true
+                rados -p .nfs --namespace $NFSNS get "export-$EXPORT_ID"     "/tmp/export-$EXPORT_ID"     || true
+                rados -p .nfs --namespace $NFSNS get "userconf-nfs.$CLUSTER" /tmp/userconf-nfs            || true
 
-                echo "--- CONTENTS ---"
-                cat /tmp/conf-nfs     || echo "(conf-nfs not found)"
-                echo "---"
-                cat /tmp/export-${toString exportId}     || echo "(export-${nfsName} not found)"
-                echo "---"
-                cat /tmp/userconf-nfs || echo "(userconf-nfs not found)"
+                echo "--------------------------- CONTENTS -----------------------------"
+                cat /tmp/conf-nfs                || echo "(conf-nfs not found)"
+                echo "------------------------------------------------------------------"
+                cat "/tmp/export-$EXPORT_ID"     || echo "(export-$CLUSTER not found)"
+                echo "------------------------------------------------------------------"
+                cat /tmp/userconf-nfs            || echo "(userconf-nfs not found)"
 
                 echo "Restarting NFS Ganesha grace..."
-                ganesha-rados-grace --pool .nfs --ns ${nfsName} add ${nfsName} || true
-                ganesha-rados-grace --pool .nfs --ns ${nfsName} start ${nfsName} || true
+
+                for SUFFIX in a b c d; do
+                  ganesha-rados-grace --pool .nfs --ns "$NFSNS" add "$CLUSTER-$SUFFIX"   || true
+                  ganesha-rados-grace --pool .nfs --ns "$NFSNS" start "$CLUSTER-$SUFFIX" || true
+                end
 
                 echo "Removing orchestrator backend..."
                 ceph -c "$CEPH_CONFIG" orch set backend "" || true
