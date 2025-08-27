@@ -3,7 +3,7 @@
 let
   namespace = homelab.kubernetes.namespaces.storage;
   nfsName = "homelab-nfs";
-  pseudo = "/${nfsName}";
+  pseudo = "/";
   cephfs = "ceph-filesystem";
   allowedCIDRs = [
     "10.10.10.0/24"
@@ -34,7 +34,7 @@ let
 
   '';
   exportConf = {
-    export_id = 10;
+    export_id = 0;
     path = "/exported/path";
     pseudo = pseudo;
     security_label = false;
@@ -47,7 +47,7 @@ let
     };
     clients = [
       {
-        addresses = allowedCIDRs;
+        addresses = "*";
         access_type = "RW";
         squash = "all_squash";
         protocols = [ 4 ];
