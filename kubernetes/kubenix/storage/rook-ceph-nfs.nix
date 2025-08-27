@@ -1,7 +1,9 @@
-{ kubenix, homelab, ... }:
+{ lib, kubenix, homelab, ... }:
 
 let
   namespace = homelab.kubernetes.namespaces.storage;
+  replicaCount = 1;
+  nodesIds = lib.lists.take replicaCount (builtins.genList (i: builtins.elemAt (lib.stringToCharacters "abcdefghijklmnopqrstuvwxyz") i) 26);
   nfsName = "homelab-nfs";
   pseudo = "/${nfsName}";
   cephfs = "ceph-filesystem";
@@ -9,19 +11,60 @@ let
     "10.10.10.0/24"
     "10.0.0.0/24"
   ];
-  customGaneshaConf = ''
+  genGaneshaConfForNode = nodeId: ''
+    NFS_CORE_PARAM {
+      Enable_NLM = false;
+      Enable_RQUOTA = false;
+      Protocols = 4;
+      allow_set_io_flusher_fail = true;
+    }
 
-    NFS_Core_Param.Protocols = 3, 4
-  
-    MDCACHE.Cache_FDs = false;
-  
-    NFSv4.Minor_Versions = 0, 1, 2;
-  
-    NFS_KRB5.Active_krb5 = false;
-  
-    CEPH.ceph_conf = "/etc/ceph/ceph.conf";
-  
-    EXPORT_DEFAULTS.Anonymous_gid = 2002;
+    MDCACHE {
+      Dir_Chunk = 0;
+      Cache_FDs = false;
+    }
+
+    NFS_KRB5 { Active_krb5 = false; }
+
+    CEPH { ceph_conf = "/etc/ceph/ceph.conf"; }
+
+    EXPORT_DEFAULTS {
+      Attr_Expiration_Time = 0;
+      Transports = TCP;
+      Access_Type = RW;
+      Squash = All_Squash;
+      Manage_Gids = true;
+      Anonymous_uid = 2002;
+      Anonymous_gid = 2002;
+      SecType = "sys";
+    }
+
+    NFSv4 {
+      Delegations = false;
+      RecoveryBackend = "rados_cluster";
+      Minor_Versions = 0, 1, 2;
+      Allow_Numeric_Owners = true;
+      Only_Numeric_Owners = true;
+    }
+
+    RADOS_KV {
+      ceph_conf = "/etc/ceph/ceph.conf";
+      userid = "nfs-ganesha.${nfsName}.${nodeId}";
+      nodeid = "${nfsName}.${nodeId}";
+      pool = ".nfs";
+      namespace = "${nfsName}";
+    }
+
+    RADOS_URLS {
+      ceph_conf = "/etc/ceph/ceph.conf";
+      userid = "nfs-ganesha.${nfsName}.${nodeId}";
+      watch_url = "rados://.nfs/${nfsName}/conf-nfs.${nfsName}";
+    }
+
+    RGW { name = "client.nfs-ganesha.${nfsName}.${nodeId}"; }
+
+    %url    rados://.nfs/${nfsName}/conf-nfs.${nfsName}
+
   '';
   exportConf = {
     export_id = 10;
@@ -54,7 +97,7 @@ in
       };
       spec = {
         server = {
-          active = 1;
+          active = replicaCount;
           resources = {
             requests = { cpu = "50m"; memory = "64Mi"; };
             limits = { memory = "2Gi"; };
@@ -84,34 +127,13 @@ in
         ports = [
           { name = "nfs-tcp"; nodePort = 30325; port = 2049; targetPort = 2049; protocol = "TCP"; }
           { name = "nfs-udp"; nodePort = 30326; port = 2049; targetPort = 2049; protocol = "UDP"; }
-          { name = "rpcbind-tcp"; port = 111; targetPort = 111; protocol = "TCP"; }
-          { name = "rpcbind-udp"; port = 111; targetPort = 111; protocol = "UDP"; }
-          { name = "mountd-tcp"; port = 20048; targetPort = 20048; protocol = "TCP"; }
-          { name = "mountd-udp"; port = 20048; targetPort = 20048; protocol = "UDP"; }
-          { name = "nlm-tcp"; port = 32803; targetPort = 32803; protocol = "TCP"; }
-          { name = "nlm-udp"; port = 32803; targetPort = 32803; protocol = "UDP"; }
-          { name = "rquota-tcp"; port = 875; targetPort = 875; protocol = "TCP"; }
-          { name = "rquota-udp"; port = 875; targetPort = 875; protocol = "UDP"; }
         ];
       };
     };
 
-    configMaps = {
-      "${nfsName}-ganesha-custom-config" = {
-        metadata = {
-          name = "${nfsName}-ganesha-custom-config";
-          namespace = namespace;
-        };
-        data = {
-          "custom.ganesha.conf" = customGaneshaConf;
-          "export.json" = builtins.toJSON exportConf;
-        };
-      };
-    };
-
-    jobs."${nfsName}-ganesha-config-patcher" = {
+    jobs."${nfsName}-ceph-export-task" = {
       metadata = {
-        name = "${nfsName}-ganesha-config-patcher";
+        name = "${nfsName}-ceph-export-task";
         namespace = namespace;
       };
       spec = {
@@ -162,7 +184,7 @@ in
                 ceph -c "$CEPH_CONFIG" orch set backend rook || true
 
                 echo "Updating RADOS pool $RADOS_POOL Auth Caps"
-                for SUFFIX in a b c d; do
+                for SUFFIX in ${builtins.concatStringsSep " " nodesIds}; do
                   ID="client.nfs-ganesha.$${CLUSTER}.$${SUFFIX}"
                   echo "Creating ID $ID"
                   ceph -c "$CEPH_CONFIG" auth get-or-create "$ID" \
@@ -201,28 +223,25 @@ in
 
                 echo "Subvolume path: $SUBVOL_PATH"
 
+                echo "${builtins.toJSON exportConf}" > /tmp/ganesha/export.json
+
                 awk -v newval="$SUBVOL_PATH" '{
                   gsub(/"path":[[:space:]]*"[^"]*"/, "\"path\": \"" newval "\"");
                   print
                 }' /tmp/ganesha/export.json > /tmp/export_final.json
 
                 ceph -c "$CEPH_CONFIG" nfs export apply "$CLUSTER" -i /tmp/export_final.json
-                ceph -c "$CEPH_CONFIG" nfs cluster config reset "$CLUSTER" || true
-                ceph -c "$CEPH_CONFIG" nfs cluster config set "$CLUSTER" -i /tmp/ganesha/custom.ganesha.conf
 
                 rados -p .nfs --namespace $NFSNS get "conf-nfs.$CLUSTER"     /tmp/conf-nfs                || true
                 rados -p .nfs --namespace $NFSNS get "export-$EXPORT_ID"     /tmp/export-$$EXPORT_ID     || true
-                rados -p .nfs --namespace $NFSNS get "userconf-nfs.$CLUSTER" /tmp/userconf-nfs            || true
 
                 echo "--------------------------- CONTENTS -----------------------------"
                 cat /tmp/conf-nfs                || echo "(conf-nfs not found)"
                 echo "------------------------------------------------------------------"
                 cat "/tmp/export-$EXPORT_ID"     || echo "(export-$CLUSTER not found)"
-                echo "------------------------------------------------------------------"
-                cat /tmp/userconf-nfs            || echo "(userconf-nfs not found)"
 
                 echo "Restarting NFS Ganesha grace..."
-                for SUFFIX in a b c d; do
+                for SUFFIX in ${builtins.concatStringsSep " " nodesIds}; do
                   ganesha-rados-grace --pool .nfs --ns "$NFSNS" add "$${CLUSTER}-$${SUFFIX}"   || true
                   ganesha-rados-grace --pool .nfs --ns "$NFSNS" start "$${CLUSTER}-$${SUFFIX}" || true
                 done
@@ -237,16 +256,97 @@ in
               { name = "mon-endpoints"; mountPath = "/etc/rook"; }
               { name = "ceph-config"; mountPath = "/etc/ceph"; }
               { name = "ceph-admin-secret"; mountPath = "/var/lib/rook-ceph-mon"; readOnly = true; }
-              { name = "${nfsName}-ganesha-custom-config"; mountPath = "/tmp/ganesha"; readOnly = true; }
             ];
           }];
           volumes = [
             { name = "mon-endpoints"; configMap = { name = "rook-ceph-mon-endpoints"; items = [{ key = "data"; path = "mon-endpoints"; }]; }; }
             { name = "ceph-config"; emptyDir = { }; }
             { name = "ceph-admin-secret"; secret = { secretName = "rook-ceph-mon"; }; }
-            { name = "${nfsName}-ganesha-custom-config"; configMap = { name = "${nfsName}-ganesha-custom-config"; }; }
           ];
         };
+      };
+    };
+
+
+    roles."${nfsName}-ganesha-conf-patch-role" = {
+      metadata = { name = "${nfsName}-ganesha-conf-patch-role"; namespace = namespace; };
+      rules = [
+        {
+          apiGroups = [ "" ];
+          resources = [ "configmaps" ];
+          verbs = [ "get" "list" "watch" "patch" ];
+        }
+        {
+          apiGroups = [ "apps" ];
+          resources = [ "deployments" ];
+          verbs = [ "get" "list" "watch" "update" "patch" ];
+        }
+      ];
+    };
+
+    roleBindings."${nfsName}-ganesha-conf-patch-rb" = {
+      metadata = { name = "${nfsName}-ganesha-conf-patch-rb"; namespace = namespace; };
+      roleRef = { apiGroup = "rbac.authorization.k8s.io"; kind = "Role"; name = "${nfsName}-ganesha-conf-patch-role"; };
+      subjects = [{ kind = "ServiceAccount"; name = "rook-ceph-default"; namespace = namespace; }];
+    };
+
+    jobs."${nfsName}-ganesha-conf-patch" = {
+      metadata = { name = "${nfsName}-ganesha-conf-patch"; namespace = namespace; };
+      spec = {
+        backoffLimit = 2;
+        ttlSecondsAfterFinished = 3600;
+        template.spec =
+          let
+            patchConfigMapFor = nodeId: ''
+              echo "Starting patch routine for node ID ${nodeId}..."
+              CM=""
+
+              for i in {1..10}; do
+                if [ -n "$CM" ]; then break; fi
+                echo "Waiting for rook-ceph-nfs ConfigMap..."
+                sleep 6
+                CM="$(kubectl -n ${namespace} get cm -l app=rook-ceph-nfs,instance=${nodeId} -o name | grep -i rook-ceph | head -n1 || true)"
+              done
+
+              [ -z "$CM" ] && { echo "ERROR: rook-ceph ganesha ConfigMap not found"; exit 1; }
+
+              echo "Patching $CM in ${namespace}..."
+
+              kubectl -n ${namespace} patch "$CM" --type merge -p '{"data":{"config": "'"${genGaneshaConfForNode nodeId}"'"}}'
+            '';
+            rolloutRestartFor = nodeId: ''
+              echo "Restarting deployment for node ID ${nodeId}..."
+              DEP="$(kubectl -n ${namespace} get deploy -l app=rook-ceph-nfs,instance=${nodeId} -o name | grep -i rook-ceph | head -n1 || true)"
+              [ -z "$DEP" ] && { echo "WARN: deployment not found; skipping restart"; exit 0; }
+              kubectl -n ${namespace} rollout restart "$DEP"
+              kubectl -n ${namespace} rollout status  "$DEP"
+            '';
+          in
+          {
+            restartPolicy = "OnFailure";
+            serviceAccountName = "rook-ceph-default";
+            containers = [{
+              name = "patch";
+              image = "bitnami/kubectl:1.30";
+              command = [ "/bin/bash" "-lc" ];
+              args = [
+                ''
+                  set -euo pipefail
+                  NS='${namespace}'
+                  CLUSTER='${nfsName}'
+                  CM=""
+
+                  export PATH=/opt/bitnami/kubectl/bin:$PATH
+
+                  ${builtins.concatStringsSep "\n" (map (nodeId: (patchConfigMapFor nodeId)) nodesIds)}
+
+                  ${builtins.concatStringsSep "\n" (map (nodeId: (rolloutRestartFor nodeId)) nodesIds)}
+
+                  echo "Done."
+                ''
+              ];
+            }];
+          };
       };
     };
 
