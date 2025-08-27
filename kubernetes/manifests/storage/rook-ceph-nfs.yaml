@@ -29,26 +29,23 @@ spec:
               \ username=client.admin; fi\ncat > \"$KEYRING_FILE\" <<EOF\n[$username]\n\
               key = $ceph_secret\nEOF\n\nceph -c \"$CEPH_CONFIG\" mgr module enable\
               \ nfs || true\nceph -c \"$CEPH_CONFIG\" mgr module enable rook || true\n\
-              ceph -c \"$CEPH_CONFIG\" orch set backend rook || true\n\nfor SUFFIX\
-              \ in a b c d; do\n  ID=\"client.nfs-ganesha.$${CLUSTER}.$${SUFFIX}\"\
+              ceph -c \"$CEPH_CONFIG\" orch set backend rook || true\n\necho \"Updating\
+              \ RADOS pool $RADOS_POOL Auth Caps\"\nfor SUFFIX in a b c d; do\n  ID=\"\
+              client.nfs-ganesha.$${CLUSTER}.$${SUFFIX}\"\n  echo \"Creating ID $ID\"\
               \n  ceph -c \"$CEPH_CONFIG\" auth get-or-create \"$ID\" \\\n    mon\
               \ 'allow r' \\\n    mgr 'allow rw' \\\n    osd \"allow rw pool=$${RADOS_POOL}\
-              \ namespace=$${NFSNS}\" >/dev/null || true\ndone\nfor ID in $(ceph -c\
-              \ \"$CEPH_CONFIG\" auth ls | awk '/client\\.nfs-ganesha\\.'\"$CLUSTER\"\
-              '\\./{print $1}'); do\n  ceph -c \"$CEPH_CONFIG\" auth caps \"$ID\"\
-              \ \\\n    mon 'allow r' \\\n    mgr 'allow rw' \\\n    osd \"allow rw\
-              \ pool=$${RADOS_POOL} namespace=$${NFSNS}\" || true\ndone\nfor ID in\
-              \ $(ceph -c \"$CEPH_CONFIG\" auth ls | awk '/client\\.nfs\\.'\"$CLUSTER\"\
-              '\\.'\"$FS\"'\\./{print $1}'); do\n  ceph -c \"$CEPH_CONFIG\" auth caps\
-              \ \"$ID\" \\\n    mon 'allow r' \\\n    mgr 'allow rw' \\\n    mds 'allow\
-              \ rw' \\\n    osd \"allow rw tag cephfs data=$${FS}, allow rw pool=$${RADOS_POOL}\
-              \ namespace=$${NFSNS}\" || true\ndone\n\nif ! SUBVOL_PATH=\"$(\n  ceph\
-              \ -c \"$CEPH_CONFIG\" fs subvolume getpath \"$FS\" \"$SUBVOL_NAME\"\
-              \ --group_name \"$SUBVOL_GROUP\" 2>/dev/null\n)\"; then\n  echo \"Creating\
-              \ subvolume group and subvolume...\"\n  if ! ceph -c \"$CEPH_CONFIG\"\
-              \ fs subvolumegroup ls \"$FS\" -f json 2>/dev/null \\\n      | grep\
-              \ -q \"\\\"name\\\"[[:space:]]*:[[:space:]]*\\\"$SUBVOL_GROUP\\\"\"\
-              ; then\n    echo \"Creating subvolume group $SUBVOL_GROUP in filesystem\
+              \ namespace=$${NFSNS}\" >/dev/null || true\ndone\n\necho \"Updating\
+              \ NFS Ganesha cluster $CLUSTER Auth Caps\"\nfor ID in $(ceph -c \"$CEPH_CONFIG\"\
+              \ auth ls | awk '/client\\.nfs-ganesha\\.'\"$CLUSTER\"'\\./{print $1}');\
+              \ do\n  echo \"Setting caps for $ID\"\n  ceph -c \"$CEPH_CONFIG\" auth\
+              \ caps \"$ID\" \\\n    mon 'allow r' \\\n    mgr 'allow rw' \\\n   \
+              \ osd \"allow rw pool=$${RADOS_POOL} namespace=$${NFSNS}\" || true\n\
+              done\n\nif ! SUBVOL_PATH=\"$(\n  ceph -c \"$CEPH_CONFIG\" fs subvolume\
+              \ getpath \"$FS\" \"$SUBVOL_NAME\" --group_name \"$SUBVOL_GROUP\" 2>/dev/null\n\
+              )\"; then\n  echo \"Creating subvolume group and subvolume...\"\n  if\
+              \ ! ceph -c \"$CEPH_CONFIG\" fs subvolumegroup ls \"$FS\" -f json 2>/dev/null\
+              \ \\\n      | grep -q \"\\\"name\\\"[[:space:]]*:[[:space:]]*\\\"$SUBVOL_GROUP\\\
+              \"\"; then\n    echo \"Creating subvolume group $SUBVOL_GROUP in filesystem\
               \ $FS\"\n    ceph -c \"$CEPH_CONFIG\" fs subvolumegroup create \"$FS\"\
               \ \"$SUBVOL_GROUP\"\n  fi\n\n  if ! ceph -c \"$CEPH_CONFIG\" fs subvolume\
               \ info \"$FS\" \"$SUBVOL_NAME\" --group_name \"$SUBVOL_GROUP\" >/dev/null\

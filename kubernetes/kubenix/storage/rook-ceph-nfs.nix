@@ -163,25 +163,23 @@ in
                 ceph -c "$CEPH_CONFIG" mgr module enable rook || true
                 ceph -c "$CEPH_CONFIG" orch set backend rook || true
 
+                echo "Updating RADOS pool $RADOS_POOL Auth Caps"
                 for SUFFIX in a b c d; do
                   ID="client.nfs-ganesha.$${CLUSTER}.$${SUFFIX}"
+                  echo "Creating ID $ID"
                   ceph -c "$CEPH_CONFIG" auth get-or-create "$ID" \
                     mon 'allow r' \
                     mgr 'allow rw' \
                     osd "allow rw pool=$${RADOS_POOL} namespace=$${NFSNS}" >/dev/null || true
                 done
+
+                echo "Updating NFS Ganesha cluster $CLUSTER Auth Caps"
                 for ID in $(ceph -c "$CEPH_CONFIG" auth ls | awk '/client\.nfs-ganesha\.'"$CLUSTER"'\./{print $1}'); do
+                  echo "Setting caps for $ID"
                   ceph -c "$CEPH_CONFIG" auth caps "$ID" \
                     mon 'allow r' \
                     mgr 'allow rw' \
                     osd "allow rw pool=$${RADOS_POOL} namespace=$${NFSNS}" || true
-                done
-                for ID in $(ceph -c "$CEPH_CONFIG" auth ls | awk '/client\.nfs\.'"$CLUSTER"'\.'"$FS"'\./{print $1}'); do
-                  ceph -c "$CEPH_CONFIG" auth caps "$ID" \
-                    mon 'allow r' \
-                    mgr 'allow rw' \
-                    mds 'allow rw' \
-                    osd "allow rw tag cephfs data=$${FS}, allow rw pool=$${RADOS_POOL} namespace=$${NFSNS}" || true
                 done
 
                 if ! SUBVOL_PATH="$(
