@@ -224,11 +224,9 @@ in
                 cat /tmp/userconf-nfs            || echo "(userconf-nfs not found)"
 
                 echo "Restarting NFS Ganesha grace..."
-
                 for SUFFIX in a b c d; do
-                  echo "Restarting ganesha-rados-grace $CLUSTER-$SUFFIX"
-                  ganesha-rados-grace --pool .nfs --ns "$NFSNS" add "$CLUSTER-$SUFFIX"   || true
-                  ganesha-rados-grace --pool .nfs --ns "$NFSNS" start "$CLUSTER-$SUFFIX" || true
+                  ganesha-rados-grace --pool .nfs --ns "$NFSNS" add "$${CLUSTER}-$${SUFFIX}"   || true
+                  ganesha-rados-grace --pool .nfs --ns "$NFSNS" start "$${CLUSTER}-$${SUFFIX}" || true
                 end
 
                 echo "Removing orchestrator backend..."
