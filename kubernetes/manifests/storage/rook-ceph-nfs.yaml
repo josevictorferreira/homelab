@@ -1,0 +1,166 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: homelab-nfs-ganesha-config-patcher
+  namespace: rook-ceph
+spec:
+  backoffLimit: 3
+  template:
+    spec:
+      containers:
+        - command:
+            - /bin/bash
+            - -lc
+            - "set -euo pipefail\nSUBVOL_GROUP='nfs-exports'\nSUBVOL_NAME='homelab-nfs'\n\
+              FS='ceph-filesystem'\n\nCEPH_CONFIG=/etc/ceph/ceph.conf\nMON_CONFIG=/etc/rook/mon-endpoints\n\
+              KEYRING_FILE=/etc/ceph/keyring\nendpoints=$(cat \"$MON_CONFIG\")\nmon_endpoints=$(echo\
+              \ \"$endpoints\" | sed 's/[a-z0-9_-]\\+=//g')\nmkdir -p /etc/ceph\n\
+              cat > \"$CEPH_CONFIG\" <<EOF\n[global]\nmon_host = $mon_endpoints\n\
+              [client.admin]\nkeyring = $KEYRING_FILE\nEOF\nif   [ -f /var/lib/rook-ceph-mon/ceph-secret\
+              \ ];  then ceph_secret=$(cat /var/lib/rook-ceph-mon/ceph-secret)\nelif\
+              \ [ -f /var/lib/rook-ceph-mon/admin-secret ]; then ceph_secret=$(cat\
+              \ /var/lib/rook-ceph-mon/admin-secret)\nelse echo \"No ceph admin secret\
+              \ found\"; exit 2; fi\nif [ -f /var/lib/rook-ceph-mon/ceph-username\
+              \ ]; then username=$(cat /var/lib/rook-ceph-mon/ceph-username); else\
+              \ username=client.admin; fi\ncat > \"$KEYRING_FILE\" <<EOF\n[$username]\n\
+              key = $ceph_secret\nEOF\n\nceph -c \"$CEPH_CONFIG\" mgr module enable\
+              \ nfs || true\nceph -c \"$CEPH_CONFIG\" mgr module enable rook || true\n\
+              cep -c \"$CEPH_CONFIG\" orch set backend rook || true\n\nif ! SUBVOL_PATH=\"\
+              $(\n  ceph -c \"$CEPH_CONFIG\" fs subvolume getpath \"$FS\" \"$SUBVOL_NAME\"\
+              \ --group_name \"$SUBVOL_GROUP\" 2>/dev/null\n)\"; then\n  echo \"Creating\
+              \ subvolume group and subvolume...\"\n  if ! ceph -c \"$CEPH_CONFIG\"\
+              \ fs subvolumegroup ls \"$FS\" -f json 2>/dev/null \\\n      | grep\
+              \ -q \"\\\"name\\\"[[:space:]]*:[[:space:]]*\\\"$SUBVOL_GROUP\\\"\"\
+              ; then\n    echo \"Creating subvolume group $SUBVOL_GROUP in filesystem\
+              \ $FS\"\n    ceph -c \"$CEPH_CONFIG\" fs subvolumegroup create \"$FS\"\
+              \ \"$SUBVOL_GROUP\"\n  fi\n\n  if ! ceph -c \"$CEPH_CONFIG\" fs subvolume\
+              \ info \"$FS\" \"$SUBVOL_NAME\" --group_name \"$SUBVOL_GROUP\" >/dev/null\
+              \ 2>&1; then\n    echo \"Creating subvolume $SUBVOL_NAME in group $SUBVOL_GROUP\"\
+              \n    ceph -c \"$CEPH_CONFIG\" fs subvolume create \"$FS\" \"$SUBVOL_NAME\"\
+              \ \\\n      --group_name \"$SUBVOL_GROUP\" --size 0 --uid 2002 --gid\
+              \ 2002 --mode 2775\n  fi\n\n  SUBVOL_PATH=\"$(ceph -c \"$CEPH_CONFIG\"\
+              \ fs subvolume getpath \"$FS\" \"$SUBVOL_NAME\" --group_name \"$SUBVOL_GROUP\"\
+              )\"\nfi\n\necho \"Subvolume path: $SUBVOL_PATH\"\n\ncluster='homelab-nfs'\n\
+              \nawk -v newval=\"$SUBVOL_PATH\" '{\n  gsub(/\"path\":[[:space:]]*\"\
+              [^\"]*\"/, \"\\\"path\\\": \\\"\" newval \"\\\"\");\n  print\n}' /tmp/ganesha/export.json\
+              \ > /tmp/export_final.json\n\nceph -c \"$CEPH_CONFIG\" nfs export apply\
+              \ \"$cluster\" -i /tmp/export_final.json\nceph -c \"$CEPH_CONFIG\" nfs\
+              \ cluster config reset \"$cluster\" || true\nceph -c \"$CEPH_CONFIG\"\
+              \ nfs cluster config set \"$cluster\" -i /tmp/ganesha/custom.ganesha.conf\n\
+              \necho \"--- CUSTOM CONFIGURATIONS ---\"\nrados -p .nfs --namespace\
+              \ homelab-nfs get \"conf-nfs.homelab-nfs\"     /tmp/conf-nfs     ||\
+              \ true\nrados -p .nfs --namespace homelab-nfs get \"export-10\"    \
+              \            /tmp/export-1     || true\nrados -p .nfs --namespace homelab-nfs\
+              \ get \"userconf-nfs.homelab-nfs\" /tmp/userconf-nfs || true\n\necho\
+              \ \"--- CONTENTS ---\"\ncat /tmp/conf-nfs     || echo \"(conf-nfs not\
+              \ found)\"\necho \"---\"\ncat /tmp/export-10     || echo \"(export-homelab-nfs\
+              \ not found)\"\necho \"---\"\ncat /tmp/userconf-nfs || echo \"(userconf-nfs\
+              \ not found)\"\n\necho \"Restarting NFS Ganesha...\"\nganesha-rados-grace\
+              \ --pool .nfs --ns homelab-nfs add homelab-nfs || true\nganesha-rados-grace\
+              \ --pool .nfs --ns homelab-nfs start homelab-nfs || true\nceph -c \"\
+              $CEPH_CONFIG\" orch restart nfs.homelab-nfs || true\n\necho \"Removing\
+              \ orchestrator backend...\"\nceph -c \"$CEPH_CONFIG\" orch set backend\
+              \ \"\" || true\n"
+          image: quay.io/ceph/ceph:v19
+          name: apply
+          volumeMounts:
+            - mountPath: /etc/rook
+              name: mon-endpoints
+            - mountPath: /etc/ceph
+              name: ceph-config
+            - mountPath: /var/lib/rook-ceph-mon
+              name: ceph-admin-secret
+              readOnly: true
+            - mountPath: /tmp/ganesha
+              name: homelab-nfs-ganesha-custom-config
+              readOnly: true
+      restartPolicy: OnFailure
+      serviceAccountName: rook-ceph-default
+      volumes:
+        - configMap:
+            items:
+              - key: data
+                path: mon-endpoints
+            name: rook-ceph-mon-endpoints
+          name: mon-endpoints
+        - emptyDir: {}
+          name: ceph-config
+        - name: ceph-admin-secret
+          secret:
+            secretName: rook-ceph-mon
+        - configMap:
+            name: homelab-nfs-ganesha-custom-config
+          name: homelab-nfs-ganesha-custom-config
+  ttlSecondsAfterFinished: 3600
+---
+apiVersion: ceph.rook.io/v1
+kind: CephNFS
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: homelab-nfs
+  namespace: rook-ceph
+spec:
+  server:
+    active: 1
+    logLevel: NIV_INFO
+    placement:
+      tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+          operator: Exists
+    resources:
+      limits:
+        memory: 2Gi
+      requests:
+        cpu: 50m
+        memory: 64Mi
+---
+apiVersion: v1
+data:
+  custom.ganesha.conf: "NFSv4 {\n  Delegations = false;\n  RecoveryBackend = \"rados_cluster\"\
+    ;\n  Minor_Versions = 0, 1, 2;\n  Only_Numeric_Owners = true;\n}\n\nNFS_KRB5 {\
+    \ Active_krb5 = false; }\n\nEXPORT_DEFAULTS {\n  Attr_Expiration_Time = 0;\n \
+    \ Protocols = 4;\n  Transports = TCP;\n  Access_Type = RW;\n  Squash = All_Squash;\n\
+    \  Manage_Gids = true;\n  Anonymous_uid = 2002;\n  Anonymous_gid = 2002;\n  SecType\
+    \ = \"sys\";\n}\n"
+  export.json: '{"access_type":"RW","clients":[{"access_type":"RW","addresses":["10.10.10.0/24","10.0.0.0/24"],"protocols":[4],"sectype":["sys"],"squash":"all_squash"}],"export_id":10,"fsal":{"fs_name":"ceph-filesystem","name":"CEPH"},"path":"/exported/path","pseudo":"/homelab-nfs","sectype":["sys"],"security_label":false,"squash":"all_squash"}'
+kind: ConfigMap
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: homelab-nfs-ganesha-custom-config
+  namespace: rook-ceph
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+    lbipam.cilium.io/ips: 10.10.10.150
+    lbipam.cilium.io/sharing-key: homelab-nfs
+  name: homelab-nfs
+  namespace: rook-ceph
+spec:
+  externalTrafficPolicy: Cluster
+  ports:
+    - name: nfs-tcp
+      nodePort: 30325
+      port: 2049
+      protocol: TCP
+      targetPort: 2049
+    - name: nfs-udp
+      nodePort: 30326
+      port: 2049
+      protocol: UDP
+      targetPort: 2049
+  selector:
+    app: rook-ceph-nfs
+    ceph_daemon_type: nfs
+  type: LoadBalancer
