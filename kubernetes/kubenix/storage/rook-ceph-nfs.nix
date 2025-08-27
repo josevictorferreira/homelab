@@ -69,7 +69,6 @@ in
             fsal = {
               name = "CEPH";
               fs_name = cephfs;
-              cmount_path = "/";
             };
             clients = [
               {
