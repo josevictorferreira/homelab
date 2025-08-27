@@ -6,8 +6,8 @@ let
   pseudo = "/homelab";
   cephfs = "ceph-filesystem";
   allowedCIDRs = [
-    "10.0.0.0/24"
     "10.10.10.0/24"
+    "10.0.0.0/24"
   ];
 in
 {
@@ -28,7 +28,7 @@ in
               { key = "node-role.kubernetes.io/control-plane"; operator = "Exists"; effect = "NoSchedule"; }
             ];
           };
-          logLevel = "NIV_DEBUG";
+          logLevel = "NIV_FULL_DEBUG";
         };
       };
     };
@@ -69,6 +69,7 @@ in
             fsal = {
               name = "CEPH";
               fs_name = cephfs;
+              cmount_path = "/";
             };
             clients = [
               {
