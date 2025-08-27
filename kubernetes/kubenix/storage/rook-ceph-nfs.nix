@@ -11,17 +11,17 @@ let
   ];
   customGaneshaConf = ''
 
-    NFS_Core_Param  { Protocols = 3, 4; }
+    NFS_Core_Param.Protocols = 3, 4
   
-    MDCACHE { Cache_FDs = false; }
+    MDCACHE.Cache_FDs = false;
   
-    NFSv4 { Minor_Versions = 0, 1, 2; }
+    NFSv4.Minor_Versions = 0, 1, 2;
   
-    NFS_KRB5 { Active_krb5 = false; }
+    NFS_KRB5.Active_krb5 = false;
   
-    CEPH { ceph_conf = "/etc/ceph/ceph.conf"; }
+    CEPH.ceph_conf = "/etc/ceph/ceph.conf";
   
-    EXPORT_DEFAULTS { Anonymous_gid = 2002; }
+    EXPORT_DEFAULTS.Anonymous_gid = 2002;
   '';
   exportConf = {
     export_id = 10;
