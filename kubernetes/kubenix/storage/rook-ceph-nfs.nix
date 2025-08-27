@@ -34,9 +34,10 @@ let
       SecType = "sys";
     }
 
+    \n\n
   '';
   exportConf = {
-    export_id = 0;
+    export_id = 10;
     path = "/exported/path";
     pseudo = pseudo;
     security_label = false;
@@ -49,7 +50,7 @@ let
     };
     clients = [
       {
-        addresses = "*";
+        addresses = allowedCIDRs;
         access_type = "RW";
         squash = "all_squash";
         protocols = [ 4 ];
