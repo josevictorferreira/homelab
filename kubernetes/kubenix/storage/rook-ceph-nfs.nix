@@ -82,24 +82,29 @@ in
           };
           "custom.ganesha.conf" = ''
 
-            NFSv4 {
-              Delegations = false;
-              RecoveryBackend = "rados_cluster";
-              Minor_Versions = 0, 1, 2;
-              Only_Numeric_Owners = true;
-            }
-
             NFS_KRB5 { Active_krb5 = false; }
 
-            EXPORT_DEFAULTS {
-              Attr_Expiration_Time = 1;
-              Manage_Gids = true;
-              Anonymous_uid = 2002;
-              Anonymous_gid = 2002;
-              SecType = "sys";
-            }
-
           '';
+          # "custom.ganesha.conf" = ''
+          #
+          #   NFSv4 {
+          #     Delegations = false;
+          #     RecoveryBackend = "rados_cluster";
+          #     Minor_Versions = 0, 1, 2;
+          #     Only_Numeric_Owners = true;
+          #   }
+          #
+          #   NFS_KRB5 { Active_krb5 = false; }
+          #
+          #   EXPORT_DEFAULTS {
+          #     Attr_Expiration_Time = 1;
+          #     Manage_Gids = true;
+          #     Anonymous_uid = 2002;
+          #     Anonymous_gid = 2002;
+          #     SecType = "sys";
+          #   }
+          #
+          # '';
         };
       };
     };
