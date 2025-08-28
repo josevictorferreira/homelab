@@ -66,7 +66,7 @@ let
     export_id = 10;
     path = "__SUBVOL_PATH__";
     access_type = "RW";
-    squash = "All_Squash";
+    squash = "all_squash";
     security_label = false;
     pseudo = pseudo;
     fsal = {
