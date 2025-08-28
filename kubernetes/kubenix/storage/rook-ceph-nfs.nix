@@ -64,6 +64,20 @@ let
       watch_url = "rados://.nfs/${nfsName}/conf-nfs.${nfsName}";
     }
 
+    EXPORT {
+      Export_Id = 0;
+      Path = "/";
+      Pseudo = "/";
+      Access_Type = RW;
+      Squash = All_Squash;
+      SecType = "sys";
+      FSAL {
+        Name = "CEPH";
+        Filesystem = "${cephfs}";
+        User_Id = nfs-ganesha.${nfsName}.${nodeId};
+      }
+    }
+
     LOG {
       Components {
         ALL = "INFO";
@@ -78,28 +92,6 @@ let
     %url    "rados://.nfs/${nfsName}/conf-nfs.${nfsName}"
 
   '';
-  exportBaseConf = {
-    export_id = 0;
-    path = "__SUBVOL_PATH__";
-    pseudo = "/";
-    security_label = false;
-    access_type = "RW";
-    sectype = [ "sys" ];
-    squash = "all_squash";
-    fsal = {
-      name = "CEPH";
-      fs_name = cephfs;
-    };
-    clients = [
-      {
-        addresses = "*";
-        protocol = "4";
-        access_type = "RW";
-        squash = "all_squash";
-        sectype = [ "sys" ];
-      }
-    ];
-  };
   exportConf = {
     export_id = 10;
     path = "__SUBVOL_PATH__";
@@ -246,10 +238,6 @@ in
 
                 echo "Subvolume path: $SUBVOL_PATH"
 
-                EXPORT_BASE_JSON='${builtins.toJSON exportBaseConf}'
-                EXPORT_BASE_JSON="$${EXPORT_BASE_JSON/__SUBVOL_PATH__/$SUBVOL_PATH}"
-                printf '%s' "$EXPORT_BASE_JSON" > /tmp/export_base.json
-
                 EXPORT_JSON='${builtins.toJSON exportConf}'
                 EXPORT_JSON="$${EXPORT_JSON/__SUBVOL_PATH__/$SUBVOL_PATH}"
                 printf '%s' "$EXPORT_JSON" > /tmp/export_final.json
@@ -263,8 +251,6 @@ in
                 cat /tmp/conf-nfs                || echo "(conf-nfs not found)"
                 echo "------------------------------------------------------------------"
                 cat "/tmp/export-$EXPORT_ID"     || echo "(export-$CLUSTER not found)"
-                echo "------------------------------------------------------------------"
-                cat "/tmp/export-0"     || echo "(export-0 not found)"
 
                 echo "Restarting NFS Ganesha grace..."
                 for SUFFIX in ${builtins.concatStringsSep " " nodesIds}; do
