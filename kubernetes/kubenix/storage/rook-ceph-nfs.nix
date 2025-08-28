@@ -63,6 +63,19 @@ let
 
     RGW { name = "client.nfs-ganesha.${nfsName}.${nodeId}"; }
 
+    LOG {
+      default_log_level = WARN;
+      Components {
+        ALL = WARN;
+        FSAL = DEBUG;
+        NFS4 = DEBUG;
+        EXPORT = DEBUG;
+        DISPATCH = DEBUG;
+        RADOS = DEBUG;
+      }
+    }
+
+
     %url    rados://.nfs/${nfsName}/conf-nfs.${nfsName}
 
   '';
