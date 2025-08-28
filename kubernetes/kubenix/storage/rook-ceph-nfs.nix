@@ -2,7 +2,7 @@
 
 let
   namespace = homelab.kubernetes.namespaces.storage;
-  replicaCount = 1;
+  replicaCount = 3;
   nodesIds = lib.lists.take replicaCount (builtins.genList (i: builtins.elemAt (lib.stringToCharacters "abcdefghijklmnopqrstuvwxyz") i) 26);
   nfsName = "homelab-nfs";
   pseudo = "/${nfsName}";
