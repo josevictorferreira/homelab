@@ -56,14 +56,15 @@ spec:
               \ fs subvolume getpath \"$FS\" \"$SUBVOL_NAME\" --group_name \"$SUBVOL_GROUP\"\
               )\"\nfi\n\necho \"Subvolume path: $SUBVOL_PATH\"\n\nEXPORT_JSON='{\"\
               access_type\":\"RW\",\"clients\":[{\"access_type\":\"RW\",\"addresses\"\
-              :\"*\",\"protocol\":\"4\",\"squash\":\"all_squash\"}],\"export_id\"\
-              :10,\"fsal\":{\"fs_name\":\"ceph-filesystem\",\"name\":\"CEPH\"},\"\
-              path\":\"__SUBVOL_PATH__\",\"pseudo\":\"/homelab-nfs\",\"security_label\"\
-              :false,\"squash\":\"all_squash\"}'\nEXPORT_JSON=\"$${EXPORT_JSON/__SUBVOL_PATH__/$SUBVOL_PATH}\"\
-              \nprintf '%s' \"$EXPORT_JSON\" > /tmp/export_final.json\n\nceph -c \"\
-              $CEPH_CONFIG\" nfs export apply \"$CLUSTER\" -i /tmp/export_final.json\n\
-              \nrados -p .nfs --namespace $NFSNS get \"conf-nfs.$CLUSTER\"     /tmp/conf-nfs\
-              \                || true\nrados -p .nfs --namespace $NFSNS get \"export-$EXPORT_ID\"\
+              :\"*\",\"protocol\":\"4\",\"sectype\":[\"sys\"],\"squash\":\"all_squash\"\
+              }],\"export_id\":10,\"fsal\":{\"fs_name\":\"ceph-filesystem\",\"name\"\
+              :\"CEPH\"},\"path\":\"__SUBVOL_PATH__\",\"pseudo\":\"/homelab-nfs\"\
+              ,\"security_label\":false,\"squash\":\"all_squash\"}'\nEXPORT_JSON=\"\
+              $${EXPORT_JSON/__SUBVOL_PATH__/$SUBVOL_PATH}\"\nprintf '%s' \"$EXPORT_JSON\"\
+              \ > /tmp/export_final.json\n\nceph -c \"$CEPH_CONFIG\" nfs export apply\
+              \ \"$CLUSTER\" -i /tmp/export_final.json\n\nrados -p .nfs --namespace\
+              \ $NFSNS get \"conf-nfs.$CLUSTER\"     /tmp/conf-nfs               \
+              \ || true\nrados -p .nfs --namespace $NFSNS get \"export-$EXPORT_ID\"\
               \     /tmp/export-$$EXPORT_ID     || true\n\necho \"---------------------------\
               \ CONTENTS -----------------------------\"\ncat /tmp/conf-nfs      \
               \          || echo \"(conf-nfs not found)\"\necho \"------------------------------------------------------------------\"\
@@ -124,25 +125,27 @@ spec:
               \ ConfigMap not found\"; exit 1; }\n\necho \"Patching $CM in rook-ceph...\"\
               \n\nkubectl -n rook-ceph patch \"$CM\" --type merge -p '{\"data\":{\"\
               config\":\"NFS_CORE_PARAM {\\n  Enable_NLM = false;\\n  Enable_RQUOTA\
-              \ = false;\\n  Protocols = 4;\\n}\\n\\nMDCACHE {\\n  Dir_Chunk = 0;\\\
-              n}\\n\\nNFS_KRB5 { Active_krb5 = false; }\\n\\nEXPORT_DEFAULTS {\\n\
-              \  Attr_Expiration_Time = 0;\\n  Transports = TCP;\\n  Access_Type =\
-              \ RW;\\n  Squash = All_Squash;\\n  Protocols = 4;\\n  Manage_Gids =\
-              \ true;\\n  Anonymous_uid = 2002;\\n  Anonymous_gid = 2002;\\n  SecType\
-              \ = \\\"sys\\\";\\n  Protocols = 4;\\n}\\n\\nNFSv4 {\\n  Graceless =\
-              \ true;\\n  Delegations = false;\\n  RecoveryBackend = \\\"rados_cluster\\\
-              \";\\n  Minor_Versions = 0, 1, 2;\\n  Allow_Numeric_Owners = true;\\\
-              n  Only_Numeric_Owners = true;\\n}\\n\\nRADOS_KV {\\n  ceph_conf = \\\
-              \"/etc/ceph/ceph.conf\\\";\\n  userid = nfs-ganesha.homelab-nfs.a;\\\
-              n  nodeid = homelab-nfs.a;\\n  pool = \\\".nfs\\\";\\n  namespace =\
-              \ \\\"homelab-nfs\\\";\\n}\\n\\nRADOS_URLS {\\n  ceph_conf = \\\"/etc/ceph/ceph.conf\\\
-              \";\\n  userid = nfs-ganesha.homelab-nfs.a;\\n  watch_url = \\\"rados://.nfs/homelab-nfs/conf-nfs.homelab-nfs\\\
-              \";\\n}\\n\\n%url    rados://.nfs/homelab-nfs/conf-nfs.homelab-nfs\\\
-              n\\n\"}}'\n\n\n\necho \"Restarting deployment for node ID a...\"\nDEP=\"\
-              $(kubectl -n rook-ceph get deploy -l app=rook-ceph-nfs,instance=a -o\
-              \ name | grep -i rook-ceph | head -n1 || true)\"\n[ -z \"$DEP\" ] &&\
-              \ { echo \"WARN: deployment not found; skipping restart\"; exit 0; }\n\
-              kubectl -n rook-ceph rollout restart \"$DEP\"\nkubectl -n rook-ceph\
+              \ = false;\\n  Protocols = 4;\\n  Bind_addr = 0.0.0.0;\\n  NFS_Port\
+              \ = 2049;\\n  allow_set_io_flusher_fail = true;\\n}\\n\\nMDCACHE {\\\
+              n  Dir_Chunk = 0;\\n}\\n\\nNFS_KRB5 { Active_krb5 = false; }\\n\\nNFSv4\
+              \ {\\n  Graceless = true;\\n  Delegations = false;\\n  Minor_Versions\
+              \ = 0, 1, 2;\\n  Allow_Numeric_Owners = true;\\n  Only_Numeric_Owners\
+              \ = true;\\n  RecoveryBackend = \\\"rados_cluster\\\";\\n}\\n\\nEXPORT_DEFAULTS\
+              \ {\\n  Attr_Expiration_Time = 0;\\n  Protocols = 4;\\n  Transports\
+              \ = TCP;\\n  Access_Type = RW;\\n  Squash = All_Squash;\\n  Manage_Gids\
+              \ = true;\\n  Anonymous_uid = 2002;\\n  Anonymous_gid = 2002;\\n  SecType\
+              \ = \\\"sys\\\";\\n}\\n\\nRADOS_KV {\\n  ceph_conf = \\\"/etc/ceph/ceph.conf\\\
+              \";\\n  userid = nfs-ganesha.homelab-nfs.a;\\n  nodeid = homelab-nfs.a;\\\
+              n  pool = \\\".nfs\\\";\\n  namespace = \\\"homelab-nfs\\\";\\n}\\n\\\
+              nCEPH { Ceph_Conf = \\\"/etc/ceph/ceph.conf\\\"; }\\n\\nRADOS_URLS {\\\
+              n  ceph_conf = \\\"/etc/ceph/ceph.conf\\\";\\n  userid = nfs-ganesha.homelab-nfs.a;\\\
+              n  watch_url = \\\"rados://.nfs/homelab-nfs/conf-nfs.homelab-nfs\\\"\
+              ;\\n}\\n\\n%url    \\\"rados://.nfs/homelab-nfs/conf-nfs.homelab-nfs\\\
+              \"\\n\\n\"}}'\n\n\n\necho \"Restarting deployment for node ID a...\"\
+              \nDEP=\"$(kubectl -n rook-ceph get deploy -l app=rook-ceph-nfs,instance=a\
+              \ -o name | grep -i rook-ceph | head -n1 || true)\"\n[ -z \"$DEP\" ]\
+              \ && { echo \"WARN: deployment not found; skipping restart\"; exit 0;\
+              \ }\nkubectl -n rook-ceph rollout restart \"$DEP\"\nkubectl -n rook-ceph\
               \ rollout status  \"$DEP\"\n\n\n\necho \"Done.\"\n"
           command:
             - /bin/bash
