@@ -85,8 +85,8 @@ let
       Path = "/";
       Pseudo = "/";
       Access_Type = RW;
-      Squash = All_Squash;
-      SecType = "sys";
+      Squash = No_Root_Squash;
+      SecType = sys;
       Security_Label = false;
       FSAL {
         Name = CEPH;
@@ -251,11 +251,13 @@ in
                 rados -p .nfs --namespace $NFSNS get "export-$EXPORT_ID"     /tmp/export-$$EXPORT_ID     || true
 
                 echo "Fetching user_id from export-$EXPORT_ID"
-                USER_ID=$(grep -oP 'user_id\s*=\s*"\K[^"]+' /tmp/export-$$EXPORT_ID || true)
+                USER_ID="$(grep -oP 'user_id\s*=\s*"\K[^"]+' /tmp/export-$EXPORT_ID)"
                 echo "User ID: $USER_ID"
 
                 BASE_EXPORT_CONF='${baseExportConf}'
-                BASE_EXPORT_CONF="$${BASE_EXPORT_CONF/__USER_ID__/$USER_ID}"
+                BASE_EXPORT_CONF="$${BASE_EXPORT_CONF/__USER_ID__/$$USER_ID}"
+                echo "Base export config:"
+                echo "$BASE_EXPORT_CONF"
                 printf '%s\n' "$BASE_EXPORT_CONF" > /tmp/export_base.conf
 
                 cat /tmp/export_base.conf
