@@ -16,13 +16,10 @@ let
       Enable_NLM = false;
       Enable_RQUOTA = false;
       Protocols = 4;
-      Allow_Set_Io_Flusher_Fail = true;
-      Enable_malloc_trim = true;
     }
 
     MDCACHE {
       Dir_Chunk = 0;
-      Cache_FDs = false;
     }
 
     NFS_KRB5 { Active_krb5 = false; }
@@ -50,29 +47,17 @@ let
 
     RADOS_KV {
       ceph_conf = "/etc/ceph/ceph.conf";
-      userid = "nfs-ganesha.${nfsName}.${nodeId}";
-      nodeid = "${nfsName}.${nodeId}";
+      userid = nfs-ganesha.${nfsName}.${nodeId};
+      nodeid = ${nfsName}.${nodeId};
       pool = ".nfs";
       namespace = "${nfsName}";
     }
 
     RADOS_URLS {
       ceph_conf = "/etc/ceph/ceph.conf";
-      userid = "nfs-ganesha.${nfsName}.${nodeId}";
+      userid = nfs-ganesha.${nfsName}.${nodeId};
       watch_url = "rados://.nfs/${nfsName}/conf-nfs.${nfsName}";
     }
-
-    LOG {
-      default_log_level = INFO;
-      Components {
-        ALL = DEBUG;
-        FSAL = DEBUG;
-        NFS4 = DEBUG;
-        EXPORT = DEBUG;
-        DISPATCH = DEBUG;
-      }
-    }
-
 
     %url    rados://.nfs/${nfsName}/conf-nfs.${nfsName}
 
