@@ -226,8 +226,6 @@ in
                 cat /tmp/conf-nfs                || echo "(conf-nfs not found)"
                 echo "------------------------------------------------------------------"
                 cat "/tmp/export-$EXPORT_ID"     || echo "(export-$CLUSTER not found)"
-                echo "------------------------------------------------------------------"
-                cat /tmp/export_base.conf        || echo "(export_base.conf not found)"
 
                 echo "Restarting NFS Ganesha grace..."
                 for SUFFIX in ${builtins.concatStringsSep " " nodesIds}; do
