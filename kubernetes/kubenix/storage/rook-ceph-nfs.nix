@@ -14,6 +14,7 @@ let
       Protocols = 4;
       Bind_addr = 0.0.0.0;
       NFS_Port = 2049;
+      Allow_Set_Io_Flusher_Fail = true;
     }
 
     MDCACHE {
