@@ -65,12 +65,12 @@ let
     LOG {
       default_log_level = INFO;
       Components {
-        ALL = FULL_DEBUG;
-        FSAL = FULL_DEBUG;
-        NFS4 = FULL_DEBUG;
-        EXPORT = FULL_DEBUG;
-        DISPATCH = FULL_DEBUG;
-        RADOS = FULL_DEBUG;
+        ALL = DEBUG;
+        FSAL = DEBUG;
+        NFS4 = DEBUG;
+        EXPORT = DEBUG;
+        DISPATCH = DEBUG;
+        RADOS = DEBUG;
       }
     }
 
