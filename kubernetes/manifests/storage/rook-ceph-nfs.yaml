@@ -56,9 +56,9 @@ spec:
               :\"CEPH\"},\"path\":\"__SUBVOL_PATH__\",\"pseudo\":\"/homelab-nfs\"\
               ,\"security_label\":false,\"squash\":\"all_squash\"}'\nEXPORT_JSON=\"\
               $${EXPORT_JSON/__SUBVOL_PATH__/$SUBVOL_PATH}\"\nprintf '%s' \"$EXPORT_JSON\"\
-              \ > /tmp/export_final.json\n\necho \"\\n\" > /tmp/empty-conf-nfs\n\n\
-              echo \"Uploading empty conf to RADOS to reset any previous config...\"\
-              \n\nrados -p .nfs --namespace $NFSNS put \"conf-nfs.$CLUSTER\"     /tmp/empty-conf-nfs\
+              \ > /tmp/export_final.json\n\necho \"\" > /tmp/empty-conf-nfs\n\necho\
+              \ \"Uploading empty conf to RADOS to reset any previous config...\"\n\
+              \nrados -p .nfs --namespace $NFSNS put \"conf-nfs.$CLUSTER\"     /tmp/empty-conf-nfs\
               \ || true\n\nceph -c \"$CEPH_CONFIG\" nfs export apply \"$CLUSTER\"\
               \ -i /tmp/export_final.json\n\nrados -p .nfs --namespace $NFSNS get\
               \ \"conf-nfs.$CLUSTER\"     /tmp/conf-nfs                || true\nrados\
