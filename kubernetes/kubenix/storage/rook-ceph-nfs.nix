@@ -232,7 +232,7 @@ in
 
                 ceph -c "$CEPH_CONFIG" nfs export apply "$CLUSTER" -i /tmp/export_final.json
 
-                USER_ID="$(ceph -c "$CEPH_CONFIG" nfs export get ${nfsName} /${nfsName} -f json | jq -r '.fsal.user_id')"
+                USER_ID=$(ceph -c "$CEPH_CONFIG" nfs export get ${nfsName} /${pseudo} -f json | jq -r '.fsal.user_id')
 
                 ceph -c "$CEPH_CONFIG" auth caps "$USER_ID" \
                   mon 'allow r' \
