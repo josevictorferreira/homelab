@@ -192,15 +192,6 @@ in
                     osd "allow rw pool=$${RADOS_POOL} namespace=$${NFSNS}" >/dev/null || true
                 done
 
-                echo "Updating NFS Ganesha cluster $CLUSTER Auth Caps"
-                for ID in $(ceph -c "$CEPH_CONFIG" auth ls | awk '/client\.nfs-ganesha\.'"$CLUSTER"'\./{print $1}'); do
-                  echo "Setting caps for $ID"
-                  ceph -c "$CEPH_CONFIG" auth caps "$ID" \
-                    mon 'allow r' \
-                    mgr 'allow rw' \
-                    osd "allow rw pool=$${RADOS_POOL} namespace=$${NFSNS}" || true
-                done
-
                 if ! SUBVOL_PATH="$(
                   ceph -c "$CEPH_CONFIG" fs subvolume getpath "$FS" "$SUBVOL_NAME" --group_name "$SUBVOL_GROUP" 2>/dev/null
                 )"; then
