@@ -245,6 +245,10 @@ in
                 EXPORT_JSON="$${EXPORT_JSON/__SUBVOL_PATH__/$SUBVOL_PATH}"
                 printf '%s' "$EXPORT_JSON" > /tmp/export_final.json
 
+                echo "" > /tmp/empty-conf-nfs
+
+                rados -p .nfs --namespace $NFSNS put "conf-nfs.$CLUSTER"     /tmp/empty-conf-nfs || true
+
                 ceph -c "$CEPH_CONFIG" nfs export apply "$CLUSTER" -i /tmp/export_final.json
 
                 rados -p .nfs --namespace $NFSNS get "conf-nfs.$CLUSTER"     /tmp/conf-nfs                || true
