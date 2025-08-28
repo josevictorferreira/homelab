@@ -16,6 +16,9 @@ let
       Enable_NLM = false;
       Enable_RQUOTA = false;
       Protocols = 4;
+      Bind_addr = 0.0.0.0;
+      NFS_Port = 2049;
+      allow_set_io_flusher_fail = true;
     }
 
     MDCACHE {
@@ -24,26 +27,25 @@ let
 
     NFS_KRB5 { Active_krb5 = false; }
 
+    NFSv4 {
+      Graceless = true;
+      Delegations = false;
+      Minor_Versions = 0, 1, 2;
+      Allow_Numeric_Owners = true;
+      Only_Numeric_Owners = true;
+      RecoveryBackend = "rados_cluster";
+    }
+
     EXPORT_DEFAULTS {
       Attr_Expiration_Time = 0;
+      Protocols = 4;
       Transports = TCP;
       Access_Type = RW;
       Squash = All_Squash;
-      Protocols = 4;
       Manage_Gids = true;
       Anonymous_uid = 2002;
       Anonymous_gid = 2002;
       SecType = "sys";
-      Protocols = 4;
-    }
-
-    NFSv4 {
-      Graceless = true;
-      Delegations = false;
-      RecoveryBackend = "rados_cluster";
-      Minor_Versions = 0, 1, 2;
-      Allow_Numeric_Owners = true;
-      Only_Numeric_Owners = true;
     }
 
     RADOS_KV {
@@ -54,32 +56,35 @@ let
       namespace = "${nfsName}";
     }
 
+    CEPH { Ceph_Conf = "/etc/ceph/ceph.conf"; }
+
     RADOS_URLS {
       ceph_conf = "/etc/ceph/ceph.conf";
       userid = nfs-ganesha.${nfsName}.${nodeId};
       watch_url = "rados://.nfs/${nfsName}/conf-nfs.${nfsName}";
     }
 
-    %url    rados://.nfs/${nfsName}/conf-nfs.${nfsName}
+    %url    "rados://.nfs/${nfsName}/conf-nfs.${nfsName}"
 
   '';
   exportConf = {
     export_id = 10;
     path = "__SUBVOL_PATH__";
+    pseudo = pseudo;
+    security_label = false;
     access_type = "RW";
     squash = "all_squash";
-    security_label = false;
-    pseudo = pseudo;
     fsal = {
       name = "CEPH";
       fs_name = cephfs;
     };
     clients = [
       {
-        protocol = "4";
         addresses = "*";
+        protocol = "4";
         access_type = "RW";
         squash = "all_squash";
+        sectype = [ "sys" ];
       }
     ];
   };
