@@ -75,9 +75,10 @@ spec:
               \ \"export-0\"     /tmp/export_base.conf\n\necho \"%url    \\\"rados://.nfs/$CLUSTER/export-0\\\
               \"\" >> /tmp/conf-nfs\n\nrados -p .nfs --namespace $NFSNS rm \"conf-nfs.$CLUSTER\"\
               \ || true\nrados -p .nfs --namespace $NFSNS put \"conf-nfs.$CLUSTER\"\
-              \     /tmp/conf-nfs\n\necho \"--------------------------- CONTENTS -----------------------------\"\
-              \ncat /tmp/conf-nfs                || echo \"(conf-nfs not found)\"\n\
-              echo \"------------------------------------------------------------------\"\
+              \     /tmp/conf-nfs\nrados -p .nfs --namespace $NFSNS get \"conf-nfs.$CLUSTER\"\
+              \     /tmp/conf-nfs                || true\n\necho \"---------------------------\
+              \ CONTENTS -----------------------------\"\ncat /tmp/conf-nfs      \
+              \          || echo \"(conf-nfs not found)\"\necho \"------------------------------------------------------------------\"\
               \ncat \"/tmp/export-$EXPORT_ID\"     || echo \"(export-$CLUSTER not\
               \ found)\"\necho \"------------------------------------------------------------------\"\
               \ncat /tmp/export_base.conf        || echo \"(export_base.conf not found)\"\
