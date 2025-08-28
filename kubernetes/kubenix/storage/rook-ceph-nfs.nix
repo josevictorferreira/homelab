@@ -27,13 +27,12 @@ let
 
     NFS_KRB5 { Active_krb5 = false; }
 
-    CEPH { ceph_conf = "/etc/ceph/ceph.conf"; }
-
     EXPORT_DEFAULTS {
       Attr_Expiration_Time = 0;
       Transports = TCP;
       Access_Type = RW;
       Squash = All_Squash;
+      Protocols = 4;
       Manage_Gids = true;
       Anonymous_uid = 2002;
       Anonymous_gid = 2002;
@@ -63,8 +62,6 @@ let
       watch_url = "rados://.nfs/${nfsName}/conf-nfs.${nfsName}";
     }
 
-    RGW { name = "client.nfs-ganesha.${nfsName}.${nodeId}"; }
-
     LOG {
       default_log_level = INFO;
       Components {
@@ -85,18 +82,13 @@ let
     export_id = 10;
     path = "__SUBVOL_PATH__";
     pseudo = pseudo;
-    security_label = false;
-    access_type = "RW";
-    protocols = [ 4 ];
-    manage_gids = true;
-    squash = "all_squash";
-    sectype = [ "sys" ];
     fsal = {
       name = "CEPH";
       fs_name = cephfs;
     };
     clients = [
       {
+        protocol = "4";
         addresses = "*";
         access_type = "RW";
         squash = "all_squash";
