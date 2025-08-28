@@ -273,7 +273,7 @@ in
                 rados -p .nfs --namespace $NFSNS rm "export-0" || true
                 rados -p .nfs --namespace $NFSNS put "export-0"     /tmp/export_base.conf
 
-                printf "\%\url    \"rados://.nfs/$CLUSTER/export-$EXPORT_ID\" \n\%\url    \"rados://.nfs/$CLUSTER/export-0\"\n" >> /tmp/conf-nfs
+                printf "%%url    \"rados://.nfs/$CLUSTER/export-$EXPORT_ID\"\n%%url    \"rados://.nfs/$CLUSTER/export-0\"\n" >> /tmp/conf-nfs
 
                 rados -p .nfs --namespace $NFSNS rm "conf-nfs.$CLUSTER" || true
                 rados -p .nfs --namespace $NFSNS put "conf-nfs.$CLUSTER"     /tmp/conf-nfs
