@@ -19,7 +19,7 @@ let
 
     MDCACHE {
       Dir_Chunk = 0;
-      Cache_FDs = false;
+      Cache_FDs = true;
     }
 
     NFS_KRB5 { Active_krb5 = false; }
@@ -31,6 +31,9 @@ let
       Allow_Numeric_Owners = true;
       Only_Numeric_Owners = true;
       RecoveryBackend = "rados_cluster";
+      pnfs_mds = true;
+      pnfs_ds = true;
+      Lease_Lifetime = 60;
     }
 
     EXPORT_DEFAULTS {
@@ -59,6 +62,17 @@ let
       ceph_conf = "/etc/ceph/ceph.conf";
       userid = nfs-ganesha.${nfsName}.${nodeId};
       watch_url = "rados://.nfs/${nfsName}/conf-nfs.${nfsName}";
+    }
+
+    LOG {
+      Components {
+        ALL = "INFO";
+        CLIENT = "DEBUG";
+        FSA = "DEBUG";
+        NFSV4 = "DEBUG";
+        RADOS = "DEBUG";
+        RADOS_URLS = "DEBUG";
+      }
     }
 
     %url    "rados://.nfs/${nfsName}/conf-nfs.${nfsName}"
@@ -126,7 +140,6 @@ in
               { key = "node-role.kubernetes.io/control-plane"; operator = "Exists"; effect = "NoSchedule"; }
             ];
           };
-          logLevel = "NIV_WARN";
         };
       };
     };
@@ -241,12 +254,10 @@ in
                 EXPORT_JSON="$${EXPORT_JSON/__SUBVOL_PATH__/$SUBVOL_PATH}"
                 printf '%s' "$EXPORT_JSON" > /tmp/export_final.json
 
-                ceph -c "$CEPH_CONFIG" nfs export apply "$CLUSTER" -i /tmp/export_base.json || true
                 ceph -c "$CEPH_CONFIG" nfs export apply "$CLUSTER" -i /tmp/export_final.json
 
                 rados -p .nfs --namespace $NFSNS get "conf-nfs.$CLUSTER"     /tmp/conf-nfs                || true
                 rados -p .nfs --namespace $NFSNS get "export-$EXPORT_ID"     /tmp/export-$$EXPORT_ID     || true
-                rados -p .nfs --namespace $NFSNS get "export-0"              /tmp/export-0              || true
 
                 echo "--------------------------- CONTENTS -----------------------------"
                 cat /tmp/conf-nfs                || echo "(conf-nfs not found)"
