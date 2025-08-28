@@ -55,10 +55,11 @@ spec:
               \ 2002 --mode 2775\n  fi\n\n  SUBVOL_PATH=\"$(ceph -c \"$CEPH_CONFIG\"\
               \ fs subvolume getpath \"$FS\" \"$SUBVOL_NAME\" --group_name \"$SUBVOL_GROUP\"\
               )\"\nfi\n\necho \"Subvolume path: $SUBVOL_PATH\"\n\nEXPORT_JSON='{\"\
-              clients\":[{\"access_type\":\"RW\",\"addresses\":\"*\",\"protocol\"\
-              :\"4\",\"squash\":\"all_squash\"}],\"export_id\":10,\"fsal\":{\"fs_name\"\
-              :\"ceph-filesystem\",\"name\":\"CEPH\"},\"path\":\"__SUBVOL_PATH__\"\
-              ,\"pseudo\":\"/homelab-nfs\"}'\nEXPORT_JSON=\"$${EXPORT_JSON/__SUBVOL_PATH__/$SUBVOL_PATH}\"\
+              access_type\":\"RW\",\"clients\":[{\"access_type\":\"RW\",\"addresses\"\
+              :\"*\",\"protocol\":\"4\",\"squash\":\"all_squash\"}],\"export_id\"\
+              :10,\"fsal\":{\"fs_name\":\"ceph-filesystem\",\"name\":\"CEPH\"},\"\
+              path\":\"__SUBVOL_PATH__\",\"pseudo\":\"/homelab-nfs\",\"security_label\"\
+              :false,\"squash\":\"All_Squash\"}'\nEXPORT_JSON=\"$${EXPORT_JSON/__SUBVOL_PATH__/$SUBVOL_PATH}\"\
               \nprintf '%s' \"$EXPORT_JSON\" > /tmp/export_final.json\n\nceph -c \"\
               $CEPH_CONFIG\" nfs export apply \"$CLUSTER\" -i /tmp/export_final.json\n\
               \nrados -p .nfs --namespace $NFSNS get \"conf-nfs.$CLUSTER\"     /tmp/conf-nfs\
