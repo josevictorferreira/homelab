@@ -82,7 +82,7 @@ let
     };
     clients = [
       {
-        addresses = allowedCIDRs;
+        addresses = "*";
         protocol = "4";
         access_type = "RW";
         squash = "all_squash";
