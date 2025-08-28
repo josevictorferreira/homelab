@@ -79,6 +79,22 @@ let
     %url    "rados://.nfs/${nfsName}/conf-nfs.${nfsName}"
 
   '';
+  baseExportConf = ''
+    EXPORT {
+      Export_Id = 0;
+      Path = "/";
+      Pseudo = "/";
+      Access_Type = RW;
+      Squash = All_Squash;
+      SecType = "sys";
+      Security_Label = false;
+      FSAL {
+        Name = CEPH;
+        User_Id = "__USER_ID__";
+        Filesystem = "${cephfs}";
+      }
+    }
+  '';
   exportConf = {
     export_id = 10;
     path = "__SUBVOL_PATH__";
@@ -234,10 +250,30 @@ in
                 rados -p .nfs --namespace $NFSNS get "conf-nfs.$CLUSTER"     /tmp/conf-nfs                || true
                 rados -p .nfs --namespace $NFSNS get "export-$EXPORT_ID"     /tmp/export-$$EXPORT_ID     || true
 
+                echo "Fetching user_id from export-$EXPORT_ID"
+                USER_ID=$(grep -oP 'user_id\s*=\s*"\K[^"]+' /tmp/export.json)
+                echo "User ID: $USER_ID"
+
+                BASE_EXPORT_CONF='${baseExportConf}'
+                BASE_EXPORT_CONF="$${BASE_EXPORT_CONF/__USER_ID__/$USER_ID}"
+                printf '%s\n' "$BASE_EXPORT_CONF" > /tmp/export_base.conf
+
+                cat /tmp/export_base.conf
+
+                echo "Uploading updated configs to RADOS..."
+
+                rados -p .nfs --namespace $NFSNS put "export-0"     /tmp/export_base.conf
+
+                echo "%url    \"rados://.nfs/$CLUSTER/export-0\"" >> /tmp/conf-nfs
+
+                rados -p .nfs --namespace $NFSNS put "conf-nfs.$CLUSTER"     /tmp/conf-nfs
+
                 echo "--------------------------- CONTENTS -----------------------------"
                 cat /tmp/conf-nfs                || echo "(conf-nfs not found)"
                 echo "------------------------------------------------------------------"
                 cat "/tmp/export-$EXPORT_ID"     || echo "(export-$CLUSTER not found)"
+                echo "------------------------------------------------------------------"
+                cat /tmp/export_base.conf        || echo "(export_base.conf not found)"
 
                 echo "Restarting NFS Ganesha grace..."
                 for SUFFIX in ${builtins.concatStringsSep " " nodesIds}; do
