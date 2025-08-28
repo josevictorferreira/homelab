@@ -232,8 +232,8 @@ in
 
                 echo "Restarting NFS Ganesha grace..."
                 for SUFFIX in ${builtins.concatStringsSep " " nodesIds}; do
-                  ganesha-rados-grace --pool .nfs --ns "$NFSNS" add "$${CLUSTER}-$${SUFFIX}"   || true
-                  ganesha-rados-grace --pool .nfs --ns "$NFSNS" start "$${CLUSTER}-$${SUFFIX}" || true
+                  ganesha-rados-grace --pool .nfs --ns "$NFSNS" add "$${CLUSTER}.$${SUFFIX}"   || true
+                  ganesha-rados-grace --pool .nfs --ns "$NFSNS" start "$${CLUSTER}.$${SUFFIX}" || true
                 done
 
                 echo "Removing orchestrator backend..."
