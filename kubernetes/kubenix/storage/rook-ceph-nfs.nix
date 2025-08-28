@@ -34,6 +34,7 @@ let
       Anonymous_uid = 2002;
       Anonymous_gid = 2002;
       SecType = "sys";
+      Protocols = 4;
     }
 
     NFSv4 {
