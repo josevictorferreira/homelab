@@ -16,6 +16,11 @@ let
       NFS_Port = 2049;
     }
 
+    MDCACHE {
+      Dir_Chunk = 0;
+      Cache_FDs = false;
+    }
+
     NFS_KRB5 { Active_krb5 = false; }
 
     NFSv4 {
