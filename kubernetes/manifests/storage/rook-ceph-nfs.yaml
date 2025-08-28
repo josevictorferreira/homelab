@@ -67,14 +67,15 @@ spec:
               USER_ID=\"$(grep -oP 'user_id\\s*=\\s*\"\\K[^\"]+' /tmp/export-$EXPORT_ID)\"\
               \necho \"User ID: $USER_ID\"\n\nBASE_EXPORT_CONF='EXPORT {\n  Export_Id\
               \ = 0;\n  Path = \"/\";\n  Pseudo = \"/\";\n  Access_Type = RW;\n  Squash\
-              \ = No_Root_Squash;\n  SecType = sys;\n  Security_Label = false;\n \
-              \ FSAL {\n    Name = CEPH;\n    User_Id = \"__USER_ID__\";\n    Filesystem\
-              \ = \"ceph-filesystem\";\n  }\n}\n'\nBASE_EXPORT_CONF=\"$${BASE_EXPORT_CONF/__USER_ID__/$$USER_ID}\"\
+              \ = No_Root_Squash;\n  Protocols = 4;\n  Transports = TCP;\n  Attr_Expiration_Time\
+              \ = 0;\n  SecType = sys;\n  Security_Label = false;\n  FSAL {\n    Name\
+              \ = CEPH;\n    User_Id = \"__USER_ID__\";\n    Filesystem = \"ceph-filesystem\"\
+              ;\n  }\n}\n'\nBASE_EXPORT_CONF=\"$${BASE_EXPORT_CONF/__USER_ID__/$$USER_ID}\"\
               \necho \"Base export config:\"\necho \"$BASE_EXPORT_CONF\"\nprintf '%s\\\
-              n' \"$BASE_EXPORT_CONF\" > /tmp/export_base.conf\n\ncat /tmp/export_base.conf\n\
-              \necho \"Uploading updated configs to RADOS...\"\n\nrados -p .nfs --namespace\
-              \ $NFSNS rm \"export-0\" || true\nrados -p .nfs --namespace $NFSNS put\
-              \ \"export-0\"     /tmp/export_base.conf\n\nprintf \"%%url    \\\"rados://.nfs/$CLUSTER/export-$EXPORT_ID\\\
+              n' \"$BASE_EXPORT_CONF\" > /tmp/export_base.conf\n\necho \"Uploading\
+              \ updated configs to RADOS...\"\n\nrados -p .nfs --namespace $NFSNS\
+              \ rm \"export-0\" || true\nrados -p .nfs --namespace $NFSNS put \"export-0\"\
+              \     /tmp/export_base.conf\n\nprintf \"%%url    \\\"rados://.nfs/$CLUSTER/export-$EXPORT_ID\\\
               \"\\n%%url    \\\"rados://.nfs/$CLUSTER/export-0\\\"\\n\" >> /tmp/conf-nfs\n\
               \nrados -p .nfs --namespace $NFSNS rm \"conf-nfs.$CLUSTER\" || true\n\
               rados -p .nfs --namespace $NFSNS put \"conf-nfs.$CLUSTER\"     /tmp/conf-nfs\n\

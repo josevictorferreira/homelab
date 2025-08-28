@@ -86,6 +86,9 @@ let
       Pseudo = "/";
       Access_Type = RW;
       Squash = No_Root_Squash;
+      Protocols = 4;
+      Transports = TCP;
+      Attr_Expiration_Time = 0;
       SecType = sys;
       Security_Label = false;
       FSAL {
@@ -265,8 +268,6 @@ in
                 echo "Base export config:"
                 echo "$BASE_EXPORT_CONF"
                 printf '%s\n' "$BASE_EXPORT_CONF" > /tmp/export_base.conf
-
-                cat /tmp/export_base.conf
 
                 echo "Uploading updated configs to RADOS..."
 
