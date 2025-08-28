@@ -93,8 +93,8 @@ let
       Security_Label = false;
       FSAL {
         Name = CEPH;
-        User_Id = "__USER_ID__";
         Filesystem = "${cephfs}";
+        User_Id = "nfs-ganesha.homelab-nfs.a";
       }
     }
   '';
@@ -260,12 +260,8 @@ in
                 rados -p .nfs --namespace $NFSNS get "export-$EXPORT_ID"     /tmp/export-$$EXPORT_ID     || true
 
                 echo "Fetching user_id from export-$EXPORT_ID"
-                USER_ID="$(grep -oP 'user_id\s*=\s*"\K[^"]+' /tmp/export-$EXPORT_ID)"
-                echo "User ID: $USER_ID"
 
                 BASE_EXPORT_CONF='${baseExportConf}'
-                BASE_EXPORT_CONF="$${BASE_EXPORT_CONF/__USER_ID__/$$USER_ID}"
-                echo "Base export config:"
                 echo "$BASE_EXPORT_CONF"
                 printf '%s\n' "$BASE_EXPORT_CONF" > /tmp/export_base.conf
 
@@ -274,7 +270,7 @@ in
                 rados -p .nfs --namespace $NFSNS rm "export-0" || true
                 rados -p .nfs --namespace $NFSNS put "export-0"     /tmp/export_base.conf
 
-                printf "%%url    \"rados://.nfs/$CLUSTER/export-$EXPORT_ID\"\n%%url    \"rados://.nfs/$CLUSTER/export-0\"\n" >> /tmp/conf-nfs
+                printf "%%url    \"rados://.nfs/$CLUSTER/export-0\"\n%%url    \"rados://.nfs/$CLUSTER/export-$EXPORT_ID\"\n" >> /tmp/conf-nfs
 
                 rados -p .nfs --namespace $NFSNS rm "conf-nfs.$CLUSTER" || true
                 rados -p .nfs --namespace $NFSNS put "conf-nfs.$CLUSTER"     /tmp/conf-nfs
