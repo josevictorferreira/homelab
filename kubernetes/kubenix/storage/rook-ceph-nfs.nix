@@ -21,6 +21,7 @@ let
     MDCACHE {
       Dir_Chunk = 0;
       Cache_FDs = true;
+      FD_HWMark_Percent = 40;
     }
 
     NFS_KRB5 { Active_krb5 = false; }
@@ -32,6 +33,8 @@ let
       Allow_Numeric_Owners = true;
       Only_Numeric_Owners = true;
       RecoveryBackend = "fs_ng";
+      pnfs = true;
+      pnfs_ds = true;
     }
 
     EXPORT_DEFAULTS {
@@ -97,7 +100,7 @@ in
           active = replicaCount;
           resources = {
             requests = { cpu = "50m"; memory = "64Mi"; };
-            limits = { memory = "1Gi"; };
+            limits = { memory = "2Gi"; };
           };
           placement = {
             tolerations = [
