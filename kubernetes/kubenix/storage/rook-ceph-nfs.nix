@@ -245,7 +245,9 @@ in
                 EXPORT_JSON="$${EXPORT_JSON/__SUBVOL_PATH__/$SUBVOL_PATH}"
                 printf '%s' "$EXPORT_JSON" > /tmp/export_final.json
 
-                echo "" > /tmp/empty-conf-nfs
+                echo "\n" > /tmp/empty-conf-nfs
+
+                echo "Uploading empty conf to RADOS to reset any previous config..."
 
                 rados -p .nfs --namespace $NFSNS put "conf-nfs.$CLUSTER"     /tmp/empty-conf-nfs || true
 
