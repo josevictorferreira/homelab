@@ -232,10 +232,10 @@ in
 
                 ceph -c "$CEPH_CONFIG" nfs export apply "$CLUSTER" -i /tmp/export_final.json
 
-                CEPH_USER_ID="$(ceph -c $CEPH_CONFIG nfs export get $CLUSTER /$CLUSTER -f json | jq -r '.fsal.user_id')"
+                CEPH_USER_ID="$(ceph -c $CEPH_CONFIG nfs export get $CLUSTER /${pseudo} -f json | jq -r '.fsal.user_id')"
 
                 echo "Setting final Auth Caps for NFS Ganesha user $CEPH_USER_ID"
-                ceph -c "$CEPH_CONFIG" auth caps "$CEPH_USER_ID" \
+                ceph -c "$CEPH_CONFIG" auth caps "client.$CEPH_USER_ID" \
                   mon 'allow r' \
                   mgr 'allow rw fsname="$FS"' \
                   osd 'allow rw tag cephfs data="$FS"'
