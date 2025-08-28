@@ -251,7 +251,7 @@ in
                 rados -p .nfs --namespace $NFSNS get "export-$EXPORT_ID"     /tmp/export-$$EXPORT_ID     || true
 
                 echo "Fetching user_id from export-$EXPORT_ID"
-                USER_ID=$(grep -oP 'user_id\s*=\s*"\K[^"]+' /tmp/export.json)
+                USER_ID=$(grep -oP 'user_id\s*=\s*"\K[^"]+' /tmp/export-$$EXPORT_ID || true)
                 echo "User ID: $USER_ID"
 
                 BASE_EXPORT_CONF='${baseExportConf}'
