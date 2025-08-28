@@ -64,14 +64,14 @@ let
     RGW { name = "client.nfs-ganesha.${nfsName}.${nodeId}"; }
 
     LOG {
-      default_log_level = WARN;
+      default_log_level = INFO;
       Components {
-        ALL = WARN;
+        ALL = INFO;
         FSAL = DEBUG;
-        NFS4 = DEBUG;
-        EXPORT = DEBUG;
-        DISPATCH = DEBUG;
-        RADOS = DEBUG;
+        NFS4 = EVENT;
+        EXPORT = INFO;
+        DISPATCH = INFO;
+        RADOS = INFO;
       }
     }
 
