@@ -65,14 +65,13 @@ spec:
               \nCEPH_USER_ID=\"$(ceph -c $CEPH_CONFIG nfs export get $CLUSTER /homelab-nfs\
               \ -f json | jq -r '.fsal.user_id')\"\n\necho \"Setting final Auth Caps\
               \ for NFS Ganesha user $CEPH_USER_ID\"\nceph -c \"$CEPH_CONFIG\" auth\
-              \ caps \"client.$CEPH_USER_ID\" \\\n  mon 'allow r' \\\n  mgr 'allow\
-              \ rw' \\\n  mds \"allow rw fsname=$FS\" \\\n  osd \"allow rw tag cephfs\
-              \ data=$FS\"\n\nrados -p .nfs --namespace $NFSNS get \"conf-nfs.$CLUSTER\"\
-              \     /tmp/conf-nfs                || true\nrados -p .nfs --namespace\
-              \ $NFSNS get \"export-$EXPORT_ID\"     /tmp/export-$$EXPORT_ID     ||\
-              \ true\n\necho \"--------------------------- CONTENTS -----------------------------\"\
-              \ncat /tmp/conf-nfs                || echo \"(conf-nfs not found)\"\n\
-              echo \"------------------------------------------------------------------\"\
+              \ caps \"client.$CEPH_USER_ID\" \\\n  mon 'allow r' \\\n  mds \"allow\
+              \ rw fsname=$FS\" \\\n  osd \"allow rw tag cephfs data=$FS\"\n\nrados\
+              \ -p .nfs --namespace $NFSNS get \"conf-nfs.$CLUSTER\"     /tmp/conf-nfs\
+              \                || true\nrados -p .nfs --namespace $NFSNS get \"export-$EXPORT_ID\"\
+              \     /tmp/export-$$EXPORT_ID     || true\n\necho \"---------------------------\
+              \ CONTENTS -----------------------------\"\ncat /tmp/conf-nfs      \
+              \          || echo \"(conf-nfs not found)\"\necho \"------------------------------------------------------------------\"\
               \ncat \"/tmp/export-$EXPORT_ID\"     || echo \"(export-$CLUSTER not\
               \ found)\"\n\necho \"Restarting NFS Ganesha grace...\"\nfor SUFFIX in\
               \ a; do\n  ganesha-rados-grace --pool .nfs --ns \"$NFSNS\" add \"$${CLUSTER}-$${SUFFIX}\"\
@@ -142,10 +141,12 @@ spec:
               n  Only_Numeric_Owners = true;\\n}\\n\\nRADOS_KV {\\n  ceph_conf = \\\
               \"/etc/ceph/ceph.conf\\\";\\n  userid = \\\"nfs-ganesha.homelab-nfs.a\\\
               \";\\n  nodeid = \\\"homelab-nfs.a\\\";\\n  pool = \\\".nfs\\\";\\n\
-              \  namespace = \\\"homelab-nfs\\\";\\n}\\n\\nLOG {\\n  default_log_level\
-              \ = INFO;\\n  Components {\\n    ALL = DEBUG;\\n    FSAL = DEBUG;\\\
-              n    NFS4 = DEBUG;\\n    EXPORT = DEBUG;\\n    DISPATCH = DEBUG;\\n\
-              \  }\\n}\\n\\n\\n%url    rados://.nfs/homelab-nfs/conf-nfs.homelab-nfs\\\
+              \  namespace = \\\"homelab-nfs\\\";\\n}\\n\\nRADOS_URLS {\\n  ceph_conf\
+              \ = \\\"/etc/ceph/ceph.conf\\\";\\n  userid = \\\"nfs-ganesha.homelab-nfs.a\\\
+              \";\\n  watch_url = \\\"rados://.nfs/homelab-nfs/conf-nfs.homelab-nfs\\\
+              \";\\n}\\n\\nLOG {\\n  default_log_level = INFO;\\n  Components {\\\
+              n    ALL = DEBUG;\\n    FSAL = DEBUG;\\n    NFS4 = DEBUG;\\n    EXPORT\
+              \ = DEBUG;\\n    DISPATCH = DEBUG;\\n  }\\n}\\n\\n\\n%url    rados://.nfs/homelab-nfs/conf-nfs.homelab-nfs\\\
               n\\n\"}}'\n\n\n\necho \"Restarting deployment for node ID a...\"\nDEP=\"\
               $(kubectl -n rook-ceph get deploy -l app=rook-ceph-nfs,instance=a -o\
               \ name | grep -i rook-ceph | head -n1 || true)\"\n[ -z \"$DEP\" ] &&\
