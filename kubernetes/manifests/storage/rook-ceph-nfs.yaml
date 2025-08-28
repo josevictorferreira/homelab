@@ -125,31 +125,32 @@ spec:
               \ ConfigMap not found\"; exit 1; }\n\necho \"Patching $CM in rook-ceph...\"\
               \n\nkubectl -n rook-ceph patch \"$CM\" --type merge -p '{\"data\":{\"\
               config\":\"NFS_CORE_PARAM {\\n  Enable_NLM = false;\\n  Enable_RQUOTA\
-              \ = false;\\n  Protocols = 4;\\n  allow_set_io_flusher_fail = true;\\\
-              n}\\n\\nMDCACHE {\\n  Dir_Chunk = 0;\\n  Cache_FDs = false;\\n}\\n\\\
-              nNFS_KRB5 { Active_krb5 = false; }\\n\\nCEPH { ceph_conf = \\\"/etc/ceph/ceph.conf\\\
-              \"; }\\n\\nEXPORT_DEFAULTS {\\n  Attr_Expiration_Time = 0;\\n  Transports\
-              \ = TCP;\\n  Access_Type = RW;\\n  Squash = All_Squash;\\n  Manage_Gids\
-              \ = true;\\n  Anonymous_uid = 2002;\\n  Anonymous_gid = 2002;\\n  SecType\
-              \ = \\\"sys\\\";\\n}\\n\\nNFSv4 {\\n  Delegations = false;\\n  RecoveryBackend\
-              \ = \\\"rados_cluster\\\";\\n  Minor_Versions = 0, 1, 2;\\n  Allow_Numeric_Owners\
-              \ = true;\\n  Only_Numeric_Owners = true;\\n}\\n\\nRADOS_KV {\\n  ceph_conf\
-              \ = \\\"/etc/ceph/ceph.conf\\\";\\n  userid = \\\"nfs-ganesha.homelab-nfs.a\\\
+              \ = false;\\n  Protocols = 4;\\n  Allow_Set_Io_Flusher_Fail = true;\\\
+              n  Enable_malloc_trim = true;\\n}\\n\\nMDCACHE {\\n  Dir_Chunk = 0;\\\
+              n  Cache_FDs = false;\\n}\\n\\nNFS_KRB5 { Active_krb5 = false; }\\n\\\
+              nCEPH { ceph_conf = \\\"/etc/ceph/ceph.conf\\\"; }\\n\\nEXPORT_DEFAULTS\
+              \ {\\n  Attr_Expiration_Time = 0;\\n  Transports = TCP;\\n  Access_Type\
+              \ = RW;\\n  Squash = All_Squash;\\n  Manage_Gids = true;\\n  Anonymous_uid\
+              \ = 2002;\\n  Anonymous_gid = 2002;\\n  SecType = \\\"sys\\\";\\n}\\\
+              n\\nNFSv4 {\\n  Delegations = false;\\n  RecoveryBackend = \\\"rados_cluster\\\
+              \";\\n  Minor_Versions = 0, 1, 2;\\n  Allow_Numeric_Owners = true;\\\
+              n  Only_Numeric_Owners = true;\\n}\\n\\nRADOS_KV {\\n  ceph_conf = \\\
+              \"/etc/ceph/ceph.conf\\\";\\n  userid = \\\"nfs-ganesha.homelab-nfs.a\\\
               \";\\n  nodeid = \\\"homelab-nfs.a\\\";\\n  pool = \\\".nfs\\\";\\n\
               \  namespace = \\\"homelab-nfs\\\";\\n}\\n\\nRADOS_URLS {\\n  ceph_conf\
               \ = \\\"/etc/ceph/ceph.conf\\\";\\n  userid = \\\"nfs-ganesha.homelab-nfs.a\\\
               \";\\n  watch_url = \\\"rados://.nfs/homelab-nfs/conf-nfs.homelab-nfs\\\
               \";\\n}\\n\\nRGW { name = \\\"client.nfs-ganesha.homelab-nfs.a\\\";\
               \ }\\n\\nLOG {\\n  default_log_level = INFO;\\n  Components {\\n   \
-              \ ALL = INFO;\\n    FSAL = DEBUG;\\n    NFS4 = EVENT;\\n    EXPORT =\
-              \ INFO;\\n    DISPATCH = INFO;\\n    RADOS = INFO;\\n  }\\n}\\n\\n\\\
-              n%url    rados://.nfs/homelab-nfs/conf-nfs.homelab-nfs\\n\\n\"}}'\n\n\
-              \n\necho \"Restarting deployment for node ID a...\"\nDEP=\"$(kubectl\
-              \ -n rook-ceph get deploy -l app=rook-ceph-nfs,instance=a -o name |\
-              \ grep -i rook-ceph | head -n1 || true)\"\n[ -z \"$DEP\" ] && { echo\
-              \ \"WARN: deployment not found; skipping restart\"; exit 0; }\nkubectl\
-              \ -n rook-ceph rollout restart \"$DEP\"\nkubectl -n rook-ceph rollout\
-              \ status  \"$DEP\"\n\n\n\necho \"Done.\"\n"
+              \ ALL = INFO;\\n    FSAL = INFO;\\n    NFS4 = INFO;\\n    EXPORT = INFO;\\\
+              n    DISPATCH = INFO;\\n    RADOS = INFO;\\n  }\\n}\\n\\n\\n%url   \
+              \ rados://.nfs/homelab-nfs/conf-nfs.homelab-nfs\\n\\n\"}}'\n\n\n\necho\
+              \ \"Restarting deployment for node ID a...\"\nDEP=\"$(kubectl -n rook-ceph\
+              \ get deploy -l app=rook-ceph-nfs,instance=a -o name | grep -i rook-ceph\
+              \ | head -n1 || true)\"\n[ -z \"$DEP\" ] && { echo \"WARN: deployment\
+              \ not found; skipping restart\"; exit 0; }\nkubectl -n rook-ceph rollout\
+              \ restart \"$DEP\"\nkubectl -n rook-ceph rollout status  \"$DEP\"\n\n\
+              \n\necho \"Done.\"\n"
           command:
             - /bin/bash
             - -lc
