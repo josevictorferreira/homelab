@@ -14,13 +14,6 @@ let
       Protocols = 4;
       Bind_addr = 0.0.0.0;
       NFS_Port = 2049;
-      Allow_Set_Io_Flusher_Fail = true;
-      Enable_malloc_trim = true;
-    }
-
-    MDCACHE {
-      Dir_Chunk = 0;
-      Cache_FDs = false;
     }
 
     NFS_KRB5 { Active_krb5 = false; }
@@ -75,6 +68,8 @@ let
     fsal = {
       name = "CEPH";
       fs_name = cephfs;
+      client_mount_timeout = 30;
+      client_reconnect_timeout = 15;
     };
     clients = [
       {
