@@ -62,9 +62,9 @@ spec:
               :false,\"squash\":\"All_Squash\"}'\nEXPORT_JSON=\"$${EXPORT_JSON/__SUBVOL_PATH__/$SUBVOL_PATH}\"\
               \nprintf '%s' \"$EXPORT_JSON\" > /tmp/export_final.json\n\nceph -c \"\
               $CEPH_CONFIG\" nfs export apply \"$CLUSTER\" -i /tmp/export_final.json\n\
-              \nUSERID=$(ceph -c \"$CEPH_CONFIG\" nfs export get homelab-nfs /homelab-nfs\
-              \ -f json | jq -r '.fsal.user_id')\n\nceph -c \"$CEPH_CONFIG\" auth\
-              \ caps \"$USERID\" \\\n  mon 'allow r' \\\n  mgr 'allow rw fsname=ceph-filesystem'\
+              \nUSER_ID=\"$(ceph -c \"$CEPH_CONFIG\" nfs export get homelab-nfs /homelab-nfs\
+              \ -f json | jq -r '.fsal.user_id')\"\n\nceph -c \"$CEPH_CONFIG\" auth\
+              \ caps \"$USER_ID\" \\\n  mon 'allow r' \\\n  mgr 'allow rw fsname=ceph-filesystem'\
               \ \\\n  osd 'allow rw tag cephfs data=ceph-filesystem\n\nrados -p .nfs\
               \ --namespace $NFSNS get \"conf-nfs.$CLUSTER\"     /tmp/conf-nfs   \
               \             || true\nrados -p .nfs --namespace $NFSNS get \"export-$EXPORT_ID\"\
