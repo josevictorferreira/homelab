@@ -15,6 +15,7 @@ let
       Bind_addr = 0.0.0.0;
       NFS_Port = 2049;
       Allow_Set_Io_Flusher_Fail = true;
+      Enable_malloc_trim = true;
     }
 
     MDCACHE {

@@ -121,11 +121,12 @@ spec:
               \n\nkubectl -n rook-ceph patch \"$CM\" --type merge -p '{\"data\":{\"\
               config\":\"NFS_CORE_PARAM {\\n  Enable_NLM = false;\\n  Enable_RQUOTA\
               \ = false;\\n  Protocols = 4;\\n  Bind_addr = 0.0.0.0;\\n  NFS_Port\
-              \ = 2049;\\n  Allow_Set_Io_Flusher_Fail = true;\\n}\\n\\nMDCACHE {\\\
-              n  Dir_Chunk = 0;\\n  Cache_FDs = false;\\n}\\n\\nNFS_KRB5 { Active_krb5\
-              \ = false; }\\n\\nNFSv4 {\\n  Graceless = false;\\n  Delegations = false;\\\
-              n  Minor_Versions = 0, 1, 2;\\n  Allow_Numeric_Owners = true;\\n  Only_Numeric_Owners\
-              \ = true;\\n  RecoveryBackend = \\\"rados_cluster\\\";\\n}\\n\\nEXPORT_DEFAULTS\
+              \ = 2049;\\n  Allow_Set_Io_Flusher_Fail = true;\\n  Enable_malloc_trim\
+              \ = true;\\n}\\n\\nMDCACHE {\\n  Dir_Chunk = 0;\\n  Cache_FDs = false;\\\
+              n}\\n\\nNFS_KRB5 { Active_krb5 = false; }\\n\\nNFSv4 {\\n  Graceless\
+              \ = false;\\n  Delegations = false;\\n  Minor_Versions = 0, 1, 2;\\\
+              n  Allow_Numeric_Owners = true;\\n  Only_Numeric_Owners = true;\\n \
+              \ RecoveryBackend = \\\"rados_cluster\\\";\\n}\\n\\nEXPORT_DEFAULTS\
               \ {\\n  Attr_Expiration_Time = 0;\\n  Protocols = 4;\\n  Transports\
               \ = TCP;\\n  Access_Type = RW;\\n  Squash = All_Squash;\\n  Manage_Gids\
               \ = true;\\n  Anonymous_uid = 2002;\\n  Anonymous_gid = 2002;\\n  SecType\
@@ -146,11 +147,11 @@ spec:
               \ patch \"$CM\" --type merge -p '{\"data\":{\"config\":\"NFS_CORE_PARAM\
               \ {\\n  Enable_NLM = false;\\n  Enable_RQUOTA = false;\\n  Protocols\
               \ = 4;\\n  Bind_addr = 0.0.0.0;\\n  NFS_Port = 2049;\\n  Allow_Set_Io_Flusher_Fail\
-              \ = true;\\n}\\n\\nMDCACHE {\\n  Dir_Chunk = 0;\\n  Cache_FDs = false;\\\
-              n}\\n\\nNFS_KRB5 { Active_krb5 = false; }\\n\\nNFSv4 {\\n  Graceless\
-              \ = false;\\n  Delegations = false;\\n  Minor_Versions = 0, 1, 2;\\\
-              n  Allow_Numeric_Owners = true;\\n  Only_Numeric_Owners = true;\\n \
-              \ RecoveryBackend = \\\"rados_cluster\\\";\\n}\\n\\nEXPORT_DEFAULTS\
+              \ = true;\\n  Enable_malloc_trim = true;\\n}\\n\\nMDCACHE {\\n  Dir_Chunk\
+              \ = 0;\\n  Cache_FDs = false;\\n}\\n\\nNFS_KRB5 { Active_krb5 = false;\
+              \ }\\n\\nNFSv4 {\\n  Graceless = false;\\n  Delegations = false;\\n\
+              \  Minor_Versions = 0, 1, 2;\\n  Allow_Numeric_Owners = true;\\n  Only_Numeric_Owners\
+              \ = true;\\n  RecoveryBackend = \\\"rados_cluster\\\";\\n}\\n\\nEXPORT_DEFAULTS\
               \ {\\n  Attr_Expiration_Time = 0;\\n  Protocols = 4;\\n  Transports\
               \ = TCP;\\n  Access_Type = RW;\\n  Squash = All_Squash;\\n  Manage_Gids\
               \ = true;\\n  Anonymous_uid = 2002;\\n  Anonymous_gid = 2002;\\n  SecType\
