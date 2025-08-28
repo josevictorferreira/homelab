@@ -271,6 +271,7 @@ in
 
                 rados -p .nfs --namespace $NFSNS rm "conf-nfs.$CLUSTER" || true
                 rados -p .nfs --namespace $NFSNS put "conf-nfs.$CLUSTER"     /tmp/conf-nfs
+                rados -p .nfs --namespace $NFSNS get "conf-nfs.$CLUSTER"     /tmp/conf-nfs                || true
 
                 echo "--------------------------- CONTENTS -----------------------------"
                 cat /tmp/conf-nfs                || echo "(conf-nfs not found)"
