@@ -56,12 +56,6 @@ let
       namespace = "${nfsName}";
     }
 
-    RADOS_URLS {
-      ceph_conf = "/etc/ceph/ceph.conf";
-      userid = "nfs-ganesha.${nfsName}.${nodeId}";
-      watch_url = "rados://.nfs/${nfsName}/conf-nfs.${nfsName}";
-    }
-
     LOG {
       default_log_level = INFO;
       Components {
@@ -70,7 +64,6 @@ let
         NFS4 = DEBUG;
         EXPORT = DEBUG;
         DISPATCH = DEBUG;
-        RADOS = DEBUG;
       }
     }
 
@@ -238,6 +231,13 @@ in
                 printf '%s' "$EXPORT_JSON" > /tmp/export_final.json
 
                 ceph -c "$CEPH_CONFIG" nfs export apply "$CLUSTER" -i /tmp/export_final.json
+
+                USERID=$(ceph -c "$CEPH_CONFIG" nfs export get ${nfsName} /${nfsName} -f json | jq -r '.fsal.user_id')
+
+                ceph -c "$CEPH_CONFIG" auth caps "$USERID" \
+                  mon 'allow r' \
+                  mgr 'allow rw fsname=${cephfs}' \
+                  osd 'allow rw tag cephfs data=${cephfs}
 
                 rados -p .nfs --namespace $NFSNS get "conf-nfs.$CLUSTER"     /tmp/conf-nfs                || true
                 rados -p .nfs --namespace $NFSNS get "export-$EXPORT_ID"     /tmp/export-$$EXPORT_ID     || true
