@@ -264,10 +264,12 @@ in
 
                 echo "Uploading updated configs to RADOS..."
 
+                rados -p .nfs --namespace $NFSNS rm "export-0" || true
                 rados -p .nfs --namespace $NFSNS put "export-0"     /tmp/export_base.conf
 
                 echo "%url    \"rados://.nfs/$CLUSTER/export-0\"" >> /tmp/conf-nfs
 
+                rados -p .nfs --namespace $NFSNS rm "conf-nfs.$CLUSTER" || true
                 rados -p .nfs --namespace $NFSNS put "conf-nfs.$CLUSTER"     /tmp/conf-nfs
 
                 echo "--------------------------- CONTENTS -----------------------------"

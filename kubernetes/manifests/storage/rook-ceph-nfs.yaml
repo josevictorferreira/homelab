@@ -71,10 +71,11 @@ spec:
               \necho \"Base export config:\"\necho \"$BASE_EXPORT_CONF\"\nprintf '%s\\\
               n' \"$BASE_EXPORT_CONF\" > /tmp/export_base.conf\n\ncat /tmp/export_base.conf\n\
               \necho \"Uploading updated configs to RADOS...\"\n\nrados -p .nfs --namespace\
-              \ $NFSNS put \"export-0\"     /tmp/export_base.conf\n\necho \"%url \
-              \   \\\"rados://.nfs/$CLUSTER/export-0\\\"\" >> /tmp/conf-nfs\n\nrados\
-              \ -p .nfs --namespace $NFSNS put \"conf-nfs.$CLUSTER\"     /tmp/conf-nfs\n\
-              \necho \"--------------------------- CONTENTS -----------------------------\"\
+              \ $NFSNS rm \"export-0\" || true\nrados -p .nfs --namespace $NFSNS put\
+              \ \"export-0\"     /tmp/export_base.conf\n\necho \"%url    \\\"rados://.nfs/$CLUSTER/export-0\\\
+              \"\" >> /tmp/conf-nfs\n\nrados -p .nfs --namespace $NFSNS rm \"conf-nfs.$CLUSTER\"\
+              \ || true\nrados -p .nfs --namespace $NFSNS put \"conf-nfs.$CLUSTER\"\
+              \     /tmp/conf-nfs\n\necho \"--------------------------- CONTENTS -----------------------------\"\
               \ncat /tmp/conf-nfs                || echo \"(conf-nfs not found)\"\n\
               echo \"------------------------------------------------------------------\"\
               \ncat \"/tmp/export-$EXPORT_ID\"     || echo \"(export-$CLUSTER not\
