@@ -74,7 +74,7 @@ spec:
               n' \"$BASE_EXPORT_CONF\" > /tmp/export_base.conf\n\ncat /tmp/export_base.conf\n\
               \necho \"Uploading updated configs to RADOS...\"\n\nrados -p .nfs --namespace\
               \ $NFSNS rm \"export-0\" || true\nrados -p .nfs --namespace $NFSNS put\
-              \ \"export-0\"     /tmp/export_base.conf\n\necho \"%url    \\\"rados://.nfs/$CLUSTER/export-$EXPORT_ID\\\
+              \ \"export-0\"     /tmp/export_base.conf\n\nprintf \"%url    \\\"rados://.nfs/$CLUSTER/export-$EXPORT_ID\\\
               \" \\n%url    \\\"rados://.nfs/$CLUSTER/export-0\\\"\" >> /tmp/conf-nfs\n\
               \nrados -p .nfs --namespace $NFSNS rm \"conf-nfs.$CLUSTER\" || true\n\
               rados -p .nfs --namespace $NFSNS put \"conf-nfs.$CLUSTER\"     /tmp/conf-nfs\n\
