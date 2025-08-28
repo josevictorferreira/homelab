@@ -71,6 +71,8 @@ let
       Access_Type = RW;
       Squash = All_Squash;
       SecType = "sys";
+      Protocols = 4;
+      Transports = TCP;
       FSAL {
         Name = "CEPH";
         Filesystem = "${cephfs}";

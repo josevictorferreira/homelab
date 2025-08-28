@@ -138,22 +138,23 @@ spec:
               n  watch_url = \\\"rados://.nfs/homelab-nfs/conf-nfs.homelab-nfs\\\"\
               ;\\n}\\n\\nEXPORT {\\n  Export_Id = 0;\\n  Path = \\\"/\\\";\\n  Pseudo\
               \ = \\\"/\\\";\\n  Access_Type = RW;\\n  Squash = All_Squash;\\n  SecType\
-              \ = \\\"sys\\\";\\n  FSAL {\\n    Name = \\\"CEPH\\\";\\n    Filesystem\
-              \ = \\\"ceph-filesystem\\\";\\n    User_Id = nfs-ganesha.homelab-nfs.a;\\\
-              n  }\\n}\\n\\nLOG {\\n  Components {\\n    ALL = \\\"INFO\\\";\\n  \
-              \  CLIENT = \\\"DEBUG\\\";\\n    FSA = \\\"DEBUG\\\";\\n    NFSV4 =\
-              \ \\\"DEBUG\\\";\\n    RADOS = \\\"DEBUG\\\";\\n    RADOS_URLS = \\\"\
-              DEBUG\\\";\\n  }\\n}\\n\\n%url    \\\"rados://.nfs/homelab-nfs/conf-nfs.homelab-nfs\\\
-              \"\\n\\n\"}}'\n\necho \"Starting patch routine for node ID b...\"\n\
-              CM=\"\"\n\nfor i in {1..10}; do\n  if [ -n \"$CM\" ]; then break; fi\n\
-              \  echo \"Waiting for rook-ceph-nfs ConfigMap...\"\n  sleep 6\n  CM=\"\
-              $(kubectl -n rook-ceph get cm -l app=rook-ceph-nfs,instance=b -o name\
-              \ | grep -i rook-ceph | head -n1 || true)\"\ndone\n\n[ -z \"$CM\" ]\
-              \ && { echo \"ERROR: rook-ceph ganesha ConfigMap not found\"; exit 1;\
-              \ }\n\necho \"Patching $CM in rook-ceph...\"\n\nkubectl -n rook-ceph\
-              \ patch \"$CM\" --type merge -p '{\"data\":{\"config\":\"NFS_CORE_PARAM\
-              \ {\\n  Enable_NLM = false;\\n  Enable_RQUOTA = false;\\n  Protocols\
-              \ = 4;\\n  Bind_addr = 0.0.0.0;\\n  NFS_Port = 2049;\\n  Allow_Set_Io_Flusher_Fail\
+              \ = \\\"sys\\\";\\n  Protocols = 4;\\n  Transports = TCP;\\n  FSAL {\\\
+              n    Name = \\\"CEPH\\\";\\n    Filesystem = \\\"ceph-filesystem\\\"\
+              ;\\n    User_Id = nfs-ganesha.homelab-nfs.a;\\n  }\\n}\\n\\nLOG {\\\
+              n  Components {\\n    ALL = \\\"INFO\\\";\\n    CLIENT = \\\"DEBUG\\\
+              \";\\n    FSA = \\\"DEBUG\\\";\\n    NFSV4 = \\\"DEBUG\\\";\\n    RADOS\
+              \ = \\\"DEBUG\\\";\\n    RADOS_URLS = \\\"DEBUG\\\";\\n  }\\n}\\n\\\
+              n%url    \\\"rados://.nfs/homelab-nfs/conf-nfs.homelab-nfs\\\"\\n\\\
+              n\"}}'\n\necho \"Starting patch routine for node ID b...\"\nCM=\"\"\n\
+              \nfor i in {1..10}; do\n  if [ -n \"$CM\" ]; then break; fi\n  echo\
+              \ \"Waiting for rook-ceph-nfs ConfigMap...\"\n  sleep 6\n  CM=\"$(kubectl\
+              \ -n rook-ceph get cm -l app=rook-ceph-nfs,instance=b -o name | grep\
+              \ -i rook-ceph | head -n1 || true)\"\ndone\n\n[ -z \"$CM\" ] && { echo\
+              \ \"ERROR: rook-ceph ganesha ConfigMap not found\"; exit 1; }\n\necho\
+              \ \"Patching $CM in rook-ceph...\"\n\nkubectl -n rook-ceph patch \"\
+              $CM\" --type merge -p '{\"data\":{\"config\":\"NFS_CORE_PARAM {\\n \
+              \ Enable_NLM = false;\\n  Enable_RQUOTA = false;\\n  Protocols = 4;\\\
+              n  Bind_addr = 0.0.0.0;\\n  NFS_Port = 2049;\\n  Allow_Set_Io_Flusher_Fail\
               \ = true;\\n}\\n\\nMDCACHE {\\n  Dir_Chunk = 0;\\n  Cache_FDs = true;\\\
               n}\\n\\nNFS_KRB5 { Active_krb5 = false; }\\n\\nNFSv4 {\\n  Graceless\
               \ = false;\\n  Delegations = false;\\n  Minor_Versions = 0, 1, 2;\\\
@@ -171,17 +172,18 @@ spec:
               n  watch_url = \\\"rados://.nfs/homelab-nfs/conf-nfs.homelab-nfs\\\"\
               ;\\n}\\n\\nEXPORT {\\n  Export_Id = 0;\\n  Path = \\\"/\\\";\\n  Pseudo\
               \ = \\\"/\\\";\\n  Access_Type = RW;\\n  Squash = All_Squash;\\n  SecType\
-              \ = \\\"sys\\\";\\n  FSAL {\\n    Name = \\\"CEPH\\\";\\n    Filesystem\
-              \ = \\\"ceph-filesystem\\\";\\n    User_Id = nfs-ganesha.homelab-nfs.b;\\\
-              n  }\\n}\\n\\nLOG {\\n  Components {\\n    ALL = \\\"INFO\\\";\\n  \
-              \  CLIENT = \\\"DEBUG\\\";\\n    FSA = \\\"DEBUG\\\";\\n    NFSV4 =\
-              \ \\\"DEBUG\\\";\\n    RADOS = \\\"DEBUG\\\";\\n    RADOS_URLS = \\\"\
-              DEBUG\\\";\\n  }\\n}\\n\\n%url    \\\"rados://.nfs/homelab-nfs/conf-nfs.homelab-nfs\\\
-              \"\\n\\n\"}}'\n\n\n\necho \"Restarting deployment for node ID a...\"\
-              \nDEP=\"$(kubectl -n rook-ceph get deploy -l app=rook-ceph-nfs,instance=a\
-              \ -o name | grep -i rook-ceph | head -n1 || true)\"\n[ -z \"$DEP\" ]\
-              \ && { echo \"WARN: deployment not found; skipping restart\"; exit 0;\
-              \ }\nkubectl -n rook-ceph rollout restart \"$DEP\"\nkubectl -n rook-ceph\
+              \ = \\\"sys\\\";\\n  Protocols = 4;\\n  Transports = TCP;\\n  FSAL {\\\
+              n    Name = \\\"CEPH\\\";\\n    Filesystem = \\\"ceph-filesystem\\\"\
+              ;\\n    User_Id = nfs-ganesha.homelab-nfs.b;\\n  }\\n}\\n\\nLOG {\\\
+              n  Components {\\n    ALL = \\\"INFO\\\";\\n    CLIENT = \\\"DEBUG\\\
+              \";\\n    FSA = \\\"DEBUG\\\";\\n    NFSV4 = \\\"DEBUG\\\";\\n    RADOS\
+              \ = \\\"DEBUG\\\";\\n    RADOS_URLS = \\\"DEBUG\\\";\\n  }\\n}\\n\\\
+              n%url    \\\"rados://.nfs/homelab-nfs/conf-nfs.homelab-nfs\\\"\\n\\\
+              n\"}}'\n\n\n\necho \"Restarting deployment for node ID a...\"\nDEP=\"\
+              $(kubectl -n rook-ceph get deploy -l app=rook-ceph-nfs,instance=a -o\
+              \ name | grep -i rook-ceph | head -n1 || true)\"\n[ -z \"$DEP\" ] &&\
+              \ { echo \"WARN: deployment not found; skipping restart\"; exit 0; }\n\
+              kubectl -n rook-ceph rollout restart \"$DEP\"\nkubectl -n rook-ceph\
               \ rollout status  \"$DEP\"\n\necho \"Restarting deployment for node\
               \ ID b...\"\nDEP=\"$(kubectl -n rook-ceph get deploy -l app=rook-ceph-nfs,instance=b\
               \ -o name | grep -i rook-ceph | head -n1 || true)\"\n[ -z \"$DEP\" ]\
