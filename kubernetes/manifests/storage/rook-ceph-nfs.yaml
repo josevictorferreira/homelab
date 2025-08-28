@@ -49,34 +49,27 @@ spec:
               \ \\\n      --group_name \"$SUBVOL_GROUP\" --size 0 --uid 2002 --gid\
               \ 2002 --mode 2775\n  fi\n\n  SUBVOL_PATH=\"$(ceph -c \"$CEPH_CONFIG\"\
               \ fs subvolume getpath \"$FS\" \"$SUBVOL_NAME\" --group_name \"$SUBVOL_GROUP\"\
-              )\"\nfi\n\necho \"Subvolume path: $SUBVOL_PATH\"\n\nEXPORT_BASE_JSON='{\"\
+              )\"\nfi\n\necho \"Subvolume path: $SUBVOL_PATH\"\n\nEXPORT_JSON='{\"\
               access_type\":\"RW\",\"clients\":[{\"access_type\":\"RW\",\"addresses\"\
               :\"*\",\"protocol\":\"4\",\"sectype\":[\"sys\"],\"squash\":\"all_squash\"\
-              }],\"export_id\":0,\"fsal\":{\"fs_name\":\"ceph-filesystem\",\"name\"\
-              :\"CEPH\"},\"path\":\"__SUBVOL_PATH__\",\"pseudo\":\"/\",\"sectype\"\
-              :[\"sys\"],\"security_label\":false,\"squash\":\"all_squash\"}'\nEXPORT_BASE_JSON=\"\
-              $${EXPORT_BASE_JSON/__SUBVOL_PATH__/$SUBVOL_PATH}\"\nprintf '%s' \"\
-              $EXPORT_BASE_JSON\" > /tmp/export_base.json\n\nEXPORT_JSON='{\"access_type\"\
-              :\"RW\",\"clients\":[{\"access_type\":\"RW\",\"addresses\":\"*\",\"\
-              protocol\":\"4\",\"sectype\":[\"sys\"],\"squash\":\"all_squash\"}],\"\
-              export_id\":10,\"fsal\":{\"fs_name\":\"ceph-filesystem\",\"name\":\"\
-              CEPH\"},\"path\":\"__SUBVOL_PATH__\",\"pseudo\":\"/homelab-nfs\",\"\
-              security_label\":false,\"squash\":\"all_squash\"}'\nEXPORT_JSON=\"$${EXPORT_JSON/__SUBVOL_PATH__/$SUBVOL_PATH}\"\
-              \nprintf '%s' \"$EXPORT_JSON\" > /tmp/export_final.json\n\nceph -c \"\
-              $CEPH_CONFIG\" nfs export apply \"$CLUSTER\" -i /tmp/export_final.json\n\
-              \nrados -p .nfs --namespace $NFSNS get \"conf-nfs.$CLUSTER\"     /tmp/conf-nfs\
-              \                || true\nrados -p .nfs --namespace $NFSNS get \"export-$EXPORT_ID\"\
+              }],\"export_id\":10,\"fsal\":{\"fs_name\":\"ceph-filesystem\",\"name\"\
+              :\"CEPH\"},\"path\":\"__SUBVOL_PATH__\",\"pseudo\":\"/homelab-nfs\"\
+              ,\"security_label\":false,\"squash\":\"all_squash\"}'\nEXPORT_JSON=\"\
+              $${EXPORT_JSON/__SUBVOL_PATH__/$SUBVOL_PATH}\"\nprintf '%s' \"$EXPORT_JSON\"\
+              \ > /tmp/export_final.json\n\nceph -c \"$CEPH_CONFIG\" nfs export apply\
+              \ \"$CLUSTER\" -i /tmp/export_final.json\n\nrados -p .nfs --namespace\
+              \ $NFSNS get \"conf-nfs.$CLUSTER\"     /tmp/conf-nfs               \
+              \ || true\nrados -p .nfs --namespace $NFSNS get \"export-$EXPORT_ID\"\
               \     /tmp/export-$$EXPORT_ID     || true\n\necho \"---------------------------\
               \ CONTENTS -----------------------------\"\ncat /tmp/conf-nfs      \
               \          || echo \"(conf-nfs not found)\"\necho \"------------------------------------------------------------------\"\
               \ncat \"/tmp/export-$EXPORT_ID\"     || echo \"(export-$CLUSTER not\
-              \ found)\"\necho \"------------------------------------------------------------------\"\
-              \ncat \"/tmp/export-0\"     || echo \"(export-0 not found)\"\n\necho\
-              \ \"Restarting NFS Ganesha grace...\"\nfor SUFFIX in a b; do\n  ganesha-rados-grace\
-              \ --pool .nfs --ns \"$NFSNS\" add \"$${CLUSTER}.$${SUFFIX}\"   || true\n\
-              \  ganesha-rados-grace --pool .nfs --ns \"$NFSNS\" start \"$${CLUSTER}.$${SUFFIX}\"\
-              \ || true\ndone\n\necho \"Removing orchestrator backend...\"\nceph -c\
-              \ \"$CEPH_CONFIG\" orch set backend \"\" || true\n\necho \"DONE.\"\n"
+              \ found)\"\n\necho \"Restarting NFS Ganesha grace...\"\nfor SUFFIX in\
+              \ a b; do\n  ganesha-rados-grace --pool .nfs --ns \"$NFSNS\" add \"\
+              $${CLUSTER}.$${SUFFIX}\"   || true\n  ganesha-rados-grace --pool .nfs\
+              \ --ns \"$NFSNS\" start \"$${CLUSTER}.$${SUFFIX}\" || true\ndone\n\n\
+              echo \"Removing orchestrator backend...\"\nceph -c \"$CEPH_CONFIG\"\
+              \ orch set backend \"\" || true\n\necho \"DONE.\"\n"
           image: quay.io/ceph/ceph:v19
           name: apply
           volumeMounts:
@@ -143,10 +136,14 @@ spec:
               nCEPH { Ceph_Conf = \\\"/etc/ceph/ceph.conf\\\"; }\\n\\nRADOS_URLS {\\\
               n  ceph_conf = \\\"/etc/ceph/ceph.conf\\\";\\n  userid = nfs-ganesha.homelab-nfs.a;\\\
               n  watch_url = \\\"rados://.nfs/homelab-nfs/conf-nfs.homelab-nfs\\\"\
-              ;\\n}\\n\\nLOG {\\n  Components {\\n    ALL = \\\"INFO\\\";\\n    CLIENT\
-              \ = \\\"DEBUG\\\";\\n    FSA = \\\"DEBUG\\\";\\n    NFSV4 = \\\"DEBUG\\\
-              \";\\n    RADOS = \\\"DEBUG\\\";\\n    RADOS_URLS = \\\"DEBUG\\\";\\\
-              n  }\\n}\\n\\n%url    \\\"rados://.nfs/homelab-nfs/conf-nfs.homelab-nfs\\\
+              ;\\n}\\n\\nEXPORT {\\n  Export_Id = 0;\\n  Path = \\\"/\\\";\\n  Pseudo\
+              \ = \\\"/\\\";\\n  Access_Type = RW;\\n  Squash = All_Squash;\\n  SecType\
+              \ = \\\"sys\\\";\\n  FSAL {\\n    Name = \\\"CEPH\\\";\\n    Filesystem\
+              \ = \\\"ceph-filesystem\\\";\\n    User_Id = nfs-ganesha.homelab-nfs.a;\\\
+              n  }\\n}\\n\\nLOG {\\n  Components {\\n    ALL = \\\"INFO\\\";\\n  \
+              \  CLIENT = \\\"DEBUG\\\";\\n    FSA = \\\"DEBUG\\\";\\n    NFSV4 =\
+              \ \\\"DEBUG\\\";\\n    RADOS = \\\"DEBUG\\\";\\n    RADOS_URLS = \\\"\
+              DEBUG\\\";\\n  }\\n}\\n\\n%url    \\\"rados://.nfs/homelab-nfs/conf-nfs.homelab-nfs\\\
               \"\\n\\n\"}}'\n\necho \"Starting patch routine for node ID b...\"\n\
               CM=\"\"\n\nfor i in {1..10}; do\n  if [ -n \"$CM\" ]; then break; fi\n\
               \  echo \"Waiting for rook-ceph-nfs ConfigMap...\"\n  sleep 6\n  CM=\"\
@@ -172,10 +169,14 @@ spec:
               nCEPH { Ceph_Conf = \\\"/etc/ceph/ceph.conf\\\"; }\\n\\nRADOS_URLS {\\\
               n  ceph_conf = \\\"/etc/ceph/ceph.conf\\\";\\n  userid = nfs-ganesha.homelab-nfs.b;\\\
               n  watch_url = \\\"rados://.nfs/homelab-nfs/conf-nfs.homelab-nfs\\\"\
-              ;\\n}\\n\\nLOG {\\n  Components {\\n    ALL = \\\"INFO\\\";\\n    CLIENT\
-              \ = \\\"DEBUG\\\";\\n    FSA = \\\"DEBUG\\\";\\n    NFSV4 = \\\"DEBUG\\\
-              \";\\n    RADOS = \\\"DEBUG\\\";\\n    RADOS_URLS = \\\"DEBUG\\\";\\\
-              n  }\\n}\\n\\n%url    \\\"rados://.nfs/homelab-nfs/conf-nfs.homelab-nfs\\\
+              ;\\n}\\n\\nEXPORT {\\n  Export_Id = 0;\\n  Path = \\\"/\\\";\\n  Pseudo\
+              \ = \\\"/\\\";\\n  Access_Type = RW;\\n  Squash = All_Squash;\\n  SecType\
+              \ = \\\"sys\\\";\\n  FSAL {\\n    Name = \\\"CEPH\\\";\\n    Filesystem\
+              \ = \\\"ceph-filesystem\\\";\\n    User_Id = nfs-ganesha.homelab-nfs.b;\\\
+              n  }\\n}\\n\\nLOG {\\n  Components {\\n    ALL = \\\"INFO\\\";\\n  \
+              \  CLIENT = \\\"DEBUG\\\";\\n    FSA = \\\"DEBUG\\\";\\n    NFSV4 =\
+              \ \\\"DEBUG\\\";\\n    RADOS = \\\"DEBUG\\\";\\n    RADOS_URLS = \\\"\
+              DEBUG\\\";\\n  }\\n}\\n\\n%url    \\\"rados://.nfs/homelab-nfs/conf-nfs.homelab-nfs\\\
               \"\\n\\n\"}}'\n\n\n\necho \"Restarting deployment for node ID a...\"\
               \nDEP=\"$(kubectl -n rook-ceph get deploy -l app=rook-ceph-nfs,instance=a\
               \ -o name | grep -i rook-ceph | head -n1 || true)\"\n[ -z \"$DEP\" ]\
