@@ -109,7 +109,7 @@ in
               { key = "node-role.kubernetes.io/control-plane"; operator = "Exists"; effect = "NoSchedule"; }
             ];
           };
-          logLevel = "NIX_DEBUG";
+          logLevel = "NIV_DEBUG";
         };
       };
     };
