@@ -7,10 +7,6 @@ let
   nfsName = "homelab-nfs";
   pseudo = "/${nfsName}";
   cephfs = "ceph-filesystem";
-  allowedCIDRs = [
-    "10.10.10.0/24"
-    "10.0.0.0/24"
-  ];
   genGaneshaConfForNode = nodeId: ''
     NFS_CORE_PARAM {
       Enable_NLM = false;
