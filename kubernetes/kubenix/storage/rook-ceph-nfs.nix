@@ -237,7 +237,7 @@ in
                 echo "Setting final Auth Caps for NFS Ganesha user $CEPH_USER_ID"
                 ceph -c "$CEPH_CONFIG" auth caps "client.$CEPH_USER_ID" \
                   mon 'allow r' \
-                  mgr "allow rw fsname=$FS" \
+                  mds "allow rw fsname=$FS" \
                   osd "allow rw tag cephfs data=$FS"
 
                 rados -p .nfs --namespace $NFSNS get "conf-nfs.$CLUSTER"     /tmp/conf-nfs                || true
