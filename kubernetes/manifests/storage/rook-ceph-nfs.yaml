@@ -65,7 +65,7 @@ spec:
               \nCEPH_USER_ID=\"$(ceph -c $CEPH_CONFIG nfs export get $CLUSTER /homelab-nfs\
               \ -f json | jq -r '.fsal.user_id')\"\n\necho \"Setting final Auth Caps\
               \ for NFS Ganesha user $CEPH_USER_ID\"\nceph -c \"$CEPH_CONFIG\" auth\
-              \ caps \"client.$CEPH_USER_ID\" \\\n  mon 'allow r' \\\n  mgr \"allow\
+              \ caps \"client.$CEPH_USER_ID\" \\\n  mon 'allow r' \\\n  mds \"allow\
               \ rw fsname=$FS\" \\\n  osd \"allow rw tag cephfs data=$FS\"\n\nrados\
               \ -p .nfs --namespace $NFSNS get \"conf-nfs.$CLUSTER\"     /tmp/conf-nfs\
               \                || true\nrados -p .nfs --namespace $NFSNS get \"export-$EXPORT_ID\"\
