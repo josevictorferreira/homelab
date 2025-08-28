@@ -2,7 +2,7 @@
 
 let
   namespace = homelab.kubernetes.namespaces.storage;
-  replicaCount = 2;
+  replicaCount = 1;
   nodesIds = lib.lists.take replicaCount (builtins.genList (i: builtins.elemAt (lib.stringToCharacters "abcdefghijklmnopqrstuvwxyz") i) 26);
   nfsName = "homelab-nfs";
   pseudo = "/${nfsName}";
@@ -15,6 +15,7 @@ let
       Bind_addr = 0.0.0.0;
       NFS_Port = 2049;
       Allow_Set_Io_Flusher_Fail = true;
+      Enable_malloc_trim = true;
     }
 
     MDCACHE {
@@ -30,10 +31,7 @@ let
       Minor_Versions = 0, 1, 2;
       Allow_Numeric_Owners = true;
       Only_Numeric_Owners = true;
-      RecoveryBackend = "rados_cluster";
-      pnfs_mds = true;
-      pnfs_ds = true;
-      Lease_Lifetime = 60;
+      RecoveryBackend = "fs_ng";
     }
 
     EXPORT_DEFAULTS {
@@ -45,7 +43,7 @@ let
       Manage_Gids = true;
       Anonymous_uid = 2002;
       Anonymous_gid = 2002;
-      SecType = "sys";
+      SecType = sys;
     }
 
     RADOS_KV {
@@ -64,39 +62,7 @@ let
       watch_url = "rados://.nfs/${nfsName}/conf-nfs.${nfsName}";
     }
 
-    LOG {
-      Default_Log_Level = INFO;
-      Components {
-        ALL = "INFO";
-        CLIENT = "DEBUG";
-        FSA = "DEBUG";
-        NFSV4 = "DEBUG";
-        RADOS = "DEBUG";
-        RADOS_URLS = "DEBUG";
-      }
-    }
-
     %url    "rados://.nfs/${nfsName}/conf-nfs.${nfsName}"
-
-  '';
-  baseExportConf = ''
-    EXPORT {
-      Export_Id = 0;
-      Path = "/";
-      Pseudo = "/";
-      Access_Type = RW;
-      Squash = No_Root_Squash;
-      Protocols = 4;
-      Transports = TCP;
-      Attr_Expiration_Time = 0;
-      SecType = sys;
-      Security_Label = false;
-      FSAL {
-        Name = CEPH;
-        Filesystem = "${cephfs}";
-        User_Id = "nfs-ganesha.homelab-nfs.a";
-      }
-    }
   '';
   exportConf = {
     export_id = 10;
@@ -138,6 +104,7 @@ in
               { key = "node-role.kubernetes.io/control-plane"; operator = "Exists"; effect = "NoSchedule"; }
             ];
           };
+          logLevel = "NIV_WARN";
         };
       };
     };
@@ -248,33 +215,12 @@ in
                 EXPORT_JSON="$${EXPORT_JSON/__SUBVOL_PATH__/$SUBVOL_PATH}"
                 printf '%s' "$EXPORT_JSON" > /tmp/export_final.json
 
-                echo "" > /tmp/empty-conf-nfs
-
-                echo "Uploading empty conf to RADOS to reset any previous config..."
-
-                rados -p .nfs --namespace $NFSNS put "conf-nfs.$CLUSTER"     /tmp/empty-conf-nfs || true
-
                 ceph -c "$CEPH_CONFIG" nfs export apply "$CLUSTER" -i /tmp/export_final.json
 
                 rados -p .nfs --namespace $NFSNS get "conf-nfs.$CLUSTER"     /tmp/conf-nfs                || true
                 rados -p .nfs --namespace $NFSNS get "export-$EXPORT_ID"     /tmp/export-$$EXPORT_ID     || true
 
                 echo "Fetching user_id from export-$EXPORT_ID"
-
-                BASE_EXPORT_CONF='${baseExportConf}'
-                echo "$BASE_EXPORT_CONF"
-                printf '%s\n' "$BASE_EXPORT_CONF" > /tmp/export_base.conf
-
-                echo "Uploading updated configs to RADOS..."
-
-                rados -p .nfs --namespace $NFSNS rm "export-0" || true
-                rados -p .nfs --namespace $NFSNS put "export-0"     /tmp/export_base.conf
-
-                printf "%%url    \"rados://.nfs/$CLUSTER/export-0\"\n%%url    \"rados://.nfs/$CLUSTER/export-$EXPORT_ID\"\n" >> /tmp/conf-nfs
-
-                rados -p .nfs --namespace $NFSNS rm "conf-nfs.$CLUSTER" || true
-                rados -p .nfs --namespace $NFSNS put "conf-nfs.$CLUSTER"     /tmp/conf-nfs
-                rados -p .nfs --namespace $NFSNS get "conf-nfs.$CLUSTER"     /tmp/conf-nfs                || true
 
                 echo "--------------------------- CONTENTS -----------------------------"
                 cat /tmp/conf-nfs                || echo "(conf-nfs not found)"
