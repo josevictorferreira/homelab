@@ -237,7 +237,7 @@ in
                 ceph -c "$CEPH_CONFIG" auth caps "$USER_ID" \
                   mon 'allow r' \
                   mgr 'allow rw fsname=${cephfs}' \
-                  osd 'allow rw tag cephfs data=${cephfs}
+                  osd 'allow rw tag cephfs data=${cephfs}'
 
                 rados -p .nfs --namespace $NFSNS get "conf-nfs.$CLUSTER"     /tmp/conf-nfs                || true
                 rados -p .nfs --namespace $NFSNS get "export-$EXPORT_ID"     /tmp/export-$$EXPORT_ID     || true
