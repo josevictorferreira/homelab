@@ -41,6 +41,7 @@ let
     }
 
     NFSv4 {
+      Graceless = true;
       Delegations = false;
       RecoveryBackend = "rados_cluster";
       Minor_Versions = 0, 1, 2;
@@ -69,8 +70,8 @@ let
       Components {
         ALL = INFO;
         FSAL = INFO;
-        NFS4 = INFO;
-        EXPORT = INFO;
+        NFS4 = FULL_DEBUG;
+        EXPORT = FULL_DEBUG;
         DISPATCH = INFO;
         RADOS = INFO;
       }
