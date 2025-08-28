@@ -15,7 +15,6 @@ let
       Bind_addr = 0.0.0.0;
       NFS_Port = 2049;
       Allow_Set_Io_Flusher_Fail = true;
-      Enable_malloc_trim = true;
     }
 
     MDCACHE {
@@ -65,6 +64,28 @@ let
     %url    "rados://.nfs/${nfsName}/conf-nfs.${nfsName}"
 
   '';
+  exportBaseConf = {
+    export_id = 0;
+    path = "__SUBVOL_PATH__";
+    pseudo = "/";
+    security_label = false;
+    access_type = "RW";
+    sectype = [ "sys" ];
+    squash = "all_squash";
+    fsal = {
+      name = "CEPH";
+      fs_name = cephfs;
+    };
+    clients = [
+      {
+        addresses = "*";
+        protocol = "4";
+        access_type = "RW";
+        squash = "all_squash";
+        sectype = [ "sys" ];
+      }
+    ];
+  };
   exportConf = {
     export_id = 10;
     path = "__SUBVOL_PATH__";
@@ -212,19 +233,27 @@ in
 
                 echo "Subvolume path: $SUBVOL_PATH"
 
+                EXPORT_BASE_JSON='${builtins.toJSON exportBaseConf}'
+                EXPORT_BASE_JSON="$${EXPORT_BASE_JSON/__SUBVOL_PATH__/$SUBVOL_PATH}"
+                printf '%s' "$EXPORT_BASE_JSON" > /tmp/export_base.json
+
                 EXPORT_JSON='${builtins.toJSON exportConf}'
                 EXPORT_JSON="$${EXPORT_JSON/__SUBVOL_PATH__/$SUBVOL_PATH}"
                 printf '%s' "$EXPORT_JSON" > /tmp/export_final.json
 
+                ceph -c "$CEPH_CONFIG" nfs export apply "$CLUSTER" -i /tmp/export_base.json || true
                 ceph -c "$CEPH_CONFIG" nfs export apply "$CLUSTER" -i /tmp/export_final.json
 
                 rados -p .nfs --namespace $NFSNS get "conf-nfs.$CLUSTER"     /tmp/conf-nfs                || true
                 rados -p .nfs --namespace $NFSNS get "export-$EXPORT_ID"     /tmp/export-$$EXPORT_ID     || true
+                rados -p .nfs --namespace $NFSNS get "export-0"              /tmp/export-0              || true
 
                 echo "--------------------------- CONTENTS -----------------------------"
                 cat /tmp/conf-nfs                || echo "(conf-nfs not found)"
                 echo "------------------------------------------------------------------"
                 cat "/tmp/export-$EXPORT_ID"     || echo "(export-$CLUSTER not found)"
+                echo "------------------------------------------------------------------"
+                cat "/tmp/export-0"     || echo "(export-0 not found)"
 
                 echo "Restarting NFS Ganesha grace..."
                 for SUFFIX in ${builtins.concatStringsSep " " nodesIds}; do
