@@ -64,23 +64,8 @@ let
       watch_url = "rados://.nfs/${nfsName}/conf-nfs.${nfsName}";
     }
 
-    EXPORT {
-      Export_Id = 0;
-      Path = "/";
-      Pseudo = "/";
-      Access_Type = RW;
-      Squash = All_Squash;
-      SecType = "sys";
-      Protocols = 4;
-      Transports = TCP;
-      FSAL {
-        Name = "CEPH";
-        Filesystem = "${cephfs}";
-        User_Id = nfs-ganesha.${nfsName}.${nodeId};
-      }
-    }
-
     LOG {
+      Default_Log_Level = INFO;
       Components {
         ALL = "INFO";
         CLIENT = "DEBUG";
