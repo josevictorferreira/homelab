@@ -16,7 +16,8 @@ let
       Enable_NLM = false;
       Enable_RQUOTA = false;
       Protocols = 4;
-      allow_set_io_flusher_fail = true;
+      Allow_Set_Io_Flusher_Fail = true;
+      Enable_malloc_trim = true;
     }
 
     MDCACHE {
@@ -67,8 +68,8 @@ let
       default_log_level = INFO;
       Components {
         ALL = INFO;
-        FSAL = DEBUG;
-        NFS4 = EVENT;
+        FSAL = INFO;
+        NFS4 = INFO;
         EXPORT = INFO;
         DISPATCH = INFO;
         RADOS = INFO;
