@@ -232,7 +232,7 @@ in
 
                 ceph -c "$CEPH_CONFIG" nfs export apply "$CLUSTER" -i /tmp/export_final.json
 
-                CEPH_USER_ID=$(ceph -c "$CEPH_CONFIG" nfs export get ${nfsName} /${pseudo} -f json | jq -r '.fsal.user_id')
+                CEPH_USER_ID=$(ceph -c "$CEPH_CONFIG" nfs export get "$CLUSTER" ${pseudo} -f json | jq -r '.fsal.user_id')
 
                 echo "Setting final Auth Caps for NFS Ganesha user $CEPH_USER_ID"
                 ceph -c "$CEPH_CONFIG" auth caps "$CEPH_USER_ID" \
