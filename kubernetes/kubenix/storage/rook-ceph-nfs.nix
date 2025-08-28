@@ -30,12 +30,12 @@ let
     NFS_KRB5 { Active_krb5 = false; }
 
     NFSv4 {
-      Graceless = true;
+      Graceless = false;
       Delegations = false;
       Minor_Versions = 0, 1, 2;
       Allow_Numeric_Owners = true;
       Only_Numeric_Owners = true;
-      RecoveryBackend = "rados_cluster";
+      RecoveryBackend = "rados_ng";
     }
 
     EXPORT_DEFAULTS {

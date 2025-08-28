@@ -123,8 +123,8 @@ spec:
               \ = 2049;\\n  Allow_Set_Io_Flusher_Fail = true;\\n  Enable_malloc_trim\
               \ = true;\\n}\\n\\nMDCACHE {\\n  Dir_Chunk = 0;\\n  Cache_FDs = false;\\\
               n}\\n\\nNFS_KRB5 { Active_krb5 = false; }\\n\\nNFSv4 {\\n  Graceless\
-              \ = true;\\n  Delegations = false;\\n  Minor_Versions = 0, 1, 2;\\n\
-              \  Allow_Numeric_Owners = true;\\n  Only_Numeric_Owners = true;\\n \
+              \ = false;\\n  Delegations = false;\\n  Minor_Versions = 0, 1, 2;\\\
+              n  Allow_Numeric_Owners = true;\\n  Only_Numeric_Owners = true;\\n \
               \ RecoveryBackend = \\\"rados_cluster\\\";\\n}\\n\\nEXPORT_DEFAULTS\
               \ {\\n  Attr_Expiration_Time = 0;\\n  Protocols = 4;\\n  Transports\
               \ = TCP;\\n  Access_Type = RW;\\n  Squash = All_Squash;\\n  Manage_Gids\
