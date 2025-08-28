@@ -30,16 +30,17 @@ spec:
               key = $ceph_secret\nEOF\n\nceph -c \"$CEPH_CONFIG\" mgr module enable\
               \ nfs || true\nceph -c \"$CEPH_CONFIG\" mgr module enable rook || true\n\
               ceph -c \"$CEPH_CONFIG\" orch set backend rook || true\n\necho \"Updating\
-              \ RADOS pool $RADOS_POOL Auth Caps\"\nfor SUFFIX in a; do\n  ID=\"client.nfs-ganesha.$${CLUSTER}.$${SUFFIX}\"\
-              \n  echo \"Creating ID $ID\"\n  ceph -c \"$CEPH_CONFIG\" auth get-or-create\
-              \ \"$ID\" \\\n    mon 'allow r' \\\n    mgr 'allow rw' \\\n    osd \"\
-              allow rw pool=$${RADOS_POOL} namespace=$${NFSNS}\" >/dev/null || true\n\
-              done\n\nif ! SUBVOL_PATH=\"$(\n  ceph -c \"$CEPH_CONFIG\" fs subvolume\
-              \ getpath \"$FS\" \"$SUBVOL_NAME\" --group_name \"$SUBVOL_GROUP\" 2>/dev/null\n\
-              )\"; then\n  echo \"Creating subvolume group and subvolume...\"\n  if\
-              \ ! ceph -c \"$CEPH_CONFIG\" fs subvolumegroup ls \"$FS\" -f json 2>/dev/null\
-              \ \\\n      | grep -q \"\\\"name\\\"[[:space:]]*:[[:space:]]*\\\"$SUBVOL_GROUP\\\
-              \"\"; then\n    echo \"Creating subvolume group $SUBVOL_GROUP in filesystem\
+              \ RADOS pool $RADOS_POOL Auth Caps\"\nfor SUFFIX in a b c; do\n  ID=\"\
+              client.nfs-ganesha.$${CLUSTER}.$${SUFFIX}\"\n  echo \"Creating ID $ID\"\
+              \n  ceph -c \"$CEPH_CONFIG\" auth get-or-create \"$ID\" \\\n    mon\
+              \ 'allow r' \\\n    mgr 'allow rw' \\\n    osd \"allow rw pool=$${RADOS_POOL}\
+              \ namespace=$${NFSNS}\" >/dev/null || true\ndone\n\nif ! SUBVOL_PATH=\"\
+              $(\n  ceph -c \"$CEPH_CONFIG\" fs subvolume getpath \"$FS\" \"$SUBVOL_NAME\"\
+              \ --group_name \"$SUBVOL_GROUP\" 2>/dev/null\n)\"; then\n  echo \"Creating\
+              \ subvolume group and subvolume...\"\n  if ! ceph -c \"$CEPH_CONFIG\"\
+              \ fs subvolumegroup ls \"$FS\" -f json 2>/dev/null \\\n      | grep\
+              \ -q \"\\\"name\\\"[[:space:]]*:[[:space:]]*\\\"$SUBVOL_GROUP\\\"\"\
+              ; then\n    echo \"Creating subvolume group $SUBVOL_GROUP in filesystem\
               \ $FS\"\n    ceph -c \"$CEPH_CONFIG\" fs subvolumegroup create \"$FS\"\
               \ \"$SUBVOL_GROUP\"\n  fi\n\n  if ! ceph -c \"$CEPH_CONFIG\" fs subvolume\
               \ info \"$FS\" \"$SUBVOL_NAME\" --group_name \"$SUBVOL_GROUP\" >/dev/null\
@@ -64,11 +65,11 @@ spec:
               \          || echo \"(conf-nfs not found)\"\necho \"------------------------------------------------------------------\"\
               \ncat \"/tmp/export-$EXPORT_ID\"     || echo \"(export-$CLUSTER not\
               \ found)\"\n\necho \"Restarting NFS Ganesha grace...\"\nfor SUFFIX in\
-              \ a; do\n  ganesha-rados-grace --pool .nfs --ns \"$NFSNS\" add \"$${CLUSTER}.$${SUFFIX}\"\
-              \   || true\n  ganesha-rados-grace --pool .nfs --ns \"$NFSNS\" start\
-              \ \"$${CLUSTER}.$${SUFFIX}\" || true\ndone\n\necho \"Removing orchestrator\
-              \ backend...\"\nceph -c \"$CEPH_CONFIG\" orch set backend \"\" || true\n\
-              \necho \"DONE.\"\n"
+              \ a b c; do\n  ganesha-rados-grace --pool .nfs --ns \"$NFSNS\" add \"\
+              $${CLUSTER}.$${SUFFIX}\"   || true\n  ganesha-rados-grace --pool .nfs\
+              \ --ns \"$NFSNS\" start \"$${CLUSTER}.$${SUFFIX}\" || true\ndone\n\n\
+              echo \"Removing orchestrator backend...\"\nceph -c \"$CEPH_CONFIG\"\
+              \ orch set backend \"\" || true\n\necho \"DONE.\"\n"
           image: quay.io/ceph/ceph:v19
           name: apply
           volumeMounts:
@@ -135,8 +136,68 @@ spec:
               n  ceph_conf = \\\"/etc/ceph/ceph.conf\\\";\\n  userid = nfs-ganesha.homelab-nfs.a;\\\
               n  watch_url = \\\"rados://.nfs/homelab-nfs/conf-nfs.homelab-nfs\\\"\
               ;\\n}\\n\\n%url    \\\"rados://.nfs/homelab-nfs/conf-nfs.homelab-nfs\\\
+              \"\\n\\n\"}}'\n\necho \"Starting patch routine for node ID b...\"\n\
+              CM=\"\"\n\nfor i in {1..10}; do\n  if [ -n \"$CM\" ]; then break; fi\n\
+              \  echo \"Waiting for rook-ceph-nfs ConfigMap...\"\n  sleep 6\n  CM=\"\
+              $(kubectl -n rook-ceph get cm -l app=rook-ceph-nfs,instance=b -o name\
+              \ | grep -i rook-ceph | head -n1 || true)\"\ndone\n\n[ -z \"$CM\" ]\
+              \ && { echo \"ERROR: rook-ceph ganesha ConfigMap not found\"; exit 1;\
+              \ }\n\necho \"Patching $CM in rook-ceph...\"\n\nkubectl -n rook-ceph\
+              \ patch \"$CM\" --type merge -p '{\"data\":{\"config\":\"NFS_CORE_PARAM\
+              \ {\\n  Enable_NLM = false;\\n  Enable_RQUOTA = false;\\n  Protocols\
+              \ = 4;\\n  Bind_addr = 0.0.0.0;\\n  NFS_Port = 2049;\\n  Allow_Set_Io_Flusher_Fail\
+              \ = true;\\n}\\n\\nMDCACHE {\\n  Dir_Chunk = 0;\\n  Cache_FDs = false;\\\
+              n}\\n\\nNFS_KRB5 { Active_krb5 = false; }\\n\\nNFSv4 {\\n  Graceless\
+              \ = false;\\n  Delegations = false;\\n  Minor_Versions = 0, 1, 2;\\\
+              n  Allow_Numeric_Owners = true;\\n  Only_Numeric_Owners = true;\\n \
+              \ RecoveryBackend = \\\"rados_cluster\\\";\\n}\\n\\nEXPORT_DEFAULTS\
+              \ {\\n  Attr_Expiration_Time = 0;\\n  Protocols = 4;\\n  Transports\
+              \ = TCP;\\n  Access_Type = RW;\\n  Squash = All_Squash;\\n  Manage_Gids\
+              \ = true;\\n  Anonymous_uid = 2002;\\n  Anonymous_gid = 2002;\\n  SecType\
+              \ = \\\"sys\\\";\\n}\\n\\nRADOS_KV {\\n  ceph_conf = \\\"/etc/ceph/ceph.conf\\\
+              \";\\n  userid = nfs-ganesha.homelab-nfs.b;\\n  nodeid = homelab-nfs.b;\\\
+              n  pool = \\\".nfs\\\";\\n  namespace = \\\"homelab-nfs\\\";\\n}\\n\\\
+              nCEPH { Ceph_Conf = \\\"/etc/ceph/ceph.conf\\\"; }\\n\\nRADOS_URLS {\\\
+              n  ceph_conf = \\\"/etc/ceph/ceph.conf\\\";\\n  userid = nfs-ganesha.homelab-nfs.b;\\\
+              n  watch_url = \\\"rados://.nfs/homelab-nfs/conf-nfs.homelab-nfs\\\"\
+              ;\\n}\\n\\n%url    \\\"rados://.nfs/homelab-nfs/conf-nfs.homelab-nfs\\\
+              \"\\n\\n\"}}'\n\necho \"Starting patch routine for node ID c...\"\n\
+              CM=\"\"\n\nfor i in {1..10}; do\n  if [ -n \"$CM\" ]; then break; fi\n\
+              \  echo \"Waiting for rook-ceph-nfs ConfigMap...\"\n  sleep 6\n  CM=\"\
+              $(kubectl -n rook-ceph get cm -l app=rook-ceph-nfs,instance=c -o name\
+              \ | grep -i rook-ceph | head -n1 || true)\"\ndone\n\n[ -z \"$CM\" ]\
+              \ && { echo \"ERROR: rook-ceph ganesha ConfigMap not found\"; exit 1;\
+              \ }\n\necho \"Patching $CM in rook-ceph...\"\n\nkubectl -n rook-ceph\
+              \ patch \"$CM\" --type merge -p '{\"data\":{\"config\":\"NFS_CORE_PARAM\
+              \ {\\n  Enable_NLM = false;\\n  Enable_RQUOTA = false;\\n  Protocols\
+              \ = 4;\\n  Bind_addr = 0.0.0.0;\\n  NFS_Port = 2049;\\n  Allow_Set_Io_Flusher_Fail\
+              \ = true;\\n}\\n\\nMDCACHE {\\n  Dir_Chunk = 0;\\n  Cache_FDs = false;\\\
+              n}\\n\\nNFS_KRB5 { Active_krb5 = false; }\\n\\nNFSv4 {\\n  Graceless\
+              \ = false;\\n  Delegations = false;\\n  Minor_Versions = 0, 1, 2;\\\
+              n  Allow_Numeric_Owners = true;\\n  Only_Numeric_Owners = true;\\n \
+              \ RecoveryBackend = \\\"rados_cluster\\\";\\n}\\n\\nEXPORT_DEFAULTS\
+              \ {\\n  Attr_Expiration_Time = 0;\\n  Protocols = 4;\\n  Transports\
+              \ = TCP;\\n  Access_Type = RW;\\n  Squash = All_Squash;\\n  Manage_Gids\
+              \ = true;\\n  Anonymous_uid = 2002;\\n  Anonymous_gid = 2002;\\n  SecType\
+              \ = \\\"sys\\\";\\n}\\n\\nRADOS_KV {\\n  ceph_conf = \\\"/etc/ceph/ceph.conf\\\
+              \";\\n  userid = nfs-ganesha.homelab-nfs.c;\\n  nodeid = homelab-nfs.c;\\\
+              n  pool = \\\".nfs\\\";\\n  namespace = \\\"homelab-nfs\\\";\\n}\\n\\\
+              nCEPH { Ceph_Conf = \\\"/etc/ceph/ceph.conf\\\"; }\\n\\nRADOS_URLS {\\\
+              n  ceph_conf = \\\"/etc/ceph/ceph.conf\\\";\\n  userid = nfs-ganesha.homelab-nfs.c;\\\
+              n  watch_url = \\\"rados://.nfs/homelab-nfs/conf-nfs.homelab-nfs\\\"\
+              ;\\n}\\n\\n%url    \\\"rados://.nfs/homelab-nfs/conf-nfs.homelab-nfs\\\
               \"\\n\\n\"}}'\n\n\n\necho \"Restarting deployment for node ID a...\"\
               \nDEP=\"$(kubectl -n rook-ceph get deploy -l app=rook-ceph-nfs,instance=a\
+              \ -o name | grep -i rook-ceph | head -n1 || true)\"\n[ -z \"$DEP\" ]\
+              \ && { echo \"WARN: deployment not found; skipping restart\"; exit 0;\
+              \ }\nkubectl -n rook-ceph rollout restart \"$DEP\"\nkubectl -n rook-ceph\
+              \ rollout status  \"$DEP\"\n\necho \"Restarting deployment for node\
+              \ ID b...\"\nDEP=\"$(kubectl -n rook-ceph get deploy -l app=rook-ceph-nfs,instance=b\
+              \ -o name | grep -i rook-ceph | head -n1 || true)\"\n[ -z \"$DEP\" ]\
+              \ && { echo \"WARN: deployment not found; skipping restart\"; exit 0;\
+              \ }\nkubectl -n rook-ceph rollout restart \"$DEP\"\nkubectl -n rook-ceph\
+              \ rollout status  \"$DEP\"\n\necho \"Restarting deployment for node\
+              \ ID c...\"\nDEP=\"$(kubectl -n rook-ceph get deploy -l app=rook-ceph-nfs,instance=c\
               \ -o name | grep -i rook-ceph | head -n1 || true)\"\n[ -z \"$DEP\" ]\
               \ && { echo \"WARN: deployment not found; skipping restart\"; exit 0;\
               \ }\nkubectl -n rook-ceph rollout restart \"$DEP\"\nkubectl -n rook-ceph\
@@ -160,7 +221,7 @@ metadata:
   namespace: rook-ceph
 spec:
   server:
-    active: 1
+    active: 3
     logLevel: NIV_WARN
     placement:
       tolerations:
