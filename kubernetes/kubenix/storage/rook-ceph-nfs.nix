@@ -2,7 +2,7 @@
 
 let
   namespace = homelab.kubernetes.namespaces.storage;
-  replicaCount = 3;
+  replicaCount = 2;
   nodesIds = lib.lists.take replicaCount (builtins.genList (i: builtins.elemAt (lib.stringToCharacters "abcdefghijklmnopqrstuvwxyz") i) 26);
   nfsName = "homelab-nfs";
   pseudo = "/${nfsName}";
@@ -74,8 +74,6 @@ let
     fsal = {
       name = "CEPH";
       fs_name = cephfs;
-      client_mount_timeout = 30;
-      client_reconnect_timeout = 15;
     };
     clients = [
       {
@@ -99,7 +97,7 @@ in
           active = replicaCount;
           resources = {
             requests = { cpu = "50m"; memory = "64Mi"; };
-            limits = { memory = "2Gi"; };
+            limits = { memory = "1Gi"; };
           };
           placement = {
             tolerations = [
@@ -113,7 +111,7 @@ in
 
     services.${nfsName} = {
       metadata = {
-        annotations = kubenix.lib.serviceIpFor nfsName;
+        annotations = kubenix.lib.serviceIpFor "nfs";
         namespace = namespace;
       };
       spec = {
