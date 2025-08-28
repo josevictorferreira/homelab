@@ -31,7 +31,7 @@ let
       Minor_Versions = 0, 1, 2;
       Allow_Numeric_Owners = true;
       Only_Numeric_Owners = true;
-      RecoveryBackend = "fs_ng";
+      RecoveryBackend = "rados_cluster";
     }
 
     EXPORT_DEFAULTS {
