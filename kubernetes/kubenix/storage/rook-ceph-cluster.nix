@@ -49,10 +49,26 @@ in
               cluster = "k8s-cluster";
             };
           };
-          placement.all = {
-            tolerations = [
-              { key = "node-role.kubernetes.io/control-plane"; operator = "Exists"; effect = "NoSchedule"; }
-            ];
+          placement = {
+            all = {
+              tolerations = [
+                { key = "node-role.kubernetes.io/control-plane"; operator = "Exists"; effect = "NoSchedule"; }
+              ];
+            };
+
+            mon = {
+              nodeAffinity = {
+                requiredDuringSchedulingIgnoredDuringExecution = {
+                  nodeSelectorTerms = [
+                    {
+                      matchExpressions = [
+                        { key = "node-role.kubernetes.io/control-plane"; operator = "In"; values = [ "true" ]; }
+                      ];
+                    }
+                  ];
+                };
+              };
+            };
           };
           resources = {
             mgr = {
