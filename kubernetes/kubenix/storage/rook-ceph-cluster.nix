@@ -50,11 +50,11 @@ in
             };
           };
           placement = {
-            all = {
-              tolerations = [
-                { key = "node-role.kubernetes.io/control-plane"; operator = "Exists"; effect = "NoSchedule"; }
-              ];
-            };
+            # all = {
+            #   tolerations = [
+            #     { key = "node-role.kubernetes.io/control-plane"; operator = "Exists"; effect = "NoSchedule"; }
+            #   ];
+            # };
 
             mon = {
               nodeAffinity = {
