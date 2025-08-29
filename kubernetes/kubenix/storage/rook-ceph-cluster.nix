@@ -38,9 +38,17 @@ in
         };
         cephClusterSpec = {
           mon.count = 3;
-          mon.allowMultiplePerNode = true;
+          mon.allowMultiplePerNode = false;
           dashboard.enabled = true;
           dashboard.ssl = false;
+          network = {
+            hostNetwork = false;
+            provider = "host";
+            selectors = {
+              public = "k8s-public";
+              cluster = "k8s-cluster";
+            };
+          };
           placement.all = {
             tolerations = [
               { key = "node-role.kubernetes.io/control-plane"; operator = "Exists"; effect = "NoSchedule"; }

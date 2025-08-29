@@ -78,6 +78,7 @@ spec:
             - mountPath: /var/lib/rook-ceph-mon
               name: ceph-admin-secret
       dnsPolicy: ClusterFirstWithHostNet
+      hostNetwork: true
       serviceAccountName: rook-ceph-default
       tolerations:
         - effect: NoExecute
@@ -169,7 +170,7 @@ spec:
     allowMultiplePerNode: false
     count: 2
   mon:
-    allowMultiplePerNode: true
+    allowMultiplePerNode: false
     count: 3
   monitoring:
     enabled: false
@@ -180,6 +181,11 @@ spec:
       encryption:
         enabled: false
       requireMsgr2: false
+    hostNetwork: false
+    provider: host
+    selectors:
+      cluster: k8s-cluster
+      public: k8s-public
   placement:
     all:
       tolerations:
