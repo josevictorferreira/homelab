@@ -187,11 +187,6 @@ spec:
       cluster: k8s-cluster
       public: k8s-public
   placement:
-    all:
-      tolerations:
-        - effect: NoSchedule
-          key: node-role.kubernetes.io/control-plane
-          operator: Exists
     mon:
       nodeAffinity:
         requiredDuringSchedulingIgnoredDuringExecution:
