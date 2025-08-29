@@ -46,6 +46,7 @@ let
       Manage_Gids = true;
       Anonymous_uid = 2002;
       Anonymous_gid = 2002;
+      Disable_ACL = true;
       SecType = sys;
     }
 
