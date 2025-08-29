@@ -130,13 +130,14 @@ spec:
               \ pnfs_ds = true;\\n}\\n\\nEXPORT_DEFAULTS {\\n  Attr_Expiration_Time\
               \ = 0;\\n  Protocols = 4;\\n  Transports = TCP;\\n  Access_Type = RW;\\\
               n  Squash = All_Squash;\\n  Manage_Gids = true;\\n  Anonymous_uid =\
-              \ 2002;\\n  Anonymous_gid = 2002;\\n  SecType = sys;\\n}\\n\\nRADOS_KV\
-              \ {\\n  ceph_conf = \\\"/etc/ceph/ceph.conf\\\";\\n  userid = nfs-ganesha.homelab-nfs.a;\\\
-              n  nodeid = homelab-nfs.a;\\n  pool = \\\".nfs\\\";\\n  namespace =\
-              \ \\\"homelab-nfs\\\";\\n}\\n\\nCEPH { Ceph_Conf = \\\"/etc/ceph/ceph.conf\\\
-              \"; }\\n\\nRADOS_URLS {\\n  ceph_conf = \\\"/etc/ceph/ceph.conf\\\"\
-              ;\\n  userid = nfs-ganesha.homelab-nfs.a;\\n  watch_url = \\\"rados://.nfs/homelab-nfs/conf-nfs.homelab-nfs\\\
-              \";\\n}\\n\\n%url    \\\"rados://.nfs/homelab-nfs/conf-nfs.homelab-nfs\\\
+              \ 2002;\\n  Anonymous_gid = 2002;\\n  Disable_ACL = true;\\n  SecType\
+              \ = sys;\\n}\\n\\nRADOS_KV {\\n  ceph_conf = \\\"/etc/ceph/ceph.conf\\\
+              \";\\n  userid = nfs-ganesha.homelab-nfs.a;\\n  nodeid = homelab-nfs.a;\\\
+              n  pool = \\\".nfs\\\";\\n  namespace = \\\"homelab-nfs\\\";\\n}\\n\\\
+              nCEPH { Ceph_Conf = \\\"/etc/ceph/ceph.conf\\\"; }\\n\\nRADOS_URLS {\\\
+              n  ceph_conf = \\\"/etc/ceph/ceph.conf\\\";\\n  userid = nfs-ganesha.homelab-nfs.a;\\\
+              n  watch_url = \\\"rados://.nfs/homelab-nfs/conf-nfs.homelab-nfs\\\"\
+              ;\\n}\\n\\n%url    \\\"rados://.nfs/homelab-nfs/conf-nfs.homelab-nfs\\\
               \"\\n\"}}'\n\n\n\necho \"Restarting deployment for node ID a...\"\n\
               DEP=\"$(kubectl -n rook-ceph get deploy -l app=rook-ceph-nfs,instance=a\
               \ -o name | grep -i rook-ceph | head -n1 || true)\"\n[ -z \"$DEP\" ]\
