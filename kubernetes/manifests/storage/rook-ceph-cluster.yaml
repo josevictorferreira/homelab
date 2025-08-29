@@ -180,14 +180,10 @@ spec:
         enabled: false
       encryption:
         enabled: false
-      requireMsgr2: false
-    hostNetwork: false
+      requireMsgr2: true
     provider: host
-    selectors:
-      cluster: k8s-cluster
-      public: k8s-public
   placement:
-    mon:
+    all:
       nodeAffinity:
         requiredDuringSchedulingIgnoredDuringExecution:
           nodeSelectorTerms:

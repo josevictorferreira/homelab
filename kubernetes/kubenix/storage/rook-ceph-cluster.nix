@@ -14,6 +14,8 @@ let
         attrs.disks;
     })
     storageNodes;
+  monitorGroupName = "k8s-control-plane"; # Name of the node group to run monitors on
+  monitorHostNames = homelab.nodes.group.${monitorGroupName}.names;
 in
 {
   kubernetes = {
@@ -37,20 +39,16 @@ in
           };
         };
         cephClusterSpec = {
-          mon.count = 3;
+          mon.count = builtins.length monitorHostNames;
           mon.allowMultiplePerNode = false;
           dashboard.enabled = true;
           dashboard.ssl = false;
           network = {
-            hostNetwork = false;
             provider = "host";
-            selectors = {
-              public = "k8s-public";
-              cluster = "k8s-cluster";
-            };
+            connections.requireMsgr2 = true;
           };
           placement = {
-            mon = {
+            all = {
               tolerations = [
                 { key = "node-role.kubernetes.io/control-plane"; operator = "Exists"; effect = "NoSchedule"; }
               ];
@@ -59,7 +57,11 @@ in
                   nodeSelectorTerms = [
                     {
                       matchExpressions = [
-                        { key = "node-group"; operator = "In"; values = [ "control-plane" ]; }
+                        {
+                          key = "node-group";
+                          operator = "In";
+                          values = [ "control-plane" ];
+                        }
                       ];
                     }
                   ];
