@@ -192,8 +192,14 @@ spec:
         requiredDuringSchedulingIgnoredDuringExecution:
           nodeSelectorTerms:
             - matchExpressions:
-                - key: node-role.kubernetes.io/control-plane
-                  operator: Exists
+                - key: node-group
+                  operator: In
+                  values:
+                    - control-plane
+      tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+          operator: Exists
   priorityClassNames:
     mgr: system-cluster-critical
     mon: system-node-critical
