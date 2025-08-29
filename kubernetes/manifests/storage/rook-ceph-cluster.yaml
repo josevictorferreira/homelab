@@ -193,9 +193,7 @@ spec:
           nodeSelectorTerms:
             - matchExpressions:
                 - key: node-role.kubernetes.io/control-plane
-                  operator: In
-                  values:
-                    - 'true'
+                  operator: Exists
   priorityClassNames:
     mgr: system-cluster-critical
     mon: system-node-critical
