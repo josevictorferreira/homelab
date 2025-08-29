@@ -62,7 +62,7 @@ in
                   nodeSelectorTerms = [
                     {
                       matchExpressions = [
-                        { key = "node-role.kubernetes.io/control-plane"; operator = "Exists"; }
+                        { key = "node-group"; operator = "In"; values = [ "control-plane" ]; }
                       ];
                     }
                   ];
