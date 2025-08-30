@@ -3,9 +3,9 @@
 let
   namespace = homelab.kubernetes.namespaces.storage;
   rookNs = "homelab-nfs";
-  pvName = "cephfs-smb-homelab-nfs";
-  pvcName = "cephfs-smb-export";
-  appName = "smb-export";
+  pvName = "cephfs-shared-storage";
+  pvcName = "cephfs-shared-storage";
+  appName = "cephfs-smb-export";
 in
 {
   kubernetes.resources = {

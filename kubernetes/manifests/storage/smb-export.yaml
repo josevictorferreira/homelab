@@ -1,0 +1,181 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app: cephfs-smb-export
+  name: cephfs-smb-export
+  namespace: rook-ceph
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cephfs-smb-export
+  template:
+    metadata:
+      labels:
+        app: cephfs-smb-export
+    spec:
+      containers:
+        - args:
+            - -c
+            - "set -eu\n\ngetent group 2002 >/dev/null 2>&1 || groupadd -g 2002 smb2002\n\
+              getent group smbusers >/dev/null 2>&1 || groupadd smbusers\n\nid -u\
+              \ smb2002 >/dev/null 2>&1 || useradd -u 2002 -g 2002 -M -s /sbin/nologin\
+              \ smb2002\n\nif ! id \"$${SMB_USERNAME}\" >/dev/null 2>&1; then\n  useradd\
+              \ -M -s /sbin/nologin \"$${SMB_USERNAME}\" || true\nfi\nusermod -a -G\
+              \ smbusers \"$${SMB_USERNAME}\" || true\n\nprintf \"%s\\n%s\\n\" \"\
+              $${SMB_PASSWORD}\" \"$${SMB_PASSWORD}\" | smbpasswd -a -s \"$${SMB_USERNAME}\"\
+              \ || true\n\nchown -R 2002:2002 /export || true\n\nsmbd -F --no-process-group\n"
+          command:
+            - /bin/sh
+          env:
+            - name: SMB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  key: username
+                  name: smb-export-credentials
+            - name: SMB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: password
+                  name: smb-export-credentials
+          image: quay.io/samba.org/samba-server:latest
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            initialDelaySeconds: 15
+            periodSeconds: 20
+            tcpSocket:
+              port: 445
+          name: samba
+          ports:
+            - containerPort: 445
+              name: smb
+              protocol: TCP
+          readinessProbe:
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            tcpSocket:
+              port: 445
+          securityContext:
+            capabilities:
+              add:
+                - NET_BIND_SERVICE
+            runAsGroup: 0
+            runAsUser: 0
+          volumeMounts:
+            - mountPath: /etc/samba/smb.conf
+              name: conf
+              subPath: smb.conf
+            - mountPath: /export
+              name: data
+            - mountPath: /var/lib/samba
+              name: state
+            - mountPath: /var/cache/samba
+              name: cache
+            - mountPath: /run
+              name: run
+      securityContext:
+        fsGroup: 2002
+        fsGroupChangePolicy: OnRootMismatch
+        supplementalGroups:
+          - 2002
+      volumes:
+        - configMap:
+            name: cephfs-smb-export-conf
+          name: conf
+        - name: data
+          persistentVolumeClaim:
+            claimName: cephfs-shared-storage
+        - emptyDir: {}
+          name: state
+        - emptyDir: {}
+          name: cache
+        - emptyDir: {}
+          name: run
+---
+apiVersion: v1
+data:
+  smb.conf: "[global]\n  server min protocol = SMB2\n  map to guest = Bad User\n \
+    \ security = user\n  load printers = no\n  printing = bsd\n  disable spoolss =\
+    \ yes\n  smb2 leases = yes\n  aio read size = 1\n  aio write size = 1\n  # Preserve/propagate\
+    \ ACLs on CephFS and store NT ACLs in xattrs\n  vfs objects = acl_xattr\n  ea\
+    \ support = yes\n  map acl inherit = yes\n  inherit acls = yes\n  inherit permissions\
+    \ = yes\n\n[cephfs]\n  path = /export\n  browseable = yes\n  read only = no\n\
+    \  guest ok = no\n  valid users = @smbusers\n\n  # >>> Squash everything to uid/gid\
+    \ 2002 via a fixed unix account <<<\n  force user = smb2002\n  force group = smb2002\n\
+    \n  # Sensible masks; adjust if you need stricter perms\n  create mask = 0664\n\
+    \  force create mode = 0664\n  directory mask = 0775\n  force directory mode =\
+    \ 0775\n"
+kind: ConfigMap
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: cephfs-smb-export-conf
+  namespace: rook-ceph
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: cephfs-shared-storage
+spec:
+  accessModes:
+    - ReadWriteMany
+  capacity:
+    storage: 1Gi
+  csi:
+    driver: rook-ceph.cephfs.csi.ceph.com
+    nodeStageSecretRef:
+      name: rook-csi-cephfs-node
+      namespace: homelab-nfs
+    volumeAttributes:
+      clusterID: homelab-nfs
+      fsName: ceph-filesystem
+      rootPath: /volumes/nfs-exports/homelab-nfs/dfd23da6-d80d-48c7-b568-025ec7badd17
+      staticVolume: 'true'
+    volumeHandle: cephfs-shared-storage
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: rook-ceph-filesystem
+  volumeMode: Filesystem
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: cephfs-shared-storage
+  namespace: rook-ceph
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+  volumeName: cephfs-shared-storage
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app: cephfs-smb-export
+  name: cephfs-smb-export
+  namespace: rook-ceph
+spec:
+  ports:
+    - name: smb
+      port: 445
+      protocol: TCP
+      targetPort: 445
+  selector:
+    app: cephfs-smb-export
+  type: LoadBalancer
