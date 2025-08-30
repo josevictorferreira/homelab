@@ -158,6 +158,7 @@ spec:
   resources:
     requests:
       storage: 1Gi
+  storageClassName: rook-ceph-filesystem
   volumeName: cephfs-shared-storage
 ---
 apiVersion: v1
