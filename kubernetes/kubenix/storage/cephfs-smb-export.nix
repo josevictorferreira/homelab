@@ -43,6 +43,7 @@ in
       spec = {
         accessModes = [ "ReadWriteMany" ];
         resources.requests.storage = "1Gi";
+        storageClassName = "rook-ceph-filesystem";
         volumeName = pvName;
       };
     };
