@@ -2,7 +2,6 @@
 
 let
   namespace = homelab.kubernetes.namespaces.storage;
-  rookNs = "homelab-nfs";
   pvName = "cephfs-shared-storage";
   pvcName = "cephfs-shared-storage";
   appName = "cephfs-smb-export";
@@ -23,10 +22,10 @@ in
           volumeHandle = pvName;
           nodeStageSecretRef = {
             name = "rook-csi-cephfs-node";
-            namespace = rookNs;
+            namespace = namespace;
           };
           volumeAttributes = {
-            clusterID = rookNs;
+            clusterID = namespace;
             fsName = "ceph-filesystem";
             staticVolume = "true";
             rootPath = "/volumes/nfs-exports/homelab-nfs/dfd23da6-d80d-48c7-b568-025ec7badd17";
