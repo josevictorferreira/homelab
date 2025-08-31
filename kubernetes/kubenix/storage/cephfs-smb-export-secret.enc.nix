@@ -6,6 +6,17 @@ in
 {
   kubernetes = {
     resources = {
+      secrets."cephfs-user-secret" = {
+        type = "Opaque";
+        metadata = {
+          namespace = namespace;
+        };
+        data = {
+          "userID" = kubenix.lib.secretsFor "cephfs_user_id";
+          "userKey" = kubenix.lib.secretsFor "cephfs_user_key";
+        };
+      };
+
       secrets."smb-export-credentials" = {
         type = "Opaque";
         metadata = {
