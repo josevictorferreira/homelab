@@ -7,7 +7,6 @@ in
   kubernetes = {
     resources = {
       secrets."cephfs-user-secret" = {
-        type = "Opaque";
         metadata = {
           namespace = namespace;
         };
