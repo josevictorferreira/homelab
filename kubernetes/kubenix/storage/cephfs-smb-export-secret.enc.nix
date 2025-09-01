@@ -41,6 +41,8 @@ in
             - "inherit permissions = yes"
             - "create mask = 0664"
             - "directory mask = 0775"
+            - "force user = homelab"
+            - "force group = homelab"
 
           share:
             - name: cephfs
@@ -52,9 +54,6 @@ in
               writelist: homelab
               veto: no
               recycle: yes
-              extra:
-                - "force user = homelab"
-                - "force group = homelab"
         '';
       };
     };
