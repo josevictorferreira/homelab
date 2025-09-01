@@ -21,7 +21,7 @@ spec:
       containers:
         - envFrom:
             - secretRef:
-                name: cephfs-smb-export-credentials
+                name: smb-export-credentials
           image: ghcr.io/crazy-max/samba:4.21.4
           imagePullPolicy: IfNotPresent
           name: samba
