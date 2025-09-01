@@ -21,14 +21,18 @@ spec:
       containers:
         - args:
             - -c
-            - "set -eu\n\ngetent group 2002 >/dev/null 2>&1 || groupadd -g 2002 smb2002\n\
-              getent group smbusers >/dev/null 2>&1 || groupadd smbusers\n\nid -u\
-              \ smb2002 >/dev/null 2>&1 || useradd -u 2002 -g 2002 -M -s /sbin/nologin\
-              \ smb2002\n\nif ! id \"$${SMB_USERNAME}\" >/dev/null 2>&1; then\n  useradd\
-              \ -M -s /sbin/nologin \"$${SMB_USERNAME}\" || true\nfi\nusermod -a -G\
-              \ smbusers \"$${SMB_USERNAME}\" || true\n\nprintf \"%s\\n%s\\n\" \"\
-              $${SMB_PASSWORD}\" \"$${SMB_PASSWORD}\" | smbpasswd -a -s \"$${SMB_USERNAME}\"\
-              \ || true\n\nchown -R 2002:2002 /export || true\n\nsmbd -F --no-process-group\n"
+            - "set -eu\n\n# --- system accounts ---\ngetent group 2002 >/dev/null\
+              \ 2>&1 || groupadd -g 2002 smb2002\ngetent group smbusers >/dev/null\
+              \ 2>&1 || groupadd smbusers\n\nid -u smb2002 >/dev/null 2>&1 || useradd\
+              \ -u 2002 -g 2002 -M -s /sbin/nologin smb2002\n\nif ! id \"$${SMB_USERNAME}\"\
+              \ >/dev/null 2>&1; then\n  useradd -M -s /sbin/nologin \"$${SMB_USERNAME}\"\
+              \ || true\nfi\nusermod -a -G smbusers \"$${SMB_USERNAME}\" || true\n\
+              \nprintf \"%s\\n%s\\n\" \"$${SMB_PASSWORD}\" \"$${SMB_PASSWORD}\" |\
+              \ smbpasswd -a -s \"$${SMB_USERNAME}\" || true\n\n# --- fix Samba state\
+              \ dirs ---\nmkdir -p /var/lib/samba/private /var/cache/samba /run/samba\n\
+              chown -R root:root /var/lib/samba /var/cache/samba /run/samba\n\n# ---\
+              \ fix CephFS export ownership ---\nchown -R 2002:2002 /export || true\n\
+              \n# --- run smbd in foreground ---\nsmbd -F --no-process-group\n"
           command:
             - /bin/sh
           env:
