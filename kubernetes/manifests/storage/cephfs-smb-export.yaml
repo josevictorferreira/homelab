@@ -41,25 +41,6 @@ spec:
             claimName: cephfs-shared-storage
 ---
 apiVersion: v1
-data:
-  config.yml: "auth:\n  - user: homelab\n    group: homelab\n    uid: 2002\n    gid:\
-    \ 2002\n    password: teste123\n\nglobal:\n  - \"server min protocol = SMB2\"\n\
-    \  - \"server max protocol = SMB3\"\n  - \"map to guest = Bad User\"\n  - \"ea\
-    \ support = yes\"\n  - \"vfs objects = fruit streams_xattr\"\n  - \"fruit:metadata\
-    \ = stream\"\n  - \"fruit:model = MacSamba\"\n  - \"inherit permissions = yes\"\
-    \n  - \"create mask = 0664\"\n  - \"directory mask = 0775\"\n\nshare:\n  - name:\
-    \ cephfs\n    path: /samba/share\n    browsable: yes\n    readonly: no\n    guestok:\
-    \ no\n    validusers: homelab\n    writelist: homelab\n    veto: no\n    recycle:\
-    \ yes\n"
-kind: ConfigMap
-metadata:
-  annotations:
-    kubenix/k8s-version: '1.32'
-    kubenix/project-name: ze-homelab
-  name: cephfs-smb-export-config
-  namespace: rook-ceph
----
-apiVersion: v1
 kind: PersistentVolume
 metadata:
   annotations:
