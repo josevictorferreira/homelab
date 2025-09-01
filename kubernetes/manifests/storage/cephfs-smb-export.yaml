@@ -19,10 +19,14 @@ spec:
         app: cephfs-smb-export
     spec:
       containers:
+<<<<<<< HEAD
         - envFrom:
             - secretRef:
                 name: cephfs-smb-export-credentials
           image: ghcr.io/crazy-max/samba:4.21.4
+=======
+        - image: ghcr.io/crazy-max/samba:4.21.4
+>>>>>>> ad53ddf (added cephfs smb export)
           imagePullPolicy: IfNotPresent
           name: samba
           ports:
@@ -30,32 +34,43 @@ spec:
               name: smb
               protocol: TCP
           volumeMounts:
+<<<<<<< HEAD
             - mountPath: /export
               name: data
       volumes:
         - name: data
+=======
+            - mountPath: /data/config.yml
+              name: config
+              subPath: config.yml
+            - mountPath: /samba/share
+              name: share
+      volumes:
+        - configMap:
+            name: cephfs-smb-export-config
+          name: config
+        - name: share
+>>>>>>> ad53ddf (added cephfs smb export)
           persistentVolumeClaim:
             claimName: cephfs-shared-storage
 ---
 apiVersion: v1
 data:
-  smb.conf: "[global]\n  server min protocol = SMB2\n  map to guest = Bad User\n \
-    \ security = user\n  load printers = no\n  printing = bsd\n  disable spoolss =\
-    \ yes\n  smb2 leases = yes\n  aio read size = 1\n  aio write size = 1\n  # Preserve/propagate\
-    \ ACLs on CephFS and store NT ACLs in xattrs\n  vfs objects = acl_xattr\n  ea\
-    \ support = yes\n  map acl inherit = yes\n  inherit acls = yes\n  inherit permissions\
-    \ = yes\n\n[cephfs]\n  path = /export\n  browseable = yes\n  read only = no\n\
-    \  guest ok = no\n  valid users = @smbusers\n\n  # >>> Squash everything to uid/gid\
-    \ 2002 via a fixed unix account <<<\n  force user = smb2002\n  force group = smb2002\n\
-    \n  # Sensible masks; adjust if you need stricter perms\n  create mask = 0664\n\
-    \  force create mode = 0664\n  directory mask = 0775\n  force directory mode =\
-    \ 0775\n"
+  config.yml: "auth:\n  - user: homelab\n    group: homelab\n    uid: 2002\n    gid:\
+    \ 2002\n    password: teste123\n\nglobal:\n  - \"server min protocol = SMB2\"\n\
+    \  - \"server max protocol = SMB3\"\n  - \"map to guest = Bad User\"\n  - \"ea\
+    \ support = yes\"\n  - \"vfs objects = fruit streams_xattr\"\n  - \"fruit:metadata\
+    \ = stream\"\n  - \"fruit:model = MacSamba\"\n  - \"inherit permissions = yes\"\
+    \n  - \"create mask = 0664\"\n  - \"directory mask = 0775\"\n\nshare:\n  - name:\
+    \ cephfs\n    path: /samba/share\n    browsable: yes\n    readonly: no\n    guestok:\
+    \ no\n    validusers: homelab\n    writelist: homelab\n    veto: no\n    recycle:\
+    \ yes\n"
 kind: ConfigMap
 metadata:
   annotations:
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
-  name: cephfs-smb-export-conf
+  name: cephfs-smb-export-config
   namespace: rook-ceph
 ---
 apiVersion: v1
