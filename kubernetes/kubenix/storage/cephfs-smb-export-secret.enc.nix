@@ -52,6 +52,8 @@ in
               writelist: homelab
               veto: no
               recycle: yes
+              "force user = homelab"
+              "force group = homelab"
         '';
       };
     };
