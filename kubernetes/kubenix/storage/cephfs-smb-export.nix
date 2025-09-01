@@ -120,6 +120,7 @@ in
                   ''
                     set -eu
 
+                    # --- system accounts ---
                     getent group 2002 >/dev/null 2>&1 || groupadd -g 2002 smb2002
                     getent group smbusers >/dev/null 2>&1 || groupadd smbusers
 
@@ -132,8 +133,14 @@ in
 
                     printf "%s\n%s\n" "$${SMB_PASSWORD}" "$${SMB_PASSWORD}" | smbpasswd -a -s "$${SMB_USERNAME}" || true
 
+                    # --- fix Samba state dirs ---
+                    mkdir -p /var/lib/samba/private /var/cache/samba /run/samba
+                    chown -R root:root /var/lib/samba /var/cache/samba /run/samba
+
+                    # --- fix CephFS export ownership ---
                     chown -R 2002:2002 /export || true
 
+                    # --- run smbd in foreground ---
                     smbd -F --no-process-group
                   ''
                 ];
