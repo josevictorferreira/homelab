@@ -71,6 +71,11 @@ in
                   { name = "config"; mountPath = "/data/config.yml"; subPath = "config.yml"; }
                   { name = "share"; mountPath = "/samba/share"; }
                 ];
+                env = [
+                  { name = "TZ"; value = homelab.timeZone; }
+                  { name = "SAMBA_WORKGROUP"; value = "WORKGROUP"; }
+                  { name = "SAMBA_LOG_LEVEL"; value = "3"; }
+                ];
               }
             ];
             volumes = [
