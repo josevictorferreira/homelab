@@ -75,6 +75,7 @@ in
                 ];
                 env = [
                   { name = "TZ"; value = homelab.timeZone; }
+                  { name = "SAMBA_LOG_LEVEL"; value = "3"; }
                 ];
               }
             ];

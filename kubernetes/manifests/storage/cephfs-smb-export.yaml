@@ -22,6 +22,8 @@ spec:
         - env:
             - name: TZ
               value: America/Sao_Paulo
+            - name: SAMBA_LOG_LEVEL
+              value: '3'
           image: ghcr.io/crazy-max/samba:4.21.4
           imagePullPolicy: IfNotPresent
           name: samba
