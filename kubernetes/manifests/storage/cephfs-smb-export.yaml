@@ -130,7 +130,7 @@ spec:
   capacity:
     storage: 1Gi
   csi:
-    driver: rook-ceph.cephfs.csi.ceph.com
+    driver: cephfs.csi.ceph.com
     nodeStageSecretRef:
       name: cephfs-user-secret
       namespace: rook-ceph
@@ -141,7 +141,6 @@ spec:
       staticVolume: 'true'
     volumeHandle: cephfs-shared-storage
   persistentVolumeReclaimPolicy: Retain
-  storageClassName: rook-ceph-filesystem
   volumeMode: Filesystem
 ---
 apiVersion: v1
@@ -158,7 +157,8 @@ spec:
   resources:
     requests:
       storage: 1Gi
-  storageClassName: rook-ceph-filesystem
+  storageClassName: ''
+  volumeMode: Filesystem
   volumeName: cephfs-shared-storage
 ---
 apiVersion: v1
