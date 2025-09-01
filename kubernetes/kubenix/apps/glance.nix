@@ -70,6 +70,7 @@ let
                   "UCpMcsdZf2KkAnfmxiq2MfMQ" # Arvin Ash
                   "UC9PIn6-XuRKZ5HmYeu46AIw" # Barely Sociable
                   "UCqnYRbOnwVAWU6plY904eAg" # VULDAR
+                  "UC_zBdZ0_H_jn41FDRG7q4Tw" # Vimjoyer
                 ];
               }
               {
