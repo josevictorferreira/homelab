@@ -29,6 +29,16 @@ in
               uid: 2002
               gid: 2002
               password: ${kubenix.lib.secretsFor "cephfs_smb_export_password"}
+            - user: josevictor
+              group: homelab
+              uid: 1000
+              gid: 2002
+              password: ${kubenix.lib.secretsFor "cephfs_smb_export_password"}
+            - user: josevictorferreira
+              group: homelab
+              uid: 501
+              gid: 2002
+              password: ${kubenix.lib.secretsFor "cephfs_smb_export_password"}
 
           global:
             - "server min protocol = SMB2"
@@ -45,15 +55,13 @@ in
             - "force group = homelab"
 
           share:
-            - name: cephfs
+            - name: homelab-smb
               path: /samba/share
               browsable: yes
               readonly: no
               guestok: no
-              validusers: homelab
-              writelist: homelab
               veto: no
-              recycle: yes
+              recycle: no
         '';
       };
     };
