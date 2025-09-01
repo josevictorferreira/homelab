@@ -5,6 +5,8 @@ let
   pvName = "cephfs-shared-storage";
   pvcName = "cephfs-shared-storage";
   appName = "cephfs-smb-export";
+  fsName = "ceph-filesystem";
+  exportPath = "/volumes/nfs-exports/homelab-nfs/dfd23da6-d80d-48c7-b568-025ec7badd17";
 in
 {
   kubernetes.resources = {
@@ -25,9 +27,9 @@ in
           };
           volumeAttributes = {
             clusterID = "rook-ceph";
-            fsName = "ceph-filesystem";
+            fsName = fsName;
             staticVolume = "true";
-            rootPath = "/volumes/nfs-exports/homelab-nfs/dfd23da6-d80d-48c7-b568-025ec7badd17";
+            rootPath = exportPath;
           };
         };
       };
