@@ -21,7 +21,7 @@ in
           driver = "rook-ceph.cephfs.csi.ceph.com";
           volumeHandle = pvName;
           nodeStageSecretRef = {
-            name = "rook-csi-cephfs-node";
+            name = "cephfs-user-secret";
             namespace = namespace;
           };
           volumeAttributes = {
