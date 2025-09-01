@@ -16,14 +16,14 @@ in
         };
       };
 
-      secrets."smb-export-credentials" = {
+      secrets."cephfs-smb-export-credentials" = {
         type = "Opaque";
         metadata = {
           namespace = namespace;
         };
-        data = {
-          "username" = kubenix.lib.secretsFor "smb_export_username";
-          "password" = kubenix.lib.secretsFor "smb_export_password";
+        stringData = {
+          "SAMBA_USERS" = kubenix.lib.secretsFor "smb_users";
+          "SAMBA_SHARES" = "cephfs;/export;yes;yes;no;homelab";
         };
       };
     };

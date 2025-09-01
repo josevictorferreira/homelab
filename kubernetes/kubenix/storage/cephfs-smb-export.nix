@@ -108,7 +108,7 @@ in
                 image = "ghcr.io/crazy-max/samba:4.21.4";
                 imagePullPolicy = "IfNotPresent";
                 envFrom = [
-                  { secretRef.name = "smb-export-credentials"; }
+                  { secretRef.name = "${appName}-credentials"; }
                 ];
                 ports = [
                   { name = "smb"; containerPort = 445; protocol = "TCP"; }
