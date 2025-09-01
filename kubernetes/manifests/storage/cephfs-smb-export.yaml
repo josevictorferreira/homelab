@@ -130,7 +130,7 @@ spec:
   capacity:
     storage: 1Gi
   csi:
-    driver: cephfs.csi.ceph.com
+    driver: rook-ceph.cephfs.csi.ceph.com
     nodeStageSecretRef:
       name: cephfs-user-secret
       namespace: rook-ceph
