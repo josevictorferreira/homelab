@@ -17,7 +17,7 @@ in
         persistentVolumeReclaimPolicy = "Retain";
         volumeMode = "Filesystem";
         csi = {
-          driver = "cephfs.csi.ceph.com";
+          driver = "rook-ceph.cephfs.csi.ceph.com";
           volumeHandle = pvName;
           nodeStageSecretRef = {
             name = "cephfs-user-secret";
