@@ -132,7 +132,7 @@ spec:
   csi:
     driver: rook-ceph.cephfs.csi.ceph.com
     nodeStageSecretRef:
-      name: cephfs-user-secret
+      name: rook-csi-cephfs-node
       namespace: rook-ceph
     volumeAttributes:
       clusterID: rook-ceph
