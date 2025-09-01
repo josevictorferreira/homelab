@@ -10,7 +10,7 @@ in
   kubernetes.resources = {
 
     persistentVolumes.${pvName} = {
-      metadata = { name = pvName; };
+      metadata.name = pvName;
       spec = {
         capacity.storage = "1Gi";
         accessModes = [ "ReadWriteMany" ];
@@ -47,49 +47,45 @@ in
       };
     };
 
-    configMaps."${appName}-conf" = {
+    configMaps."${appName}-config" = {
       metadata = {
-        name = "${appName}-conf";
+        name = "${appName}-config";
         namespace = namespace;
       };
-      data."smb.conf" = ''
-        [global]
-          server min protocol = SMB2
-          map to guest = Bad User
-          security = user
-          load printers = no
-          printing = bsd
-          disable spoolss = yes
-          smb2 leases = yes
-          aio read size = 1
-          aio write size = 1
-          # Preserve/propagate ACLs on CephFS and store NT ACLs in xattrs
-          vfs objects = acl_xattr
-          ea support = yes
-          map acl inherit = yes
-          inherit acls = yes
-          inherit permissions = yes
+      data."config.yml" = ''
+        auth:
+          - user: homelab
+            group: homelab
+            uid: 2002
+            gid: 2002
+            password: teste123
 
-        [cephfs]
-          path = /export
-          browseable = yes
-          read only = no
-          guest ok = no
-          valid users = @smbusers
+        global:
+          - "server min protocol = SMB2"
+          - "server max protocol = SMB3"
+          - "map to guest = Bad User"
+          - "ea support = yes"
+          - "vfs objects = fruit streams_xattr"
+          - "fruit:metadata = stream"
+          - "fruit:model = MacSamba"
+          - "inherit permissions = yes"
+          - "create mask = 0664"
+          - "directory mask = 0775"
 
-          # >>> Squash everything to uid/gid 2002 via a fixed unix account <<<
-          force user = smb2002
-          force group = smb2002
-
-          # Sensible masks; adjust if you need stricter perms
-          create mask = 0664
-          force create mode = 0664
-          directory mask = 0775
-          force directory mode = 0775
+        share:
+          - name: cephfs
+            path: /samba/share
+            browsable: yes
+            readonly: no
+            guestok: no
+            validusers: homelab
+            writelist: homelab
+            veto: no
+            recycle: yes
       '';
     };
 
-
+    # --- Samba Deployment ---
     deployments.${appName} = {
       metadata = {
         name = appName;
@@ -107,35 +103,33 @@ in
                 name = "samba";
                 image = "ghcr.io/crazy-max/samba:4.21.4";
                 imagePullPolicy = "IfNotPresent";
-                envFrom = [
-                  { secretRef.name = "${appName}-credentials"; }
-                ];
                 ports = [
                   { name = "smb"; containerPort = 445; protocol = "TCP"; }
                 ];
                 volumeMounts = [
-                  { name = "data"; mountPath = "/export"; }
+                  { name = "config"; mountPath = "/data/config.yml"; subPath = "config.yml"; }
+                  { name = "share"; mountPath = "/samba/share"; }
                 ];
               }
             ];
             volumes = [
-              { name = "data"; persistentVolumeClaim.claimName = pvcName; }
+              { name = "config"; configMap.name = "${appName}-config"; }
+              { name = "share"; persistentVolumeClaim.claimName = pvcName; }
             ];
           };
         };
       };
     };
 
-
     services.${appName} = {
       metadata = {
         name = appName;
         namespace = namespace;
-        labels = { app = appName; };
+        labels.app = appName;
       };
       spec = {
         type = "LoadBalancer";
-        selector = { app = appName; };
+        selector.app = appName;
         ports = [
           { name = "smb"; port = 445; targetPort = 445; protocol = "TCP"; }
         ];
@@ -143,4 +137,3 @@ in
     };
   };
 }
-
