@@ -19,7 +19,14 @@ spec:
         app: cephfs-smb-export
     spec:
       containers:
-        - image: ghcr.io/crazy-max/samba:4.21.4
+        - env:
+            - name: TZ
+              value: America/Sao_Paulo
+            - name: SAMBA_WORKGROUP
+              value: WORKGROUP
+            - name: SAMBA_LOG_LEVEL
+              value: '3'
+          image: ghcr.io/crazy-max/samba:4.21.4
           imagePullPolicy: IfNotPresent
           name: samba
           ports:
