@@ -47,45 +47,6 @@ in
       };
     };
 
-    configMaps."${appName}-config" = {
-      metadata = {
-        name = "${appName}-config";
-        namespace = namespace;
-      };
-      data."config.yml" = ''
-        auth:
-          - user: homelab
-            group: homelab
-            uid: 2002
-            gid: 2002
-            password: teste123
-
-        global:
-          - "server min protocol = SMB2"
-          - "server max protocol = SMB3"
-          - "map to guest = Bad User"
-          - "ea support = yes"
-          - "vfs objects = fruit streams_xattr"
-          - "fruit:metadata = stream"
-          - "fruit:model = MacSamba"
-          - "inherit permissions = yes"
-          - "create mask = 0664"
-          - "directory mask = 0775"
-
-        share:
-          - name: cephfs
-            path: /samba/share
-            browsable: yes
-            readonly: no
-            guestok: no
-            validusers: homelab
-            writelist: homelab
-            veto: no
-            recycle: yes
-      '';
-    };
-
-    # --- Samba Deployment ---
     deployments.${appName} = {
       metadata = {
         name = appName;

@@ -2,6 +2,7 @@
 
 let
   namespace = homelab.kubernetes.namespaces.storage;
+  appName = "cephfs-smb-export";
 in
 {
   kubernetes = {
@@ -16,15 +17,42 @@ in
         };
       };
 
-      secrets."cephfs-smb-export-credentials" = {
-        type = "Opaque";
+      configMaps."${appName}-config" = {
         metadata = {
+          name = "${appName}-config";
           namespace = namespace;
         };
-        stringData = {
-          "SAMBA_USERS" = kubenix.lib.secretsFor "smb_users";
-          "SAMBA_SHARES" = "cephfs;/export;yes;yes;no;homelab";
-        };
+        data."config.yml" = ''
+          auth:
+            - user: homelab
+              group: homelab
+              uid: 2002
+              gid: 2002
+              password: ${kubenix.lib.secretsFor "cephfs_smb_export_password"}
+
+          global:
+            - "server min protocol = SMB2"
+            - "server max protocol = SMB3"
+            - "map to guest = Bad User"
+            - "ea support = yes"
+            - "vfs objects = fruit streams_xattr"
+            - "fruit:metadata = stream"
+            - "fruit:model = MacSamba"
+            - "inherit permissions = yes"
+            - "create mask = 0664"
+            - "directory mask = 0775"
+
+          share:
+            - name: cephfs
+              path: /samba/share
+              browsable: yes
+              readonly: no
+              guestok: no
+              validusers: homelab
+              writelist: homelab
+              veto: no
+              recycle: yes
+        '';
       };
     };
   };
