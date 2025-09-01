@@ -16,9 +16,8 @@ in
         accessModes = [ "ReadWriteMany" ];
         persistentVolumeReclaimPolicy = "Retain";
         volumeMode = "Filesystem";
-        storageClassName = "rook-ceph-filesystem";
         csi = {
-          driver = "rook-ceph.cephfs.csi.ceph.com";
+          driver = "cephfs.csi.ceph.com";
           volumeHandle = pvName;
           nodeStageSecretRef = {
             name = "cephfs-user-secret";
@@ -42,7 +41,8 @@ in
       spec = {
         accessModes = [ "ReadWriteMany" ];
         resources.requests.storage = "1Gi";
-        storageClassName = "rook-ceph-filesystem";
+        storageClassName = "";
+        volumeMode = "Filesystem";
         volumeName = pvName;
       };
     };
