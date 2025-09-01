@@ -19,14 +19,7 @@ spec:
         app: cephfs-smb-export
     spec:
       containers:
-<<<<<<< HEAD
-        - envFrom:
-            - secretRef:
-                name: cephfs-smb-export-credentials
-          image: ghcr.io/crazy-max/samba:4.21.4
-=======
         - image: ghcr.io/crazy-max/samba:4.21.4
->>>>>>> ad53ddf (added cephfs smb export)
           imagePullPolicy: IfNotPresent
           name: samba
           ports:
@@ -34,12 +27,6 @@ spec:
               name: smb
               protocol: TCP
           volumeMounts:
-<<<<<<< HEAD
-            - mountPath: /export
-              name: data
-      volumes:
-        - name: data
-=======
             - mountPath: /data/config.yml
               name: config
               subPath: config.yml
@@ -50,7 +37,6 @@ spec:
             name: cephfs-smb-export-config
           name: config
         - name: share
->>>>>>> ad53ddf (added cephfs smb export)
           persistentVolumeClaim:
             claimName: cephfs-shared-storage
 ---
