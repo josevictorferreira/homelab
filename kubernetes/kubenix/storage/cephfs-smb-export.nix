@@ -25,7 +25,7 @@ in
             namespace = namespace;
           };
           volumeAttributes = {
-            clusterID = "e2f8f1ec-72a4-4b49-a175-058c23a7e84b";
+            clusterID = "rook-ceph";
             fsName = "ceph-filesystem";
             staticVolume = "true";
             rootPath = "/volumes/nfs-exports/homelab-nfs/dfd23da6-d80d-48c7-b568-025ec7badd17";
