@@ -51,7 +51,11 @@ in
               readonly: no
               guestok: no
               veto: no
-              recycle: no
+              extra:
+                - "force user = homelab"
+                - "force group = homelab"
+                - "create mask = 0664"
+                - "directory mask = 0775"
         '';
       };
     };
