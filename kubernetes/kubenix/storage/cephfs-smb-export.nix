@@ -94,95 +94,32 @@ in
       metadata = {
         name = appName;
         namespace = namespace;
-        labels = { app = appName; };
+        labels.app = appName;
       };
       spec = {
         replicas = 1;
-        selector.matchLabels = { app = appName; };
+        selector.matchLabels.app = appName;
         template = {
-          metadata.labels = { app = appName; };
+          metadata.labels.app = appName;
           spec = {
-            securityContext = {
-              fsGroup = 2002;
-              fsGroupChangePolicy = "OnRootMismatch";
-              supplementalGroups = [ 2002 ];
-            };
-
             containers = [
               {
                 name = "samba";
-                image = "quay.io/samba.org/samba-server:latest";
+                image = "ghcr.io/crazy-max/samba:4.21.4";
                 imagePullPolicy = "IfNotPresent";
-
-                command = [ "/bin/sh" ];
-                args = [
-                  "-c"
-                  ''
-                    set -eu
-
-                    # --- system accounts ---
-                    getent group 2002 >/dev/null 2>&1 || groupadd -g 2002 smb2002
-                    getent group smbusers >/dev/null 2>&1 || groupadd smbusers
-
-                    id -u smb2002 >/dev/null 2>&1 || useradd -u 2002 -g 2002 -M -s /sbin/nologin smb2002
-
-                    if ! id "$${SMB_USERNAME}" >/dev/null 2>&1; then
-                      useradd -M -s /sbin/nologin "$${SMB_USERNAME}" || true
-                    fi
-                    usermod -a -G smbusers "$${SMB_USERNAME}" || true
-
-                    printf "%s\n%s\n" "$${SMB_PASSWORD}" "$${SMB_PASSWORD}" | smbpasswd -a -s "$${SMB_USERNAME}" || true
-
-                    # --- fix Samba state dirs ---
-                    mkdir -p /var/lib/samba/private /var/cache/samba /run/samba
-                    chown -R root:root /var/lib/samba /var/cache/samba /run/samba
-
-                    # --- fix CephFS export ownership ---
-                    chown -R 2002:2002 /export || true
-
-                    # --- run smbd in foreground ---
-                    smbd -F --no-process-group
-                  ''
+                envFrom = [
+                  { secretRef.name = "${appName}-credentials"; }
                 ];
-
-                ports = [{ name = "smb"; containerPort = 445; protocol = "TCP"; }];
-
-                env = [
-                  {
-                    name = "SMB_USERNAME";
-                    valueFrom.secretKeyRef = { name = "smb-export-credentials"; key = "username"; };
-                  }
-                  {
-                    name = "SMB_PASSWORD";
-                    valueFrom.secretKeyRef = { name = "smb-export-credentials"; key = "password"; };
-                  }
+                ports = [
+                  { name = "smb"; containerPort = 445; protocol = "TCP"; }
                 ];
-
-                readinessProbe = { tcpSocket.port = 445; initialDelaySeconds = 5; periodSeconds = 10; };
-                livenessProbe = { tcpSocket.port = 445; initialDelaySeconds = 15; periodSeconds = 20; };
-
-                securityContext = {
-                  runAsUser = 0;
-                  runAsGroup = 0;
-                  capabilities.add = [ "NET_BIND_SERVICE" ];
-                };
-
                 volumeMounts = [
-                  { name = "conf"; mountPath = "/etc/samba/smb.conf"; subPath = "smb.conf"; }
                   { name = "data"; mountPath = "/export"; }
-                  { name = "state"; mountPath = "/var/lib/samba"; }
-                  { name = "cache"; mountPath = "/var/cache/samba"; }
-                  { name = "run"; mountPath = "/run"; }
                 ];
               }
             ];
-
             volumes = [
-              { name = "conf"; configMap = { name = "${appName}-conf"; }; }
-              { name = "data"; persistentVolumeClaim = { claimName = pvcName; }; }
-              { name = "state"; emptyDir = { }; }
-              { name = "cache"; emptyDir = { }; }
-              { name = "run"; emptyDir = { }; }
+              { name = "data"; persistentVolumeClaim.claimName = pvcName; }
             ];
           };
         };
