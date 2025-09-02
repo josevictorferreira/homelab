@@ -156,7 +156,8 @@ in
           container.env = {
             QBT_USERNAME = qbtUsername;
             QBT_PASSWORD = qbtPassword;
-            FIREWALL_VPN_INPUT_PORTS = "8080";
+            FIREWALL = "on";
+            FIREWALL_INPUT_PORTS = "8080,${toString torrentingPort}";
           };
           container.envFrom = [
             {
