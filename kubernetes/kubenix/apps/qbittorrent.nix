@@ -121,13 +121,17 @@ in
         workload = {
           main.podSpec = {
             initContainers = {
-              "install-vue-torrent" = {
+              "install-vuetorrent" = {
                 type = "init";
                 enabled = true;
                 image = {
                   repository = "alpine";
-                  tag = "3.20";
+                  tag = "3.21";
                   pullPolicy = "IfNotPresent";
+                };
+                securityContext = {
+                  runAsUser = 0;
+                  runAsGroup = 0;
                 };
                 command = [ "sh" "-c" ];
                 args = [ vueTorrentInstallScript ];
