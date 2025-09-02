@@ -20,12 +20,12 @@ in
       values = {
         image = {
           repository = "ghcr.io/home-operations/qbittorrent";
-          tag = "5.1.0@sha256:1cd84c74d3c7ccb7d2edb43fec4cdd2306f6ca30b7e85efd762fa476e1470fba";
+          tag = "5.1.2@sha256:sha256:9dd0164cc23e9c937e0af27fd7c3f627d1df30c182cf62ed34d3f129c55dc0e8";
           pullPolicy = "IfNotPresent";
         };
         qbitportforwardImage = {
           repository = "docker.io/mjmeli/qbittorrent-port-forward-gluetun-server";
-          tag = "latest@sha256:67d0d21ed792cf80716d4211e7162b6d375af5c12f3cf096c9032ad705dddaa8";
+          tag = "latest@sha256:4bd94ad0d289d3d52facdcb708a019e693c8df41e386f6aee80b870fa90baeec";
           pullPolicy = "IfNotPresent";
         };
         securityContext = {
