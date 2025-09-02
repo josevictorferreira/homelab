@@ -32,15 +32,15 @@ in
           tag = "latest@sha256:4bd94ad0d289d3d52facdcb708a019e693c8df41e386f6aee80b870fa90baeec";
           pullPolicy = "IfNotPresent";
         };
-        securityContext = {
-          fsGroup = 65534;
-          container = {
-            fsGroup = 65534;
-            runAsUser = 65534;
-            runAsGroup = 65534;
-            readOnlyRootFilesystem = false;
-          };
-        };
+        # securityContext = {
+        #   fsGroup = 65534;
+        #   container = {
+        #     fsGroup = 65534;
+        #     runAsUser = 65534;
+        #     runAsGroup = 65534;
+        #     readOnlyRootFilesystem = false;
+        #   };
+        # };
 
         qbitportforward = {
           enabled = false;
@@ -124,8 +124,8 @@ in
                 };
                 env = {
                   DOCKER_MODS = "ghcr.io/vuetorrent/vuetorrent-lsio-mod:latest";
-                  PUID = "2002";
-                  PGID = "2002";
+                  PUID = "0";
+                  PGID = "0";
                   WEBUI_PORT = "8080";
                   TORRENTING_PORT = toString torrentingPort;
                   # QBT_WEBUI_PORT = "8080";
