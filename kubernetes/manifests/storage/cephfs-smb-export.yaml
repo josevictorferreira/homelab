@@ -23,7 +23,7 @@ spec:
             - name: TZ
               value: America/Sao_Paulo
             - name: SAMBA_LOG_LEVEL
-              value: '3'
+              value: '0'
           image: ghcr.io/crazy-max/samba:4.21.4
           imagePullPolicy: IfNotPresent
           name: samba
@@ -44,50 +44,6 @@ spec:
         - name: share
           persistentVolumeClaim:
             claimName: cephfs-shared-storage
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  annotations:
-    kubenix/k8s-version: '1.32'
-    kubenix/project-name: ze-homelab
-  name: cephfs-shared-storage
-spec:
-  accessModes:
-    - ReadWriteMany
-  capacity:
-    storage: 1Gi
-  csi:
-    driver: rook-ceph.cephfs.csi.ceph.com
-    nodeStageSecretRef:
-      name: cephfs-user-secret
-      namespace: rook-ceph
-    volumeAttributes:
-      clusterID: rook-ceph
-      fsName: ceph-filesystem
-      rootPath: /volumes/nfs-exports/homelab-nfs/dfd23da6-d80d-48c7-b568-025ec7badd17
-      staticVolume: 'true'
-    volumeHandle: cephfs-shared-storage
-  persistentVolumeReclaimPolicy: Retain
-  volumeMode: Filesystem
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  annotations:
-    kubenix/k8s-version: '1.32'
-    kubenix/project-name: ze-homelab
-  name: cephfs-shared-storage
-  namespace: rook-ceph
-spec:
-  accessModes:
-    - ReadWriteMany
-  resources:
-    requests:
-      storage: 1Gi
-  storageClassName: ''
-  volumeMode: Filesystem
-  volumeName: cephfs-shared-storage
 ---
 apiVersion: v1
 kind: Service
