@@ -43,7 +43,7 @@ in
         };
 
         qbitportforward = {
-          enabled = true;
+          enabled = false;
           QBT_USERNAME = qbtUsername;
           QBT_PASSWORD = qbtPassword;
         };
