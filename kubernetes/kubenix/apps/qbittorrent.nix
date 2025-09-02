@@ -53,7 +53,7 @@ in
             enabled = true;
             type = "LoadBalancer";
             annotations = kubenix.lib.serviceIpFor "qbittorrent";
-            ports.main.port = 8080;
+            ports.main.port = 80;
             ports.main.targetPort = 8080;
           };
           torrent = {
