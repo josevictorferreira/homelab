@@ -9,13 +9,23 @@ let
   qbtPassword = "adminadmin";
   vueTorrentInstallScript = ''
     set -e
-    apk add --no-cache curl unzip
+    echo "Creating config directory"
     cd /config
+    echo "Downloading VueTorrent"
     curl -L -o vuetorrent.zip https://github.com/VueTorrent/VueTorrent/releases/download/v2.29.0/vuetorrent.zip
+    echo "Removing old VueTorrent files"
     rm -rf /config/webui
+    echo "Extracting VueTorrent"
     unzip vuetorrent.zip -d /config/webui
+    echo "Removing unused files"
     rm vuetorrent.zip
+    echo "VueTorrent installed"
   '';
+  qbtImage = {
+    repository = "ghcr.io/home-operations/qbittorrent";
+    tag = "5.1.2@sha256:9dd0164cc23e9c937e0af27fd7c3f627d1df30c182cf62ed34d3f129c55dc0e8";
+    pullPolicy = "IfNotPresent";
+  };
 in
 {
   kubernetes = {
@@ -31,11 +41,7 @@ in
       noHooks = true;
       namespace = namespace;
       values = {
-        image = {
-          repository = "ghcr.io/home-operations/qbittorrent";
-          tag = "5.1.2@sha256:9dd0164cc23e9c937e0af27fd7c3f627d1df30c182cf62ed34d3f129c55dc0e8";
-          pullPolicy = "IfNotPresent";
-        };
+        image = qbtImage;
         qbitportforwardImage = {
           repository = "docker.io/mjmeli/qbittorrent-port-forward-gluetun-server";
           tag = "latest@sha256:4bd94ad0d289d3d52facdcb708a019e693c8df41e386f6aee80b870fa90baeec";
@@ -96,6 +102,7 @@ in
             targetSelector = {
               main = {
                 main = { mountPath = "/config"; readOnly = false; };
+                "install-vuetorrent" = { mountPath = "/config"; readOnly = false; };
               };
             };
           };
@@ -124,23 +131,9 @@ in
               "install-vuetorrent" = {
                 type = "init";
                 enabled = true;
-                image = {
-                  repository = "alpine";
-                  tag = "3.21";
-                  pullPolicy = "IfNotPresent";
-                };
-                securityContext = {
-                  runAsUser = 0;
-                  runAsGroup = 0;
-                };
+                image = qbtImage;
                 command = [ "sh" "-c" ];
                 args = [ vueTorrentInstallScript ];
-                volumeMounts = [
-                  {
-                    name = "config";
-                    mountPath = "/config";
-                  }
-                ];
               };
             };
             containers = {

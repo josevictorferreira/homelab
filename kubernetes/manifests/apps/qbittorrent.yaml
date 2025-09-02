@@ -32,7 +32,7 @@ spec:
         checksum/configmaps: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
         checksum/mariadb: 09c85576cb45b1eecd1467732b11ea8fa3363b0105c465f02a6ad64991521d52
         checksum/mongodb: 09c85576cb45b1eecd1467732b11ea8fa3363b0105c465f02a6ad64991521d52
-        checksum/persistence: 95078f511c122878bbd34ce8b1c953de93cce2cc111a1165384f7e9b420e0cd7
+        checksum/persistence: df429b354edc9e8196bbfe7134862f3c419b4cbfcf99b3dd89632fed6993eb86
         checksum/redis: 013343a028cbb3f7e08f4ba7522702dd98e52632c688641074b0b1db3df29894
         checksum/secrets: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
         checksum/services: e956a5c4cf8923876402324a4ea8a601db8255d76b9950b219ec45bfec96e545
@@ -232,17 +232,27 @@ spec:
         - args:
             - 'set -e
 
-              apk add --no-cache curl unzip
+              echo "Creating config directory"
 
               cd /config
 
+              echo "Downloading VueTorrent"
+
               curl -L -o vuetorrent.zip https://github.com/VueTorrent/VueTorrent/releases/download/v2.29.0/vuetorrent.zip
+
+              echo "Removing old VueTorrent files"
 
               rm -rf /config/webui
 
+              echo "Extracting VueTorrent"
+
               unzip vuetorrent.zip -d /config/webui
 
+              echo "Removing unused files"
+
               rm vuetorrent.zip
+
+              echo "VueTorrent installed"
 
               '
           command:
@@ -257,18 +267,8 @@ spec:
               value: '0022'
             - name: NVIDIA_VISIBLE_DEVICES
               value: void
-            - name: PUID
-              value: '568'
-            - name: USER_ID
-              value: '568'
-            - name: UID
-              value: '568'
-            - name: PGID
-              value: '568'
-            - name: GROUP_ID
-              value: '568'
-            - name: GID
-              value: '568'
+            - name: S6_READ_ONLY_ROOT
+              value: '1'
           image: ghcr.io/home-operations/qbittorrent:5.1.2@sha256:9dd0164cc23e9c937e0af27fd7c3f627d1df30c182cf62ed34d3f129c55dc0e8
           imagePullPolicy: IfNotPresent
           name: qbittorrent-init-install-vuetorrent
@@ -282,24 +282,22 @@ spec:
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
-              add:
-                - CHOWN
-                - SETUID
-                - SETGID
-                - FOWNER
-                - DAC_OVERRIDE
+              add: []
               drop:
                 - ALL
             privileged: false
             readOnlyRootFilesystem: false
-            runAsGroup: 0
-            runAsNonRoot: false
-            runAsUser: 0
+            runAsGroup: 65534
+            runAsNonRoot: true
+            runAsUser: 65534
             seccompProfile:
               type: RuntimeDefault
           stdin: false
           tty: false
           volumeMounts:
+            - mountPath: /config
+              name: config
+              readOnly: false
             - mountPath: /dev/shm
               name: devshm
               readOnly: false
