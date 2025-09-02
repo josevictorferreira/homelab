@@ -93,9 +93,11 @@ spec:
               value: ''
             - name: FIREWALL_OUTBOUND_SUBNETS
               value: ''
+            - name: QBT_PASSWORD
+              value: adminadmin
+            - name: QBT_USERNAME
+              value: admin
           envFrom:
-            - secretRef:
-                name: qbittorrent-credentials
             - secretRef:
                 name: gluetun-vpn-credentials
           image: tccr.io/tccr/gluetun:v3.40.0@sha256:a8189e29155e0f8142be1500ae068a92b189b1b25abbba036321e74d6389bf2b
