@@ -35,4 +35,24 @@ rec {
       }
     ];
   };
+
+  ingressDomainForService = serviceName: {
+    enabled = true;
+    primary = true;
+    ingressClassName = "cilium";
+    annotations = {
+      "cert-manager.io/cluster-issuer" = "cloudflare-issuer";
+    };
+    hosts = [
+      { host = "${serviceName}.${homelab.domain}"; }
+    ];
+    tls = [
+      {
+        hosts = [
+          "${serviceName}.${homelab.domain}"
+        ];
+        secretName = "wildcard-tls";
+      }
+    ];
+  };
 }
