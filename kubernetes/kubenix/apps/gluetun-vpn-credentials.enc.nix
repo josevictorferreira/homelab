@@ -8,6 +8,7 @@ in
     resources = {
       secrets."gluetun-vpn-credentials" = {
         metadata = {
+          name = "gluetun-vpn-credentials";
           namespace = namespace;
         };
         data = {
