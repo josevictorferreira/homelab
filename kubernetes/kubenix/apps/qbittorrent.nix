@@ -43,7 +43,7 @@ in
         };
 
         qbitportforward = {
-          enabled = false;
+          enabled = true;
           QBT_USERNAME = qbtUsername;
           QBT_PASSWORD = qbtPassword;
         };
@@ -53,7 +53,7 @@ in
             enabled = true;
             type = "LoadBalancer";
             annotations = kubenix.lib.serviceIpFor "qbittorrent";
-            ports.main.port = 80;
+            ports.main.port = 8080;
             ports.main.targetPort = 8080;
           };
           torrent = {
@@ -153,6 +153,7 @@ in
             type = "Deployment";
             strategy = "RollingUpdate";
             replicas = 1;
+            podSpec.restartPolicy = "Always";
             podSpec.containers.qbitportforward = {
               primary = true;
               enabeld = true;
@@ -167,6 +168,7 @@ in
                 QBT_USERNAME = qbtUsername;
                 QBT_PASSWORD = qbtPassword;
               };
+              command = "/usr/src/app/main.sh";
             };
           };
         };
