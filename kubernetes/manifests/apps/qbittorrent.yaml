@@ -229,13 +229,25 @@ spec:
       hostPID: false
       hostUsers: true
       initContainers:
-        - command:
+        - args:
+            - 'set -e
+
+              apk add --no-cache curl unzip
+
+              cd /config
+
+              curl -L -o vuetorrent.zip https://github.com/VueTorrent/VueTorrent/releases/download/v2.29.0/vuetorrent.zip
+
+              rm -rf /config/webui
+
+              unzip vuetorrent.zip -d /config/webui
+
+              rm vuetorrent.zip
+
+              '
+          command:
             - sh
             - -c
-            - cd /config
-            - ' && curl -O https://github.com/VueTorrent/VueTorrent/releases/download/v2.29.0/vuetorrent.zip'
-            - ' && unzip vuetorrent.zip -d /config/webui'
-            - ' && rm vuetorrent.zip'
           env:
             - name: TZ
               value: UTC

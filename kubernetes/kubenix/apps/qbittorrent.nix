@@ -7,6 +7,15 @@ let
   torrentingPort = 62657;
   qbtUsername = "admin";
   qbtPassword = "adminadmin";
+  vueTorrentInstallScript = ''
+    set -e
+    apk add --no-cache curl unzip
+    cd /config
+    curl -L -o vuetorrent.zip https://github.com/VueTorrent/VueTorrent/releases/download/v2.29.0/vuetorrent.zip
+    rm -rf /config/webui
+    unzip vuetorrent.zip -d /config/webui
+    rm vuetorrent.zip
+  '';
 in
 {
   kubernetes = {
@@ -116,15 +125,12 @@ in
                 type = "init";
                 enabled = true;
                 image = {
-                  repository = "busybox";
-                  tag = "1.36.1";
+                  repository = "alpine";
+                  tag = "3.20";
                   pullPolicy = "IfNotPresent";
                 };
-                command = [ "sh" "-c"
-                  "cd /config"
-                  " && curl -O https://github.com/VueTorrent/VueTorrent/releases/download/v2.29.0/vuetorrent.zip"
-                  " && unzip vuetorrent.zip -d /config/webui"
-                  " && rm vuetorrent.zip" ];
+                command = [ "sh" "-c" ];
+                args = [ vueTorrentInstallScript ];
                 volumeMounts = [
                   {
                     name = "config";
