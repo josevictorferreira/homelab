@@ -2,7 +2,7 @@
 
 let
   k8s = homelab.kubernetes;
-  pvcName = "cephfs-shared-storage";
+  pvcName = "cephfs-apps-shared-storage";
 in
 {
   kubernetes = {
