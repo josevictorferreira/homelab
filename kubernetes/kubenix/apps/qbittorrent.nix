@@ -3,6 +3,7 @@
 let
   k8s = homelab.kubernetes;
   pvcName = "cephfs-apps-shared-storage";
+  namespace = k8s.namespaces.applications;
 in
 {
   kubernetes = {
@@ -16,7 +17,7 @@ in
         };
       includeCRDs = true;
       noHooks = true;
-      namespace = k8s.namespaces.applications;
+      namespace = namespace;
       values = {
         image = {
           repository = "ghcr.io/home-operations/qbittorrent";
@@ -159,9 +160,14 @@ in
         };
 
         addons.gluetun = {
-          type = "gluetun";
+          enabled = true;
           killSwitch = true;
-          envFrom = [ { secretRef.name = "gluetun-vpn-credentials"; } ];
+          container.envFrom = [
+            {
+              secretRef.name = "gluetun-vpn-credentials";
+              secretRef.expandObjectName = false;
+            }
+          ];
         };
 
       };

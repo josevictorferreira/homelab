@@ -71,6 +71,89 @@ spec:
               value: '0022'
             - name: NVIDIA_VISIBLE_DEVICES
               value: void
+            - name: PUID
+              value: '568'
+            - name: USER_ID
+              value: '568'
+            - name: UID
+              value: '568'
+            - name: PGID
+              value: '568'
+            - name: GROUP_ID
+              value: '568'
+            - name: GID
+              value: '568'
+            - name: DNS_KEEP_NAMESERVER
+              value: 'on'
+            - name: DOT
+              value: 'off'
+            - name: FIREWALL
+              value: 'off'
+            - name: FIREWALL_INPUT_PORTS
+              value: ''
+            - name: FIREWALL_OUTBOUND_SUBNETS
+              value: ''
+          envFrom:
+            - secretRef:
+                name: gluetun-vpn-credentials
+          image: tccr.io/tccr/gluetun:v3.40.0@sha256:a8189e29155e0f8142be1500ae068a92b189b1b25abbba036321e74d6389bf2b
+          imagePullPolicy: IfNotPresent
+          name: qbittorrent-gluetun
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 1500Mi
+            requests:
+              cpu: 100m
+              memory: 250Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              add:
+                - NET_ADMIN
+                - NET_RAW
+                - MKNOD
+                - CHOWN
+                - SETUID
+                - SETGID
+                - FOWNER
+                - DAC_OVERRIDE
+              drop:
+                - ALL
+            privileged: false
+            readOnlyRootFilesystem: false
+            runAsGroup: 568
+            runAsNonRoot: false
+            runAsUser: 0
+            seccompProfile:
+              type: RuntimeDefault
+          stdin: false
+          tty: false
+          volumeMounts:
+            - mountPath: /dev/shm
+              name: devshm
+              readOnly: false
+            - mountPath: /downloads
+              name: shared
+              readOnly: false
+            - mountPath: /tmp
+              name: tmp
+              readOnly: false
+            - mountPath: /var/logs
+              name: varlogs
+              readOnly: false
+            - mountPath: /var/run
+              name: varrun
+              readOnly: false
+        - env:
+            - name: TZ
+              value: UTC
+            - name: UMASK
+              value: '0022'
+            - name: UMASK_SET
+              value: '0022'
+            - name: NVIDIA_VISIBLE_DEVICES
+              value: void
             - name: S6_READ_ONLY_ROOT
               value: '1'
             - name: DOCKER_MODS
