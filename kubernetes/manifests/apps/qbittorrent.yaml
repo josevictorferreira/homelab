@@ -198,9 +198,9 @@ spec:
                 - ALL
             privileged: false
             readOnlyRootFilesystem: false
-            runAsGroup: 568
+            runAsGroup: 65534
             runAsNonRoot: true
-            runAsUser: 568
+            runAsUser: 65534
             seccompProfile:
               type: RuntimeDefault
           stdin: false
