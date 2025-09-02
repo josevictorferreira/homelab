@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
     app: qbittorrent-23.3.2
@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: qbittorrent
     app.kubernetes.io/version: 5.1.2
-    helm-revision: '1'
+    helm-revision: "1"
     helm.sh/chart: qbittorrent-23.3.2
     release: qbittorrent
   name: qbittorrent
@@ -43,7 +43,7 @@ spec:
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: qbittorrent
         app.kubernetes.io/version: 5.1.2
-        helm-revision: '1'
+        helm-revision: "1"
         helm.sh/chart: qbittorrent-23.3.2
         pod.lifecycle: permanent
         pod.name: main
@@ -66,29 +66,29 @@ spec:
             - name: TZ
               value: UTC
             - name: UMASK
-              value: '0022'
+              value: "0022"
             - name: UMASK_SET
-              value: '0022'
+              value: "0022"
             - name: NVIDIA_VISIBLE_DEVICES
               value: void
             - name: PUID
-              value: '568'
+              value: "568"
             - name: USER_ID
-              value: '568'
+              value: "568"
             - name: UID
-              value: '568'
+              value: "568"
             - name: PGID
-              value: '568'
+              value: "568"
             - name: GROUP_ID
-              value: '568'
+              value: "568"
             - name: GID
-              value: '568'
+              value: "568"
             - name: DNS_KEEP_NAMESERVER
-              value: 'on'
+              value: "on"
             - name: DOT
-              value: 'off'
+              value: "off"
             - name: FIREWALL
-              value: 'on'
+              value: "on"
             - name: FIREWALL_INPUT_PORTS
               value: 8080,62657,80
             - name: FIREWALL_OUTBOUND_SUBNETS
@@ -153,28 +153,18 @@ spec:
             - name: TZ
               value: UTC
             - name: UMASK
-              value: '0022'
+              value: "0022"
             - name: UMASK_SET
-              value: '0022'
+              value: "0022"
             - name: NVIDIA_VISIBLE_DEVICES
               value: void
             - name: S6_READ_ONLY_ROOT
-              value: '1'
-            - name: DOCKER_MODS
-              value: ghcr.io/vuetorrent/vuetorrent-lsio-mod:latest
-            - name: PGID
-              value: '65534'
-            - name: PUID
-              value: '65534'
+              value: "1"
             - name: QBT_TORRENTING_PORT
-              value: '6881'
+              value: "62657"
             - name: QBT_WEBUI_PORT
-              value: '80'
-            - name: TORRENTING_PORT
-              value: '62657'
-            - name: WEBUI_PORT
-              value: '8080'
-          image: lscr.io/linuxserver/qbittorrent:5.1.2@sha256:d464a92d5656f1fa66baafe610a06a6cafd4bdf900a245e6f20b220f281b456d
+              value: "8080"
+          image: ghcr.io/home-operations/qbittorrent:5.1.2@sha256:9dd0164cc23e9c937e0af27fd7c3f627d1df30c182cf62ed34d3f129c55dc0e8
           imagePullPolicy: IfNotPresent
           name: qbittorrent
           ports:
@@ -231,13 +221,73 @@ spec:
       dnsConfig:
         options:
           - name: ndots
-            value: '1'
+            value: "1"
       dnsPolicy: ClusterFirst
       enableServiceLinks: false
       hostIPC: false
       hostNetwork: false
       hostPID: false
       hostUsers: true
+      initContainers:
+        - command:
+            - sh
+            - -c
+            - cd /config
+            - " && curl -O https://github.com/VueTorrent/VueTorrent/releases/download/v2.29.0/vuetorrent.zip"
+            - " && unzip vuetorrent.zip -d /config/webui"
+            - " && rm vuetorrent.zip"
+          env:
+            - name: TZ
+              value: UTC
+            - name: UMASK
+              value: "0022"
+            - name: UMASK_SET
+              value: "0022"
+            - name: NVIDIA_VISIBLE_DEVICES
+              value: void
+            - name: S6_READ_ONLY_ROOT
+              value: "1"
+          image: ghcr.io/home-operations/qbittorrent:5.1.2@sha256:9dd0164cc23e9c937e0af27fd7c3f627d1df30c182cf62ed34d3f129c55dc0e8
+          imagePullPolicy: IfNotPresent
+          name: qbittorrent-init-installVueTorrent
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 1500Mi
+            requests:
+              cpu: 100m
+              memory: 250Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              add: []
+              drop:
+                - ALL
+            privileged: false
+            readOnlyRootFilesystem: false
+            runAsGroup: 65534
+            runAsNonRoot: true
+            runAsUser: 65534
+            seccompProfile:
+              type: RuntimeDefault
+          stdin: false
+          tty: false
+          volumeMounts:
+            - mountPath: /dev/shm
+              name: devshm
+              readOnly: false
+            - mountPath: /downloads
+              name: shared
+              readOnly: false
+            - mountPath: /tmp
+              name: tmp
+              readOnly: false
+            - mountPath: /var/logs
+              name: varlogs
+              readOnly: false
+            - mountPath: /var/run
+              name: varrun
+              readOnly: false
       nodeSelector:
         kubernetes.io/arch: amd64
       restartPolicy: Always
@@ -289,7 +339,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
     app: qbittorrent-23.3.2
@@ -297,7 +347,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: qbittorrent
     app.kubernetes.io/version: 5.1.2
-    helm-revision: '1'
+    helm-revision: "1"
     helm.sh/chart: qbittorrent-23.3.2
     release: qbittorrent
   name: qbittorrent-config
@@ -314,7 +364,7 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
     lbipam.cilium.io/ips: 10.10.10.119
     lbipam.cilium.io/sharing-key: qbittorrent
@@ -324,7 +374,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: qbittorrent
     app.kubernetes.io/version: 5.1.2
-    helm-revision: '1'
+    helm-revision: "1"
     helm.sh/chart: qbittorrent-23.3.2
     release: qbittorrent
     service.name: main
@@ -348,7 +398,7 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
     app: qbittorrent-23.3.2
@@ -356,7 +406,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: qbittorrent
     app.kubernetes.io/version: 5.1.2
-    helm-revision: '1'
+    helm-revision: "1"
     helm.sh/chart: qbittorrent-23.3.2
     release: qbittorrent
     service.name: torrent
@@ -386,7 +436,7 @@ metadata:
     cert-manager.io/cluster-issuer: cloudflare-issuer
     checksum/secrets: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
     checksum/services: e956a5c4cf8923876402324a4ea8a601db8255d76b9950b219ec45bfec96e545
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
     app: qbittorrent-23.3.2
@@ -394,7 +444,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: qbittorrent
     app.kubernetes.io/version: 5.1.2
-    helm-revision: '1'
+    helm-revision: "1"
     helm.sh/chart: qbittorrent-23.3.2
     release: qbittorrent
   name: qbittorrent
