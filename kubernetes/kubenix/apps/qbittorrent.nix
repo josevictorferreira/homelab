@@ -32,15 +32,14 @@ in
           tag = "latest@sha256:4bd94ad0d289d3d52facdcb708a019e693c8df41e386f6aee80b870fa90baeec";
           pullPolicy = "IfNotPresent";
         };
-        # securityContext = {
-        #   fsGroup = 65534;
-        #   container = {
-        #     fsGroup = 65534;
-        #     runAsUser = 65534;
-        #     runAsGroup = 65534;
-        #     readOnlyRootFilesystem = false;
-        #   };
-        # };
+        securityContext = {
+          fsGroup = 65534;
+          container = {
+            fsGroup = 65534;
+            runAsUser = 65534;
+            runAsGroup = 65534;
+          };
+        };
 
         qbitportforward = {
           enabled = false;
