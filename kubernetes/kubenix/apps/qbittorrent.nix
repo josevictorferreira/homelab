@@ -20,7 +20,7 @@ in
       values = {
         image = {
           repository = "ghcr.io/home-operations/qbittorrent";
-          tag = "5.1.2@sha256:sha256:9dd0164cc23e9c937e0af27fd7c3f627d1df30c182cf62ed34d3f129c55dc0e8";
+          tag = "5.1.2@sha256:9dd0164cc23e9c937e0af27fd7c3f627d1df30c182cf62ed34d3f129c55dc0e8";
           pullPolicy = "IfNotPresent";
         };
         qbitportforwardImage = {
