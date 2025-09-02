@@ -257,11 +257,21 @@ spec:
               value: '0022'
             - name: NVIDIA_VISIBLE_DEVICES
               value: void
-            - name: S6_READ_ONLY_ROOT
-              value: '1'
+            - name: PUID
+              value: '568'
+            - name: USER_ID
+              value: '568'
+            - name: UID
+              value: '568'
+            - name: PGID
+              value: '568'
+            - name: GROUP_ID
+              value: '568'
+            - name: GID
+              value: '568'
           image: ghcr.io/home-operations/qbittorrent:5.1.2@sha256:9dd0164cc23e9c937e0af27fd7c3f627d1df30c182cf62ed34d3f129c55dc0e8
           imagePullPolicy: IfNotPresent
-          name: qbittorrent-init-install-vue-torrent
+          name: qbittorrent-init-install-vuetorrent
           resources:
             limits:
               cpu: 1000m
@@ -272,14 +282,19 @@ spec:
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
-              add: []
+              add:
+                - CHOWN
+                - SETUID
+                - SETGID
+                - FOWNER
+                - DAC_OVERRIDE
               drop:
                 - ALL
             privileged: false
             readOnlyRootFilesystem: false
-            runAsGroup: 65534
-            runAsNonRoot: true
-            runAsUser: 65534
+            runAsGroup: 0
+            runAsNonRoot: false
+            runAsUser: 0
             seccompProfile:
               type: RuntimeDefault
           stdin: false
