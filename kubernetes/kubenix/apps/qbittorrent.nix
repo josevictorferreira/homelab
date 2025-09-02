@@ -53,7 +53,7 @@ in
             enabled = true;
             type = "LoadBalancer";
             annotations = kubenix.lib.serviceIpFor "qbittorrent";
-            ports.main.port = 80;
+            ports.main.port = 8080;
             ports.main.targetPort = 8080;
           };
           torrent = {
@@ -140,6 +140,9 @@ in
           main.podSpec = {
             containers = {
               main = {
+                probes.liveness.enabled = false;
+                probes.readiness.enabled = false;
+                probes.startup.enabled = false;
                 env = {
                   DOCKER_MODS = "ghcr.io/vuetorrent/vuetorrent-lsio-mod:latest";
                   QBT_WEBUI_PORT = "8080";
