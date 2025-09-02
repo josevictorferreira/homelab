@@ -4,6 +4,7 @@ let
   k8s = homelab.kubernetes;
   pvcName = "cephfs-apps-shared-storage";
   namespace = k8s.namespaces.applications;
+  torrentingPort = 62657;
 in
 {
   kubernetes = {
@@ -42,7 +43,10 @@ in
         qbitportforward.enabled = false;
 
         service = {
-          main = kubenix.lib.serviceIpFor "qbittorrent" // {
+          main = {
+            enabled = true;
+            type = "LoadBalancer";
+            annotations = kubenix.lib.serviceIpFor "qbittorrent";
             ports.main.port = 80;
             ports.main.targetPort = 8080;
           };
@@ -50,12 +54,12 @@ in
             enabled = true;
             ports.torrent = {
               enabled = true;
-              part = 62657;
+              part = torrentingPort;
               protocol = "tcp";
             };
             ports.torrentudp = {
               enabled = true;
-              part = 62657;
+              part = torrentingPort;
               protocol = "udp";
             };
           };
@@ -64,8 +68,8 @@ in
             type = "ClusterIP";
             ports.gluetun = {
               enabled = true;
-              part = 8080;
-              targetPort = 8080;
+              part = 8000;
+              targetPort = 8000;
               protocol = "http";
             };
           };
@@ -133,7 +137,7 @@ in
                 env = {
                   DOCKER_MODS = "ghcr.io/vuetorrent/vuetorrent-lsio-mod:latest";
                   QBT_WEBUI_PORT = "8080";
-                  QBT_TORRENTING_PORT = "62657";
+                  QBT_TORRENTING_PORT = "${toString torrentingPort}";
                 };
               };
             };
