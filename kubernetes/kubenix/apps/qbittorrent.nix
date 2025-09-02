@@ -2,6 +2,7 @@
 
 let
   k8s = homelab.kubernetes;
+  pvcName = "cephfs-shared-storage";
 in
 {
   kubernetes = {
@@ -78,25 +79,18 @@ in
             targetSelector = {
               main = {
                 main = { mountPath = "/config"; };
-                exportarr = { mountPath = "/config"; readOnly = true; };
+                exportarr = { mountPath = "/config"; readOnly = false; };
               };
             };
           };
-          "prowlarr-custom-definitions" = {
+          shared = {
             enabled = true;
-            type = "secret";
-            mountPath = "/config/Definitions/Custom";
-            objectName = "prowlarr-custom-definitions";
-            expandObjectName = false;
-            optional = false;
-            defaultMode = "0777";
-            items = [
-              { key = "custom-indexer"; path = "custom-indexer.yml"; }
-            ];
+            type = "pvc";
+            existingClaim = pvcName;
+            mountPath = "/downloads";
             targetSelector = {
               main = {
-                main = { mountPath = "/config/Definitions/Custom"; };
-                exportarr = { mountPath = "/config/Definitions/Custom"; readOnly = true; };
+                main = { mountPath = "/downloads"; readOnly = false; };
               };
             };
           };
@@ -110,52 +104,64 @@ in
             "cert-manager.io/cluster-issuer" = "cloudflare-issuer";
           };
           hosts = [
-            { host = "prowlarr.${homelab.domain}"; }
+            {
+              host = "qbittorrent.${homelab.domain}";
+              paths = [ {
+                path = "/";
+                pathType = "Prefix";
+              } ];
+            }
           ];
           tls = [
             {
               hosts = [
-                "prowlarr.${homelab.domain}"
+                "qbittorrent.${homelab.domain}"
               ];
               secretName = "wildcard-tls";
             }
           ];
+          integrations.traefik.enabled = false;
         };
 
-        workload.main.podSpec = {
-          containers = {
-            main = {
-              probes = {
-                liveness = { path = "/ping"; };
-                readiness = { path = "/ping"; };
-                startup = { type = "tcp"; };
-              };
-              env = {
-                PROWLARR__SERVER__PORT = "9696";
-                PROWLARR__AUTH__REQUIRED = "DisabledForLocalAddresses";
-                PROWLARR__APP__THEME = "dark";
-                PROWLARR__APP__INSTANCENAME = "Prowlarr";
-                PROWLARR__LOG__LEVEL = "info";
-                PROWLARR__UPDATE__BRANCH = "develop";
-              };
-            };
-            exportarr = {
-              enabled = true;
-              imageSelector = "exportarrImage";
-              args = [ "prowlarr" ];
-              probes = {
-                liveness = { enabled = true; type = "http"; path = "/healthz"; port = 9697; };
-                readiness = { enabled = true; type = "http"; path = "/healthz"; port = 9697; };
-                startup = { enabled = true; type = "http"; path = "/healthz"; port = 9697; };
-              };
-              env = {
-                INTERFACE = "0.0.0.0";
-                PORT = "9697";
-                URL = "http://localhost:9696";
-                CONFIG = "/config/config.xml";
+        portal.open.enabled = true;
+
+        workload = {
+          main.podSpec = {
+            containers = {
+              main = {
+                env = {
+                  DOCKER_MODS = "ghcr.io/vuetorrent/vuetorrent-lsio-mod:latest";
+                  QBT_WEBUI_PORT = "8080";
+                  QBT_TORRENTING_PORT = "62657";
+                };
               };
             };
           };
+          qbitportforward = {
+            enabled = true;
+            type = "Deployment";
+            strategy = "RollingUpdate";
+            replicas = 1;
+            podSpec.containers.qbitportforward = {
+              primary = true;
+              enabeld = true;
+              imageSelector = "qbitportforwardImage";
+              probes.liveness.enabled = false;
+              probes.readiness.enabled = false;
+              probes.startup.enabled = false;
+              env = {
+                DOCKER_MODS = "ghcr.io/vuetorrent/vuetorrent-lsio-mod:latest";
+                QBT_ADDR = "http://localhost:8080";
+                GTN_ADDR = "http://localhost:8000";
+              };
+            };
+          };
+        };
+
+        addons.vpn = {
+          type = "gluetun";
+          killSwitch = true;
+          envFrom = [ { secretRef.name = "gluetun-vpn-credentials"; } ];
         };
 
       };
