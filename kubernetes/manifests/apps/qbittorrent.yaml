@@ -32,7 +32,7 @@ spec:
         checksum/configmaps: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
         checksum/mariadb: 09c85576cb45b1eecd1467732b11ea8fa3363b0105c465f02a6ad64991521d52
         checksum/mongodb: 09c85576cb45b1eecd1467732b11ea8fa3363b0105c465f02a6ad64991521d52
-        checksum/persistence: 77f4e97e17e6f755deb2bdcf2e2467401c3a78f5f3f646072bf13503de6888bd
+        checksum/persistence: 4678e240e153f1f5d036b8bf0318c13d86d559913c1e4050352193b9265620a6
         checksum/redis: 013343a028cbb3f7e08f4ba7522702dd98e52632c688641074b0b1db3df29894
         checksum/secrets: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
         checksum/services: f9f81a151dc8ec41b834126fc90dae5e877f45db1880154a1df5fe914dec4bfa
@@ -218,7 +218,7 @@ spec:
             claimName: qbittorrent-config
         - name: shared
           persistentVolumeClaim:
-            claimName: cephfs-shared-storage
+            claimName: cephfs-apps-shared-storage
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim

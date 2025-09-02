@@ -1,10 +1,36 @@
 apiVersion: v1
+kind: PersistentVolume
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: cephfs-apps-shared-storage
+spec:
+  accessModes:
+    - ReadWriteMany
+  capacity:
+    storage: 1Gi
+  csi:
+    driver: rook-ceph.cephfs.csi.ceph.com
+    nodeStageSecretRef:
+      name: cephfs-user-secret
+      namespace: apps
+    volumeAttributes:
+      clusterID: rook-ceph
+      fsName: ceph-filesystem
+      rootPath: /volumes/nfs-exports/homelab-nfs/dfd23da6-d80d-48c7-b568-025ec7badd17
+      staticVolume: 'true'
+    volumeHandle: cephfs-apps-shared-storage
+  persistentVolumeReclaimPolicy: Retain
+  volumeMode: Filesystem
+---
+apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   annotations:
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
-  name: cephfs-shared-storage
+  name: cephfs-apps-shared-storage
   namespace: apps
 spec:
   accessModes:
@@ -14,4 +40,4 @@ spec:
       storage: 1Gi
   storageClassName: ''
   volumeMode: Filesystem
-  volumeName: cephfs-shared-storage
+  volumeName: cephfs-apps-shared-storage
