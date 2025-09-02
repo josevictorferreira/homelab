@@ -162,11 +162,19 @@ spec:
               value: '1'
             - name: DOCKER_MODS
               value: ghcr.io/vuetorrent/vuetorrent-lsio-mod:latest
+            - name: PGID
+              value: '1000'
+            - name: PUID
+              value: '1000'
             - name: QBT_TORRENTING_PORT
-              value: '62657'
+              value: '6881'
             - name: QBT_WEBUI_PORT
+              value: '80'
+            - name: TORRENTING_PORT
+              value: '62657'
+            - name: WEBUI_PORT
               value: '8080'
-          image: ghcr.io/home-operations/qbittorrent:5.1.2@sha256:9dd0164cc23e9c937e0af27fd7c3f627d1df30c182cf62ed34d3f129c55dc0e8
+          image: lscr.io/linuxserver/qbittorrent:5.1.2@sha256:d464a92d5656f1fa66baafe610a06a6cafd4bdf900a245e6f20b220f281b456d
           imagePullPolicy: IfNotPresent
           name: qbittorrent
           ports:
