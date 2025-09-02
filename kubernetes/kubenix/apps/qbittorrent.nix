@@ -5,6 +5,8 @@ let
   pvcName = "cephfs-apps-shared-storage";
   namespace = k8s.namespaces.applications;
   torrentingPort = 62657;
+  qbtUsername = "admin";
+  qbtPassword = "adminadmin";
 in
 {
   kubernetes = {
@@ -40,7 +42,11 @@ in
           };
         };
 
-        qbitportforward.enabled = false;
+        qbitportforward = {
+          enabled = false;
+          QBT_USERNAME = qbtUsername;
+          QBT_PASSWORD = qbtPassword;
+        };
 
         service = {
           main = {
@@ -158,13 +164,9 @@ in
                 DOCKER_MODS = "ghcr.io/vuetorrent/vuetorrent-lsio-mod:latest";
                 QBT_ADDR = "http://localhost:8080";
                 GTN_ADDR = "http://localhost:8000";
+                QBT_USERNAME = qbtUsername;
+                QBT_PASSWORD = qbtPassword;
               };
-              envFrom = [
-                {
-                  secretRef.name = "qbittorrent-credentials";
-                  secretRef.expandObjectName = false;
-                }
-              ];
             };
           };
         };
@@ -172,11 +174,11 @@ in
         addons.gluetun = {
           enabled = true;
           killSwitch = true;
+          container.env = {
+            QBT_USERNAME = qbtUsername;
+            QBT_PASSWORD = qbtPassword;
+          };
           container.envFrom = [
-            {
-              secretRef.name = "qbittorrent-credentials";
-              secretRef.expandObjectName = false;
-            }
             {
               secretRef.name = "gluetun-vpn-credentials";
               secretRef.expandObjectName = false;
