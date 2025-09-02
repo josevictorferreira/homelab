@@ -49,10 +49,7 @@ in
         };
 
         service = {
-          main = {
-            enabled = true;
-            type = "LoadBalancer";
-            annotations = kubenix.lib.serviceIpFor "qbittorrent";
+          main = kubenix.lib.plainServiceFor "qbittorrent" // {
             ports.main.port = 80;
             ports.main.targetPort = 8080;
           };
@@ -107,30 +104,7 @@ in
           };
         };
 
-        ingress.main = {
-          enabled = true;
-          primary = true;
-          ingressClassName = "cilium";
-          annotations = {
-            "cert-manager.io/cluster-issuer" = "cloudflare-issuer";
-          };
-          hosts = [
-            {
-              host = "qbittorrent.${homelab.domain}";
-              paths = [ {
-                path = "/";
-                pathType = "Prefix";
-              } ];
-            }
-          ];
-          tls = [
-            {
-              hosts = [
-                "qbittorrent.${homelab.domain}"
-              ];
-              secretName = "wildcard-tls";
-            }
-          ];
+        ingress.main = kubenix.lib.ingressDomainForService "qbittorrent" // {
           integrations.traefik.enabled = false;
         };
 
