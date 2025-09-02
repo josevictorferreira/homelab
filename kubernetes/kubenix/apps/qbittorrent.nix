@@ -85,8 +85,7 @@ in
             storageClass = "rook-ceph-block";
             targetSelector = {
               main = {
-                main = { mountPath = "/config"; };
-                exportarr = { mountPath = "/config"; readOnly = false; };
+                main = { mountPath = "/config";  readOnly = false; };
               };
             };
           };
@@ -122,6 +121,8 @@ in
                   torrentudp = { containerPort = torrentingPort; protocol = "UDP"; };
                 };
                 env = {
+                  PUID  = "65534";
+                  PGID  = "65534";
                   DOCKER_MODS = "ghcr.io/vuetorrent/vuetorrent-lsio-mod:latest";
                   WEBUI_PORT = "8080";
                   TORRENTING_PORT = toString torrentingPort;
