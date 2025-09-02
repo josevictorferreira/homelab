@@ -88,13 +88,11 @@ spec:
             - name: DOT
               value: 'off'
             - name: FIREWALL
-              value: 'off'
+              value: 'on'
             - name: FIREWALL_INPUT_PORTS
-              value: ''
+              value: 8080,62657,80
             - name: FIREWALL_OUTBOUND_SUBNETS
-              value: ''
-            - name: FIREWALL_VPN_INPUT_PORTS
-              value: '8080'
+              value: 172.16.0.0/16,172.17.0.0/16
             - name: QBT_PASSWORD
               value: adminadmin
             - name: QBT_USERNAME
