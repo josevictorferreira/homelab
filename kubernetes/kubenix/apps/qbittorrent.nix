@@ -23,8 +23,8 @@ in
       namespace = namespace;
       values = {
         image = {
-          repository = "lscr.io/linuxserver/qbittorrent";
-          tag = "5.1.2@sha256:d464a92d5656f1fa66baafe610a06a6cafd4bdf900a245e6f20b220f281b456d";
+          repository = "ghcr.io/home-operations/qbittorrent";
+          tag = "5.1.2@sha256:9dd0164cc23e9c937e0af27fd7c3f627d1df30c182cf62ed34d3f129c55dc0e8";
           pullPolicy = "IfNotPresent";
         };
         qbitportforwardImage = {
@@ -38,6 +38,7 @@ in
             fsGroup = 65534;
             runAsUser = 65534;
             runAsGroup = 65534;
+            readOnlyRootFilesystem = false;
           };
         };
 
@@ -85,7 +86,7 @@ in
             storageClass = "rook-ceph-block";
             targetSelector = {
               main = {
-                main = { mountPath = "/config";  readOnly = false; };
+                main = { mountPath = "/config"; readOnly = false; };
               };
             };
           };
@@ -110,24 +111,36 @@ in
 
         workload = {
           main.podSpec = {
+            initContainers = {
+              installVueTorrent = {
+                type = "init";
+                enabled = true;
+                image = {
+                  repository = "busybox";
+                  tag = "1.36.1";
+                  pullPolicy = "IfNotPresent";
+                };
+                command = [ "sh" "-c"
+                  "cd /config"
+                  " && curl -O https://github.com/VueTorrent/VueTorrent/releases/download/v2.29.0/vuetorrent.zip"
+                  " && unzip vuetorrent.zip -d /config/webui"
+                  " && rm vuetorrent.zip" ];
+                volumeMounts = [
+                  {
+                    name = "config";
+                    mountPath = "/config";
+                  }
+                ];
+              };
+            };
             containers = {
               main = {
                 probes.liveness.enabled = false;
                 probes.readiness.enabled = false;
                 probes.startup.enabled = false;
-                ports = {
-                  main = { containerPort = 8080; };
-                  torrent = { containerPort = torrentingPort; };
-                  torrentudp = { containerPort = torrentingPort; protocol = "UDP"; };
-                };
                 env = {
-                  PUID  = "65534";
-                  PGID  = "65534";
-                  DOCKER_MODS = "ghcr.io/vuetorrent/vuetorrent-lsio-mod:latest";
-                  WEBUI_PORT = "8080";
-                  TORRENTING_PORT = toString torrentingPort;
-                  # QBT_WEBUI_PORT = "8080";
-                  # QBT_TORRENTING_PORT = "${toString torrentingPort}";
+                  QBT_WEBUI_PORT = "8080";
+                  QBT_TORRENTING_PORT = "${toString torrentingPort}";
                 };
               };
             };
