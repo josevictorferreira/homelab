@@ -35,7 +35,7 @@ spec:
         checksum/persistence: 4678e240e153f1f5d036b8bf0318c13d86d559913c1e4050352193b9265620a6
         checksum/redis: 013343a028cbb3f7e08f4ba7522702dd98e52632c688641074b0b1db3df29894
         checksum/secrets: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
-        checksum/services: 7d33af53f305e2392f70b2abfb94732920b50c91c0e9e23980783169351d32ea
+        checksum/services: 47cf513535c2f95bd20d17103481ebc022c5df8d5f05574a10d3cde00ae9d969
         checksum/solr: 29c14feeaddbf7762052db593898d274941f539cee681ddc613957587686f347
       labels:
         app: qbittorrent-23.3.2
@@ -347,7 +347,7 @@ spec:
         checksum/persistence: 4678e240e153f1f5d036b8bf0318c13d86d559913c1e4050352193b9265620a6
         checksum/redis: 013343a028cbb3f7e08f4ba7522702dd98e52632c688641074b0b1db3df29894
         checksum/secrets: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
-        checksum/services: 7d33af53f305e2392f70b2abfb94732920b50c91c0e9e23980783169351d32ea
+        checksum/services: 47cf513535c2f95bd20d17103481ebc022c5df8d5f05574a10d3cde00ae9d969
         checksum/solr: 29c14feeaddbf7762052db593898d274941f539cee681ddc613957587686f347
       labels:
         app: qbittorrent-23.3.2
@@ -541,7 +541,7 @@ spec:
   allocateLoadBalancerNodePorts: false
   ports:
     - name: main
-      port: 8080
+      port: 80
       protocol: TCP
       targetPort: 8080
   publishNotReadyAddresses: false
@@ -623,7 +623,7 @@ metadata:
   annotations:
     cert-manager.io/cluster-issuer: cloudflare-issuer
     checksum/secrets: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
-    checksum/services: 7d33af53f305e2392f70b2abfb94732920b50c91c0e9e23980783169351d32ea
+    checksum/services: 47cf513535c2f95bd20d17103481ebc022c5df8d5f05574a10d3cde00ae9d969
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   labels:
@@ -647,7 +647,7 @@ spec:
               service:
                 name: qbittorrent
                 port:
-                  number: 8080
+                  number: 80
             path: /
             pathType: Prefix
   tls:
