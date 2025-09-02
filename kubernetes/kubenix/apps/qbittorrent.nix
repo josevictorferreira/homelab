@@ -159,6 +159,12 @@ in
                 QBT_ADDR = "http://localhost:8080";
                 GTN_ADDR = "http://localhost:8000";
               };
+              envFrom = [
+                {
+                  secretRef.name = "qbittorrent-credentials";
+                  secretRef.expandObjectName = false;
+                }
+              ];
             };
           };
         };
@@ -167,6 +173,10 @@ in
           enabled = true;
           killSwitch = true;
           container.envFrom = [
+            {
+              secretRef.name = "qbittorrent-credentials";
+              secretRef.expandObjectName = false;
+            }
             {
               secretRef.name = "gluetun-vpn-credentials";
               secretRef.expandObjectName = false;

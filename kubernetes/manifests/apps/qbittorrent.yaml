@@ -95,6 +95,8 @@ spec:
               value: ''
           envFrom:
             - secretRef:
+                name: qbittorrent-credentials
+            - secretRef:
                 name: gluetun-vpn-credentials
           image: tccr.io/tccr/gluetun:v3.40.0@sha256:a8189e29155e0f8142be1500ae068a92b189b1b25abbba036321e74d6389bf2b
           imagePullPolicy: IfNotPresent
