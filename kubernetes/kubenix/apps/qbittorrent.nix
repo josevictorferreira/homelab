@@ -12,7 +12,7 @@ in
           chartUrl = "oci://tccr.io/truecharts/qbittorrent";
           chart = "qbittorrent";
           version = "23.3.2";
-          sha256 = "sha256-YzN+udEKXR4P73M3sQ6RkRlLhNUunD/jv8C9Ve+Qsoo=";
+          sha256 = "sha256-Rks81hetW/b29Dg0PmmresvCuGL3cVuu4leTTZjwSIc=";
         };
       includeCRDs = true;
       noHooks = true;
@@ -158,7 +158,7 @@ in
           };
         };
 
-        addons.vpn = {
+        addons.gluetun = {
           type = "gluetun";
           killSwitch = true;
           envFrom = [ { secretRef.name = "gluetun-vpn-credentials"; } ];

@@ -1,0 +1,350 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app: qbittorrent-23.3.2
+    app.kubernetes.io/instance: qbittorrent
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: qbittorrent
+    app.kubernetes.io/version: 5.1.2
+    helm-revision: '1'
+    helm.sh/chart: qbittorrent-23.3.2
+    release: qbittorrent
+  name: qbittorrent
+  namespace: apps
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: qbittorrent
+      app.kubernetes.io/name: qbittorrent
+      pod.name: main
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        checksum/cnpg: 2291fc448ae81adfd860632d73e38ffc039fc25959ede77cf692f754199383ee
+        checksum/configmaps: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
+        checksum/mariadb: 09c85576cb45b1eecd1467732b11ea8fa3363b0105c465f02a6ad64991521d52
+        checksum/mongodb: 09c85576cb45b1eecd1467732b11ea8fa3363b0105c465f02a6ad64991521d52
+        checksum/persistence: 77f4e97e17e6f755deb2bdcf2e2467401c3a78f5f3f646072bf13503de6888bd
+        checksum/redis: 013343a028cbb3f7e08f4ba7522702dd98e52632c688641074b0b1db3df29894
+        checksum/secrets: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
+        checksum/services: f9f81a151dc8ec41b834126fc90dae5e877f45db1880154a1df5fe914dec4bfa
+        checksum/solr: 29c14feeaddbf7762052db593898d274941f539cee681ddc613957587686f347
+      labels:
+        app: qbittorrent-23.3.2
+        app.kubernetes.io/instance: qbittorrent
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: qbittorrent
+        app.kubernetes.io/version: 5.1.2
+        helm-revision: '1'
+        helm.sh/chart: qbittorrent-23.3.2
+        pod.lifecycle: permanent
+        pod.name: main
+        release: qbittorrent
+        truecharts.org/pvc: config_shared
+    spec:
+      affinity:
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: truecharts.org/pvc
+                    operator: In
+                    values:
+                      - config_shared
+              topologyKey: kubernetes.io/hostname
+      automountServiceAccountToken: false
+      containers:
+        - env:
+            - name: TZ
+              value: UTC
+            - name: UMASK
+              value: '0022'
+            - name: UMASK_SET
+              value: '0022'
+            - name: NVIDIA_VISIBLE_DEVICES
+              value: void
+            - name: S6_READ_ONLY_ROOT
+              value: '1'
+            - name: DOCKER_MODS
+              value: ghcr.io/vuetorrent/vuetorrent-lsio-mod:latest
+            - name: QBT_TORRENTING_PORT
+              value: '62657'
+            - name: QBT_WEBUI_PORT
+              value: '8080'
+          image: ghcr.io/home-operations/qbittorrent:5.1.0@sha256:1cd84c74d3c7ccb7d2edb43fec4cdd2306f6ca30b7e85efd762fa476e1470fba
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 5
+            httpGet:
+              path: /
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 12
+            periodSeconds: 15
+            successThreshold: 1
+            timeoutSeconds: 5
+          name: qbittorrent
+          ports:
+            - containerPort: 8080
+              name: main
+              protocol: TCP
+            - containerPort: 6881
+              name: torrent
+              protocol: TCP
+            - containerPort: 6881
+              name: torrentudp
+              protocol: UDP
+          readinessProbe:
+            failureThreshold: 4
+            httpGet:
+              path: /
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 12
+            successThreshold: 2
+            timeoutSeconds: 5
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 1500Mi
+            requests:
+              cpu: 100m
+              memory: 250Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              add: []
+              drop:
+                - ALL
+            privileged: false
+            readOnlyRootFilesystem: false
+            runAsGroup: 65534
+            runAsNonRoot: true
+            runAsUser: 65534
+            seccompProfile:
+              type: RuntimeDefault
+          startupProbe:
+            failureThreshold: 60
+            httpGet:
+              path: /
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 3
+          stdin: false
+          tty: false
+          volumeMounts:
+            - mountPath: /config
+              name: config
+              readOnly: false
+            - mountPath: /dev/shm
+              name: devshm
+              readOnly: false
+            - mountPath: /downloads
+              name: shared
+              readOnly: false
+            - mountPath: /tmp
+              name: tmp
+              readOnly: false
+            - mountPath: /var/logs
+              name: varlogs
+              readOnly: false
+            - mountPath: /var/run
+              name: varrun
+              readOnly: false
+      dnsConfig:
+        options:
+          - name: ndots
+            value: '1'
+      dnsPolicy: ClusterFirst
+      enableServiceLinks: false
+      hostIPC: false
+      hostNetwork: false
+      hostPID: false
+      hostUsers: true
+      nodeSelector:
+        kubernetes.io/arch: amd64
+      restartPolicy: Always
+      securityContext:
+        fsGroup: 568
+        fsGroupChangePolicy: OnRootMismatch
+        supplementalGroups:
+          - 568
+        sysctls: []
+      serviceAccountName: default
+      shareProcessNamespace: false
+      terminationGracePeriodSeconds: 60
+      topologySpreadConstraints:
+        - labelSelector:
+            matchLabels:
+              app.kubernetes.io/instance: qbittorrent
+              app.kubernetes.io/name: qbittorrent
+              pod.name: main
+          maxSkew: 1
+          nodeAffinityPolicy: Honor
+          nodeTaintsPolicy: Honor
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+      volumes:
+        - emptyDir:
+            medium: Memory
+            sizeLimit: 1500Mi
+          name: devshm
+        - emptyDir:
+            medium: Memory
+            sizeLimit: 1500Mi
+          name: tmp
+        - emptyDir:
+            medium: Memory
+            sizeLimit: 1500Mi
+          name: varlogs
+        - emptyDir:
+            medium: Memory
+            sizeLimit: 1500Mi
+          name: varrun
+        - name: config
+          persistentVolumeClaim:
+            claimName: qbittorrent-config
+        - name: shared
+          persistentVolumeClaim:
+            claimName: cephfs-shared-storage
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app: qbittorrent-23.3.2
+    app.kubernetes.io/instance: qbittorrent
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: qbittorrent
+    app.kubernetes.io/version: 5.1.2
+    helm-revision: '1'
+    helm.sh/chart: qbittorrent-23.3.2
+    release: qbittorrent
+  name: qbittorrent-config
+  namespace: apps
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: rook-ceph-block
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app: qbittorrent-23.3.2
+    app.kubernetes.io/instance: qbittorrent
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: qbittorrent
+    app.kubernetes.io/version: 5.1.2
+    helm-revision: '1'
+    helm.sh/chart: qbittorrent-23.3.2
+    release: qbittorrent
+    service.name: main
+  name: qbittorrent
+  namespace: apps
+spec:
+  ports:
+    - name: main
+      port: 80
+      protocol: TCP
+      targetPort: 8080
+  publishNotReadyAddresses: false
+  selector:
+    app.kubernetes.io/instance: qbittorrent
+    app.kubernetes.io/name: qbittorrent
+    pod.name: main
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app: qbittorrent-23.3.2
+    app.kubernetes.io/instance: qbittorrent
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: qbittorrent
+    app.kubernetes.io/version: 5.1.2
+    helm-revision: '1'
+    helm.sh/chart: qbittorrent-23.3.2
+    release: qbittorrent
+    service.name: torrent
+  name: qbittorrent-torrent
+  namespace: apps
+spec:
+  ports:
+    - name: torrent
+      port: 6881
+      protocol: TCP
+      targetPort: 6881
+    - name: torrentudp
+      port: 6881
+      protocol: UDP
+      targetPort: 6881
+  publishNotReadyAddresses: false
+  selector:
+    app.kubernetes.io/instance: qbittorrent
+    app.kubernetes.io/name: qbittorrent
+    pod.name: main
+  type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: cloudflare-issuer
+    checksum/secrets: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
+    checksum/services: f9f81a151dc8ec41b834126fc90dae5e877f45db1880154a1df5fe914dec4bfa
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app: qbittorrent-23.3.2
+    app.kubernetes.io/instance: qbittorrent
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: qbittorrent
+    app.kubernetes.io/version: 5.1.2
+    helm-revision: '1'
+    helm.sh/chart: qbittorrent-23.3.2
+    release: qbittorrent
+  name: qbittorrent
+  namespace: apps
+spec:
+  ingressClassName: cilium
+  rules:
+    - host: qbittorrent.josevictor.me
+      http:
+        paths:
+          - backend:
+              service:
+                name: qbittorrent
+                port:
+                  number: 80
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - qbittorrent.josevictor.me
+      secretName: wildcard-tls
