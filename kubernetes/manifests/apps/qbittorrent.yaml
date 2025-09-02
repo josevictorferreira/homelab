@@ -97,6 +97,8 @@ spec:
               value: adminadmin
             - name: QBT_USERNAME
               value: admin
+            - name: VPN_INPUT_PORTS
+              value: '8080'
           envFrom:
             - secretRef:
                 name: gluetun-vpn-credentials

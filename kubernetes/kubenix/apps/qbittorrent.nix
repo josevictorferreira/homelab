@@ -156,6 +156,7 @@ in
           container.env = {
             QBT_USERNAME = qbtUsername;
             QBT_PASSWORD = qbtPassword;
+            VPN_INPUT_PORTS = "8080";
           };
           container.envFrom = [
             {
