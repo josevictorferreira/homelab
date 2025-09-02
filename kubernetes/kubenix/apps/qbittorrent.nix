@@ -112,7 +112,7 @@ in
         workload = {
           main.podSpec = {
             initContainers = {
-              installVueTorrent = {
+              "install-vue-torrent" = {
                 type = "init";
                 enabled = true;
                 image = {
