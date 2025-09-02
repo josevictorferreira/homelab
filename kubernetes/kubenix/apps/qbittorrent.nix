@@ -124,8 +124,8 @@ in
                 };
                 env = {
                   DOCKER_MODS = "ghcr.io/vuetorrent/vuetorrent-lsio-mod:latest";
-                  PUID = "1000";
-                  PGID = "1000";
+                  PUID = "2002";
+                  PGID = "2002";
                   WEBUI_PORT = "8080";
                   TORRENTING_PORT = toString torrentingPort;
                   # QBT_WEBUI_PORT = "8080";
