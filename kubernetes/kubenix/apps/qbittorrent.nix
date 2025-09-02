@@ -23,8 +23,8 @@ in
       namespace = namespace;
       values = {
         image = {
-          repository = "ghcr.io/home-operations/qbittorrent";
-          tag = "5.1.2@sha256:9dd0164cc23e9c937e0af27fd7c3f627d1df30c182cf62ed34d3f129c55dc0e8";
+          repository = "lscr.io/linuxserver/qbittorrent";
+          tag = "5.1.2@sha256:d464a92d5656f1fa66baafe610a06a6cafd4bdf900a245e6f20b220f281b456d";
           pullPolicy = "IfNotPresent";
         };
         qbitportforwardImage = {
@@ -117,10 +117,19 @@ in
                 probes.liveness.enabled = false;
                 probes.readiness.enabled = false;
                 probes.startup.enabled = false;
+                ports = {
+                  main = { containerPort = 8080; };
+                  torrent = { containerPort = torrentingPort; };
+                  torrentudp = { containerPort = torrentingPort; protocol = "UDP"; };
+                };
                 env = {
                   DOCKER_MODS = "ghcr.io/vuetorrent/vuetorrent-lsio-mod:latest";
-                  QBT_WEBUI_PORT = "8080";
-                  QBT_TORRENTING_PORT = "${toString torrentingPort}";
+                  PUID = "1000";
+                  PGID = "1000";
+                  WEBUI_PORT = "8080";
+                  TORRENTING_PORT = toString torrentingPort;
+                  # QBT_WEBUI_PORT = "8080";
+                  # QBT_TORRENTING_PORT = "${toString torrentingPort}";
                 };
               };
             };
@@ -139,7 +148,6 @@ in
               probes.readiness.enabled = false;
               probes.startup.enabled = false;
               env = {
-                DOCKER_MODS = "ghcr.io/vuetorrent/vuetorrent-lsio-mod:latest";
                 QBT_ADDR = "http://localhost:8080";
                 GTN_ADDR = "http://localhost:8000";
                 QBT_USERNAME = qbtUsername;
