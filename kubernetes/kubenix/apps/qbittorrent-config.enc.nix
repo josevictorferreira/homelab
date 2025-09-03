@@ -171,9 +171,11 @@ in
           name = "qbittorrent-config";
           namespace = namespace;
         };
-        data."qBittorrent.conf" = qbtConf;
-        data."watched_folders.json" = builtins.toJSON watchedDownloadsConf;
-        data."categories.json" = builtins.toJSON categoriesConf;
+        data = {
+          "qBittorrent.conf" = qbtConf;
+          "watched_folders.json" = builtins.toJSON watchedDownloadsConf;
+          "categories.json" = builtins.toJSON categoriesConf;
+        };
       };
     };
   };
