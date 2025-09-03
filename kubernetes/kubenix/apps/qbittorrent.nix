@@ -46,11 +46,11 @@ in
           pullPolicy = "IfNotPresent";
         };
         securityContext = {
-          fsGroup = 65534;
+          fsGroup = 2002;
           container = {
-            fsGroup = 65534;
-            runAsUser = 65534;
-            runAsGroup = 65534;
+            fsGroup = 2002;
+            runAsUser = 2002;
+            runAsGroup = 2002;
             readOnlyRootFilesystem = false;
           };
         };
