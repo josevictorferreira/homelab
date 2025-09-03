@@ -5,37 +5,74 @@ let
 in
 {
   kubernetes = {
-    helm.releases."postgresql" = {
+    helm.releases."linkwarden" = {
       chart = kubenix.lib.helm.fetch
         {
-          chartUrl = "oci://registry-1.docker.io/bitnamicharts/postgresql";
-          chart = "postgresql";
-          version = "16.5.2";
-          sha256 = "sha256-iJ4clEnUshRP/s/qwkn/07JTSonGzMRV6XpMvwI9pAQ=";
+          chartUrl = "oci://ghcr.io/fmjstudios/helm/linkwarden";
+          chart = "linkwarden";
+          version = "0.3.3";
+          sha256 = "sha256-rFzutBrDDF4qVj38dYazjv3iUl2uszIJSKWPwrRdX1E=";
         };
       includeCRDs = true;
       noHooks = true;
       namespace = namespace;
       values = {
-        global.postgresql.auth = {
-          database = "linkwarden";
-          existingSecret = "postgresql-auth";
-          secretKeys = {
-            adminPasswordKey = "admin-password";
-            userPasswordKey = "user-password";
-            replicationPasswordKey = "replication-password";
+        image = {
+          registry = "ghcr.io";
+          repository = "linkwarden/linkwarden";
+          tag = "v2.12.2@sha256:c1c6f417ea566de2c2dac6e79353ee5f40cb6a44fd9dd3970c83e6fc098de1df";
+        };
+
+        linkwarden = {
+          labels = {
+            app = "linkwarden";
+            release = "linkwarden";
+          };
+          domain = "linkwarden.${homelab.domain}";
+
+          data = {
+            storageType = "s3";
+            s3 = {
+              bucketName = "linkwarden";
+              endpoint = "objectstore.${homelab.domain}";
+              region = "us-east-1";
+              existingSecret = "ceph-object-storage-credentials";
+            };
+          };
+
+          database = {
+            user = "postgres";
+            password = kubenix.lib.secretsFor "postgresql_admin_password";
+            host = "postgresql-hl";
+            name = "linkwarden";
           };
         };
 
-        primary.persistence = {
-          enabled = true;
-          storageClass = "rook-ceph-block";
-          reclaimPolicy = "Retain";
-          accessModes = [ "ReadWriteOnce" ];
+        resources = {
+          requests = {
+            cpu = "50m";
+            memory = "1Gi";
+          };
+          limits.memory = "1.5Gi";
         };
 
-        primary.service = kubenix.lib.plainServiceFor "postgresql";
+        service = {
+          port = 80;
+        };
+
+        postgresql.enabled = false;
+
+        ingress = kubenix.lib.ingressDomainForService "linkwarden";
       };
+    };
+
+    resources.deployments.linkwarden = {
+      metadata.namespace = namespace;
+      spec.template.spec.containers.linkwarden.envFrom = [
+        {
+          secretRef.name = "linkwarden-secrets";
+        }
+      ];
     };
   };
 }
