@@ -120,6 +120,13 @@ in
             expandObjectName = false;
             mountPath = "/config/qBittorrent/qBittorrent.conf";
             subPath = "qBittorrent.conf";
+            defaultMode = "0777";
+            items = [
+              {
+                key = "qBittorrent.conf";
+                path = "/config/qBittorrent/qBittorrent.conf";
+              }
+            ];
             targetSelector = {
               main = {
                 main = { mountPath = "/config/qBittorrent/qBittorrent.conf"; subPath = "qBittorrent.conf"; readOnly = false; };
@@ -133,6 +140,13 @@ in
             expandObjectName = false;
             mountPath = "/config/qBittorrent/categories.json";
             subPath = "categories.json";
+            defaultMode = "0777";
+            items = [
+              {
+                key = "categories.json";
+                path = "/config/qBittorrent/categories.json";
+              }
+            ];
             targetSelector = {
               main = {
                 main = { mountPath = "/config/qBittorrent/categories.json"; subPath = "categories.json"; readOnly = false; };
@@ -146,6 +160,13 @@ in
             expandObjectName = false;
             mountPath = "/config/qBittorrent/watched_folders.json";
             subPath = "watched_folders.json";
+            defaultMode = "0777";
+            items = [
+              {
+                key = "watched_folders.json";
+                path = "/config/qBittorrent/watched_folders.json";
+              }
+            ];
             targetSelector = {
               main = {
                 main = { mountPath = "/config/qBittorrent/watched_folders.json"; subPath = "watched_folders.json"; readOnly = false; };
