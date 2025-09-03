@@ -119,7 +119,8 @@ in
             objectName = "qbittorrent-config";
             expandObjectName = false;
             optional = false;
-            mountPath = "/config/qBittorrent";
+            mountPath = "/config/qBittorrent/qBittorrent.conf";
+            subPath = "qBittorrent.conf";
             items = [
               {
                 key = "qBittorrent.conf";
@@ -128,7 +129,7 @@ in
             ];
             targetSelector = {
               main = {
-                main = { mountPath = "/config/qBittorrent"; readOnly = false; };
+                main = { mountPath = "/config/qBittorrent/qBittorrent.conf"; subPath = "qBittorrent.conf"; readOnly = false; };
               };
             };
           };
