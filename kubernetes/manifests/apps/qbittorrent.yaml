@@ -32,7 +32,7 @@ spec:
         checksum/configmaps: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
         checksum/mariadb: 09c85576cb45b1eecd1467732b11ea8fa3363b0105c465f02a6ad64991521d52
         checksum/mongodb: 09c85576cb45b1eecd1467732b11ea8fa3363b0105c465f02a6ad64991521d52
-        checksum/persistence: 556e0580319f1d6dbc4db3e56aec6c1cfdcfc8b454edef7adfc3e9287f741cbf
+        checksum/persistence: df429b354edc9e8196bbfe7134862f3c419b4cbfcf99b3dd89632fed6993eb86
         checksum/redis: 013343a028cbb3f7e08f4ba7522702dd98e52632c688641074b0b1db3df29894
         checksum/secrets: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
         checksum/services: e956a5c4cf8923876402324a4ea8a601db8255d76b9950b219ec45bfec96e545
@@ -202,10 +202,6 @@ spec:
             - mountPath: /dev/shm
               name: devshm
               readOnly: false
-            - mountPath: /config/qBittorrent/qBittorrent.conf
-              name: qbittorrent-config
-              readOnly: false
-              subPath: qBittorrent.conf
             - mountPath: /downloads
               name: shared
               readOnly: false
@@ -337,10 +333,6 @@ spec:
           topologyKey: kubernetes.io/hostname
           whenUnsatisfiable: ScheduleAnyway
       volumes:
-        - configMap:
-            name: qbittorrent-config
-            optional: false
-          name: qbittorrent-config
         - emptyDir:
             medium: Memory
             sizeLimit: 1500Mi
