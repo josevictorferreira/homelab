@@ -6,6 +6,8 @@ in
 rec {
   secretsFor = secretName: "ref+sops://${k8sSecretsFile}#${secretName}";
 
+  domainFor = serviceName: "${serviceName}.${homelab.domain}";
+
   serviceIpFor = serviceName: {
     "lbipam.cilium.io/ips" = homelab.kubernetes.loadBalancer.services.${serviceName};
     "lbipam.cilium.io/sharing-key" = serviceName;
