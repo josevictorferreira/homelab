@@ -95,22 +95,16 @@ in
             mountPath = "/config";
             size = "1Gi";
             storageClass = "rook-ceph-block";
-            targetSelector = {
-              main = {
-                main = { mountPath = "/config"; readOnly = false; };
-                "install-vuetorrent" = { mountPath = "/config"; readOnly = false; };
-              };
+            targetSelector.main = {
+              main = { mountPath = "/config"; readOnly = false; };
+              install-vuetorrent = { mountPath = "/config"; readOnly = false; };
             };
           };
           config-dir = {
             enabled = true;
             type = "emptyDir";
             mountPath = "/config/qBittorrent";
-            targetSelector = {
-              main = {
-                main = { readOnly = false; };
-              };
-            };
+            targetSelector.main.main.readOnly = false;
           };
           qbittorrent-conf = {
             enabled = true;
@@ -119,22 +113,32 @@ in
             expandObjectName = false;
             mountPath = "/config/qBittorrent/qBittorrent.conf";
             subPath = "qBittorrent.conf";
-            targetSelector = {
-              main = {
-                main = { readOnly = false; };
-              };
-            };
+            targetSelector.main.main.readOnly = false;
+          };
+          categories-conf = {
+            enabled = true;
+            type = "configmap";
+            objectName = "qbittorrent-config";
+            expandObjectName = false;
+            mountPath = "/config/qBittorrent/categories.json";
+            subPath = "categories.json";
+            targetSelector.main.main.readOnly = false;
+          };
+          watched-folders-conf = {
+            enabled = true;
+            type = "configmap";
+            objectName = "qbittorrent-config";
+            expandObjectName = false;
+            mountPath = "/config/qBittorrent/watched_folders.json";
+            subPath = "watched_folders.json";
+            targetSelector.main.main.readOnly = false;
           };
           shared = {
             enabled = true;
             type = "pvc";
             existingClaim = pvcName;
             mountPath = "/downloads";
-            targetSelector = {
-              main = {
-                main = { mountPath = "/downloads"; readOnly = false; };
-              };
-            };
+            targetSelector.main.main = { mountPath = "/downloads"; readOnly = false; };
           };
         };
 
