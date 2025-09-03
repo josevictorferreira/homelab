@@ -102,6 +102,29 @@ in
               };
             };
           };
+          config-dir = {
+            enabled = true;
+            type = "emptyDir";
+            mountPath = "/config/qBittorrent";
+            targetSelector = {
+              main = {
+                main = { readOnly = false; };
+              };
+            };
+          };
+          qbittorrent-conf = {
+            enabled = true;
+            type = "configmap";
+            objectName = "qbittorrent-config";
+            expandObjectName = false;
+            mountPath = "/config/qBittorrent/qBittorrent.conf";
+            subPath = "qBittorrent.conf";
+            targetSelector = {
+              main = {
+                main = { readOnly = false; };
+              };
+            };
+          };
           shared = {
             enabled = true;
             type = "pvc";
