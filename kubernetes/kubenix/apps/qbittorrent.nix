@@ -119,35 +119,13 @@ in
             objectName = "qbittorrent-config";
             optional = false;
             expandObjectName = false;
-            items = [
-              {
-                key = "qBittorrent.conf";
-                path = "qBittorrent.conf";
-              }
-              {
-                key = "categories.json";
-                path = "categories.json";
-              }
-              {
-                key = "watched_folders.json";
-                path = "watched_folders.json";
-              }
-            ];
+            mountPath = "/config/qBittorrent/qBittorrent.conf";
+            subPath = "qBittorrent.conf";
             targetSelector = {
               main = {
-                main = { mountPath = "/config/qBittorrent"; readOnly = false; };
-              };
-            };
-          };
-          qbittorrent-logs = {
-            enabled = true;
-            type = "emptyDir";
-            mountPath = "/config/qBittorrent/logs";
-            readOnly = true;
-            defaultMode = 0755;
-            targetSelector = {
-              main = {
-                main = { mountPath = "/config/qBittorrent/logs"; readOnly = false; };
+                main = {
+                  readOnly = false;
+                };
               };
             };
           };
