@@ -32,7 +32,7 @@ spec:
         checksum/configmaps: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
         checksum/mariadb: 09c85576cb45b1eecd1467732b11ea8fa3363b0105c465f02a6ad64991521d52
         checksum/mongodb: 09c85576cb45b1eecd1467732b11ea8fa3363b0105c465f02a6ad64991521d52
-        checksum/persistence: 6e37e7f1d476c3c4800ca71a39d1ef4208b4e5a49fd1868b38a03ee6b7f895b2
+        checksum/persistence: de84959ccaab832d6eef0c7699456463a283e107e45327a0e203b4a693f9df02
         checksum/redis: 013343a028cbb3f7e08f4ba7522702dd98e52632c688641074b0b1db3df29894
         checksum/secrets: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
         checksum/services: e956a5c4cf8923876402324a4ea8a601db8255d76b9950b219ec45bfec96e545
@@ -196,6 +196,10 @@ spec:
           stdin: false
           tty: false
           volumeMounts:
+            - mountPath: /config/qBittorrent/categories.json
+              name: categories-conf
+              readOnly: false
+              subPath: categories.json
             - mountPath: /config
               name: config
               readOnly: false
@@ -221,6 +225,10 @@ spec:
             - mountPath: /var/run
               name: varrun
               readOnly: false
+            - mountPath: /config/qBittorrent/watched_folders.json
+              name: watched-folders-conf
+              readOnly: false
+              subPath: watched_folders.json
       dnsConfig:
         options:
           - name: ndots
@@ -343,7 +351,15 @@ spec:
         - configMap:
             name: qbittorrent-config
             optional: false
+          name: categories-conf
+        - configMap:
+            name: qbittorrent-config
+            optional: false
           name: qbittorrent-conf
+        - configMap:
+            name: qbittorrent-config
+            optional: false
+          name: watched-folders-conf
         - emptyDir: {}
           name: config-dir
         - emptyDir:
