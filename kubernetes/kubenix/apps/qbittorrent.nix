@@ -90,18 +90,18 @@ in
         };
 
         persistence = {
-          config = {
-            enabled = true;
-            mountPath = "/config";
-            size = "1Gi";
-            storageClass = "rook-ceph-block";
-            targetSelector = {
-              main = {
-                main = { mountPath = "/config"; readOnly = false; };
-                "install-vuetorrent" = { mountPath = "/config"; readOnly = false; };
-              };
-            };
-          };
+          # config = {
+          #   enabled = true;
+          #   mountPath = "/config";
+          #   size = "1Gi";
+          #   storageClass = "rook-ceph-block";
+          #   targetSelector = {
+          #     main = {
+          #       main = { mountPath = "/config"; readOnly = false; };
+          #       "install-vuetorrent" = { mountPath = "/config"; readOnly = false; };
+          #     };
+          #   };
+          # };
           shared = {
             enabled = true;
             type = "pvc";
@@ -119,9 +119,6 @@ in
             objectName = "qbittorrent-config";
             optional = false;
             expandObjectName = false;
-            mountPath = "/config/qBittorrent/qBittorrent.conf";
-            subPath = "qBittorrent.conf";
-            defaultMode = "0777";
             items = [
               {
                 key = "qBittorrent.conf";
