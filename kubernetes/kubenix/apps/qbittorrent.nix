@@ -118,11 +118,14 @@ in
             type = "configmap";
             objectName = "qbittorrent-config";
             expandObjectName = false;
+            items = [
+              { key = "qBittorrent.conf"; path = "qBittorrent.conf"; }
+              { key = "categories.json"; path = "categories.json"; }
+              { key = "watched_folders.json"; path = "watched_folders.json"; }
+            ];
             targetSelector = {
               main = {
-                main-conf = { mountPath = "/config/qBittorrent/qBittorrent.conf"; subPath = "qBittorrent.conf"; readOnly = false; };
-                main-categories = { mountPath = "/config/qBittorrent/categories.json"; subPath = "categories.json"; readOnly = false; };
-                main-watch = { mountPath = "/config/qBittorrent/watched_folders.json"; subPath = "watched_folders.json"; readOnly = false; };
+                main = { mountPath = "/config/qBittorrent"; readOnly = false; };
               };
             };
           };
