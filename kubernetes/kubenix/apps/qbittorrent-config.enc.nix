@@ -47,7 +47,8 @@ let
     WebUI\CSRFProtection=false
     WebUI\HostHeaderValidation=false
     WebUI\LocalHostAuth=false
-    WebUI\Password_PBKDF2='PBKDF2$sha512$100000$lhlkLd134xQEpKC0KxmAFw==$qerzYLduO7zOydTrbfmK8EIJqVEEDHMDi/dOSOZjvc+7qjpHsKr3oXk1qD1m9OpmLnoSv/fWQnx8piPUolrKSA=='
+    WebUI\Username=josevictor
+    WebUI\Password_PBKDF2="@ByteArray(rdFrj84LCsPuBFwdx535EA==:RHDXcnMQjCGd5sauAOa7veGSlQK4goDKa8CsR++oGHJHwm/a4RBev5IIEJG0GBRQbgP+9T0Ft+0iVUozu3PYTw==)"
     WebUI\Port=8080
     WebUI\ServerDomains=*
     WebUI\UseUPnP=false
