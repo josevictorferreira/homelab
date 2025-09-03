@@ -48,12 +48,16 @@ in
           pullPolicy = "IfNotPresent";
         };
         securityContext = {
-          fsGroup = 2002;
           container = {
-            fsGroup = 2002;
             runAsUser = 2002;
             runAsGroup = 2002;
+            PUID = 2002;
             readOnlyRootFilesystem = false;
+            fsGroupChangePolicy = "OnRootMismatch";
+          };
+          pod = {
+            fsGroup = 2002;
+            fsGroupChangePolicy = "OnRootMismatch";
           };
         };
 
