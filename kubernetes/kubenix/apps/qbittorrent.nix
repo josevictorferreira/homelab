@@ -5,8 +5,6 @@ let
   pvcName = "cephfs-apps-shared-storage";
   namespace = k8s.namespaces.applications;
   torrentingPort = 62657;
-  qbtUsername = "admin";
-  qbtPassword = "adminadmin";
   vueTorrentInstallScript = ''
     set -e
     echo "Creating config directory"
@@ -59,8 +57,6 @@ in
 
         qbitportforward = {
           enabled = false;
-          QBT_USERNAME = qbtUsername;
-          QBT_PASSWORD = qbtPassword;
         };
 
         service = {
@@ -117,6 +113,19 @@ in
               };
             };
           };
+          "qbittorrent-conf" = {
+            enabled = true;
+            type = "configmap";
+            objectName = "qbittorrent-config";
+            expandObjectName = false;
+            optional = false;
+            mountPath = "/config/qBittorrent";
+            targetSelector = {
+              main = {
+                main = { mountPath = "/config/qBittorrent"; readOnly = false; };
+              };
+            };
+          };
         };
 
         ingress.main = kubenix.lib.ingressDomainForService "qbittorrent" // {
@@ -164,8 +173,6 @@ in
               env = {
                 QBT_ADDR = "http://localhost:8080";
                 GTN_ADDR = "http://localhost:8000";
-                QBT_USERNAME = qbtUsername;
-                QBT_PASSWORD = qbtPassword;
               };
               command = "/usr/src/app/main.sh";
             };
@@ -176,8 +183,6 @@ in
           enabled = true;
           killSwitch = true;
           container.env = {
-            QBT_USERNAME = qbtUsername;
-            QBT_PASSWORD = qbtPassword;
             FIREWALL = "on";
             FIREWALL_INPUT_PORTS = "8080,${toString torrentingPort}";
           };
