@@ -2,7 +2,7 @@
 
 let
   k8s = homelab.kubernetes;
-  pvcName = "cephfs-apps-shared-storage";
+  pvcName = "cephfs-shared-storage-downloads";
   namespace = k8s.namespaces.applications;
   torrentingPort = 62657;
   vueTorrentInstallScript = ''

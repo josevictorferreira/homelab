@@ -1,10 +1,10 @@
 { homelab, ... }:
 
 let
-  pvName = "cephfs-apps-shared-storage";
-  pvcName = "cephfs-apps-shared-storage";
+  pvName = "cephfs-shared-storage-downloads";
+  pvcName = "cephfs-shared-storage-downloads";
   fsName = "ceph-filesystem";
-  exportPath = "/volumes/nfs-exports/homelab-nfs/dfd23da6-d80d-48c7-b568-025ec7badd17";
+  exportPath = "/volumes/nfs-exports/homelab-nfs/dfd23da6-d80d-48c7-b568-025ec7badd17/downloads";
   namespace = homelab.kubernetes.namespaces.applications;
 in
 {
