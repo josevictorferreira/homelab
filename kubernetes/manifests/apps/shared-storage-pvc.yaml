@@ -4,7 +4,7 @@ metadata:
   annotations:
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
-  name: cephfs-apps-shared-storage
+  name: cephfs-shared-storage-downloads
 spec:
   accessModes:
     - ReadWriteMany
@@ -18,9 +18,9 @@ spec:
     volumeAttributes:
       clusterID: rook-ceph
       fsName: ceph-filesystem
-      rootPath: /volumes/nfs-exports/homelab-nfs/dfd23da6-d80d-48c7-b568-025ec7badd17
+      rootPath: /volumes/nfs-exports/homelab-nfs/dfd23da6-d80d-48c7-b568-025ec7badd17/downloads
       staticVolume: 'true'
-    volumeHandle: cephfs-apps-shared-storage
+    volumeHandle: cephfs-shared-storage-downloads
   persistentVolumeReclaimPolicy: Retain
   volumeMode: Filesystem
 ---
@@ -30,7 +30,7 @@ metadata:
   annotations:
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
-  name: cephfs-apps-shared-storage
+  name: cephfs-shared-storage-downloads
   namespace: apps
 spec:
   accessModes:
@@ -40,4 +40,4 @@ spec:
       storage: 1Gi
   storageClassName: ''
   volumeMode: Filesystem
-  volumeName: cephfs-apps-shared-storage
+  volumeName: cephfs-shared-storage-downloads
