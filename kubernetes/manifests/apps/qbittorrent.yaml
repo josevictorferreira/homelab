@@ -72,17 +72,17 @@ spec:
             - name: NVIDIA_VISIBLE_DEVICES
               value: void
             - name: PUID
-              value: '568'
+              value: '2002'
             - name: USER_ID
-              value: '568'
+              value: '2002'
             - name: UID
-              value: '568'
+              value: '2002'
             - name: PGID
-              value: '568'
+              value: '2002'
             - name: GROUP_ID
-              value: '568'
+              value: '2002'
             - name: GID
-              value: '568'
+              value: '2002'
             - name: DNS_KEEP_NAMESERVER
               value: 'on'
             - name: DOT
@@ -340,7 +340,7 @@ spec:
         kubernetes.io/arch: amd64
       restartPolicy: Always
       securityContext:
-        fsGroup: 568
+        fsGroup: 2002
         fsGroupChangePolicy: OnRootMismatch
         supplementalGroups:
           - 568
