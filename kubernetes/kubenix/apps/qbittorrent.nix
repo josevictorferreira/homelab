@@ -18,6 +18,7 @@ let
     echo "Removing unused files"
     rm vuetorrent.zip
     echo "VueTorrent installed"
+    mkdir -p qBittorrent
     cp -f qBittorrent.conf qBittorrent/qBittorrent.conf
   '';
   qbtImage = {
