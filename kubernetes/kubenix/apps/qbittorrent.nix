@@ -113,17 +113,17 @@ in
               };
             };
           };
-          "qbittorrent-config-file" = {
-            enabled = true;
-            type = "configmap";
-            objectName = "qbittorrent-config";
-            expandObjectName = false;
-            targetSelector = {
-              main = {
-                main = { name = "qbittorrent-config"; mountPath = "/config/qBittorrent/qBittorrent.conf"; subPath = "qBittorrent.conf"; readOnly = false; };
-              };
-            };
-          };
+          # "qbittorrent-config-file" = {
+          #   enabled = true;
+          #   type = "configmap";
+          #   objectName = "qbittorrent-config";
+          #   expandObjectName = false;
+          #   targetSelector = {
+          #     main = {
+          #       main = { name = "qbittorrent-config"; mountPath = "/config/qBittorrent/qBittorrent.conf"; subPath = "qBittorrent.conf"; readOnly = false; };
+          #     };
+          #   };
+          # };
         };
 
         ingress.main = kubenix.lib.ingressDomainForService "qbittorrent" // {
