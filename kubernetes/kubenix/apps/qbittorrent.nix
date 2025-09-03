@@ -7,6 +7,8 @@ let
   torrentingPort = 62657;
   vueTorrentInstallScript = ''
     set -e
+    chown -R 2002:2002 /downloads
+    chown -R 2002:2002 /config
     echo "Creating config directory"
     cd /config
     echo "Downloading VueTorrent"
