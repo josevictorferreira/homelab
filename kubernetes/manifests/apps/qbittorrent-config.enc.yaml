@@ -1,0 +1,43 @@
+apiVersion: v1
+data:
+    qBittorrent.conf: ENC[AES256_GCM,data:htgWC/bVNmorI4Z2ONijvzO2ddu+ZJq0Cg682flVuBT01O27j/bFogB48At4SLy7VoNne12VSvOZlZasFexxOIAvI9pKs8S+mFWypq4T0bChVBptsj5h/Aoj7SrNDNYdIhtAtRLbthiw/znviq4bZxKXHkBo3/WChGHPws3msRDkXxM1+d4QsM/6ebdwtNS/Ft1k/j/9TlR3y5xuBKKDYOTWzn4rOh1n8Myr7uiTYEtt6Z159zB0Vt6NcJpJ3bPJ7woT8Ae8ICOhsywjPHtYLsKRW/8X6dQ9T7mbsR971Np82Ki6aHlOMGD/WhaqVzFyjzgaLd0t6ktm47evbFDOfoRt8tpM056meWYP+P4Au/fFh6HC+T//kQ6Wn3REgGsDafT3dZSuisTNo6EhVXQNRA2bLlTuq4xkXurfj/8y7iVyKZNp3YlhvyQ+/Sj2qdJPJS2jh+3LDSk8LovN5TKhQ5tmKSPdXoPdOIEtAwYOG7PUyZFmjTK/qsp1VwXx1kLiBExqT7aSajcACjMn7zZrszKHoB1EZt87tNr8IT9vNd8gbGy+n23QtBKwRLgAPuNJRu1RWq9GFBDXJpN8VOybHsINWdoyjnF1rpKYMd6U4ysPbv/nugxHcusBB2oxljQYcpZeDPzqWgxp+0WvxKkDUi+cGMdL3nRWpxK8AOlX2fDdpKLHE5Ex8QVhvHSqAj7b4aeJ9tQHDleg/yF+ipVy3TgCuh66D53NpePIMy4P6aapVW6+ReJAhzIucmaaKNWSqtW/TSbe8XDXM/ug7+YhtCAJbprXg01JG0FzIyHVLiVEJZDdlkyhahvcmsPinH2oPKd3SGOUjZF9H11hBdEjD3dB/Cjca9PGP4tx5W05QFkauVKR0zx33vytX3eFd/Uc+p8CooXhUnvCH3LKeJ/QC+TKI4MUV6GHtlZUDpeeQ1+O77loa52phyhg15cbmbbzkHoJY7u5df0RJMtAI4UKOhTsRCHl/LE8G2tjoYt17vGUxCwrFwc12IOhvsm6nb/IDJnvtqno/NjqhkFL4eiFddXRUCOAyO1yVSX64t9bh44zJKsf5VMNwedFc0HEyR/25Lx/wmCm4HHTgBwNI5IwVa9Y0IGIWtuP1XVmn4KZJq0ntwzSIl6YbbgKps7j8zrGXwjHCQ2EZQ0KhtiCg+TtFP2LqZnPzwyx6sbz+w7bRK1hz1RelneJPNZJEzFv3t9Dl5lTJLxAPv4Y2atqlqku15DZO705DUTanKDnq+NylYRv6LqQaQ5QE3JCYRg20x8zjlLgkZBF8gt2pvghoiY+ULgN5wQwka6i2vgVkFrD98vlnS83HlyiIKG2c9RhvMBx/XIxw68EmvvSmbtWN+HmyEfBf7+BER7t/Co0jwsFeb/ZL4rqDpiuNPonIMqZL6xsRRx4+nrx8xbNid6Jm8S8pBYPSwgsIZ7LjMwcdhXXRGqR6GdSZzB1BE5RuZqL8fIgnEhkvRjsTDJrqB9uesr8hzfKl6rAck6UFCVkoRZMVvppCVFuSzXSpJu5yTZflb/WplhXsxqUJPwXFEaRKMu/ztHVTatpHrerBrR3g9GxkqUfNw==,iv:Z7zjJCxTBzi8VebQMAjQH/DMYM8n1tuo9RvG2LZXtjQ=,tag:oMCpycfaFQqEnNatM5pSaQ==,type:str]
+kind: ConfigMap
+metadata:
+    annotations:
+        kubenix/k8s-version: "1.32"
+        kubenix/project-name: ze-homelab
+    name: qbittorrent-config
+    namespace: apps
+sops:
+    age:
+        - recipient: age16yrhmz8fytj7j9ns80zl40zjcdfd3pdxh48ld7ys7veea774udtqfn9jyx
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBxRFhtMXZ5TUNsZnAzZThi
+            K0JQbXZ5L1hlRGpBaGhZOGhVKzEydlRLeDJjCmthYTBvdldoekhJazIrMGRpTVhK
+            aG84MW8xL1lFVXU5Uk5ENE40bXVYZWMKLS0tIEllTDlCNVB2aDRjV0lhWENrKzhS
+            YU8yKzFnbUpEVERMVUNVRWIxNHEyTGcK1oo6q1ajlGF2W5HZj31Tzj/VlXK00p6v
+            PvXG2k81d1UiDw/1K2M8tE7FerzTY1YdnPTqIRv2eRJHq9yAk4XxZw==
+            -----END AGE ENCRYPTED FILE-----
+        - recipient: age1jx9qu5p0ycvymrl2gykd9z3w8x8n67jxnatxs49j7qzspjr6asqqf8u35h
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBMbFpqSDFweXkwK1FMOHR4
+            TzJSNTdURXg5TG5TTVhxVzZyY2VvQnNsRFUwClREYUlkTjlBdG9VVHdGdmFGKzlQ
+            Ty9HRWp0cnJvUEllcm1vbkw0UnZwaWMKLS0tIGlYUExkRy9XaXV2d08vTFNaU05r
+            SXBXZlBLRU1BQkwxaTIxdU5YT2R1cU0K8ozhB1eeXDJueP/xFMrz2J5CCUS7GygK
+            v5c93fcSEWOGJZZh+YvTKJbHCK0Jy80dWUarECgad1fX84NYMiatRw==
+            -----END AGE ENCRYPTED FILE-----
+        - recipient: age1myzhwq67gu5zrfk8fvs0p7mh5fk67d20ltwqf9325ya83lm06ytsyax3j2
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSAyUWpLSDY2Z3FWRkJORU4x
+            ekNmRWxBV2RGRnZoaFo5RG81L3RLSzlka3p3Cm9IcU9rK3RIYW1VbURqV0I0OTVM
+            dVhZZFlnR3o0KzdSenFnQmtvQUpibTAKLS0tIFdzMWJCMFFDaEVjVnp0ZjBkZzg3
+            bkVRWnFDQU9zMjFhdDdUTlc4ZmNjUTAKkTzHQJf9K2D3MxjC0q1oQzMkDXmbTGSD
+            bGeata61MqoATkHYu0LotID9zE8HNLOg+3r/py+fje1wvUvYZDQUJA==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2025-09-03T00:20:07Z"
+    mac: ENC[AES256_GCM,data:olHaCt+YTRIOfYTdlHOJYeLh1TpRLtF9760FBNlk5MMSOApo3xbU3H9TCMZR710v2Bx5JZmVX1CatH/vB1zos4bXauT53TNZnmAqbo3/h8PobKj/YcsUXygti6FuIRSuHmegjyqeSv+cPtea1yVMGoTrwxL/n+MI9o26vSOFyEs=,iv:BmJg6SlSKmsglNV3K3gZaBrFOcxa9sepBpFg7p+G0Kk=,tag:zZ06rxFTpXGWQBc1VXwA+w==,type:str]
+    encrypted_regex: ^(data|stringData)$
+    version: 3.10.2
