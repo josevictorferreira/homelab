@@ -18,7 +18,7 @@ let
     echo "Removing unused files"
     rm vuetorrent.zip
     echo "VueTorrent installed"
-    cp -f qBittorrent.conf /config/qBittorrent.conf
+    cp -f qBittorrent.conf qBittorrent/qBittorrent.conf
   '';
   qbtImage = {
     repository = "ghcr.io/home-operations/qbittorrent";
