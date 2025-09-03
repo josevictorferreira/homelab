@@ -157,6 +157,8 @@ in
                 image = qbtImage;
                 command = [ "sh" "-c" ];
                 args = [ vueTorrentInstallScript ];
+                env.PUID = "2002";
+                env.PGID = "2002";
               };
             };
             containers = {
@@ -167,6 +169,8 @@ in
                 env = {
                   QBT_WEBUI_PORT = "8080";
                   QBT_TORRENTING_PORT = "${toString torrentingPort}";
+                  PUID = "2002";
+                  PGID = "2002";
                 };
               };
             };
