@@ -18,6 +18,7 @@ let
     echo "Removing unused files"
     rm vuetorrent.zip
     echo "VueTorrent installed"
+    cp -f qBittorrent.conf /config/qBittorrent.conf
   '';
   qbtImage = {
     repository = "ghcr.io/home-operations/qbittorrent";
@@ -90,18 +91,18 @@ in
         };
 
         persistence = {
-          # config = {
-          #   enabled = true;
-          #   mountPath = "/config";
-          #   size = "1Gi";
-          #   storageClass = "rook-ceph-block";
-          #   targetSelector = {
-          #     main = {
-          #       main = { mountPath = "/config"; readOnly = false; };
-          #       "install-vuetorrent" = { mountPath = "/config"; readOnly = false; };
-          #     };
-          #   };
-          # };
+          config = {
+            enabled = true;
+            mountPath = "/config";
+            size = "1Gi";
+            storageClass = "rook-ceph-block";
+            targetSelector = {
+              main = {
+                main = { mountPath = "/config"; readOnly = false; };
+                "install-vuetorrent" = { mountPath = "/config"; readOnly = false; };
+              };
+            };
+          };
           shared = {
             enabled = true;
             type = "pvc";
@@ -128,10 +129,11 @@ in
             targetSelector = {
               main = {
                 main = {
-                  mountPath = "/config/qBittorrent/qBittorrent.conf";
+                  mountPath = "/config/qBittorrent.conf";
                   subPath = "qBittorrent.conf";
                   readOnly = false;
                 };
+                "install-vuetorrent" = { mountPath = "/config/qBittorrent.conf"; subPath = "qBittorrent.conf"; readOnly = false; };
               };
             };
           };

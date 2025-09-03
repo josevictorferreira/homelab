@@ -32,7 +32,7 @@ spec:
         checksum/configmaps: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
         checksum/mariadb: 09c85576cb45b1eecd1467732b11ea8fa3363b0105c465f02a6ad64991521d52
         checksum/mongodb: 09c85576cb45b1eecd1467732b11ea8fa3363b0105c465f02a6ad64991521d52
-        checksum/persistence: 45f786907a16cb1263c3d4826e4efe235b754786dd13a239015439f9cf427322
+        checksum/persistence: 6ec98627a2f04692a801dddcb75e67e5e7c3a3b4b9cb1d4aea77f6917f5958bd
         checksum/redis: 013343a028cbb3f7e08f4ba7522702dd98e52632c688641074b0b1db3df29894
         checksum/secrets: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
         checksum/services: e956a5c4cf8923876402324a4ea8a601db8255d76b9950b219ec45bfec96e545
@@ -202,7 +202,7 @@ spec:
             - mountPath: /dev/shm
               name: devshm
               readOnly: false
-            - mountPath: /config/qBittorrent/qBittorrent.conf
+            - mountPath: /config/qBittorrent.conf
               name: qbittorrent-config
               readOnly: false
               subPath: qBittorrent.conf
@@ -254,6 +254,8 @@ spec:
 
               echo "VueTorrent installed"
 
+              cp -f qBittorrent.conf /config/qBittorrent.conf
+
               '
           command:
             - sh
@@ -295,9 +297,16 @@ spec:
           stdin: false
           tty: false
           volumeMounts:
+            - mountPath: /config
+              name: config
+              readOnly: false
             - mountPath: /dev/shm
               name: devshm
               readOnly: false
+            - mountPath: /config/qBittorrent.conf
+              name: qbittorrent-config
+              readOnly: false
+              subPath: qBittorrent.conf
             - mountPath: /downloads
               name: shared
               readOnly: false
@@ -386,7 +395,8 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 100Gi
+      storage: 1Gi
+  storageClassName: rook-ceph-block
 ---
 apiVersion: v1
 kind: Service
