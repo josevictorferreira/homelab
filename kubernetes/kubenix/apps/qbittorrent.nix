@@ -124,7 +124,7 @@ in
             items = [
               {
                 key = "qBittorrent.conf";
-                path = "/config/qBittorrent/qBittorrent.conf";
+                path = "qBittorrent.conf";
               }
             ];
             targetSelector = {
@@ -144,7 +144,7 @@ in
             items = [
               {
                 key = "categories.json";
-                path = "/config/qBittorrent/categories.json";
+                path = "categories.json";
               }
             ];
             targetSelector = {
@@ -164,7 +164,7 @@ in
             items = [
               {
                 key = "watched_folders.json";
-                path = "/config/qBittorrent/watched_folders.json";
+                path = "watched_folders.json";
               }
             ];
             targetSelector = {
