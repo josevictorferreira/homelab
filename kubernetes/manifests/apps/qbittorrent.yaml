@@ -156,6 +156,10 @@ spec:
               value: void
             - name: S6_READ_ONLY_ROOT
               value: '1'
+            - name: PGID
+              value: '2002'
+            - name: PUID
+              value: '2002'
             - name: QBT_TORRENTING_PORT
               value: '62657'
             - name: QBT_WEBUI_PORT
@@ -280,6 +284,10 @@ spec:
               value: void
             - name: S6_READ_ONLY_ROOT
               value: '1'
+            - name: PGID
+              value: '2002'
+            - name: PUID
+              value: '2002'
           image: ghcr.io/home-operations/qbittorrent:5.1.2@sha256:9dd0164cc23e9c937e0af27fd7c3f627d1df30c182cf62ed34d3f129c55dc0e8
           imagePullPolicy: IfNotPresent
           name: qbittorrent-init-install-vuetorrent
