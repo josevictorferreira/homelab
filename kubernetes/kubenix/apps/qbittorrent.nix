@@ -113,55 +113,21 @@ in
               };
             };
           };
-          "qbittorrent-conf" = {
+          qbittorrent-config = {
             enabled = true;
             type = "configmap";
             objectName = "qbittorrent-config";
+            optional = false;
             expandObjectName = false;
-            mountPath = "/config/qBittorrent/qBittorrent.conf";
-            subPath = "qBittorrent.conf";
-            defaultMode = "0777";
             items = [
               {
                 key = "qBittorrent.conf";
                 path = "qBittorrent.conf";
               }
-            ];
-            targetSelector = {
-              main = {
-                main = { mountPath = "/config/qBittorrent/qBittorrent.conf"; subPath = "qBittorrent.conf"; readOnly = false; };
-              };
-            };
-          };
-          "qbittorrent-categories" = {
-            enabled = true;
-            type = "configmap";
-            objectName = "qbittorrent-config";
-            expandObjectName = false;
-            mountPath = "/config/qBittorrent/categories.json";
-            subPath = "categories.json";
-            defaultMode = "0777";
-            items = [
               {
                 key = "categories.json";
                 path = "categories.json";
               }
-            ];
-            targetSelector = {
-              main = {
-                main = { mountPath = "/config/qBittorrent/categories.json"; subPath = "categories.json"; readOnly = false; };
-              };
-            };
-          };
-          "qbittorrent-watched-folders" = {
-            enabled = true;
-            type = "configmap";
-            objectName = "qbittorrent-config";
-            expandObjectName = false;
-            mountPath = "/config/qBittorrent/watched_folders.json";
-            subPath = "watched_folders.json";
-            defaultMode = "0777";
-            items = [
               {
                 key = "watched_folders.json";
                 path = "watched_folders.json";
@@ -169,7 +135,19 @@ in
             ];
             targetSelector = {
               main = {
-                main = { mountPath = "/config/qBittorrent/watched_folders.json"; subPath = "watched_folders.json"; readOnly = false; };
+                main = { mountPath = "/config/qBittorrent"; readOnly = false; };
+              };
+            };
+          };
+          qbittorrent-logs = {
+            enabled = true;
+            type = "emptyDir";
+            mountPath = "/config/qBittorrent/logs";
+            readOnly = true;
+            defaultMode = 0755;
+            targetSelector = {
+              main = {
+                main = { mountPath = "/config/qBittorrent/logs"; readOnly = false; };
               };
             };
           };
