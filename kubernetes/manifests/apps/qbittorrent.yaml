@@ -32,7 +32,7 @@ spec:
         checksum/configmaps: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
         checksum/mariadb: 09c85576cb45b1eecd1467732b11ea8fa3363b0105c465f02a6ad64991521d52
         checksum/mongodb: 09c85576cb45b1eecd1467732b11ea8fa3363b0105c465f02a6ad64991521d52
-        checksum/persistence: d9a80c4e2a71820d3f8829c79509747160b0d69dcde65d8ecf1dd684c43e5900
+        checksum/persistence: 6ec98eeddbf8158791fae74b24748b347177c8f870d4ea0cee2d4d9c138c5d79
         checksum/redis: 013343a028cbb3f7e08f4ba7522702dd98e52632c688641074b0b1db3df29894
         checksum/secrets: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
         checksum/services: e956a5c4cf8923876402324a4ea8a601db8255d76b9950b219ec45bfec96e545
@@ -202,9 +202,6 @@ spec:
             - mountPath: /dev/shm
               name: devshm
               readOnly: false
-            - mountPath: /config/qBittorrent/
-              name: qbittorrent-configs
-              readOnly: false
             - mountPath: /downloads
               name: shared
               readOnly: false
@@ -337,13 +334,6 @@ spec:
           whenUnsatisfiable: ScheduleAnyway
       volumes:
         - configMap:
-            items:
-              - key: qBittorrent.conf
-                path: qBittorrent.conf
-              - key: categories.json
-                path: categories.json
-              - key: watched_folders.json
-                path: watched_folders.json
             name: qbittorrent-config
             optional: false
           name: qbittorrent-configs
