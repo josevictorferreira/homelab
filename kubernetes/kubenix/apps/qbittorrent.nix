@@ -131,6 +131,8 @@ in
             targetSelector = {
               main = {
                 main = {
+                  mountPath = "/config/qBittorrent/qBittorrent.conf";
+                  subPath = "qBittorrent.conf";
                   readOnly = false;
                 };
               };

@@ -126,37 +126,37 @@ let
   categoriesConf = {
     books = {
         "color" = "#ff9900";
-        "save_path" = "/downloads/complete/books";
+        "save_path" = "/downloads/books";
         "sort" = 0;
     };
     games = {
         "color" = "#ff33cc";
-        "save_path" = "/downloads/complete/games";
+        "save_path" = "/downloads/games";
         "sort" = 1;
     };
     movies = {
         "color" = "#33ccff";
-        "save_path" = "/downloads/complete/movies";
+        "save_path" = "/downloads/movies";
         "sort" = 2;
     };
     nsfw = {
         "color" = "#ff0066";
-        "save_path" = "/downloads/complete/nsfw";
+        "save_path" = "/downloads/nsfw";
         "sort" = 3;
     };
     other = {
         "color" = "#cccccc";
-        "save_path" = "/downloads/complete/other";
+        "save_path" = "/downloads/other";
         "sort" = 9;
     };
     sports = {
         "color" = "#66ff66";
-        "save_path" = "/downloads/complete/sports";
+        "save_path" = "/downloads/sports";
         "sort" = 5;
     };
     tv = {
         "color" = "#ffff66";
-        "save_path" = "/downloads/complete/tv";
+        "save_path" = "/downloads/tv";
         "sort" = 6;
     };
   };
