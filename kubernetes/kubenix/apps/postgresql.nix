@@ -34,7 +34,7 @@ in
           accessModes = [ "ReadWriteOnce" ];
         };
 
-        service = kubenix.lib.plainServiceFor "postgresql";
+        primary.service = kubenix.lib.plainServiceFor "postgresql";
       };
     };
   };
