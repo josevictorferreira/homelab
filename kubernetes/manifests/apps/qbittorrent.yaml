@@ -32,7 +32,7 @@ spec:
         checksum/configmaps: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
         checksum/mariadb: 09c85576cb45b1eecd1467732b11ea8fa3363b0105c465f02a6ad64991521d52
         checksum/mongodb: 09c85576cb45b1eecd1467732b11ea8fa3363b0105c465f02a6ad64991521d52
-        checksum/persistence: cb54c8f7f573a05747826a42257feb6be9a1bf6d30845207edf28d6c65d22ced
+        checksum/persistence: 56bec38c30e3e3808b4a56efe7eb2e9a81c7452993194869c5d4547049c604dc
         checksum/redis: 013343a028cbb3f7e08f4ba7522702dd98e52632c688641074b0b1db3df29894
         checksum/secrets: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
         checksum/services: e956a5c4cf8923876402324a4ea8a601db8255d76b9950b219ec45bfec96e545
@@ -203,7 +203,7 @@ spec:
               name: devshm
               readOnly: false
             - mountPath: /config/qBittorrent
-              name: qbittorrent-conf
+              name: qBittorrent.conf
               readOnly: false
             - mountPath: /downloads
               name: shared
@@ -337,9 +337,12 @@ spec:
           whenUnsatisfiable: ScheduleAnyway
       volumes:
         - configMap:
+            items:
+              - key: qBittorrent.conf
+                path: qBittorrent.conf
             name: qbittorrent-config
             optional: false
-          name: qbittorrent-conf
+          name: qBittorrent.conf
         - emptyDir:
             medium: Memory
             sizeLimit: 1500Mi
