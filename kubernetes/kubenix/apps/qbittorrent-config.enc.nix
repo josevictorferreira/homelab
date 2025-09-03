@@ -147,7 +147,7 @@ let
     other = {
         "color" = "#cccccc";
         "save_path" = "/downloads/complete/other";
-        "sort" = 4;
+        "sort" = 9;
     };
     sports = {
         "color" = "#66ff66";
