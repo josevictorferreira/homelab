@@ -1,0 +1,278 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: linkwarden
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: linkwarden
+    app.kubernetes.io/version: 2.5.3
+    helm.sh/chart: linkwarden-0.3.3
+  name: linkwarden
+  namespace: apps
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: linkwarden
+      app.kubernetes.io/name: linkwarden
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: linkwarden
+        app.kubernetes.io/name: linkwarden
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - env:
+            - name: SPACES_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: accessKey
+                  name: ceph-object-storage-credentials
+            - name: SPACES_SECRET
+              valueFrom:
+                secretKeyRef:
+                  key: secretKey
+                  name: ceph-object-storage-credentials
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  key: uri
+                  name: linkwarden-db
+          envFrom:
+            - configMapRef:
+                name: linkwarden-general
+            - secretRef:
+                name: linkwarden-secrets
+          image: ghcr.io/linkwarden/linkwarden:v2.12.2@sha256:c1c6f417ea566de2c2dac6e79353ee5f40cb6a44fd9dd3970c83e6fc098de1df
+          imagePullPolicy: IfNotPresent
+          name: linkwarden
+          ports:
+            - containerPort: 3000
+              name: http
+              protocol: TCP
+          resources:
+            limits:
+              memory: 1.5Gi
+            requests:
+              cpu: 50m
+              memory: 1Gi
+      serviceAccountName: linkwarden
+---
+apiVersion: v1
+data:
+  AUTOSCROLL_TIMEOUT: '30'
+  NEXTAUTH_URL: https://linkwarden.josevictor.me/api/v1/auth
+  PAGINATION_TAKE_COUNT: '20'
+  RE_ARCHIVE_LIMIT: '5'
+  SPACES_BUCKET_NAME: linkwarden
+  SPACES_ENDPOINT: objectstore.josevictor.me
+  SPACES_REGION: us-east-1
+kind: ConfigMap
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/component: linkwarden
+    app.kubernetes.io/instance: linkwarden
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: linkwarden
+    app.kubernetes.io/version: 2.5.3
+    helm.sh/chart: linkwarden-0.3.3
+  name: linkwarden-general
+  namespace: apps
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    helm.sh/resource-policy: keep
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+    meta.helm.sh/release-name: linkwarden
+    meta.helm.sh/release-namespace: apps
+  labels:
+    app.kubernetes.io/instance: linkwarden
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: linkwarden
+    app.kubernetes.io/version: 2.5.3
+    helm.sh/chart: linkwarden-0.3.3
+  name: linkwarden-pvc
+  namespace: apps
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: standard
+---
+apiVersion: v1
+data:
+  uri: cG9zdGdyZXNxbDovL3Bvc3RncmVzOnJlZitzb3BzOi8vL2hvbWUvam9zZXZpY3Rvci9Xb3Jrc3BhY2UvaG9tZWxhYi1yZWJvcm4vc2VjcmV0cy9rOHMtc2VjcmV0cy5lbmMueWFtbCNwb3N0Z3Jlc3FsX2FkbWluX3Bhc3N3b3JkQHBvc3RncmVzcWwtaGw6NTQzMi9saW5rd2FyZGVu
+kind: Secret
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/component: linkwarden
+    app.kubernetes.io/instance: linkwarden
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: linkwarden
+    app.kubernetes.io/version: 2.5.3
+    helm.sh/chart: linkwarden-0.3.3
+  name: linkwarden-db
+  namespace: apps
+type: Opaque
+---
+apiVersion: v1
+data:
+  token: ''
+kind: Secret
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/component: linkwarden
+    app.kubernetes.io/instance: linkwarden
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: linkwarden
+    app.kubernetes.io/version: 2.5.3
+    helm.sh/chart: linkwarden-0.3.3
+  name: linkwarden-next-auth
+  namespace: apps
+type: Opaque
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: linkwarden
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: linkwarden
+    app.kubernetes.io/version: 2.5.3
+    helm.sh/chart: linkwarden-0.3.3
+  name: linkwarden
+  namespace: apps
+spec:
+  internalTrafficPolicy: Cluster
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 3000
+  selector:
+    app.kubernetes.io/instance: linkwarden
+    app.kubernetes.io/name: linkwarden
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: v1
+automountServiceAccountToken: false
+kind: ServiceAccount
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: linkwarden
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: linkwarden
+    app.kubernetes.io/version: 2.5.3
+    helm.sh/chart: linkwarden-0.3.3
+  name: linkwarden
+  namespace: apps
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: cloudflare-issuer
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: linkwarden
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: linkwarden
+    app.kubernetes.io/version: 2.5.3
+    helm.sh/chart: linkwarden-0.3.3
+  name: linkwarden
+  namespace: apps
+spec:
+  rules:
+    - host: linkwarden.josevictor.me
+      http:
+        paths:
+          - backend:
+              service:
+                name: linkwarden
+                port:
+                  number: 80
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - linkwarden.josevictor.me
+      secretName: wildcard-tls
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/component: linkwarden
+    app.kubernetes.io/instance: linkwarden
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: linkwarden
+    app.kubernetes.io/version: 2.5.3
+    helm.sh/chart: linkwarden-0.3.3
+  name: linkwarden
+  namespace: apps
+rules:
+  - apiGroups:
+      - ''
+    resources:
+      - secrets
+    verbs:
+      - get
+  - apiGroups:
+      - ''
+    resources:
+      - configmaps
+    verbs:
+      - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/component: linkwarden
+    app.kubernetes.io/instance: linkwarden
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: linkwarden
+    app.kubernetes.io/version: 2.5.3
+    helm.sh/chart: linkwarden-0.3.3
+  name: linkwarden
+  namespace: apps
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: linkwarden
+subjects:
+  - kind: ServiceAccount
+    name: linkwarden
+    namespace: apps
