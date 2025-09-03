@@ -113,23 +113,14 @@ in
               };
             };
           };
-          "qBittorrent.conf" = {
+          "qbittorrent-config" = {
             enabled = true;
             type = "configmap";
             objectName = "qbittorrent-config";
             expandObjectName = false;
-            optional = false;
-            mountPath = "/config/qBittorrent/qBittorrent.conf";
-            subPath = "qBittorrent.conf";
-            items = [
-              {
-                key = "qBittorrent.conf";
-                path = "qBittorrent.conf";
-              }
-            ];
             targetSelector = {
               main = {
-                main = { mountPath = "/config/qBittorrent/qBittorrent.conf"; subPath = "qBittorrent.conf"; readOnly = false; };
+                main = { name = "qbittorrent-config"; mountPath = "/config/qBittorrent/qBittorrent.conf"; subPath = "qBittorrent.conf"; readOnly = false; };
               };
             };
           };
