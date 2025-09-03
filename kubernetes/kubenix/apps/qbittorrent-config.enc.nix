@@ -49,6 +49,7 @@ let
     WebUI\LocalHostAuth=false
     WebUI\Username=josevictor
     WebUI\Password_PBKDF2="@ByteArray(rdFrj84LCsPuBFwdx535EA==:RHDXcnMQjCGd5sauAOa7veGSlQK4goDKa8CsR++oGHJHwm/a4RBev5IIEJG0GBRQbgP+9T0Ft+0iVUozu3PYTw==)"
+    WebUI\RootFolder=/config/webui/vuetorrent
     WebUI\Port=8080
     WebUI\ServerDomains=*
     WebUI\UseUPnP=false
