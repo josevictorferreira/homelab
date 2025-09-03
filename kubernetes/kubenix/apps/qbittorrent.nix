@@ -121,6 +121,7 @@ in
             expandObjectName = false;
             mountPath = "/config/qBittorrent/qBittorrent.conf";
             subPath = "qBittorrent.conf";
+            defaultMode = "0777";
             items = [
               {
                 key = "qBittorrent.conf";
