@@ -39,9 +39,13 @@ in
         adlists = [
           "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/pro.plus.txt"
         ];
-        serviceWeb = kubenix.lib.plainServiceFor "pihole";
+        serviceWeb = kubenix.lib.plainServiceFor "pihole" // {
+          mixedService = true;
+          externalTrafficPolicy = "Cluster";
+        };
         serviceDns = kubenix.lib.plainServiceFor "pihole" // {
           mixedService = true;
+          externalTrafficPolicy = "Cluster";
         };
         serviceDhcp.enabled = false;
         admin = {
