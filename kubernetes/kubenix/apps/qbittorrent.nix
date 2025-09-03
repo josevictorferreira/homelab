@@ -113,7 +113,7 @@ in
               };
             };
           };
-          "qbittorrent-config" = {
+          "qbittorrent-config-file" = {
             enabled = true;
             type = "configmap";
             objectName = "qbittorrent-config";

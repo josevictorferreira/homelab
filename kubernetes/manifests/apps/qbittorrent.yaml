@@ -32,7 +32,7 @@ spec:
         checksum/configmaps: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
         checksum/mariadb: 09c85576cb45b1eecd1467732b11ea8fa3363b0105c465f02a6ad64991521d52
         checksum/mongodb: 09c85576cb45b1eecd1467732b11ea8fa3363b0105c465f02a6ad64991521d52
-        checksum/persistence: de3bdc81f7f6226bacec2a7845ce4eee069ec27e61cacaaf1f929a78f6c48e5f
+        checksum/persistence: 5b794269e72c38df9726406dbc084a76109a0787df22c6b33994d46f10b96b70
         checksum/redis: 013343a028cbb3f7e08f4ba7522702dd98e52632c688641074b0b1db3df29894
         checksum/secrets: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
         checksum/services: e956a5c4cf8923876402324a4ea8a601db8255d76b9950b219ec45bfec96e545
@@ -340,7 +340,7 @@ spec:
         - configMap:
             name: qbittorrent-config
             optional: false
-          name: qbittorrent-config
+          name: qbittorrent-config-file
         - emptyDir:
             medium: Memory
             sizeLimit: 1500Mi
