@@ -32,7 +32,7 @@ spec:
         checksum/configmaps: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
         checksum/mariadb: 09c85576cb45b1eecd1467732b11ea8fa3363b0105c465f02a6ad64991521d52
         checksum/mongodb: 09c85576cb45b1eecd1467732b11ea8fa3363b0105c465f02a6ad64991521d52
-        checksum/persistence: 3986092a1cc2d26143fd4b88c445d87a493e9437871c6f664513dd91790bf434
+        checksum/persistence: 6a639b38140ff5431962ffc8a13e702d903ac145b4dc07d2b3154077dcb46b50
         checksum/redis: 013343a028cbb3f7e08f4ba7522702dd98e52632c688641074b0b1db3df29894
         checksum/secrets: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
         checksum/services: e956a5c4cf8923876402324a4ea8a601db8255d76b9950b219ec45bfec96e545
@@ -346,14 +346,26 @@ spec:
           whenUnsatisfiable: ScheduleAnyway
       volumes:
         - configMap:
+            defaultMode: 511
+            items:
+              - key: categories.json
+                path: /config/qBittorrent/categories.json
             name: qbittorrent-config
             optional: false
           name: qbittorrent-categories
         - configMap:
+            defaultMode: 511
+            items:
+              - key: qBittorrent.conf
+                path: /config/qBittorrent/qBittorrent.conf
             name: qbittorrent-config
             optional: false
           name: qbittorrent-conf
         - configMap:
+            defaultMode: 511
+            items:
+              - key: watched_folders.json
+                path: /config/qBittorrent/watched_folders.json
             name: qbittorrent-config
             optional: false
           name: qbittorrent-watched-folders
