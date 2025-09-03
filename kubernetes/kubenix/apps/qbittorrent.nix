@@ -124,8 +124,8 @@ in
                 path = "qBittorrent.conf";
               }
               {
-                key = "categories.conf";
-                path = "categories.conf";
+                key = "categories.json";
+                path = "categories.json";
               }
               {
                 key = "watched_folders.json";
