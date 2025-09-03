@@ -121,6 +121,12 @@ in
             expandObjectName = false;
             mountPath = "/config/qBittorrent/qBittorrent.conf";
             subPath = "qBittorrent.conf";
+            items = [
+              {
+                key = "qBittorrent.conf";
+                path = "qBittorrent.conf";
+              }
+            ];
             targetSelector = {
               main = {
                 main = {
