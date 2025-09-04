@@ -20,7 +20,7 @@ in
         metadata = {
           namespace = namespace;
         };
-        data = {
+        stringData = {
           "uri" = "postgresql://postgres:${kubenix.lib.secretsFor "postgresql_admin_password"}+@postgresql-hl:5432/linkwarden";
         };
       };
