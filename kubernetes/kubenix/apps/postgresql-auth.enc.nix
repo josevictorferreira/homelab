@@ -11,7 +11,7 @@ in
         metadata = {
           namespace = namespace;
         };
-        data = {
+        stringData = {
           "admin-password" = kubenix.lib.secretsFor "postgresql_admin_password";
           "user-password" = kubenix.lib.secretsFor "postgresql_user_password";
           "replication-password" = kubenix.lib.secretsFor "postgresql_replication_password";
