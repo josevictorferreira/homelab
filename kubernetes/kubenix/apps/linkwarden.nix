@@ -2,6 +2,7 @@
 
 let
   namespace = homelab.kubernetes.namespaces.applications;
+  bucketName = "linkwarden";
 in
 {
   kubernetes = {
@@ -33,10 +34,10 @@ in
           data = {
             storageType = "s3";
             s3 = {
-              bucketName = "linkwarden";
+              bucketName = bucketName;
               endpoint = "objectstore.${homelab.domain}";
               region = "us-east-1";
-              existingSecret = "ceph-object-storage-credentials";
+              existingSecret = "ceph-object-store-credentials";
             };
           };
 
@@ -74,5 +75,18 @@ in
         }
       ];
     };
+
+    resources.objectbucketclaim."linkwarden" = {
+      metadata = {
+        namespace = namespace;
+      };
+      spec = {
+        bucketName = "linkwarden";
+        storageClassName = "rook-ceph-objectstore";
+        generateBucketName = false;
+        reclaimPolicy = "Retain";
+      };
+    };
+
   };
 }
