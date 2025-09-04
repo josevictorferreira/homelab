@@ -49,9 +49,9 @@ in
         resources = {
           requests = {
             cpu = "50m";
-            memory = "1Gi";
+            memory = "512Mi";
           };
-          limits.memory = "1.5Gi";
+          limits.memory = "2Gi";
         };
 
         service = {
