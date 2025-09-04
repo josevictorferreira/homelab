@@ -25,7 +25,7 @@ in
         };
 
         linkwarden = {
-          replicas = 3;
+          replicas = 4;
 
           labels = {
             app = "linkwarden";
