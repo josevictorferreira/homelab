@@ -25,7 +25,7 @@ in
         };
 
         linkwarden = {
-          replicas = 2;
+          replicas = 3;
 
           labels = {
             app = "linkwarden";
@@ -53,7 +53,7 @@ in
             cpu = "50m";
             memory = "512Mi";
           };
-          limits.memory = "2Gi";
+          limits.memory = "2.5Gi";
         };
 
         service = {
