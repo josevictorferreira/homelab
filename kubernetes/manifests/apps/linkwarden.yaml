@@ -69,7 +69,7 @@ data:
   PAGINATION_TAKE_COUNT: '20'
   RE_ARCHIVE_LIMIT: '5'
   SPACES_BUCKET_NAME: linkwarden-files
-  SPACES_ENDPOINT: objectstore.josevictor.me
+  SPACES_ENDPOINT: rook-ceph-rgw-ceph-objectstore.rook-ceph.svc.cluster.local
   SPACES_REGION: us-east-1
 kind: ConfigMap
 metadata:
