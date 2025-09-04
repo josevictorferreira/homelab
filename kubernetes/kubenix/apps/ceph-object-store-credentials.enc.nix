@@ -1,0 +1,22 @@
+{ kubenix, homelab, ... }:
+
+let
+  namespace = homelab.kubernetes.namespaces.applications;
+in
+{
+  kubernetes = {
+    resources = {
+      secrets."ceph-object-store-credentials" = {
+        metadata = {
+          namespace = namespace;
+        };
+        data = {
+          "AccessKey" = kubenix.lib.secretsFor "ceph_object_store_access_key";
+          "SecretKey" = kubenix.lib.secretsFor "ceph_object_store_secret_key";
+          "accessKey" = kubenix.lib.secretsFor "ceph_object_store_access_key";
+          "secretKey" = kubenix.lib.secretsFor "ceph_object_store_secret_key";
+        };
+      };
+    };
+  };
+}
