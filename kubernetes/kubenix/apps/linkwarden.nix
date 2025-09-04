@@ -83,8 +83,6 @@ in
       spec = {
         bucketName = "linkwarden";
         storageClassName = "rook-ceph-objectstore";
-        generateBucketName = false;
-        reclaimPolicy = "Retain";
       };
     };
 
