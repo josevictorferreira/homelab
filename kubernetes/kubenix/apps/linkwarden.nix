@@ -42,7 +42,7 @@ in
           };
 
           database = {
-            existingSecret = "linkwarden-secrets";
+            existingSecret = "linkwarden-db";
           };
         };
 
