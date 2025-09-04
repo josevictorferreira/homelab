@@ -13,7 +13,7 @@ in
         data = {
           "ANTHROPIC_MODEL" = kubenix.lib.secretsFor "anthropic_model";
           "ANTHROPIC_API_KEY" = kubenix.lib.secretsFor "anthropic_api_key";
-          "uri" = kubenix.lib.secretsFor "linkwarden_database_uri";
+          "uri" = "postgresql://postgres:${kubenix.lib.secretsFor "postgresql_admin_password"}+@postgresql-hl:5432/linkwarden";
         };
       };
     };
