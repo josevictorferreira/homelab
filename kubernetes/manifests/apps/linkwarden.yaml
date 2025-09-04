@@ -13,7 +13,7 @@ metadata:
   name: linkwarden
   namespace: apps
 spec:
-  replicas: 2
+  replicas: 3
   selector:
     matchLabels:
       app.kubernetes.io/instance: linkwarden
@@ -58,7 +58,7 @@ spec:
               protocol: TCP
           resources:
             limits:
-              memory: 2Gi
+              memory: 2.5Gi
             requests:
               cpu: 50m
               memory: 512Mi
