@@ -10,9 +10,9 @@ in
         metadata = {
           namespace = namespace;
         };
-        data = {
-          "ANTHROPIC_MODEL" = kubenix.lib.secretsFor "anthropic_model";
-          "ANTHROPIC_API_KEY" = kubenix.lib.secretsFor "anthropic_api_key";
+        stringData = {
+          "OPEN_ROUTER_MODEL" = kubenix.lib.secretsFor "open_router_model";
+          "OPEN_ROUTER_API_KEY" = kubenix.lib.secretsFor "open_router_api_key";
           "NEXTAUTH_SECRET" = kubenix.lib.secretsFor "linkwarden_auth_secret";
         };
       };
