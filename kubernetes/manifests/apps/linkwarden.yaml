@@ -113,25 +113,6 @@ spec:
 ---
 apiVersion: v1
 data:
-  uri: cG9zdGdyZXNxbDovL3Bvc3RncmVzOnJlZitzb3BzOi8vL2hvbWUvam9zZXZpY3Rvci9Xb3Jrc3BhY2UvaG9tZWxhYi1yZWJvcm4vc2VjcmV0cy9rOHMtc2VjcmV0cy5lbmMueWFtbCNwb3N0Z3Jlc3FsX2FkbWluX3Bhc3N3b3JkQHBvc3RncmVzcWwtaGw6NTQzMi9saW5rd2FyZGVu
-kind: Secret
-metadata:
-  annotations:
-    kubenix/k8s-version: '1.32'
-    kubenix/project-name: ze-homelab
-  labels:
-    app.kubernetes.io/component: linkwarden
-    app.kubernetes.io/instance: linkwarden
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: linkwarden
-    app.kubernetes.io/version: 2.5.3
-    helm.sh/chart: linkwarden-0.3.3
-  name: linkwarden-db
-  namespace: apps
-type: Opaque
----
-apiVersion: v1
-data:
   token: ''
 kind: Secret
 metadata:
