@@ -2,7 +2,7 @@
 
 let
   namespace = homelab.kubernetes.namespaces.applications;
-  bucketName = "linkwarden";
+  bucketName = "linkwarden-files";
 in
 {
   kubernetes = {
@@ -78,27 +78,13 @@ in
         ];
       };
 
-      objectbucketclaim."linkwarden" = {
+      objectbucketclaim."linkwarden-s3" = {
         metadata = {
           namespace = namespace;
         };
         spec = {
-          bucketName = "linkwarden";
+          bucketName = bucketName;
           storageClassName = "rook-ceph-objectstore";
-        };
-      };
-
-      cephobjectstoreuser."linkwarden-client" = {
-        metadata = {
-          namespace = namespace;
-        };
-        spec = {
-          store = "homelab-store";
-          displayName = "Linkwarden S3 Client";
-          capabilities = {
-            user = "*";
-            buckets = "*";
-          };
         };
       };
     };
