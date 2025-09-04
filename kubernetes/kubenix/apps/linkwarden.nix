@@ -35,7 +35,7 @@ in
             storageType = "s3";
             s3 = {
               bucketName = bucketName;
-              endpoint = "rook-ceph-rgw-ceph-objectstore.${homelab.kubernetes.namespaces.storage}.svc.cluster.local";
+              endpoint = "http://rook-ceph-rgw-ceph-objectstore.${homelab.kubernetes.namespaces.storage}.svc.cluster.local";
               region = "us-east-1";
               existingSecret = "linkwarden-s3";
             };
@@ -83,6 +83,10 @@ in
                 name = lib.mkForce "linkwarden-s3";
                 key = lib.mkForce "AWS_SECRET_ACCESS_KEY";
               };
+            }
+            {
+              name = "SPACES_FORCE_PATH_STYLE";
+              value = "true";
             }
           ];
           envFrom = [
