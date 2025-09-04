@@ -62,6 +62,18 @@ spec:
               memory: 1Gi
       serviceAccountName: linkwarden
 ---
+apiVersion: ceph.rook.io/v1
+kind: CephObjectStoreUser
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: linkwarden-client
+  namespace: apps
+spec:
+  displayName: Linkwarden S3 Client
+  store: homelab-store
+---
 apiVersion: v1
 data:
   AUTOSCROLL_TIMEOUT: '30'
