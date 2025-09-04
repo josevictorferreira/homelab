@@ -13,6 +13,7 @@ in
         data = {
           "ANTHROPIC_MODEL" = kubenix.lib.secretsFor "anthropic_model";
           "ANTHROPIC_API_KEY" = kubenix.lib.secretsFor "anthropic_api_key";
+          "NEXTAUTH_SECRET" = kubenix.lib.secretsFor "linkwarden_auth_secret";
         };
       };
 
