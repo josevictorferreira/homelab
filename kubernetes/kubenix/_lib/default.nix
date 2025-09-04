@@ -6,9 +6,6 @@ in
 rec {
   secretsFor = secretName: "ref+sops://${k8sSecretsFile}#${secretName}";
 
-  secretUri = { secretName, templatePrefix, templateSuffix }:
-    "${templatePrefix}${secretsFor secretName}${templateSuffix}";
-
   domainFor = serviceName: "${serviceName}.${homelab.domain}";
 
   serviceIpFor = serviceName: {
