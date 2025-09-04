@@ -62,28 +62,13 @@ spec:
               memory: 1Gi
       serviceAccountName: linkwarden
 ---
-apiVersion: ceph.rook.io/v1
-kind: CephObjectStoreUser
-metadata:
-  annotations:
-    kubenix/k8s-version: '1.32'
-    kubenix/project-name: ze-homelab
-  name: linkwarden-client
-  namespace: apps
-spec:
-  capabilities:
-    buckets: '*'
-    user: '*'
-  displayName: Linkwarden S3 Client
-  store: homelab-store
----
 apiVersion: v1
 data:
   AUTOSCROLL_TIMEOUT: '30'
   NEXTAUTH_URL: https://linkwarden.josevictor.me/api/v1/auth
   PAGINATION_TAKE_COUNT: '20'
   RE_ARCHIVE_LIMIT: '5'
-  SPACES_BUCKET_NAME: linkwarden
+  SPACES_BUCKET_NAME: linkwarden-files
   SPACES_ENDPOINT: objectstore.josevictor.me
   SPACES_REGION: us-east-1
 kind: ConfigMap
@@ -245,10 +230,10 @@ metadata:
   annotations:
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
-  name: linkwarden
+  name: linkwarden-s3
   namespace: apps
 spec:
-  bucketName: linkwarden
+  bucketName: linkwarden-files
   storageClassName: rook-ceph-objectstore
 ---
 apiVersion: rbac.authorization.k8s.io/v1
