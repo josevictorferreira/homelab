@@ -42,6 +42,8 @@ spec:
                 secretKeyRef:
                   key: uri
                   name: linkwarden-db
+            - name: SPACES_FORCE_PATH_STYLE
+              value: 'true'
           envFrom:
             - configMapRef:
                 name: linkwarden-general
@@ -69,7 +71,7 @@ data:
   PAGINATION_TAKE_COUNT: '20'
   RE_ARCHIVE_LIMIT: '5'
   SPACES_BUCKET_NAME: linkwarden-files
-  SPACES_ENDPOINT: rook-ceph-rgw-ceph-objectstore.rook-ceph.svc.cluster.local
+  SPACES_ENDPOINT: http://rook-ceph-rgw-ceph-objectstore.rook-ceph.svc.cluster.local
   SPACES_REGION: us-east-1
 kind: ConfigMap
 metadata:
