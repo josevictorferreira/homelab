@@ -35,7 +35,7 @@ in
             storageType = "s3";
             s3 = {
               bucketName = bucketName;
-              endpoint = "objectstore.${homelab.domain}";
+              endpoint = "rook-ceph-rgw-ceph-objectstore.${homelab.kubernetes.namespaces.storage}.svc.cluster.local";
               region = "us-east-1";
               existingSecret = "linkwarden-s3";
             };
