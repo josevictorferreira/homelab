@@ -1,4 +1,4 @@
-{ kubenix, homelab, ... }:
+{ lib, kubenix, homelab, ... }:
 
 let
   namespace = homelab.kubernetes.namespaces.applications;
@@ -37,7 +37,7 @@ in
               bucketName = bucketName;
               endpoint = "objectstore.${homelab.domain}";
               region = "us-east-1";
-              existingSecret = "ceph-object-store-credentials";
+              existingSecret = "linkwarden-s3";
             };
           };
 
@@ -71,11 +71,29 @@ in
     resources = {
       deployments.linkwarden = {
         metadata.namespace = namespace;
-        spec.template.spec.containers.linkwarden.envFrom = [
-          {
-            secretRef.name = "linkwarden-secrets";
-          }
-        ];
+        spec.template.spec.containers.linkwarden = {
+          env = [
+            {
+              name = "SPACES_KEY";
+              valueFrom.secretKeyRef = {
+                name = lib.mkForce "linkwarden-s3";
+                key = lib.mkForce "AWS_ACCESS_KEY_ID";
+              };
+            }
+            {
+              name = "SPACES_SECRET";
+              valueFrom.secretKeyRef = {
+                name = lib.mkForce "linkwarden-s3";
+                key = lib.mkForce "AWS_SECRET_ACCESS_KEY";
+              };
+            }
+          ];
+          envFrom = [
+            {
+              secretRef.name = "linkwarden-secrets";
+            }
+          ];
+        };
       };
 
       objectbucketclaim."linkwarden-s3" = {
