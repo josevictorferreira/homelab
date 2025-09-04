@@ -71,6 +71,9 @@ metadata:
   name: linkwarden-client
   namespace: apps
 spec:
+  capabilities:
+    buckets: '*'
+    user: '*'
   displayName: Linkwarden S3 Client
   store: homelab-store
 ---
