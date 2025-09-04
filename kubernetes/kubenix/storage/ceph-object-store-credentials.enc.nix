@@ -22,9 +22,12 @@ in
           namespace = namespace;
         };
         spec = {
-          store = "homelab-store";
+          store = "ceph-objectstore";
           displayName = "Homelab Client";
-          credentials.name = "ceph-object-store-credentials";
+          capabilities = {
+            user = "*";
+            buckets = "*";
+          };
         };
       };
     };
