@@ -30,13 +30,13 @@ spec:
             - name: SPACES_KEY
               valueFrom:
                 secretKeyRef:
-                  key: accessKey
-                  name: ceph-object-store-credentials
+                  key: AWS_ACCESS_KEY_ID
+                  name: linkwarden-s3
             - name: SPACES_SECRET
               valueFrom:
                 secretKeyRef:
-                  key: secretKey
-                  name: ceph-object-store-credentials
+                  key: AWS_SECRET_ACCESS_KEY
+                  name: linkwarden-s3
             - name: DATABASE_URL
               valueFrom:
                 secretKeyRef:
