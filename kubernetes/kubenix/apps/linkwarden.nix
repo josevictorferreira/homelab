@@ -42,10 +42,7 @@ in
           };
 
           database = {
-            user = "postgres";
-            password = kubenix.lib.secretsFor "postgresql_admin_password";
-            host = "postgresql-hl";
-            name = "linkwarden";
+            existingSecret = "linkwarden-secrets";
           };
         };
 
