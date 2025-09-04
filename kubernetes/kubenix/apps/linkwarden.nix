@@ -95,6 +95,10 @@ in
         spec = {
           store = "homelab-store";
           displayName = "Linkwarden S3 Client";
+          capabilities = {
+            user = "*";
+            buckets = "*";
+          };
         };
       };
     };
