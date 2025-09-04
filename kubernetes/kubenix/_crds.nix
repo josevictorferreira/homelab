@@ -84,6 +84,20 @@
         kind = "CephNFS";
       };
 
+      cephobjectstoreuser = {
+        attrName = "cephobjectstoreuser";
+        group = "ceph.rook.io";
+        version = "v1";
+        kind = "CephObjectStoreUser";
+      };
+
+      objectbucketclaim = {
+        attrName = "objectbucketclaim";
+        group = "objectbucket.io";
+        version = "v1alpha1";
+        kind = "ObjectBucketClaim";
+      };
+
       prometheus = {
         attrName = "prometheus";
         group = "monitoring.coreos.com";

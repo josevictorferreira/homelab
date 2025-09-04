@@ -31,12 +31,12 @@ spec:
               valueFrom:
                 secretKeyRef:
                   key: accessKey
-                  name: ceph-object-storage-credentials
+                  name: ceph-object-store-credentials
             - name: SPACES_SECRET
               valueFrom:
                 secretKeyRef:
                   key: secretKey
-                  name: ceph-object-storage-credentials
+                  name: ceph-object-store-credentials
             - name: DATABASE_URL
               valueFrom:
                 secretKeyRef:
@@ -223,6 +223,20 @@ spec:
     - hosts:
         - linkwarden.josevictor.me
       secretName: wildcard-tls
+---
+apiVersion: objectbucket.io/v1alpha1
+kind: ObjectBucketClaim
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: linkwarden
+  namespace: apps
+spec:
+  bucketName: linkwarden
+  generateBucketName: false
+  reclaimPolicy: Retain
+  storageClassName: rook-ceph-objectstore
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
