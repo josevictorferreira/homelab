@@ -58,10 +58,10 @@ spec:
               protocol: TCP
           resources:
             limits:
-              memory: 1.5Gi
+              memory: 2Gi
             requests:
               cpu: 50m
-              memory: 1Gi
+              memory: 512Mi
       serviceAccountName: linkwarden
 ---
 apiVersion: v1
