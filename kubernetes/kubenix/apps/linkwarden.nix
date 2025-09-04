@@ -67,22 +67,35 @@ in
       };
     };
 
-    resources.deployments.linkwarden = {
-      metadata.namespace = namespace;
-      spec.template.spec.containers.linkwarden.envFrom = [
-        {
-          secretRef.name = "linkwarden-secrets";
-        }
-      ];
-    };
 
-    resources.objectbucketclaim."linkwarden" = {
-      metadata = {
-        namespace = namespace;
+    resources = {
+      deployments.linkwarden = {
+        metadata.namespace = namespace;
+        spec.template.spec.containers.linkwarden.envFrom = [
+          {
+            secretRef.name = "linkwarden-secrets";
+          }
+        ];
       };
-      spec = {
-        bucketName = "linkwarden";
-        storageClassName = "rook-ceph-objectstore";
+
+      objectbucketclaim."linkwarden" = {
+        metadata = {
+          namespace = namespace;
+        };
+        spec = {
+          bucketName = "linkwarden";
+          storageClassName = "rook-ceph-objectstore";
+        };
+      };
+
+      cephobjectstoreuser."linkwarden-client" = {
+        metadata = {
+          namespace = namespace;
+        };
+        spec = {
+          store = "homelab-store";
+          displayName = "Linkwarden S3 Client";
+        };
       };
     };
 
