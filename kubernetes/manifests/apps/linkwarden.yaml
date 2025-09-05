@@ -13,7 +13,7 @@ metadata:
   name: linkwarden
   namespace: apps
 spec:
-  replicas: 4
+  replicas: 2
   selector:
     matchLabels:
       app.kubernetes.io/instance: linkwarden
