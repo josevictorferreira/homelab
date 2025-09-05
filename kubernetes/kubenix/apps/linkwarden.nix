@@ -1,13 +1,14 @@
-{ lib, kubenix, homelab, ... }:
+{ lib, k8sLib, homelab, ... }:
 
 let
   namespace = homelab.kubernetes.namespaces.applications;
+  app = "linkwarden";
   bucketName = "linkwarden-files";
 in
 {
   kubernetes = {
-    helm.releases."linkwarden" = {
-      chart = kubenix.lib.helm.fetch
+    helm.releases.${app} = {
+      chart = k8sLib.helm.fetch
         {
           chartUrl = "oci://ghcr.io/fmjstudios/helm/linkwarden";
           chart = "linkwarden";
@@ -25,13 +26,13 @@ in
         };
 
         linkwarden = {
-          replicas = 4;
+          replicas = 2;
 
           labels = {
-            app = "linkwarden";
-            release = "linkwarden";
+            app = app;
+            release = app;
           };
-          domain = "linkwarden.${homelab.domain}";
+          domain = k8sLib.domainFor app;
 
           data = {
             storageType = "s3";
@@ -62,7 +63,7 @@ in
 
         postgresql.enabled = false;
 
-        ingress = kubenix.lib.ingressDomainForService "linkwarden";
+        ingress = k8sLib.ingressDomainForService app;
       };
     };
 
