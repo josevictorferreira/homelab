@@ -7,16 +7,11 @@ let
     "open-webui"
   ];
   mkCreateDb = db: ''
-    DO
-    $do$
-    BEGIN
-      IF NOT EXISTS (SELECT FROM pg_database WHERE datname = '${db}') THEN
-        CREATE DATABASE "${db}";
-      END IF;
-    END
-    $do$;
+    echo "Ensuring database '${db}' exists..."
+    psql -h postgresql -U postgres -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname='${db}'" | grep -q 1 \
+      || psql -h postgresql -U postgres -d postgres -c "CREATE DATABASE \\"${db}\\";"
   '';
-  createDbCommands = lib.concatStringsSep "\n\n" (map mkCreateDb bootstrapDatabases);
+  createDbCommands = lib.concatStringsSep "\n" (map mkCreateDb bootstrapDatabases);
 in
 {
   kubernetes = {
@@ -75,9 +70,8 @@ in
             ];
             command = [ "sh" "-c" ];
             args = [''
-              psql -h postgresql -U postgres -U postgres -d postgres <<'EOF'
+              set -e
               ${createDbCommands}
-              EOF
             ''];
           }
         ];

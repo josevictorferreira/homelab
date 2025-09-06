@@ -192,12 +192,14 @@ spec:
     spec:
       containers:
         - args:
-            - "psql -h postgresql -U postgres -U postgres -d postgres <<'EOF'\nDO\n\
-              $do$\nBEGIN\n  IF NOT EXISTS (SELECT FROM pg_database WHERE datname\
-              \ = 'linkwarden') THEN\n    CREATE DATABASE \"linkwarden\";\n  END IF;\n\
-              END\n$do$;\n\n\nDO\n$do$\nBEGIN\n  IF NOT EXISTS (SELECT FROM pg_database\
-              \ WHERE datname = 'open-webui') THEN\n    CREATE DATABASE \"open-webui\"\
-              ;\n  END IF;\nEND\n$do$;\n\nEOF\n"
+            - "set -e\necho \"Ensuring database 'linkwarden' exists...\"\npsql -h\
+              \ postgresql -U postgres -d postgres -tAc \"SELECT 1 FROM pg_database\
+              \ WHERE datname='linkwarden'\" | grep -q 1 \\\n  || psql -h postgresql\
+              \ -U postgres -d postgres -c \"CREATE DATABASE \\\\\"linkwarden\\\\\"\
+              ;\"\n\necho \"Ensuring database 'open-webui' exists...\"\npsql -h postgresql\
+              \ -U postgres -d postgres -tAc \"SELECT 1 FROM pg_database WHERE datname='open-webui'\"\
+              \ | grep -q 1 \\\n  || psql -h postgresql -U postgres -d postgres -c\
+              \ \"CREATE DATABASE \\\\\"open-webui\\\\\";\"\n\n"
           command:
             - sh
             - -c
