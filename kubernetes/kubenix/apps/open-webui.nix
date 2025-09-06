@@ -100,7 +100,7 @@ in
             valueFrom = {
               secretKeyRef = {
                 name = "open-webui-secrets";
-                key = "WEBSOCKET_REDIS_URL";
+                key = "REDIS_URL";
               };
             };
           }
@@ -109,7 +109,7 @@ in
             valueFrom = {
               secretKeyRef = {
                 name = "open-webui-secrets";
-                key = "WEBSOCKET_REDIS_URL";
+                key = "REDIS_URL";
               };
             };
           }
