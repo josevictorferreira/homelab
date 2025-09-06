@@ -2,6 +2,10 @@
 
 let
   namespace = homelab.kubernetes.namespaces.applications;
+  boostrapDatabases = [
+    "linkwarden"
+    "open-webui"
+  ];
 in
 {
   kubernetes = {
@@ -37,5 +41,39 @@ in
         primary.service = kubenix.lib.plainServiceFor "postgresql";
       };
     };
+
+    jobs."postgresql-bootstrap" = let
+      createDbCommands = lib.concatStringsSep "\n" (map (db: "CREATE DATABASE IF NOT EXISTS ${db};") boostrapDatabases);
+      in {
+      metadata = {
+        name = "postgresql-bootstrap";
+        namespace = namespace;
+      };
+      spec.template.spec = {
+        restartPolicy = "OnFailure";
+        containers = [
+          {
+            name = "psql";
+            image = "bitnami/postgresql:16";
+            env = [
+              {
+                name = "PGPASSWORD";
+                valueFrom.secretKeyRef = {
+                  name = "postgresql-auth";
+                  key = "admin-password";
+                };
+              }
+            ];
+            command = [ "sh" "-c" ];
+            args = [''
+              psql -h postgresql -U postgres -U postgres -d postgres <<'EOF'
+              ${createDbCommands}
+              EOF
+            ''];
+          }
+        ];
+      };
+    };
+
   };
 }
