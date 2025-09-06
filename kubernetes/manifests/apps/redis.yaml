@@ -27,7 +27,7 @@ spec:
       annotations:
         checksum/configmap: 2a9ab4a5432825504d910f022638674ce88eaefe9f9f595ad8bc107377d104fb
         checksum/health: aff24913d801436ea469d8d374b2ddb3ec4c43ee7ab24663d5f8ff1a1b6991a9
-        checksum/scripts: bdec350b84a1ace7cc118db113a21c9f160bde3425b07714e1c0c1da722621cf
+        checksum/scripts: 0717e77fd3bb941f602860e9be4f2ed87b481cddeadf37be463f8512ecde0c3e
         checksum/secret: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
       labels:
         app.kubernetes.io/component: master
@@ -61,7 +61,9 @@ spec:
             - name: REDIS_REPLICATION_MODE
               value: master
             - name: ALLOW_EMPTY_PASSWORD
-              value: 'yes'
+              value: 'no'
+            - name: REDIS_PASSWORD_FILE
+              value: /opt/bitnami/redis/secrets/redis-password
             - name: REDIS_TLS_ENABLED
               value: 'no'
             - name: REDIS_PORT
@@ -120,6 +122,8 @@ spec:
               name: start-scripts
             - mountPath: /health
               name: health
+            - mountPath: /opt/bitnami/redis/secrets/
+              name: redis-password
             - mountPath: /data
               name: redis-data
             - mountPath: /opt/bitnami/redis/mounted-etc
@@ -147,6 +151,12 @@ spec:
             defaultMode: 493
             name: redis-health
           name: health
+        - name: redis-password
+          secret:
+            items:
+              - key: redis-password
+                path: redis-password
+            secretName: redis-auth
         - configMap:
             name: redis-configuration
           name: config
@@ -288,9 +298,10 @@ data:
     fi\nif [[ -f /opt/bitnami/redis/mounted-etc/redis.conf ]];then\n    cp /opt/bitnami/redis/mounted-etc/redis.conf\
     \ /opt/bitnami/redis/etc/redis.conf\nfi\nif [[ -f /opt/bitnami/redis/mounted-etc/users.acl\
     \ ]];then\n    cp /opt/bitnami/redis/mounted-etc/users.acl /opt/bitnami/redis/etc/users.acl\n\
-    fi\nARGS=(\"--port\" \"${REDIS_PORT}\")\nARGS+=(\"--protected-mode\" \"no\")\n\
-    ARGS+=(\"--include\" \"/opt/bitnami/redis/etc/redis.conf\")\nARGS+=(\"--include\"\
-    \ \"/opt/bitnami/redis/etc/master.conf\")\nexec redis-server \"${ARGS[@]}\"\n"
+    fi\nARGS=(\"--port\" \"${REDIS_PORT}\")\nARGS+=(\"--requirepass\" \"${REDIS_PASSWORD}\"\
+    )\nARGS+=(\"--masterauth\" \"${REDIS_PASSWORD}\")\nARGS+=(\"--include\" \"/opt/bitnami/redis/etc/redis.conf\"\
+    )\nARGS+=(\"--include\" \"/opt/bitnami/redis/etc/master.conf\")\nexec redis-server\
+    \ \"${ARGS[@]}\"\n"
 kind: ConfigMap
 metadata:
   annotations:
