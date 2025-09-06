@@ -42,7 +42,7 @@ in
       };
     };
 
-    jobs."postgresql-bootstrap" = let
+    resources.jobs."postgresql-bootstrap" = let
       createDbCommands = lib.concatStringsSep "\n" (map (db: "CREATE DATABASE IF NOT EXISTS ${db};") boostrapDatabases);
       in {
       metadata = {
