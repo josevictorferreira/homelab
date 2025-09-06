@@ -11,8 +11,6 @@ in
           namespace = namespace;
         };
         stringData = {
-          "OPENROUTER_MODEL" = kubenix.lib.secretsFor "open_router_model";
-          "OPENROUTER_API_KEY" = kubenix.lib.secretsFor "open_router_api_key";
           "NEXTAUTH_SECRET" = kubenix.lib.secretsFor "linkwarden_auth_secret";
         };
       };

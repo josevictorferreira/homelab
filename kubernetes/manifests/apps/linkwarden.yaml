@@ -42,6 +42,16 @@ spec:
                 secretKeyRef:
                   key: uri
                   name: linkwarden-db
+            - name: OPENROUTER_MODEL
+              valueFrom:
+                secretKeyRef:
+                  key: OPENROUTER_MODEL
+                  name: openrouter-secrets
+            - name: OPENROUTER_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: OPENROUTER_API_KEY
+                  name: openrouter-secrets
             - name: SPACES_FORCE_PATH_STYLE
               value: 'true'
           envFrom:
