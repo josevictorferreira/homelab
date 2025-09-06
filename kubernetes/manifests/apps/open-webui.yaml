@@ -56,10 +56,6 @@ spec:
             - name: S3_REGION_NAME
               value: us-east-1
             - name: S3_KEY_PREFIX
-            - name: ENABLE_SIGNUP
-              value: 'False'
-            - name: OFFLINE_MODE
-              value: 'True'
             - name: OPENAI_API_KEY
               valueFrom:
                 secretKeyRef:
@@ -70,25 +66,9 @@ spec:
                 secretKeyRef:
                   key: OPENROUTER_API_BASE_URL
                   name: openrouter-secrets
-            - name: DATABASE_URL
-              valueFrom:
-                secretKeyRef:
-                  key: DATABASE_URL
-                  name: open-webui-secrets
-            - name: ENABLE_WEBSOCKET_SUPPORT
-              value: 'True'
-            - name: WEBSOCKET_MANAGER
-              value: 'True'
-            - name: WEBSOCKET_REDIS_URL
-              valueFrom:
-                secretKeyRef:
-                  key: REDIS_URL
-                  name: open-webui-secrets
-            - name: REDIS_URL
-              valueFrom:
-                secretKeyRef:
-                  key: REDIS_URL
-                  name: open-webui-secrets
+          envFrom:
+            - secretRef:
+                name: open-webui-secrets
           image: ghcr.io/open-webui/open-webui:0.6.26
           imagePullPolicy: IfNotPresent
           name: open-webui
@@ -190,8 +170,6 @@ metadata:
   annotations:
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
-    lbipam.cilium.io/ips: 10.10.10.111
-    lbipam.cilium.io/sharing-key: open-webui
   labels:
     app.kubernetes.io/component: open-webui
     app.kubernetes.io/instance: open-webui
@@ -202,7 +180,6 @@ metadata:
   name: open-webui
   namespace: apps
 spec:
-  loadBalancerClass: cilium
   ports:
     - name: http
       port: 80
@@ -211,7 +188,7 @@ spec:
   selector:
     app.kubernetes.io/component: open-webui
     app.kubernetes.io/instance: open-webui
-  type: LoadBalancer
+  type: ClusterIP
 ---
 apiVersion: v1
 kind: Service

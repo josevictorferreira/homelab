@@ -33,11 +33,6 @@ in
           tls = true;
           existingSecret = "wildcard-tls";
         };
-        service = {
-          type = "LoadBalancer";
-          annotations = k8sLib.serviceIpFor app;
-          loadBalancerClass = "cilium";
-        };
         persistence = {
           enabled = true;
           size = "2Gi";
@@ -53,21 +48,15 @@ in
             bucket = bucketName;
           };
         };
-        websocket = {
-          enabled = false;
-          manager = "redis";
-          url = "redis://redis-headless:6379/0";
-          redis.enabled = false;
-        };
+        websocket.enabled = false;
+        extraEnvFrom = [
+          {
+            secretRef = {
+              name = "open-webui-secrets";
+            };
+          }
+        ];
         extraEnvVars = [
-          {
-            name = "ENABLE_SIGNUP";
-            value = "False";
-          }
-          {
-            name = "OFFLINE_MODE";
-            value = "True";
-          }
           {
             name = "OPENAI_API_KEY";
             valueFrom = {
@@ -83,41 +72,6 @@ in
               secretKeyRef = {
                 name = "openrouter-secrets";
                 key = "OPENROUTER_API_BASE_URL";
-              };
-            };
-          }
-          {
-            name = "DATABASE_URL";
-            valueFrom = {
-              secretKeyRef = {
-                name = "open-webui-secrets";
-                key = "DATABASE_URL";
-              };
-            };
-          }
-          {
-            name = "ENABLE_WEBSOCKET_SUPPORT";
-            value = "True";
-          }
-          {
-            name = "WEBSOCKET_MANAGER";
-            value = "True";
-          }
-          {
-            name = "WEBSOCKET_REDIS_URL";
-            valueFrom = {
-              secretKeyRef = {
-                name = "open-webui-secrets";
-                key = "REDIS_URL";
-              };
-            };
-          }
-          {
-            name = "REDIS_URL";
-            valueFrom = {
-              secretKeyRef = {
-                name = "open-webui-secrets";
-                key = "REDIS_URL";
               };
             };
           }
