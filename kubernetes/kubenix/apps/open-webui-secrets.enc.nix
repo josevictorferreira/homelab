@@ -12,7 +12,7 @@ in
         };
         stringData = {
           "DATABASE_URL" = "postgresql://postgres:${kubenix.lib.secretsFor "postgresql_admin_password"}+@postgresql-hl:5432/open-webui";
-          "REDIS_URL" = "redis://${kubenix.lib.secretsFor "redis_password"}+@redis-headless:6379/0";
+          "WEBSOCKET_REDIS_URL" = "redis://${kubenix.lib.secretsFor "redis_password"}+@redis-headless:6379/0";
         };
       };
     };
