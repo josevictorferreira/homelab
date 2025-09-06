@@ -81,6 +81,11 @@ spec:
                 secretKeyRef:
                   key: DATABASE_URL
                   name: open-webui-secrets
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  key: WEBSOCKET_REDIS_URL
+                  name: open-webui-secrets
           image: ghcr.io/open-webui/open-webui:0.6.26
           imagePullPolicy: IfNotPresent
           name: open-webui
