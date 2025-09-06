@@ -28,7 +28,8 @@ in
           "https://openrouter.ai/api/v1"
         ];
         ingress = {
-          host = k8sLib.domainFor app;
+          enabled = true;
+          host = k8sLib.domainFor "openwebui";
           class = "cilium";
           tls = true;
           existingSecret = "wildcard-tls";
