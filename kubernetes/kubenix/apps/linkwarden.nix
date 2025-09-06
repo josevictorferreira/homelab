@@ -88,6 +88,20 @@ in
               };
             }
             {
+              name = "OPENROUTER_MODEL";
+              valueFrom.secretKeyRef = {
+                name = lib.mkForce "openrouter-secrets";
+                key = lib.mkForce "OPENROUTER_MODEL";
+              };
+            }
+            {
+              name = "OPENROUTER_API_KEY";
+              valueFrom.secretKeyRef = {
+                name = lib.mkForce "openrouter-secrets";
+                key = lib.mkForce "OPENROUTER_API_KEY";
+              };
+            }
+            {
               name = "SPACES_FORCE_PATH_STYLE";
               value = "true";
             }
