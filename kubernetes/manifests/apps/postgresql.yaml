@@ -179,6 +179,41 @@ spec:
             storage: 8Gi
         storageClassName: rook-ceph-block
 ---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: postgresql-bootstrap
+  namespace: apps
+spec:
+  template:
+    spec:
+      containers:
+        - args:
+            - 'psql -h postgresql -U postgres -U postgres -d postgres <<''EOF''
+
+              CREATE DATABASE IF NOT EXISTS linkwarden;
+
+              CREATE DATABASE IF NOT EXISTS open-webui;
+
+              EOF
+
+              '
+          command:
+            - sh
+            - -c
+          env:
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: admin-password
+                  name: postgresql-auth
+          image: bitnami/postgresql:16
+          name: psql
+      restartPolicy: OnFailure
+---
 apiVersion: v1
 kind: Service
 metadata:
