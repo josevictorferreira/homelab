@@ -56,16 +56,10 @@ spec:
             - name: S3_REGION_NAME
               value: us-east-1
             - name: S3_KEY_PREFIX
-            - name: ENABLE_WEBSOCKET_SUPPORT
-              value: 'True'
-            - name: WEBSOCKET_MANAGER
-              value: redis
-            - name: WEBSOCKET_REDIS_URL
-              value: redis://open-webui-redis:6379/0
             - name: ENABLE_SIGNUP
-              value: 'false'
+              value: 'False'
             - name: OFFLINE_MODE
-              value: 'true'
+              value: 'True'
             - name: OPENAI_API_KEY
               valueFrom:
                 secretKeyRef:
@@ -80,6 +74,15 @@ spec:
               valueFrom:
                 secretKeyRef:
                   key: DATABASE_URL
+                  name: open-webui-secrets
+            - name: ENABLE_WEBSOCKET_SUPPORT
+              value: 'True'
+            - name: WEBSOCKET_MANAGER
+              value: 'True'
+            - name: WEBSOCKET_REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  key: REDIS_URL
                   name: open-webui-secrets
             - name: REDIS_URL
               valueFrom:

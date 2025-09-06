@@ -54,18 +54,19 @@ in
           };
         };
         websocket = {
-          enabled = true;
+          enabled = false;
           manager = "redis";
+          url = "redis://redis-headless:6379/0";
           redis.enabled = false;
         };
         extraEnvVars = [
           {
             name = "ENABLE_SIGNUP";
-            value = "false";
+            value = "False";
           }
           {
             name = "OFFLINE_MODE";
-            value = "true";
+            value = "True";
           }
           {
             name = "OPENAI_API_KEY";
@@ -95,7 +96,15 @@ in
             };
           }
           {
-            name = "REDIS_URL";
+            name = "ENABLE_WEBSOCKET_SUPPORT";
+            value = "True";
+          }
+          {
+            name = "WEBSOCKET_MANAGER";
+            value = "True";
+          }
+          {
+            name = "WEBSOCKET_REDIS_URL";
             valueFrom = {
               secretKeyRef = {
                 name = "open-webui-secrets";
@@ -104,7 +113,7 @@ in
             };
           }
           {
-            name = "WEBSOCKET_REDIS_URL";
+            name = "REDIS_URL";
             valueFrom = {
               secretKeyRef = {
                 name = "open-webui-secrets";
