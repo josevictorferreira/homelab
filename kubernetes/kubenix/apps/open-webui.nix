@@ -56,7 +56,6 @@ in
         websocket = {
           enabled = true;
           manager = "redis";
-          url = "redis://redis-headless:6379/0";
           redis.enabled = false;
         };
         extraEnvVars = [
