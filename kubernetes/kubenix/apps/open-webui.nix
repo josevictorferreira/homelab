@@ -53,6 +53,11 @@ in
             bucket = bucketName;
           };
         };
+        websocket = {
+          enabled = true;
+          manager = "redis";
+          url = "redis://redis-headless:6379/0";
+        };
         extraEnvVars = [
           {
             name = "ENABLE_SIGNUP";
@@ -73,6 +78,24 @@ in
               secretKeyRef = {
                 name = "openrouter-secrets";
                 key = "OPENROUTER_API_BASE_URL";
+              };
+            };
+          }
+          {
+            name = "DATABASE_URL";
+            valueFrom = {
+              secretKeyRef = {
+                name = "open-webui-secrets";
+                key = "DATABASE_URL";
+              };
+            };
+          }
+          {
+            name = "WEBSOCKET_REDIS_URL";
+            valueFrom = {
+              secretKeyRef = {
+                name = "open-webui-secrets";
+                key = "WEBSOCKET_REDIS_URL";
               };
             };
           }
