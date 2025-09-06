@@ -11,7 +11,7 @@ in
           namespace = namespace;
         };
         stringData = {
-          "ENABLE_SIGNUP" = "False";
+          "ENABLE_SIGNUP" = "True";
           "OFFLINE_MODE" = "True";
           "ENABLE_WEBSOCKET_SUPPORT" = "True";
           "WEBSOCKET_MANAGER" = "True";
