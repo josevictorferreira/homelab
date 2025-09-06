@@ -61,7 +61,7 @@ spec:
             - name: WEBSOCKET_MANAGER
               value: redis
             - name: WEBSOCKET_REDIS_URL
-              value: redis://redis-headless:6379/0
+              value: redis://open-webui-redis:6379/0
             - name: ENABLE_SIGNUP
               value: 'false'
             - name: OFFLINE_MODE
