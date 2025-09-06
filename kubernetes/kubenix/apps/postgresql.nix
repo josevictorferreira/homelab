@@ -2,10 +2,21 @@
 
 let
   namespace = homelab.kubernetes.namespaces.applications;
-  boostrapDatabases = [
+  bootstrapDatabases = [
     "linkwarden"
     "open-webui"
   ];
+  mkCreateDb = db: ''
+    DO
+    $do$
+    BEGIN
+      IF NOT EXISTS (SELECT FROM pg_database WHERE datname = '${db}') THEN
+        CREATE DATABASE "${db}";
+      END IF;
+    END
+    $do$;
+  '';
+  createDbCommands = lib.concatStringsSep "\n\n" (map mkCreateDb bootstrapDatabases);
 in
 {
   kubernetes = {
@@ -42,9 +53,7 @@ in
       };
     };
 
-    resources.jobs."postgresql-bootstrap" = let
-      createDbCommands = lib.concatStringsSep "\n" (map (db: "CREATE DATABASE IF NOT EXISTS ${db};") boostrapDatabases);
-      in {
+    resources.jobs."postgresql-bootstrap" = {
       metadata = {
         name = "postgresql-bootstrap";
         namespace = namespace;
