@@ -96,6 +96,15 @@ in
             };
           }
           {
+            name = "REDIS_URL";
+            valueFrom = {
+              secretKeyRef = {
+                name = "open-webui-secrets";
+                key = "WEBSOCKET_REDIS_URL";
+              };
+            };
+          }
+          {
             name = "WEBSOCKET_REDIS_URL";
             valueFrom = {
               secretKeyRef = {
