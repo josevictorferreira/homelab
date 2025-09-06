@@ -1,0 +1,264 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/component: open-webui
+    app.kubernetes.io/instance: open-webui
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: open-webui
+    app.kubernetes.io/version: 0.6.26
+    helm.sh/chart: open-webui-8.1.0
+  name: open-webui
+  namespace: apps
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: open-webui
+      app.kubernetes.io/instance: open-webui
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: open-webui
+        app.kubernetes.io/instance: open-webui
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: open-webui
+        app.kubernetes.io/version: 0.6.26
+        helm.sh/chart: open-webui-8.1.0
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - env:
+            - name: ENABLE_OLLAMA_API
+              value: "False"
+            - name: OPENAI_API_BASE_URLS
+              value: http://open-webui-pipelines.apps.svc.cluster.local:9099;https://openrouter.ai/api/v1
+            - name: STORAGE_PROVIDER
+              value: s3
+            - name: S3_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  key: AWS_ACCESS_KEY_ID
+                  name: open-webui-s3
+            - name: S3_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: AWS_SECRET_ACCESS_KEY
+                  name: open-webui-s3
+            - name: S3_ENDPOINT_URL
+              value: http://rook-ceph-rgw-ceph-objectstore.rook-ceph.svc.cluster.local
+            - name: S3_BUCKET_NAME
+              value: open-webui-files
+            - name: S3_REGION_NAME
+              value: us-east-1
+            - name: S3_KEY_PREFIX
+            - name: ENABLE_SIGNUP
+              value: "false"
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: OPENROUTER_API_KEY
+                  name: openrouter-secrets
+            - name: OPENAI_API_BASE_URL
+              valueFrom:
+                secretKeyRef:
+                  key: OPENROUTER_API_BASE_URL
+                  name: openrouter-secrets
+          image: ghcr.io/open-webui/open-webui:0.6.26
+          imagePullPolicy: IfNotPresent
+          name: open-webui
+          ports:
+            - containerPort: 8080
+              name: http
+          tty: true
+          volumeMounts:
+            - mountPath: /app/backend/data
+              name: data
+      enableServiceLinks: false
+      initContainers:
+        - command:
+            - sh
+            - -c
+            - cp -R -n /app/backend/data/* /tmp/app-data/
+          image: ghcr.io/open-webui/open-webui:0.6.26
+          imagePullPolicy: IfNotPresent
+          name: copy-app-data
+          volumeMounts:
+            - mountPath: /tmp/app-data
+              name: data
+      serviceAccountName: open-webui
+      volumes:
+        - emptyDir: {}
+          name: data
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/component: open-webui-pipelines
+    app.kubernetes.io/instance: open-webui
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: pipelines
+    app.kubernetes.io/version: alpha
+    helm.sh/chart: pipelines-0.7.0
+  name: open-webui-pipelines
+  namespace: apps
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: open-webui-pipelines
+      app.kubernetes.io/instance: open-webui
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: open-webui-pipelines
+        app.kubernetes.io/instance: open-webui
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: pipelines
+        app.kubernetes.io/version: alpha
+        helm.sh/chart: pipelines-0.7.0
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - image: ghcr.io/open-webui/pipelines:main
+          imagePullPolicy: Always
+          name: pipelines
+          ports:
+            - containerPort: 9099
+              name: http
+          tty: true
+          volumeMounts:
+            - mountPath: /app/pipelines
+              name: data
+      enableServiceLinks: false
+      serviceAccountName: open-webui-pipelines
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: open-webui-pipelines
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/component: open-webui-pipelines
+    app.kubernetes.io/instance: open-webui
+  name: open-webui-pipelines
+  namespace: apps
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+    lbipam.cilium.io/ips: 10.10.10.111
+    lbipam.cilium.io/sharing-key: open-webui
+  labels:
+    app.kubernetes.io/component: open-webui
+    app.kubernetes.io/instance: open-webui
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: open-webui
+    app.kubernetes.io/version: 0.6.26
+    helm.sh/chart: open-webui-8.1.0
+  name: open-webui
+  namespace: apps
+spec:
+  loadBalancerClass: cilium
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: http
+  selector:
+    app.kubernetes.io/component: open-webui
+    app.kubernetes.io/instance: open-webui
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/component: open-webui-pipelines
+    app.kubernetes.io/instance: open-webui
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: pipelines
+    app.kubernetes.io/version: alpha
+    helm.sh/chart: pipelines-0.7.0
+  name: open-webui-pipelines
+  namespace: apps
+spec:
+  ports:
+    - name: http
+      port: 9099
+      protocol: TCP
+      targetPort: http
+  selector:
+    app.kubernetes.io/component: open-webui-pipelines
+    app.kubernetes.io/instance: open-webui
+  type: ClusterIP
+---
+apiVersion: v1
+automountServiceAccountToken: false
+kind: ServiceAccount
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/component: open-webui
+    app.kubernetes.io/instance: open-webui
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: open-webui
+    app.kubernetes.io/version: 0.6.26
+    helm.sh/chart: open-webui-8.1.0
+  name: open-webui
+  namespace: apps
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/component: open-webui-pipelines
+    app.kubernetes.io/instance: open-webui
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: pipelines
+    app.kubernetes.io/version: alpha
+    helm.sh/chart: pipelines-0.7.0
+  name: open-webui-pipelines
+  namespace: apps
+---
+apiVersion: objectbucket.io/v1alpha1
+kind: ObjectBucketClaim
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  name: open-webui-s3
+  namespace: apps
+spec:
+  bucketName: open-webui-files
+  storageClassName: rook-ceph-objectstore

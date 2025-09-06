@@ -2,7 +2,7 @@
 
 let
   app = "open-webui";
-  namespace = homelab.kubernetes.namespaces.apps;
+  namespace = homelab.kubernetes.namespaces.applications;
   bucketName = "open-webui-files";
 in
 {
@@ -13,7 +13,7 @@ in
           repo = "https://helm.openwebui.com/";
           chart = "open-webui";
           version = "8.1.0";
-          sha256 = "sha256-nhvifpDdM8MoxF43cJAi6o+il2BbHX+udVAvvm1PukM=";
+          sha256 = "sha256-qFG0Iq2IBwkqG6t2Z47GDU3fjftzy3xI7ALNJjctNQk=";
         };
       includeCRDs = true;
       noHooks = true;
