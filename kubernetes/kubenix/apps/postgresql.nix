@@ -9,7 +9,7 @@ let
   mkCreateDb = db: ''
     echo "Ensuring database '${db}' exists..."
     psql -h postgresql -U postgres -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname='${db}'" | grep -q 1 \
-      || psql -h postgresql -U postgres -d postgres -c "CREATE DATABASE \\"${db}\\";"
+      || psql -h postgresql -U postgres -d postgres -c "CREATE DATABASE \"${db}\";"
   '';
   createDbCommands = lib.concatStringsSep "\n" (map mkCreateDb bootstrapDatabases);
 in
