@@ -20,7 +20,7 @@ in
         architecture = "standalone";
 
         auth = {
-          enabled                       = true;
+          enabled                       = false;
           existingSecret                = "redis-auth";
           existingSecretPasswordKey     = "redis-password";
         };
