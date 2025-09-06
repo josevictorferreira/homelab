@@ -57,4 +57,6 @@ rec {
       }
     ];
   };
+
+  objectStoreEndpoint = "http://rook-ceph-rgw-ceph-objectstore.${homelab.kubernetes.namespaces.storage}.svc.cluster.local";
 }
