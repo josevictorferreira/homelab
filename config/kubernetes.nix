@@ -23,6 +23,7 @@
       prowlarr = "10.10.10.120";
       qbittorrent = "10.10.10.119";
       postgresql = "10.10.10.101";
+      open-webui = "10.10.10.111";
     };
   };
 
