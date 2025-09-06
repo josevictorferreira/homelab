@@ -65,6 +65,10 @@ in
             value = "false";
           }
           {
+            name = "OFFLINE_MODE";
+            value = "true";
+          }
+          {
             name = "OPENAI_API_KEY";
             valueFrom = {
               secretKeyRef = {
