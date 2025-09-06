@@ -10,7 +10,7 @@ in
         chartUrl = "oci://registry-1.docker.io/bitnamicharts/redis";
         chart    = "redis";
         version  = "22.0.7";
-        sha256   = "sha256-iJ4clEnUshRP/s/qwkn/07JTSonGzMRV6XpMvwI9pAQ=";
+        sha256   = "sha256-aYghmMzdQO5ynmcG6w9aQmzRHnaLMKoNwsjZRKGdbrs=";
       };
       includeCRDs = true;
       noHooks     = true;
