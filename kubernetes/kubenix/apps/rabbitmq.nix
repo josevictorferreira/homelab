@@ -11,7 +11,7 @@ in
         repo = "https://charts.bitnami.com/bitnami";
         chart = "rabbitmq";
         version = "16.0.14";
-        sha256 = "sha256-iJ4clEnUshRP/s/qwkn/07JTSonGzMRV6XpMvwI9pAQ=";
+        sha256 = "sha256-fL0CmBadbyCRzRZs/GnjVFDQ8UaXdJewzl9RPLk8rxE=";
       };
       includeCRDs = true;
       noHooks = true;
@@ -47,8 +47,8 @@ in
         networkPolicy.extraIngress = [
           {
             ports = [
-              { protocol = "TCP"; containerPort = 1883; port = 1883; }
-              { protocol = "TCP"; containerPort = 8883; port = 8883; }
+              { protocol = "TCP"; port = 1883; }
+              { protocol = "TCP"; port = 8883; }
             ];
           }
         ];
@@ -82,7 +82,7 @@ in
         metrics = {
           enabled = true;
           serviceMonitor = {
-            namespace = "monitoring";
+            namespace = namespace;
             default.enabled = true;
           };
         };
