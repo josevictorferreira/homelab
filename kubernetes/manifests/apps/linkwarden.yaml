@@ -99,31 +99,6 @@ metadata:
   namespace: apps
 ---
 apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  annotations:
-    helm.sh/resource-policy: keep
-    kubenix/k8s-version: '1.32'
-    kubenix/project-name: ze-homelab
-    meta.helm.sh/release-name: linkwarden
-    meta.helm.sh/release-namespace: apps
-  labels:
-    app.kubernetes.io/instance: linkwarden
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: linkwarden
-    app.kubernetes.io/version: 2.5.3
-    helm.sh/chart: linkwarden-0.3.3
-  name: linkwarden-pvc
-  namespace: apps
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 5Gi
-  storageClassName: standard
----
-apiVersion: v1
 data:
   token: ''
 kind: Secret
