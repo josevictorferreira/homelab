@@ -63,11 +63,6 @@ spec:
                 secretKeyRef:
                   key: OPENROUTER_API_KEY
                   name: openrouter-secrets
-            - name: OPENAI_API_BASE_URL
-              valueFrom:
-                secretKeyRef:
-                  key: OPENROUTER_API_BASE_URL
-                  name: openrouter-secrets
           envFrom:
             - secretRef:
                 name: open-webui-secrets
