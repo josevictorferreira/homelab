@@ -26,8 +26,6 @@ spec:
     type: Recreate
   template:
     metadata:
-      annotations:
-        checksum/configMaps: 7b56848bc679bc4fc5b5b8afe7bfd7c57a6df98b160b29666f98206b0dbd52ac
       labels:
         app.kubernetes.io/controller: main
         app.kubernetes.io/instance: glance
@@ -58,39 +56,8 @@ spec:
             items:
               - key: glance.yml
                 path: glance.yml
-            name: glance
+            name: glance-config
           name: glance
----
-apiVersion: v1
-data:
-  glance.yml: '{"pages":[{"columns":[{"size":"small","widgets":[{"first-day-of-week":"monday","type":"calendar"},{"cache":"1m","headers":{"Authorization":"Bearer
-    RANDOM_TOKEN"},"method":"GET","template":"<ul class=\"list list-gap-10 collapsible-container\"
-    data-collapse-after=\"7\">\n  {{ range .JSON.Array \"response\" }}\n    <li>\n      {{
-    $title := .String \"name\" }}\n      {{ if gt (len $title) 50 }}\n        {{ $title
-    = (slice $title 0 50) | printf \"%s...\" }}\n      {{ end }}\n      <a class=\"size-title-dynamic
-    color-primary-if-not-visited\" href=\"{{ .String \"url\" }}\" target=\"_self\"
-    rel=\"noopener noreferrer\">{{ $title }}</a>\n      <ul class=\"list-horizontal-text\">\n        <li
-    style=\"color: {{ .String \"collection.color\" }};\">{{ .String \"collection.name\"
-    }}</li>\n        {{ $tags := .Array \"tags\" }}\n        {{ range $index, $tag
-    := $tags }}\n          <li>{{ .String \"name\" }} </li>\n        {{ end }}\n      </ul>\n    </li>\n  {{
-    end }}\n</ul>\n","title":"Bookmarks","type":"custom-api","url":"http://10.10.10.103/api/v1/links"}]},{"size":"full","widgets":[{"type":"group","widgets":[{"type":"hacker-news"},{"type":"lobsters"}]},{"channels":["UCOuGATIAbd2DvzJmUgXn2IQ","UCHnyfMqiRRG1u-2MsSQLbXA","UCR-DXc1voovS8nhAvccRZhg","UCpMcsdZf2KkAnfmxiq2MfMQ","UC9PIn6-XuRKZ5HmYeu46AIw","UCqnYRbOnwVAWU6plY904eAg","UC_zBdZ0_H_jn41FDRG7q4Tw"],"type":"videos"},{"type":"group","widgets":[{"show-thumbnails":true,"subreddit":"selfhosted","type":"reddit"},{"show-thumbnails":true,"subreddit":"minilab","type":"reddit"},{"show-thumbnails":true,"subreddit":"homelab","type":"reddit"}]}]},{"size":"small","widgets":[{"hour-format":"24h","location":"Londrina,
-    Paraná, Brazil","type":"weather","units":"metric"},{"markets":[{"name":"Bitcoin","symbol":"BTC-USD"},{"name":"Kaspa","symbol":"KAS-USD"},{"name":"Brazilian
-    Real","symbol":"USDBRL=X"}],"type":"markets"},{"cache":"1d","repositories":["glanceapp/glance","pi-hole/pi-hole","grafana/grafana","linkwarden/linkwarden","drakkan/sftpgo","binwiederhier/ntfy","louislam/uptime-kuma","prowlarr/prowlarr"],"type":"releases"}]}],"name":"Home"}],"theme":{"background-color":"50
-    1 6","negative-color":"209 88 54","primary-color":"24 97 58"}}'
-kind: ConfigMap
-metadata:
-  annotations:
-    kubenix/k8s-version: '1.32'
-    kubenix/project-name: ze-homelab
-  labels:
-    app.kubernetes.io/instance: glance
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: glance
-    helm.sh/chart: app-template-4.2.0
-    kubenix/module-name: release
-    kubenix/module-version: 1.0.0
-  name: glance
-  namespace: apps
 ---
 apiVersion: v1
 kind: Service
