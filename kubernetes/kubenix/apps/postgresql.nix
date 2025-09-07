@@ -4,7 +4,7 @@ let
   namespace = homelab.kubernetes.namespaces.applications;
   bootstrapDatabases = [
     "linkwarden"
-    "open-webui"
+    "openwebui"
   ];
   mkCreateDb = db: ''
     echo "Ensuring database '${db}' exists..."
