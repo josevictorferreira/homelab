@@ -11,8 +11,8 @@ in
           namespace = namespace;
         };
         stringData = {
-          "RABBITMQ_PASSWORD" = kubenix.lib.secretsFor "rabbitmq_password";
-          "RABBITMQ_ERLANG_COOKIE" = kubenix.lib.secretsFor "rabbitmq_erlang_cookie";
+          "rabbitmq-password" = kubenix.lib.secretsFor "rabbitmq_password";
+          "rabbitmq-erlang-cookie" = kubenix.lib.secretsFor "rabbitmq_erlang_cookie";
         };
       };
     };

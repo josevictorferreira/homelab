@@ -58,11 +58,13 @@ in
           storageClass = "rook-ceph-block";
         };
 
+        usePasswordFiles = true;
+
         auth = {
           existingPasswordSecret = "rabbitmq-auth";
-          existingPasswordKey = "RABBITMQ_PASSWORD";
+          existingPasswordKey = "rabbitmq-password";
           existingErlangSecret = "rabbitmq-auth";
-          existingErlangKey = "RABBITMQ_ERLANG_COOKIE";
+          existingErlangKey = "rabbitmq-erlang-cookie";
           username = "josevictor";
         };
 
