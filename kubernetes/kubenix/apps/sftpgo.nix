@@ -21,7 +21,7 @@ in
       values = {
         image = {
           repository = "ghcr.io/drakkan/sftpgo";
-          tag = "v2.6.6-alpine@sha256:1dfde466cd2298c67050ea74798fd8e026f1667e657e0b8b2c68a7753ebe302a";
+          tag = "v2.6.6-alpine";
           pullPolicy = "IfNotPresent";
         };
 
