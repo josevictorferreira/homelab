@@ -11,7 +11,7 @@ in
         repo = "https://helm.irsigler.cloud/";
         chart = "uptime-kuma";
         version = "2.22.0";
-        sha256 = "sha256-qFG0Iq2IBwkqG6t2Z47GDU3fjftzy3xI7ALNJjctNQk=";
+        sha256 = "sha256-eh42cO0bFiMNYIpXJSHkGQVnGsn4cmv6ju8VjYu8YYU=";
       };
       includeCRDs = true;
       noHooks = true;
