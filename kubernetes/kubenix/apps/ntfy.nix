@@ -8,10 +8,10 @@ in
   kubernetes = {
     helm.releases.${app} = {
       chart = k8sLib.helm.fetch {
-        repo = "https://fmjstudios.github.io/helm-charts/";
+        chartUrl = "oci://ghcr.io/fmjstudios/helm/ntfy";
         chart = "ntfy";
         version = "0.2.2";
-        sha256 = "sha256-qFG0Iq2IBwkqG6t2Z47GDU3fjftzy3xI7ALNJjctNQk=";
+        sha256 = "sha256-AVvangTTMY1rakFqTOffJYjuuBPAoGNltCkooWKYmHk=";
       };
       includeCRDs = true;
       noHooks = true;
@@ -26,9 +26,11 @@ in
         };
 
         ntfy = {
-          baseURL = "ntfy.${homelab.domain}";
+          baseURL = k8sLib.domainFor app;
           listenHTTP = ":80";
           behindProxy = true;
+          serviceAccount.name = "ntfy";
+          serviceName = "ntfy";
           web = {
             existingSecret = "ntfy-secrets";
             file = "/data/webpush.db";
@@ -60,12 +62,14 @@ in
           };
           tls = [
             {
-              hosts = [ "ntfy.${homelab.domain}" ];
+              hosts = [ (k8sLib.domainFor app) ];
               secretName = "wildcard-tls";
             }
           ];
         };
       };
     };
+
+    resources.statefulSets.ntfy.spec.serviceName = "ntfy";
   };
 }
