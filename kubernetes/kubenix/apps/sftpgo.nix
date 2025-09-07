@@ -29,7 +29,6 @@ in
           runAsUser = 2002;
           runAsGroup = 2002;
           readOnlyRootFilesystem = false;
-          # fsGroupChangePolicy = "OnRootMismatch";
         };
 
         podSecurityContext = {
