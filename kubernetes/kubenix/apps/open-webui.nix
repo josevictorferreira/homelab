@@ -66,15 +66,6 @@ in
               };
             };
           }
-          {
-            name = "OPENAI_API_BASE_URL";
-            valueFrom = {
-              secretKeyRef = {
-                name = "openrouter-secrets";
-                key = "OPENROUTER_API_BASE_URL";
-              };
-            };
-          }
         ];
       };
     };
