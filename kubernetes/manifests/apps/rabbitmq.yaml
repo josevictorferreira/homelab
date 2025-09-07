@@ -65,7 +65,7 @@ spec:
             - name: RABBITMQ_NODE_NAME
               value: rabbit@$(MY_POD_NAME).rabbitmq-headless.$(MY_POD_NAMESPACE).svc.cluster.local
             - name: RABBITMQ_UPDATE_PASSWORD
-              value: 'no'
+              value: 'yes'
             - name: RABBITMQ_MNESIA_DIR
               value: /opt/bitnami/rabbitmq/.rabbitmq/mnesia/$(RABBITMQ_NODE_NAME)
             - name: RABBITMQ_LDAP_ENABLE
