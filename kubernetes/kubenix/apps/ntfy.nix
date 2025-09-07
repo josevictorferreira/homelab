@@ -72,15 +72,27 @@ in
 
     resources.statefulSets.ntfy.spec = {
       serviceName = "ntfy";
-      template.spec.containers.ntfy = {
-        args = [ "serve" "--config" "/var/lib/ntfy/config.yaml" ];
-        volumeMounts = [
-          {
+      template.spec = {
+        volumes.ntfy-config = {
+          name = "ntfy-config";
+          configMap = {
+            name = "ntfy";
+            items = [
+              {
+                key = "config.yaml";
+                path = "config.yaml";
+              }
+            ];
+          };
+        };
+        containers.ntfy = {
+          args = [ "serve" "--config" "/var/lib/ntfy/config.yaml" ];
+          volumeMounts.ntfy-config = {
             name = "ntfy-config";
             mountPath = "/var/lib/ntfy/config.yaml";
             subPath = "config.yaml";
-          }
-        ];
+          };
+        };
       };
     };
 
