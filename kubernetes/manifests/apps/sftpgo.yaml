@@ -1,0 +1,323 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: sftpgo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: sftpgo
+    app.kubernetes.io/version: 2.6.6-alpine@sha256:1dfde466cd2298c67050ea74798fd8e026f1667e657e0b8b2c68a7753ebe302a
+    helm.sh/chart: sftpgo-0.40.0
+  name: sftpgo
+  namespace: apps
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: sftpgo
+      app.kubernetes.io/name: sftpgo
+  template:
+    metadata:
+      annotations:
+        checksum/config: b389032e681b2cb16dfdc9c1d37e7e0dc00e915281f044dd6c8b7a87b374c4e3
+      labels:
+        app.kubernetes.io/instance: sftpgo
+        app.kubernetes.io/name: sftpgo
+    spec:
+      containers:
+        - args:
+            - sftpgo
+            - serve
+          env:
+            - name: SFTPGO_SFTPD__BINDINGS__0__PORT
+              value: '2022'
+            - name: SFTPGO_FTPD__BINDINGS__0__PORT
+              value: '2021'
+            - name: SFTPGO_FTPD__PASSIVE_PORT_RANGE__START
+              value: '50000'
+            - name: SFTPGO_FTPD__PASSIVE_PORT_RANGE__END
+              value: '50009'
+            - name: SFTPGO_WEBDAVD__BINDINGS__0__PORT
+              value: '8081'
+            - name: SFTPGO_HTTPD__BINDINGS__0__PORT
+              value: '8080'
+            - name: SFTPGO_TELEMETRY__BIND_PORT
+              value: '10000'
+            - name: SFTPGO_TELEMETRY__BIND_ADDRESS
+              value: ''
+          image: ghcr.io/drakkan/sftpgo:v2.6.6-alpine@sha256:1dfde466cd2298c67050ea74798fd8e026f1667e657e0b8b2c68a7753ebe302a
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: telemetry
+          name: sftpgo
+          ports:
+            - containerPort: 2022
+              name: sftp
+              protocol: TCP
+            - containerPort: 2021
+              name: ftp
+              protocol: TCP
+            - containerPort: 8081
+              name: webdav
+              protocol: TCP
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+            - containerPort: 10000
+              name: telemetry
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: telemetry
+          resources: {}
+          securityContext: {}
+          volumeMounts:
+            - mountPath: /etc/sftpgo/sftpgo.json
+              name: config
+              readOnly: true
+              subPath: sftpgo.json
+            - mountPath: /var/lib/sftpgo
+              name: sftpgo-volume
+            - mountPath: /mnt/shared_storage
+              name: shared-storage
+              readOnly: false
+      hostNetwork: false
+      securityContext:
+        fsGroup: 1000
+      serviceAccountName: sftpgo
+      volumes:
+        - configMap:
+            name: sftpgo
+          name: config
+        - name: sftpgo-volume
+          persistentVolumeClaim:
+            claimName: sftpgo
+        - name: shared-storage
+          persistentVolumeClaim:
+            claimName: cephfs-shared-storage-root
+---
+apiVersion: v1
+data:
+  sftpgo.json: '{"ftpd":{"bindings":[{"active_connections_security":1,"debug":true,"force_passive_ip":"10.10.10.115","passive_connections_security":1,"port":21,"tls_mode":0}],"passive_port_range":{"end":50009,"start":50000}},"sftpd":{"bindings":[{"port":22}],"max_auth_tries":4}}'
+kind: ConfigMap
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: sftpgo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: sftpgo
+    app.kubernetes.io/version: 2.6.6-alpine@sha256:1dfde466cd2298c67050ea74798fd8e026f1667e657e0b8b2c68a7753ebe302a
+    helm.sh/chart: sftpgo-0.40.0
+  name: sftpgo
+  namespace: apps
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  finalizers:
+    - kubernetes.io/pvc-protection
+  labels:
+    app.kubernetes.io/instance: sftpgo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: sftpgo
+    app.kubernetes.io/version: 2.6.6-alpine@sha256:1dfde466cd2298c67050ea74798fd8e026f1667e657e0b8b2c68a7753ebe302a
+    helm.sh/chart: sftpgo-0.40.0
+  name: sftpgo
+  namespace: apps
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: rook-ceph-block
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+    lbipam.cilium.io/ips: 10.10.10.115
+    lbipam.cilium.io/sharing-key: sftpgo
+  labels:
+    app.kubernetes.io/instance: sftpgo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: sftpgo
+    app.kubernetes.io/version: 2.6.6-alpine@sha256:1dfde466cd2298c67050ea74798fd8e026f1667e657e0b8b2c68a7753ebe302a
+    helm.sh/chart: sftpgo-0.40.0
+  name: sftpgo
+  namespace: apps
+spec:
+  externalTrafficPolicy: Cluster
+  ports:
+    - appProtocol: sftp-ssh
+      name: sftp
+      port: 22
+      protocol: TCP
+      targetPort: sftp
+    - appProtocol: ftp
+      name: ftp
+      port: 21
+      protocol: TCP
+      targetPort: ftp
+    - appProtocol: ftp
+      name: ftp-passive-50000
+      port: 50000
+      protocol: TCP
+      targetPort: 50000
+    - appProtocol: ftp
+      name: ftp-passive-50001
+      port: 50001
+      protocol: TCP
+      targetPort: 50001
+    - appProtocol: ftp
+      name: ftp-passive-50002
+      port: 50002
+      protocol: TCP
+      targetPort: 50002
+    - appProtocol: ftp
+      name: ftp-passive-50003
+      port: 50003
+      protocol: TCP
+      targetPort: 50003
+    - appProtocol: ftp
+      name: ftp-passive-50004
+      port: 50004
+      protocol: TCP
+      targetPort: 50004
+    - appProtocol: ftp
+      name: ftp-passive-50005
+      port: 50005
+      protocol: TCP
+      targetPort: 50005
+    - appProtocol: ftp
+      name: ftp-passive-50006
+      port: 50006
+      protocol: TCP
+      targetPort: 50006
+    - appProtocol: ftp
+      name: ftp-passive-50007
+      port: 50007
+      protocol: TCP
+      targetPort: 50007
+    - appProtocol: ftp
+      name: ftp-passive-50008
+      port: 50008
+      protocol: TCP
+      targetPort: 50008
+    - appProtocol: ftp
+      name: ftp-passive-50009
+      port: 50009
+      protocol: TCP
+      targetPort: 50009
+    - appProtocol: webdav
+      name: webdav
+      port: 81
+      protocol: TCP
+      targetPort: webdav
+    - appProtocol: http
+      name: http
+      port: 80
+      protocol: TCP
+      targetPort: http
+    - appProtocol: http
+      name: telemetry
+      port: 10000
+      protocol: TCP
+      targetPort: telemetry
+  selector:
+    app.kubernetes.io/instance: sftpgo
+    app.kubernetes.io/name: sftpgo
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: sftpgo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: sftpgo
+    app.kubernetes.io/version: 2.6.6-alpine@sha256:1dfde466cd2298c67050ea74798fd8e026f1667e657e0b8b2c68a7753ebe302a
+    helm.sh/chart: sftpgo-0.40.0
+  name: sftpgo
+  namespace: apps
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: cloudflare-issuer
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: sftpgo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: sftpgo
+    app.kubernetes.io/version: 2.6.6-alpine@sha256:1dfde466cd2298c67050ea74798fd8e026f1667e657e0b8b2c68a7753ebe302a
+    helm.sh/chart: sftpgo-0.40.0
+  name: sftpgo-api
+  namespace: apps
+spec:
+  ingressClassName: cilium
+  rules:
+    - host: sftpgoapi.josevictor.me
+      http:
+        paths:
+          - backend:
+              service:
+                name: sftpgo
+                port:
+                  number: 80
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - sftpgoapi.josevictor.me
+      secretName: wildcard-tls
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: cloudflare-issuer
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: sftpgo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: sftpgo
+    app.kubernetes.io/version: 2.6.6-alpine@sha256:1dfde466cd2298c67050ea74798fd8e026f1667e657e0b8b2c68a7753ebe302a
+    helm.sh/chart: sftpgo-0.40.0
+  name: sftpgo-ui
+  namespace: apps
+spec:
+  ingressClassName: cilium
+  rules:
+    - host: sftpgo.josevictor.me
+      http:
+        paths:
+          - backend:
+              service:
+                name: sftpgo
+                port:
+                  number: 80
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - sftpgo.josevictor.me
+      secretName: wildcard-tls
