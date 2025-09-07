@@ -26,17 +26,15 @@ in
         };
 
         securityContext = {
-          container = {
-            runAsUser = 2002;
-            runAsGroup = 2002;
-            PUID = 2002;
-            readOnlyRootFilesystem = false;
-            fsGroupChangePolicy = "OnRootMismatch";
-          };
-          pod = {
-            fsGroup = 2002;
-            fsGroupChangePolicy = "OnRootMismatch";
-          };
+          runAsUser = 2002;
+          runAsGroup = 2002;
+          readOnlyRootFilesystem = false;
+          # fsGroupChangePolicy = "OnRootMismatch";
+        };
+
+        podSecurityContext = {
+          fsGroup = 2002;
+          fsGroupChangePolicy = "OnRootMismatch";
         };
 
         config = {
