@@ -55,6 +55,7 @@ in
         service = {
           ports = {
             http = 80;
+            https = 80;
           };
         };
 
