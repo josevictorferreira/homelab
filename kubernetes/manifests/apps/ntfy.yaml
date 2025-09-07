@@ -271,6 +271,7 @@ metadata:
   name: ntfy
   namespace: apps
 spec:
+  ingressClassName: cilium
   rules:
     - host: ntfy.josevictor.me
       http:
