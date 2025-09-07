@@ -25,6 +25,20 @@ in
           pullPolicy = "IfNotPresent";
         };
 
+        securityContext = {
+          container = {
+            runAsUser = 2002;
+            runAsGroup = 2002;
+            PUID = 2002;
+            readOnlyRootFilesystem = false;
+            fsGroupChangePolicy = "OnRootMismatch";
+          };
+          pod = {
+            fsGroup = 2002;
+            fsGroupChangePolicy = "OnRootMismatch";
+          };
+        };
+
         config = {
           sftpd = {
             max_auth_tries = 4;
