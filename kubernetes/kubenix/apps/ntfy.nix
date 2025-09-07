@@ -77,7 +77,8 @@ in
         volumeMounts = [
           {
             name = "ntfy-config";
-            mountPath = "/var/lib/ntfy";
+            mountPath = "/var/lib/ntfy/config.yaml";
+            subPath = "config.yaml";
           }
         ];
       };
