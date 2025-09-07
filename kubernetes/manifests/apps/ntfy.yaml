@@ -68,7 +68,7 @@ spec:
 ---
 apiVersion: v1
 data:
-  config.yml: 'base-url: ntfy.josevictor.me
+  config.yml: 'base-url: https://ntfy.josevictor.me
 
     listen-http: :80
 
@@ -279,7 +279,7 @@ metadata:
 spec:
   ingressClassName: cilium
   rules:
-    - host: ntfy.josevictor.me
+    - host: https://ntfy.josevictor.me
       http:
         paths:
           - backend:

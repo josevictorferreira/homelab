@@ -26,11 +26,9 @@ in
         };
 
         ntfy = {
-          baseURL = k8sLib.domainFor app;
+          baseURL = "https://${k8sLib.domainFor app}";
           listenHTTP = ":80";
           behindProxy = true;
-          serviceAccount.name = "ntfy";
-          serviceName = "ntfy";
           web = {
             existingSecret = "ntfy-secrets";
             file = "/data/webpush.db";
