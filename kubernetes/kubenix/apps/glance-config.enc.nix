@@ -25,7 +25,7 @@ let
                 method = "GET";
                 url = "http://${homelab.kubernetes.loadBalancer.services.linkwarden}/api/v1/links";
                 headers = {
-                  Authorization = "Bearer " + k8sLib.secretsFor "linkwarden_api_key";
+                  Authorization = "Bearer ${k8sLib.secretsFor "linkwarden_api_key"}+";
                 };
                 template = ''
                   <ul class="list list-gap-10 collapsible-container" data-collapse-after="7">
@@ -99,7 +99,7 @@ let
             widgets = [
               {
                 type = "weather";
-                location = k8sLib.secretsFor "weather_location";
+                location = "${k8sLib.secretsFor "weather_location"}+";
                 units = "metric";
                 "hour-format" = "24h";
               }
