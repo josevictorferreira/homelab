@@ -42,6 +42,7 @@ in
               region = "us-east-1";
               existingSecret = "linkwarden-s3";
             };
+            filesystem.pvc.existingClaim = "true";
           };
 
           database = {
