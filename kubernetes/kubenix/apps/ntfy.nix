@@ -71,5 +71,6 @@ in
     };
 
     resources.statefulSets.ntfy.spec.serviceName = "ntfy";
+    resources.statefulSets.ntfy.spec.template.spec.containers.ntfy.args = [ "serve" "--config" "/var/lib/ntfy/config.yaml" ];
   };
 }
