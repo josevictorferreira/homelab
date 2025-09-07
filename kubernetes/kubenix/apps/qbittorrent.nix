@@ -167,9 +167,6 @@ in
             };
             containers = {
               main = {
-                probes.liveness.enabled = false;
-                probes.readiness.enabled = false;
-                probes.startup.enabled = false;
                 env = {
                   QBT_WEBUI_PORT = "8080";
                   QBT_TORRENTING_PORT = "${toString torrentingPort}";
