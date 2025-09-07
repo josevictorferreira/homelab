@@ -9,10 +9,10 @@ in
   kubernetes = {
     helm.releases.${app} = {
       chart = k8sLib.helm.fetch {
-        repo = "https://sftpgo.github.io/helm-chart";
+        chartUrl = "oci://ghcr.io/sftpgo/helm-charts/sftpgo";
         chart = "sftpgo";
         version = "0.40.0";
-        sha256 = "sha256-AVvangTTMY1rakFqTOffJYjuuBPAoGNltCkooWKYmHk=";
+        sha256 = "sha256-BXSGD9IWdy7AVDSVo8a7HFitFutr2v96w2Nypp29blg=";
       };
       includeCRDs = true;
       noHooks = true;
@@ -40,7 +40,7 @@ in
                 debug = true;
                 active_connections_security = 1;
                 passive_connections_security = 1;
-                force_passive_ip = homelab.kubernetes.loadBalancer.addresses.services.sftpgo;
+                force_passive_ip = homelab.kubernetes.loadBalancer.services.sftpgo;
               }
             ];
             passive_port_range = {
@@ -76,9 +76,18 @@ in
 
         volumes = [
           {
-            type = "pvc";
-            existingClaim = pvcName;
+            name = "shared-storage";
+            persistentVolumeClaim = {
+              claimName = pvcName;
+            };
+          }
+        ];
+
+        volumeMounts = [
+          {
+            name = "shared-storage";
             mountPath = "/mnt/shared_storage";
+            readOnly = false;
           }
         ];
 
