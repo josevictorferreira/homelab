@@ -1,0 +1,344 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: ntfy
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: ntfy
+    app.kubernetes.io/version: 2.11.0
+    helm.sh/chart: ntfy-0.2.2
+  name: ntfy
+  namespace: apps
+spec:
+  persistentVolumeClaimRetentionPolicy:
+    whenDeleted: Retain
+    whenScaled: Retain
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: ntfy
+      app.kubernetes.io/name: ntfy
+  serviceName: ntfy
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: ntfy
+        app.kubernetes.io/name: ntfy
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - env:
+            - name: NTFY_WEB_PUSH_PUBLIC_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: publicKey
+                  name: ntfy-secrets
+            - name: NTFY_WEB_PUSH_PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: privateKey
+                  name: ntfy-secrets
+          image: docker.io/binwiederhier/ntfy:v2.11.0
+          imagePullPolicy: IfNotPresent
+          name: ntfy
+          ports:
+            - containerPort: 80
+              name: http
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /var/lib/ntfy
+              name: ntfy-config
+            - mountPath: /data
+              name: ntfy-pv
+      serviceAccountName: ntfy
+      volumes:
+        - configMap:
+            name: ntfy
+          name: ntfy-config
+        - name: ntfy-pv
+          persistentVolumeClaim:
+            claimName: ntfy-pvc
+---
+apiVersion: v1
+data:
+  config.yml: 'base-url: ntfy.josevictor.me
+
+    listen-http: :80
+
+    web-root: /
+
+    global-topic-limit: 15000
+
+    behind-proxy: true
+
+    cache-file: /data/cache.db
+
+    auth-default-access: deny-all
+
+    attachment-cache-dir: /data/attachments
+
+    attachment-total-size-limit: 5G
+
+    attachment-file-size-limit: 15M
+
+    attachment-expiry-duration: 3h
+
+    web-push-file: /data/webpush.db
+
+    web-push-email-address: alerts@josevictor.me
+
+    upstream-base-url: https://ntfy.sh
+
+    visitor-subscription-limit: 30
+
+    visitor-request-limit-burst: 60
+
+    visitor-request-limit-replenish: 5s
+
+    visitor-message-daily-limit: 15000
+
+    visitor-email-limit-burst: 16
+
+    visitor-email-limit-replenish: 1h
+
+    visitor-attachment-total-size-limit: 100M
+
+    visitor-attachment-daily-bandwidth-limit: 500M
+
+    metrics-listen-http: :9090
+
+    log-level: info
+
+    log-format: text
+
+    '
+kind: ConfigMap
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/component: ntfy
+    app.kubernetes.io/instance: ntfy
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: ntfy
+    app.kubernetes.io/version: 2.11.0
+    helm.sh/chart: ntfy-0.2.2
+  name: ntfy
+  namespace: apps
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    helm.sh/resource-policy: keep
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+    meta.helm.sh/release-name: ntfy
+    meta.helm.sh/release-namespace: apps
+  labels:
+    app.kubernetes.io/instance: ntfy
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: ntfy
+    app.kubernetes.io/version: 2.11.0
+    helm.sh/chart: ntfy-0.2.2
+  name: ntfy-pvc
+  namespace: apps
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: rook-ceph-block
+---
+apiVersion: v1
+data:
+  password: ''
+  username: ''
+kind: Secret
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/component: ntfy
+    app.kubernetes.io/instance: ntfy
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: ntfy
+    app.kubernetes.io/version: 2.11.0
+    helm.sh/chart: ntfy-0.2.2
+  name: ntfy-smtp
+  namespace: apps
+type: Opaque
+---
+apiVersion: v1
+data:
+  accountSID: ''
+  token: ''
+kind: Secret
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/component: ntfy
+    app.kubernetes.io/instance: ntfy
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: ntfy
+    app.kubernetes.io/version: 2.11.0
+    helm.sh/chart: ntfy-0.2.2
+  name: ntfy-twilio
+  namespace: apps
+type: Opaque
+---
+apiVersion: v1
+data:
+  token: ''
+kind: Secret
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/component: ntfy
+    app.kubernetes.io/instance: ntfy
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: ntfy
+    app.kubernetes.io/version: 2.11.0
+    helm.sh/chart: ntfy-0.2.2
+  name: ntfy-upstream
+  namespace: apps
+type: Opaque
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: ntfy
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: ntfy
+    app.kubernetes.io/version: 2.11.0
+    helm.sh/chart: ntfy-0.2.2
+  name: ntfy
+  namespace: apps
+spec:
+  internalTrafficPolicy: Cluster
+  ports:
+    - name: http
+      port: 8080
+      protocol: TCP
+      targetPort: 80
+  selector:
+    app.kubernetes.io/instance: ntfy
+    app.kubernetes.io/name: ntfy
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: v1
+automountServiceAccountToken: false
+kind: ServiceAccount
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: ntfy
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: ntfy
+    app.kubernetes.io/version: 2.11.0
+    helm.sh/chart: ntfy-0.2.2
+  name: ntfy
+  namespace: apps
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: cloudflare-issuer
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: ntfy
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: ntfy
+    app.kubernetes.io/version: 2.11.0
+    helm.sh/chart: ntfy-0.2.2
+  name: ntfy
+  namespace: apps
+spec:
+  ingressClassName: cilium
+  rules:
+    - host: ntfy.josevictor.me
+      http:
+        paths:
+          - backend:
+              service:
+                name: ntfy
+                port:
+                  number: 8443
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - ntfy.josevictor.me
+      secretName: wildcard-tls
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/component: ntfy
+    app.kubernetes.io/instance: ntfy
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: ntfy
+    app.kubernetes.io/version: 2.11.0
+    helm.sh/chart: ntfy-0.2.2
+  name: ntfy
+  namespace: apps
+rules:
+  - apiGroups:
+      - ''
+    resources:
+      - configmaps
+    verbs:
+      - get
+  - apiGroups:
+      - ''
+    resources:
+      - secrets
+    verbs:
+      - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/component: ntfy
+    app.kubernetes.io/instance: ntfy
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: ntfy
+    app.kubernetes.io/version: 2.11.0
+    helm.sh/chart: ntfy-0.2.2
+  name: ntfy
+  namespace: apps
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: ntfy
+subjects:
+  - kind: ServiceAccount
+    name: ntfy
+    namespace: apps
