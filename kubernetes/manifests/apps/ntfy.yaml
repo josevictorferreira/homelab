@@ -33,7 +33,7 @@ spec:
         - args:
             - serve
             - --config
-            - /var/lib/ntfy/config.yaml
+            - /var/lib/ntfy/config.yml
           env:
             - name: NTFY_WEB_PUSH_PUBLIC_KEY
               valueFrom:
@@ -57,15 +57,15 @@ spec:
               name: ntfy-config
             - mountPath: /data
               name: ntfy-pv
-            - mountPath: /var/lib/ntfy/config.yaml
+            - mountPath: /var/lib/ntfy/config.yml
               name: ntfy-config
-              subPath: config.yaml
+              subPath: config.yml
       serviceAccountName: ntfy
       volumes:
         - configMap:
             items:
-              - key: config.yaml
-                path: config.yaml
+              - key: config.yml
+                path: config.yml
             name: ntfy
           name: ntfy-config
         - name: ntfy-pv

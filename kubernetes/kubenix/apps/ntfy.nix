@@ -79,18 +79,18 @@ in
             name = "ntfy";
             items = [
               {
-                key = "config.yaml";
-                path = "config.yaml";
+                key = "config.yml";
+                path = "config.yml";
               }
             ];
           };
         };
         containers.ntfy = {
-          args = [ "serve" "--config" "/var/lib/ntfy/config.yaml" ];
+          args = [ "serve" "--config" "/var/lib/ntfy/config.yml" ];
           volumeMounts.ntfy-config = {
             name = "ntfy-config";
-            mountPath = "/var/lib/ntfy/config.yaml";
-            subPath = "config.yaml";
+            mountPath = "/var/lib/ntfy/config.yml";
+            subPath = "config.yml";
           };
         };
       };
