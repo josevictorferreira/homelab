@@ -166,6 +166,16 @@ spec:
               value: '8080'
           image: ghcr.io/home-operations/qbittorrent:5.1.2@sha256:9dd0164cc23e9c937e0af27fd7c3f627d1df30c182cf62ed34d3f129c55dc0e8
           imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 5
+            httpGet:
+              path: /
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 12
+            periodSeconds: 15
+            successThreshold: 1
+            timeoutSeconds: 5
           name: qbittorrent
           ports:
             - containerPort: 8080
@@ -177,6 +187,16 @@ spec:
             - containerPort: 6881
               name: torrentudp
               protocol: UDP
+          readinessProbe:
+            failureThreshold: 4
+            httpGet:
+              path: /
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 12
+            successThreshold: 2
+            timeoutSeconds: 5
           resources:
             limits:
               cpu: 1000m
@@ -197,6 +217,16 @@ spec:
             runAsUser: 2002
             seccompProfile:
               type: RuntimeDefault
+          startupProbe:
+            failureThreshold: 60
+            httpGet:
+              path: /
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 3
           stdin: false
           tty: false
           volumeMounts:
