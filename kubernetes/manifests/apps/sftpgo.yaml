@@ -75,7 +75,10 @@ spec:
               path: /healthz
               port: telemetry
           resources: {}
-          securityContext: {}
+          securityContext:
+            readOnlyRootFilesystem: false
+            runAsGroup: 2002
+            runAsUser: 2002
           volumeMounts:
             - mountPath: /etc/sftpgo/sftpgo.json
               name: config
@@ -88,7 +91,8 @@ spec:
               readOnly: false
       hostNetwork: false
       securityContext:
-        fsGroup: 1000
+        fsGroup: 2002
+        fsGroupChangePolicy: OnRootMismatch
       serviceAccountName: sftpgo
       volumes:
         - configMap:
