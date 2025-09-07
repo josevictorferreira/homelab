@@ -24,9 +24,8 @@ in
           pullPolicy = "IfNotPresent";
         };
         ollama.enabled = false;
-        openaiBaseApiUrls = [
-          "https://openrouter.ai/api/v1"
-        ];
+        enableOpenaiApi = true;
+        openaiBaseApiUrl = "https://openrouter.ai/api/v1";
         ingress = {
           enabled = true;
           host = k8sLib.domainFor "openwebui";
