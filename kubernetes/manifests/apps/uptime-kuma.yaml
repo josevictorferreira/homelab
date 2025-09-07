@@ -86,7 +86,7 @@ spec:
   resources:
     requests:
       storage: 4Gi
-  storageClassName: ceph-rbd
+  storageClassName: rook-ceph-block
 ---
 apiVersion: v1
 kind: Service

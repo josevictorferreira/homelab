@@ -25,7 +25,7 @@ in
         };
 
         volume = {
-          storageClassName = "ceph-rbd";
+          storageClassName = "rook-ceph-block";
         };
 
         ingress = {
