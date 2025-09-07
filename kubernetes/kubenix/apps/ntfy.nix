@@ -58,20 +58,37 @@ in
             https = 80;
           };
         };
-
-        ingress = {
-          enabled = true;
-          className = "cilium";
-          annotations = {
-            "cert-manager.io/cluster-issuer" = "cloudflare-issuer";
-          };
-          tls = [
-            {
-              hosts = [ (k8sLib.domainFor app) ];
-              secretName = "wildcard-tls";
-            }
-          ];
-        };
+      };
+    };
+    
+    resources.ingresses.${app} = {
+      metadata.name = app;
+      metadata.namespace = namespace;
+      metadata.annotations = {
+        "cert-manager.io/cluster-issuer" = "cloudflare-issuer";
+      };
+      spec = {
+        rules = [
+          {
+            host = k8sLib.domainFor app;
+            http.paths = [
+              {
+                path = "/";
+                pathType = "Prefix";
+                backend.service.name = "ntfy";
+                backend.service.port.number = 80;
+              }
+            ];
+          }
+        ];
+        tls = [
+          {
+            hosts = [
+              (k8sLib.domainFor app)
+            ];
+            secretName = "wildcard-tls";
+          }
+        ];
       };
     };
 

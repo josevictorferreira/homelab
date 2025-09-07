@@ -268,18 +268,11 @@ metadata:
     cert-manager.io/cluster-issuer: cloudflare-issuer
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
-  labels:
-    app.kubernetes.io/instance: ntfy
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: ntfy
-    app.kubernetes.io/version: 2.11.0
-    helm.sh/chart: ntfy-0.2.2
   name: ntfy
   namespace: apps
 spec:
-  ingressClassName: cilium
   rules:
-    - host: https://ntfy.josevictor.me
+    - host: ntfy.josevictor.me
       http:
         paths:
           - backend:
