@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   annotations:
-    kubenix/k8s-version: "1.32"
+    kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/instance: ntfy
@@ -32,6 +32,8 @@ spec:
       containers:
         - args:
             - serve
+            - --config
+            - /var/lib/ntfy/config.yaml
           env:
             - name: NTFY_WEB_PUSH_PUBLIC_KEY
               valueFrom:
@@ -52,6 +54,10 @@ spec:
               protocol: TCP
           volumeMounts:
             - mountPath: /var/lib/ntfy
+              name: ntfy-config
+            - mountPath: /var/lib/ntfy/config.yaml
+              name: ntfy-config
+              subPath: config.yaml
             - mountPath: /data
               name: ntfy-pv
       serviceAccountName: ntfy
@@ -65,7 +71,7 @@ spec:
 ---
 apiVersion: v1
 data:
-  config.yml: "base-url: ntfy.josevictor.me
+  config.yml: 'base-url: ntfy.josevictor.me
 
     listen-http: :80
 
@@ -115,11 +121,11 @@ data:
 
     log-format: text
 
-    "
+    '
 kind: ConfigMap
 metadata:
   annotations:
-    kubenix/k8s-version: "1.32"
+    kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/component: ntfy
@@ -136,7 +142,7 @@ kind: PersistentVolumeClaim
 metadata:
   annotations:
     helm.sh/resource-policy: keep
-    kubenix/k8s-version: "1.32"
+    kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
     meta.helm.sh/release-name: ntfy
     meta.helm.sh/release-namespace: apps
@@ -158,12 +164,12 @@ spec:
 ---
 apiVersion: v1
 data:
-  password: ""
-  username: ""
+  password: ''
+  username: ''
 kind: Secret
 metadata:
   annotations:
-    kubenix/k8s-version: "1.32"
+    kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/component: ntfy
@@ -178,12 +184,12 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  accountSID: ""
-  token: ""
+  accountSID: ''
+  token: ''
 kind: Secret
 metadata:
   annotations:
-    kubenix/k8s-version: "1.32"
+    kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/component: ntfy
@@ -198,11 +204,11 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  token: ""
+  token: ''
 kind: Secret
 metadata:
   annotations:
-    kubenix/k8s-version: "1.32"
+    kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/component: ntfy
@@ -219,7 +225,7 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    kubenix/k8s-version: "1.32"
+    kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/instance: ntfy
@@ -247,7 +253,7 @@ automountServiceAccountToken: false
 kind: ServiceAccount
 metadata:
   annotations:
-    kubenix/k8s-version: "1.32"
+    kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/instance: ntfy
@@ -263,7 +269,7 @@ kind: Ingress
 metadata:
   annotations:
     cert-manager.io/cluster-issuer: cloudflare-issuer
-    kubenix/k8s-version: "1.32"
+    kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/instance: ntfy
@@ -295,7 +301,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   annotations:
-    kubenix/k8s-version: "1.32"
+    kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/component: ntfy
@@ -308,13 +314,13 @@ metadata:
   namespace: apps
 rules:
   - apiGroups:
-      - ""
+      - ''
     resources:
       - configmaps
     verbs:
       - get
   - apiGroups:
-      - ""
+      - ''
     resources:
       - secrets
     verbs:
@@ -324,7 +330,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   annotations:
-    kubenix/k8s-version: "1.32"
+    kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/component: ntfy
