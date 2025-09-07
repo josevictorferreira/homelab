@@ -65,6 +65,7 @@ in
           existingPasswordKey = "rabbitmq-password";
           existingErlangSecret = "rabbitmq-auth";
           existingErlangKey = "rabbitmq-erlang-cookie";
+          updatePassword = true;
           username = "josevictor";
         };
 
