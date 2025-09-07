@@ -30,7 +30,11 @@ spec:
     spec:
       automountServiceAccountToken: false
       containers:
-        - env:
+        - args:
+            - serve
+            - --config
+            - /var/lib/ntfy/config.yaml
+          env:
             - name: NTFY_WEB_PUSH_PUBLIC_KEY
               valueFrom:
                 secretKeyRef:
