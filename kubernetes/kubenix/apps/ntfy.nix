@@ -68,6 +68,7 @@ in
         "cert-manager.io/cluster-issuer" = "cloudflare-issuer";
       };
       spec = {
+        ingressClassName = "cilium";
         rules = [
           {
             host = k8sLib.domainFor app;
