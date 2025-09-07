@@ -1,4 +1,4 @@
-{ lib, kubenix, k8sLib, homelab, ... }:
+{ k8sLib, homelab, ... }:
 
 let
   app = "ntfy";
@@ -30,8 +30,7 @@ in
           listenHTTP = ":80";
           behindProxy = true;
           web = {
-            publicKey = "\${VAPID_PUBLIC_KEY}";
-            privateKey = "\${VAPID_PRIVATE_KEY}";
+            existingSecret = "ntfy-secrets";
             file = "/data/webpush.db";
             emailAddress = "alerts@${homelab.domain}";
           };
@@ -39,7 +38,7 @@ in
             rootPath = "/data";
             pvc = {
               size = "5Gi";
-              storageClass = "ceph-rbd";
+              storageClass = "rook-ceph-block";
             };
           };
           upstream.baseURL = "https://ntfy.sh";
@@ -55,7 +54,7 @@ in
 
         ingress = {
           enabled = true;
-          className = "nginx";
+          className = "cilium";
           annotations = {
             "cert-manager.io/cluster-issuer" = "cloudflare-issuer";
           };
@@ -66,12 +65,6 @@ in
             }
           ];
         };
-
-        extraEnvFrom = [
-          {
-            secretRef.name = "ntfy-secrets";
-          }
-        ];
       };
     };
   };
