@@ -55,14 +55,17 @@ spec:
           volumeMounts:
             - mountPath: /var/lib/ntfy
               name: ntfy-config
+            - mountPath: /data
+              name: ntfy-pv
             - mountPath: /var/lib/ntfy/config.yaml
               name: ntfy-config
               subPath: config.yaml
-            - mountPath: /data
-              name: ntfy-pv
       serviceAccountName: ntfy
       volumes:
         - configMap:
+            items:
+              - key: config.yaml
+                path: config.yaml
             name: ntfy
           name: ntfy-config
         - name: ntfy-pv
