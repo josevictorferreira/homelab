@@ -1,16 +1,13 @@
 { homelab, ... }:
 
 let
-  pvName = "cephfs-shared-storage-downloads";
-  pvcName = "cephfs-shared-storage-downloads";
   fsName = "ceph-filesystem";
-  exportPath = "/volumes/nfs-exports/homelab-nfs/dfd23da6-d80d-48c7-b568-025ec7badd17/downloads";
   namespace = homelab.kubernetes.namespaces.applications;
 in
 {
   kubernetes.resources = {
-    persistentVolumes.${pvName} = {
-      metadata.name = pvName;
+    persistentVolumes."cephfs-shared-storage-downloads" = {
+      metadata.name = "cephfs-shared-storage-downloads";
       spec = {
         capacity.storage = "1Gi";
         accessModes = [ "ReadWriteMany" ];
@@ -18,7 +15,7 @@ in
         volumeMode = "Filesystem";
         csi = {
           driver = "rook-ceph.cephfs.csi.ceph.com";
-          volumeHandle = pvName;
+          volumeHandle = "cephfs-shared-storage-downloads";
           nodeStageSecretRef = {
             name = "cephfs-user-secret";
             namespace = namespace;
@@ -27,15 +24,15 @@ in
             clusterID = "rook-ceph";
             fsName = fsName;
             staticVolume = "true";
-            rootPath = exportPath;
+            rootPath = "/volumes/nfs-exports/homelab-nfs/dfd23da6-d80d-48c7-b568-025ec7badd17/downloads";
           };
         };
       };
     };
 
-    persistentVolumeClaims.${pvcName} = {
+    persistentVolumeClaims."cephfs-shared-storage-downloads" = {
       metadata = {
-        name = pvcName;
+        name = "cephfs-shared-storage-downloads";
         namespace = namespace;
       };
       spec = {
@@ -43,8 +40,47 @@ in
         resources.requests.storage = "1Gi";
         storageClassName = "";
         volumeMode = "Filesystem";
-        volumeName = pvName;
+        volumeName = "cephfs-shared-storage-downloads";
       };
     };
+
+    persistentVolumes."cephfs-shared-storage-root" = {
+      metadata.name = "cephfs-shared-storage-root";
+      spec = {
+        capacity.storage = "1Gi";
+        accessModes = [ "ReadWriteMany" ];
+        persistentVolumeReclaimPolicy = "Retain";
+        volumeMode = "Filesystem";
+        csi = {
+          driver = "rook-ceph.cephfs.csi.ceph.com";
+          volumeHandle = "cephfs-shared-storage-root";
+          nodeStageSecretRef = {
+            name = "cephfs-user-secret";
+            namespace = namespace;
+          };
+          volumeAttributes = {
+            clusterID = "rook-ceph";
+            fsName = fsName;
+            staticVolume = "true";
+            rootPath = "/volumes/nfs-exports/homelab-nfs/dfd23da6-d80d-48c7-b568-025ec7badd17";
+          };
+        };
+      };
+    };
+
+    persistentVolumeClaims."cephfs-shared-storage-root" = {
+      metadata = {
+        name = "cephfs-shared-storage-root";
+        namespace = namespace;
+      };
+      spec = {
+        accessModes = [ "ReadWriteMany" ];
+        resources.requests.storage = "1Gi";
+        storageClassName = "";
+        volumeMode = "Filesystem";
+        volumeName = "cephfs-shared-storage-root";
+      };
+    };
+
   };
 }
