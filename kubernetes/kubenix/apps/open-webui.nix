@@ -49,6 +49,7 @@ in
           };
         };
         websocket.enabled = false;
+        pipelines.enabled = false;
         extraEnvFrom = [
           {
             secretRef = {
