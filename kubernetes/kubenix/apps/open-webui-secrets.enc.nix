@@ -12,7 +12,6 @@ in
         };
         stringData = {
           "ENV" = "prod";
-          "ENABLE_OPENAI_API" = "True";
           "ENABLE_SIGNUP" = "True";
           "OFFLINE_MODE" = "True";
           "ENABLE_WEBSOCKET_SUPPORT" = "True";
