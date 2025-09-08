@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
     app: rook-ceph-tools
@@ -106,7 +106,7 @@ apiVersion: ceph.rook.io/v1
 kind: CephBlockPool
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   name: replicapool
   namespace: rook-ceph
@@ -119,7 +119,7 @@ apiVersion: ceph.rook.io/v1
 kind: CephCluster
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   name: rook-ceph
   namespace: rook-ceph
@@ -129,7 +129,7 @@ spec:
     image: quay.io/ceph/ceph:v19.2.3
   cleanupPolicy:
     allowUninstallWithVolumes: false
-    confirmation: ''
+    confirmation: ""
     sanitizeDisks:
       dataSource: zero
       iteration: 1
@@ -280,7 +280,7 @@ apiVersion: ceph.rook.io/v1
 kind: CephFilesystem
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   name: ceph-filesystem
   namespace: rook-ceph
@@ -298,7 +298,7 @@ apiVersion: ceph.rook.io/v1
 kind: CephFilesystemSubVolumeGroup
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   name: ceph-filesystem-csi
   namespace: rook-ceph
@@ -312,7 +312,7 @@ apiVersion: ceph.rook.io/v1
 kind: CephObjectStore
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   name: ceph-objectstore
   namespace: rook-ceph
@@ -338,7 +338,7 @@ kind: Ingress
 metadata:
   annotations:
     cert-manager.io/cluster-issuer: cloudflare-issuer
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   name: ceph-objectstore
   namespace: rook-ceph
@@ -365,7 +365,7 @@ kind: Ingress
 metadata:
   annotations:
     cert-manager.io/cluster-issuer: cloudflare-issuer
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   name: rook-ceph-dashboard
   namespace: rook-ceph
@@ -392,9 +392,9 @@ apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
-    storageclass.kubernetes.io/is-default-class: 'true'
+    storageclass.kubernetes.io/is-default-class: "true"
   name: rook-ceph-block
   namespace: rook-ceph
 parameters:
@@ -406,7 +406,7 @@ parameters:
   csi.storage.k8s.io/provisioner-secret-name: rook-csi-rbd-provisioner
   csi.storage.k8s.io/provisioner-secret-namespace: rook-ceph
   imageFeatures: layering
-  imageFormat: '2'
+  imageFormat: "2"
   pool: replicapool
 provisioner: rook-ceph.rbd.csi.ceph.com
 reclaimPolicy: Delete
@@ -417,9 +417,9 @@ apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
-    storageclass.kubernetes.io/is-default-class: 'false'
+    storageclass.kubernetes.io/is-default-class: "false"
   name: rook-ceph-filesystem
   namespace: rook-ceph
 parameters:
@@ -431,7 +431,6 @@ parameters:
   csi.storage.k8s.io/provisioner-secret-name: rook-csi-cephfs-provisioner
   csi.storage.k8s.io/provisioner-secret-namespace: rook-ceph
   fsName: ceph-filesystem
-  pool: ceph-filesystem-data0
 provisioner: rook-ceph.cephfs.csi.ceph.com
 reclaimPolicy: Delete
 volumeBindingMode: Immediate
@@ -440,7 +439,7 @@ apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   name: rook-ceph-objectstore
   namespace: rook-ceph
