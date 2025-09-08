@@ -1,4 +1,4 @@
-{ lib, homelab, k8sLib, ... }:
+{ homelab, k8sLib, ... }:
 let
   glanceConfig = {
     theme = {
@@ -141,7 +141,7 @@ in
           name = "glance-config";
           namespace = namespace;
         };
-        data."glance.yml" = "${lib.generators.toYAML { } glanceConfig}";
+        data."glance.yml" = k8sLib.toYamlStr glanceConfig;
       };
     };
   };

@@ -1,4 +1,4 @@
-{ homelab, ... }:
+{ pkgs, homelab, ... }:
 
 let
   k8sSecretsFile = "${homelab.paths.secrets}/k8s-secrets.enc.yaml";
@@ -7,6 +7,8 @@ rec {
   secretsFor = secretName: "ref+sops://${k8sSecretsFile}#${secretName}";
 
   domainFor = serviceName: "${serviceName}.${homelab.domain}";
+
+  toYamlStr = data: builtins.readFile ((pkgs.formats.yaml { }).generate "." data);
 
   serviceIpFor = serviceName: {
     "lbipam.cilium.io/ips" = homelab.kubernetes.loadBalancer.services.${serviceName};
