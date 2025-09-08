@@ -56,6 +56,7 @@ in
         persistentVolumeClaim = {
           enabled = true;
           storageClass = "rook-ceph-filesystem";
+          size = "10Gi";
           accessModes = [ "ReadWriteMany" ];
         };
         ingress = {
