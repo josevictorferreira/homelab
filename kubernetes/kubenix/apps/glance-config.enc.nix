@@ -1,5 +1,28 @@
 { homelab, k8sLib, ... }:
 let
+  linkwardenTemplate = ''
+    <ul class="list list-gap-10 collapsible-container" data-collapse-after="7">
+      {{ range .JSON.Array "response" }}
+        <li>
+          {{ $title := .String "name" }}
+          {{ if gt (len $title) 50 }}
+            {{ $title = (slice $title 0 50) | printf "%s..." }}
+          {{ end }}
+          <a class="size-title-dynamic color-primary-if-not-visited"
+             href="{{ .String "url" }}"
+             target="_self"
+             rel="noopener noreferrer">{{ $title }}</a>
+          <ul class="list-horizontal-text">
+            <li style="color: {{ .String "collection.color" }};">{{ .String "collection.name" }}</li>
+            {{ $tags := .Array "tags" }}
+            {{ range $index, $tag := $tags }}
+              <li>{{ .String "name" }}</li>
+            {{ end }}
+          </ul>
+        </li>
+      {{ end }}
+    </ul>
+  '';
   glanceConfig = {
     theme = {
       "background-color" = "50 1 6";
@@ -27,26 +50,7 @@ let
                 headers = {
                   Authorization = "Bearer ${k8sLib.secretsFor "linkwarden_api_key"}+";
                 };
-                template = ''
-                  <ul class="list list-gap-10 collapsible-container" data-collapse-after="7">
-                    {{`{{ range .JSON.Array "response" }}`}}
-                      <li>
-                        {{`{{ $title := .String "name" }}`}}
-                        {{`{{ if gt (len $title) 50 }}`}}
-                          {{`{{ $title = (slice $title 0 50) | printf "%s..." }}`}}
-                        {{`{{ end }}`}}
-                        <a class="size-title-dynamic color-primary-if-not-visited" href="{{`{{ .String "url" }}`}}" target="_self" rel="noopener noreferrer">{{`{{ $title }}`}}</a>
-                        <ul class="list-horizontal-text">
-                          <li style="color: {{`{{ .String "collection.color" }}`}};">{{`{{ .String "collection.name" }}`}}</li>
-                          {{`{{ $tags := .Array "tags" }}`}}
-                          {{`{{ range $index, $tag := $tags }}`}}
-                            <li>{{`{{ .String "name" }}`}} </li>
-                          {{`{{ end }}`}}
-                        </ul>
-                      </li>
-                    {{`{{ end }}`}}
-                  </ul>
-                '';
+                template = linkwardenTemplate;
               }
             ];
           }
