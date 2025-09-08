@@ -141,7 +141,7 @@ in
           name = "glance-config";
           namespace = namespace;
         };
-        data."glance.yml" = lib.generators.toYAML { } glanceConfig;
+        data."glance.yml" = "${lib.generators.toYAML { } glanceConfig}";
       };
     };
   };
