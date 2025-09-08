@@ -1,6 +1,6 @@
-{ homelab, k8sLib, ... }:
+{ lib, homelab, k8sLib, ... }:
 let
-  linkwardenTemplate = ''
+  linkwardenTemplate = lib.literalExample ''
     <ul class="list list-gap-10 collapsible-container" data-collapse-after="7">
       {{ range .JSON.Array "response" }}
         <li>
