@@ -11,7 +11,7 @@ in
         repo = "https://self-hosters-by-night.github.io/helm-charts";
         chart = "searxng";
         version = "1.0.0";
-        sha256 = "sha256-rFzutBrDDF4qVj38dYazjv3iUl2uszIJSKWPwrRdX1E=";
+        sha256 = "sha256-JJNfXcKol5Ct0dOB2xkIdM3MYbgZh10DIP2x0c3S8XA=";
       };
       includeCRDs = true;
       noHooks = true;
@@ -27,7 +27,7 @@ in
 
         service = k8sLib.plainServiceFor app;
 
-        ingress = k8sLib.ingressDomainForService app;
+        ingress = k8sLib.ingressFor app;
       };
     };
   };

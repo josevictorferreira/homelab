@@ -40,6 +40,40 @@ rec {
     ];
   };
 
+  ingressFor = serviceName: {
+    enabled = true;
+    ingressClassName = "cilium";
+    className = "cilium";
+    annotations = {
+      "cert-manager.io/cluster-issuer" = "cloudflare-issuer";
+    };
+    hosts = [
+      {
+        host = domainFor serviceName;
+        paths = [
+          {
+            path = "/";
+            pathType = "Prefix";
+            backend = {
+              service = {
+                name = serviceName;
+                port.name = "http";
+              };
+            };
+          }
+        ];
+      }
+    ];
+    tls = [
+      {
+        hosts = [
+          (domainFor serviceName)
+        ];
+        secretName = "wildcard-tls";
+      }
+    ];
+  };
+
   ingressDomainForService = serviceName: {
     enabled = true;
     primary = true;
