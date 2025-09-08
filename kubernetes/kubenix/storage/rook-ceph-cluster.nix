@@ -24,8 +24,8 @@ in
         {
           repo = "https://charts.rook.io/release";
           chart = "rook-ceph-cluster";
-          version = "1.17.7";
-          sha256 = "sha256-/TIeOE0BlivSAn4Wg3rS20IfTrfbSrybz/oLYfD3aSQ=";
+          version = "1.18.1";
+          sha256 = "sha256-lX9aDPUbfrZ8yuMKtKqDROX+MWQFB8gYHTlOm27FfaE=";
         };
       namespace = namespace;
       includeCRDs = true;
