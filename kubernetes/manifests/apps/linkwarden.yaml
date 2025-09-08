@@ -123,6 +123,8 @@ metadata:
   annotations:
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
+    lbipam.cilium.io/ips: 10.10.10.103
+    lbipam.cilium.io/sharing-key: linkwarden
   labels:
     app.kubernetes.io/instance: linkwarden
     app.kubernetes.io/managed-by: Helm
@@ -132,6 +134,7 @@ metadata:
   name: linkwarden
   namespace: apps
 spec:
+  externalTrafficPolicy: Cluster
   internalTrafficPolicy: Cluster
   ports:
     - name: http
@@ -142,7 +145,7 @@ spec:
     app.kubernetes.io/instance: linkwarden
     app.kubernetes.io/name: linkwarden
   sessionAffinity: None
-  type: ClusterIP
+  type: LoadBalancer
 ---
 apiVersion: v1
 automountServiceAccountToken: false
