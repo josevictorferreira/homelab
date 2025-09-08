@@ -59,6 +59,7 @@ in
         };
 
         service = {
+          type = "LoadBalancer";
           port = 80;
         };
 
@@ -70,6 +71,13 @@ in
 
 
     resources = {
+      services.linkwarden = {
+        metadata = {
+          namespace = namespace;
+          annotations = k8sLib.serviceIpFor app;
+        };
+      };
+
       deployments.linkwarden = {
         metadata.namespace = namespace;
         spec.template.spec.containers.linkwarden = {
