@@ -1,0 +1,148 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: searxng
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: searxng
+    app.kubernetes.io/version: 2025.8.20-41a4a3e
+    helm.sh/chart: searxng-1.0.0
+  name: searxng
+  namespace: apps
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: searxng
+      app.kubernetes.io/name: searxng
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: searxng
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: searxng
+        app.kubernetes.io/version: 2025.8.20-41a4a3e
+        helm.sh/chart: searxng-1.0.0
+    spec:
+      containers:
+        - image: searxng/searxng:2025.8.20-41a4a3e
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          name: searxng
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          volumeMounts:
+            - mountPath: /etc/searxng/limiter.toml
+              name: limiter
+              readOnly: true
+              subPath: limiter.toml
+      volumes:
+        - configMap:
+            name: searxng-limiter
+          name: limiter
+---
+apiVersion: v1
+data:
+  limiter.toml: "[botdetection]\n\n# The prefix defines the number of leading bits\
+    \ in an address that are compared\n# to determine whether or not an address is\
+    \ part of a (client) network.\n\nipv4_prefix = 32\nipv6_prefix = 48\n\n# If the\
+    \ request IP is in trusted_proxies list, the client IP address is\n# extracted\
+    \ from the X-Forwarded-For and X-Real-IP headers. This should be\n# used if SearXNG\
+    \ is behind a reverse proxy or load balancer.\n\ntrusted_proxies = [\n  '127.0.0.0/8',\n\
+    \  '::1',\n  # '192.168.0.0/16',\n  # '172.16.0.0/12',\n  # '10.0.0.0/8',\n  #\
+    \ 'fd00::/8',\n]\n\n[botdetection.ip_limit]\n\n# To get unlimited access in a\
+    \ local network, by default link-local addresses\n# (networks) are not monitored\
+    \ by the ip_limit\nfilter_link_local = false\n\n# activate link_token method in\
+    \ the ip_limit method\nlink_token = false\n\n[botdetection.ip_lists]\n\n# In the\
+    \ limiter, the ip_lists method has priority over all other methods -> if\n# an\
+    \ IP is in the pass_ip list, it has unrestricted access and it is also not\n#\
+    \ checked if e.g. the \"user agent\" suggests a bot (e.g. curl).\n\nblock_ip =\
+    \ [\n  # '93.184.216.34',  # IPv4 of example.org\n  # '257.1.1.1',      # invalid\
+    \ IP --> will be ignored, logged in ERROR class\n]\n\npass_ip = [\n  # '192.168.0.0/16',\
+    \      # IPv4 private network\n  # 'fe80::/10'            # IPv6 linklocal / wins\
+    \ over botdetection.ip_limit.filter_link_local\n]\n\n# Activate passlist of (hardcoded)\
+    \ IPs from the SearXNG organization,\n# e.g. `check.searx.space`.\npass_searxng_org\
+    \ = true\n"
+kind: ConfigMap
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: searxng
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: searxng
+    app.kubernetes.io/version: 2025.8.20-41a4a3e
+    helm.sh/chart: searxng-1.0.0
+  name: searxng-limiter
+  namespace: apps
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: searxng
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: searxng
+    app.kubernetes.io/version: 2025.8.20-41a4a3e
+    helm.sh/chart: searxng-1.0.0
+  name: searxng
+  namespace: apps
+spec:
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: http
+  selector:
+    app.kubernetes.io/instance: searxng
+    app.kubernetes.io/name: searxng
+  type: LoadBalancer
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: cloudflare-issuer
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: searxng
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: searxng
+    app.kubernetes.io/version: 2025.8.20-41a4a3e
+    helm.sh/chart: searxng-1.0.0
+  name: searxng
+  namespace: apps
+spec:
+  ingressClassName: cilium
+  rules:
+    - host: searxng.josevictor.me
+      http:
+        paths:
+          - backend:
+              service:
+                name: searxng
+                port:
+                  number: 80
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - searxng.josevictor.me
+      secretName: wildcard-tls
