@@ -29,7 +29,7 @@ in
         };
       namespace = namespace;
       includeCRDs = true;
-      noHooks = true;
+      noHooks = false;
       values = {
         toolbox = {
           enabled = true;
@@ -179,6 +179,8 @@ in
                 "csi.storage.k8s.io/provisioner-secret-namespace" = namespace;
                 "csi.storage.k8s.io/controller-expand-secret-name" = "rook-csi-rbd-provisioner";
                 "csi.storage.k8s.io/controller-expand-secret-namespace" = namespace;
+                "csi.storage.k8s.io/controller-publish-secret-name" = "rook-csi-rbd-provisioner";
+                "csi.storage.k8s.io/controller-publish-secret-namespace" = namespace;
                 "csi.storage.k8s.io/node-stage-secret-name" = "rook-csi-rbd-node";
                 "csi.storage.k8s.io/node-stage-secret-namespace" = namespace;
               };
@@ -207,6 +209,8 @@ in
                 "csi.storage.k8s.io/provisioner-secret-namespace" = namespace;
                 "csi.storage.k8s.io/controller-expand-secret-name" = "rook-csi-cephfs-provisioner";
                 "csi.storage.k8s.io/controller-expand-secret-namespace" = namespace;
+                "csi.storage.k8s.io/controller-publish-secret-name" = "rook-csi-cephfs-provisioner";
+                "csi.storage.k8s.io/controller-publish-secret-namespace" = namespace;
                 "csi.storage.k8s.io/node-stage-secret-name" = "rook-csi-cephfs-node";
                 "csi.storage.k8s.io/node-stage-secret-namespace" = namespace;
               };
