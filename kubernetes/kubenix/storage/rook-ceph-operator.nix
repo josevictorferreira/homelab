@@ -15,7 +15,7 @@ in
         };
       namespace = namespace;
       includeCRDs = true;
-      noHooks = true;
+      noHooks = false;
       values = {
         crds.enabled = true;
         csi.cephFSAttachRequired = true;
