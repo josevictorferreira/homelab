@@ -34,6 +34,13 @@ in
         privileged = true;
         extraEnvVars = {
           "FTLCONF_dns_hosts" = lib.concatStringsSep "\n" dnsHosts;
+          "TZ" = homelab.timeZone;
+        };
+        extraEnvVarsSecret = {
+          "FTLCONF_webserver_api_password" = {
+            name = "pihole-admin";
+            key = "password";
+          };
         };
         adlists = [
           "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/pro.plus.txt"
