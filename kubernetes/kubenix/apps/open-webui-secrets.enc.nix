@@ -20,6 +20,11 @@ in
           "DATABASE_URL" = "postgresql://postgres:${kubenix.lib.secretsFor "postgresql_admin_password"}+@postgresql-hl:5432/openwebui";
           "REDIS_URL" = "redis://:${kubenix.lib.secretsFor "redis_password"}+@redis-headless:6379/0";
           "WEBUI_SECRET_KEY" = kubenix.lib.secretsFor "openwebui_secret_key";
+          "ENABLE_RAG_WEB_SEARCH" = "True";
+          "RAG_WEB_SEARCH_ENGINE" = "searxng";
+          "RAG_WEB_SEARCH_RESULT_COUNT" = "3";
+          "RAG_WEB_SEARCH_CONCURRENT_REQUESTS" = "10";
+          "SEARXNG_QUERY_URL" = "http://searxng/search?q=<query>";
         };
       };
     };
