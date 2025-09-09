@@ -107,7 +107,7 @@ For managing the nix configs and setup of the machines in each node, we'll use `
 This is the list of applications I have planned to install in the cluster:
 - Postgresql
 - Rabbitmq(especially for MQTT)
-- Pihole
+- Blocky DNS
 - Sftpgo
 - Ntfy
 - Uptime Kuma
