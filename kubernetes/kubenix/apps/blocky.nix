@@ -18,7 +18,7 @@ in
       port = 4000;
       config = {};
       values = {
-        service.app = {
+        service.main = {
           type = "LoadBalancer";
           primary = true;
           annotations = kubenix.lib.serviceAnnotationFor app;
@@ -66,7 +66,7 @@ in
             }
           ];
           advancedMounts = {
-            app.app = [
+            main.main = [
               {
                 path = "/app/config.yml";
                 readOnly = true;

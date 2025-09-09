@@ -16,7 +16,7 @@ in
       subdomain = "libebooker";
       port = 9292;
       values = {
-        service.app = {
+        service.main = {
           type = "LoadBalancer";
           annotations = kubenix.lib.serviceAnnotationFor "libebooker";
           ports = {

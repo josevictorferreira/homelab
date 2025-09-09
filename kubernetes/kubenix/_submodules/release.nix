@@ -127,7 +127,7 @@
               lib.mkMerge [
                 {
                   inherit (cfg) persistence;
-                  controllers.app.containers.app = {
+                  controllers.main.containers.main = {
                     image = cfg.image;
                     ports = [
                       {
@@ -137,8 +137,8 @@
                       }
                     ];
                   };
-                  service.app.ports.http.port = cfg.port;
-                  ingress.app = {
+                  service.main.ports.http.port = cfg.port;
+                  ingress.main = {
                     enabled = cfg.subdomain != "";
                     className = "cilium";
                     hosts = [{

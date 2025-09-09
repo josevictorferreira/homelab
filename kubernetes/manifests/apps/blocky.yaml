@@ -5,7 +5,7 @@ metadata:
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   labels:
-    app.kubernetes.io/controller: app
+    app.kubernetes.io/controller: main
     app.kubernetes.io/instance: blocky
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: blocky
@@ -19,7 +19,7 @@ spec:
   revisionHistoryLimit: 3
   selector:
     matchLabels:
-      app.kubernetes.io/controller: app
+      app.kubernetes.io/controller: main
       app.kubernetes.io/instance: blocky
       app.kubernetes.io/name: blocky
   strategy:
@@ -27,7 +27,7 @@ spec:
   template:
     metadata:
       labels:
-        app.kubernetes.io/controller: app
+        app.kubernetes.io/controller: main
         app.kubernetes.io/instance: blocky
         app.kubernetes.io/name: blocky
     spec:
@@ -35,7 +35,7 @@ spec:
       containers:
         - image: ghcr.io/0xerr0r/blocky:v0.26.1@sha256:969aeb8e573dee62c565c6e1f9604d44a367adfcf560edac4994b14af90f81a6
           imagePullPolicy: IfNotPresent
-          name: app
+          name: main
           ports:
             - containerPort: 4000
               name: http
@@ -71,36 +71,6 @@ metadata:
     app.kubernetes.io/instance: blocky
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: blocky
-    app.kubernetes.io/service: blocky-app
-    helm.sh/chart: app-template-4.2.0
-    kubenix/module-name: release
-    kubenix/module-version: 1.0.0
-  name: blocky-app
-  namespace: apps
-spec:
-  ports:
-    - name: http
-      port: 4000
-      protocol: TCP
-      targetPort: 4000
-  selector:
-    app.kubernetes.io/controller: app
-    app.kubernetes.io/instance: blocky
-    app.kubernetes.io/name: blocky
-  type: LoadBalancer
----
-apiVersion: v1
-kind: Service
-metadata:
-  annotations:
-    kubenix/k8s-version: '1.32'
-    kubenix/project-name: ze-homelab
-    lbipam.cilium.io/ips: 10.10.10.104
-    lbipam.cilium.io/sharing-key: blocky
-  labels:
-    app.kubernetes.io/instance: blocky
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: blocky
     app.kubernetes.io/service: blocky-dns
     helm.sh/chart: app-template-4.2.0
     kubenix/module-name: release
@@ -118,7 +88,7 @@ spec:
       protocol: TCP
       targetPort: 53
   selector:
-    app.kubernetes.io/controller: app
+    app.kubernetes.io/controller: main
     app.kubernetes.io/instance: blocky
     app.kubernetes.io/name: blocky
   type: LoadBalancer
@@ -148,7 +118,37 @@ spec:
       protocol: TCP
       targetPort: 853
   selector:
-    app.kubernetes.io/controller: app
+    app.kubernetes.io/controller: main
+    app.kubernetes.io/instance: blocky
+    app.kubernetes.io/name: blocky
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+    lbipam.cilium.io/ips: 10.10.10.104
+    lbipam.cilium.io/sharing-key: blocky
+  labels:
+    app.kubernetes.io/instance: blocky
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: blocky
+    app.kubernetes.io/service: blocky-main
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: blocky-main
+  namespace: apps
+spec:
+  ports:
+    - name: http
+      port: 4000
+      protocol: TCP
+      targetPort: 4000
+  selector:
+    app.kubernetes.io/controller: main
     app.kubernetes.io/instance: blocky
     app.kubernetes.io/name: blocky
   type: LoadBalancer
