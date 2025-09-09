@@ -5,7 +5,7 @@ metadata:
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   labels:
-    app.kubernetes.io/controller: app
+    app.kubernetes.io/controller: main
     app.kubernetes.io/instance: glance
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: glance
@@ -19,7 +19,7 @@ spec:
   revisionHistoryLimit: 3
   selector:
     matchLabels:
-      app.kubernetes.io/controller: app
+      app.kubernetes.io/controller: main
       app.kubernetes.io/instance: glance
       app.kubernetes.io/name: glance
   strategy:
@@ -27,7 +27,7 @@ spec:
   template:
     metadata:
       labels:
-        app.kubernetes.io/controller: app
+        app.kubernetes.io/controller: main
         app.kubernetes.io/instance: glance
         app.kubernetes.io/name: glance
     spec:
@@ -35,7 +35,7 @@ spec:
       containers:
         - image: glanceapp/glance:v0.8.4@sha256:6df86a7e8868d1eda21f35205134b1962c422957e42a0c44d4717c8e8f741b1a
           imagePullPolicy: IfNotPresent
-          name: app
+          name: main
           ports:
             - containerPort: 8080
               name: http
@@ -84,7 +84,7 @@ spec:
       protocol: TCP
       targetPort: 8080
   selector:
-    app.kubernetes.io/controller: app
+    app.kubernetes.io/controller: main
     app.kubernetes.io/instance: glance
     app.kubernetes.io/name: glance
   type: LoadBalancer
