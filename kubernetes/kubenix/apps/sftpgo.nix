@@ -71,7 +71,7 @@ in
         service = {
           type = "LoadBalancer";
           externalTrafficPolicy = "Cluster";
-          annotations = k8sLib.serviceIpFor "sftpgo";
+          annotations = k8sLib.serviceAnnotationFor "sftpgo";
           ports.ftp.passiveRange.start = 50000;
           ports.ftp.passiveRange.end = 50009;
         };

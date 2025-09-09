@@ -29,7 +29,7 @@ in
         };
         securityContext.container.readOnlyRootFilesystem = false;
         service = {
-          main = kubenix.lib.serviceIpFor "prowlarr" // {
+          main = kubenix.lib.serviceAnnotationFor "prowlarr" // {
             ports.main.port = 9696;
           };
           metrics = {

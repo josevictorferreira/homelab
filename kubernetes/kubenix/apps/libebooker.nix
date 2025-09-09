@@ -18,7 +18,7 @@ in
       values = {
         service.main = {
           type = "LoadBalancer";
-          annotations = kubenix.lib.serviceIpFor "libebooker";
+          annotations = kubenix.lib.serviceAnnotationFor "libebooker";
           ports = {
             http = {
               enabled = true;

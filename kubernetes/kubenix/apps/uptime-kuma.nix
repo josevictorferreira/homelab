@@ -31,7 +31,7 @@ in
         ingress = {
           enabled = true;
           className = "cilium";
-          annotations = k8sLib.serviceIpFor app;
+          annotations = k8sLib.serviceAnnotationFor app;
           hosts = [
             {
               host = k8sLib.domainFor "uptimekuma";
