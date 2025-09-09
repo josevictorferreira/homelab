@@ -152,7 +152,7 @@
                       host = kubenix.lib.domainFor cfg.subdomain;
                       paths = [{
                         path = "/";
-                        service.name = "main";
+                        service.name = "${config._module.args.name}";
                         service.port = cfg.port;
                       }];
                     }];
