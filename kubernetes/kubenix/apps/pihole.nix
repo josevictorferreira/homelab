@@ -23,7 +23,6 @@ in
           tag = "2025.08.0@sha256:90a1412b3d3037d1c22131402bde19180d898255b584d685c84d943cf9c14821";
           pullPolicy = "IfNotPresent";
         };
-        virtualHost = "pihole.${domain}";
         replicaCount = 3;
         DNS1 = builtins.elemAt homelab.dnsServers 0;
         DNS2 = builtins.elemAt homelab.dnsServers 1;
