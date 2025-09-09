@@ -265,19 +265,15 @@ metadata:
     chart: pihole-2.34.0
     heritage: Helm
     release: pihole
-  name: pihole-dns
+  name: pihole-dns-tcp
   namespace: apps
 spec:
-  externalTrafficPolicy: Cluster
+  externalTrafficPolicy: Local
   ports:
     - name: dns
       port: 53
       protocol: TCP
       targetPort: dns
-    - name: dns-udp
-      port: 53
-      protocol: UDP
-      targetPort: dns-udp
     - name: prometheus
       port: 9617
       protocol: TCP
@@ -301,10 +297,35 @@ metadata:
     chart: pihole-2.34.0
     heritage: Helm
     release: pihole
+  name: pihole-dns-udp
+  namespace: apps
+spec:
+  externalTrafficPolicy: Local
+  ports:
+    - name: dns-udp
+      port: 53
+      protocol: UDP
+      targetPort: dns-udp
+  selector:
+    app: pihole
+    release: pihole
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app: pihole
+    app.kubernetes.io/name: pihole
+    chart: pihole-2.34.0
+    heritage: Helm
+    release: pihole
   name: pihole-web
   namespace: apps
 spec:
-  externalTrafficPolicy: Cluster
   ports:
     - name: http
       port: 80
@@ -317,7 +338,7 @@ spec:
   selector:
     app: pihole
     release: pihole
-  type: LoadBalancer
+  type: ClusterIP
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: PodMonitor
