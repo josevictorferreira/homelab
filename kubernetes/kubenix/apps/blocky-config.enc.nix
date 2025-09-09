@@ -29,7 +29,7 @@ let
     blocking = {
       denylists = {
         ads = [
-          "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/pro.plus.txt"
+          "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/wildcard/pro.plus.txt"
         ];
       };
       clientGroupsBlock = {
