@@ -20,7 +20,7 @@ in
       values = {
         image = {
           repository = "pihole/pihole";
-          tag = "2025.07.0@sha256:da0216f6ee64c36dd9cae8576d3ec8c8f7436d6f5fb504a8f58bdda913647db5";
+          tag = "2025.08.0@sha256:90a1412b3d3037d1c22131402bde19180d898255b584d685c84d943cf9c14821";
           pullPolicy = "IfNotPresent";
         };
         virtualHost = "pihole.${domain}";
