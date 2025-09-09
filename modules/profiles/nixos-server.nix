@@ -35,7 +35,7 @@ in
       address = homelab.nodes.hosts.${hostName}.ipAddress;
       prefixLength = 24;
       gateway = homelab.gateway;
-      nameservers = [ homelab.kubernetes.loadBalancer.services.pihole ] ++ homelab.dnsServers;
+      nameservers = [ homelab.kubernetes.loadBalancer.services.blocky ] ++ homelab.dnsServers;
     };
 
     services.earlyoom.enable = true;
