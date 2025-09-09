@@ -233,6 +233,7 @@ in
           ];
           annotations = {
             "cert-manager.io/cluster-issuer" = "cloudflare-issuer";
+            "ingress.cilium.io/tls-passthrough" = "true";
           };
         };
       };
