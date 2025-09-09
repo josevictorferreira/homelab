@@ -1,4 +1,4 @@
-{ lib, kubenix, homelab, ... }: with lib;
+{ lib, kubenix, ... }: with lib;
 
 {
   submodules.imports = [{
@@ -127,7 +127,7 @@
               lib.mkMerge [
                 {
                   inherit (cfg) persistence;
-                  controllers.main.containers.main = {
+                  controllers.app.containers.app = {
                     image = cfg.image;
                     ports = [
                       {
@@ -137,17 +137,21 @@
                       }
                     ];
                   };
-                  service.main.ports.http.port = cfg.port;
-                  ingress.main = {
+                  service.app.ports.http.port = cfg.port;
+                  ingress.app = {
                     enabled = cfg.subdomain != "";
                     className = "cilium";
                     hosts = [{
-                      host = "${cfg.subdomain}.${homelab.domain}";
-                      paths = [{ path = "/"; }];
+                      host = kubenix.lib.domainFor cfg.subdomain;
+                      paths = [{
+                        path = "/";
+                        service.name = "app";
+                        service.port = cfg.port;
+                      }];
                     }];
                     tls = [{
                       secretName = "wildcard-tls";
-                      hosts = [ "${cfg.subdomain}.${homelab.domain}" ];
+                      hosts = [ (kubenix.lib.domainFor cfg.subdomain) ];
                     }];
                   };
                 }

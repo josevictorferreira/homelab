@@ -65,7 +65,7 @@ let
 
       redis = {
         address = "redis-headless";
-        password = kubenix.lib.secretsFor "redis-password";
+        password = kubenix.lib.secretsFor "redis_password";
         database = 1;
         required = false;
       };
