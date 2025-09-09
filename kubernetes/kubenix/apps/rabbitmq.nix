@@ -33,7 +33,7 @@ in
 
         service = {
           type = "LoadBalancer";
-          annotations = k8sLib.serviceIpFor app;
+          annotations = k8sLib.serviceAnnotationFor app;
           extraPorts = [
             { name = "mqtt"; port = 1883; targetPort = 1883; }
             { name = "mqtts"; port = 8883; targetPort = 8883; }

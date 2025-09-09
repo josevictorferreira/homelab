@@ -115,7 +115,7 @@ in
 
     services.${nfsName} = {
       metadata = {
-        annotations = kubenix.lib.serviceIpFor "nfs";
+        annotations = kubenix.lib.serviceAnnotationFor "nfs";
         namespace = namespace;
       };
       spec = {
