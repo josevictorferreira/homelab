@@ -16,6 +16,7 @@ in
       };
       subdomain = app;
       port = 4000;
+      replicas = 3;
       config = {};
       values = {
         service.main = {
