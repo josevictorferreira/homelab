@@ -74,7 +74,7 @@ in
       services.linkwarden = {
         metadata = {
           namespace = namespace;
-          annotations = k8sLib.serviceIpFor app;
+          annotations = k8sLib.serviceAnnotationFor app;
         };
       };
 

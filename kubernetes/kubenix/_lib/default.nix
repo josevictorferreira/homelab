@@ -6,11 +6,13 @@ in
 rec {
   secretsFor = secretName: "ref+sops://${k8sSecretsFile}#${secretName}";
 
+  secretsInlineFor =  secretName: "ref+sops://${k8sSecretsFile}#${secretName}+";
+
   domainFor = serviceName: "${serviceName}.${homelab.domain}";
 
   toYamlStr = data: builtins.readFile ((pkgs.formats.yaml { }).generate "." data);
 
-  serviceIpFor = serviceName: {
+  serviceAnnotationFor = serviceName: {
     "lbipam.cilium.io/ips" = homelab.kubernetes.loadBalancer.services.${serviceName};
     "lbipam.cilium.io/sharing-key" = serviceName;
   };
@@ -18,7 +20,7 @@ rec {
   plainServiceFor = serviceName: {
     enabled = true;
     type = "LoadBalancer";
-    annotations = serviceIpFor serviceName;
+    annotations = serviceAnnotationFor serviceName;
   };
 
   ingressDomainFor = serviceName: {
