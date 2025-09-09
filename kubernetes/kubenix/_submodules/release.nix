@@ -38,6 +38,12 @@
             description = "container port";
           };
 
+          replicas = mkOption {
+            type = types.int;
+            default = 1;
+            description = "number of replicas";
+          };
+
           persistence = mkOption {
             description = "attrset of persistent volumes";
             default = { };
@@ -127,6 +133,7 @@
               lib.mkMerge [
                 {
                   inherit (cfg) persistence;
+                  controllers.main.replicas = cfg.replicas;
                   controllers.main.containers.main = {
                     image = cfg.image;
                     ports = [
