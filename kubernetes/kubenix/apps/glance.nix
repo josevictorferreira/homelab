@@ -14,9 +14,9 @@
       port = 8080;
       config = {};
       values = {
-        service.main = {
+        service.app = {
           type = "LoadBalancer";
-          annotations = kubenix.lib.serviceIpFor "glance";
+          annotations = kubenix.lib.serviceAnnotationFor "glance";
           ports = {
             http = {
               enabled = true;
@@ -34,7 +34,7 @@
             }
           ];
           advancedMounts = {
-            main.main = [
+            app.app = [
               {
                 path = "/app/config/glance.yml";
                 readOnly = true;

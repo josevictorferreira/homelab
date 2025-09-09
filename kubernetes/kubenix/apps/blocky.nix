@@ -18,9 +18,10 @@ in
       port = 4000;
       config = {};
       values = {
-        service.main = {
+        service.app = {
           type = "LoadBalancer";
-          annotations = kubenix.lib.serviceIpFor app;
+          primary = true;
+          annotations = kubenix.lib.serviceAnnotationFor app;
           ports = {
             http = {
               enabled = true;
@@ -30,7 +31,7 @@ in
         };
         service.dns = {
           type = "LoadBalancer";
-          annotations = kubenix.lib.serviceIpFor app;
+          annotations = kubenix.lib.serviceAnnotationFor app;
           ports = {
             dns = {
               enabled = true;
@@ -46,7 +47,7 @@ in
         };
         service.dot = {
           type = "LoadBalancer";
-          annotations = kubenix.lib.serviceIpFor app;
+          annotations = kubenix.lib.serviceAnnotationFor app;
           ports = {
             dot = {
               enabled = true;
@@ -65,7 +66,7 @@ in
             }
           ];
           advancedMounts = {
-            main.main = [
+            app.app = [
               {
                 path = "/app/config.yml";
                 readOnly = true;
