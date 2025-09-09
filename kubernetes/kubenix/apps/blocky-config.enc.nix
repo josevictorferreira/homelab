@@ -58,10 +58,6 @@ let
 
     fqdnOnly.enable = true;
 
-    extra = {
-      timeZone = homelab.timeZone;
-    };
-
     redis = {
       address = "redis-headless";
       password = kubenix.lib.secretsFor "redis_password";
