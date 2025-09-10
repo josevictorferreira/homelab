@@ -28,7 +28,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: 26b2fb49ecd97349bf20b9f07767274ae48b780e2ebcbc02b189a27179e0a618
+        checksum/config: 1e751cddd0e29bf45093bd57ef3838f998298ed1fae98f6728eb5a1729b3ed19
       labels:
         app.kubernetes.io/component: main
         app.kubernetes.io/instance: n8n
@@ -64,6 +64,16 @@ spec:
                   key: postgres-password
                   name: n8n-env
                   optional: true
+            - name: N8N_EXTERNAL_STORAGE_S3_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: access-key-id
+                  name: s3-credentials
+            - name: N8N_EXTERNAL_STORAGE_S3_ACCESS_SECRET
+              valueFrom:
+                secretKeyRef:
+                  key: secret-access-key
+                  name: s3-credentials
           envFrom:
             - configMapRef:
                 name: n8n-database-configmap
@@ -126,7 +136,11 @@ spec:
 ---
 apiVersion: v1
 data:
+  N8N_AVAILABLE_BINARY_DATA_MODES: s3
   N8N_DEFAULT_BINARY_DATA_MODE: s3
+  N8N_EXTERNAL_STORAGE_S3_BUCKET_NAME: n8n-files
+  N8N_EXTERNAL_STORAGE_S3_BUCKET_REGION: us-east-1
+  N8N_EXTERNAL_STORAGE_S3_HOST: http://rook-ceph-rgw-ceph-objectstore.rook-ceph.svc.cluster.local
 kind: ConfigMap
 metadata:
   annotations:
@@ -328,7 +342,7 @@ spec:
 ---
 apiVersion: v1
 data:
-  N8N_ENCRYPTION_KEY: MzFlMWRhMjJhMjFmMjk2YThiZDUxYjIyM2M4MTNkZDA=
+  N8N_ENCRYPTION_KEY: YzRhMTc1MzUwMWRjYzZkOTJkODY5NGY3NjMxZjc0MTg=
 kind: Secret
 metadata:
   annotations:

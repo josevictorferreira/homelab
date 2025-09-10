@@ -30,6 +30,20 @@ in
         ingress = k8sLib.ingressFor app;
       };
     };
+
+    resources = {
+      deployments.${app} = {
+        metadata.namespace = namespace;
+        spec.template.spec.containers.${app} = {
+          env = [
+            {
+              name = "SEARXNG_UI_DEFAULT_LOCALE";
+              value = "en-US";
+            }
+          ];
+        };
+      };
+    };
   };
 }
 

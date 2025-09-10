@@ -80,6 +80,7 @@ in
         };
 
         binaryData = {
+          availableModes = [ "s3" ];
           mode = "s3";
           s3 = {
             host = kubenix.lib.objectStoreEndpoint;
