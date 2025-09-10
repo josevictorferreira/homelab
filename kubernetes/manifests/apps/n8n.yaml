@@ -28,7 +28,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: 1e751cddd0e29bf45093bd57ef3838f998298ed1fae98f6728eb5a1729b3ed19
+        checksum/config: 9b8cdf187c2b198b359923b0ad4284f7845f2866e8ca66bf52213712e3ab875d
       labels:
         app.kubernetes.io/component: main
         app.kubernetes.io/instance: n8n
@@ -64,16 +64,6 @@ spec:
                   key: postgres-password
                   name: n8n-env
                   optional: true
-            - name: N8N_EXTERNAL_STORAGE_S3_ACCESS_KEY
-              valueFrom:
-                secretKeyRef:
-                  key: access-key-id
-                  name: n8n-env
-            - name: N8N_EXTERNAL_STORAGE_S3_ACCESS_SECRET
-              valueFrom:
-                secretKeyRef:
-                  key: secret-access-key
-                  name: n8n-env
           envFrom:
             - configMapRef:
                 name: n8n-database-configmap
@@ -94,7 +84,7 @@ spec:
             - configMapRef:
                 name: n8n-binary-data-configmap
             - secretRef:
-                name: n8n-encryption-key-secret-v2
+                name: n8n-env
           image: n8nio/n8n:1.110.1
           imagePullPolicy: IfNotPresent
           livenessProbe:
@@ -136,11 +126,8 @@ spec:
 ---
 apiVersion: v1
 data:
-  N8N_AVAILABLE_BINARY_DATA_MODES: s3
-  N8N_DEFAULT_BINARY_DATA_MODE: s3
-  N8N_EXTERNAL_STORAGE_S3_BUCKET_NAME: n8n-files
-  N8N_EXTERNAL_STORAGE_S3_BUCKET_REGION: us-east-1
-  N8N_EXTERNAL_STORAGE_S3_HOST: http://rook-ceph-rgw-ceph-objectstore.rook-ceph.svc.cluster.local
+  N8N_AVAILABLE_BINARY_DATA_MODES: filesystem
+  N8N_DEFAULT_BINARY_DATA_MODE: filesystem
 kind: ConfigMap
 metadata:
   annotations:
@@ -339,26 +326,6 @@ spec:
     requests:
       storage: 8Gi
   storageClassName: rook-ceph-block
----
-apiVersion: v1
-data:
-  N8N_ENCRYPTION_KEY: YWU0ZGM2NjMwMGMzODhmNDg5NGE3NDY5NmZmYTk5ZDY=
-kind: Secret
-metadata:
-  annotations:
-    kubenix/k8s-version: '1.32'
-    kubenix/project-name: ze-homelab
-    meta.helm.sh/release-name: n8n
-    meta.helm.sh/release-namespace: apps
-  labels:
-    app: n8n
-    app.kubernetes.io/managed-by: Helm
-    chart: n8n-1.15.5
-    heritage: Helm
-    release: n8n
-  name: n8n-encryption-key-secret-v2
-  namespace: apps
-type: Opaque
 ---
 apiVersion: v1
 kind: Service
