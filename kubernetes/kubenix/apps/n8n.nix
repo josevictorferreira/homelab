@@ -32,6 +32,8 @@ in
         timezone = homelab.timeZone;
         defaultLocale = "en";
 
+        existingEncryptionKeySecret = secretName;
+
         ingress = {
           enabled = true;
           className = "cilium";
@@ -80,14 +82,8 @@ in
         };
 
         binaryData = {
-          availableModes = [ "s3" ];
-          mode = "s3";
-          s3 = {
-            host = kubenix.lib.objectStoreEndpoint;
-            bucketName = bucketName;
-            bucketRegion = "us-east-1";
-            existingSecret = secretName;
-          };
+          availableModes = [ "filesystem" ];
+          mode = "filesystem";
         };
 
         redis.enabled = false;
