@@ -11,6 +11,7 @@ in
           namespace = namespace;
         };
         stringData = {
+          "N8N_ENCRYPTION_KEY" = kubenix.lib.secretsFor "n8n_encryption_key";
           "redis-password" = kubenix.lib.secretsFor "redis_password";
           "postgres-password" = kubenix.lib.secretsFor "postgresql_admin_password";
           "access-key-id" = kubenix.lib.secretsFor "ceph_objectstore_access_key_id";
