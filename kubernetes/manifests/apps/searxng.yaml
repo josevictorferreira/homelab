@@ -28,7 +28,10 @@ spec:
         helm.sh/chart: searxng-1.0.0
     spec:
       containers:
-        - image: searxng/searxng:2025.8.20-41a4a3e
+        - env:
+            - name: SEARXNG_UI_DEFAULT_LOCALE
+              value: en-US
+          image: searxng/searxng:2025.8.20-41a4a3e
           imagePullPolicy: IfNotPresent
           livenessProbe:
             httpGet:
