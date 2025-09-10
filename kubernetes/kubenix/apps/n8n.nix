@@ -86,7 +86,7 @@ in
             host = kubenix.lib.objectStoreEndpoint;
             bucketName = bucketName;
             bucketRegion = "us-east-1";
-            existingSecret = "s3-credentials";
+            existingSecret = secretName;
           };
         };
 
