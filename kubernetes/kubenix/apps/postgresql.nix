@@ -5,13 +5,8 @@ let
   bootstrapDatabases = [
     "linkwarden"
     "openwebui"
+    "n8n"
   ];
-  mkCreateDb = db: ''
-    echo "Ensuring database '${db}' exists..."
-    psql -h postgresql -U postgres -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname='${db}'" | grep -q 1 \
-      || psql -h postgresql -U postgres -d postgres -c "CREATE DATABASE \"${db}\";"
-  '';
-  createDbCommands = lib.concatStringsSep "\n" (map mkCreateDb bootstrapDatabases);
 in
 {
   kubernetes = {
@@ -48,33 +43,57 @@ in
       };
     };
 
-    resources.jobs."postgresql-bootstrap" = {
+    resources.configMaps."postgresql-bootstrap" = {
       metadata = {
         name = "postgresql-bootstrap";
         namespace = namespace;
       };
-      spec.template.spec = {
-        restartPolicy = "OnFailure";
-        containers = [
-          {
-            name = "psql";
-            image = "bitnami/postgresql:16";
-            env = [
-              {
-                name = "PGPASSWORD";
-                valueFrom.secretKeyRef = {
-                  name = "postgresql-auth";
-                  key = "admin-password";
-                };
-              }
-            ];
-            command = [ "sh" "-c" ];
-            args = [''
-              set -e
-              ${createDbCommands}
-            ''];
-          }
-        ];
+      data = {
+        databases = lib.concatStringsSep "\n" bootstrapDatabases;
+      };
+    };
+
+    resources.jobs."postgresql-bootstrap" =
+    let
+      databasesConfig = lib.concatStringsSep "\n" bootstrapDatabases;
+      configChecksum = builtins.hashString "sha256" databasesConfig;
+      mkCreateDb = db: ''
+        echo "Ensuring database '${db}' exists..."
+        psql -h postgresql -U postgres -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname='${db}'" | grep -q 1 \
+          || psql -h postgresql -U postgres -d postgres -c "CREATE DATABASE \"${db}\";"
+      '';
+      createDbCommands = lib.concatStringsSep "\n" (map mkCreateDb bootstrapDatabases);
+    in
+    {
+      metadata = {
+        name = "postgresql-bootstrap";
+        namespace = namespace;
+      };
+      spec.template = {
+        metadata.annotations."checksum/config" = configChecksum;
+        spec = {
+          restartPolicy = "OnFailure";
+          containers = [
+            {
+              name = "psql";
+              image = "bitnami/postgresql:16";
+              env = [
+                {
+                  name = "PGPASSWORD";
+                  valueFrom.secretKeyRef = {
+                    name = "postgresql-auth";
+                    key = "admin-password";
+                  };
+                }
+              ];
+              command = [ "sh" "-c" ];
+              args = [''
+                set -e
+                ${createDbCommands}
+              ''];
+            }
+          ];
+        };
       };
     };
 

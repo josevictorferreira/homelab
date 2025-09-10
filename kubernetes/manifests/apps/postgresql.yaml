@@ -189,6 +189,9 @@ metadata:
   namespace: apps
 spec:
   template:
+    metadata:
+      annotations:
+        checksum/config: c218f5a1158a5812c63b19866ce9a362c1cdf5b5bd1e8bce475a82eeafe75d12
     spec:
       containers:
         - args:
@@ -199,7 +202,11 @@ spec:
               \n\necho \"Ensuring database 'openwebui' exists...\"\npsql -h postgresql\
               \ -U postgres -d postgres -tAc \"SELECT 1 FROM pg_database WHERE datname='openwebui'\"\
               \ | grep -q 1 \\\n  || psql -h postgresql -U postgres -d postgres -c\
-              \ \"CREATE DATABASE \\\"openwebui\\\";\"\n\n"
+              \ \"CREATE DATABASE \\\"openwebui\\\";\"\n\necho \"Ensuring database\
+              \ 'n8n' exists...\"\npsql -h postgresql -U postgres -d postgres -tAc\
+              \ \"SELECT 1 FROM pg_database WHERE datname='n8n'\" | grep -q 1 \\\n\
+              \  || psql -h postgresql -U postgres -d postgres -c \"CREATE DATABASE\
+              \ \\\"n8n\\\";\"\n\n"
           command:
             - sh
             - -c
@@ -212,6 +219,21 @@ spec:
           image: bitnami/postgresql:16
           name: psql
       restartPolicy: OnFailure
+---
+apiVersion: v1
+data:
+  databases: 'linkwarden
+
+    openwebui
+
+    n8n'
+kind: ConfigMap
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: postgresql-bootstrap
+  namespace: apps
 ---
 apiVersion: v1
 kind: Service
