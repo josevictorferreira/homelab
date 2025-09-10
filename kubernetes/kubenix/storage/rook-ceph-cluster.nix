@@ -121,7 +121,7 @@ in
           {
             name = "ceph-objectstore";
             spec = {
-              allowUsersInNamespaces = "*";
+              allowUsersInNamespaces = [ "*" ];
               metadataPool.replicated.size = 3;
               dataPool.replicated.size = 3;
               gateway = {
