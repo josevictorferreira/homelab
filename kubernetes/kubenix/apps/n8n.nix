@@ -3,6 +3,7 @@
 let
   app = "n8n";
   secretName = "${app}-env";
+  bucketName = "n8n-files";
   namespace = homelab.kubernetes.namespaces.applications;
 in
 {
@@ -12,7 +13,7 @@ in
         repo = "https://community-charts.github.io/helm-charts";
         chart = "n8n";
         version = "1.15.5";
-        sha256 = "sha256-qFG0Iq2IBwkqG6t2Z47GDU3fjftzy3xI7ALNJjctNQk=";
+        sha256 = "sha256-1GiNnh/wuLx+ubKzd2o+hH0/9TO3yOA5A9re2AVlUNE=";
       };
       includeCRDs = true;
       noHooks = false;
@@ -33,10 +34,29 @@ in
 
         ingress = {
           enabled = true;
-          class = "cilium";
-          host = kubenix.lib.domainFor "n8n";
-          tls = true;
-          existingSecret = "wildcard-tls";
+          className = "cilium";
+          annotations = {
+            "cert-manager.io/cluster-issuer" = "cloudflare-issuer";
+          };
+          hosts = [
+            {
+              host = kubenix.lib.domainFor app;
+              paths = [
+                {
+                  path = "/";
+                  pathType = "Prefix";
+                }
+              ];
+            }
+          ];
+          tls = [
+            {
+              hosts = [
+                (kubenix.lib.domainFor app)
+              ];
+              secretName = "wildcard-tls";
+            }
+          ];
         };
 
         service = {
@@ -47,9 +67,6 @@ in
         };
 
         main = {
-          pdb = { enabled = true; minAvailable = 1; };
-          livenessProbe = { httpGet = { path = "/healthz";        port = "http"; }; };
-          readinessProbe = { httpGet = { path = "/healthz/readiness"; port = "http"; }; };
           forceToUseStatefulset = false;
 
           persistence = {
@@ -60,35 +77,16 @@ in
             mountPath = "/home/node/.n8n";
             annotations = { "helm.sh/resource-policy" = "keep"; };
           };
-
-          extraEnvFrom = [
-            { secretRef = { name = secretName; }; }
-          ];
-        };
-
-        worker = {
-          mode = "regular";
-          pdb = { enabled = true; minAvailable = 1; };
-          livenessProbe = { httpGet = { path = "/healthz"; port = "http"; }; };
-          readinessProbe = { httpGet = { path = "/healthz/readiness"; port = "http"; }; };
-          extraEnvFrom = [
-            { secretRef = { name = secretName; }; }
-          ];
-        };
-
-        webhook = {
-          mode = "regular";
-          pdb = { enabled = true; minAvailable = 1; };
-          livenessProbe = { httpGet = { path = "/healthz"; port = "http"; }; };
-          readinessProbe = { httpGet = { path = "/healthz/readiness"; port = "http"; }; };
-          extraEnvFrom = [
-            { secretRef = { name = secretName; }; }
-          ];
         };
 
         binaryData = {
-          mode = "filesystem";
-          localStoragePath = "/home/node/.n8n";
+          mode = "s3";
+          s3 = {
+            host = kubenix.lib.objectStoreEndpoint;
+            bucketName = bucketName;
+            bucketRegion = "us-east-1";
+            existingSecret = "s3-credentials";
+          };
         };
 
         redis.enabled = false;
@@ -104,6 +102,16 @@ in
         };
 
         serviceMonitor = { enabled = false; };
+      };
+    };
+
+    resources.objectbucketclaim."n8n-s3" = {
+      metadata = {
+        namespace = namespace;
+      };
+      spec = {
+        bucketName = bucketName;
+        storageClassName = "rook-ceph-objectstore";
       };
     };
   };
