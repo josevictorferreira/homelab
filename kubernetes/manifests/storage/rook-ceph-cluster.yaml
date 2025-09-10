@@ -317,7 +317,8 @@ metadata:
   name: ceph-objectstore
   namespace: rook-ceph
 spec:
-  allowUsersInNamespaces: '*'
+  allowUsersInNamespaces:
+    - '*'
   dataPool:
     replicated:
       size: 3
