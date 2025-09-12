@@ -7,7 +7,7 @@ metadata:
     labels:
         grafana_datasource: "1"
     name: grafana-ds-postgres
-    namespace: apps
+    namespace: monitoring
 stringData:
     postgresql-datasource.yaml: ENC[AES256_GCM,data:IM+XqF0xZ7XAfTua5OB/XWm2GGhucNvhHZAClcOqiCwPQQuV+pS896c/708qHV0zXgM3XbRe7jFlTs5wqXhOqrGcaM6iZwb11MStD//AvB++4ZcG6zM92kFNvZBYZNTAGajlnjEBi4d7QH6CWn6uHDAxGIYbA8moiKtIWlxQimqa1evKrxH1ujjpp00+zLdGYmEjahgA6cftR4Zvlnf+jx/VGk6x5v424TwDyeZpspkRvMnG4NAV1HC98b+x140+LV+RVY/d1DkaCe327YC4tGQjbQ+YwzhV+GTPb78SQj9kRWVKCKPnqyk/ojf+wzN2xj89FbHpELOYV5hWfK2OmqjoHRvL9nRAlGkMvUyfzSlKgL0emd3z89p2kv8+Wb9kDMAiqGslHuHdvWv4GXoWXHh3jqChaxRCA9bzWz3WpWZlTwwiT8ItOhlkzzDB5LX6kIT5ICN0c9lPG7gQvAt+FIrFA80rk8J7jo3ESHseiDobrYfP9wabjnivhG3Al5zPwbJcoD+7GzBvGgJeJ6EeIXxaiNuzTX/GXToN8xknQP+TIIOXViV4KSAOq1hZCuTQou7r/hsmFh1yVJy1F9IWxDBOKAq8/MxAAB9d/w65M/Ivh4eQ8hbo0CPRfH/Xhc0N5Nv4jdKodi+eV7DTCSqKxyBFBowzSyD3CnsYr+hTCaXKU5f14Tl29kr1qRNBCwP2plsPoFDnjTcZQqGqBFWsv4nfcDCUWmXqnHFBLhQopZaIORInInxV1sMDaxE4nQceq1JRZe4qImGpilMhadDU3nU2tFJ9PztTz02xSs0AIYf3hDa2bvkJRkLBqNnXqi2ys6yExQUTvpw27mgy0s0uSdnoVlUi68w3dw2MKS1AcdHz4WAt/v74HmYt4pNjL6C2jofzt6kThkfj39AfBQo0opQr3gJKZ2lfVs+RTd1ncsiMwUtkFX+0kLH+BbYEjWIxqTLDDSlQZi8oTjAoPiUmf3Wp1pUTQMUuD8BGB477G5ZPvKNx8bggETTlVbwI5OLIOA1isRN1ljCijgftqKuoSeBVEZXacPpjmAQfzQOGDwbZFCICDWrEiNhT/L94jYHAF0KmwOABQcLrwIhCocb7fmEi/RgNtOxnlZRm1n+1sV605OugYyMNKG/lPSmAaMDsfyUSoUy842bwSHQJ2ODE8bNwiW1RLUm9O+6fLs5BwMl4NcGGpI85awqMKiO1dQ4DCQA76OrAeVoOhXpVTzoM97XyjhioB407H1wMkNBXEcx53zVQoeXrBMFPiYIWmw93+1S4LvQdkdUwwn5IZrDZ42QvKA==,iv:VOFa09NP2lQ8CdX0HPVtcepuZlK3zizK+PA6dBIVw4U=,tag:uPVZ94nqumkKQ6iXBNZRjw==,type:str]
 type: Opaque
@@ -40,8 +40,8 @@ sops:
             b0tkRk5ONWgrT2g1NUYxbWtCSmpvMm8K/CPZc4oBv/iTuOCnKzfSbYrKBuCtaBVr
             XUxXN2m26FbzD2Ozl/QSgsdw26H7DCZzMzpo841GuhAZC52j/KSvfw==
             -----END AGE ENCRYPTED FILE-----
-    lastmodified: "2025-09-12T19:51:40Z"
-    mac: ENC[AES256_GCM,data:UXH+qK7jaqiYo0GtPlPi+0XNKVrJMwwowDuJghinWBdphiNgCUfwVWlGd+6L4hxfCbI1BxQqvwO2ca2WPwZb99dO62NO/YbJMgungmTdzmg6liJWzAyZKiqn73GFPertbEfkuXg9wTw3SMfpH3cUqUxvSI/TrJkM1rVmVmkDK/w=,iv:DGGF1iqvLzwzLwu6m8eKQAlPsDg2Qp7P+153v7pgRvI=,tag:FBpogxo91FWuIrCP5Rt5BQ==,type:str]
+    lastmodified: "2025-09-12T20:04:09Z"
+    mac: ENC[AES256_GCM,data:NnOXHdIkIewoU9Kosgch/KPrV3jsgLTMuuVKWnMStESQ3Kolc00V3YsBpIYxEiTWKoFApG5IttqQJ/chJF6p1AnglXzsnNoi7kp+W8+mp5HBRhkOpwpX1YgniM2nhhD/r3cAXnUaQ2qAxVopT19/zXFoJY2BlV8yQ6KLBki7Tu4=,iv:AeBdWn/f39PCoTCXmtB6SXfc/HQzmpa9nP9jRU30jfM=,tag:ZFzsuUtRj6K6rpyRNDWkeQ==,type:str]
     encrypted_regex: ^(data|stringData)$
     version: 3.10.2
 ---
@@ -87,7 +87,7 @@ sops:
             b0tkRk5ONWgrT2g1NUYxbWtCSmpvMm8K/CPZc4oBv/iTuOCnKzfSbYrKBuCtaBVr
             XUxXN2m26FbzD2Ozl/QSgsdw26H7DCZzMzpo841GuhAZC52j/KSvfw==
             -----END AGE ENCRYPTED FILE-----
-    lastmodified: "2025-09-12T19:51:40Z"
-    mac: ENC[AES256_GCM,data:UXH+qK7jaqiYo0GtPlPi+0XNKVrJMwwowDuJghinWBdphiNgCUfwVWlGd+6L4hxfCbI1BxQqvwO2ca2WPwZb99dO62NO/YbJMgungmTdzmg6liJWzAyZKiqn73GFPertbEfkuXg9wTw3SMfpH3cUqUxvSI/TrJkM1rVmVmkDK/w=,iv:DGGF1iqvLzwzLwu6m8eKQAlPsDg2Qp7P+153v7pgRvI=,tag:FBpogxo91FWuIrCP5Rt5BQ==,type:str]
+    lastmodified: "2025-09-12T20:04:09Z"
+    mac: ENC[AES256_GCM,data:NnOXHdIkIewoU9Kosgch/KPrV3jsgLTMuuVKWnMStESQ3Kolc00V3YsBpIYxEiTWKoFApG5IttqQJ/chJF6p1AnglXzsnNoi7kp+W8+mp5HBRhkOpwpX1YgniM2nhhD/r3cAXnUaQ2qAxVopT19/zXFoJY2BlV8yQ6KLBki7Tu4=,iv:AeBdWn/f39PCoTCXmtB6SXfc/HQzmpa9nP9jRU30jfM=,tag:ZFzsuUtRj6K6rpyRNDWkeQ==,type:str]
     encrypted_regex: ^(data|stringData)$
     version: 3.10.2
