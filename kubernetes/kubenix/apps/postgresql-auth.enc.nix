@@ -28,28 +28,27 @@ in
 {
   kubernetes = {
     resources = {
-      secrets."postgresql-auth" = {
-        type = "Opaque";
-        metadata = {
-          namespace = namespace;
-        };
-        stringData = {
-          "admin-password" = kubenix.lib.secretsFor "postgresql_admin_password";
-          "user-password" = kubenix.lib.secretsFor "postgresql_user_password";
-          "replication-password" = kubenix.lib.secretsFor "postgresql_replication_password";
-        };
-      };
-
-      secrets."grafana-ds-postgres" = {
-        metadata = {
-          namespace = namespace;
-          labels = {
-            grafana_datasource = "1";
+      secrets = {
+        "postgresql-auth" = {
+          type = "Opaque";
+          metadata.name = "postgresql-auth";
+          metadata.namespace = namespace;
+          stringData = {
+            "admin-password" = kubenix.lib.secretsFor "postgresql_admin_password";
+            "user-password" = kubenix.lib.secretsFor "postgresql_user_password";
+            "replication-password" = kubenix.lib.secretsFor "postgresql_replication_password";
           };
         };
-        type = "Opaque";
-        stringData = {
-          "postgresql-datasource.yaml" = kubenix.lib.toYamlStr grafanaDatasource;
+        "grafana-ds-postgres" = {
+          type = "Opaque";
+          metadata = {
+            name = "grafana-ds-postgres";
+            namespace = namespace;
+            labels.grafana_datasource = "1";
+          };
+          stringData = {
+            "postgresql-datasource.yaml" = kubenix.lib.toYamlStr grafanaDatasource;
+          };
         };
       };
     };
