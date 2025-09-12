@@ -2,11 +2,7 @@
 
 let
   namespace = homelab.kubernetes.namespaces.applications;
-  bootstrapDatabases = [
-    "linkwarden"
-    "openwebui"
-    "n8n"
-  ];
+  bootstrapDatabases = homelab.kubernetes.databases.postgres;
 in
 {
   kubernetes = {

@@ -68,12 +68,19 @@ let
     };
   };
 
+  databasesType = t.submodule {
+    options = {
+      postgres = mkOption { type = t.listOf t.str; description = "List of postgres databases to be installed."; };
+    };
+  };
+
   kubernetesConfigType = t.submodule {
     options = {
       vipAddress = mkOption { type = t.str; description = "Virtual IP address for the Kubernetes API server."; };
       version = mkOption { type = t.str; description = "Kubernetes version to deploy."; default = "stable"; };
       namespaces = mkOption { type = t.attrsOf t.str; description = "List of Kubernetes namespaces to create."; default = [ "default" "kube-system" "kube-public" ]; };
       loadBalancer = mkOption { type = loadBalancerType; description = "Configuration for the load balancer managing Kubernetes API access."; };
+      databases = mkOption { type = databasesType; description = "Options related to databases that needed to be created in the cluster."; };
     };
   };
 

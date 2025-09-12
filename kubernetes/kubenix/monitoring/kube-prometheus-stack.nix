@@ -22,6 +22,8 @@ in
         kubeProxy.enabled = false;
         grafana = {
           enabled = true;
+          sidecar.dashboards.enabled = true;
+          sidecar.datasources.enabled = true;
           namespace = namespace;
           persistence = {
             enabled = true;

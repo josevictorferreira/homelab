@@ -2,6 +2,28 @@
 
 let
   namespace = homelab.kubernetes.namespaces.applications;
+  mkDatasource = database: {
+    name = "app-postgres";
+    uid = "ds-app-postgres";
+    access = "proxy";
+    url = "postgresql-hl:5432";
+    database = database;
+    user = "postgres";
+    isDefault = false;
+    editable = false;
+    jsonData = {
+      sslMode = "disable";
+      postgresVersion = 1700;
+      timescaledb = false;
+    };
+    secureJsonData = {
+      password = kubenix.lib.secretsFor "postgresql_admin_password";
+    };
+  };
+  grafanaDatasource = {
+    apiVersion = 1;
+    datasources = map mkDatasource homelab.kubernetes.databases.postgres;
+  };
 in
 {
   kubernetes = {
@@ -15,6 +37,19 @@ in
           "admin-password" = kubenix.lib.secretsFor "postgresql_admin_password";
           "user-password" = kubenix.lib.secretsFor "postgresql_user_password";
           "replication-password" = kubenix.lib.secretsFor "postgresql_replication_password";
+        };
+      };
+
+      secrets."grafana-ds-postgres" = {
+        metadata = {
+          namespace = namespace;
+          labels = {
+            grafana_datasource = "1";
+          };
+        };
+        type = "Opaque";
+        stringData = {
+          "datasource.yaml" = kubenix.lib.toYamlStr grafanaDatasource;
         };
       };
     };
