@@ -35,6 +35,14 @@
     };
   };
 
+  databases = {
+    postgres = [
+      "linkwarden"
+      "openwebui"
+      "n8n"
+    ];
+  };
+
   namespaces = {
     monitoring = "monitoring";
     certificate = "cert-manager";
