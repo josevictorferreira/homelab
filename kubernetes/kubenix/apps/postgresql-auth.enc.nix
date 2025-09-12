@@ -5,6 +5,7 @@ let
   mkDatasource = database: {
     name = "postgres-database-${database}";
     uid = "postgres-database-${database}";
+    type = "postgres";
     access = "proxy";
     url = "postgresql://${kubenix.lib.serviceHostFor "postgresql-hl" "apps"}:5432/${database}";
     database = database;
