@@ -3,10 +3,10 @@
 let
   namespace = homelab.kubernetes.namespaces.applications;
   mkDatasource = database: {
-    name = "app-postgres";
-    uid = "ds-app-postgres";
+    name = "postgres-database-${database}";
+    uid = "postgres-database-${database}";
     access = "proxy";
-    url = "${kubenix.lib.serviceHostFor "postgresql-hl" "apps"}:5432";
+    url = "postgresql://${kubenix.lib.serviceHostFor "postgresql-hl" "apps"}:5432/${database}";
     database = database;
     user = "postgres";
     isDefault = false;
@@ -43,7 +43,7 @@ in
           type = "Opaque";
           metadata = {
             name = "grafana-ds-postgres";
-            namespace = namespace;
+            namespace = homelab.kubernetes.namespaces.monitoring;
             labels.grafana_datasource = "1";
           };
           stringData = {
