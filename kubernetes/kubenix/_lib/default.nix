@@ -12,6 +12,8 @@ rec {
 
   toYamlStr = data: builtins.readFile ((pkgs.formats.yaml { }).generate "." data);
 
+  serviceHostFor = serviceName: namespace: "${serviceName}.${namespace}.svc.cluster.local";
+
   serviceAnnotationFor = serviceName: {
     "lbipam.cilium.io/ips" = homelab.kubernetes.loadBalancer.services.${serviceName};
     "lbipam.cilium.io/sharing-key" = serviceName;
