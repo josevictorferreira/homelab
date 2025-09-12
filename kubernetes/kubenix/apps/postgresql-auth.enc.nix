@@ -17,7 +17,7 @@ let
       timescaledb = false;
     };
     secureJsonData = {
-      password = kubenix.lib.secretsFor "postgresql_admin_password";
+      password = kubenix.lib.secretsInlineFor "postgresql_admin_password";
     };
   };
   grafanaDatasource = {
@@ -49,7 +49,7 @@ in
         };
         type = "Opaque";
         stringData = {
-          "datasource.yaml" = kubenix.lib.toYamlStr grafanaDatasource;
+          "postgresql-datasource.yaml" = kubenix.lib.toYamlStr grafanaDatasource;
         };
       };
     };
