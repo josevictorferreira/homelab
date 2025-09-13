@@ -1,4 +1,4 @@
-{ k8sLib, homelab, ... }:
+{ kubenix, homelab, ... }:
 
 let
   app = "ntfy";
@@ -7,7 +7,7 @@ in
 {
   kubernetes = {
     helm.releases.${app} = {
-      chart = k8sLib.helm.fetch {
+      chart = kubenix.lib.helm.fetch {
         chartUrl = "oci://ghcr.io/fmjstudios/helm/ntfy";
         chart = "ntfy";
         version = "0.2.2";
@@ -26,7 +26,7 @@ in
         };
 
         ntfy = {
-          baseURL = "https://${k8sLib.domainFor app}";
+          baseURL = "https://${kubenix.lib.domainFor app}";
           listenHTTP = ":80";
           behindProxy = true;
           web = {
@@ -71,7 +71,7 @@ in
         ingressClassName = "cilium";
         rules = [
           {
-            host = k8sLib.domainFor app;
+            host = kubenix.lib.domainFor app;
             http.paths = [
               {
                 path = "/";
@@ -85,7 +85,7 @@ in
         tls = [
           {
             hosts = [
-              (k8sLib.domainFor app)
+              (kubenix.lib.domainFor app)
             ];
             secretName = "wildcard-tls";
           }

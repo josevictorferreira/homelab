@@ -1,4 +1,4 @@
-{ k8sLib, homelab, ... }:
+{ kubenix, homelab, ... }:
 
 let
   app = "sftpgo";
@@ -8,7 +8,7 @@ in
 {
   kubernetes = {
     helm.releases.${app} = {
-      chart = k8sLib.helm.fetch {
+      chart = kubenix.lib.helm.fetch {
         chartUrl = "oci://ghcr.io/sftpgo/helm-charts/sftpgo";
         chart = "sftpgo";
         version = "0.40.0";
@@ -71,7 +71,7 @@ in
         service = {
           type = "LoadBalancer";
           externalTrafficPolicy = "Cluster";
-          annotations = k8sLib.serviceAnnotationFor "sftpgo";
+          annotations = kubenix.lib.serviceAnnotationFor "sftpgo";
           ports.ftp.passiveRange.start = 50000;
           ports.ftp.passiveRange.end = 50009;
         };
