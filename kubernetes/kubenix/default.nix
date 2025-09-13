@@ -53,7 +53,6 @@ let
       ];
       specialArgs = {
         kubenix = kubenixModule;
-        k8sLib = kubenixModule.lib; 
         inherit homelab;
       };
     }).config.kubernetes.resultYAML;

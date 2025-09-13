@@ -1,4 +1,4 @@
-{ k8sLib, homelab, ... }:
+{ kubenix, homelab, ... }:
 
 let
   app = "rabbitmq";
@@ -7,7 +7,7 @@ in
 {
   kubernetes = {
     helm.releases.${app} = {
-      chart = k8sLib.helm.fetch {
+      chart = kubenix.lib.helm.fetch {
         repo = "https://charts.bitnami.com/bitnami";
         chart = "rabbitmq";
         version = "16.0.14";
@@ -33,7 +33,7 @@ in
 
         service = {
           type = "LoadBalancer";
-          annotations = k8sLib.serviceAnnotationFor app;
+          annotations = kubenix.lib.serviceAnnotationFor app;
           extraPorts = [
             { name = "mqtt"; port = 1883; targetPort = 1883; }
             { name = "mqtts"; port = 8883; targetPort = 8883; }
@@ -77,7 +77,7 @@ in
             "cert-manager.io/cluster-issuer" = "cloudflare-issuer";
           };
           ingressClassName = "cilium";
-          hostname = k8sLib.domainFor app;
+          hostname = kubenix.lib.domainFor app;
           existingSecret = "wildcard-tls";
           tls = true;
         };
