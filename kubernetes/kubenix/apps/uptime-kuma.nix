@@ -1,4 +1,4 @@
-{ lib, kubenix, k8sLib, homelab, ... }:
+{ lib, kubenix, homelab, ... }:
 
 let
   app = "uptimekuma";
@@ -7,7 +7,7 @@ in
 {
   kubernetes = {
     helm.releases.${app} = {
-      chart = k8sLib.helm.fetch {
+      chart = kubenix.lib.helm.fetch {
         repo = "https://helm.irsigler.cloud/";
         chart = "uptime-kuma";
         version = "2.22.0";
@@ -31,10 +31,10 @@ in
         ingress = {
           enabled = true;
           className = "cilium";
-          annotations = k8sLib.serviceAnnotationFor app;
+          annotations = kubenix.lib.serviceAnnotationFor app;
           hosts = [
             {
-              host = k8sLib.domainFor "uptimekuma";
+              host = kubenix.lib.domainFor "uptimekuma";
               paths = [
                 {
                   path = "/";
@@ -45,7 +45,7 @@ in
           ];
           tls = [
             {
-              hosts = [ (k8sLib.domainFor "uptimekuma") ];
+              hosts = [ (kubenix.lib.domainFor "uptimekuma") ];
               secretName = "wildcard-tls";
             }
           ];

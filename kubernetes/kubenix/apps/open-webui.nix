@@ -1,4 +1,4 @@
-{ lib, kubenix, k8sLib, homelab, ... }:
+{ lib, kubenix, homelab, ... }:
 
 let
   app = "open-webui";
@@ -8,7 +8,7 @@ in
 {
   kubernetes = {
     helm.releases.${app} = {
-      chart = k8sLib.helm.fetch
+      chart = kubenix.lib.helm.fetch
         {
           repo = "https://helm.openwebui.com/";
           chart = "open-webui";
@@ -28,7 +28,7 @@ in
         openaiBaseApiUrl = "https://openrouter.ai/api/v1";
         ingress = {
           enabled = true;
-          host = k8sLib.domainFor "openwebui";
+          host = kubenix.lib.domainFor "openwebui";
           class = "cilium";
           tls = true;
           existingSecret = "wildcard-tls";
@@ -43,7 +43,7 @@ in
             accessKeyExistingAccessKey = "AWS_ACCESS_KEY_ID";
             secretKeyExistingSecret = "open-webui-s3";
             secretKeyExistingSecretKey = "AWS_SECRET_ACCESS_KEY";
-            endpointUrl = k8sLib.objectStoreEndpoint;
+            endpointUrl = kubenix.lib.objectStoreEndpoint;
             region = "us-east-1";
             bucket = bucketName;
           };

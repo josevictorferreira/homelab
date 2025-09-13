@@ -1,4 +1,4 @@
-{ homelab, k8sLib, ... }:
+{ homelab, kubenix, ... }:
 let
   linkwardenTemplate = ''
     <ul class="list list-gap-10 collapsible-container" data-collapse-after="7">
@@ -48,7 +48,7 @@ let
                 method = "GET";
                 url = "http://${homelab.kubernetes.loadBalancer.services.linkwarden}/api/v1/links";
                 headers = {
-                  Authorization = "Bearer ${k8sLib.secretsFor "linkwarden_api_key"}+";
+                  Authorization = "Bearer ${kubenix.lib.secretsFor "linkwarden_api_key"}+";
                 };
                 template = linkwardenTemplate;
               }
@@ -103,7 +103,7 @@ let
             widgets = [
               {
                 type = "weather";
-                location = "${k8sLib.secretsFor "weather_location"}+";
+                location = "${kubenix.lib.secretsFor "weather_location"}+";
                 units = "metric";
                 "hour-format" = "24h";
               }
@@ -155,7 +155,7 @@ in
           name = "glance-config";
           namespace = namespace;
         };
-        data."glance.yml" = k8sLib.toYamlStr glanceConfig;
+        data."glance.yml" = kubenix.lib.toYamlStr glanceConfig;
       };
     };
   };
