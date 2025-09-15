@@ -100,6 +100,22 @@ metadata:
 ---
 apiVersion: v1
 data:
+  postgres-linkwarden-dashboard.json: '{"id":null,"panels":[{"datasource":{"type":"postgres","uid":"postgres-database-linkwarden"},"targets":[{"format":"time_series","rawSql":"SELECT\n  now()
+    AS time,\n  numbackends AS \"connections\"\nFROM pg_stat_database\nWHERE datname
+    = ''linkwarden'';\n","refId":"A"}],"title":"Connections","type":"timeseries"}],"refresh":"10s","schemaVersion":17,"tags":["postgres","linkwarden"],"timezone":"America/Sao_Paulo","title":"Postgres
+    - Linkwarden","uid":"postgres-linkwarden","version":1}'
+kind: ConfigMap
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    grafana_dashboard: '1'
+  name: postgres-linkwarden-dashboard
+  namespace: monitoring
+---
+apiVersion: v1
+data:
   token: ''
 kind: Secret
 metadata:
