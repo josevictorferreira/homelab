@@ -78,6 +78,49 @@ in
         };
       };
 
+      configMaps."postgres-linkwarden-dashboard" = {
+        metadata = {
+          namespace = homelab.kubernetes.namespaces.monitoring;
+          labels.grafana_dashboard = "1";
+        };
+        data = {
+          "postgres-linkwarden-dashboard.json" = builtins.toJSON {
+            id = null;
+            uid = "postgres-linkwarden";
+            title = "Postgres - Linkwarden";
+            tags = [ "postgres" "linkwarden" ];
+            timezone = homelab.timeZone;
+            schemaVersion = 17;
+            version = 1;
+            refresh = "10s";
+
+            panels = [
+              {
+                type = "timeseries";
+                title = "Connections";
+                datasource = {
+                  type = "postgres";
+                  uid = "postgres-database-linkwarden";
+                };
+                targets = [
+                  {
+                    refId = "A";
+                    rawSql  = ''
+                      SELECT
+                        now() AS time,
+                        numbackends AS "connections"
+                      FROM pg_stat_database
+                      WHERE datname = 'linkwarden';
+                    '';
+                    format = "time_series";
+                  }
+                ];
+              }
+            ];
+          };
+        };
+      };
+
       deployments.linkwarden = {
         metadata.namespace = namespace;
         spec.template.spec.containers.linkwarden = {
