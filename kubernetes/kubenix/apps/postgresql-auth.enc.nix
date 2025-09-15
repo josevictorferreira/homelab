@@ -7,7 +7,7 @@ let
     uid = "postgres-database-${database}";
     type = "postgres";
     access = "proxy";
-    url = "postgresql://${kubenix.lib.serviceHostFor "postgresql-hl" "apps"}:5432/${database}";
+    url = "${kubenix.lib.serviceHostFor "postgresql-hl" "apps"}:5432";
     database = database;
     user = "postgres";
     isDefault = false;
