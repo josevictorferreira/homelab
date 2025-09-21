@@ -126,7 +126,6 @@ let
                   "n8n-io/n8n"
                   "open-webui/open-webui"
                   "grafana/grafana"
-                  "qbittorrent/qbittorrent"
                   "linkwarden/linkwarden"
                   "rook/rook"
                   "drakkan/sftpgo"
@@ -141,10 +140,8 @@ let
                   "dockerhub:searxng/searxng"
                   "dockerhub:mjmeli/qbittorrent-port-forward-gluetun-server"
                   # Daily Usage
-                  "ghostty-org/ghostty"
                   "neovim/neovim"
                   "kovidgoyal/kitty"
-                  "nixos/nixpkgs"
                   "hyprwm/hyprland"
                   "hyprwm/hyprlock"
                   "derailed/k9s"
@@ -153,7 +150,6 @@ let
                   "erikreider/swaynotificationcenter"
                   "weechat/weechat"
                   "alexays/waybar"
-                  "wwmm/easyeffects"
                   "jtheoof/swappy"
                 ];
               }
