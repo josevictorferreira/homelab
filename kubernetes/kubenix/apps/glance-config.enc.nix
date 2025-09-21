@@ -118,14 +118,15 @@ let
               {
                 type = "releases";
                 cache = "1d";
+                show-source-icon = true;
                 repositories = [
+                  # Homelab Apps
                   "glanceapp/glance"
                   "0xERR0R/blocky"
                   "n8n-io/n8n"
                   "open-webui/open-webui"
-                  "searxng/searxng"
                   "grafana/grafana"
-                  "qbittorrent/qBittorrent"
+                  "qbittorrent/qbittorrent"
                   "linkwarden/linkwarden"
                   "rook/rook"
                   "drakkan/sftpgo"
@@ -137,6 +138,23 @@ let
                   "binwiederhier/ntfy"
                   "louislam/uptime-kuma"
                   "prowlarr/prowlarr"
+                  "dockerhub:searxng/searxng"
+                  "dockerhub:mjmeli/qbittorrent-port-forward-gluetun-server"
+                  # Daily Usage
+                  "ghostty-org/ghostty"
+                  "neovim/neovim"
+                  "kovidgoyal/kitty"
+                  "nixos/nixpkgs"
+                  "hyprwm/hyprland"
+                  "hyprwm/hyprlock"
+                  "derailed/k9s"
+                  "davatorium/rofi"
+                  "tmux/tmux"
+                  "erikreider/swaynotificationcenter"
+                  "weechat/weechat"
+                  "alexays/waybar"
+                  "wwmm/easyeffects"
+                  "jtheoof/swappy"
                 ];
               }
             ];
