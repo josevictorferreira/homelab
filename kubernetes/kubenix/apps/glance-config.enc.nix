@@ -44,7 +44,7 @@ let
               {
                 type = "custom-api";
                 title = "Bookmarks";
-                cache = "1m";
+                cache = "1h";
                 method = "GET";
                 url = "http://${homelab.kubernetes.loadBalancer.services.linkwarden}/api/v1/links";
                 headers = {
@@ -66,6 +66,7 @@ let
               }
               {
                 type = "videos";
+                cache = "1h";
                 channels = [
                   "UCOuGATIAbd2DvzJmUgXn2IQ" # Network Chuck
                   "UCHnyfMqiRRG1u-2MsSQLbXA" # Veritasium
@@ -109,6 +110,7 @@ let
               }
               {
                 type = "markets";
+                cache = "1h";
                 markets = [
                   { symbol = "BTC-USD"; name = "Bitcoin"; }
                   { symbol = "KAS-USD"; name = "Kaspa"; }
