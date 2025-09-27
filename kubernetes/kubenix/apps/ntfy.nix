@@ -21,7 +21,7 @@ in
         image = {
           registry = "docker.io";
           repository = "binwiederhier/ntfy";
-          tag = "v2.11.0";
+          tag = "v2.14.0@sha256:5a051798d14138c3ecb12c038652558ab6a077e1aceeb867c151cbf5fa8451ef";
           pullPolicy = "IfNotPresent";
         };
 

@@ -45,7 +45,7 @@ spec:
                 secretKeyRef:
                   key: privateKey
                   name: ntfy-secrets
-          image: docker.io/binwiederhier/ntfy:v2.11.0
+          image: docker.io/binwiederhier/ntfy:v2.14.0@sha256:5a051798d14138c3ecb12c038652558ab6a077e1aceeb867c151cbf5fa8451ef
           imagePullPolicy: IfNotPresent
           name: ntfy
           ports:
