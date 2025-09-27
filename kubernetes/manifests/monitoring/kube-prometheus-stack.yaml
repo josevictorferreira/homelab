@@ -91425,7 +91425,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: 3555c8d9331af488d1f285ed2efc09c6c6099b5044e6eeaa893975e5fd760284
+        checksum/config: ec02c175b6fa7a2c0974ee8901013161054548f4955e3eb5159611b157d6f361
         checksum/sc-dashboard-provider-config: e70bf6a851099d385178a76de9757bb0bef8299da6d8443602590e44f05fdf24
         kubectl.kubernetes.io/default-container: grafana
       labels:
@@ -91577,6 +91577,9 @@ spec:
               subPath: grafana.ini
             - mountPath: /var/lib/grafana
               name: storage
+            - mountPath: /etc/grafana/provisioning/alerting/contactpoints.yaml
+              name: config
+              subPath: contactpoints.yaml
             - mountPath: /tmp/dashboards
               name: sc-dashboard-volume
             - mountPath: /etc/grafana/provisioning/dashboards/sc-dashboardproviders.yaml
@@ -92201,6 +92204,10 @@ metadata:
 ---
 apiVersion: v1
 data:
+  contactpoints.yaml: "apiVersion: 1\ncontactPoints:\n- name: Ntfy\n  orgId: 1\n \
+    \ receivers:\n  - disableResolveMessage: false\n    settings:\n      headers:\n\
+    \        X-Template: grafana\n      httpMethod: POST\n      url: http://ntfy.apps.svc.cluster.local/homelab\n\
+    \    type: webhook\n    uid: dezclgug3tb0ga\n"
   grafana.ini: '[analytics]
 
     check_for_updates = true

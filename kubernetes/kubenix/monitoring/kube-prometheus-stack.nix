@@ -2,6 +2,29 @@
 
 let
   namespace = homelab.kubernetes.namespaces.monitoring;
+  ntfyContactPoint = {
+    apiVersion = 1;
+    contactPoints = [
+      {
+        orgId = 1;
+        name = "Ntfy";
+        receivers = [
+          {
+            uid = "dezclgug3tb0ga";
+            type = "webhook";
+            settings = {
+              headers = {
+                "X-Template" = "grafana";
+              };
+              httpMethod = "POST";
+              url = "http://ntfy.apps.svc.cluster.local/homelab";
+            };
+            disableResolveMessage = false;
+          }
+        ];
+      }
+    ];
+  };
 in
 {
   kubernetes = {
@@ -41,6 +64,9 @@ in
             passwordKey = "ADMIN_PASSWORD";
           };
           ingress = kubenix.lib.ingressDomainFor "grafana";
+          alerting = {
+            "contactpoints.yaml" = ntfyContactPoint;
+          };
         };
         prometheusOperator = {
           enabled = true;
