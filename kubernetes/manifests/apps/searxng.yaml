@@ -59,7 +59,7 @@ spec:
 apiVersion: v1
 data:
   limiter.toml: "[botdetection]\nipv4_prefix = 32\nipv6_prefix = 48\ntrusted_proxies\
-    \ = [\n  '10.10.10.0/24',\n  '10.42.0.0/24'\n  '10.43.0.0/24'\n]\n\n[botdetection.ip_limit]\n\
+    \ = [\n  '10.10.10.0/24',\n  '10.42.0.0/24',\n  '10.43.0.0/24'\n]\n\n[botdetection.ip_limit]\n\
     filter_link_local = false\nlink_token = false\n\n[botdetection.ip_lists]\nblock_ip\
     \ = [\n]\npass_ip = [\n]\npass_searxng_org = true\n"
 kind: ConfigMap
