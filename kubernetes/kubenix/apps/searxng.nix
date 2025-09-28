@@ -35,16 +35,26 @@ in
         volumeMounts = [
           {
             name = "settings";
-            mountPath = "/etc/searxng/settings.yml";
-            subPath = "settings.yml";
-            readOnly = true;
+            mountPath = "/etc/searxng";
           }
         ];
 
         volumes = [
           {
             name = "settings";
-            configMap.name = "${app}-config";
+            configMap = {
+              name = "${app}-config";
+              items = [
+                {
+                  key = "settings.yml";
+                  path = "settings.yml";
+                }
+                {
+                  key = "limiter.toml";
+                  path = "limiter.toml";
+                }
+              ];
+            };
           }
         ];
       };
@@ -54,11 +64,8 @@ in
       deployments.${app} = {
         metadata.namespace = namespace;
         spec.template.spec.containers.${app} = {
-          env = [
-            {
-              name = "SEARXNG_HOSTNAME";
-              value = kubenix.lib.domainFor app;
-            }
+          envFrom = [
+            { secretRef.name = "searxng-secret"; }
           ];
         };
       };
