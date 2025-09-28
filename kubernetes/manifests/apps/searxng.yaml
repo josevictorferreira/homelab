@@ -31,7 +31,7 @@ spec:
         - env:
             - name: SEARXNG_UI_DEFAULT_LOCALE
               value: en-US
-          image: searxng/searxng:2025.8.20-41a4a3e
+          image: ghcr.io/searxng/searxng:2025.8.20-41a4a3e
           imagePullPolicy: IfNotPresent
           livenessProbe:
             httpGet:
