@@ -4,6 +4,22 @@ let
   namespace = homelab.kubernetes.namespaces.applications;
   app = "searxng";
   limiter = ''
+    [botdetection]
+    ipv4_prefix = 32
+    ipv6_prefix = 48
+    trusted_proxies = [
+      '10.10.10.0/24',
+      '10.42.0.0/16',
+      '10.43.0.0/16',
+      '10.0.0.0/8'
+    ]
+    [botdetection.ip_limit]
+    filter_link_local = false
+    link_token = false
+    [botdetection.ip_lists]
+    block_ip = []
+    pass_ip = []
+    pass_searxng_org = true
   '';
 in
 {
@@ -44,6 +60,18 @@ in
             {
               name = "SEARXNG_UI_DEFAULT_LOCALE";
               value = "en-US";
+            }
+            {
+              name = "SEARXNG_HOSTNAME";
+              value = kubenix.lib.domainFor app;
+            }
+            {
+              name = "SEARXNG_BASE_URL";
+              value = "https://${kubenix.lib.domainFor app}";
+            }
+            {
+              name = "SEARXNG_SEARCH_FORMATS";
+              value = "html,csv,json";
             }
           ];
         };
