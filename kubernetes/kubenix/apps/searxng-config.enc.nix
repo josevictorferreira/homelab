@@ -25,6 +25,9 @@ let
     redis = {
       url = "redis://:${kubenix.lib.secretsInlineFor "redis_password"}@redis-headless:6379/2";
     };
+    valkey = {
+      url = "redis://:${kubenix.lib.secretsInlineFor "redis_password"}@redis-headless:6379/2";
+    };
   };
   limiter = ''
     [botdetection]
