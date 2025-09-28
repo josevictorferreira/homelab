@@ -66,7 +66,7 @@ spec:
           envFrom:
             - secretRef:
                 name: open-webui-secrets
-          image: ghcr.io/open-webui/open-webui:0.6.26
+          image: ghcr.io/open-webui/open-webui:v0.6.31@sha256:807a4e918d5ffddebc5ac6ff1b9c0966162be366691852d3b96983305b43fd5e
           imagePullPolicy: IfNotPresent
           name: open-webui
           ports:
@@ -82,7 +82,7 @@ spec:
             - sh
             - -c
             - cp -R -n /app/backend/data/* /tmp/app-data/
-          image: ghcr.io/open-webui/open-webui:0.6.26
+          image: ghcr.io/open-webui/open-webui:v0.6.31@sha256:807a4e918d5ffddebc5ac6ff1b9c0966162be366691852d3b96983305b43fd5e
           imagePullPolicy: IfNotPresent
           name: copy-app-data
           volumeMounts:
