@@ -29,14 +29,8 @@ spec:
     spec:
       containers:
         - env:
-            - name: SEARXNG_UI_DEFAULT_LOCALE
-              value: en-US
             - name: SEARXNG_HOSTNAME
               value: searxng.josevictor.me
-            - name: SEARXNG_BASE_URL
-              value: https://searxng.josevictor.me
-            - name: SEARXNG_SEARCH_FORMATS
-              value: html,csv,json
           image: ghcr.io/searxng/searxng:2025.8.20-41a4a3e
           imagePullPolicy: IfNotPresent
           livenessProbe:
@@ -53,34 +47,14 @@ spec:
               path: /
               port: http
           volumeMounts:
-            - mountPath: /etc/searxng/limiter.toml
-              name: limiter
+            - mountPath: /etc/searxng/settings.yml
+              name: settings
               readOnly: true
-              subPath: limiter.toml
+              subPath: settings.yml
       volumes:
         - configMap:
-            name: searxng-limiter
-          name: limiter
----
-apiVersion: v1
-data:
-  limiter.toml: "[botdetection]\nipv4_prefix = 32\nipv6_prefix = 48\ntrusted_proxies\
-    \ = [\n  '10.10.10.0/24',\n  '10.42.0.0/16',\n  '10.43.0.0/16',\n  '10.0.0.0/8'\n\
-    ]\n[botdetection.ip_limit]\nfilter_link_local = false\nlink_token = false\n[botdetection.ip_lists]\n\
-    block_ip = []\npass_ip = []\npass_searxng_org = true\n"
-kind: ConfigMap
-metadata:
-  annotations:
-    kubenix/k8s-version: '1.32'
-    kubenix/project-name: ze-homelab
-  labels:
-    app.kubernetes.io/instance: searxng
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: searxng
-    app.kubernetes.io/version: 2025.8.20-41a4a3e
-    helm.sh/chart: searxng-1.0.0
-  name: searxng-limiter
-  namespace: apps
+            name: searxng-config
+          name: settings
 ---
 apiVersion: v1
 kind: Service
