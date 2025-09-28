@@ -22,7 +22,9 @@ let
       default_locale = "en-US";
       hotkeys = "vim";
     };
-    redis = "redis://:${kubenix.lib.secretsInlineFor "redis_password"}@redis-headless:6379/2";
+    redis = {
+      url = "redis://:${kubenix.lib.secretsInlineFor "redis_password"}@redis-headless:6379/2";
+    };
   };
   limiter = ''
     [botdetection]
