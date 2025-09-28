@@ -40,6 +40,7 @@
       "linkwarden"
       "openwebui"
       "n8n"
+      "immich"
     ];
   };
 
