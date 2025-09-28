@@ -4,25 +4,6 @@ let
   namespace = homelab.kubernetes.namespaces.applications;
   app = "searxng";
   limiter = ''
-    [botdetection]
-    ipv4_prefix = 32
-    ipv6_prefix = 48
-    trusted_proxies = [
-      '10.10.10.0/24',
-      '10.42.0.0/24',
-      '10.43.0.0/24'
-    ]
-
-    [botdetection.ip_limit]
-    filter_link_local = false
-    link_token = false
-
-    [botdetection.ip_lists]
-    block_ip = [
-    ]
-    pass_ip = [
-    ]
-    pass_searxng_org = true
   '';
 in
 {
