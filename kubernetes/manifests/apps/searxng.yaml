@@ -28,9 +28,9 @@ spec:
         helm.sh/chart: searxng-1.0.0
     spec:
       containers:
-        - env:
-            - name: SEARXNG_HOSTNAME
-              value: searxng.josevictor.me
+        - envFrom:
+            - secretRef:
+                name: searxng-secret
           image: ghcr.io/searxng/searxng:2025.8.20-41a4a3e
           imagePullPolicy: IfNotPresent
           livenessProbe:
@@ -47,12 +47,15 @@ spec:
               path: /
               port: http
           volumeMounts:
-            - mountPath: /etc/searxng/settings.yml
+            - mountPath: /etc/searxng
               name: settings
-              readOnly: true
-              subPath: settings.yml
       volumes:
         - configMap:
+            items:
+              - key: settings.yml
+                path: settings.yml
+              - key: limiter.toml
+                path: limiter.toml
             name: searxng-config
           name: settings
 ---
