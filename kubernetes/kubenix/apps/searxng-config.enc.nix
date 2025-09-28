@@ -60,6 +60,17 @@ in
           "limiter.toml" = limiter;
         };
       };
+
+      secrets."searxng-secret" = {
+        metadata = {
+          name = "searxng-secret";
+          namespace = namespace;
+        };
+        stringData = {
+          "SEARXNG_HOSTNAME" = domain;
+          "SEARXNG_SECRET" = kubenix.lib.secretsFor "searxng_secret_key";
+        };
+      };
     };
   };
 }
