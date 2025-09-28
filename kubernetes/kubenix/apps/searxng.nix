@@ -21,8 +21,9 @@ in
         replicaCount = 1;
 
         image = {
-          repository = "searxng/searxng";
-          tag = "searxng/searxng:2025.9.5-e7501ea@sha256:511fa3f34c1d119c47f88c9a1e7eda1340f346543e980c17e5f14b27dac6a1ed";
+          repository = "ghcr.io/searxng/searxng";
+          tag = "2025.9.27-87bc97776@sha256:50e3a9591c1e9ab223aed8f5b1cd2c34340b48c91fce74f3a077755f2900b479";
+          pullPolicy = "IfNotPresent";
         };
 
         service = kubenix.lib.plainServiceFor app;

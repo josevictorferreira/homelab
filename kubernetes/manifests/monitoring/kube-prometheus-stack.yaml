@@ -5,7 +5,7 @@ metadata:
     controller-gen.kubebuilder.io/version: v0.18.0
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
-    operator.prometheus.io/version: 0.84.1
+    operator.prometheus.io/version: 0.85.0
   name: alertmanagerconfigs.monitoring.coreos.com
   namespace: monitoring
 spec:
@@ -6386,6 +6386,1035 @@ spec:
 
                                 It requires Alertmanager >= v0.26.0.'
                               type: string
+                          type: object
+                        type: array
+                      rocketchatConfigs:
+                        description: 'List of RocketChat configurations.
+
+                          It requires Alertmanager >= 0.28.0.'
+                        items:
+                          description: 'RocketChatConfig configures notifications
+                            via RocketChat.
+
+                            It requires Alertmanager >= 0.28.0.'
+                          properties:
+                            actions:
+                              description: Actions to include in the message.
+                              items:
+                                description: RocketChatActionConfig defines actions
+                                  for RocketChat messages.
+                                properties:
+                                  msg:
+                                    description: The message to send when the button
+                                      is clicked.
+                                    minLength: 1
+                                    type: string
+                                  text:
+                                    description: The button text.
+                                    minLength: 1
+                                    type: string
+                                  url:
+                                    description: The URL the button links to.
+                                    pattern: ^https?://.+$
+                                    type: string
+                                type: object
+                              minItems: 1
+                              type: array
+                            apiURL:
+                              description: 'The API URL for RocketChat.
+
+                                Defaults to https://open.rocket.chat/ if not specified.'
+                              pattern: ^https?://.+$
+                              type: string
+                            channel:
+                              description: The channel to send alerts to.
+                              minLength: 1
+                              type: string
+                            color:
+                              description: The message color.
+                              minLength: 1
+                              type: string
+                            emoji:
+                              description: If provided, the avatar will be displayed
+                                as an emoji.
+                              minLength: 1
+                              type: string
+                            fields:
+                              description: Additional fields for the message.
+                              items:
+                                description: RocketChatFieldConfig defines additional
+                                  fields for RocketChat messages.
+                                properties:
+                                  short:
+                                    description: Whether this field should be a short
+                                      field.
+                                    type: boolean
+                                  title:
+                                    description: The title of this field.
+                                    minLength: 1
+                                    type: string
+                                  value:
+                                    description: The value of this field, displayed
+                                      underneath the title value.
+                                    minLength: 1
+                                    type: string
+                                type: object
+                              minItems: 1
+                              type: array
+                            httpConfig:
+                              description: HTTP client configuration.
+                              properties:
+                                authorization:
+                                  description: 'Authorization header configuration
+                                    for the client.
+
+                                    This is mutually exclusive with BasicAuth and
+                                    is only available starting from Alertmanager v0.22+.'
+                                  properties:
+                                    credentials:
+                                      description: Selects a key of a Secret in the
+                                        namespace that contains the credentials for
+                                        authentication.
+                                      properties:
+                                        key:
+                                          description: The key of the secret to select
+                                            from.  Must be a valid secret key.
+                                          type: string
+                                        name:
+                                          default: ''
+                                          description: 'Name of the referent.
+
+                                            This field is effectively required, but
+                                            due to backwards compatibility is
+
+                                            allowed to be empty. Instances of this
+                                            type with an empty value here are
+
+                                            almost certainly wrong.
+
+                                            More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                                          type: string
+                                        optional:
+                                          description: Specify whether the Secret
+                                            or its key must be defined
+                                          type: boolean
+                                      required:
+                                        - key
+                                      type: object
+                                      x-kubernetes-map-type: atomic
+                                    type:
+                                      description: 'Defines the authentication type.
+                                        The value is case-insensitive.
+
+
+                                        "Basic" is not a supported value.
+
+
+                                        Default: "Bearer"'
+                                      type: string
+                                  type: object
+                                basicAuth:
+                                  description: 'BasicAuth for the client.
+
+                                    This is mutually exclusive with Authorization.
+                                    If both are defined, BasicAuth takes precedence.'
+                                  properties:
+                                    password:
+                                      description: '`password` specifies a key of
+                                        a Secret containing the password for
+
+                                        authentication.'
+                                      properties:
+                                        key:
+                                          description: The key of the secret to select
+                                            from.  Must be a valid secret key.
+                                          type: string
+                                        name:
+                                          default: ''
+                                          description: 'Name of the referent.
+
+                                            This field is effectively required, but
+                                            due to backwards compatibility is
+
+                                            allowed to be empty. Instances of this
+                                            type with an empty value here are
+
+                                            almost certainly wrong.
+
+                                            More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                                          type: string
+                                        optional:
+                                          description: Specify whether the Secret
+                                            or its key must be defined
+                                          type: boolean
+                                      required:
+                                        - key
+                                      type: object
+                                      x-kubernetes-map-type: atomic
+                                    username:
+                                      description: '`username` specifies a key of
+                                        a Secret containing the username for
+
+                                        authentication.'
+                                      properties:
+                                        key:
+                                          description: The key of the secret to select
+                                            from.  Must be a valid secret key.
+                                          type: string
+                                        name:
+                                          default: ''
+                                          description: 'Name of the referent.
+
+                                            This field is effectively required, but
+                                            due to backwards compatibility is
+
+                                            allowed to be empty. Instances of this
+                                            type with an empty value here are
+
+                                            almost certainly wrong.
+
+                                            More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                                          type: string
+                                        optional:
+                                          description: Specify whether the Secret
+                                            or its key must be defined
+                                          type: boolean
+                                      required:
+                                        - key
+                                      type: object
+                                      x-kubernetes-map-type: atomic
+                                  type: object
+                                bearerTokenSecret:
+                                  description: 'The secret''s key that contains the
+                                    bearer token to be used by the client
+
+                                    for authentication.
+
+                                    The secret needs to be in the same namespace as
+                                    the AlertmanagerConfig
+
+                                    object and accessible by the Prometheus Operator.'
+                                  properties:
+                                    key:
+                                      description: The key of the secret to select
+                                        from.  Must be a valid secret key.
+                                      type: string
+                                    name:
+                                      default: ''
+                                      description: 'Name of the referent.
+
+                                        This field is effectively required, but due
+                                        to backwards compatibility is
+
+                                        allowed to be empty. Instances of this type
+                                        with an empty value here are
+
+                                        almost certainly wrong.
+
+                                        More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                                      type: string
+                                    optional:
+                                      description: Specify whether the Secret or its
+                                        key must be defined
+                                      type: boolean
+                                  required:
+                                    - key
+                                  type: object
+                                  x-kubernetes-map-type: atomic
+                                followRedirects:
+                                  description: FollowRedirects specifies whether the
+                                    client should follow HTTP 3xx redirects.
+                                  type: boolean
+                                noProxy:
+                                  description: '`noProxy` is a comma-separated string
+                                    that can contain IPs, CIDR notation, domain names
+
+                                    that should be excluded from proxying. IP and
+                                    domain names can
+
+                                    contain port numbers.
+
+
+                                    It requires Prometheus >= v2.43.0, Alertmanager
+                                    >= v0.25.0 or Thanos >= v0.32.0.'
+                                  type: string
+                                oauth2:
+                                  description: OAuth2 client credentials used to fetch
+                                    a token for the targets.
+                                  properties:
+                                    clientId:
+                                      description: '`clientId` specifies a key of
+                                        a Secret or ConfigMap containing the
+
+                                        OAuth2 client''s ID.'
+                                      properties:
+                                        configMap:
+                                          description: ConfigMap containing data to
+                                            use for the targets.
+                                          properties:
+                                            key:
+                                              description: The key to select.
+                                              type: string
+                                            name:
+                                              default: ''
+                                              description: 'Name of the referent.
+
+                                                This field is effectively required,
+                                                but due to backwards compatibility
+                                                is
+
+                                                allowed to be empty. Instances of
+                                                this type with an empty value here
+                                                are
+
+                                                almost certainly wrong.
+
+                                                More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                                              type: string
+                                            optional:
+                                              description: Specify whether the ConfigMap
+                                                or its key must be defined
+                                              type: boolean
+                                          required:
+                                            - key
+                                          type: object
+                                          x-kubernetes-map-type: atomic
+                                        secret:
+                                          description: Secret containing data to use
+                                            for the targets.
+                                          properties:
+                                            key:
+                                              description: The key of the secret to
+                                                select from.  Must be a valid secret
+                                                key.
+                                              type: string
+                                            name:
+                                              default: ''
+                                              description: 'Name of the referent.
+
+                                                This field is effectively required,
+                                                but due to backwards compatibility
+                                                is
+
+                                                allowed to be empty. Instances of
+                                                this type with an empty value here
+                                                are
+
+                                                almost certainly wrong.
+
+                                                More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                                              type: string
+                                            optional:
+                                              description: Specify whether the Secret
+                                                or its key must be defined
+                                              type: boolean
+                                          required:
+                                            - key
+                                          type: object
+                                          x-kubernetes-map-type: atomic
+                                      type: object
+                                    clientSecret:
+                                      description: '`clientSecret` specifies a key
+                                        of a Secret containing the OAuth2
+
+                                        client''s secret.'
+                                      properties:
+                                        key:
+                                          description: The key of the secret to select
+                                            from.  Must be a valid secret key.
+                                          type: string
+                                        name:
+                                          default: ''
+                                          description: 'Name of the referent.
+
+                                            This field is effectively required, but
+                                            due to backwards compatibility is
+
+                                            allowed to be empty. Instances of this
+                                            type with an empty value here are
+
+                                            almost certainly wrong.
+
+                                            More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                                          type: string
+                                        optional:
+                                          description: Specify whether the Secret
+                                            or its key must be defined
+                                          type: boolean
+                                      required:
+                                        - key
+                                      type: object
+                                      x-kubernetes-map-type: atomic
+                                    endpointParams:
+                                      additionalProperties:
+                                        type: string
+                                      description: '`endpointParams` configures the
+                                        HTTP parameters to append to the token
+
+                                        URL.'
+                                      type: object
+                                    noProxy:
+                                      description: '`noProxy` is a comma-separated
+                                        string that can contain IPs, CIDR notation,
+                                        domain names
+
+                                        that should be excluded from proxying. IP
+                                        and domain names can
+
+                                        contain port numbers.
+
+
+                                        It requires Prometheus >= v2.43.0, Alertmanager
+                                        >= v0.25.0 or Thanos >= v0.32.0.'
+                                      type: string
+                                    proxyConnectHeader:
+                                      additionalProperties:
+                                        items:
+                                          description: SecretKeySelector selects a
+                                            key of a Secret.
+                                          properties:
+                                            key:
+                                              description: The key of the secret to
+                                                select from.  Must be a valid secret
+                                                key.
+                                              type: string
+                                            name:
+                                              default: ''
+                                              description: 'Name of the referent.
+
+                                                This field is effectively required,
+                                                but due to backwards compatibility
+                                                is
+
+                                                allowed to be empty. Instances of
+                                                this type with an empty value here
+                                                are
+
+                                                almost certainly wrong.
+
+                                                More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                                              type: string
+                                            optional:
+                                              description: Specify whether the Secret
+                                                or its key must be defined
+                                              type: boolean
+                                          required:
+                                            - key
+                                          type: object
+                                          x-kubernetes-map-type: atomic
+                                        type: array
+                                      description: 'ProxyConnectHeader optionally
+                                        specifies headers to send to
+
+                                        proxies during CONNECT requests.
+
+
+                                        It requires Prometheus >= v2.43.0, Alertmanager
+                                        >= v0.25.0 or Thanos >= v0.32.0.'
+                                      type: object
+                                      x-kubernetes-map-type: atomic
+                                    proxyFromEnvironment:
+                                      description: 'Whether to use the proxy configuration
+                                        defined by environment variables (HTTP_PROXY,
+                                        HTTPS_PROXY, and NO_PROXY).
+
+
+                                        It requires Prometheus >= v2.43.0, Alertmanager
+                                        >= v0.25.0 or Thanos >= v0.32.0.'
+                                      type: boolean
+                                    proxyUrl:
+                                      description: '`proxyURL` defines the HTTP proxy
+                                        server to use.'
+                                      pattern: ^(http|https|socks5)://.+$
+                                      type: string
+                                    scopes:
+                                      description: '`scopes` defines the OAuth2 scopes
+                                        used for the token request.'
+                                      items:
+                                        type: string
+                                      type: array
+                                    tlsConfig:
+                                      description: 'TLS configuration to use when
+                                        connecting to the OAuth2 server.
+
+                                        It requires Prometheus >= v2.43.0.'
+                                      properties:
+                                        ca:
+                                          description: Certificate authority used
+                                            when verifying server certificates.
+                                          properties:
+                                            configMap:
+                                              description: ConfigMap containing data
+                                                to use for the targets.
+                                              properties:
+                                                key:
+                                                  description: The key to select.
+                                                  type: string
+                                                name:
+                                                  default: ''
+                                                  description: 'Name of the referent.
+
+                                                    This field is effectively required,
+                                                    but due to backwards compatibility
+                                                    is
+
+                                                    allowed to be empty. Instances
+                                                    of this type with an empty value
+                                                    here are
+
+                                                    almost certainly wrong.
+
+                                                    More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                                                  type: string
+                                                optional:
+                                                  description: Specify whether the
+                                                    ConfigMap or its key must be defined
+                                                  type: boolean
+                                              required:
+                                                - key
+                                              type: object
+                                              x-kubernetes-map-type: atomic
+                                            secret:
+                                              description: Secret containing data
+                                                to use for the targets.
+                                              properties:
+                                                key:
+                                                  description: The key of the secret
+                                                    to select from.  Must be a valid
+                                                    secret key.
+                                                  type: string
+                                                name:
+                                                  default: ''
+                                                  description: 'Name of the referent.
+
+                                                    This field is effectively required,
+                                                    but due to backwards compatibility
+                                                    is
+
+                                                    allowed to be empty. Instances
+                                                    of this type with an empty value
+                                                    here are
+
+                                                    almost certainly wrong.
+
+                                                    More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                                                  type: string
+                                                optional:
+                                                  description: Specify whether the
+                                                    Secret or its key must be defined
+                                                  type: boolean
+                                              required:
+                                                - key
+                                              type: object
+                                              x-kubernetes-map-type: atomic
+                                          type: object
+                                        cert:
+                                          description: Client certificate to present
+                                            when doing client-authentication.
+                                          properties:
+                                            configMap:
+                                              description: ConfigMap containing data
+                                                to use for the targets.
+                                              properties:
+                                                key:
+                                                  description: The key to select.
+                                                  type: string
+                                                name:
+                                                  default: ''
+                                                  description: 'Name of the referent.
+
+                                                    This field is effectively required,
+                                                    but due to backwards compatibility
+                                                    is
+
+                                                    allowed to be empty. Instances
+                                                    of this type with an empty value
+                                                    here are
+
+                                                    almost certainly wrong.
+
+                                                    More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                                                  type: string
+                                                optional:
+                                                  description: Specify whether the
+                                                    ConfigMap or its key must be defined
+                                                  type: boolean
+                                              required:
+                                                - key
+                                              type: object
+                                              x-kubernetes-map-type: atomic
+                                            secret:
+                                              description: Secret containing data
+                                                to use for the targets.
+                                              properties:
+                                                key:
+                                                  description: The key of the secret
+                                                    to select from.  Must be a valid
+                                                    secret key.
+                                                  type: string
+                                                name:
+                                                  default: ''
+                                                  description: 'Name of the referent.
+
+                                                    This field is effectively required,
+                                                    but due to backwards compatibility
+                                                    is
+
+                                                    allowed to be empty. Instances
+                                                    of this type with an empty value
+                                                    here are
+
+                                                    almost certainly wrong.
+
+                                                    More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                                                  type: string
+                                                optional:
+                                                  description: Specify whether the
+                                                    Secret or its key must be defined
+                                                  type: boolean
+                                              required:
+                                                - key
+                                              type: object
+                                              x-kubernetes-map-type: atomic
+                                          type: object
+                                        insecureSkipVerify:
+                                          description: Disable target certificate
+                                            validation.
+                                          type: boolean
+                                        keySecret:
+                                          description: Secret containing the client
+                                            key file for the targets.
+                                          properties:
+                                            key:
+                                              description: The key of the secret to
+                                                select from.  Must be a valid secret
+                                                key.
+                                              type: string
+                                            name:
+                                              default: ''
+                                              description: 'Name of the referent.
+
+                                                This field is effectively required,
+                                                but due to backwards compatibility
+                                                is
+
+                                                allowed to be empty. Instances of
+                                                this type with an empty value here
+                                                are
+
+                                                almost certainly wrong.
+
+                                                More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                                              type: string
+                                            optional:
+                                              description: Specify whether the Secret
+                                                or its key must be defined
+                                              type: boolean
+                                          required:
+                                            - key
+                                          type: object
+                                          x-kubernetes-map-type: atomic
+                                        maxVersion:
+                                          description: 'Maximum acceptable TLS version.
+
+
+                                            It requires Prometheus >= v2.41.0 or Thanos
+                                            >= v0.31.0.'
+                                          enum:
+                                            - TLS10
+                                            - TLS11
+                                            - TLS12
+                                            - TLS13
+                                          type: string
+                                        minVersion:
+                                          description: 'Minimum acceptable TLS version.
+
+
+                                            It requires Prometheus >= v2.35.0 or Thanos
+                                            >= v0.28.0.'
+                                          enum:
+                                            - TLS10
+                                            - TLS11
+                                            - TLS12
+                                            - TLS13
+                                          type: string
+                                        serverName:
+                                          description: Used to verify the hostname
+                                            for the targets.
+                                          type: string
+                                      type: object
+                                    tokenUrl:
+                                      description: '`tokenURL` configures the URL
+                                        to fetch the token from.'
+                                      minLength: 1
+                                      type: string
+                                  required:
+                                    - clientId
+                                    - clientSecret
+                                    - tokenUrl
+                                  type: object
+                                proxyConnectHeader:
+                                  additionalProperties:
+                                    items:
+                                      description: SecretKeySelector selects a key
+                                        of a Secret.
+                                      properties:
+                                        key:
+                                          description: The key of the secret to select
+                                            from.  Must be a valid secret key.
+                                          type: string
+                                        name:
+                                          default: ''
+                                          description: 'Name of the referent.
+
+                                            This field is effectively required, but
+                                            due to backwards compatibility is
+
+                                            allowed to be empty. Instances of this
+                                            type with an empty value here are
+
+                                            almost certainly wrong.
+
+                                            More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                                          type: string
+                                        optional:
+                                          description: Specify whether the Secret
+                                            or its key must be defined
+                                          type: boolean
+                                      required:
+                                        - key
+                                      type: object
+                                      x-kubernetes-map-type: atomic
+                                    type: array
+                                  description: 'ProxyConnectHeader optionally specifies
+                                    headers to send to
+
+                                    proxies during CONNECT requests.
+
+
+                                    It requires Prometheus >= v2.43.0, Alertmanager
+                                    >= v0.25.0 or Thanos >= v0.32.0.'
+                                  type: object
+                                  x-kubernetes-map-type: atomic
+                                proxyFromEnvironment:
+                                  description: 'Whether to use the proxy configuration
+                                    defined by environment variables (HTTP_PROXY,
+                                    HTTPS_PROXY, and NO_PROXY).
+
+
+                                    It requires Prometheus >= v2.43.0, Alertmanager
+                                    >= v0.25.0 or Thanos >= v0.32.0.'
+                                  type: boolean
+                                proxyURL:
+                                  description: 'Optional proxy URL.
+
+
+                                    If defined, this field takes precedence over `proxyUrl`.'
+                                  type: string
+                                proxyUrl:
+                                  description: '`proxyURL` defines the HTTP proxy
+                                    server to use.'
+                                  pattern: ^(http|https|socks5)://.+$
+                                  type: string
+                                tlsConfig:
+                                  description: TLS configuration for the client.
+                                  properties:
+                                    ca:
+                                      description: Certificate authority used when
+                                        verifying server certificates.
+                                      properties:
+                                        configMap:
+                                          description: ConfigMap containing data to
+                                            use for the targets.
+                                          properties:
+                                            key:
+                                              description: The key to select.
+                                              type: string
+                                            name:
+                                              default: ''
+                                              description: 'Name of the referent.
+
+                                                This field is effectively required,
+                                                but due to backwards compatibility
+                                                is
+
+                                                allowed to be empty. Instances of
+                                                this type with an empty value here
+                                                are
+
+                                                almost certainly wrong.
+
+                                                More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                                              type: string
+                                            optional:
+                                              description: Specify whether the ConfigMap
+                                                or its key must be defined
+                                              type: boolean
+                                          required:
+                                            - key
+                                          type: object
+                                          x-kubernetes-map-type: atomic
+                                        secret:
+                                          description: Secret containing data to use
+                                            for the targets.
+                                          properties:
+                                            key:
+                                              description: The key of the secret to
+                                                select from.  Must be a valid secret
+                                                key.
+                                              type: string
+                                            name:
+                                              default: ''
+                                              description: 'Name of the referent.
+
+                                                This field is effectively required,
+                                                but due to backwards compatibility
+                                                is
+
+                                                allowed to be empty. Instances of
+                                                this type with an empty value here
+                                                are
+
+                                                almost certainly wrong.
+
+                                                More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                                              type: string
+                                            optional:
+                                              description: Specify whether the Secret
+                                                or its key must be defined
+                                              type: boolean
+                                          required:
+                                            - key
+                                          type: object
+                                          x-kubernetes-map-type: atomic
+                                      type: object
+                                    cert:
+                                      description: Client certificate to present when
+                                        doing client-authentication.
+                                      properties:
+                                        configMap:
+                                          description: ConfigMap containing data to
+                                            use for the targets.
+                                          properties:
+                                            key:
+                                              description: The key to select.
+                                              type: string
+                                            name:
+                                              default: ''
+                                              description: 'Name of the referent.
+
+                                                This field is effectively required,
+                                                but due to backwards compatibility
+                                                is
+
+                                                allowed to be empty. Instances of
+                                                this type with an empty value here
+                                                are
+
+                                                almost certainly wrong.
+
+                                                More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                                              type: string
+                                            optional:
+                                              description: Specify whether the ConfigMap
+                                                or its key must be defined
+                                              type: boolean
+                                          required:
+                                            - key
+                                          type: object
+                                          x-kubernetes-map-type: atomic
+                                        secret:
+                                          description: Secret containing data to use
+                                            for the targets.
+                                          properties:
+                                            key:
+                                              description: The key of the secret to
+                                                select from.  Must be a valid secret
+                                                key.
+                                              type: string
+                                            name:
+                                              default: ''
+                                              description: 'Name of the referent.
+
+                                                This field is effectively required,
+                                                but due to backwards compatibility
+                                                is
+
+                                                allowed to be empty. Instances of
+                                                this type with an empty value here
+                                                are
+
+                                                almost certainly wrong.
+
+                                                More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                                              type: string
+                                            optional:
+                                              description: Specify whether the Secret
+                                                or its key must be defined
+                                              type: boolean
+                                          required:
+                                            - key
+                                          type: object
+                                          x-kubernetes-map-type: atomic
+                                      type: object
+                                    insecureSkipVerify:
+                                      description: Disable target certificate validation.
+                                      type: boolean
+                                    keySecret:
+                                      description: Secret containing the client key
+                                        file for the targets.
+                                      properties:
+                                        key:
+                                          description: The key of the secret to select
+                                            from.  Must be a valid secret key.
+                                          type: string
+                                        name:
+                                          default: ''
+                                          description: 'Name of the referent.
+
+                                            This field is effectively required, but
+                                            due to backwards compatibility is
+
+                                            allowed to be empty. Instances of this
+                                            type with an empty value here are
+
+                                            almost certainly wrong.
+
+                                            More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                                          type: string
+                                        optional:
+                                          description: Specify whether the Secret
+                                            or its key must be defined
+                                          type: boolean
+                                      required:
+                                        - key
+                                      type: object
+                                      x-kubernetes-map-type: atomic
+                                    maxVersion:
+                                      description: 'Maximum acceptable TLS version.
+
+
+                                        It requires Prometheus >= v2.41.0 or Thanos
+                                        >= v0.31.0.'
+                                      enum:
+                                        - TLS10
+                                        - TLS11
+                                        - TLS12
+                                        - TLS13
+                                      type: string
+                                    minVersion:
+                                      description: 'Minimum acceptable TLS version.
+
+
+                                        It requires Prometheus >= v2.35.0 or Thanos
+                                        >= v0.28.0.'
+                                      enum:
+                                        - TLS10
+                                        - TLS11
+                                        - TLS12
+                                        - TLS13
+                                      type: string
+                                    serverName:
+                                      description: Used to verify the hostname for
+                                        the targets.
+                                      type: string
+                                  type: object
+                              type: object
+                            iconURL:
+                              description: Icon URL for the message.
+                              pattern: ^https?://.+$
+                              type: string
+                            imageURL:
+                              description: Image URL for the message.
+                              pattern: ^https?://.+$
+                              type: string
+                            linkNames:
+                              description: Whether to enable link names.
+                              type: boolean
+                            sendResolved:
+                              description: Whether to notify about resolved alerts.
+                              type: boolean
+                            shortFields:
+                              description: Whether to use short fields.
+                              type: boolean
+                            text:
+                              description: The message text to send, it is optional
+                                because of attachments.
+                              minLength: 1
+                              type: string
+                            thumbURL:
+                              description: Thumbnail URL for the message.
+                              pattern: ^https?://.+$
+                              type: string
+                            title:
+                              description: The message title.
+                              minLength: 1
+                              type: string
+                            titleLink:
+                              description: The title link for the message.
+                              minLength: 1
+                              type: string
+                            token:
+                              description: The sender token.
+                              properties:
+                                key:
+                                  description: The key of the secret to select from.  Must
+                                    be a valid secret key.
+                                  type: string
+                                name:
+                                  default: ''
+                                  description: 'Name of the referent.
+
+                                    This field is effectively required, but due to
+                                    backwards compatibility is
+
+                                    allowed to be empty. Instances of this type with
+                                    an empty value here are
+
+                                    almost certainly wrong.
+
+                                    More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                                  type: string
+                                optional:
+                                  description: Specify whether the Secret or its key
+                                    must be defined
+                                  type: boolean
+                              required:
+                                - key
+                              type: object
+                              x-kubernetes-map-type: atomic
+                            tokenID:
+                              description: The sender token ID.
+                              properties:
+                                key:
+                                  description: The key of the secret to select from.  Must
+                                    be a valid secret key.
+                                  type: string
+                                name:
+                                  default: ''
+                                  description: 'Name of the referent.
+
+                                    This field is effectively required, but due to
+                                    backwards compatibility is
+
+                                    allowed to be empty. Instances of this type with
+                                    an empty value here are
+
+                                    almost certainly wrong.
+
+                                    More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                                  type: string
+                                optional:
+                                  description: Specify whether the Secret or its key
+                                    must be defined
+                                  type: boolean
+                              required:
+                                - key
+                              type: object
+                              x-kubernetes-map-type: atomic
+                          required:
+                            - token
+                            - tokenID
                           type: object
                         type: array
                       slackConfigs:
@@ -13213,7 +14242,7 @@ metadata:
     controller-gen.kubebuilder.io/version: v0.18.0
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
-    operator.prometheus.io/version: 0.84.1
+    operator.prometheus.io/version: 0.85.0
   name: alertmanagers.monitoring.coreos.com
   namespace: monitoring
 spec:
@@ -18997,6 +20026,18 @@ spec:
                   x-kubernetes-list-map-keys:
                     - ip
                   x-kubernetes-list-type: map
+                hostUsers:
+                  description: 'HostUsers supports the user space in Kubernetes.
+
+
+                    More info: https://kubernetes.io/docs/tasks/configure-pod-container/user-namespaces/
+
+
+                    The feature requires at least Kubernetes 1.28 with the `UserNamespacesSupport`
+                    feature gate enabled.
+
+                    Starting Kubernetes 1.33, the feature is enabled by default.'
+                  type: boolean
                 image:
                   description: 'Image if specified has precedence over baseImage,
                     tag and sha
@@ -21086,12 +22127,11 @@ spec:
                     without any of its container crashing for it to be considered
                     available.
 
-                    Defaults to 0 (pod will be considered available as soon as it
-                    is ready)
 
-                    This is an alpha field from kubernetes 1.22 until 1.24 which requires
-                    enabling the StatefulSetMinReadySeconds feature gate.'
+                    If unset, pods will be considered available as soon as they are
+                    ready.'
                   format: int32
+                  minimum: 0
                   type: integer
                 nodeSelector:
                   additionalProperties:
@@ -21102,7 +22142,7 @@ spec:
                   description: 'If set to true all actions on the underlying managed
                     objects are not
 
-                    goint to be performed, except for delete actions.'
+                    going to be performed, except for delete actions.'
                   type: boolean
                 persistentVolumeClaimRetentionPolicy:
                   description: 'The field controls if and how PVCs are deleted during
@@ -26174,7 +27214,7 @@ metadata:
     controller-gen.kubebuilder.io/version: v0.18.0
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
-    operator.prometheus.io/version: 0.84.1
+    operator.prometheus.io/version: 0.85.0
   name: podmonitors.monitoring.coreos.com
   namespace: monitoring
 spec:
@@ -27582,7 +28622,11 @@ spec:
                   description: 'Whether to scrape a classic histogram that is also
                     exposed as a native histogram.
 
-                    It requires Prometheus >= v2.45.0.'
+                    It requires Prometheus >= v2.45.0.
+
+
+                    Notice: `scrapeClassicHistograms` corresponds to the `always_scrape_classic_histograms`
+                    field in the Prometheus configuration.'
                   type: boolean
                 scrapeProtocols:
                   description: '`scrapeProtocols` defines the protocols to negotiate
@@ -27719,7 +28763,7 @@ metadata:
     controller-gen.kubebuilder.io/version: v0.18.0
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
-    operator.prometheus.io/version: 0.84.1
+    operator.prometheus.io/version: 0.85.0
   name: probes.monitoring.coreos.com
   namespace: monitoring
 spec:
@@ -28506,6 +29550,36 @@ spec:
                     - clientSecret
                     - tokenUrl
                   type: object
+                params:
+                  description: 'The list of HTTP query parameters for the scrape.
+
+                    Please note that the `.spec.module` field takes precedence over
+                    the `module` parameter from this list when both are defined.
+
+                    The module name must be added using Module under ProbeSpec.'
+                  items:
+                    description: ProbeParam defines specification of extra parameters
+                      for a Probe.
+                    properties:
+                      name:
+                        description: The parameter name
+                        minLength: 1
+                        type: string
+                      values:
+                        description: The parameter values
+                        items:
+                          minLength: 1
+                          type: string
+                        minItems: 1
+                        type: array
+                    required:
+                      - name
+                    type: object
+                  minItems: 1
+                  type: array
+                  x-kubernetes-list-map-keys:
+                    - name
+                  x-kubernetes-list-type: map
                 prober:
                   description: 'Specification for the prober to use for probing targets.
 
@@ -28615,7 +29689,11 @@ spec:
                   description: 'Whether to scrape a classic histogram that is also
                     exposed as a native histogram.
 
-                    It requires Prometheus >= v2.45.0.'
+                    It requires Prometheus >= v2.45.0.
+
+
+                    Notice: `scrapeClassicHistograms` corresponds to the `always_scrape_classic_histograms`
+                    field in the Prometheus configuration.'
                   type: boolean
                 scrapeProtocols:
                   description: '`scrapeProtocols` defines the protocols to negotiate
@@ -29203,7 +30281,7 @@ metadata:
     controller-gen.kubebuilder.io/version: v0.18.0
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
-    operator.prometheus.io/version: 0.84.1
+    operator.prometheus.io/version: 0.85.0
   name: prometheusagents.monitoring.coreos.com
   namespace: monitoring
 spec:
@@ -33644,6 +34722,18 @@ spec:
 
                     to a different value).'
                   type: boolean
+                hostUsers:
+                  description: 'HostUsers supports the user space in Kubernetes.
+
+
+                    More info: https://kubernetes.io/docs/tasks/configure-pod-container/user-namespaces/
+
+
+                    The feature requires at least Kubernetes 1.28 with the `UserNamespacesSupport`
+                    feature gate enabled.
+
+                    Starting Kubernetes 1.33, the feature is enabled by default.'
+                  type: boolean
                 ignoreNamespaceSelectors:
                   description: 'When true, `spec.namespaceSelector` from all PodMonitor,
                     ServiceMonitor
@@ -35804,14 +36894,11 @@ spec:
                     without any of its container crashing for it to be considered
                     available.
 
-                    Defaults to 0 (pod will be considered available as soon as it
-                    is ready)
 
-
-                    This is an alpha field from kubernetes 1.22 until 1.24 which requires
-
-                    enabling the StatefulSetMinReadySeconds feature gate.'
+                    If unset, pods will be considered available as soon as they are
+                    ready.'
                   format: int32
+                  minimum: 0
                   type: integer
                 mode:
                   description: 'Mode defines how the Prometheus operator deploys the
@@ -35866,6 +36953,20 @@ spec:
 
                         It requires Prometheus >= v3.4.0.'
                       type: boolean
+                    ignoreResourceAttributes:
+                      description: 'List of OpenTelemetry resource attributes to ignore
+                        when `promoteAllResourceAttributes` is true.
+
+
+                        It requires `promoteAllResourceAttributes` to be true.
+
+                        It requires Prometheus >= v3.5.0.'
+                      items:
+                        minLength: 1
+                        type: string
+                      minItems: 1
+                      type: array
+                      x-kubernetes-list-type: set
                     keepIdentifyingResourceAttributes:
                       description: 'Enables adding `service.name`, `service.namespace`
                         and `service.instance.id`
@@ -35876,9 +36977,20 @@ spec:
 
                         It requires Prometheus >= v3.1.0.'
                       type: boolean
+                    promoteAllResourceAttributes:
+                      description: 'Promote all resource attributes to metric labels
+                        except the ones defined in `ignoreResourceAttributes`.
+
+
+                        Cannot be true when `promoteResourceAttributes` is defined.
+
+                        It requires Prometheus >= v3.5.0.'
+                      type: boolean
                     promoteResourceAttributes:
-                      description: List of OpenTelemetry Attributes that should be
+                      description: 'List of OpenTelemetry Attributes that should be
                         promoted to metric labels, defaults to none.
+
+                        Cannot be defined when `promoteAllResourceAttributes` is true.'
                       items:
                         minLength: 1
                         type: string
@@ -38397,6 +39509,11 @@ spec:
                 scrapeClassicHistograms:
                   description: 'Whether to scrape a classic histogram that is also
                     exposed as a native histogram.
+
+
+                    Notice: `scrapeClassicHistograms` corresponds to the `always_scrape_classic_histograms`
+                    field in the Prometheus configuration.
+
 
                     It requires Prometheus >= v3.5.0.'
                   type: boolean
@@ -43881,6 +44998,10 @@ spec:
                 - message: persistentVolumeClaimRetentionPolicy cannot be set when
                     mode is DaemonSet
                   rule: '!(has(self.mode) && self.mode == ''DaemonSet'' && has(self.persistentVolumeClaimRetentionPolicy))'
+                - message: scrapeConfigSelector cannot be set when mode is DaemonSet
+                  rule: '!(has(self.mode) && self.mode == ''DaemonSet'' && has(self.scrapeConfigSelector))'
+                - message: probeSelector cannot be set when mode is DaemonSet
+                  rule: '!(has(self.mode) && self.mode == ''DaemonSet'' && has(self.probeSelector))'
             status:
               description: 'Most recent observed status of the Prometheus cluster.
                 Read-only.
@@ -44050,7 +45171,7 @@ metadata:
     controller-gen.kubebuilder.io/version: v0.18.0
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
-    operator.prometheus.io/version: 0.84.1
+    operator.prometheus.io/version: 0.85.0
   name: prometheuses.monitoring.coreos.com
   namespace: monitoring
 spec:
@@ -49463,6 +50584,18 @@ spec:
 
                     to a different value).'
                   type: boolean
+                hostUsers:
+                  description: 'HostUsers supports the user space in Kubernetes.
+
+
+                    More info: https://kubernetes.io/docs/tasks/configure-pod-container/user-namespaces/
+
+
+                    The feature requires at least Kubernetes 1.28 with the `UserNamespacesSupport`
+                    feature gate enabled.
+
+                    Starting Kubernetes 1.33, the feature is enabled by default.'
+                  type: boolean
                 ignoreNamespaceSelectors:
                   description: 'When true, `spec.namespaceSelector` from all PodMonitor,
                     ServiceMonitor
@@ -51623,14 +52756,11 @@ spec:
                     without any of its container crashing for it to be considered
                     available.
 
-                    Defaults to 0 (pod will be considered available as soon as it
-                    is ready)
 
-
-                    This is an alpha field from kubernetes 1.22 until 1.24 which requires
-
-                    enabling the StatefulSetMinReadySeconds feature gate.'
+                    If unset, pods will be considered available as soon as they are
+                    ready.'
                   format: int32
+                  minimum: 0
                   type: integer
                 nameEscapingScheme:
                   description: 'Specifies the character escaping scheme that will
@@ -51674,6 +52804,20 @@ spec:
 
                         It requires Prometheus >= v3.4.0.'
                       type: boolean
+                    ignoreResourceAttributes:
+                      description: 'List of OpenTelemetry resource attributes to ignore
+                        when `promoteAllResourceAttributes` is true.
+
+
+                        It requires `promoteAllResourceAttributes` to be true.
+
+                        It requires Prometheus >= v3.5.0.'
+                      items:
+                        minLength: 1
+                        type: string
+                      minItems: 1
+                      type: array
+                      x-kubernetes-list-type: set
                     keepIdentifyingResourceAttributes:
                       description: 'Enables adding `service.name`, `service.namespace`
                         and `service.instance.id`
@@ -51684,9 +52828,20 @@ spec:
 
                         It requires Prometheus >= v3.1.0.'
                       type: boolean
+                    promoteAllResourceAttributes:
+                      description: 'Promote all resource attributes to metric labels
+                        except the ones defined in `ignoreResourceAttributes`.
+
+
+                        Cannot be true when `promoteResourceAttributes` is defined.
+
+                        It requires Prometheus >= v3.5.0.'
+                      type: boolean
                     promoteResourceAttributes:
-                      description: List of OpenTelemetry Attributes that should be
+                      description: 'List of OpenTelemetry Attributes that should be
                         promoted to metric labels, defaults to none.
+
+                        Cannot be defined when `promoteAllResourceAttributes` is true.'
                       items:
                         minLength: 1
                         type: string
@@ -55348,6 +56503,11 @@ spec:
                 scrapeClassicHistograms:
                   description: 'Whether to scrape a classic histogram that is also
                     exposed as a native histogram.
+
+
+                    Notice: `scrapeClassicHistograms` corresponds to the `always_scrape_classic_histograms`
+                    field in the Prometheus configuration.
+
 
                     It requires Prometheus >= v3.5.0.'
                   type: boolean
@@ -61710,7 +62870,7 @@ metadata:
     controller-gen.kubebuilder.io/version: v0.18.0
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
-    operator.prometheus.io/version: 0.84.1
+    operator.prometheus.io/version: 0.85.0
   name: prometheusrules.monitoring.coreos.com
   namespace: monitoring
 spec:
@@ -61901,7 +63061,7 @@ metadata:
     controller-gen.kubebuilder.io/version: v0.18.0
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
-    operator.prometheus.io/version: 0.84.1
+    operator.prometheus.io/version: 0.85.0
   name: scrapeconfigs.monitoring.coreos.com
   namespace: monitoring
 spec:
@@ -64817,6 +65977,7 @@ spec:
                       hostNetworkingHost:
                         description: The host to use if the container is in host networking
                           mode.
+                        minLength: 1
                         type: string
                       matchFirstNetwork:
                         description: 'Configure whether to match the first network
@@ -65231,6 +66392,9 @@ spec:
                         type: object
                       port:
                         description: The port to scrape metrics from.
+                        format: int32
+                        maximum: 65535
+                        minimum: 0
                         type: integer
                       proxyConnectHeader:
                         additionalProperties:
@@ -76555,7 +77719,11 @@ spec:
                   description: 'Whether to scrape a classic histogram that is also
                     exposed as a native histogram.
 
-                    It requires Prometheus >= v2.45.0.'
+                    It requires Prometheus >= v2.45.0.
+
+
+                    Notice: `scrapeClassicHistograms` corresponds to the `always_scrape_classic_histograms`
+                    field in the Prometheus configuration.'
                   type: boolean
                 scrapeInterval:
                   description: ScrapeInterval is the interval between consecutive
@@ -76851,7 +78019,7 @@ metadata:
     controller-gen.kubebuilder.io/version: v0.18.0
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
-    operator.prometheus.io/version: 0.84.1
+    operator.prometheus.io/version: 0.85.0
   name: servicemonitors.monitoring.coreos.com
   namespace: monitoring
 spec:
@@ -78279,7 +79447,11 @@ spec:
                   description: 'Whether to scrape a classic histogram that is also
                     exposed as a native histogram.
 
-                    It requires Prometheus >= v2.45.0.'
+                    It requires Prometheus >= v2.45.0.
+
+
+                    Notice: `scrapeClassicHistograms` corresponds to the `always_scrape_classic_histograms`
+                    field in the Prometheus configuration.'
                   type: boolean
                 scrapeProtocols:
                   description: '`scrapeProtocols` defines the protocols to negotiate
@@ -78530,7 +79702,7 @@ metadata:
     controller-gen.kubebuilder.io/version: v0.18.0
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
-    operator.prometheus.io/version: 0.84.1
+    operator.prometheus.io/version: 0.85.0
   name: thanosrulers.monitoring.coreos.com
   namespace: monitoring
 spec:
@@ -82198,6 +83370,29 @@ spec:
                     - Default
                     - None
                   type: string
+                enableFeatures:
+                  description: 'Enable access to Thanos Ruler feature flags. By default,
+                    no features are enabled.
+
+
+                    Enabling features which are disabled by default is entirely outside
+                    the
+
+                    scope of what the maintainers will support and by doing so, you
+                    accept
+
+                    that this behaviour may break at any time without notice.
+
+
+                    For more information see https://thanos.io/tip/components/rule.md/
+
+
+                    It requires Thanos >= 0.39.0.'
+                  items:
+                    minLength: 1
+                    type: string
+                  type: array
+                  x-kubernetes-list-type: set
                 enableServiceLinks:
                   description: Indicates whether information about services should
                     be injected into pod's environment variables
@@ -82494,6 +83689,18 @@ spec:
                   x-kubernetes-list-map-keys:
                     - ip
                   x-kubernetes-list-type: map
+                hostUsers:
+                  description: 'HostUsers supports the user space in Kubernetes.
+
+
+                    More info: https://kubernetes.io/docs/tasks/configure-pod-container/user-namespaces/
+
+
+                    The feature requires at least Kubernetes 1.28 with the `UserNamespacesSupport`
+                    feature gate enabled.
+
+                    Starting Kubernetes 1.33, the feature is enabled by default.'
+                  type: boolean
                 image:
                   description: Thanos container image URL.
                   type: string
@@ -84555,12 +85762,11 @@ spec:
                     without any of its container crashing for it to be considered
                     available.
 
-                    Defaults to 0 (pod will be considered available as soon as it
-                    is ready)
 
-                    This is an alpha field from kubernetes 1.22 until 1.24 which requires
-                    enabling the StatefulSetMinReadySeconds feature gate.'
+                    If unset, pods will be considered available as soon as they are
+                    ready.'
                   format: int32
+                  minimum: 0
                   type: integer
                 nodeSelector:
                   additionalProperties:
@@ -86095,6 +87301,11 @@ spec:
                   description: Number of thanos ruler instances to deploy.
                   format: int32
                   type: integer
+                resendDelay:
+                  description: Minimum amount of time to wait before resending an
+                    alert to Alertmanager.
+                  pattern: ^(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$
+                  type: string
                 resources:
                   description: 'Resources defines the resource requirements for single
                     Pods.
@@ -86200,6 +87411,16 @@ spec:
                   format: int32
                   minimum: 1
                   type: integer
+                ruleGracePeriod:
+                  description: 'Minimum duration between alert and restored "for"
+                    state.
+
+                    This is maintained only for alerts with configured "for" time
+                    greater than grace period.
+
+                    It requires Thanos >= v0.30.0.'
+                  pattern: ^(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$
+                  type: string
                 ruleNamespaceSelector:
                   description: 'Namespaces to be selected for Rules discovery. If
                     unspecified, only
@@ -91194,8 +92415,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kube-prometheus-stack-prometheus-operator
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     heritage: Helm
     release: kube-prometheus-stack
   name: kube-prometheus-stack-admission
@@ -91237,8 +92458,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kube-prometheus-stack-prometheus-operator
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     heritage: Helm
     release: kube-prometheus-stack
   name: kube-prometheus-stack-admission
@@ -91280,7 +92501,7 @@ metadata:
     app.kubernetes.io/name: prometheus-node-exporter
     app.kubernetes.io/part-of: prometheus-node-exporter
     app.kubernetes.io/version: 1.9.1
-    helm.sh/chart: prometheus-node-exporter-4.47.3
+    helm.sh/chart: prometheus-node-exporter-4.48.0
     release: kube-prometheus-stack
   name: kube-prometheus-stack-prometheus-node-exporter
   namespace: monitoring
@@ -91301,7 +92522,7 @@ spec:
         app.kubernetes.io/name: prometheus-node-exporter
         app.kubernetes.io/part-of: prometheus-node-exporter
         app.kubernetes.io/version: 1.9.1
-        helm.sh/chart: prometheus-node-exporter-4.47.3
+        helm.sh/chart: prometheus-node-exporter-4.48.0
         jobLabel: node-exporter
         release: kube-prometheus-stack
     spec:
@@ -91409,8 +92630,8 @@ metadata:
   labels:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/name: grafana
-    app.kubernetes.io/version: 12.1.0
-    helm.sh/chart: grafana-9.3.2
+    app.kubernetes.io/version: 12.1.1
+    helm.sh/chart: grafana-10.0.0
   name: kube-prometheus-stack-grafana
   namespace: monitoring
 spec:
@@ -91431,8 +92652,8 @@ spec:
       labels:
         app.kubernetes.io/instance: kube-prometheus-stack
         app.kubernetes.io/name: grafana
-        app.kubernetes.io/version: 12.1.0
-        helm.sh/chart: grafana-9.3.2
+        app.kubernetes.io/version: 12.1.1
+        helm.sh/chart: grafana-10.0.0
     spec:
       automountServiceAccountToken: true
       containers:
@@ -91459,7 +92680,7 @@ spec:
               value: http://localhost:3000/api/admin/provisioning/alerting/reload
             - name: REQ_METHOD
               value: POST
-          image: quay.io/kiwigrid/k8s-sidecar:1.30.3
+          image: quay.io/kiwigrid/k8s-sidecar:1.30.10
           imagePullPolicy: IfNotPresent
           name: grafana-sc-alerts
           securityContext:
@@ -91499,7 +92720,7 @@ spec:
               value: http://localhost:3000/api/admin/provisioning/dashboards/reload
             - name: REQ_METHOD
               value: POST
-          image: quay.io/kiwigrid/k8s-sidecar:1.30.3
+          image: quay.io/kiwigrid/k8s-sidecar:1.30.10
           imagePullPolicy: IfNotPresent
           name: grafana-sc-dashboard
           securityContext:
@@ -91537,7 +92758,7 @@ spec:
               value: http://localhost:3000/api/admin/provisioning/datasources/reload
             - name: REQ_METHOD
               value: POST
-          image: quay.io/kiwigrid/k8s-sidecar:1.30.3
+          image: quay.io/kiwigrid/k8s-sidecar:1.30.10
           imagePullPolicy: IfNotPresent
           name: grafana-sc-datasources
           securityContext:
@@ -91573,7 +92794,7 @@ spec:
               value: /var/lib/grafana/plugins
             - name: GF_PATHS_PROVISIONING
               value: /etc/grafana/provisioning
-          image: docker.io/grafana/grafana:12.1.0
+          image: docker.io/grafana/grafana:12.1.1
           imagePullPolicy: IfNotPresent
           livenessProbe:
             failureThreshold: 10
@@ -91682,8 +92903,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kube-state-metrics
     app.kubernetes.io/part-of: kube-state-metrics
-    app.kubernetes.io/version: 2.16.0
-    helm.sh/chart: kube-state-metrics-6.1.4
+    app.kubernetes.io/version: 2.17.0
+    helm.sh/chart: kube-state-metrics-6.3.0
     release: kube-prometheus-stack
   name: kube-prometheus-stack-kube-state-metrics
   namespace: monitoring
@@ -91704,8 +92925,8 @@ spec:
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: kube-state-metrics
         app.kubernetes.io/part-of: kube-state-metrics
-        app.kubernetes.io/version: 2.16.0
-        helm.sh/chart: kube-state-metrics-6.1.4
+        app.kubernetes.io/version: 2.17.0
+        helm.sh/chart: kube-state-metrics-6.3.0
         release: kube-prometheus-stack
     spec:
       automountServiceAccountToken: true
@@ -91713,7 +92934,7 @@ spec:
         - args:
             - --port=8080
             - --resources=certificatesigningrequests,configmaps,cronjobs,daemonsets,deployments,endpoints,horizontalpodautoscalers,ingresses,jobs,leases,limitranges,mutatingwebhookconfigurations,namespaces,networkpolicies,nodes,persistentvolumeclaims,persistentvolumes,poddisruptionbudgets,pods,replicasets,replicationcontrollers,resourcequotas,secrets,services,statefulsets,storageclasses,validatingwebhookconfigurations,volumeattachments
-          image: registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.16.0
+          image: registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.17.0
           imagePullPolicy: IfNotPresent
           livenessProbe:
             failureThreshold: 3
@@ -91770,8 +92991,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kube-prometheus-stack-prometheus-operator
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     heritage: Helm
     release: kube-prometheus-stack
   name: kube-prometheus-stack-operator
@@ -91792,8 +93013,8 @@ spec:
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: kube-prometheus-stack-prometheus-operator
         app.kubernetes.io/part-of: kube-prometheus-stack
-        app.kubernetes.io/version: 76.4.0
-        chart: kube-prometheus-stack-76.4.0
+        app.kubernetes.io/version: 77.11.1
+        chart: kube-prometheus-stack-77.11.1
         heritage: Helm
         release: kube-prometheus-stack
     spec:
@@ -91804,7 +93025,7 @@ spec:
             - --kubelet-endpoints=true
             - --kubelet-endpointslice=false
             - --localhost=127.0.0.1
-            - --prometheus-config-reloader=quay.io/prometheus-operator/prometheus-config-reloader:v0.84.1
+            - --prometheus-config-reloader=quay.io/prometheus-operator/prometheus-config-reloader:v0.85.0
             - --config-reloader-cpu-request=0
             - --config-reloader-cpu-limit=0
             - --config-reloader-memory-request=0
@@ -91816,7 +93037,7 @@ spec:
           env:
             - name: GOGC
               value: '30'
-          image: quay.io/prometheus-operator/prometheus-operator:v0.84.1
+          image: quay.io/prometheus-operator/prometheus-operator:v0.85.0
           imagePullPolicy: IfNotPresent
           livenessProbe:
             failureThreshold: 3
@@ -91897,8 +93118,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     grafana_dashboard: '1'
     heritage: Helm
     release: kube-prometheus-stack
@@ -91983,8 +93204,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     grafana_dashboard: '1'
     heritage: Helm
     release: kube-prometheus-stack
@@ -92103,8 +93324,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     grafana_dashboard: '1'
     heritage: Helm
     release: kube-prometheus-stack
@@ -92163,8 +93384,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     grafana_dashboard: '1'
     heritage: Helm
     release: kube-prometheus-stack
@@ -92231,8 +93452,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     grafana_dashboard: '1'
     heritage: Helm
     release: kube-prometheus-stack
@@ -92276,8 +93497,8 @@ metadata:
   labels:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/name: grafana
-    app.kubernetes.io/version: 12.1.0
-    helm.sh/chart: grafana-9.3.2
+    app.kubernetes.io/version: 12.1.1
+    helm.sh/chart: grafana-10.0.0
   name: kube-prometheus-stack-grafana
   namespace: monitoring
 ---
@@ -92295,8 +93516,8 @@ metadata:
   labels:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/name: grafana
-    app.kubernetes.io/version: 12.1.0
-    helm.sh/chart: grafana-9.3.2
+    app.kubernetes.io/version: 12.1.1
+    helm.sh/chart: grafana-10.0.0
   name: kube-prometheus-stack-grafana-config-dashboards
   namespace: monitoring
 ---
@@ -92318,8 +93539,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     grafana_datasource: '1'
     heritage: Helm
     release: kube-prometheus-stack
@@ -92361,8 +93582,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     grafana_dashboard: '1'
     heritage: Helm
     release: kube-prometheus-stack
@@ -92470,8 +93691,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     grafana_dashboard: '1'
     heritage: Helm
     release: kube-prometheus-stack
@@ -92646,8 +93867,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     grafana_dashboard: '1'
     heritage: Helm
     release: kube-prometheus-stack
@@ -92721,8 +93942,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     grafana_dashboard: '1'
     heritage: Helm
     release: kube-prometheus-stack
@@ -92899,8 +94120,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     grafana_dashboard: '1'
     heritage: Helm
     release: kube-prometheus-stack
@@ -92971,8 +94192,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     grafana_dashboard: '1'
     heritage: Helm
     release: kube-prometheus-stack
@@ -93136,8 +94357,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     grafana_dashboard: '1'
     heritage: Helm
     release: kube-prometheus-stack
@@ -93315,8 +94536,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     grafana_dashboard: '1'
     heritage: Helm
     release: kube-prometheus-stack
@@ -93501,8 +94722,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     grafana_dashboard: '1'
     heritage: Helm
     release: kube-prometheus-stack
@@ -93618,8 +94839,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     grafana_dashboard: '1'
     heritage: Helm
     release: kube-prometheus-stack
@@ -93711,8 +94932,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     grafana_dashboard: '1'
     heritage: Helm
     release: kube-prometheus-stack
@@ -93836,8 +95057,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     grafana_dashboard: '1'
     heritage: Helm
     release: kube-prometheus-stack
@@ -93890,8 +95111,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     grafana_dashboard: '1'
     heritage: Helm
     release: kube-prometheus-stack
@@ -93939,8 +95160,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     grafana_dashboard: '1'
     heritage: Helm
     release: kube-prometheus-stack
@@ -94013,8 +95234,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     grafana_dashboard: '1'
     heritage: Helm
     release: kube-prometheus-stack
@@ -94083,8 +95304,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     grafana_dashboard: '1'
     heritage: Helm
     release: kube-prometheus-stack
@@ -94161,8 +95382,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     grafana_dashboard: '1'
     heritage: Helm
     release: kube-prometheus-stack
@@ -94218,8 +95439,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     grafana_dashboard: '1'
     heritage: Helm
     release: kube-prometheus-stack
@@ -94268,8 +95489,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     grafana_dashboard: '1'
     heritage: Helm
     release: kube-prometheus-stack
@@ -94327,8 +95548,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     grafana_dashboard: '1'
     heritage: Helm
     release: kube-prometheus-stack
@@ -94398,8 +95619,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     grafana_dashboard: '1'
     heritage: Helm
     release: kube-prometheus-stack
@@ -94475,8 +95696,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     grafana_dashboard: '1'
     heritage: Helm
     release: kube-prometheus-stack
@@ -94494,8 +95715,8 @@ metadata:
   labels:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/name: grafana
-    app.kubernetes.io/version: 12.1.0
-    helm.sh/chart: grafana-9.3.2
+    app.kubernetes.io/version: 12.1.1
+    helm.sh/chart: grafana-10.0.0
   name: kube-prometheus-stack-grafana
   namespace: monitoring
 spec:
@@ -94519,8 +95740,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     heritage: Helm
     release: kube-prometheus-stack
   name: alertmanager-kube-prometheus-stack-alertmanager
@@ -94537,8 +95758,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     heritage: Helm
     release: kube-prometheus-stack
     self-monitor: 'true'
@@ -94571,8 +95792,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     heritage: Helm
     jobLabel: coredns
     release: kube-prometheus-stack
@@ -94599,8 +95820,8 @@ metadata:
   labels:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/name: grafana
-    app.kubernetes.io/version: 12.1.0
-    helm.sh/chart: grafana-9.3.2
+    app.kubernetes.io/version: 12.1.1
+    helm.sh/chart: grafana-10.0.0
   name: kube-prometheus-stack-grafana
   namespace: monitoring
 spec:
@@ -94608,7 +95829,7 @@ spec:
     - name: http-web
       port: 80
       protocol: TCP
-      targetPort: 3000
+      targetPort: grafana
   selector:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/name: grafana
@@ -94625,8 +95846,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     heritage: Helm
     jobLabel: kube-controller-manager
     release: kube-prometheus-stack
@@ -94654,8 +95875,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     heritage: Helm
     jobLabel: kube-etcd
     release: kube-prometheus-stack
@@ -94683,8 +95904,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     heritage: Helm
     jobLabel: kube-scheduler
     release: kube-prometheus-stack
@@ -94713,8 +95934,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kube-state-metrics
     app.kubernetes.io/part-of: kube-state-metrics
-    app.kubernetes.io/version: 2.16.0
-    helm.sh/chart: kube-state-metrics-6.1.4
+    app.kubernetes.io/version: 2.17.0
+    helm.sh/chart: kube-state-metrics-6.3.0
     release: kube-prometheus-stack
   name: kube-prometheus-stack-kube-state-metrics
   namespace: monitoring
@@ -94723,7 +95944,7 @@ spec:
     - name: http
       port: 8080
       protocol: TCP
-      targetPort: 8080
+      targetPort: http
   selector:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/name: kube-state-metrics
@@ -94742,8 +95963,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kube-prometheus-stack-prometheus-operator
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     heritage: Helm
     release: kube-prometheus-stack
   name: kube-prometheus-stack-operator
@@ -94769,8 +95990,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     heritage: Helm
     release: kube-prometheus-stack
     self-monitor: 'true'
@@ -94806,7 +96027,7 @@ metadata:
     app.kubernetes.io/name: prometheus-node-exporter
     app.kubernetes.io/part-of: prometheus-node-exporter
     app.kubernetes.io/version: 1.9.1
-    helm.sh/chart: prometheus-node-exporter-4.47.3
+    helm.sh/chart: prometheus-node-exporter-4.48.0
     jobLabel: node-exporter
     release: kube-prometheus-stack
   name: kube-prometheus-stack-prometheus-node-exporter
@@ -94836,8 +96057,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kube-prometheus-stack-alertmanager
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     heritage: Helm
     release: kube-prometheus-stack
   name: kube-prometheus-stack-alertmanager
@@ -94853,8 +96074,8 @@ metadata:
   labels:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/name: grafana
-    app.kubernetes.io/version: 12.1.0
-    helm.sh/chart: grafana-9.3.2
+    app.kubernetes.io/version: 12.1.1
+    helm.sh/chart: grafana-10.0.0
   name: kube-prometheus-stack-grafana
   namespace: monitoring
 ---
@@ -94871,8 +96092,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kube-state-metrics
     app.kubernetes.io/part-of: kube-state-metrics
-    app.kubernetes.io/version: 2.16.0
-    helm.sh/chart: kube-state-metrics-6.1.4
+    app.kubernetes.io/version: 2.17.0
+    helm.sh/chart: kube-state-metrics-6.3.0
     release: kube-prometheus-stack
   name: kube-prometheus-stack-kube-state-metrics
   namespace: monitoring
@@ -94891,8 +96112,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kube-prometheus-stack-prometheus-operator
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     heritage: Helm
     release: kube-prometheus-stack
   name: kube-prometheus-stack-operator
@@ -94912,8 +96133,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kube-prometheus-stack-prometheus
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     heritage: Helm
     release: kube-prometheus-stack
   name: kube-prometheus-stack-prometheus
@@ -94933,7 +96154,7 @@ metadata:
     app.kubernetes.io/name: prometheus-node-exporter
     app.kubernetes.io/part-of: prometheus-node-exporter
     app.kubernetes.io/version: 1.9.1
-    helm.sh/chart: prometheus-node-exporter-4.47.3
+    helm.sh/chart: prometheus-node-exporter-4.48.0
     release: kube-prometheus-stack
   name: kube-prometheus-stack-prometheus-node-exporter
   namespace: monitoring
@@ -94949,8 +96170,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     heritage: Helm
     release: kube-prometheus-stack
   name: kube-prometheus-stack-alertmanager
@@ -95007,8 +96228,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     heritage: Helm
     release: kube-prometheus-stack
   name: kube-prometheus-stack-prometheus
@@ -95042,7 +96263,7 @@ spec:
   enableOTLPReceiver: false
   externalUrl: http://kube-prometheus-stack-prometheus.monitoring:9090
   hostNetwork: false
-  image: quay.io/prometheus/prometheus:v3.5.0
+  image: quay.io/prometheus/prometheus:v3.6.0
   imagePullPolicy: IfNotPresent
   listenLocal: false
   logFormat: logfmt
@@ -95088,7 +96309,7 @@ spec:
         storageClassName: rook-ceph-block
   tsdb:
     outOfOrderTimeWindow: 0s
-  version: v3.5.0
+  version: v3.6.0
   walCompression: true
 ---
 apiVersion: monitoring.coreos.com/v1
@@ -95102,8 +96323,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     heritage: Helm
     release: kube-prometheus-stack
   name: kube-prometheus-stack-alertmanager.rules
@@ -95247,8 +96468,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     heritage: Helm
     release: kube-prometheus-stack
   name: kube-prometheus-stack-config-reloaders
@@ -95283,8 +96504,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     heritage: Helm
     release: kube-prometheus-stack
   name: kube-prometheus-stack-etcd
@@ -95483,8 +96704,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     heritage: Helm
     release: kube-prometheus-stack
   name: kube-prometheus-stack-general.rules
@@ -95565,8 +96786,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     heritage: Helm
     release: kube-prometheus-stack
   name: kube-prometheus-stack-k8s.rules.container-cpu-usage-seconds-tot
@@ -95599,8 +96820,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     heritage: Helm
     release: kube-prometheus-stack
   name: kube-prometheus-stack-k8s.rules.container-memory-cache
@@ -95626,8 +96847,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     heritage: Helm
     release: kube-prometheus-stack
   name: kube-prometheus-stack-k8s.rules.container-memory-rss
@@ -95653,8 +96874,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     heritage: Helm
     release: kube-prometheus-stack
   name: kube-prometheus-stack-k8s.rules.container-memory-swap
@@ -95680,8 +96901,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     heritage: Helm
     release: kube-prometheus-stack
   name: kube-prometheus-stack-k8s.rules.container-memory-working-set-by
@@ -95707,8 +96928,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     heritage: Helm
     release: kube-prometheus-stack
   name: kube-prometheus-stack-k8s.rules.container-resource
@@ -95777,8 +96998,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     heritage: Helm
     release: kube-prometheus-stack
   name: kube-prometheus-stack-k8s.rules.pod-owner
@@ -95878,8 +97099,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     heritage: Helm
     release: kube-prometheus-stack
   name: kube-prometheus-stack-kube-apiserver-availability.rules
@@ -95974,8 +97195,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     heritage: Helm
     release: kube-prometheus-stack
   name: kube-prometheus-stack-kube-apiserver-burnrate.rules
@@ -96192,8 +97413,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     heritage: Helm
     release: kube-prometheus-stack
   name: kube-prometheus-stack-kube-apiserver-histogram.rules
@@ -96226,8 +97447,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     heritage: Helm
     release: kube-prometheus-stack
   name: kube-prometheus-stack-kube-apiserver-slos
@@ -96312,8 +97533,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     heritage: Helm
     release: kube-prometheus-stack
   name: kube-prometheus-stack-kube-prometheus-general.rules
@@ -96338,8 +97559,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     heritage: Helm
     release: kube-prometheus-stack
   name: kube-prometheus-stack-kube-prometheus-node-recording.rules
@@ -96376,8 +97597,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     heritage: Helm
     release: kube-prometheus-stack
   name: kube-prometheus-stack-kube-scheduler.rules
@@ -96443,8 +97664,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     heritage: Helm
     release: kube-prometheus-stack
   name: kube-prometheus-stack-kube-state-metrics
@@ -96515,8 +97736,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     heritage: Helm
     release: kube-prometheus-stack
   name: kube-prometheus-stack-kubelet.rules
@@ -96561,8 +97782,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     heritage: Helm
     release: kube-prometheus-stack
   name: kube-prometheus-stack-kubernetes-apps
@@ -96821,8 +98042,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     heritage: Helm
     release: kube-prometheus-stack
   name: kube-prometheus-stack-kubernetes-resources
@@ -96871,14 +98092,14 @@ spec:
             severity: warning
         - alert: KubeCPUQuotaOvercommit
           annotations:
-            description: Cluster {{ $labels.cluster }}  has overcommitted CPU resource
+            description: Cluster {{ $labels.cluster }} has overcommitted CPU resource
               requests for Namespaces.
             runbook_url: https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubecpuquotaovercommit
             summary: Cluster has overcommitted CPU resource requests.
-          expr: "sum(min without(resource) (kube_resourcequota{job=\"kube-state-metrics\"\
-            , type=\"hard\", resource=~\"(cpu|requests.cpu)\"})) by (cluster)\n  /\n\
-            sum(kube_node_status_allocatable{resource=\"cpu\", job=\"kube-state-metrics\"\
-            }) by (cluster)\n  > 1.5"
+          expr: "sum by (cluster) (\n  min without(resource) (kube_resourcequota{job=\"\
+            kube-state-metrics\", type=\"hard\", resource=~\"(cpu|requests.cpu)\"\
+            })\n)\n/\nsum by (cluster) (\n  kube_node_status_allocatable{resource=\"\
+            cpu\", job=\"kube-state-metrics\"}\n) > 1.5"
           for: 5m
           labels:
             severity: warning
@@ -96888,10 +98109,10 @@ spec:
               requests for Namespaces.
             runbook_url: https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubememoryquotaovercommit
             summary: Cluster has overcommitted memory resource requests.
-          expr: "sum(min without(resource) (kube_resourcequota{job=\"kube-state-metrics\"\
-            , type=\"hard\", resource=~\"(memory|requests.memory)\"})) by (cluster)\n\
-            \  /\nsum(kube_node_status_allocatable{resource=\"memory\", job=\"kube-state-metrics\"\
-            }) by (cluster)\n  > 1.5"
+          expr: "sum by (cluster) (\n  min without(resource) (kube_resourcequota{job=\"\
+            kube-state-metrics\", type=\"hard\", resource=~\"(memory|requests.memory)\"\
+            })\n)\n/\nsum by (cluster) (\n  kube_node_status_allocatable{resource=\"\
+            memory\", job=\"kube-state-metrics\"}\n) > 1.5"
           for: 5m
           labels:
             severity: warning
@@ -96962,8 +98183,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     heritage: Helm
     release: kube-prometheus-stack
   name: kube-prometheus-stack-kubernetes-storage
@@ -97078,8 +98299,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     heritage: Helm
     release: kube-prometheus-stack
   name: kube-prometheus-stack-kubernetes-system
@@ -97124,8 +98345,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     heritage: Helm
     release: kube-prometheus-stack
   name: kube-prometheus-stack-kubernetes-system-apiserver
@@ -97227,8 +98448,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     heritage: Helm
     release: kube-prometheus-stack
   name: kube-prometheus-stack-kubernetes-system-controller-manager
@@ -97259,8 +98480,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     heritage: Helm
     release: kube-prometheus-stack
   name: kube-prometheus-stack-kubernetes-system-kubelet
@@ -97470,8 +98691,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     heritage: Helm
     release: kube-prometheus-stack
   name: kube-prometheus-stack-kubernetes-system-scheduler
@@ -97501,8 +98722,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     heritage: Helm
     release: kube-prometheus-stack
   name: kube-prometheus-stack-node-exporter
@@ -97858,8 +99079,9 @@ spec:
             description: Bonding interface {{ $labels.master }} on {{ $labels.instance
               }} is in degraded state due to one or more slave failures.
             runbook_url: https://runbooks.prometheus-operator.dev/runbooks/node/nodebondingdegraded
-            summary: Bonding interface is degraded
-          expr: (node_bonding_slaves - node_bonding_active) != 0
+            summary: Bonding interface is degraded.
+          expr: (node_bonding_slaves{job="node-exporter"} - node_bonding_active{job="node-exporter"})
+            != 0
           for: 5m
           labels:
             severity: warning
@@ -97875,8 +99097,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     heritage: Helm
     release: kube-prometheus-stack
   name: kube-prometheus-stack-node-exporter.rules
@@ -97932,8 +99154,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     heritage: Helm
     release: kube-prometheus-stack
   name: kube-prometheus-stack-node-network
@@ -97966,8 +99188,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     heritage: Helm
     release: kube-prometheus-stack
   name: kube-prometheus-stack-node.rules
@@ -98008,8 +99230,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     heritage: Helm
     release: kube-prometheus-stack
   name: kube-prometheus-stack-prometheus
@@ -98196,9 +99418,9 @@ spec:
             summary: Prometheus remote write is behind.
           expr: "# Without max_over_time, failed scrapes could create false negatives,\
             \ see\n# https://www.robustperception.io/alerting-on-gauges-in-prometheus-2-0\
-            \ for details.\n(\n  max_over_time(prometheus_remote_storage_highest_timestamp_in_seconds{job=\"\
-            kube-prometheus-stack-prometheus\",namespace=\"monitoring\"}[5m])\n- ignoring(remote_name,\
-            \ url) group_right\n  max_over_time(prometheus_remote_storage_queue_highest_sent_timestamp_seconds{job=\"\
+            \ for details.\n(\n  max_over_time(prometheus_remote_storage_queue_highest_timestamp_seconds{job=\"\
+            kube-prometheus-stack-prometheus\",namespace=\"monitoring\"}[5m])\n-\n\
+            \  max_over_time(prometheus_remote_storage_queue_highest_sent_timestamp_seconds{job=\"\
             kube-prometheus-stack-prometheus\",namespace=\"monitoring\"}[5m])\n)\n\
             > 120"
           for: 15m
@@ -98349,8 +99571,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     heritage: Helm
     release: kube-prometheus-stack
   name: kube-prometheus-stack-prometheus-operator
@@ -98466,8 +99688,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     heritage: Helm
     release: kube-prometheus-stack
   name: kube-prometheus-stack-alertmanager
@@ -98499,8 +99721,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     heritage: Helm
     release: kube-prometheus-stack
   name: kube-prometheus-stack-apiserver
@@ -98540,8 +99762,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     heritage: Helm
     release: kube-prometheus-stack
   name: kube-prometheus-stack-coredns
@@ -98568,8 +99790,8 @@ metadata:
   labels:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/name: grafana
-    app.kubernetes.io/version: 12.1.0
-    helm.sh/chart: grafana-9.3.2
+    app.kubernetes.io/version: 12.1.1
+    helm.sh/chart: grafana-10.0.0
   name: kube-prometheus-stack-grafana
   namespace: monitoring
 spec:
@@ -98599,8 +99821,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     heritage: Helm
     release: kube-prometheus-stack
   name: kube-prometheus-stack-kube-controller-manager
@@ -98633,8 +99855,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     heritage: Helm
     release: kube-prometheus-stack
   name: kube-prometheus-stack-kube-etcd
@@ -98663,8 +99885,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     heritage: Helm
     release: kube-prometheus-stack
   name: kube-prometheus-stack-kube-scheduler
@@ -98698,8 +99920,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kube-state-metrics
     app.kubernetes.io/part-of: kube-state-metrics
-    app.kubernetes.io/version: 2.16.0
-    helm.sh/chart: kube-state-metrics-6.1.4
+    app.kubernetes.io/version: 2.17.0
+    helm.sh/chart: kube-state-metrics-6.3.0
     release: kube-prometheus-stack
   name: kube-prometheus-stack-kube-state-metrics
   namespace: monitoring
@@ -98724,8 +99946,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     heritage: Helm
     release: kube-prometheus-stack
   name: kube-prometheus-stack-kubelet
@@ -98841,8 +100063,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kube-prometheus-stack-prometheus-operator
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     heritage: Helm
     release: kube-prometheus-stack
   name: kube-prometheus-stack-operator
@@ -98870,8 +100092,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     heritage: Helm
     release: kube-prometheus-stack
   name: kube-prometheus-stack-prometheus
@@ -98904,7 +100126,7 @@ metadata:
     app.kubernetes.io/name: prometheus-node-exporter
     app.kubernetes.io/part-of: prometheus-node-exporter
     app.kubernetes.io/version: 1.9.1
-    helm.sh/chart: prometheus-node-exporter-4.47.3
+    helm.sh/chart: prometheus-node-exporter-4.48.0
     release: kube-prometheus-stack
   name: kube-prometheus-stack-prometheus-node-exporter
   namespace: monitoring
@@ -98930,8 +100152,8 @@ metadata:
   labels:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/name: grafana
-    app.kubernetes.io/version: 12.1.0
-    helm.sh/chart: grafana-9.3.2
+    app.kubernetes.io/version: 12.1.1
+    helm.sh/chart: grafana-10.0.0
   name: kube-prometheus-stack-grafana
   namespace: monitoring
 spec:
@@ -98961,8 +100183,8 @@ metadata:
   labels:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/name: grafana
-    app.kubernetes.io/version: 12.1.0
-    helm.sh/chart: grafana-9.3.2
+    app.kubernetes.io/version: 12.1.1
+    helm.sh/chart: grafana-10.0.0
   name: kube-prometheus-stack-grafana-clusterrole
   namespace: monitoring
 rules:
@@ -98988,8 +100210,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kube-state-metrics
     app.kubernetes.io/part-of: kube-state-metrics
-    app.kubernetes.io/version: 2.16.0
-    helm.sh/chart: kube-state-metrics-6.1.4
+    app.kubernetes.io/version: 2.17.0
+    helm.sh/chart: kube-state-metrics-6.3.0
     release: kube-prometheus-stack
   name: kube-prometheus-stack-kube-state-metrics
   namespace: monitoring
@@ -99204,8 +100426,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kube-prometheus-stack-prometheus-operator
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     heritage: Helm
     release: kube-prometheus-stack
   name: kube-prometheus-stack-operator
@@ -99229,6 +100451,7 @@ rules:
       - thanosrulers/status
       - scrapeconfigs
       - servicemonitors
+      - servicemonitors/status
       - podmonitors
       - probes
       - prometheusrules
@@ -99313,8 +100536,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     heritage: Helm
     release: kube-prometheus-stack
   name: kube-prometheus-stack-prometheus
@@ -99363,8 +100586,8 @@ metadata:
   labels:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/name: grafana
-    app.kubernetes.io/version: 12.1.0
-    helm.sh/chart: grafana-9.3.2
+    app.kubernetes.io/version: 12.1.1
+    helm.sh/chart: grafana-10.0.0
   name: kube-prometheus-stack-grafana-clusterrolebinding
   namespace: monitoring
 roleRef:
@@ -99388,8 +100611,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kube-state-metrics
     app.kubernetes.io/part-of: kube-state-metrics
-    app.kubernetes.io/version: 2.16.0
-    helm.sh/chart: kube-state-metrics-6.1.4
+    app.kubernetes.io/version: 2.17.0
+    helm.sh/chart: kube-state-metrics-6.3.0
     release: kube-prometheus-stack
   name: kube-prometheus-stack-kube-state-metrics
   namespace: monitoring
@@ -99415,8 +100638,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kube-prometheus-stack-prometheus-operator
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     heritage: Helm
     release: kube-prometheus-stack
   name: kube-prometheus-stack-operator
@@ -99441,8 +100664,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 76.4.0
-    chart: kube-prometheus-stack-76.4.0
+    app.kubernetes.io/version: 77.11.1
+    chart: kube-prometheus-stack-77.11.1
     heritage: Helm
     release: kube-prometheus-stack
   name: kube-prometheus-stack-prometheus
@@ -99465,8 +100688,8 @@ metadata:
   labels:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/name: grafana
-    app.kubernetes.io/version: 12.1.0
-    helm.sh/chart: grafana-9.3.2
+    app.kubernetes.io/version: 12.1.1
+    helm.sh/chart: grafana-10.0.0
   name: kube-prometheus-stack-grafana
   namespace: monitoring
 rules: []
@@ -99480,8 +100703,8 @@ metadata:
   labels:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/name: grafana
-    app.kubernetes.io/version: 12.1.0
-    helm.sh/chart: grafana-9.3.2
+    app.kubernetes.io/version: 12.1.1
+    helm.sh/chart: grafana-10.0.0
   name: kube-prometheus-stack-grafana
   namespace: monitoring
 roleRef:
