@@ -30,8 +30,12 @@ in
           "SEARXNG_QUERY_URL" = "http://searxng.apps.svc.cluster.local/search?q=<query>";
           "ENABLE_WEB_SEARCH" = "True";
           "WEB_SEARCH_ENGINE" = "searxng";
-          "IMAGE_GENERATION_ENGINE" = "openai";
+          "IMAGE_GENERATION_ENGINE" = "gemini";
           "IMAGE_GENERATION_MODEL" = "google/gemini-2.5-flash-image-preview";
+          "GEMINI_API_BASE_URL" = "https://openrouter.ai/api/v1/chat/completions";
+          "GEMINI_API_KEY" = kubenix.lib.secretsFor "openrouter_api_key";
+          "IMAGES_GEMINI_API_BASE_URL" = "https://openrouter.ai/api/v1/chat/completions";
+          "IMAGES_GEMINI_API_KEY" = kubenix.lib.secretsFor "openrouter_api_key";
           "ENABLE_IMAGE_GENERATION" = "True";
           "IMAGES_OPENAI_API_BASE_URL"  = "https://openrouter.ai/api/v1";
           "IMAGES_OPENAI_API_KEY" = kubenix.lib.secretsFor "openrouter_api_key";
