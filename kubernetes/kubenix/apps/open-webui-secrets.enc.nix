@@ -27,7 +27,7 @@ in
           "RAG_WEB_SEARCH_ENGINE" = "searxng";
           "RAG_WEB_SEARCH_RESULT_COUNT" = "3";
           "RAG_WEB_SEARCH_CONCURRENT_REQUESTS" = "10";
-          "SEARXNG_QUERY_URL" = "http://searxng/search?q=<query>";
+          "SEARXNG_QUERY_URL" = "http://searxng.apps.svc.cluster.local/search?q=<query>";
           "ENABLE_WEB_SEARCH" = "True";
           "WEB_SEARCH_ENGINE" = "searxng";
           "IMAGE_GENERATION_ENGINE" = "openai";
