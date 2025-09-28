@@ -19,7 +19,7 @@ let
       formats = [ "html" "css" "json" ];
     };
     ui = {
-      default_locale = "en-US";
+      default_locale = "en";
       hotkeys = "vim";
     };
     redis = {
