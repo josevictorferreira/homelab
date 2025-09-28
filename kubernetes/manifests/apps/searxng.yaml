@@ -46,35 +46,6 @@ spec:
             httpGet:
               path: /
               port: http
-          volumeMounts:
-            - mountPath: /etc/searxng/limiter.toml
-              name: limiter
-              readOnly: true
-              subPath: limiter.toml
-      volumes:
-        - configMap:
-            name: searxng-limiter
-          name: limiter
----
-apiVersion: v1
-data:
-  limiter.toml: "[botdetection]\nipv4_prefix = 32\nipv6_prefix = 48\ntrusted_proxies\
-    \ = [\n  '10.10.10.0/24',\n  '10.42.0.0/24',\n  '10.43.0.0/24'\n]\n\n[botdetection.ip_limit]\n\
-    filter_link_local = false\nlink_token = false\n\n[botdetection.ip_lists]\nblock_ip\
-    \ = [\n]\npass_ip = [\n]\npass_searxng_org = true\n"
-kind: ConfigMap
-metadata:
-  annotations:
-    kubenix/k8s-version: '1.32'
-    kubenix/project-name: ze-homelab
-  labels:
-    app.kubernetes.io/instance: searxng
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: searxng
-    app.kubernetes.io/version: 2025.8.20-41a4a3e
-    helm.sh/chart: searxng-1.0.0
-  name: searxng-limiter
-  namespace: apps
 ---
 apiVersion: v1
 kind: Service
