@@ -83,7 +83,7 @@ in
           containers = [
             {
               name = "psql";
-              image = "${imageRep}@${imageTag}";
+              image = "${imageRep}:${imageTag}";
               env = [
                 {
                   name = "PGPASSWORD";
