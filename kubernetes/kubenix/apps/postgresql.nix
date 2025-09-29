@@ -71,7 +71,7 @@ in
           containers = [
             {
               name = "psql";
-              image = "bitnami/postgresql:17";
+              image = "bitnami/postgresql:16";
               env = [
                 {
                   name = "PGPASSWORD";

@@ -221,7 +221,7 @@ spec:
                 secretKeyRef:
                   key: admin-password
                   name: postgresql-auth
-          image: bitnami/postgresql:17
+          image: bitnami/postgresql:16
           name: psql
       restartPolicy: OnFailure
 ---
