@@ -234,7 +234,7 @@ spec:
                 secretKeyRef:
                   key: admin-password
                   name: postgresql-auth
-          image: bitnamisecure/postgresql@sha256-3df41817b00506ab5b0b8ecc3ca3bc5ba3dc1eeb9a3def902beca37393ed4c36
+          image: bitnamisecure/postgresql:sha256-3df41817b00506ab5b0b8ecc3ca3bc5ba3dc1eeb9a3def902beca37393ed4c36
           name: psql
       restartPolicy: OnFailure
 ---
