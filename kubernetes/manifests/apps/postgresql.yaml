@@ -77,7 +77,7 @@ spec:
               value: error
             - name: POSTGRESQL_SHARED_PRELOAD_LIBRARIES
               value: pgaudit
-          image: ghcr.io/tensorchord/pgvecto-rs:pg17-v0.4.0
+          image: docker.io/bitnami/postgresql:17.4.0-debian-12-r8
           imagePullPolicy: IfNotPresent
           livenessProbe:
             exec:
@@ -103,6 +103,9 @@ spec:
                 - -e
                 - 'exec pg_isready -U "postgres" -d "dbname=linkwarden" -h 127.0.0.1
                   -p 5432
+
+                  [ -f /opt/bitnami/postgresql/tmp/.initialized ] || [ -f /bitnami/postgresql/.initialized
+                  ]
 
                   '
             failureThreshold: 6
@@ -216,7 +219,7 @@ spec:
                 secretKeyRef:
                   key: admin-password
                   name: postgresql-auth
-          image: ghcr.io/tensorchord/pgvecto-rs:pg17-v0.4.0
+          image: docker.io/bitnami/postgresql/17.6.0-debian-12-r4
           name: psql
       restartPolicy: OnFailure
 ---
