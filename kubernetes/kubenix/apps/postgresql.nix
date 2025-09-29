@@ -28,6 +28,15 @@ in
       noHooks = true;
       namespace = namespace;
       values = {
+        image = {
+          registry = "ghcr.io";
+          repository = "tensorchord/pgvecto-rs";
+          tag = "pg17-v0.4.0";
+          pullPolicy = "IfNotPresent";
+        };
+
+        global.security.allowInsecureImages = true;
+
         global.postgresql.auth = {
           database = "linkwarden";
           existingSecret = "postgresql-auth";
