@@ -191,7 +191,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: c218f5a1158a5812c63b19866ce9a362c1cdf5b5bd1e8bce475a82eeafe75d12
+        checksum/config: 9c6a4d2415f7ba9fb5e46b263a9cd6e41fd0d407ed1253230a5a22d5ee83fd79
     spec:
       containers:
         - args:
@@ -206,7 +206,10 @@ spec:
               \ 'n8n' exists...\"\npsql -h postgresql -U postgres -d postgres -tAc\
               \ \"SELECT 1 FROM pg_database WHERE datname='n8n'\" | grep -q 1 \\\n\
               \  || psql -h postgresql -U postgres -d postgres -c \"CREATE DATABASE\
-              \ \\\"n8n\\\";\"\n\n"
+              \ \\\"n8n\\\";\"\n\necho \"Ensuring database 'immich' exists...\"\n\
+              psql -h postgresql -U postgres -d postgres -tAc \"SELECT 1 FROM pg_database\
+              \ WHERE datname='immich'\" | grep -q 1 \\\n  || psql -h postgresql -U\
+              \ postgres -d postgres -c \"CREATE DATABASE \\\"immich\\\";\"\n\n"
           command:
             - sh
             - -c
@@ -226,7 +229,9 @@ data:
 
     openwebui
 
-    n8n'
+    n8n
+
+    immich'
 kind: ConfigMap
 metadata:
   annotations:
