@@ -12,7 +12,7 @@ in
         chartUrl = "oci://ghcr.io/immich-app/immich-charts/immich";
         chart = "immich";
         version = "0.9.3";
-        sha256 = "sha256-AVvangTTMY1rakFqTOffJYjuuBPAoGNltCkooWKYmHk=";
+        sha256 = "sha256-UHuuu6u+UjHPgdLONZim6j+nyCINtClcAZRRJlHuaaw=";
       };
       includeCRDs = true;
       noHooks = true;
