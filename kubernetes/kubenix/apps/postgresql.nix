@@ -61,7 +61,7 @@ in
 
     resources.jobs."${jobName}" = {
       metadata = {
-        name = "postgresql-bootstrap-${jobName}";
+        name = jobName;
         namespace = namespace;
       };
       spec.template = {
