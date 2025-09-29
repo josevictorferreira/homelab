@@ -219,7 +219,7 @@ spec:
                 secretKeyRef:
                   key: admin-password
                   name: postgresql-auth
-          image: bitnami/postgresql:16
+          image: ghcr.io/tensorchord/pgvecto-rs:pg17-v0.4.0
           name: psql
       restartPolicy: OnFailure
 ---
