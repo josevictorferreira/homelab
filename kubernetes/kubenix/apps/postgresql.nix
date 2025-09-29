@@ -71,7 +71,7 @@ in
           containers = [
             {
               name = "psql";
-              image = "bitnami/postgresql:16";
+              image = "ghcr.io/tensorchord/pgvecto-rs:pg17-v0.4.0";
               env = [
                 {
                   name = "PGPASSWORD";
