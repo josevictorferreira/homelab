@@ -28,6 +28,11 @@ in
       noHooks = true;
       namespace = namespace;
       values = {
+        image = {
+          repository = "bitnamilegacy/postgresql";
+          tag = "17.6.0-debian-12-r4";
+        };
+
         global.postgresql.auth = {
           database = "linkwarden";
           existingSecret = "postgresql-auth";
@@ -71,7 +76,7 @@ in
           containers = [
             {
               name = "psql";
-              image = "bitnami/postgresql:16";
+              image = "docker.io/bitnamilegacy/postgresql:16";
               env = [
                 {
                   name = "PGPASSWORD";
