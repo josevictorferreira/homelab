@@ -29,6 +29,7 @@ in
       curl
       gnumake
       htop
+      ncdu
     ];
 
     users = {
