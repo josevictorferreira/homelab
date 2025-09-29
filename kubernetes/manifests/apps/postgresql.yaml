@@ -74,7 +74,7 @@ spec:
               value: error
             - name: POSTGRESQL_SHARED_PRELOAD_LIBRARIES
               value: pgaudit
-          image: docker.io/bitnamilegacy/postgresql:17.6.0-debian-12-r4
+          image: docker.io/bitnamisecure/postgresql:sha256-3df41817b00506ab5b0b8ecc3ca3bc5ba3dc1eeb9a3def902beca37393ed4c36
           imagePullPolicy: IfNotPresent
           livenessProbe:
             exec:
@@ -201,17 +201,30 @@ spec:
               \ postgresql -U postgres -d postgres -tAc \"SELECT 1 FROM pg_database\
               \ WHERE datname='linkwarden'\" | grep -q 1 \\\n  || psql -h postgresql\
               \ -U postgres -d postgres -c \"CREATE DATABASE \\\"linkwarden\\\";\"\
-              \n\necho \"Ensuring database 'openwebui' exists...\"\npsql -h postgresql\
-              \ -U postgres -d postgres -tAc \"SELECT 1 FROM pg_database WHERE datname='openwebui'\"\
-              \ | grep -q 1 \\\n  || psql -h postgresql -U postgres -d postgres -c\
-              \ \"CREATE DATABASE \\\"openwebui\\\";\"\n\necho \"Ensuring database\
-              \ 'n8n' exists...\"\npsql -h postgresql -U postgres -d postgres -tAc\
-              \ \"SELECT 1 FROM pg_database WHERE datname='n8n'\" | grep -q 1 \\\n\
-              \  || psql -h postgresql -U postgres -d postgres -c \"CREATE DATABASE\
-              \ \\\"n8n\\\";\"\n\necho \"Ensuring database 'immich' exists...\"\n\
-              psql -h postgresql -U postgres -d postgres -tAc \"SELECT 1 FROM pg_database\
-              \ WHERE datname='immich'\" | grep -q 1 \\\n  || psql -h postgresql -U\
-              \ postgres -d postgres -c \"CREATE DATABASE \\\"immich\\\";\"\n\n"
+              \n\necho \"Installing pgvecto.rs extension in database 'linkwarden'...\"\
+              \npsql -h postgresql -U postgres -d linkwarden -c \"CREATE EXTENSION\
+              \ IF NOT EXISTS vectors;\" || echo \"Extension installation completed\
+              \ for linkwarden\"\n\necho \"Ensuring database 'openwebui' exists...\"\
+              \npsql -h postgresql -U postgres -d postgres -tAc \"SELECT 1 FROM pg_database\
+              \ WHERE datname='openwebui'\" | grep -q 1 \\\n  || psql -h postgresql\
+              \ -U postgres -d postgres -c \"CREATE DATABASE \\\"openwebui\\\";\"\n\
+              \necho \"Installing pgvecto.rs extension in database 'openwebui'...\"\
+              \npsql -h postgresql -U postgres -d openwebui -c \"CREATE EXTENSION\
+              \ IF NOT EXISTS vectors;\" || echo \"Extension installation completed\
+              \ for openwebui\"\n\necho \"Ensuring database 'n8n' exists...\"\npsql\
+              \ -h postgresql -U postgres -d postgres -tAc \"SELECT 1 FROM pg_database\
+              \ WHERE datname='n8n'\" | grep -q 1 \\\n  || psql -h postgresql -U postgres\
+              \ -d postgres -c \"CREATE DATABASE \\\"n8n\\\";\"\n\necho \"Installing\
+              \ pgvecto.rs extension in database 'n8n'...\"\npsql -h postgresql -U\
+              \ postgres -d n8n -c \"CREATE EXTENSION IF NOT EXISTS vectors;\" ||\
+              \ echo \"Extension installation completed for n8n\"\n\necho \"Ensuring\
+              \ database 'immich' exists...\"\npsql -h postgresql -U postgres -d postgres\
+              \ -tAc \"SELECT 1 FROM pg_database WHERE datname='immich'\" | grep -q\
+              \ 1 \\\n  || psql -h postgresql -U postgres -d postgres -c \"CREATE\
+              \ DATABASE \\\"immich\\\";\"\n\necho \"Installing pgvecto.rs extension\
+              \ in database 'immich'...\"\npsql -h postgresql -U postgres -d immich\
+              \ -c \"CREATE EXTENSION IF NOT EXISTS vectors;\" || echo \"Extension\
+              \ installation completed for immich\"\n\n"
           command:
             - sh
             - -c
@@ -221,7 +234,7 @@ spec:
                 secretKeyRef:
                   key: admin-password
                   name: postgresql-auth
-          image: docker.io/bitnamilegacy/postgresql:16
+          image: bitnamisecure/postgresql@sha256-3df41817b00506ab5b0b8ecc3ca3bc5ba3dc1eeb9a3def902beca37393ed4c36
           name: psql
       restartPolicy: OnFailure
 ---
