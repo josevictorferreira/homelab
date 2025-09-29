@@ -1,12 +1,10 @@
 { lib, kubenix, homelab, ... }:
 
 let
-  imageRep = "bitnamisecure/postgresql";
-  imageTag = "sha256-3df41817b00506ab5b0b8ecc3ca3bc5ba3dc1eeb9a3def902beca37393ed4c36";
+  imageRep = "bitnamilegacy/postgresql";
+  imageTag = "17.6.0-debian-12-r4@sha256:926356130b77d5742d8ce605b258d35db9b62f2f8fd1601f9dbaef0c8a710a8d";
   namespace = homelab.kubernetes.namespaces.applications;
   bootstrapDatabases = homelab.kubernetes.databases.postgres;
-  databasesConfig = lib.concatStringsSep "\n" bootstrapDatabases;
-  configChecksum = builtins.hashString "sha256" databasesConfig;
   mkCreateDb = db: ''
     echo "Ensuring database '${db}' exists..."
     psql -h postgresql -U postgres -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname='${db}'" | grep -q 1 \
@@ -16,6 +14,7 @@ let
     psql -h postgresql -U postgres -d ${db} -c "CREATE EXTENSION IF NOT EXISTS vectors;" || echo "Extension installation completed for ${db}"
   '';
   createDbCommands = lib.concatStringsSep "\n" (map mkCreateDb bootstrapDatabases);
+  configChecksum = builtins.hashString "sha256" createDbCommands;
   jobName = "postgresql-bootstrap-${builtins.substring 0 8 configChecksum}";
 in
 {
@@ -67,7 +66,7 @@ in
         namespace = namespace;
       };
       data = {
-        databases = lib.concatStringsSep "\n" bootstrapDatabases;
+        databases = createDbCommands;
       };
     };
 
