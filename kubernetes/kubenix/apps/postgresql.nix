@@ -21,8 +21,8 @@ in
         {
           chartUrl = "oci://registry-1.docker.io/bitnamicharts/postgresql";
           chart = "postgresql";
-          version = "16.5.2";
-          sha256 = "sha256-iJ4clEnUshRP/s/qwkn/07JTSonGzMRV6XpMvwI9pAQ=";
+          version = "16.7.27";
+          sha256 = "sha256-Sl3CjRqPSVl5j8BYNvahUiAZqCUIAK3Xsv/bMFdQ3t8=";
         };
       includeCRDs = true;
       noHooks = true;
