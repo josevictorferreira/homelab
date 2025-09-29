@@ -3,10 +3,20 @@
 let
   namespace = homelab.kubernetes.namespaces.applications;
   bootstrapDatabases = homelab.kubernetes.databases.postgres;
+  databasesConfig = lib.concatStringsSep "\n" bootstrapDatabases;
+  configChecksum = builtins.hashString "sha256" databasesConfig;
+  mkCreateDb = db: ''
+    echo "Ensuring database '${db}' exists..."
+    psql -h postgresql -U postgres -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname='${db}'" | grep -q 1 \
+      || psql -h postgresql -U postgres -d postgres -c "CREATE DATABASE \"${db}\";"
+  '';
+  createDbCommands = lib.concatStringsSep "\n" (map mkCreateDb bootstrapDatabases);
+  jobName = "postgresql-bootstrap-${builtins.substring 0 8 configChecksum}";
 in
 {
   kubernetes = {
-    helm.releases."postgresql" = {
+    helm.releases."postgresql" =
+    {
       chart = kubenix.lib.helm.fetch
         {
           chartUrl = "oci://registry-1.docker.io/bitnamicharts/postgresql";
@@ -49,20 +59,9 @@ in
       };
     };
 
-    resources.jobs."postgresql-bootstrap" =
-    let
-      databasesConfig = lib.concatStringsSep "\n" bootstrapDatabases;
-      configChecksum = builtins.hashString "sha256" databasesConfig;
-      mkCreateDb = db: ''
-        echo "Ensuring database '${db}' exists..."
-        psql -h postgresql -U postgres -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname='${db}'" | grep -q 1 \
-          || psql -h postgresql -U postgres -d postgres -c "CREATE DATABASE \"${db}\";"
-      '';
-      createDbCommands = lib.concatStringsSep "\n" (map mkCreateDb bootstrapDatabases);
-    in
-    {
+    resources.jobs."${jobName}" = {
       metadata = {
-        name = "postgresql-bootstrap";
+        name = "postgresql-bootstrap-${jobName}";
         namespace = namespace;
       };
       spec.template = {
