@@ -1,6 +1,8 @@
 { lib, kubenix, homelab, ... }:
 
 let
+  imageRep = "bitnamisecure/postgresql";
+  imageTag = "sha256-3df41817b00506ab5b0b8ecc3ca3bc5ba3dc1eeb9a3def902beca37393ed4c36";
   namespace = homelab.kubernetes.namespaces.applications;
   bootstrapDatabases = homelab.kubernetes.databases.postgres;
   databasesConfig = lib.concatStringsSep "\n" bootstrapDatabases;
@@ -9,6 +11,9 @@ let
     echo "Ensuring database '${db}' exists..."
     psql -h postgresql -U postgres -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname='${db}'" | grep -q 1 \
       || psql -h postgresql -U postgres -d postgres -c "CREATE DATABASE \"${db}\";"
+
+    echo "Installing pgvecto.rs extension in database '${db}'..."
+    psql -h postgresql -U postgres -d ${db} -c "CREATE EXTENSION IF NOT EXISTS vectors;" || echo "Extension installation completed for ${db}"
   '';
   createDbCommands = lib.concatStringsSep "\n" (map mkCreateDb bootstrapDatabases);
   jobName = "postgresql-bootstrap-${builtins.substring 0 8 configChecksum}";
@@ -29,9 +34,11 @@ in
       namespace = namespace;
       values = {
         image = {
-          repository = "bitnamilegacy/postgresql";
-          tag = "17.6.0-debian-12-r4";
+          repository = imageRep;
+          tag = imageTag;
         };
+
+        global.security.allowInsecureImages = true;
 
         global.postgresql.auth = {
           database = "linkwarden";
@@ -76,7 +83,7 @@ in
           containers = [
             {
               name = "psql";
-              image = "docker.io/bitnamilegacy/postgresql:16";
+              image = "${imageRep}@${imageTag}";
               env = [
                 {
                   name = "PGPASSWORD";
