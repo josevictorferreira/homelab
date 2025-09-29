@@ -71,7 +71,7 @@ in
           containers = [
             {
               name = "psql";
-              image = "docker.io/bitnami/postgresql/17.6.0-debian-12-r4";
+              image = "bitnami/postgresql:17";
               env = [
                 {
                   name = "PGPASSWORD";
