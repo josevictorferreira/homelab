@@ -9,8 +9,8 @@ metadata:
     app.kubernetes.io/instance: postgresql
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: postgresql
-    app.kubernetes.io/version: 17.4.0
-    helm.sh/chart: postgresql-16.5.2
+    app.kubernetes.io/version: 17.6.0
+    helm.sh/chart: postgresql-16.7.27
   name: postgresql
   namespace: apps
 spec:
@@ -28,8 +28,8 @@ spec:
         app.kubernetes.io/instance: postgresql
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: postgresql
-        app.kubernetes.io/version: 17.4.0
-        helm.sh/chart: postgresql-16.5.2
+        app.kubernetes.io/version: 17.6.0
+        helm.sh/chart: postgresql-16.7.27
       name: postgresql
     spec:
       affinity:
@@ -54,11 +54,8 @@ spec:
               value: /bitnami/postgresql
             - name: PGDATA
               value: /bitnami/postgresql/data
-            - name: POSTGRES_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  key: admin-password
-                  name: postgresql-auth
+            - name: POSTGRES_PASSWORD_FILE
+              value: /opt/bitnami/postgresql/secrets/admin-password
             - name: POSTGRES_DATABASE
               value: linkwarden
             - name: POSTGRESQL_ENABLE_LDAP
@@ -77,7 +74,7 @@ spec:
               value: error
             - name: POSTGRESQL_SHARED_PRELOAD_LIBRARIES
               value: pgaudit
-          image: docker.io/bitnami/postgresql:17.4.0-debian-12-r8
+          image: docker.io/bitnami/postgresql:17.6.0-debian-12-r4
           imagePullPolicy: IfNotPresent
           livenessProbe:
             exec:
@@ -145,6 +142,8 @@ spec:
             - mountPath: /opt/bitnami/postgresql/tmp
               name: empty-dir
               subPath: app-tmp-dir
+            - mountPath: /opt/bitnami/postgresql/secrets/
+              name: postgresql-password
             - mountPath: /dev/shm
               name: dshm
             - mountPath: /bitnami/postgresql
@@ -160,6 +159,9 @@ spec:
       volumes:
         - emptyDir: {}
           name: empty-dir
+        - name: postgresql-password
+          secret:
+            secretName: postgresql-auth
         - emptyDir:
             medium: Memory
           name: dshm
@@ -253,8 +255,8 @@ metadata:
     app.kubernetes.io/instance: postgresql
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: postgresql
-    app.kubernetes.io/version: 17.4.0
-    helm.sh/chart: postgresql-16.5.2
+    app.kubernetes.io/version: 17.6.0
+    helm.sh/chart: postgresql-16.7.27
   name: postgresql
   namespace: apps
 spec:
@@ -281,8 +283,8 @@ metadata:
     app.kubernetes.io/instance: postgresql
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: postgresql
-    app.kubernetes.io/version: 17.4.0
-    helm.sh/chart: postgresql-16.5.2
+    app.kubernetes.io/version: 17.6.0
+    helm.sh/chart: postgresql-16.7.27
   name: postgresql-hl
   namespace: apps
 spec:
@@ -309,8 +311,8 @@ metadata:
     app.kubernetes.io/instance: postgresql
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: postgresql
-    app.kubernetes.io/version: 17.4.0
-    helm.sh/chart: postgresql-16.5.2
+    app.kubernetes.io/version: 17.6.0
+    helm.sh/chart: postgresql-16.7.27
   name: postgresql
   namespace: apps
 ---
@@ -325,8 +327,8 @@ metadata:
     app.kubernetes.io/instance: postgresql
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: postgresql
-    app.kubernetes.io/version: 17.4.0
-    helm.sh/chart: postgresql-16.5.2
+    app.kubernetes.io/version: 17.6.0
+    helm.sh/chart: postgresql-16.7.27
   name: postgresql
   namespace: apps
 spec:
@@ -355,8 +357,8 @@ metadata:
     app.kubernetes.io/instance: postgresql
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: postgresql
-    app.kubernetes.io/version: 17.4.0
-    helm.sh/chart: postgresql-16.5.2
+    app.kubernetes.io/version: 17.6.0
+    helm.sh/chart: postgresql-16.7.27
   name: postgresql
   namespace: apps
 spec:
