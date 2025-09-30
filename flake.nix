@@ -82,10 +82,9 @@
 
       deployGroups = (builtins.mapAttrs (_: values: (builtins.concatStringsSep " " (builtins.map (v: "--targets='.#${v}'") values.names))) homelab.nodes.group);
 
-      checks = lib.mapAttrs
-        (sys: deployLib:
-          deployLib.deployChecks self.deploy)
-        deploy-rs.lib;
+      checks = lib.optionalAttrs (lib.hasAttr currentSystem deploy-rs.lib) {
+        ${currentSystem} = deploy-rs.lib.${currentSystem}.deployChecks self.deploy;
+      };
 
       packages.${currentSystem}.gen-manifests =
         kubenixModule.mkRenderer currentSystem pkgs;
