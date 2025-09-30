@@ -40,6 +40,12 @@ in
 
     services.earlyoom.enable = true;
 
+    services.journald.extraConfig = ''
+      SystemMaxUse=100M
+      SystemMaxFileSize=50M
+      MaxRetentionSec=7day
+    '';
+
     boot.supportedFilesystems = [ "nfs" ];
     services.rpcbind.enable = true;
 
@@ -50,5 +56,11 @@ in
     };
 
     boot.kernel.sysctl."vm.swappiness" = 180;
+
+    nix.gc = {
+      automatic = true;
+      dates = "weekly";
+      options = "--delete-older-than 7d";
+    };
   };
 }
