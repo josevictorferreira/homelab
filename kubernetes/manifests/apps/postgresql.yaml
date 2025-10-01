@@ -187,18 +187,17 @@ metadata:
   annotations:
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
-  name: postgresql-bootstrap-a747b91d
+  name: postgresql-bootstrap-c31eafa6
   namespace: apps
 spec:
   template:
     metadata:
       annotations:
-        checksum/config: a747b91d5de07c26663754609046e4db0b4aaabe8140940438bb52d571388e08
+        checksum/config: c31eafa664f1ad9073a767c861c8a7e7b9598a09089ce5f3fc82fd6e12341aef
     spec:
       containers:
         - args:
-            - "set -e\n\t\tpsql -h postgresql -U postgres -c 'DROP EXTENSION vectors;'\n\
-              \t\tpsql -h postgresql -U postgres -c 'ALTER SYSTEM SET shared_preload_libraries\
+            - "set -e\n\t\tpsql -h postgresql -U postgres -c 'ALTER SYSTEM SET shared_preload_libraries\
               \ = \"vectors.so\"'\n\t\tpsql -h postgresql -U postgres -c 'ALTER SYSTEM\
               \ SET search_path TO \"$user\", public, vectors'\n    echo \"Ensuring\
               \ database 'linkwarden' exists...\"\n    psql -h postgresql -U postgres\
@@ -206,41 +205,41 @@ spec:
               \ | grep -q 1 \\\n      || psql -h postgresql -U postgres -d postgres\
               \ -c \"CREATE DATABASE \\\"linkwarden\\\";\"\n\n    echo \"Installing\
               \ pgvecto.rs extension in database 'linkwarden'...\"\n    psql -h postgresql\
-              \ -U postgres -d linkwarden -c \"CREATE EXTENSION IF NOT EXISTS vectors;\"\
-              \ || echo \"Extension installation completed for linkwarden\"\n\n\t\t\
-              psql -h postgresql -U postgres -c 'DROP EXTENSION vectors;'\n\t\tpsql\
-              \ -h postgresql -U postgres -c 'ALTER SYSTEM SET shared_preload_libraries\
-              \ = \"vectors.so\"'\n\t\tpsql -h postgresql -U postgres -c 'ALTER SYSTEM\
-              \ SET search_path TO \"$user\", public, vectors'\n    echo \"Ensuring\
-              \ database 'openwebui' exists...\"\n    psql -h postgresql -U postgres\
-              \ -d postgres -tAc \"SELECT 1 FROM pg_database WHERE datname='openwebui'\"\
-              \ | grep -q 1 \\\n      || psql -h postgresql -U postgres -d postgres\
-              \ -c \"CREATE DATABASE \\\"openwebui\\\";\"\n\n    echo \"Installing\
-              \ pgvecto.rs extension in database 'openwebui'...\"\n    psql -h postgresql\
-              \ -U postgres -d openwebui -c \"CREATE EXTENSION IF NOT EXISTS vectors;\"\
-              \ || echo \"Extension installation completed for openwebui\"\n\n\t\t\
-              psql -h postgresql -U postgres -c 'DROP EXTENSION vectors;'\n\t\tpsql\
-              \ -h postgresql -U postgres -c 'ALTER SYSTEM SET shared_preload_libraries\
-              \ = \"vectors.so\"'\n\t\tpsql -h postgresql -U postgres -c 'ALTER SYSTEM\
-              \ SET search_path TO \"$user\", public, vectors'\n    echo \"Ensuring\
-              \ database 'n8n' exists...\"\n    psql -h postgresql -U postgres -d\
-              \ postgres -tAc \"SELECT 1 FROM pg_database WHERE datname='n8n'\" |\
-              \ grep -q 1 \\\n      || psql -h postgresql -U postgres -d postgres\
-              \ -c \"CREATE DATABASE \\\"n8n\\\";\"\n\n    echo \"Installing pgvecto.rs\
-              \ extension in database 'n8n'...\"\n    psql -h postgresql -U postgres\
-              \ -d n8n -c \"CREATE EXTENSION IF NOT EXISTS vectors;\" || echo \"Extension\
-              \ installation completed for n8n\"\n\n\t\tpsql -h postgresql -U postgres\
-              \ -c 'DROP EXTENSION vectors;'\n\t\tpsql -h postgresql -U postgres -c\
+              \ -U postgres -d linkwarden -c \"DROP EXTENSION IF EXISTS vectors;CREATE\
+              \ EXTENSION IF NOT EXISTS vectors;\" || echo \"Extension installation\
+              \ completed for linkwarden\"\n\n\t\tpsql -h postgresql -U postgres -c\
               \ 'ALTER SYSTEM SET shared_preload_libraries = \"vectors.so\"'\n\t\t\
               psql -h postgresql -U postgres -c 'ALTER SYSTEM SET search_path TO \"\
-              $user\", public, vectors'\n    echo \"Ensuring database 'immich' exists...\"\
-              \n    psql -h postgresql -U postgres -d postgres -tAc \"SELECT 1 FROM\
-              \ pg_database WHERE datname='immich'\" | grep -q 1 \\\n      || psql\
-              \ -h postgresql -U postgres -d postgres -c \"CREATE DATABASE \\\"immich\\\
-              \";\"\n\n    echo \"Installing pgvecto.rs extension in database 'immich'...\"\
-              \n    psql -h postgresql -U postgres -d immich -c \"CREATE EXTENSION\
-              \ IF NOT EXISTS vectors;\" || echo \"Extension installation completed\
-              \ for immich\"\n\n"
+              $user\", public, vectors'\n    echo \"Ensuring database 'openwebui'\
+              \ exists...\"\n    psql -h postgresql -U postgres -d postgres -tAc \"\
+              SELECT 1 FROM pg_database WHERE datname='openwebui'\" | grep -q 1 \\\
+              \n      || psql -h postgresql -U postgres -d postgres -c \"CREATE DATABASE\
+              \ \\\"openwebui\\\";\"\n\n    echo \"Installing pgvecto.rs extension\
+              \ in database 'openwebui'...\"\n    psql -h postgresql -U postgres -d\
+              \ openwebui -c \"DROP EXTENSION IF EXISTS vectors;CREATE EXTENSION IF\
+              \ NOT EXISTS vectors;\" || echo \"Extension installation completed for\
+              \ openwebui\"\n\n\t\tpsql -h postgresql -U postgres -c 'ALTER SYSTEM\
+              \ SET shared_preload_libraries = \"vectors.so\"'\n\t\tpsql -h postgresql\
+              \ -U postgres -c 'ALTER SYSTEM SET search_path TO \"$user\", public,\
+              \ vectors'\n    echo \"Ensuring database 'n8n' exists...\"\n    psql\
+              \ -h postgresql -U postgres -d postgres -tAc \"SELECT 1 FROM pg_database\
+              \ WHERE datname='n8n'\" | grep -q 1 \\\n      || psql -h postgresql\
+              \ -U postgres -d postgres -c \"CREATE DATABASE \\\"n8n\\\";\"\n\n  \
+              \  echo \"Installing pgvecto.rs extension in database 'n8n'...\"\n \
+              \   psql -h postgresql -U postgres -d n8n -c \"DROP EXTENSION IF EXISTS\
+              \ vectors;CREATE EXTENSION IF NOT EXISTS vectors;\" || echo \"Extension\
+              \ installation completed for n8n\"\n\n\t\tpsql -h postgresql -U postgres\
+              \ -c 'ALTER SYSTEM SET shared_preload_libraries = \"vectors.so\"'\n\t\
+              \tpsql -h postgresql -U postgres -c 'ALTER SYSTEM SET search_path TO\
+              \ \"$user\", public, vectors'\n    echo \"Ensuring database 'immich'\
+              \ exists...\"\n    psql -h postgresql -U postgres -d postgres -tAc \"\
+              SELECT 1 FROM pg_database WHERE datname='immich'\" | grep -q 1 \\\n\
+              \      || psql -h postgresql -U postgres -d postgres -c \"CREATE DATABASE\
+              \ \\\"immich\\\";\"\n\n    echo \"Installing pgvecto.rs extension in\
+              \ database 'immich'...\"\n    psql -h postgresql -U postgres -d immich\
+              \ -c \"DROP EXTENSION IF EXISTS vectors;CREATE EXTENSION IF NOT EXISTS\
+              \ vectors;\" || echo \"Extension installation completed for immich\"\
+              \n\n"
           command:
             - sh
             - -c
@@ -256,44 +255,43 @@ spec:
 ---
 apiVersion: v1
 data:
-  databases: "\t\tpsql -h postgresql -U postgres -c 'DROP EXTENSION vectors;'\n\t\t\
-    psql -h postgresql -U postgres -c 'ALTER SYSTEM SET shared_preload_libraries =\
-    \ \"vectors.so\"'\n\t\tpsql -h postgresql -U postgres -c 'ALTER SYSTEM SET search_path\
+  databases: "\t\tpsql -h postgresql -U postgres -c 'ALTER SYSTEM SET shared_preload_libraries\
+    \ = \"vectors.so\"'\n\t\tpsql -h postgresql -U postgres -c 'ALTER SYSTEM SET search_path\
     \ TO \"$user\", public, vectors'\n    echo \"Ensuring database 'linkwarden' exists...\"\
     \n    psql -h postgresql -U postgres -d postgres -tAc \"SELECT 1 FROM pg_database\
     \ WHERE datname='linkwarden'\" | grep -q 1 \\\n      || psql -h postgresql -U\
     \ postgres -d postgres -c \"CREATE DATABASE \\\"linkwarden\\\";\"\n\n    echo\
     \ \"Installing pgvecto.rs extension in database 'linkwarden'...\"\n    psql -h\
-    \ postgresql -U postgres -d linkwarden -c \"CREATE EXTENSION IF NOT EXISTS vectors;\"\
-    \ || echo \"Extension installation completed for linkwarden\"\n\n\t\tpsql -h postgresql\
-    \ -U postgres -c 'DROP EXTENSION vectors;'\n\t\tpsql -h postgresql -U postgres\
-    \ -c 'ALTER SYSTEM SET shared_preload_libraries = \"vectors.so\"'\n\t\tpsql -h\
-    \ postgresql -U postgres -c 'ALTER SYSTEM SET search_path TO \"$user\", public,\
-    \ vectors'\n    echo \"Ensuring database 'openwebui' exists...\"\n    psql -h\
-    \ postgresql -U postgres -d postgres -tAc \"SELECT 1 FROM pg_database WHERE datname='openwebui'\"\
+    \ postgresql -U postgres -d linkwarden -c \"DROP EXTENSION IF EXISTS vectors;CREATE\
+    \ EXTENSION IF NOT EXISTS vectors;\" || echo \"Extension installation completed\
+    \ for linkwarden\"\n\n\t\tpsql -h postgresql -U postgres -c 'ALTER SYSTEM SET\
+    \ shared_preload_libraries = \"vectors.so\"'\n\t\tpsql -h postgresql -U postgres\
+    \ -c 'ALTER SYSTEM SET search_path TO \"$user\", public, vectors'\n    echo \"\
+    Ensuring database 'openwebui' exists...\"\n    psql -h postgresql -U postgres\
+    \ -d postgres -tAc \"SELECT 1 FROM pg_database WHERE datname='openwebui'\" | grep\
+    \ -q 1 \\\n      || psql -h postgresql -U postgres -d postgres -c \"CREATE DATABASE\
+    \ \\\"openwebui\\\";\"\n\n    echo \"Installing pgvecto.rs extension in database\
+    \ 'openwebui'...\"\n    psql -h postgresql -U postgres -d openwebui -c \"DROP\
+    \ EXTENSION IF EXISTS vectors;CREATE EXTENSION IF NOT EXISTS vectors;\" || echo\
+    \ \"Extension installation completed for openwebui\"\n\n\t\tpsql -h postgresql\
+    \ -U postgres -c 'ALTER SYSTEM SET shared_preload_libraries = \"vectors.so\"'\n\
+    \t\tpsql -h postgresql -U postgres -c 'ALTER SYSTEM SET search_path TO \"$user\"\
+    , public, vectors'\n    echo \"Ensuring database 'n8n' exists...\"\n    psql -h\
+    \ postgresql -U postgres -d postgres -tAc \"SELECT 1 FROM pg_database WHERE datname='n8n'\"\
     \ | grep -q 1 \\\n      || psql -h postgresql -U postgres -d postgres -c \"CREATE\
-    \ DATABASE \\\"openwebui\\\";\"\n\n    echo \"Installing pgvecto.rs extension\
-    \ in database 'openwebui'...\"\n    psql -h postgresql -U postgres -d openwebui\
-    \ -c \"CREATE EXTENSION IF NOT EXISTS vectors;\" || echo \"Extension installation\
-    \ completed for openwebui\"\n\n\t\tpsql -h postgresql -U postgres -c 'DROP EXTENSION\
-    \ vectors;'\n\t\tpsql -h postgresql -U postgres -c 'ALTER SYSTEM SET shared_preload_libraries\
-    \ = \"vectors.so\"'\n\t\tpsql -h postgresql -U postgres -c 'ALTER SYSTEM SET search_path\
-    \ TO \"$user\", public, vectors'\n    echo \"Ensuring database 'n8n' exists...\"\
-    \n    psql -h postgresql -U postgres -d postgres -tAc \"SELECT 1 FROM pg_database\
-    \ WHERE datname='n8n'\" | grep -q 1 \\\n      || psql -h postgresql -U postgres\
-    \ -d postgres -c \"CREATE DATABASE \\\"n8n\\\";\"\n\n    echo \"Installing pgvecto.rs\
-    \ extension in database 'n8n'...\"\n    psql -h postgresql -U postgres -d n8n\
-    \ -c \"CREATE EXTENSION IF NOT EXISTS vectors;\" || echo \"Extension installation\
-    \ completed for n8n\"\n\n\t\tpsql -h postgresql -U postgres -c 'DROP EXTENSION\
-    \ vectors;'\n\t\tpsql -h postgresql -U postgres -c 'ALTER SYSTEM SET shared_preload_libraries\
-    \ = \"vectors.so\"'\n\t\tpsql -h postgresql -U postgres -c 'ALTER SYSTEM SET search_path\
-    \ TO \"$user\", public, vectors'\n    echo \"Ensuring database 'immich' exists...\"\
-    \n    psql -h postgresql -U postgres -d postgres -tAc \"SELECT 1 FROM pg_database\
-    \ WHERE datname='immich'\" | grep -q 1 \\\n      || psql -h postgresql -U postgres\
-    \ -d postgres -c \"CREATE DATABASE \\\"immich\\\";\"\n\n    echo \"Installing\
-    \ pgvecto.rs extension in database 'immich'...\"\n    psql -h postgresql -U postgres\
-    \ -d immich -c \"CREATE EXTENSION IF NOT EXISTS vectors;\" || echo \"Extension\
-    \ installation completed for immich\"\n"
+    \ DATABASE \\\"n8n\\\";\"\n\n    echo \"Installing pgvecto.rs extension in database\
+    \ 'n8n'...\"\n    psql -h postgresql -U postgres -d n8n -c \"DROP EXTENSION IF\
+    \ EXISTS vectors;CREATE EXTENSION IF NOT EXISTS vectors;\" || echo \"Extension\
+    \ installation completed for n8n\"\n\n\t\tpsql -h postgresql -U postgres -c 'ALTER\
+    \ SYSTEM SET shared_preload_libraries = \"vectors.so\"'\n\t\tpsql -h postgresql\
+    \ -U postgres -c 'ALTER SYSTEM SET search_path TO \"$user\", public, vectors'\n\
+    \    echo \"Ensuring database 'immich' exists...\"\n    psql -h postgresql -U\
+    \ postgres -d postgres -tAc \"SELECT 1 FROM pg_database WHERE datname='immich'\"\
+    \ | grep -q 1 \\\n      || psql -h postgresql -U postgres -d postgres -c \"CREATE\
+    \ DATABASE \\\"immich\\\";\"\n\n    echo \"Installing pgvecto.rs extension in\
+    \ database 'immich'...\"\n    psql -h postgresql -U postgres -d immich -c \"DROP\
+    \ EXTENSION IF EXISTS vectors;CREATE EXTENSION IF NOT EXISTS vectors;\" || echo\
+    \ \"Extension installation completed for immich\"\n"
 kind: ConfigMap
 metadata:
   annotations:
