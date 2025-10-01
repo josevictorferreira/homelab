@@ -206,5 +206,11 @@ wusbiso: ## Build the recovery ISO, formats the USB drive and writes the ISO to 
   sudo eject "$DEV" 2>/dev/null || true; \
   echo "Done. You can now boot from the USB drive.";
 
+reconcile: ## Reconcile the kubernetes cluster with the current main branch
+	@flux reconcile kustomization flux-system -n flux-system --with-source
+
+events: ## Watch for the latest events in flux kubernetes system
+	@flux events --watch
+
 help: ## Show this help.
 	@printf "Usage: make [target]\n\nTARGETS:\n"; grep -F "##" $(MAKEFILE_LIST) | grep -Fv "grep -F" | grep -Fv "printf " | sed -e 's/\\$$//' | sed -e 's/##//' | column -t -s ":" | sed -e 's/^/    /'; printf "\n"
