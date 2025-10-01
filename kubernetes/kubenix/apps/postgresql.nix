@@ -33,7 +33,8 @@ in
       namespace = namespace;
       values = {
         image = {
-          repository = imageRep;
+					registry = "ghcr.io";
+          repository = "josevictorferreira/postgresql-pgvectors-bitnami";
           tag = imageTag;
         };
 

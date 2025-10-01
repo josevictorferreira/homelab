@@ -74,7 +74,7 @@ spec:
               value: error
             - name: POSTGRESQL_SHARED_PRELOAD_LIBRARIES
               value: pgaudit
-          image: docker.io/ghcr.io/josevictorferreira/postgresql-pgvectors-bitnami:latest
+          image: ghcr.io/josevictorferreira/postgresql-pgvectors-bitnami:latest
           imagePullPolicy: IfNotPresent
           livenessProbe:
             exec:
