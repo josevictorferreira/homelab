@@ -22,12 +22,7 @@ in
         postgresql.enabled = false;
         redis.enabled = false;
 				
-				env = [
-					{
-						name = "REDIS_HOSTNAME";
-						value = "redis-headless";
-					}
-				];
+				env = [ ];
 
         envFrom = [
           {
