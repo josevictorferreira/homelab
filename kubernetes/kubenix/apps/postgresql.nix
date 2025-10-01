@@ -16,7 +16,7 @@ let
       || psql -h postgresql -U postgres -d postgres -c "CREATE DATABASE \"${db}\";"
 
     echo "Installing pgvecto.rs extension in database '${db}'..."
-    psql -h postgresql -U postgres -d ${db} -c "DROP EXTENSION IF EXISTS vectors;CREATE EXTENSION IF NOT EXISTS vectors;" || echo "Extension installation completed for ${db}"
+    psql -h postgresql -U postgres -d ${db} -c "DROP EXTENSION IF EXISTS vectors;CREATE EXTENSION IF NOT EXISTS vchord CASCADE;" || echo "Extension installation completed for ${db}"
   '';
   createDbCommands = lib.concatStringsSep "\n" (map mkCreateDb bootstrapDatabases);
   configChecksum = builtins.hashString "sha256" createDbCommands;
