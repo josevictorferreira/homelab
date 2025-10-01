@@ -1,8 +1,8 @@
 { lib, kubenix, homelab, ... }:
 
 let
-  imageRep = "bitnamilegacy/postgresql";
-  imageTag = "17.6.0-debian-12-r4@sha256:926356130b77d5742d8ce605b258d35db9b62f2f8fd1601f9dbaef0c8a710a8d";
+	imageRep = "ghcr.io/josevictorferreira/postgresql-pgvectors-bitnami";
+	imageTag = "latest";
   namespace = homelab.kubernetes.namespaces.applications;
   bootstrapDatabases = homelab.kubernetes.databases.postgres;
   mkCreateDb = db: ''
