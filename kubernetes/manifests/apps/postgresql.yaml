@@ -74,7 +74,7 @@ spec:
               value: error
             - name: POSTGRESQL_SHARED_PRELOAD_LIBRARIES
               value: pgaudit
-          image: ghcr.io/josevictorferreira/postgresql-pgvectors-bitnami:latest
+          image: ghcr.io/josevictorferreira/postgresql-pgvectors-bitnami:b927f9d9ef9e7c54c7221dd8981b4544f1f268bb
           imagePullPolicy: IfNotPresent
           livenessProbe:
             exec:
@@ -234,7 +234,7 @@ spec:
                 secretKeyRef:
                   key: admin-password
                   name: postgresql-auth
-          image: ghcr.io/josevictorferreira/postgresql-pgvectors-bitnami:latest
+          image: ghcr.io/josevictorferreira/postgresql-pgvectors-bitnami:b927f9d9ef9e7c54c7221dd8981b4544f1f268bb
           name: psql
       restartPolicy: OnFailure
 ---
