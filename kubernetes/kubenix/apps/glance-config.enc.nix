@@ -141,6 +141,7 @@ let
                   "prowlarr/prowlarr"
                   "dockerhub:searxng/searxng"
                   "dockerhub:mjmeli/qbittorrent-port-forward-gluetun-server"
+                  "immich-app/immich"
                   # Daily Usage
                   "neovim/neovim"
                   "kovidgoyal/kitty"
