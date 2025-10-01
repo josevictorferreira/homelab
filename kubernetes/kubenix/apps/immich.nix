@@ -65,7 +65,20 @@ in
           image.pullPolicy = "IfNotPresent";
 
           ingress.main = {
-            enabled = false;
+            enabled = true;
+            className = "cilium";
+            hosts = [{
+              host = kubenix.lib.domainFor app;
+              paths = [{
+                path = "/";
+                service.name = "immich-server";
+                service.port = 2283;
+              }];
+            }];
+            tls = [{
+              secretName = "wildcard-tls";
+              hosts = [ (kubenix.lib.domainFor app) ];
+            }];
           };
         };
       };
