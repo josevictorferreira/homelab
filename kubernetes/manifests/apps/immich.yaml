@@ -295,3 +295,35 @@ spec:
       app.kubernetes.io/instance: immich
       app.kubernetes.io/name: server
       app.kubernetes.io/service: immich-server
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+    nginx.ingress.kubernetes.io/proxy-body-size: '0'
+  labels:
+    app.kubernetes.io/instance: immich
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: server
+    app.kubernetes.io/version: v1.119.0
+    helm.sh/chart: immich-0.9.3
+  name: immich-server
+  namespace: apps
+spec:
+  rules:
+    - host: immich.josevictor.me
+      http:
+        paths:
+          - backend:
+              service:
+                name: immich-server
+                port:
+                  number: 2283
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - immich.josevictor.me
+      secretName: wildcard-tls
