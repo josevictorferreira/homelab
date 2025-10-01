@@ -72,7 +72,7 @@ in
               paths = [{
                 path = "/";
                 service.name = "immich-server";
-                service.port = 2283;
+                service.port = 8081;
               }];
             }];
             tls = [{
