@@ -1,8 +1,11 @@
 { lib, kubenix, homelab, ... }:
 
 let
-	imageRep = "ghcr.io/josevictorferreira/postgresql-pgvectors-bitnami";
-	imageTag = "567a03b0587b49b71776dfcc9c2f5cf89f749a8c";
+  image = {
+    registry = "ghcr.io";
+    repository = "josevictorferreira/postgresql-vchord-bitnami";
+    tag = "a5c78ca7a572fa46ad4c9153fdd592101f42ee22";
+  };
   namespace = homelab.kubernetes.namespaces.applications;
   bootstrapDatabases = homelab.kubernetes.databases.postgres;
   mkCreateDb = db: ''
@@ -34,11 +37,7 @@ in
       noHooks = true;
       namespace = namespace;
       values = {
-        image = {
-					registry = "ghcr.io";
-          repository = "josevictorferreira/postgresql-pgvectors-bitnami";
-          tag = imageTag;
-        };
+        image = image;
 
         global.security.allowInsecureImages = true;
 
@@ -85,7 +84,7 @@ in
           containers = [
             {
               name = "psql";
-              image = "${imageRep}:${imageTag}";
+              image = "${image.registry}/${image.repository}:${image.tag}";
               env = [
                 {
                   name = "PGPASSWORD";
