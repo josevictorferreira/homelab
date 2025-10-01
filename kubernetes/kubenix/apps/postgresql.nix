@@ -6,6 +6,7 @@ let
   namespace = homelab.kubernetes.namespaces.applications;
   bootstrapDatabases = homelab.kubernetes.databases.postgres;
   mkCreateDb = db: ''
+		psql -h postgresql -U postgres -c 'DROP EXTENSION vectors;'
 		psql -h postgresql -U postgres -c 'ALTER SYSTEM SET shared_preload_libraries = "vectors.so"'
 		psql -h postgresql -U postgres -c 'ALTER SYSTEM SET search_path TO "$user", public, vectors'
     echo "Ensuring database '${db}' exists..."
