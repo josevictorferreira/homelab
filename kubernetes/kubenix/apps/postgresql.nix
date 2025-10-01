@@ -2,7 +2,7 @@
 
 let
 	imageRep = "ghcr.io/josevictorferreira/postgresql-pgvectors-bitnami";
-	imageTag = "latest";
+	imageTag = "b927f9d9ef9e7c54c7221dd8981b4544f1f268bb";
   namespace = homelab.kubernetes.namespaces.applications;
   bootstrapDatabases = homelab.kubernetes.databases.postgres;
   mkCreateDb = db: ''
