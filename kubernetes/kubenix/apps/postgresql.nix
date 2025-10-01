@@ -2,10 +2,12 @@
 
 let
 	imageRep = "ghcr.io/josevictorferreira/postgresql-pgvectors-bitnami";
-	imageTag = "b927f9d9ef9e7c54c7221dd8981b4544f1f268bb";
+	imageTag = "d149212cc486403c423d47a055a68124a578d1b1";
   namespace = homelab.kubernetes.namespaces.applications;
   bootstrapDatabases = homelab.kubernetes.databases.postgres;
   mkCreateDb = db: ''
+		psql -h postgresql -U postgres -c 'ALTER SYSTEM SET shared_preload_libraries = "vectors.so"'
+		psql -h postgresql -U postgres -c 'ALTER SYSTEM SET search_path TO "$user", public, vectors'
     echo "Ensuring database '${db}' exists..."
     psql -h postgresql -U postgres -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname='${db}'" | grep -q 1 \
       || psql -h postgresql -U postgres -d postgres -c "CREATE DATABASE \"${db}\";"
