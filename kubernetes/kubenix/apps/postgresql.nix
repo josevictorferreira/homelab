@@ -4,7 +4,8 @@ let
   image = {
     registry = "ghcr.io";
     repository = "josevictorferreira/postgresql-vchord-bitnami";
-    tag = "583ab1495cbbf2d62d82695e3cbe5c45dd9e7372";
+    tag = "f78dc50630f71c248a3b71e59e2bd9e8d63242a3";
+    # tag = "583ab1495cbbf2d62d82695e3cbe5c45dd9e7372";
   };
   namespace = homelab.kubernetes.namespaces.applications;
   bootstrapDatabases = homelab.kubernetes.databases.postgres;
@@ -58,17 +59,6 @@ in
           reclaimPolicy = "Retain";
           accessModes = [ "ReadWriteOnce" ];
         };
-
-        primary.command = [ "postgres" ];
-        primary.args = [
-          "-c" "shared_preload_libraries=vchord.so"
-          "-c" "search_path=\"$$user\", public, vectors"
-          "-c" "logging_collector=on"
-          "-c" "max_wal_size=2GB"
-          "-c" "shared_buffers=512MB"
-          "-c" "wal_compression=on"
-        ];
-
         primary.service = kubenix.lib.plainServiceFor "postgresql";
       };
     };
