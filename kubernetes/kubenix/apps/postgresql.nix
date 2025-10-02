@@ -59,6 +59,30 @@ in
           accessModes = [ "ReadWriteOnce" ];
         };
         primary.service = kubenix.lib.plainServiceFor "postgresql";
+        primary.initdb.args = "--data-checksums";
+        primary.extendedConfiguration = ''
+          shared_preload_libraries = 'vchord.so'
+          search_path = '"$user", public, vectors'
+          logging_collector = on
+          max_wal_size = 2GB
+          min_wal_size = '512MB'
+          shared_buffers = 512MB
+          wal_buffers = '32MB'
+          wal_compression = on
+          wal_keep_size = '512MB'
+          checkpoint_timeout = '30min'
+          checkpoint_completion_target = 0.9
+          effective_cache_size = '10GB'
+          work_mem = '64MB'
+          maintenance_work_mem = '2GB'
+          synchronous_commit = off
+          autovacuum_max_workers = 5
+          autovacuum_naptime = '10s'
+          autovacuum_vacuum_cost_delay = '10ms'
+          autovacuum_vacuum_cost_limit = 2000
+          log_min_duration_statement = 2000
+          log_checkpoints = on
+        '';
       };
     };
 
