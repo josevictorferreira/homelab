@@ -3,6 +3,7 @@
 pkgs.mkShell {
   buildInputs = with pkgs; [
     fluxcd
+    postgresql ## For debug
   ];
 
   shellHook = ''
