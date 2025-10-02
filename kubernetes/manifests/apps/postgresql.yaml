@@ -74,7 +74,7 @@ spec:
               value: error
             - name: POSTGRESQL_SHARED_PRELOAD_LIBRARIES
               value: vchord.so
-          image: ghcr.io/josevictorferreira/postgresql-vchord-bitnami:583ab1495cbbf2d62d82695e3cbe5c45dd9e7372
+          image: ghcr.io/josevictorferreira/postgresql-vchord-bitnami:54c9cd376be1eb5a2b3baf4df0f4dc86c472325c
           imagePullPolicy: IfNotPresent
           livenessProbe:
             exec:
@@ -243,7 +243,7 @@ spec:
                 secretKeyRef:
                   key: admin-password
                   name: postgresql-auth
-          image: ghcr.io/josevictorferreira/postgresql-vchord-bitnami:583ab1495cbbf2d62d82695e3cbe5c45dd9e7372
+          image: ghcr.io/josevictorferreira/postgresql-vchord-bitnami:54c9cd376be1eb5a2b3baf4df0f4dc86c472325c
           name: psql
       restartPolicy: OnFailure
 ---

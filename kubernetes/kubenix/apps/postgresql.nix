@@ -4,7 +4,7 @@ let
   image = {
     registry = "ghcr.io";
     repository = "josevictorferreira/postgresql-vchord-bitnami";
-    tag = "583ab1495cbbf2d62d82695e3cbe5c45dd9e7372";
+    tag = "54c9cd376be1eb5a2b3baf4df0f4dc86c472325c";
   };
   namespace = homelab.kubernetes.namespaces.applications;
   bootstrapDatabases = homelab.kubernetes.databases.postgres;
