@@ -57,17 +57,17 @@ in
           storageClass = "rook-ceph-block";
           reclaimPolicy = "Retain";
           accessModes = [ "ReadWriteOnce" ];
-
-          command = [ "postgres" ];
-          args = [
-            "-c" "shared_preload_libraries=vchord.so"
-            "-c" "search_path=\"$$user\", public, vectors"
-            "-c" "logging_collector=on"
-            "-c" "max_wal_size=2GB"
-            "-c" "shared_buffers=512MB"
-            "-c" "wal_compression=on"
-          ];
         };
+
+        primary.command = [ "postgres" ];
+        primary.args = [
+          "-c" "shared_preload_libraries=vchord.so"
+          "-c" "search_path=\"$$user\", public, vectors"
+          "-c" "logging_collector=on"
+          "-c" "max_wal_size=2GB"
+          "-c" "shared_buffers=512MB"
+          "-c" "wal_compression=on"
+        ];
 
         primary.service = kubenix.lib.plainServiceFor "postgresql";
       };
