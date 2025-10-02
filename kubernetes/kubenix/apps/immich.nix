@@ -66,6 +66,12 @@ in
           image.tag = "v2.0.0@sha256:d81f4af6a622d0955e5b8e3927da32b3ec882466a7ee8a26906d9cccad4364ca";
           image.pullPolicy = "IfNotPresent";
 
+          service.main = {
+            enabled = true;
+            type = "LoadBalancer";
+            annotations = kubenix.lib.serviceAnnotationFor app;
+          };
+
           ingress.main = {
             enabled = true;
             className = "cilium";
