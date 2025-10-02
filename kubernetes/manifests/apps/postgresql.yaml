@@ -23,6 +23,8 @@ spec:
   serviceName: postgresql-hl
   template:
     metadata:
+      annotations:
+        checksum/extended-configuration: 0d94e92defb53029afb52dcb57a1db8b0b25ead9be62e8823b566fcd64b0ee36
       labels:
         app.kubernetes.io/component: primary
         app.kubernetes.io/instance: postgresql
@@ -58,6 +60,8 @@ spec:
               value: /opt/bitnami/postgresql/secrets/admin-password
             - name: POSTGRES_DATABASE
               value: linkwarden
+            - name: POSTGRES_INITDB_ARGS
+              value: --data-checksums
             - name: POSTGRESQL_ENABLE_LDAP
               value: 'no'
             - name: POSTGRESQL_ENABLE_TLS
@@ -142,6 +146,8 @@ spec:
             - mountPath: /opt/bitnami/postgresql/tmp
               name: empty-dir
               subPath: app-tmp-dir
+            - mountPath: /bitnami/postgresql/conf/conf.d/
+              name: postgresql-extended-config
             - mountPath: /opt/bitnami/postgresql/secrets/
               name: postgresql-password
             - mountPath: /dev/shm
@@ -159,6 +165,9 @@ spec:
       volumes:
         - emptyDir: {}
           name: empty-dir
+        - configMap:
+            name: postgresql-extended-configuration
+          name: postgresql-extended-config
         - name: postgresql-password
           secret:
             secretName: postgresql-auth
@@ -287,6 +296,64 @@ metadata:
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   name: postgresql-bootstrap
+  namespace: apps
+---
+apiVersion: v1
+data:
+  override.conf: 'shared_preload_libraries = ''vchord.so''
+
+    search_path = ''"$user", public, vectors''
+
+    logging_collector = on
+
+    max_wal_size = 2GB
+
+    min_wal_size = ''512MB''
+
+    shared_buffers = 512MB
+
+    wal_buffers = ''32MB''
+
+    wal_compression = on
+
+    wal_keep_size = ''512MB''
+
+    checkpoint_timeout = ''30min''
+
+    checkpoint_completion_target = 0.9
+
+    effective_cache_size = ''10GB''
+
+    work_mem = ''64MB''
+
+    maintenance_work_mem = ''2GB''
+
+    synchronous_commit = off
+
+    autovacuum_max_workers = 5
+
+    autovacuum_naptime = ''10s''
+
+    autovacuum_vacuum_cost_delay = ''10ms''
+
+    autovacuum_vacuum_cost_limit = 2000
+
+    log_min_duration_statement = 2000
+
+    log_checkpoints = on'
+kind: ConfigMap
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/component: primary
+    app.kubernetes.io/instance: postgresql
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: postgresql
+    app.kubernetes.io/version: 17.6.0
+    helm.sh/chart: postgresql-16.7.27
+  name: postgresql-extended-configuration
   namespace: apps
 ---
 apiVersion: v1
