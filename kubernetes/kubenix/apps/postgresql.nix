@@ -9,8 +9,7 @@ let
   namespace = homelab.kubernetes.namespaces.applications;
   bootstrapDatabases = homelab.kubernetes.databases.postgres;
   mkCreateDb = db: ''
-		psql -h postgresql -U postgres -c 'ALTER SYSTEM SET shared_preload_libraries = "vectors.so"'
-		psql -h postgresql -U postgres -c 'ALTER SYSTEM SET search_path TO "$user", public, vectors'
+		psql -h postgresql -U postgres -c 'ALTER SYSTEM SET shared_preload_libraries = "vchord.so"'
     echo "Ensuring database '${db}' exists..."
     psql -h postgresql -U postgres -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname='${db}'" | grep -q 1 \
       || psql -h postgresql -U postgres -d postgres -c "CREATE DATABASE \"${db}\";"
@@ -39,6 +38,8 @@ in
       values = {
         image = image;
 
+        postgresqlSharedPreloadLibraries = "vchord.so";
+
         global.security.allowInsecureImages = true;
 
         global.postgresql.auth = {
@@ -56,6 +57,16 @@ in
           storageClass = "rook-ceph-block";
           reclaimPolicy = "Retain";
           accessModes = [ "ReadWriteOnce" ];
+
+          command = [ "postgres" ];
+          args = [
+            "-c" "shared_preload_libraries=vchord.so"
+            "-c" "search_path=\"$$user\", public, vectors"
+            "-c" "logging_collector=on"
+            "-c" "max_wal_size=2GB"
+            "-c" "shared_buffers=512MB"
+            "-c" "wal_compression=on"
+          ];
         };
 
         primary.service = kubenix.lib.plainServiceFor "postgresql";
