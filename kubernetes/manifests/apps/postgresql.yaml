@@ -45,22 +45,7 @@ spec:
               weight: 1
       automountServiceAccountToken: false
       containers:
-        - args:
-            - -c
-            - shared_preload_libraries=vchord.so
-            - -c
-            - search_path="$$user", public, vectors
-            - -c
-            - logging_collector=on
-            - -c
-            - max_wal_size=2GB
-            - -c
-            - shared_buffers=512MB
-            - -c
-            - wal_compression=on
-          command:
-            - postgres
-          env:
+        - env:
             - name: BITNAMI_DEBUG
               value: 'false'
             - name: POSTGRESQL_PORT_NUMBER
@@ -89,7 +74,7 @@ spec:
               value: error
             - name: POSTGRESQL_SHARED_PRELOAD_LIBRARIES
               value: vchord.so
-          image: ghcr.io/josevictorferreira/postgresql-vchord-bitnami:583ab1495cbbf2d62d82695e3cbe5c45dd9e7372
+          image: ghcr.io/josevictorferreira/postgresql-vchord-bitnami:f78dc50630f71c248a3b71e59e2bd9e8d63242a3
           imagePullPolicy: IfNotPresent
           livenessProbe:
             exec:
@@ -258,7 +243,7 @@ spec:
                 secretKeyRef:
                   key: admin-password
                   name: postgresql-auth
-          image: ghcr.io/josevictorferreira/postgresql-vchord-bitnami:583ab1495cbbf2d62d82695e3cbe5c45dd9e7372
+          image: ghcr.io/josevictorferreira/postgresql-vchord-bitnami:f78dc50630f71c248a3b71e59e2bd9e8d63242a3
           name: psql
       restartPolicy: OnFailure
 ---
