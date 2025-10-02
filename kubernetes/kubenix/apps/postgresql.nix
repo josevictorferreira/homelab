@@ -83,6 +83,18 @@ in
           log_min_duration_statement = 2000
           log_checkpoints = on
         '';
+        primary.resources = {
+          limits = {
+            cpu = "150m";
+            memory = "1Gi";
+            ephemeral-storage = "1Gi";
+          };
+          requests = {
+            cpu = "50m";
+            memory = "128Mi";
+            ephemeral-storage = "50Mi";
+          };
+        };
       };
     };
 

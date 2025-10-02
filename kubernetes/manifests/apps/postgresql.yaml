@@ -117,10 +117,10 @@ spec:
           resources:
             limits:
               cpu: 150m
-              ephemeral-storage: 2Gi
-              memory: 192Mi
+              ephemeral-storage: 1Gi
+              memory: 1Gi
             requests:
-              cpu: 100m
+              cpu: 50m
               ephemeral-storage: 50Mi
               memory: 128Mi
           securityContext:
