@@ -1,13 +1,17 @@
-{ lib, kubenix, homelab, ... }:
+{
+  lib,
+  kubenix,
+  homelab,
+  ...
+}:
 
 let
   namespace = homelab.kubernetes.namespaces.applications;
 
-  dnsHosts = lib.mapAttrsToList
-    (serviceName: ipAddress:
-      "${kubenix.lib.domainFor serviceName} = ${homelab.kubernetes.loadBalancer.address}"
-    )
-    homelab.kubernetes.loadBalancer.services;
+  dnsHosts = lib.mapAttrsToList (
+    serviceName: ipAddress:
+    "${kubenix.lib.domainFor serviceName} = ${homelab.kubernetes.loadBalancer.address}"
+  ) homelab.kubernetes.loadBalancer.services;
 
   blockyConfig = {
     upstreams = {
@@ -20,10 +24,18 @@ let
     customDNS = {
       customTTL = "1h";
       filterUnmappedTypes = true;
-      mapping = builtins.listToAttrs (map (entry:
-        let parts = lib.splitString " = " entry;
-        in { name = builtins.head parts; value = builtins.elemAt parts 1; }
-      ) dnsHosts);
+      mapping = builtins.listToAttrs (
+        map (
+          entry:
+          let
+            parts = lib.splitString " = " entry;
+          in
+          {
+            name = builtins.head parts;
+            value = builtins.elemAt parts 1;
+          }
+        ) dnsHosts
+      );
     };
 
     blocking = {
@@ -65,6 +77,7 @@ let
       required = false;
     };
   };
+  blockyConfigYaml = kubenix.lib.toYamlStr blockyConfig;
 in
 {
   kubernetes = {
@@ -74,7 +87,7 @@ in
           name = "blocky-config";
           namespace = namespace;
         };
-        data."config.yml" = kubenix.lib.toYamlStr blockyConfig;
+        data."config.yml" = blockyConfigYaml;
       };
     };
   };

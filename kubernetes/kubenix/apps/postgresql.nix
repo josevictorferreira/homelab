@@ -1,4 +1,9 @@
-{ lib, kubenix, homelab, ... }:
+{
+  lib,
+  kubenix,
+  homelab,
+  ...
+}:
 
 let
   image = {
@@ -9,13 +14,13 @@ let
   namespace = homelab.kubernetes.namespaces.applications;
   bootstrapDatabases = homelab.kubernetes.databases.postgres;
   mkCreateDb = db: ''
-		psql -h postgresql -U postgres -c 'ALTER SYSTEM SET shared_preload_libraries = "vchord.so"'
-    echo "Ensuring database '${db}' exists..."
-    psql -h postgresql -U postgres -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname='${db}'" | grep -q 1 \
-      || psql -h postgresql -U postgres -d postgres -c "CREATE DATABASE \"${db}\";"
+    		psql -h postgresql -U postgres -c 'ALTER SYSTEM SET shared_preload_libraries = "vchord.so"'
+        echo "Ensuring database '${db}' exists..."
+        psql -h postgresql -U postgres -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname='${db}'" | grep -q 1 \
+          || psql -h postgresql -U postgres -d postgres -c "CREATE DATABASE \"${db}\";"
 
-    echo "Installing pgvecto.rs extension in database '${db}'..."
-    psql -h postgresql -U postgres -d ${db} -c "DROP EXTENSION IF EXISTS vectors;CREATE EXTENSION IF NOT EXISTS vchord CASCADE;" || echo "Extension installation completed for ${db}"
+        echo "Installing pgvecto.rs extension in database '${db}'..."
+        psql -h postgresql -U postgres -d ${db} -c "DROP EXTENSION IF EXISTS vectors;CREATE EXTENSION IF NOT EXISTS vchord CASCADE;" || echo "Extension installation completed for ${db}"
   '';
   createDbCommands = lib.concatStringsSep "\n" (map mkCreateDb bootstrapDatabases);
   configChecksum = builtins.hashString "sha256" createDbCommands;
@@ -23,15 +28,13 @@ let
 in
 {
   kubernetes = {
-    helm.releases."postgresql" =
-    {
-      chart = kubenix.lib.helm.fetch
-        {
-          chartUrl = "oci://registry-1.docker.io/bitnamicharts/postgresql";
-          chart = "postgresql";
-          version = "16.7.27";
-          sha256 = "sha256-Sl3CjRqPSVl5j8BYNvahUiAZqCUIAK3Xsv/bMFdQ3t8=";
-        };
+    helm.releases."postgresql" = {
+      chart = kubenix.lib.helm.fetch {
+        chartUrl = "oci://registry-1.docker.io/bitnamicharts/postgresql";
+        chart = "postgresql";
+        version = "16.7.27";
+        sha256 = "sha256-Sl3CjRqPSVl5j8BYNvahUiAZqCUIAK3Xsv/bMFdQ3t8=";
+      };
       includeCRDs = true;
       noHooks = true;
       namespace = namespace;
@@ -130,11 +133,16 @@ in
                   };
                 }
               ];
-              command = [ "sh" "-c" ];
-              args = [''
-                set -e
-                ${createDbCommands}
-              ''];
+              command = [
+                "sh"
+                "-c"
+              ];
+              args = [
+                ''
+                  set -e
+                  ${createDbCommands}
+                ''
+              ];
             }
           ];
         };
