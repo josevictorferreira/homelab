@@ -142,9 +142,12 @@ let
                   "dockerhub:searxng/searxng"
                   "dockerhub:mjmeli/qbittorrent-port-forward-gluetun-server"
                   "immich-app/immich"
+                  "rishikanthc/scriberr"
                   # Work Apps
                   "kong/kong"
                   "keycloak/keycloak"
+                  "ruby/ruby"
+                  "rails/rails"
                   # Daily Usage
                   "neovim/neovim"
                   "kovidgoyal/kitty"
