@@ -33,13 +33,22 @@ spec:
     spec:
       automountServiceAccountToken: true
       containers:
-        - image: ghcr.io/josevictorferreira/alarm-server:v0.2.3@sha256:317714c3c6d0939cc89aef10b00cee5dde4dd455b820c98d6cc9dbddc1552626
+        - envFrom:
+            - secretRef:
+                name: alarm-server-config
+          image: ghcr.io/josevictorferreira/alarm-server:v0.2.3@sha256:317714c3c6d0939cc89aef10b00cee5dde4dd455b820c98d6cc9dbddc1552626
           imagePullPolicy: IfNotPresent
           name: main
           ports:
             - containerPort: 8888
               name: http
               protocol: TCP
+          resources:
+            limits:
+              memory: 512Mi
+            requests:
+              cpu: 30m
+              memory: 256Mi
       dnsPolicy: ClusterFirst
       enableServiceLinks: false
       hostIPC: false
