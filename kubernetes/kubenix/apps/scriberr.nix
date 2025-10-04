@@ -35,7 +35,7 @@ in
             accessMode = "ReadWriteOnce";
             globalMounts = [
               {
-                path = "/";
+                path = "/app/data";
                 readOnly = false;
               }
             ];
