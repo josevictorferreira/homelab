@@ -36,7 +36,7 @@ in
           type = "LoadBalancer";
           annotations = kubenix.lib.serviceAnnotationFor "alarm-server";
           ports = {
-            tcp = {
+            main = {
               enabled = true;
               port = 8888;
             };
