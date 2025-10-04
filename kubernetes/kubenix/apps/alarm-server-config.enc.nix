@@ -20,7 +20,7 @@ in
           LOG_LEVEL = "info";
           LOG_OUTPUT = "stdout";
           NTFY_ENABLED = "true";
-          NTFY_URL = kubenix.lib.domainFor "ntfy";
+          NTFY_URL = "https://${kubenix.lib.domainFor "ntfy"}";
           NTFY_TOPIC = "camera";
         };
       };
