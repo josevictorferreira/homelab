@@ -1,4 +1,4 @@
-{ kubenix, ... }:
+{ ... }:
 
 {
   submodules.instances.glance = {
@@ -12,18 +12,8 @@
       };
       subdomain = "glance";
       port = 8080;
-      config = {};
+      config = { };
       values = {
-        service.main = {
-          type = "LoadBalancer";
-          annotations = kubenix.lib.serviceAnnotationFor "glance";
-          ports = {
-            http = {
-              enabled = true;
-              port = 8080;
-            };
-          };
-        };
         persistence.glance = {
           type = "configMap";
           name = "glance-config";

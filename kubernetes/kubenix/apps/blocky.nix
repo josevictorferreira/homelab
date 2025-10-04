@@ -17,19 +17,8 @@ in
       subdomain = app;
       port = 4000;
       replicas = 3;
-      config = {};
+      config = { };
       values = {
-        service.main = {
-          type = "LoadBalancer";
-          primary = true;
-          annotations = kubenix.lib.serviceAnnotationFor app;
-          ports = {
-            http = {
-              enabled = true;
-              port = 4000;
-            };
-          };
-        };
         service.dns = {
           type = "LoadBalancer";
           annotations = kubenix.lib.serviceAnnotationFor app;
