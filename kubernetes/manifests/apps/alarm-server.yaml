@@ -71,10 +71,6 @@ spec:
       port: 8888
       protocol: TCP
       targetPort: 8888
-    - name: main
-      port: 8888
-      protocol: TCP
-      targetPort: 8888
   selector:
     app.kubernetes.io/controller: main
     app.kubernetes.io/instance: alarm-server
