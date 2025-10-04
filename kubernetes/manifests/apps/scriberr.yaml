@@ -41,7 +41,7 @@ spec:
               name: http
               protocol: TCP
           volumeMounts:
-            - mountPath: /
+            - mountPath: /app/data
               name: main
       dnsPolicy: ClusterFirst
       enableServiceLinks: false
