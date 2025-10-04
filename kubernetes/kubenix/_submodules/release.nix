@@ -44,6 +44,18 @@
             description = "number of replicas";
           };
 
+          secretName = mkOption {
+            type = types.str;
+            default = "";
+            description = "secret name for application credentials and configs";
+          };
+
+          resources = mkOption {
+            type = types.attrsOf (types.attrsOf types.str);
+            default = {};
+            description = "resources limits to be applied in the release";
+          };
+
           persistence = mkOption {
             description = "attrset of persistent volumes";
             default = { };
@@ -135,13 +147,15 @@
                   controllers.main.replicas = cfg.replicas;
                   controllers.main.containers.main = {
                     image = cfg.image;
-                    ports = [
-                      {
-                        name = "http";
-                        containerPort = cfg.port;
-                        protocol = "TCP";
-                      }
-                    ];
+                    ports = [{
+                      name = "http";
+                      containerPort = cfg.port;
+                      protocol = "TCP";
+                    }];
+                  } // optionalAttrs (cfg.secretName != "") {
+                    envFrom = [ { secretRef.name = cfg.secretName; } ];
+                  } // optionalAttrs (cfg.resources != { }) {
+                    resources = cfg.resources;
                   };
                   service.main.ports.http.port = cfg.port;
                   ingress.main = {

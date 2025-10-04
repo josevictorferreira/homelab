@@ -15,23 +15,17 @@ in
       };
       subdomain = "alarm-server";
       port = 8888;
-      values = {
-        envFrom = [
-          {
-            secretRef = {
-              name = "alarm-server-config";
-            };
-          }
-        ];
-        resources = {
-          requests = {
-            memory = "256Mi";
-            cpu = "30m";
-          };
-          limits = {
-            memory = "512Mi";
-          };
+      secretName = "alarm-server-config";
+      resources = {
+        requests = {
+          memory = "256Mi";
+          cpu = "30m";
         };
+        limits = {
+          memory = "512Mi";
+        };
+      };
+      values = {
         service.main = {
           type = "LoadBalancer";
           annotations = kubenix.lib.serviceAnnotationFor "alarm-server";
