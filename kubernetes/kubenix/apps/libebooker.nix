@@ -1,4 +1,4 @@
-{ kubenix, homelab, ... }:
+{ homelab, ... }:
 
 let
   namespace = homelab.kubernetes.namespaces.applications;
@@ -15,18 +15,6 @@ in
       };
       subdomain = "libebooker";
       port = 9292;
-      values = {
-        service.main = {
-          type = "LoadBalancer";
-          annotations = kubenix.lib.serviceAnnotationFor "libebooker";
-          ports = {
-            http = {
-              enabled = true;
-              port = 9292;
-            };
-          };
-        };
-      };
     };
   };
 }

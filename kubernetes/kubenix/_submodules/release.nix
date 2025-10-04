@@ -157,7 +157,16 @@
                   } // optionalAttrs (cfg.resources != { }) {
                     resources = cfg.resources;
                   };
-                  service.main.ports.http.port = cfg.port;
+                  service.main = {
+                    type = "LoadBalancer";
+                    annotations = kubenix.lib.serviceAnnotationFor config._module.args.name;
+                    ports = {
+                      http = {
+                        enabled = true;
+                        port = cfg.port;
+                      };
+                    };
+                  };
                   ingress.main = {
                     enabled = cfg.subdomain != "";
                     className = "cilium";

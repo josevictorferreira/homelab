@@ -1,4 +1,4 @@
-{ kubenix, homelab, ... }:
+{ homelab, ... }:
 
 let
   namespace = homelab.kubernetes.namespaces.applications;
@@ -16,17 +16,7 @@ in
       subdomain = "scriberr";
       port = 8080;
       values = {
-        service.main = {
-          type = "LoadBalancer";
-          annotations = kubenix.lib.serviceAnnotationFor "scriberr";
-          ports = {
-            http = {
-              enabled = true;
-              port = 8080;
-            };
-          };
-        };
-        persistence =  {
+        persistence = {
           main = {
             enabled = true;
             size = "5Gi";

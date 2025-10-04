@@ -1,4 +1,4 @@
-{ kubenix, homelab, ... }:
+{ homelab, ... }:
 
 let
   namespace = homelab.kubernetes.namespaces.applications;
@@ -23,18 +23,6 @@ in
         };
         limits = {
           memory = "512Mi";
-        };
-      };
-      values = {
-        service.main = {
-          type = "LoadBalancer";
-          annotations = kubenix.lib.serviceAnnotationFor "alarm-server";
-          ports = {
-            http = {
-              enabled = true;
-              port = 8888;
-            };
-          };
         };
       };
     };
