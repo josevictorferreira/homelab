@@ -40,12 +40,42 @@ spec:
             - containerPort: 8080
               name: http
               protocol: TCP
+          volumeMounts:
+            - mountPath: /
+              name: main
       dnsPolicy: ClusterFirst
       enableServiceLinks: false
       hostIPC: false
       hostNetwork: false
       hostPID: false
       serviceAccountName: default
+      volumes:
+        - name: main
+          persistentVolumeClaim:
+            claimName: scriberr
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: scriberr
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: scriberr
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: scriberr
+  namespace: apps
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: rook-ceph-block
 ---
 apiVersion: v1
 kind: Service

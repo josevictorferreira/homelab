@@ -26,6 +26,21 @@ in
             };
           };
         };
+        persistence =  {
+          main = {
+            enabled = true;
+            size = "5Gi";
+            storageClass = "rook-ceph-block";
+            type = "persistentVolumeClaim";
+            accessMode = "ReadWriteOnce";
+            globalMounts = [
+              {
+                path = "/";
+                readOnly = false;
+              }
+            ];
+          };
+        };
       };
     };
   };

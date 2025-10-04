@@ -65,11 +65,11 @@
                     };
                     storageClass = mkOption {
                       type = types.str;
-                      default = "longhorn-static";
+                      default = "rook-ceph-block";
                     };
                     mountPath = mkOption {
                       type = types.str;
-                      default = "/${config._module.args.name}";
+                      default = "/";
                     };
                     existingClaim = mkOption {
                       type = types.str;
@@ -77,16 +77,15 @@
                     };
                     type = mkOption {
                       type = types.str;
-                      default = "";
+                      default = "persistentVolumeClaim";
                     };
                     hostPath = mkOption {
                       type = types.str;
                       default = "";
                     };
-
                     name = mkOption {
                       type = types.str;
-                      default = "";
+                      default = "${config._module.args.name}-pvc";
                     };
                     readOnly = mkOption {
                       type = types.bool;
