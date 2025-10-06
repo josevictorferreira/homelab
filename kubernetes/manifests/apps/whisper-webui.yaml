@@ -47,7 +47,11 @@ spec:
               cpu: 30m
               memory: 256Mi
           volumeMounts:
-            - mountPath: /Whisper-WebUI
+            - mountPath: /Whisper-WebUI/models
+              name: main
+            - mountPath: /Whisper-WebUI/backend
+              name: main
+            - mountPath: /Whisper-WebUI/outputs
               name: main
       dnsPolicy: ClusterFirst
       enableServiceLinks: false

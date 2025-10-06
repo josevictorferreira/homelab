@@ -33,7 +33,15 @@ in
         accessMode = "ReadWriteOnce";
         globalMounts = [
           {
-            path = "/Whisper-WebUI";
+            path = "/Whisper-WebUI/models";
+            readOnly = false;
+          }
+          {
+            path = "/Whisper-WebUI/backend";
+            readOnly = false;
+          }
+          {
+            path = "/Whisper-WebUI/outputs";
             readOnly = false;
           }
         ];
