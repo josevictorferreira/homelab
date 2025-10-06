@@ -197,7 +197,7 @@ in
                   persistence.config = {
                     enabled = true;
                     type = "configMap";
-                    name = "${config._module.args.name}-config";
+                    name = "${config._module.args.name}";
                     globalMounts = [
                       {
                         path = "${strings.removeSuffix "/" cfg.config.mountPath}/${strings.removePrefix "/" cfg.config.filename}";
