@@ -6,13 +6,12 @@
         repo = "https://rocm.github.io/k8s-device-plugin";
         chart = "amd-gpu";
         version = "0.20.0";
-        sha256 = "sha256-km3mRsCk7NpbTJ8l8C52eweF+u9hqxIhEWALQ8LqN+0=";
+        sha256 = "sha256-FwNSzH2qyEXiL0WmNc8/dWvNdB9SOVZ4TrvhSNtpswo=";
       };
       namespace = "kube-system";
       includeCRDs = true;
       noHooks = true;
       values = {
-        containerRuntime = "containerd";
         tolerations = [
           {
             key = "node-role.kubernetes.io/control-plane";
@@ -22,7 +21,7 @@
         ];
 
         node_selector = {
-          "gpu-amd" = "enabled";
+          "gpu.amd.rocm" = "enabled";
         };
       };
     };
