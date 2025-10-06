@@ -1,4 +1,9 @@
-{ lib, pkgs, config, ... }:
+{
+  lib,
+  pkgs,
+  config,
+  ...
+}:
 
 let
   cfg = config.users;
@@ -22,7 +27,11 @@ in
     users.users.${cfg.username} = {
       isNormalUser = true;
       home = "/home/${cfg.username}";
-      extraGroups = [ "wheel" ];
+      extraGroups = [
+        "wheel"
+        "video"
+        "render"
+      ];
       shell = pkgs.zsh;
       openssh.authorizedKeys.keys = cfg.keys;
     };
