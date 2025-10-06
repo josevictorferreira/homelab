@@ -55,6 +55,12 @@ with lib;
               description = "secret name for application credentials and configs";
             };
 
+            command = mkOption {
+              type = types.listOf types.str;
+              default = [ ];
+              description = "command to start the container";
+            };
+
             resources = mkOption {
               type = types.attrsOf (types.attrsOf types.str);
               default = { };
@@ -125,6 +131,9 @@ with lib;
                   }
                   // optionalAttrs (cfg.resources != { }) {
                     resources = cfg.resources;
+                  }
+                  // optionalAttrs (cfg.command != "") {
+                    command = cfg.command;
                   };
                   service.main = {
                     type = "LoadBalancer";
