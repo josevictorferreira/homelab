@@ -1,22 +1,23 @@
 { lib, ... }:
 
 let
-  filterByRoles = hosts: role: (lib.attrsets.filterAttrs (name: value: builtins.elem role value.roles) hosts);
+  filterByRoles =
+    hosts: role: (lib.attrsets.filterAttrs (name: value: builtins.elem role value.roles) hosts);
 in
 rec {
   hosts = {
-    lab-pi-bk = {
-      ipAddress = "10.10.10.209";
-      system = "aarch64-linux";
-      machine = "raspberry-pi-4b";
-      interface = "end0";
-      mac = "DC:A6:32:BD:01:4C";
-      roles = [
-        "nixos-server"
-        "system-admin"
-        "backup-server"
-      ];
-    };
+    # lab-pi-bk = {
+    #   ipAddress = "10.10.10.209";
+    #   system = "aarch64-linux";
+    #   machine = "raspberry-pi-4b";
+    #   interface = "end0";
+    #   mac = "DC:A6:32:BD:01:4C";
+    #   roles = [
+    #     "nixos-server"
+    #     "system-admin"
+    #     "backup-server"
+    #   ];
+    # };
     lab-alpha-cp = {
       ipAddress = "10.10.10.200";
       system = "x86_64-linux";
@@ -85,6 +86,7 @@ rec {
         "k8s-server"
         "k8s-storage"
         "k8s-control-plane"
+        "amd-gpu"
       ];
     };
   };
@@ -96,15 +98,16 @@ rec {
     "k8s-storage"
     "backup-server"
     "nixos-server"
+    "amd-gpu"
   ];
 
-  group = lib.listToAttrs (map
-    (role: {
+  group = lib.listToAttrs (
+    map (role: {
       name = role;
       value = rec {
         configs = filterByRoles hosts role;
         names = lib.attrNames configs;
       };
-    })
-    groups);
+    }) groups
+  );
 }
