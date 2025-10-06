@@ -33,7 +33,14 @@ spec:
     spec:
       automountServiceAccountToken: true
       containers:
-        - image: ghcr.io/jhj0517/whisper-webui-backend:v1.0.7@sha256:4b4ebc76d5efe57247e1136bb857ed0f374a6b471e0d4d25ea42c3874e374160
+        - command:
+            - uvicorn
+            - backend.main:app
+            - --host
+            - 0.0.0.0
+            - --port
+            - '8000'
+          image: ghcr.io/jhj0517/whisper-webui-backend:v1.0.7@sha256:4b4ebc76d5efe57247e1136bb857ed0f374a6b471e0d4d25ea42c3874e374160
           imagePullPolicy: IfNotPresent
           name: main
           ports:
@@ -48,10 +55,6 @@ spec:
               memory: 256Mi
           volumeMounts:
             - mountPath: /Whisper-WebUI/models
-              name: main
-            - mountPath: /Whisper-WebUI/backend
-              name: main
-            - mountPath: /Whisper-WebUI/outputs
               name: main
       dnsPolicy: ClusterFirst
       enableServiceLinks: false

@@ -25,6 +25,14 @@ in
           "amd.com/gpu" = "1";
         };
       };
+      command = [
+        "uvicorn"
+        "backend.main:app"
+        "--host"
+        "0.0.0.0"
+        "--port"
+        "8000"
+      ];
       persistence = {
         enabled = true;
         size = "5Gi";
@@ -34,14 +42,6 @@ in
         globalMounts = [
           {
             path = "/Whisper-WebUI/models";
-            readOnly = false;
-          }
-          {
-            path = "/Whisper-WebUI/backend";
-            readOnly = false;
-          }
-          {
-            path = "/Whisper-WebUI/outputs";
             readOnly = false;
           }
         ];
