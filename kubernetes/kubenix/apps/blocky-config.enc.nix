@@ -82,9 +82,8 @@ in
 {
   kubernetes = {
     resources = {
-      configMaps."blocky-config" = {
+      configMaps."blocky" = {
         metadata = {
-          name = "blocky-config";
           namespace = namespace;
         };
         data."config.yml" = blockyConfigYaml;
