@@ -173,9 +173,8 @@ in
 {
   kubernetes = {
     resources = {
-      configMaps."glance-config" = {
+      configMaps."glance" = {
         metadata = {
-          name = "glance-config";
           namespace = namespace;
         };
         data."glance.yml" = kubenix.lib.toYamlStr glanceConfig;
