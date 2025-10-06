@@ -12,27 +12,9 @@
       };
       subdomain = "glance";
       port = 8080;
-      config = { };
-      values = {
-        persistence.glance = {
-          type = "configMap";
-          name = "glance-config";
-          items = [
-            {
-              key = "glance.yml";
-              path = "glance.yml";
-            }
-          ];
-          advancedMounts = {
-            main.main = [
-              {
-                path = "/app/config/glance.yml";
-                readOnly = true;
-                subPath = "glance.yml";
-              }
-            ];
-          };
-        };
+      config = {
+        filename = "glance.yml";
+        mountPath = "/app/config";
       };
     };
   };

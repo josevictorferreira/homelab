@@ -26,6 +26,8 @@ spec:
     type: Recreate
   template:
     metadata:
+      annotations:
+        checksum/configMaps: 505df480598d6abaafff8f2e3ed77f08610202752ce08b494adcfb37322ef4bf
       labels:
         app.kubernetes.io/controller: main
         app.kubernetes.io/instance: ntfy
@@ -49,6 +51,10 @@ spec:
               name: http
               protocol: TCP
           volumeMounts:
+            - mountPath: /var/lib/ntfy/config.yml
+              name: config
+              readOnly: true
+              subPath: config.yml
             - mountPath: /data
               name: main
       dnsPolicy: ClusterFirst
@@ -58,9 +64,83 @@ spec:
       hostPID: false
       serviceAccountName: default
       volumes:
+        - configMap:
+            items:
+              - key: config.yml
+                path: config.yml
+            name: ntfy-config
+          name: config
         - name: main
           persistentVolumeClaim:
             claimName: ntfy
+---
+apiVersion: v1
+data:
+  config.yml: 'attachment-cache-dir: /data/attachments
+
+    attachment-expiry-duration: 3h
+
+    attachment-file-size-limit: 15M
+
+    attachment-total-size-limit: 5G
+
+    auth-default-access: deny-all
+
+    base-url: https://ntfy.josevictor.me
+
+    behind-proxy: true
+
+    cache-file: /data/cache.db
+
+    global-topic-limit: 15000
+
+    listen-http: :80
+
+    log-format: text
+
+    log-level: info
+
+    metrics-listen-http: :9090
+
+    upstream-base-url: https://ntfy.sh
+
+    visitor-attachment-daily-bandwidth-limit: 500M
+
+    visitor-attachment-total-size-limit: 100M
+
+    visitor-email-limit-burst: 16
+
+    visitor-email-limit-replenish: 1h
+
+    visitor-message-daily-limit: 15000
+
+    visitor-request-limit-burst: 60
+
+    visitor-request-limit-replenish: 5s
+
+    visitor-subscription-limit: 30
+
+    web-push-email-address: alerts@josevictor.me
+
+    web-push-file: /data/webpush.db
+
+    web-root: /
+
+    '
+kind: ConfigMap
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: ntfy
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: ntfy
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: ntfy
+  namespace: apps
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim

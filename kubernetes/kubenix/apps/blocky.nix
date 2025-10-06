@@ -21,7 +21,10 @@ in
       subdomain = app;
       port = 4000;
       replicas = 3;
-      config = { };
+      config = {
+        filename = "config.yml";
+        mountPath = "/app";
+      };
       values = {
         service.dns = {
           type = "LoadBalancer";
@@ -48,25 +51,6 @@ in
               protocol = "TCP";
               port = 853;
             };
-          };
-        };
-        persistence.blocky = {
-          type = "configMap";
-          name = "blocky-config";
-          items = [
-            {
-              key = "config.yml";
-              path = "config.yml";
-            }
-          ];
-          advancedMounts = {
-            main.main = [
-              {
-                path = "/app/config.yml";
-                readOnly = true;
-                subPath = "config.yml";
-              }
-            ];
           };
         };
       };

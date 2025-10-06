@@ -42,7 +42,7 @@ spec:
               protocol: TCP
           volumeMounts:
             - mountPath: /app/config.yml
-              name: blocky
+              name: config
               readOnly: true
               subPath: config.yml
       dnsPolicy: ClusterFirst
@@ -57,7 +57,7 @@ spec:
               - key: config.yml
                 path: config.yml
             name: blocky-config
-          name: blocky
+          name: config
 ---
 apiVersion: v1
 kind: Service
