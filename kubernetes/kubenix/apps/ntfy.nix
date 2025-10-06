@@ -16,6 +16,12 @@ in
       subdomain = "ntfy";
       port = 80;
       secretName = "ntfy-secrets";
+      command = [
+        "ntfy"
+        "serve"
+        "--config"
+        "/var/lib/ntfy/config.yml"
+      ];
       persistence = {
         enabled = true;
         type = "persistentVolumeClaim";
