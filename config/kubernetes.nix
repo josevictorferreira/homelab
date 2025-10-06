@@ -27,6 +27,7 @@
       ntfy = "10.10.10.114";
       sftpgo = "10.10.10.115";
       sftpgoapi = "10.10.10.116";
+      whisperwebui = "10.10.10.117";
       qbittorrent = "10.10.10.119";
       prowlarr = "10.10.10.120";
       uptimekuma = "10.10.10.122";

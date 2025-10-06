@@ -1,0 +1,147 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/controller: main
+    app.kubernetes.io/instance: whisperwebui
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: whisperwebui
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: whisperwebui
+  namespace: apps
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/controller: main
+      app.kubernetes.io/instance: whisperwebui
+      app.kubernetes.io/name: whisperwebui
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/controller: main
+        app.kubernetes.io/instance: whisperwebui
+        app.kubernetes.io/name: whisperwebui
+    spec:
+      automountServiceAccountToken: true
+      containers:
+        - image: ghcr.io/jhj0517/whisper-webui-backend:v1.0.7@sha256:4b4ebc76d5efe57247e1136bb857ed0f374a6b471e0d4d25ea42c3874e374160
+          imagePullPolicy: IfNotPresent
+          name: main
+          ports:
+            - containerPort: 8000
+              name: http
+              protocol: TCP
+          resources:
+            limits:
+              amd.com/gpu: '1'
+            requests:
+              cpu: 30m
+              memory: 256Mi
+          volumeMounts:
+            - mountPath: /Whisper-WebUI
+              name: main
+      dnsPolicy: ClusterFirst
+      enableServiceLinks: false
+      hostIPC: false
+      hostNetwork: false
+      hostPID: false
+      serviceAccountName: default
+      volumes:
+        - name: main
+          persistentVolumeClaim:
+            claimName: whisperwebui
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: whisperwebui
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: whisperwebui
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: whisperwebui
+  namespace: apps
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: rook-ceph-block
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+    lbipam.cilium.io/ips: 10.10.10.117
+    lbipam.cilium.io/sharing-key: whisperwebui
+  labels:
+    app.kubernetes.io/instance: whisperwebui
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: whisperwebui
+    app.kubernetes.io/service: whisperwebui
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: whisperwebui
+  namespace: apps
+spec:
+  ports:
+    - name: http
+      port: 8000
+      protocol: TCP
+      targetPort: 8000
+  selector:
+    app.kubernetes.io/controller: main
+    app.kubernetes.io/instance: whisperwebui
+    app.kubernetes.io/name: whisperwebui
+  type: LoadBalancer
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: whisperwebui
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: whisperwebui
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: whisperwebui
+  namespace: apps
+spec:
+  ingressClassName: cilium
+  rules:
+    - host: whisperwebui.josevictor.me
+      http:
+        paths:
+          - backend:
+              service:
+                name: whisperwebui
+                port:
+                  number: 8000
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - whisperwebui.josevictor.me
+      secretName: wildcard-tls

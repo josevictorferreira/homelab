@@ -22,7 +22,7 @@ in
           cpu = "30m";
         };
         limits = {
-          "amd.com/gpu" = 1;
+          "amd.com/gpu" = "1";
         };
       };
       persistence = {
