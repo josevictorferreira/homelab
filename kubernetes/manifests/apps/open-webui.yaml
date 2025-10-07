@@ -72,6 +72,13 @@ spec:
           ports:
             - containerPort: 8080
               name: http
+          resources:
+            limits:
+              amd.com/gpu: '1'
+              memory: 2Gi
+            requests:
+              cpu: '1'
+              requests: 2Gi
           tty: true
           volumeMounts:
             - mountPath: /app/backend/data

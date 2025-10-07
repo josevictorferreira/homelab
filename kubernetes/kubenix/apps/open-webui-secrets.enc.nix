@@ -17,7 +17,8 @@ in
           "ENABLE_WEBSOCKET_SUPPORT" = "True";
           "WEBSOCKET_MANAGER" = "True";
           "ADMIN_EMAIL" = "root@josevictor.me";
-          "DATABASE_URL" = "postgresql://postgres:${kubenix.lib.secretsFor "postgresql_admin_password"}+@postgresql-hl:5432/openwebui";
+          "DATABASE_URL" =
+            "postgresql://postgres:${kubenix.lib.secretsFor "postgresql_admin_password"}+@postgresql-hl:5432/openwebui";
           "REDIS_URL" = "redis://:${kubenix.lib.secretsFor "redis_password"}+@redis-headless:6379/0";
           "WEBUI_SECRET_KEY" = kubenix.lib.secretsFor "openwebui_secret_key";
           "ENABLE_RAG" = "True";
@@ -27,22 +28,11 @@ in
           "RAG_WEB_SEARCH_ENGINE" = "searxng";
           "RAG_WEB_SEARCH_RESULT_COUNT" = "3";
           "RAG_WEB_SEARCH_CONCURRENT_REQUESTS" = "10";
+          "RAG_EMBEDDING_MODEL" = "sentence-transformers/all-MiniLM-L6-v2";
+          "WHISPER_MODEL" = "Systran/faster-whisper-large-v3";
           "SEARXNG_QUERY_URL" = "http://searxng.apps.svc.cluster.local/search?q=<query>";
           "ENABLE_WEB_SEARCH" = "True";
           "WEB_SEARCH_ENGINE" = "searxng";
-          "IMAGE_GENERATION_ENGINE" = "gemini";
-          "IMAGE_GENERATION_MODEL" = "google/gemini-2.5-flash-image-preview";
-          "GEMINI_API_BASE_URL" = "https://openrouter.ai/api/v1/chat/completions";
-          "GEMINI_API_KEY" = kubenix.lib.secretsFor "openrouter_api_key";
-          "IMAGES_GEMINI_API_BASE_URL" = "https://openrouter.ai/api/v1/chat/completions";
-          "IMAGES_GEMINI_API_KEY" = kubenix.lib.secretsFor "openrouter_api_key";
-          "ENABLE_IMAGE_GENERATION" = "True";
-          "IMAGES_OPENAI_API_BASE_URL"  = "https://openrouter.ai/api/v1";
-          "IMAGES_OPENAI_API_KEY" = kubenix.lib.secretsFor "openrouter_api_key";
-          "AUDIO_STT_ENGINE" = "openai";
-          "AUDIO_STT_MODEL" = "openai/gpt-4o-audio-preview";
-          "AUDIO_STT_OPENAI_API_BASE_URL" = "https://openrouter.ai/api/v1";
-          "AUDIO_STT_OPENAI_API_KEY" = kubenix.lib.secretsFor "openrouter_api_key";
           "PDF_EXTRACT_IMAGES" = "True";
         };
       };
