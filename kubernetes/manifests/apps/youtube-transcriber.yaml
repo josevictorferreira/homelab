@@ -1,0 +1,111 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/controller: main
+    app.kubernetes.io/instance: youtube-transcriber
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: youtube-transcriber
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: youtube-transcriber
+  namespace: apps
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/controller: main
+      app.kubernetes.io/instance: youtube-transcriber
+      app.kubernetes.io/name: youtube-transcriber
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/controller: main
+        app.kubernetes.io/instance: youtube-transcriber
+        app.kubernetes.io/name: youtube-transcriber
+    spec:
+      automountServiceAccountToken: true
+      containers:
+        - image: ghcr.io/josevictorferreira/youtube-transcriber:0.0.1@sha256:13510480faf6e70c5d02b2623cf4192c03f52f246d9d00415e4a1a75326c95bd
+          imagePullPolicy: IfNotPresent
+          name: main
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+      dnsPolicy: ClusterFirst
+      enableServiceLinks: false
+      hostIPC: false
+      hostNetwork: false
+      hostPID: false
+      serviceAccountName: default
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+    lbipam.cilium.io/ips: 10.10.10.118
+    lbipam.cilium.io/sharing-key: youtube-transcriber
+  labels:
+    app.kubernetes.io/instance: youtube-transcriber
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: youtube-transcriber
+    app.kubernetes.io/service: youtube-transcriber
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: youtube-transcriber
+  namespace: apps
+spec:
+  ports:
+    - name: http
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    app.kubernetes.io/controller: main
+    app.kubernetes.io/instance: youtube-transcriber
+    app.kubernetes.io/name: youtube-transcriber
+  type: LoadBalancer
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: youtube-transcriber
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: youtube-transcriber
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: youtube-transcriber
+  namespace: apps
+spec:
+  ingressClassName: cilium
+  rules:
+    - host: ytt.josevictor.me
+      http:
+        paths:
+          - backend:
+              service:
+                name: youtube-transcriber
+                port:
+                  number: 8080
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - ytt.josevictor.me
+      secretName: wildcard-tls
