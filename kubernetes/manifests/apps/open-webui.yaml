@@ -77,8 +77,8 @@ spec:
               amd.com/gpu: '1'
               memory: 2Gi
             requests:
-              cpu: '1'
-              requests: 2Gi
+              cpu: 10m
+              memory: 2Gi
           tty: true
           volumeMounts:
             - mountPath: /app/backend/data
