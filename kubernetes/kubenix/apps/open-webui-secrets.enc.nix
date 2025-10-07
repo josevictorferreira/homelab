@@ -29,7 +29,8 @@ in
           "RAG_WEB_SEARCH_RESULT_COUNT" = "3";
           "RAG_WEB_SEARCH_CONCURRENT_REQUESTS" = "10";
           "RAG_EMBEDDING_MODEL" = "sentence-transformers/all-MiniLM-L6-v2";
-          "WHISPER_MODEL" = "Systran/faster-whisper-large-v3";
+          "WHISPER_MODEL" = "Systran/faster-whisper-tiny";
+          "WHISPER_MODEL_DIR" = "/app/backend/data/cache/whisper/models";
           "SEARXNG_QUERY_URL" = "http://searxng.apps.svc.cluster.local/search?q=<query>";
           "ENABLE_WEB_SEARCH" = "True";
           "WEB_SEARCH_ENGINE" = "searxng";
