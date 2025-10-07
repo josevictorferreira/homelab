@@ -3,6 +3,11 @@
 let
   app = "rabbitmq";
   namespace = homelab.kubernetes.namespaces.applications;
+  image = {
+    registry = "docker.io";
+    repository = "bitnamilegacy/rabbitmq";
+    tag = "4.1.3-debian-12-r1@sha256:a0745813602734f83fbdeba53dc0243a667f55fb7cded5b61f9192735b1dac1b";
+  };
 in
 {
   kubernetes = {
@@ -18,6 +23,10 @@ in
       namespace = namespace;
 
       values = {
+        image = image;
+
+        global.security.allowInsecureImages = true;
+
         extraContainerPorts = [
           {
             name = "mqtt";
@@ -35,20 +44,42 @@ in
           type = "LoadBalancer";
           annotations = kubenix.lib.serviceAnnotationFor app;
           extraPorts = [
-            { name = "mqtt"; port = 1883; targetPort = 1883; }
-            { name = "mqtts"; port = 8883; targetPort = 8883; }
+            {
+              name = "mqtt";
+              port = 1883;
+              targetPort = 1883;
+            }
+            {
+              name = "mqtts";
+              port = 8883;
+              targetPort = 8883;
+            }
           ];
           extraPortsHeadless = [
-            { name = "mqtt"; port = 1883; targetPort = 1883; }
-            { name = "mqtts"; port = 8883; targetPort = 8883; }
+            {
+              name = "mqtt";
+              port = 1883;
+              targetPort = 1883;
+            }
+            {
+              name = "mqtts";
+              port = 8883;
+              targetPort = 8883;
+            }
           ];
         };
 
         networkPolicy.extraIngress = [
           {
             ports = [
-              { protocol = "TCP"; port = 1883; }
-              { protocol = "TCP"; port = 8883; }
+              {
+                protocol = "TCP";
+                port = 1883;
+              }
+              {
+                protocol = "TCP";
+                port = 8883;
+              }
             ];
           }
         ];
