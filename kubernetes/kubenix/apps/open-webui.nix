@@ -1,4 +1,8 @@
-{ lib, kubenix, homelab, ... }:
+{
+  kubenix,
+  homelab,
+  ...
+}:
 
 let
   app = "open-webui";
@@ -8,13 +12,12 @@ in
 {
   kubernetes = {
     helm.releases.${app} = {
-      chart = kubenix.lib.helm.fetch
-        {
-          repo = "https://helm.openwebui.com/";
-          chart = "open-webui";
-          version = "8.1.0";
-          sha256 = "sha256-qFG0Iq2IBwkqG6t2Z47GDU3fjftzy3xI7ALNJjctNQk=";
-        };
+      chart = kubenix.lib.helm.fetch {
+        repo = "https://helm.openwebui.com/";
+        chart = "open-webui";
+        version = "8.1.0";
+        sha256 = "sha256-qFG0Iq2IBwkqG6t2Z47GDU3fjftzy3xI7ALNJjctNQk=";
+      };
       includeCRDs = true;
       noHooks = true;
       namespace = namespace;
@@ -27,6 +30,16 @@ in
         ollama.enabled = false;
         enableOpenaiApi = true;
         openaiBaseApiUrl = "https://openrouter.ai/api/v1";
+        resources = {
+          requests = {
+            requests = "2Gi";
+            cpu = "1";
+          };
+          limits = {
+            memory = "2Gi";
+            "amd.com/gpu" = "1";
+          };
+        };
         ingress = {
           enabled = true;
           host = kubenix.lib.domainFor "openwebui";
