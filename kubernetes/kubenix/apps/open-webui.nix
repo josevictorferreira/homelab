@@ -32,8 +32,8 @@ in
         openaiBaseApiUrl = "https://openrouter.ai/api/v1";
         resources = {
           requests = {
-            requests = "2Gi";
-            cpu = "1";
+            memory = "2Gi";
+            cpu = "10m";
           };
           limits = {
             memory = "2Gi";
