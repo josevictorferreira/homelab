@@ -95,7 +95,7 @@ metadata:
 spec:
   ingressClassName: cilium
   rules:
-    - host: ytt.josevictor.me
+    - host: youtube-transcriber.josevictor.me
       http:
         paths:
           - backend:
@@ -107,5 +107,5 @@ spec:
             pathType: Prefix
   tls:
     - hosts:
-        - ytt.josevictor.me
+        - youtube-transcriber.josevictor.me
       secretName: wildcard-tls
