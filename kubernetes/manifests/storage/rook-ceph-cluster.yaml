@@ -258,7 +258,6 @@ spec:
   storage:
     nodes:
       - devices:
-          - name: /dev/disk/by-partlabel/CEPH_OSD_NVME
           - name: /dev/disk/by-partlabel/CEPH_OSD_SATA
         name: lab-alpha-cp
       - devices:
