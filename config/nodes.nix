@@ -25,6 +25,7 @@ rec {
       interface = "enp1s0";
       mac = "68:1D:EF:30:C1:03";
       disks = [
+        "/dev/disk/by-partlabel/CEPH_OSD_NVME"
         "/dev/disk/by-partlabel/CEPH_OSD_SATA"
       ];
       roles = [
