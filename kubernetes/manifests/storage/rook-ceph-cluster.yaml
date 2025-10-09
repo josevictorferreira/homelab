@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    kubenix/k8s-version: "1.32"
+    kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   labels:
     app: rook-ceph-tools
@@ -106,7 +106,7 @@ apiVersion: ceph.rook.io/v1
 kind: CephBlockPool
 metadata:
   annotations:
-    kubenix/k8s-version: "1.32"
+    kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   name: replicapool
   namespace: rook-ceph
@@ -119,7 +119,7 @@ apiVersion: ceph.rook.io/v1
 kind: CephCluster
 metadata:
   annotations:
-    kubenix/k8s-version: "1.32"
+    kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   name: rook-ceph
   namespace: rook-ceph
@@ -129,7 +129,7 @@ spec:
     image: quay.io/ceph/ceph:v19.2.3
   cleanupPolicy:
     allowUninstallWithVolumes: false
-    confirmation: ""
+    confirmation: ''
     sanitizeDisks:
       dataSource: zero
       iteration: 1
@@ -266,6 +266,9 @@ spec:
         name: lab-beta-cp
       - devices:
           - name: /dev/disk/by-partlabel/CEPH_OSD_NVME
+        name: lab-delta-cp
+      - devices:
+          - name: /dev/disk/by-partlabel/CEPH_OSD_NVME
           - name: /dev/disk/by-partlabel/CEPH_OSD_SATA
         name: lab-gamma-wk
     useAllDevices: false
@@ -277,7 +280,7 @@ apiVersion: ceph.rook.io/v1
 kind: CephFilesystem
 metadata:
   annotations:
-    kubenix/k8s-version: "1.32"
+    kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   name: ceph-filesystem
   namespace: rook-ceph
@@ -295,7 +298,7 @@ apiVersion: ceph.rook.io/v1
 kind: CephFilesystemSubVolumeGroup
 metadata:
   annotations:
-    kubenix/k8s-version: "1.32"
+    kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   name: ceph-filesystem-csi
   namespace: rook-ceph
@@ -309,13 +312,13 @@ apiVersion: ceph.rook.io/v1
 kind: CephObjectStore
 metadata:
   annotations:
-    kubenix/k8s-version: "1.32"
+    kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   name: ceph-objectstore
   namespace: rook-ceph
 spec:
   allowUsersInNamespaces:
-    - "*"
+    - '*'
   dataPool:
     replicated:
       size: 3
@@ -337,7 +340,7 @@ kind: Ingress
 metadata:
   annotations:
     cert-manager.io/cluster-issuer: cloudflare-issuer
-    kubenix/k8s-version: "1.32"
+    kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   name: ceph-objectstore
   namespace: rook-ceph
@@ -364,8 +367,8 @@ kind: Ingress
 metadata:
   annotations:
     cert-manager.io/cluster-issuer: cloudflare-issuer
-    ingress.cilium.io/tls-passthrough: "true"
-    kubenix/k8s-version: "1.32"
+    ingress.cilium.io/tls-passthrough: 'true'
+    kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   name: rook-ceph-dashboard
   namespace: rook-ceph
@@ -395,9 +398,9 @@ metadata:
     helm.sh/hook: post-install,pre-upgrade
     helm.sh/hook-delete-policy: before-hook-creation
     helm.sh/resource-policy: keep
-    kubenix/k8s-version: "1.32"
+    kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
-    storageclass.kubernetes.io/is-default-class: "true"
+    storageclass.kubernetes.io/is-default-class: 'true'
   name: rook-ceph-block
   namespace: rook-ceph
 parameters:
@@ -411,7 +414,7 @@ parameters:
   csi.storage.k8s.io/provisioner-secret-name: rook-csi-rbd-provisioner
   csi.storage.k8s.io/provisioner-secret-namespace: rook-ceph
   imageFeatures: layering
-  imageFormat: "2"
+  imageFormat: '2'
   pool: replicapool
 provisioner: rook-ceph.rbd.csi.ceph.com
 reclaimPolicy: Delete
@@ -425,9 +428,9 @@ metadata:
     helm.sh/hook: post-install,pre-upgrade
     helm.sh/hook-delete-policy: before-hook-creation
     helm.sh/resource-policy: keep
-    kubenix/k8s-version: "1.32"
+    kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
-    storageclass.kubernetes.io/is-default-class: "false"
+    storageclass.kubernetes.io/is-default-class: 'false'
   name: rook-ceph-filesystem
   namespace: rook-ceph
 parameters:
@@ -453,7 +456,7 @@ metadata:
     helm.sh/hook: post-install,pre-upgrade
     helm.sh/hook-delete-policy: before-hook-creation
     helm.sh/resource-policy: keep
-    kubenix/k8s-version: "1.32"
+    kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   name: rook-ceph-objectstore
   namespace: rook-ceph
