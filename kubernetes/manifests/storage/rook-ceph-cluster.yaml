@@ -264,8 +264,7 @@ spec:
       - devices:
           - name: /dev/disk/by-partlabel/CEPH_OSD_NVME
         name: lab-beta-cp
-      - devices:
-          - name: /dev/disk/by-partlabel/CEPH_OSD_NVME
+      - devices: []
         name: lab-delta-cp
       - devices:
           - name: /dev/disk/by-partlabel/CEPH_OSD_NVME
