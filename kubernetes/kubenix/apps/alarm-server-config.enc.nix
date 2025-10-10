@@ -19,7 +19,7 @@ in
           MESSAGE_PRIORITY = "low";
           LOG_LEVEL = "info";
           LOG_OUTPUT = "stdout";
-          NTFY_ENABLED = "true";
+          NTFY_ENABLED = "false";
           NTFY_URL = "http://ntfy";
           NTFY_TOPIC = "camera";
         };
