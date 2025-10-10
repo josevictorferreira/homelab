@@ -1,32 +1,32 @@
-{ lib, kubenix, homelab, ... }:
+{
+  lib,
+  kubenix,
+  homelab,
+  ...
+}:
 
 let
   namespace = homelab.kubernetes.namespaces.storage;
   domain = homelab.domain;
   storageNodes = homelab.nodes.group."k8s-storage".configs;
-  storageNodesList = lib.mapAttrsToList
-    (name: attrs: {
-      name = name;
-      devices = builtins.map
-        (device: {
-          name = device;
-        })
-        attrs.disks;
-    })
-    storageNodes;
-  monitorGroupName = "k8s-control-plane"; # Name of the node group to run monitors on
+  storageNodesList = lib.mapAttrsToList (name: attrs: {
+    name = name;
+    devices = builtins.map (device: {
+      name = device;
+    }) attrs.disks;
+  }) storageNodes;
+  monitorGroupName = "k8s-storage"; # Name of the node group to run monitors on
   monitorHostNames = homelab.nodes.group.${monitorGroupName}.names;
 in
 {
   kubernetes = {
     helm.releases."rook-ceph-cluster" = {
-      chart = kubenix.lib.helm.fetch
-        {
-          repo = "https://charts.rook.io/release";
-          chart = "rook-ceph-cluster";
-          version = "1.18.1";
-          sha256 = "sha256-lX9aDPUbfrZ8yuMKtKqDROX+MWQFB8gYHTlOm27FfaE=";
-        };
+      chart = kubenix.lib.helm.fetch {
+        repo = "https://charts.rook.io/release";
+        chart = "rook-ceph-cluster";
+        version = "1.18.1";
+        sha256 = "sha256-lX9aDPUbfrZ8yuMKtKqDROX+MWQFB8gYHTlOm27FfaE=";
+      };
       namespace = namespace;
       includeCRDs = true;
       noHooks = false;
@@ -50,7 +50,11 @@ in
           placement = {
             all = {
               tolerations = [
-                { key = "node-role.kubernetes.io/control-plane"; operator = "Exists"; effect = "NoSchedule"; }
+                {
+                  key = "node-role.kubernetes.io/control-plane";
+                  operator = "Exists";
+                  effect = "NoSchedule";
+                }
               ];
               nodeAffinity = {
                 requiredDuringSchedulingIgnoredDuringExecution = {
@@ -194,9 +198,11 @@ in
             name = "ceph-filesystem";
             spec = {
               metadataPool.replicated.size = 3;
-              dataPools = [{
-                replicated.size = 3;
-              }];
+              dataPools = [
+                {
+                  replicated.size = 3;
+                }
+              ];
               metadataServer.activeCount = 1;
             };
             storageClass = {
