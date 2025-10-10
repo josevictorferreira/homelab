@@ -43,7 +43,7 @@ rec {
       interface = "enp1s0";
       mac = "68:1D:EF:3B:71:4E";
       disks = [
-        # "/dev/disk/by-partlabel/CEPH_OSD_NVME"
+        "/dev/disk/by-partlabel/CEPH_OSD_NVME"
       ];
       roles = [
         "nixos-server"
