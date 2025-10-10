@@ -267,6 +267,10 @@ spec:
       - devices:
           - name: /dev/disk/by-partlabel/CEPH_OSD_NVME
         name: lab-delta-cp
+      - devices:
+          - name: /dev/disk/by-partlabel/CEPH_OSD_NVME
+          - name: /dev/disk/by-partlabel/CEPH_OSD_SATA
+        name: lab-gamma-wk
     useAllDevices: false
     useAllNodes: false
   upgradeOSDRequiresHealthyPGs: false
