@@ -368,7 +368,6 @@ kind: Ingress
 metadata:
   annotations:
     cert-manager.io/cluster-issuer: cloudflare-issuer
-    ingress.cilium.io/tls-passthrough: 'true'
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   name: rook-ceph-dashboard
