@@ -171,7 +171,7 @@ spec:
     count: 2
   mon:
     allowMultiplePerNode: false
-    count: 4
+    count: 3
   monitoring:
     enabled: false
   network:
@@ -192,6 +192,7 @@ spec:
                   operator: In
                   values:
                     - control-plane
+                    - worker
       tolerations:
         - effect: NoSchedule
           key: node-role.kubernetes.io/control-plane
