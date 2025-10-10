@@ -15,7 +15,7 @@ let
       name = device;
     }) attrs.disks;
   }) storageNodes;
-  monitorGroupName = "k8s-storage"; # Name of the node group to run monitors on
+  monitorGroupName = "k8s-control-plane"; # Name of the node group to run monitors on
   monitorHostNames = homelab.nodes.group.${monitorGroupName}.names;
 in
 {
@@ -64,7 +64,10 @@ in
                         {
                           key = "node-group";
                           operator = "In";
-                          values = [ "control-plane" ];
+                          values = [
+                            "control-plane"
+                            "worker"
+                          ];
                         }
                       ];
                     }
