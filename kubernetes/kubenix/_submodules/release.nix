@@ -2,10 +2,14 @@
 with lib;
 
 let
-  getFileType = filename:
-              if (hasSuffix ".yaml" filename || hasSuffix ".yml" filename) then "yaml"
-              else if (hasSuffix ".json" filename) then "json"
-              else throw "Unsupported config file extension in '${filename}'. Use .yaml, .yml, or .json.";
+  getFileType =
+    filename:
+    if (hasSuffix ".yaml" filename || hasSuffix ".yml" filename) then
+      "yaml"
+    else if (hasSuffix ".json" filename) then
+      "json"
+    else
+      throw "Unsupported config file extension in '${filename}'. Use .yaml, .yml, or .json.";
 in
 
 {
@@ -36,12 +40,6 @@ in
               type = types.attrsOf types.str;
               default = { };
               description = "image to use for the release";
-            };
-
-            subdomain = mkOption {
-              type = types.nullOr types.str;
-              default = null;
-              description = "hostname subdomain";
             };
 
             port = mkOption {
@@ -95,25 +93,27 @@ in
             config = mkOption {
               description = "A structured way to define a config map and mount it.";
               default = null;
-              type = types.nullOr (types.submodule {
-                options = {
-                  filename = mkOption {
-                    type = types.str;
-                    default = "config.yml";
-                    description = "The filename";
+              type = types.nullOr (
+                types.submodule {
+                  options = {
+                    filename = mkOption {
+                      type = types.str;
+                      default = "config.yml";
+                      description = "The filename";
+                    };
+                    mountPath = mkOption {
+                      type = types.str;
+                      default = "/config";
+                      description = "The path inside the container where the config file will be mounted.";
+                    };
+                    data = mkOption {
+                      type = types.nullOr types.attrs;
+                      default = null;
+                      description = "The attrset containing the actual configuration data.";
+                    };
                   };
-                  mountPath = mkOption {
-                    type = types.str;
-                    default = "/config";
-                    description = "The path inside the container where the config file will be mounted.";
-                  };
-                  data = mkOption {
-                    type = types.nullOr types.attrs;
-                    default = null;
-                    description = "The attrset containing the actual configuration data.";
-                  };
-                };
-              });
+                }
+              );
             };
 
             values = mkOption {
@@ -171,11 +171,11 @@ in
                     };
                   };
                   ingress.main = {
-                    enabled = cfg.subdomain != null;
+                    enabled = true;
                     className = "cilium";
                     hosts = [
                       {
-                        host = kubenix.lib.domainFor cfg.subdomain;
+                        host = kubenix.lib.domainFor config._module.args.name;
                         paths = [
                           {
                             path = "/";
@@ -188,7 +188,7 @@ in
                     tls = [
                       {
                         secretName = "wildcard-tls";
-                        hosts = [ (kubenix.lib.domainFor cfg.subdomain) ];
+                        hosts = [ (kubenix.lib.domainFor config._module.args.name) ];
                       }
                     ];
                   };

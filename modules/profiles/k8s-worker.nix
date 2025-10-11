@@ -10,10 +10,7 @@
 let
   serviceEnabled = true;
   cfg = config.profiles."k8s-worker";
-  amdGpuFlags = [
-    "--node-label=gpu.amd.rocm=enabled"
-    "--node-label=workload.gpu=true"
-  ];
+  roleLabelFlags = map (role: "--node-label=node-role.kubernetes.io/${role}=true") hostConfig.roles;
 in
 {
   options.profiles."k8s-worker" = {
@@ -27,7 +24,6 @@ in
       extraFlags = toString (
         [
           "--node-name=${hostName}"
-          "--node-label=node-group=worker"
           "--kubelet-arg=container-log-max-size=10Mi"
           "--kubelet-arg=container-log-max-files=3"
           "--kubelet-arg=image-gc-high-threshold=85"
@@ -37,7 +33,7 @@ in
           "--kubelet-arg=eviction-soft-grace-period=imagefs.available=2m,nodefs.available=2m"
           "--kubelet-arg=eviction-max-pod-grace-period=30"
         ]
-        ++ (if (builtins.elem "amd-gpu" hostConfig.roles) then amdGpuFlags else [ ])
+        ++ roleLabelFlags
       );
       tokenFile = config.sops.secrets.k3s_token.path;
       serverAddr = "https://${homelab.kubernetes.vipAddress}:6443";

@@ -50,7 +50,7 @@ in
           attachment-cache-dir = "/data/attachments";
           attachment-total-size-limit = "5G";
           attachment-file-size-limit = "15M";
-          attachment-expiry-duration = "3h";
+          attachment-expiry-duration = "72h";
           web-push-file = "/data/webpush.db";
           web-push-email-address = "alerts@josevictor.me";
           upstream-base-url = "https://ntfy.sh";
