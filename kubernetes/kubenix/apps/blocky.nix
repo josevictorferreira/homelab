@@ -15,7 +15,7 @@ in
       namespace = namespace;
       image = {
         repository = "ghcr.io/0xerr0r/blocky";
-        tag = "v0.26.1@sha256:969aeb8e573dee62c565c6e1f9604d44a367adfcf560edac4994b14af90f81a6";
+        tag = "v0.27.0@sha256:d4bb3ad54b5b3471341d11609eabb8b3d9da0faf3244da7bb2d210107b2fbc30";
         pullPolicy = "IfNotPresent";
       };
       subdomain = app;
