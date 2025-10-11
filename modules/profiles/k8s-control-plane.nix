@@ -14,7 +14,7 @@ let
     "--cluster-init"
     "--write-kubeconfig-mode 0644"
   ];
-  roleLabelFlags = map (role: "--node-label=node-role.kubernetes.io/${role}=") hostConfig.roles;
+  roleLabelFlags = map (role: "--node-label=node.kubernetes.io/${role}=") hostConfig.roles;
   initNodeHostName = builtins.head homelab.nodes.group."k8s-control-plane".names;
   serverFlagList = [
     "--https-listen-port=6444"
