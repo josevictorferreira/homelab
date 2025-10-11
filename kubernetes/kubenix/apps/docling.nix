@@ -15,14 +15,11 @@ in
         pullPolicy = "IfNotPresent";
       };
       port = 5001;
-      resources = {
-        requests = {
-          memory = "2Gi";
-          cpu = "10m";
-        };
-        limits = {
-          memory = "2Gi";
-          "amd.com/gpu" = "1";
+      values = {
+        defaultPodOptions = {
+          nodeSelector = {
+            "node.kubernetes.io/amd-gpu" = "true";
+          };
         };
       };
     };

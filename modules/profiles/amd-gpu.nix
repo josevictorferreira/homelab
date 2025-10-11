@@ -39,5 +39,20 @@ in
       enable = true;
       support32Bit.enable = true;
     };
+
+    environment.systemPackages = with pkgs; [
+      pciutils
+      vulkan-tools
+      clinfo
+    ];
+
+    environment.variables = {
+      PATH = [ "/opt/rocm/bin" ];
+      LD_LIBRARY_PATH = [
+        "/opt/rocm/lib"
+        "/run/opengl-driver/lib"
+      ];
+      ROCM_PATH = "/opt/rocm";
+    };
   };
 }
