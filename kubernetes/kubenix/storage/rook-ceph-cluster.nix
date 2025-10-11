@@ -62,12 +62,8 @@ in
                     {
                       matchExpressions = [
                         {
-                          key = "node-group";
-                          operator = "In";
-                          values = [
-                            "control-plane"
-                            "worker"
-                          ];
+                          key = "node-role.kubernetes.io/k8s-storage";
+                          operator = "Exists";
                         }
                       ];
                     }

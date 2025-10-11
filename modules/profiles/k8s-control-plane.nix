@@ -14,11 +14,8 @@ let
     "--cluster-init"
     "--write-kubeconfig-mode 0644"
   ];
+  roleLabelFlags = map (role: "--node-label=node-role.kubernetes.io/${role}=") hostConfig.roles;
   initNodeHostName = builtins.head homelab.nodes.group."k8s-control-plane".names;
-  amdGpuFlags = [
-    "--node-label=gpu.amd.rocm=enabled"
-    "--node-label=workload.gpu=true"
-  ];
   serverFlagList = [
     "--https-listen-port=6444"
     "--tls-san=${homelab.kubernetes.vipAddress}"
@@ -31,7 +28,6 @@ let
     "--disable-kube-proxy"
     "--flannel-backend=none"
     "--disable=traefik,servicelb,local-storage"
-    "--node-label=node-group=control-plane"
     "--etcd-expose-metrics=true"
     "--etcd-snapshot-schedule-cron='0 */12 * * *'"
     "--etcd-arg=quota-backend-bytes=8589934592"
@@ -40,7 +36,7 @@ let
     "--etcd-arg=auto-compaction-retention=30m"
   ]
   ++ (if cfg.isInit then clusterInitFlags else [ ])
-  ++ (if (builtins.elem "amd-gpu" hostConfig.roles) then amdGpuFlags else [ ]);
+  ++ roleLabelFlags;
   bootstrapManifestFiles = builtins.attrNames (
     builtins.readDir "${homelab.paths.manifests}/bootstrap"
   );
