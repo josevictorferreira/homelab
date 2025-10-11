@@ -21,7 +21,7 @@
         ];
 
         node_selector = {
-          "node-role.kubernetes.io/amd-gpu" = "true";
+          "node.kubernetes.io/amd-gpu" = "true";
         };
       };
     };
