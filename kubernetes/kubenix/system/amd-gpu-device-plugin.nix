@@ -21,7 +21,7 @@
         ];
 
         node_selector = {
-          "gpu.amd.rocm" = "enabled";
+          "node-role.kubernetes.io/amd-gpu" = "true";
         };
       };
     };
