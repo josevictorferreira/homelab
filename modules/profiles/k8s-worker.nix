@@ -10,7 +10,7 @@
 let
   serviceEnabled = true;
   cfg = config.profiles."k8s-worker";
-  roleLabelFlags = map (role: "--node-label=node-role.kubernetes.io/${role}=true") hostConfig.roles;
+  roleLabelFlags = map (role: "--node-label=node.kubernetes.io/${role}=true") hostConfig.roles;
 in
 {
   options.profiles."k8s-worker" = {
