@@ -27,7 +27,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/configMaps: 505df480598d6abaafff8f2e3ed77f08610202752ce08b494adcfb37322ef4bf
+        checksum/configMaps: cb1745118344af31c16378d7f678f0baf2d74a42564b9f416ea5d5627da34ec1
       labels:
         app.kubernetes.io/controller: main
         app.kubernetes.io/instance: ntfy
@@ -78,7 +78,7 @@ apiVersion: v1
 data:
   config.yml: 'attachment-cache-dir: /data/attachments
 
-    attachment-expiry-duration: 3h
+    attachment-expiry-duration: 72h
 
     attachment-file-size-limit: 15M
 
