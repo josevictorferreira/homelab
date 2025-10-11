@@ -18,7 +18,6 @@ in
         tag = "v0.27.0@sha256:d4bb3ad54b5b3471341d11609eabb8b3d9da0faf3244da7bb2d210107b2fbc30";
         pullPolicy = "IfNotPresent";
       };
-      subdomain = app;
       port = 4000;
       replicas = 3;
       config = {

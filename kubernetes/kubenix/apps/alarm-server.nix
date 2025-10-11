@@ -13,7 +13,6 @@ in
         tag = "v0.2.3@sha256:317714c3c6d0939cc89aef10b00cee5dde4dd455b820c98d6cc9dbddc1552626";
         pullPolicy = "IfNotPresent";
       };
-      subdomain = "alarm-server";
       port = 8888;
       secretName = "alarm-server-config";
       resources = {
