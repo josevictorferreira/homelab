@@ -20,9 +20,17 @@
           }
         ];
 
-        node_selector = {
-          "node.kubernetes.io/amd-gpu" = "true";
-        };
+        # node_selector_enabled = true;
+        #
+        # node_selector = {
+        #   "node.kubernetes.io/amd-gpu" = "true";
+        # };
+      };
+    };
+
+    resources.daemonSets."amd-gpu-device-plugin-daemonset" = {
+      spec.template.spec.nodeSelector = {
+        "node.kubernetes.io/amd-gpu" = "true";
       };
     };
   };
