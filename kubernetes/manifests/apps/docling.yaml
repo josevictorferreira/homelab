@@ -1,0 +1,118 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/controller: main
+    app.kubernetes.io/instance: docling
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: docling
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: docling
+  namespace: apps
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/controller: main
+      app.kubernetes.io/instance: docling
+      app.kubernetes.io/name: docling
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/controller: main
+        app.kubernetes.io/instance: docling
+        app.kubernetes.io/name: docling
+    spec:
+      automountServiceAccountToken: true
+      containers:
+        - image: ghcr.io/docling-project/docling-serve:v1.6.0@sha256:7dc85167c6f9175b8380e54e6fb759654d3c2339edef3b878a9199d651c0e59b
+          imagePullPolicy: IfNotPresent
+          name: main
+          ports:
+            - containerPort: 5001
+              name: http
+              protocol: TCP
+          resources:
+            limits:
+              amd.com/gpu: '1'
+              memory: 2Gi
+            requests:
+              cpu: 10m
+              memory: 2Gi
+      dnsPolicy: ClusterFirst
+      enableServiceLinks: false
+      hostIPC: false
+      hostNetwork: false
+      hostPID: false
+      serviceAccountName: default
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+    lbipam.cilium.io/ips: 10.10.10.121
+    lbipam.cilium.io/sharing-key: docling
+  labels:
+    app.kubernetes.io/instance: docling
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: docling
+    app.kubernetes.io/service: docling
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: docling
+  namespace: apps
+spec:
+  ports:
+    - name: http
+      port: 5001
+      protocol: TCP
+      targetPort: 5001
+  selector:
+    app.kubernetes.io/controller: main
+    app.kubernetes.io/instance: docling
+    app.kubernetes.io/name: docling
+  type: LoadBalancer
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: docling
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: docling
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: docling
+  namespace: apps
+spec:
+  ingressClassName: cilium
+  rules:
+    - host: docling.josevictor.me
+      http:
+        paths:
+          - backend:
+              service:
+                name: docling
+                port:
+                  number: 5001
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - docling.josevictor.me
+      secretName: wildcard-tls
