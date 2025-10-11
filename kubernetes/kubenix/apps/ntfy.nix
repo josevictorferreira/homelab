@@ -14,7 +14,6 @@ in
         tag = "v2.14.0@sha256:5a051798d14138c3ecb12c038652558ab6a077e1aceeb867c151cbf5fa8451ef";
         pullPolicy = "IfNotPresent";
       };
-      subdomain = app;
       port = 80;
       secretName = "ntfy-secrets";
       command = [
