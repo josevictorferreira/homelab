@@ -33,7 +33,7 @@ spec:
     spec:
       automountServiceAccountToken: true
       containers:
-        - image: ghcr.io/0xerr0r/blocky:v0.26.1@sha256:969aeb8e573dee62c565c6e1f9604d44a367adfcf560edac4994b14af90f81a6
+        - image: ghcr.io/0xerr0r/blocky:v0.27.0@sha256:d4bb3ad54b5b3471341d11609eabb8b3d9da0faf3244da7bb2d210107b2fbc30
           imagePullPolicy: IfNotPresent
           name: main
           ports:
