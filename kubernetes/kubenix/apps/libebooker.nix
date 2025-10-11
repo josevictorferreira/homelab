@@ -13,7 +13,6 @@ in
         tag = "latest";
         pullPolicy = "IfNotPresent";
       };
-      subdomain = "libebooker";
       port = 9292;
     };
   };
