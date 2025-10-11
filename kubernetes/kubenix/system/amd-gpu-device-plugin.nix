@@ -19,12 +19,6 @@
             effect = "NoSchedule";
           }
         ];
-
-        # node_selector_enabled = true;
-        #
-        # node_selector = {
-        #   "node.kubernetes.io/amd-gpu" = "true";
-        # };
       };
     };
 

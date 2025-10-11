@@ -40,18 +40,13 @@ spec:
             - containerPort: 5001
               name: http
               protocol: TCP
-          resources:
-            limits:
-              amd.com/gpu: '1'
-              memory: 2Gi
-            requests:
-              cpu: 10m
-              memory: 2Gi
       dnsPolicy: ClusterFirst
       enableServiceLinks: false
       hostIPC: false
       hostNetwork: false
       hostPID: false
+      nodeSelector:
+        node.kubernetes.io/amd-gpu: 'true'
       serviceAccountName: default
 ---
 apiVersion: v1
