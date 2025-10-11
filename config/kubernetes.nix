@@ -31,6 +31,7 @@
       youtube-transcriber = "10.10.10.118";
       qbittorrent = "10.10.10.119";
       prowlarr = "10.10.10.120";
+      docling = "10.10.10.121";
       uptimekuma = "10.10.10.122";
       libebooker = "10.10.10.123";
       glance = "10.10.10.127";
