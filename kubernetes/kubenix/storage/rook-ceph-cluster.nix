@@ -62,7 +62,7 @@ in
                     {
                       matchExpressions = [
                         {
-                          key = "node-role.kubernetes.io/k8s-storage";
+                          key = "node.kubernetes.io/k8s-storage";
                           operator = "Exists";
                         }
                       ];
@@ -239,7 +239,6 @@ in
           ];
           annotations = {
             "cert-manager.io/cluster-issuer" = "cloudflare-issuer";
-            # "ingress.cilium.io/tls-passthrough" = "true";
           };
         };
       };
