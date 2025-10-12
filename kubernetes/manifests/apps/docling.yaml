@@ -33,7 +33,10 @@ spec:
     spec:
       automountServiceAccountToken: true
       containers:
-        - image: ghcr.io/docling-project/docling-serve:v1.6.0@sha256:7dc85167c6f9175b8380e54e6fb759654d3c2339edef3b878a9199d651c0e59b
+        - envFrom:
+            - secretRef:
+                name: docling-config
+          image: ghcr.io/docling-project/docling-serve:v1.6.0@sha256:7dc85167c6f9175b8380e54e6fb759654d3c2339edef3b878a9199d651c0e59b
           imagePullPolicy: IfNotPresent
           name: main
           ports:
