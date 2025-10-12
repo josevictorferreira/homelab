@@ -6,18 +6,18 @@ let
 in
 rec {
   hosts = {
-    # lab-pi-bk = {
-    #   ipAddress = "10.10.10.209";
-    #   system = "aarch64-linux";
-    #   machine = "raspberry-pi-4b";
-    #   interface = "end0";
-    #   mac = "DC:A6:32:BD:01:4C";
-    #   roles = [
-    #     "nixos-server"
-    #     "system-admin"
-    #     "backup-server"
-    #   ];
-    # };
+    lab-pi-bk = {
+      ipAddress = "10.10.10.209";
+      system = "aarch64-linux";
+      machine = "raspberry-pi-4b";
+      interface = "end0";
+      mac = "DC:A6:32:BD:01:4C";
+      roles = [
+        "nixos-server"
+        "system-admin"
+        "backup-server"
+      ];
+    };
     lab-alpha-cp = {
       ipAddress = "10.10.10.200";
       system = "x86_64-linux";
