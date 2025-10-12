@@ -1,220 +1,133 @@
-# Homelab Nix Configs
+# Homelab Cluster
 
-My Homelab to self-host some services and tools that I use everyday. Besides from the utility that the services provide, this project is also used as a way to learn new cool tech, like Networks, Kubernetes, Devops, HA, Cloud Provisioning and so on. The challenge is to have High Availability using only cheap devices, that was mostly underused or accumulating some dust on my basement. Power efficiency is also a "must", since I don't wan't this to turn into a expensive hobby.
+My Homelab to self-host services and tools using a hybrid NixOS/Kubernetes architecture. This project combines immutable infrastructure with GitOps deployment to achieve high availability using cost-efficient hardware while maintaining power efficiency.
 
+## Cluster Architecture
 
-## Machines
+### Overview
+This is a hybrid NixOS/Kubernetes homelab cluster that combines immutable OS configurations with containerized workloads using NixOS for host management and k3s Kubernetes for application deployment.
 
-| Node | Processor | Cores | Socket | Frequency Range | Memory | Storage | Address |
-|------|-----------|------ |--------|-----------------|--------|---------|---------|
-| lab-alpha-cp | Intel(R) Celeron(R) N5105 | 4 | 1 socket | 800MHz to 2900MHz | 15Gi total | 260GB NVMe + 1TB SSD | 10.10.10.200 |
-| lab-beta-cp | Intel(R) N100 | 4 | 1 socket | 700MHz to 3400MHz | 15Gi total | 500GB NVMe | 10.10.10.201 |
-| lab-gamma-wk | Intel(R) Celeron(R) N5105 | 4 | 1 socket | 800MHz to 2900MHz | 7.6Gi total| 260GB NVMe + 256GB HD | 10.10.10.202 |
-| lab-delta-cp | AMD Ryzen 5 PRO 5650U with Radeon Graphics | 6 | 1 socket | 400MHz to 4289MHz | 11Gi total | 500GB NVMe | 10.10.10.203 |
-| lab-pi-bk | ARM Cortex-A72 | 4 | no socket | 600MHz to 1500MHz | 3.7Gi total| 16GB Micro SD + 1TB USB external SSD | 10.10.10.209 |
+### Infrastructure Nodes
 
+| Node | IP | Hardware | CPU | Memory | Storage | Roles |
+|------|----|----------|-----|--------|---------|-------|
+| **lab-alpha-cp** | 10.10.10.200 | Intel NUC GK3V | Intel Celeron N5105 (4 cores) | 15Gi | NVMe + SATA Ceph OSDs | k8s-control-plane, k8s-storage, k8s-server, system-admin |
+| **lab-beta-cp** | 10.10.10.201 | Intel NUC T9Plus | Intel N100 (4 cores) | 15Gi | NVMe Ceph OSD | k8s-control-plane, k8s-storage, k8s-server, system-admin |
+| **lab-gamma-wk** | 10.10.10.202 | Intel NUC GK3V | Intel Celeron N5105 (4 cores) | 7.6Gi | NVMe + SATA Ceph OSDs | k8s-worker, k8s-storage, k8s-server, system-admin |
+| **lab-delta-cp** | 10.10.10.203 | AMD Ryzen Beelink EQR5 | AMD Ryzen 5 PRO 5650U (6 cores) | 11Gi | NVMe Ceph OSD | k8s-control-plane, k8s-storage, k8s-server, system-admin, amd-gpu |
 
+### Node Roles System
 
-## Cluster
+**k8s-control-plane** (3 nodes: alpha, beta, delta)
+- Runs k3s in server mode with HA setup
+- HAProxy + Keepalived VIP (10.10.10.250) for API server
+- etcd cluster with automatic snapshots every 12 hours
+- Cilium CNI instead of Flannel for advanced networking
+- Bootstrap manifests for system components and Flux GitOps
 
-Cluster k3s on each node, with `traeffik`and `servicelb` disabled. Name definition: `{three letter indicating the zone/location of the cluster}-{alphabet in order of machine age in cluster}-{two letters indicating the machine role in the cluster}`.
+**k8s-worker** (1 node: gamma)
+- Runs k3s in agent mode
+- Resource management with image GC and eviction policies
+- Connects to control plane via VIP for high availability
 
-Locations:
-1. lab (Currently the only cluster)
+**k8s-storage** (all 4 nodes)
+- Ceph Rook-Ceph distributed storage with OSDs on dedicated disks
+- CephFS for shared filesystems and SMB exports
+- Kernel modules: ceph, rbd, nfs
 
-Roles:
-1. cp (Kubernetes control planes nodes)
-2. wk (Kubernetes worker/agent nodes)
-3. bk (Backup machines, used only for backup routines outside the cluster)
+**amd-gpu** (1 node: delta)
+- ROCm stack for GPU acceleration workloads
+- AMDVLK drivers and Vulkan support
+- Suitable for AI/ML applications
 
+### Kubernetes Stack
 
-| Machine | Hostname | OS | Role | Notes |
-| ------------- | -------------- | ----- | ----------------------- | -------------------------------------------------------------------- |
-| lab-alpha-cp | lab-alpha-cp | NixOS | k3s server (`--init`) | Don't use NoSchedule taint |
-| lab-beta-cp | lab-beta-cp | NixOS | k3s server | |
-| lab-gamma-wk | lab-gamma-wk | NixOS | k3s agent | |
-| lab-delta-cp | lab-delta-cp | NixOS | Control-plane | |
-| lab-pi-bk | lab-pi-bk | NixOS | Backup & utility server | - NFS share or MinioIO<br>- Node status check & WOL<br>- Backup jobs |
+**Core Components:**
+- k3s lightweight Kubernetes distribution
+- Cilium CNI for advanced networking and network policies
+- Flux v2 for GitOps continuous delivery
+- Cert-manager for automatic certificate management
 
+**Storage Architecture:**
+- Rook-Ceph for distributed storage across all nodes
+- CephFS for shared POSIX filesystem access
+- SMB exports for Windows compatibility
+- Direct disk access for Ceph OSDs (no ZFS overlay)
 
+### Key Technologies
 
-## Network
+- **NixOS**: Immutable OS configuration with declarative management
+- **deploy-rs**: Remote deployment with group-based operations
+- **kubenix**: Nix DSL for authoring Kubernetes manifests
+- **Flux v2**: GitOps continuous delivery from git repository
+- **Ceph**: Distributed storage via Rook-Ceph operator
+- **sops-nix**: Integrated secret management with age encryption
 
-On the kubernetes cluster, we'll use `Cilium` instead of `Flannel`.
+### Configuration Management
 
-For the cluster server access, we'll use `HAProxy` with `Keepalived` to provide a Virtual IP address that will be used as the k3s server endpoint. The VIP will float between the control-plane nodes, and if one of them goes down, the other node will take the VIP and continue providing access to the cluster.
+**NixOS Configuration Flow:**
+1. Host definitions in `config/nodes.nix` with role assignments
+2. Role-based profiles in `modules/profiles/`
+3. Hardware-specific configurations in `hosts/hardware/`
+4. Deployed via deploy-rs with group-based deployment (`make gdeploy`)
 
+**Kubernetes Manifest Flow:**
+1. Applications authored as Nix in `kubernetes/kubenix/`
+2. Built to YAML manifests with `nix build .#gen-manifets --impure`
+3. Secrets injected using vals from encrypted sources
+4. Encrypted manifests committed as `.enc.yaml` files
+5. Flux automatically syncs changes to cluster
 
-## Storage
+### High Availability Features
+- 3-node control plane with etcd quorum
+- Floating VIP for API server access
+- Distributed storage with data replication
+- Automatic failover and recovery mechanisms
 
-Tools to be used:
+## Common Commands
 
-| Need                                   | Tool                                                | Notes            | 
-|----------------------------------------|-----------------------------------------------------|-------------------------------------------------------------|
-| K8s Storage Classess with RWM support | Rook-Ceph | Will need to add storage drives just for Ceph usage. |
-| POSIX Filesystem for file sharing | Rook-Ceph | CephFS csi avilable. |
-| Network file sharing | A NFS and SMB share that uses CephFS Storage Class | Must assign a password on both for access in the network. |
-| Node Filesystem Recovery | ZFS in all filesystems | On the main nodes use it with a Mirror partition. On the external drive use it Single only. |
+### NixOS & Deployment
+- `make check` - Validate flake configuration
+- `make deploy` - Interactive host deployment with fzf selection
+- `make gdeploy` - Deploy hosts by group (interactive selection)
 
+### Secrets Management
+- `make secrets` - Interactive secret editing with fzf selection
+- Uses sops-nix for encrypted configuration
 
-Disk layout per node:
+### Kubernetes Operations
+- `make manifests` - Complete pipeline: generate, inject secrets, encrypt, lock
+- `make kubesync` - Copy kubeconfig from control plane to local
+- `make reconcile` - Reconcile flux system with git repository
 
-|Mount|Size guideline|ZFS dataset|Why|
-|---|---|---|---|
-| `/`                   |20 GiB on of first NVMe (or single partition on Raspberry Pi)| `rpool/root` (`compression=zstd`) |immutable NixOS rollbacks |
-|`/nix`|10 GiB|`rpool/nix`|keeps store snapshots small|
-|`/var/log`|5 GiB, separate dataset|`rpool/log`|prevents runaway logs|
-|**Ceph OSD(s)**|_rest of each drive_ as raw block, **not** inside ZFS|—|RBD wants direct disks, no double CoW|
-|External USB SSD (Pi)|full drive, single ZFS pool|`backuppool`|off-cluster backups / MinIO|
-
-
-
-## Secrets
-
-Plain sops-nix to manage secrets across the project.
-The project will have a file on the root called `.sops.yaml` and a folder with `secrets/*.enc.yaml` files.
-The same folder will maintain secrets from the nixos nodes itself, but also the k8s.
-
-
-## Observability
-
-| Need | Tool | Notes | 
-| -------------------------------------------------- | ---------- | -------------------------------------------------------------- |
-| Collect metrics inside and outside the k8s cluster | Prometheus | Use the default `kube-prometheus-stack` helm chart |
-| Metrics graphics and queries | Grafana | Installed using the same stack as prometheus |
-| Logs collection and queries | Loki | OPTIONAL: In the first release I'll not worry about it for now |
-| Old metrics magement | Thanos | OPTIONAL: Don't worry on the first release, it'll be disabled. |
-
-
-
-## Backups / Recovery
-
-| Need                  | Tool                           | Notes                                                                    |
-|------|------|-------|
-| Cluster-aware backups | Velero with CSI | Supports Ceph snapshots natively |
-| Dashboards | Ceph-Rook nativaly dashboard | Dashboards come builtin |
-| Out-of-band Backups | MinIO | Installed on the backup-server and storing on the external USB storage. |
-
-
-
-## Deployments & Cluster Management
-
-For managing the nix configs and setup of the machines in each node, we'll use `rs-reploy`. To write manifests using the same language as the nodes config, we'll use `Kubenix`. Now for deploying the changes in the manifest and apply it on the k8s cluster, we'll use `Flux v2`.
-
-
-## Applications Self-Hosted
-
-This is the list of applications I have planned to install in the cluster:
-- Postgresql
-- Rabbitmq(especially for MQTT)
-- Blocky DNS
-- Sftpgo
-- Ntfy
-- Uptime Kuma
-- Qbittorrent + Gluetun
-- Prowlarr
-- AlarmServer (a custom ruby on rails application I've made to receive alerts from my CCTV cameras and forward to Ntfy + MQTT)
-- Libebooker (a custom ruby on rails application I've made to turn any website article into a epub and send to my devices for read it later)
-- Glance (dashboard home-page with some infos about my cluster)
-- Jellyfin (later, dont worry about it now)
-- Firefly 3 -> Personal finance manager
-
+### Applications
+The cluster runs various self-hosted applications deployed via Kubenix:
+- **Infrastructure**: PostgreSQL, RabbitMQ, Redis
+- **Services**: N8N, Immich, Glance dashboard, Blocky DNS
+- **Media**: qBittorrent with VPN, SearxNG, YouTube Transcriber
+- **Development**: OpenWebUI, Docling, LibeBooker
+- **Monitoring**: Prometheus + Grafana stack
 
 ## Repository Structure
 
-**Everything – NixOS hosts, Kubenix source, rendered YAML, Flux bootstrap, CI – lives here.**
-
-Flux will read only the sub‑path you point it at (e.g. `kubernetes/clusters/home`)
-
-````console
-homelab-reborn main !1 > tree
-.
-├── config
-│   ├── cluster.nix
-│   └── users.nix
-├── flake.lock
-├── flake.nix
-├── hosts
-│   ├── default.nix
-│   └── hardware
-│       ├── amd-ryzen-beelink-eqr5.nix
-│       ├── intel-nuc-gk3v.nix
-│       ├── intel-nuc-t9plus.nix
-│       └── raspberry-pi-4b.nix
-├── kubernetes
-│   ├── kubenix
-│   │   ├── _submodules
-│   │   │   └── release.nix
-│   │   ├── apps
-│   │   │   ├── apps-certificate.nix
-│   │   │   ├── glance.nix
-│   │   │   └── libebooker.nix
-│   │   ├── default.nix
-│   │   ├── monitoring
-│   │   │   └── monitoring-certificate.nix
-│   │   └── system
-│   │       ├── cert-manager.nix
-│   │       ├── cilium.nix
-│   │       └── cloudflare-api-token.enc.nix
-│   └── manifests
-│       ├── apps
-│       │   ├── apps-certificate.yaml
-│       │   ├── glance.yaml
-│       │   └── libebooker.yaml
-│       ├── flux-system
-│       │   ├── gotk-components.yaml
-│       │   ├── gotk-sync.yaml
-│       │   └── kustomization.yaml
-│       ├── monitoring
-│       │   └── monitoring-certificate.yaml
-│       └── system
-│           ├── cert-manager.yaml
-│           ├── cilium.yaml
-│           └── cloudflare-api-token.enc.yaml
-├── lib
-│   ├── files.nix
-│   └── strings.nix
-├── LICENSE
-├── Makefile
-├── modules
-│   ├── common
-│   │   ├── locale.nix
-│   │   ├── nix.nix
-│   │   ├── sops.nix
-│   │   ├── ssh.nix
-│   │   ├── static-ip.nix
-│   │   └── users.nix
-│   ├── programs
-│   │   ├── git.nix
-│   │   ├── vim.nix
-│   │   └── zsh.nix
-│   ├── roles
-│   │   ├── backup-server.nix
-│   │   ├── k8s-server.nix
-│   │   ├── k8s-storage.nix
-│   │   ├── k8s-control-plane.nix
-│   │   ├── k8s-worker.nix
-│   │   ├── nixos-server.nix
-│   │   └── system-admin.nix
-│   └── services
-│       ├── haproxy.nix
-│       ├── keepalived.nix
-│       ├── minio.nix
-│       └── wake-on-lan-observer.nix
-├── README.md
-├── secrets
-│   ├── hosts-secrets.enc.yaml
-│   └── k8s-secrets.enc.yaml
-└── templates
-    └── nix-base-install.nix
+```
+├── config/                 # NixOS configuration files
+├── hosts/                  # Host-specific configurations
+│   └── hardware/          # Hardware-specific nix configs
+├── modules/
+│   └── profiles/          # Role-based node configurations
+├── kubernetes/
+│   ├── kubenix/          # Nix DSL for K8s manifests
+│   └── manifests/        # Generated YAML manifests
+├── secrets/               # Encrypted secrets (sops)
+└── Makefile              # Common commands and workflows
 ```
 
+## Development Workflow
 
-**Folder notes**
-- `**config/**` project configuration files, where `cluster.nix` have most of the variables related with the cluster.
-- `**hosts/hardware/**` each different hardware may have different nix configurations.
-- `**secrets/**` contains only public materials and SOPS config; private Age key mounted in‑cluster via Secret.
-- `**kubernetes/kubenix/**` kubenix nix modules, each module will generate a single `YAML` manifest.
-- `**kubernetes/manifests/**` raw kubernetes manifests generated by kubenix.
-- `**kubernetes/manifests/flux-system/**` stays under version control so that a fresh cluster can self‑bootstrap from Git alone.
-- `**templates/**` this is the template that will be used in the first nixos-install in the first boot of the machines.
+1. Edit NixOS configs or kubenix modules
+2. Run `make manifests` for complete manifest build
+3. Deploy changes (`make deploy` or `make gdeploy`)
+4. Flux automatically applies kubernetes changes to cluster
+
+This architecture provides a robust, scalable homelab environment with immutable infrastructure, GitOps deployment, and enterprise-grade features including distributed storage and high availability.
