@@ -15,6 +15,7 @@ in
         pullPolicy = "IfNotPresent";
       };
       port = 5001;
+      secretName = "docling-config";
       values = {
         defaultPodOptions = {
           nodeSelector = {
