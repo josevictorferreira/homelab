@@ -1,4 +1,4 @@
-.PHONY: lgroups check ddeploy deploy gdeploy secrets vmanifests umanifests emanifests gmanifests manifests kubesync wusbiso help 
+.PHONY: lgroups check ddeploy deploy gdeploy secrets vmanifests umanifests emanifests gmanifests manifests kubesync wusbiso docker-build docker-login docker-init-repo docker-push help 
 
 .DEFAULT_GOAL := help
 
@@ -17,6 +17,13 @@ MANIFESTS_DIR ?= kubernetes/manifests
 ENC_GLOB := \( -name '*.enc.yaml' -o -name '*.enc.yml' \)
 LOCK_FILE ?= manifests.lock
 CHECKSUM_DIR  ?= .checksums
+
+# Docker configuration
+DOCKER_IMAGE_NAME = mcpo
+DOCKER_TAG = latest
+GITHUB_USER ?= josevictorferreira
+DOCKER_REGISTRY = ghcr.io
+DOCKER_FULL_IMAGE = $(DOCKER_REGISTRY)/$(GITHUB_USER)/$(DOCKER_IMAGE_NAME):$(DOCKER_TAG)
 
 lgroups: ## List available node groups.
 	@printf '%s\n' $(AVAILABLE_NODE_GROUPS)
@@ -211,6 +218,64 @@ reconcile: ## Reconcile the kubernetes cluster with the current main branch
 
 events: ## Watch for the latest events in flux kubernetes system
 	@flux events --watch
+
+docker-build: ## Build the Docker image using nix-build.
+	@echo "Building Docker image $(DOCKER_IMAGE_NAME):$(DOCKER_TAG)..."
+	nix-build images/$(DOCKER_IMAGE_NAME).nix && docker load < result
+	@echo "Tagging image as $(DOCKER_FULL_IMAGE)..."
+	docker tag localhost/$(DOCKER_IMAGE_NAME):$(DOCKER_TAG) $(DOCKER_FULL_IMAGE)
+	@echo "Image built and tagged successfully: $(DOCKER_FULL_IMAGE)"
+
+docker-login: ## Login to GitHub Container Registry using GitHub CLI or GITHUB_TOKEN.
+	@if [ -n "$(GITHUB_TOKEN)" ]; then \
+		echo "Logging in using GITHUB_TOKEN..."; \
+		echo $(GITHUB_TOKEN) | docker login $(DOCKER_REGISTRY) -u $(GITHUB_USER) --password-stdin; \
+		echo "Successfully authenticated with GITHUB_TOKEN"; \
+	elif command -v gh >/dev/null 2>&1; then \
+		echo "Logging in using GitHub CLI..."; \
+		GH_TOKEN=$$(gh auth token); \
+		if [ -n "$$GH_TOKEN" ]; then \
+			echo $$GH_TOKEN | docker login $(DOCKER_REGISTRY) -u $(GITHUB_USER) --password-stdin; \
+			echo "Successfully authenticated with GitHub CLI"; \
+		else \
+			echo "GitHub CLI not authenticated. Please run: gh auth login"; \
+			exit 1; \
+		fi; \
+	else \
+		echo "Error: Neither GitHub CLI nor GITHUB_TOKEN is available"; \
+		echo "Please install GitHub CLI or set GITHUB_TOKEN environment variable"; \
+		exit 1; \
+	fi
+
+docker-init-repo: ## Initialize the GitHub Container Registry repository.
+	@echo "Checking if repository exists..."
+	@if command -v gh >/dev/null 2>&1; then \
+		if gh api /user/packages/container/$(DOCKER_IMAGE_NAME) >/dev/null 2>&1; then \
+			echo "Repository already exists"; \
+		else \
+			echo "Creating repository using GitHub CLI..."; \
+			RESPONSE=$$(gh api --method POST \
+				-H "Accept: application/vnd.github.v3+json" \
+				/user/packages \
+				-f name='$(DOCKER_IMAGE_NAME)' \
+				-f package_type='container' \
+				-f visibility='public' 2>&1); \
+			if [ $$? -eq 0 ]; then \
+				echo "Repository created successfully"; \
+			else \
+				echo "Error creating repository: $$RESPONSE"; \
+				echo "Will try to create repository on first push instead"; \
+			fi; \
+		fi; \
+	else \
+		echo "Warning: GitHub CLI not available. Repository will be created on first push"; \
+	fi
+
+docker-push: docker-build docker-login docker-init-repo ## Build and push the Docker image to GitHub Container Registry.
+	@echo "Pushing image to $(DOCKER_FULL_IMAGE)..."
+	docker push $(DOCKER_FULL_IMAGE)
+	@echo "Image pushed successfully to $(DOCKER_FULL_IMAGE)"
+	@echo "Image is now public at: https://$(DOCKER_REGISTRY)/$(GITHUB_USER)/$(DOCKER_IMAGE_NAME)"
 
 help: ## Show this help.
 	@printf "Usage: make [target]\n\nTARGETS:\n"; grep -F "##" $(MAKEFILE_LIST) | grep -Fv "grep -F" | grep -Fv "printf " | sed -e 's/\\$$//' | sed -e 's/##//' | column -t -s ":" | sed -e 's/^/    /'; printf "\n"
