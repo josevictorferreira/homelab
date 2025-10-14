@@ -11,7 +11,7 @@ in
       namespace = namespace;
       image = {
         repository = "ghcr.io/josevictorferreira/mcpo";
-        tag = "latest@sha256:2b9fd131273b4ac53bfc9c2ff32f85e5898563d4f4704c8cd0af53f7f2ae1d85";
+        tag = "latest@sha256:87bf1da9ed289777a08e4e5816cc9f8a9df5cee259842ac5ff3a223f0256ecc2";
         pullPolicy = "IfNotPresent";
       };
       port = 8000;

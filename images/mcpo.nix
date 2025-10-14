@@ -29,7 +29,7 @@ let
           "mcp-searxng"
         ];
         env = {
-          SEARXNG_URL = "http://10.10.10.125";
+          SEARXNG_URL = "http://searxng";
         };
       };
     };
