@@ -76,8 +76,8 @@ in
             name = "OPENAI_API_KEY";
             valueFrom = {
               secretKeyRef = {
-                name = "openrouter-secrets";
-                key = "OPENROUTER_API_KEY";
+                name = "open-webui-secrets";
+                key = "RAG_OPENAI_API_KEY";
               };
             };
           }
