@@ -11,8 +11,8 @@ in
           namespace = namespace;
         };
         stringData = {
-          "OPENROUTER_MODEL" = kubenix.lib.secretsFor "openrouter_model";
-          "OPENROUTER_API_KEY" = kubenix.lib.secretsFor "openrouter_api_key";
+          "OPENROUTER_MODEL" = "qwen/qwen3-next-80b-a3b-instruct";
+          "OPENROUTER_API_KEY" = kubenix.lib.secretsFor "openrouter_api_key.linkwarden";
           "OPENROUTER_API_BASE_URL" = "https://openrouter.ai/api/v1";
         };
       };

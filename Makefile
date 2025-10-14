@@ -19,7 +19,7 @@ LOCK_FILE ?= manifests.lock
 CHECKSUM_DIR  ?= .checksums
 
 # Docker configuration
-DOCKER_IMAGE_NAME = mcpo
+DOCKER_IMAGE_NAME = docling-rocm
 DOCKER_TAG = latest
 GITHUB_USER ?= josevictorferreira
 DOCKER_REGISTRY = ghcr.io

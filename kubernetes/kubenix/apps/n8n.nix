@@ -26,9 +26,13 @@ in
           pullPolicy = "IfNotPresent";
         };
 
-        db = { type = "postgresdb"; };
+        db = {
+          type = "postgresdb";
+        };
 
-        versionNotifications = { enabled = false; };
+        versionNotifications = {
+          enabled = false;
+        };
 
         timezone = homelab.timeZone;
         defaultLocale = "en";
@@ -78,7 +82,9 @@ in
             accessMode = "ReadWriteOnce";
             size = "8Gi";
             mountPath = "/home/node/.n8n";
-            annotations = { "helm.sh/resource-policy" = "keep"; };
+            annotations = {
+              "helm.sh/resource-policy" = "keep";
+            };
           };
         };
 
@@ -94,12 +100,14 @@ in
         };
 
         postgresql.enabled = false;
-        externalPostgresql =  {
+        externalPostgresql = {
           host = "postgresql-hl";
           existingSecret = secretName;
         };
 
-        serviceMonitor = { enabled = false; };
+        serviceMonitor = {
+          enabled = false;
+        };
       };
     };
 
