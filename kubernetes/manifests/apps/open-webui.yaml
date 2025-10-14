@@ -61,8 +61,8 @@ spec:
             - name: OPENAI_API_KEY
               valueFrom:
                 secretKeyRef:
-                  key: OPENROUTER_API_KEY
-                  name: openrouter-secrets
+                  key: RAG_OPENAI_API_KEY
+                  name: open-webui-secrets
           envFrom:
             - secretRef:
                 name: open-webui-secrets

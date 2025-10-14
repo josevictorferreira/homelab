@@ -24,7 +24,7 @@ in
           "ENABLE_RAG" = "True";
           "ENABLE_RAG_WEB_SEARCH" = "True";
           "RAG_OPENAI_API_BASE_URL" = "https://openrouter.ai/api/v1";
-          "RAG_OPENAI_API_KEY" = kubenix.lib.secretsFor "openrouter_api_keys.openwebui";
+          "RAG_OPENAI_API_KEY" = kubenix.lib.secretsFor "openrouter_api_key_openwebui";
           "RAG_WEB_SEARCH_ENGINE" = "searxng";
           "RAG_WEB_SEARCH_RESULT_COUNT" = "3";
           "RAG_WEB_SEARCH_CONCURRENT_REQUESTS" = "10";
