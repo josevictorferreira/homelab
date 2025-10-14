@@ -1,0 +1,111 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/controller: main
+    app.kubernetes.io/instance: mcpo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: mcpo
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: mcpo
+  namespace: apps
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/controller: main
+      app.kubernetes.io/instance: mcpo
+      app.kubernetes.io/name: mcpo
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/controller: main
+        app.kubernetes.io/instance: mcpo
+        app.kubernetes.io/name: mcpo
+    spec:
+      automountServiceAccountToken: true
+      containers:
+        - image: ghcr.io/josevictorferreira/mcpo:latest@sha256:2b9fd131273b4ac53bfc9c2ff32f85e5898563d4f4704c8cd0af53f7f2ae1d85
+          imagePullPolicy: IfNotPresent
+          name: main
+          ports:
+            - containerPort: 8000
+              name: http
+              protocol: TCP
+      dnsPolicy: ClusterFirst
+      enableServiceLinks: false
+      hostIPC: false
+      hostNetwork: false
+      hostPID: false
+      serviceAccountName: default
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+    lbipam.cilium.io/ips: 10.10.10.124
+    lbipam.cilium.io/sharing-key: mcpo
+  labels:
+    app.kubernetes.io/instance: mcpo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: mcpo
+    app.kubernetes.io/service: mcpo
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: mcpo
+  namespace: apps
+spec:
+  ports:
+    - name: http
+      port: 8000
+      protocol: TCP
+      targetPort: 8000
+  selector:
+    app.kubernetes.io/controller: main
+    app.kubernetes.io/instance: mcpo
+    app.kubernetes.io/name: mcpo
+  type: LoadBalancer
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: mcpo
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: mcpo
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: mcpo
+  namespace: apps
+spec:
+  ingressClassName: cilium
+  rules:
+    - host: mcpo.josevictor.me
+      http:
+        paths:
+          - backend:
+              service:
+                name: mcpo
+                port:
+                  number: 8000
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - mcpo.josevictor.me
+      secretName: wildcard-tls
