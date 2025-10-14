@@ -1,4 +1,9 @@
-{ lib, kubenix, homelab, ... }:
+{
+  lib,
+  kubenix,
+  homelab,
+  ...
+}:
 
 let
   namespace = homelab.kubernetes.namespaces.applications;
@@ -8,13 +13,12 @@ in
 {
   kubernetes = {
     helm.releases.${app} = {
-      chart = kubenix.lib.helm.fetch
-        {
-          chartUrl = "oci://ghcr.io/fmjstudios/helm/linkwarden";
-          chart = "linkwarden";
-          version = "0.3.3";
-          sha256 = "sha256-rFzutBrDDF4qVj38dYazjv3iUl2uszIJSKWPwrRdX1E=";
-        };
+      chart = kubenix.lib.helm.fetch {
+        chartUrl = "oci://ghcr.io/fmjstudios/helm/linkwarden";
+        chart = "linkwarden";
+        version = "0.3.3";
+        sha256 = "sha256-rFzutBrDDF4qVj38dYazjv3iUl2uszIJSKWPwrRdX1E=";
+      };
       includeCRDs = true;
       noHooks = true;
       namespace = namespace;
@@ -69,7 +73,6 @@ in
       };
     };
 
-
     resources = {
       services.linkwarden = {
         metadata = {
@@ -88,7 +91,10 @@ in
             id = null;
             uid = "postgres-linkwarden";
             title = "Postgres - Linkwarden";
-            tags = [ "postgres" "linkwarden" ];
+            tags = [
+              "postgres"
+              "linkwarden"
+            ];
             timezone = homelab.timeZone;
             schemaVersion = 17;
             version = 1;
@@ -105,7 +111,7 @@ in
                 targets = [
                   {
                     refId = "A";
-                    rawSql  = ''
+                    rawSql = ''
                       SELECT
                         now() AS time,
                         numbackends AS "connections"

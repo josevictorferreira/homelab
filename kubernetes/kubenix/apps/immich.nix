@@ -12,7 +12,7 @@ in
         chartUrl = "oci://ghcr.io/immich-app/immich-charts/immich";
         chart = "immich";
         version = "0.9.3";
-        sha256 = "sha256-UHuuu6u+UjHPgdLONZim6j+nyCINtClcAZRRJlHuaaw=";
+        sha256 = "sha256-Jd4XGcGqJsTZwUu4NLRytS9G2vEY0NIGvU5tYZsMX3M=";
       };
       includeCRDs = true;
       noHooks = true;
@@ -21,8 +21,8 @@ in
       values = {
         postgresql.enabled = false;
         redis.enabled = false;
-				
-				env = [ ];
+
+        env = [ ];
 
         envFrom = [
           {
@@ -75,18 +75,24 @@ in
           ingress.main = {
             enabled = true;
             className = "cilium";
-            hosts = [{
-              host = kubenix.lib.domainFor app;
-              paths = [{
-                path = "/";
-                service.name = "immich-server";
-                service.port = 2283;
-              }];
-            }];
-            tls = [{
-              secretName = "wildcard-tls";
-              hosts = [ (kubenix.lib.domainFor app) ];
-            }];
+            hosts = [
+              {
+                host = kubenix.lib.domainFor app;
+                paths = [
+                  {
+                    path = "/";
+                    service.name = "immich-server";
+                    service.port = 2283;
+                  }
+                ];
+              }
+            ];
+            tls = [
+              {
+                secretName = "wildcard-tls";
+                hosts = [ (kubenix.lib.domainFor app) ];
+              }
+            ];
           };
         };
       };
