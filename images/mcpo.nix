@@ -4,10 +4,8 @@
   port ? 8000,
   tz ? "America/Sao_Paulo",
 }:
-
 let
   dockerTools = pkgs.dockerTools;
-
   mcpoConfig = {
     mcpServers = {
       memory = {
@@ -36,20 +34,16 @@ let
       };
     };
   };
-
   configJson = builtins.toJSON mcpoConfig;
-
   configFile = pkgs.writeTextFile {
     name = "mcpo-config.json";
     text = configJson;
     destination = "/etc/mcpo/config.json";
   };
-
 in
 dockerTools.buildImage {
   name = "mcpo";
   tag = "latest";
-
   copyToRoot = pkgs.buildEnv {
     name = "rootfs";
     paths = [
@@ -60,6 +54,7 @@ dockerTools.buildImage {
       pkgs.coreutils
       pkgs.procps
       pkgs.nodejs_20
+      pkgs.bash # add a shell
       configFile
     ];
     pathsToLink = [
@@ -68,20 +63,46 @@ dockerTools.buildImage {
       "/share/zoneinfo"
     ];
   };
-
   extraCommands = ''
+    # App dir
     mkdir -p ./app
+
+    # Timezone link
     mkdir -p ./usr/share
     ln -s /share/zoneinfo ./usr/share/zoneinfo
-  '';
 
+    # Ensure tmp exists and is world-writable
+    mkdir -p ./tmp ./var/tmp
+    chmod 1777 ./tmp ./var/tmp
+
+    # Provide /usr/bin/env for shebangs
+    mkdir -p ./usr/bin
+    ln -s /bin/env ./usr/bin/env
+
+    # Provide /usr/bin/python[3] for shebangs that expect it
+    ln -s /bin/python3 ./usr/bin/python3 || true
+    ln -s /bin/python3 ./usr/bin/python || true
+
+    # Provide /bin/sh (some launchers rely on it)
+    ln -s /bin/bash ./bin/sh || true
+
+    # Ensure root home exists (some tools use $HOME)
+    mkdir -p ./root
+
+    # Optional: a cache for uv to reduce /tmp usage
+    mkdir -p ./var/cache/uv
+  '';
   config = {
     WorkingDir = "/app";
     Env = [
       "UV_SYSTEM_PYTHON=1"
-      "PATH=/bin"
+      "PATH=/bin:/usr/bin"
       "SSL_CERT_FILE=/etc/ssl/certs/ca-bundle.crt"
       "TZ=${tz}"
+      "TMPDIR=/tmp"
+      "HOME=/root"
+      "XDG_CACHE_HOME=/var/cache"
+      "UV_CACHE_DIR=/var/cache/uv"
     ];
     ExposedPorts = {
       "${toString port}/tcp" = { };
