@@ -26,10 +26,8 @@ in
           pullPolicy = "IfNotPresent";
         };
 
-        service = kubenix.lib.plainServiceFor app;
-
         ingress = kubenix.lib.ingressFor app;
-        
+
         limiter = "";
 
         volumeMounts = [
