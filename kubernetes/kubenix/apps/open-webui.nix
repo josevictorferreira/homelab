@@ -30,16 +30,6 @@ in
         ollama.enabled = false;
         enableOpenaiApi = true;
         openaiBaseApiUrl = "https://openrouter.ai/api/v1";
-        resources = {
-          requests = {
-            memory = "2Gi";
-            cpu = "10m";
-          };
-          limits = {
-            memory = "2Gi";
-            "amd.com/gpu" = "1";
-          };
-        };
         ingress = {
           enabled = true;
           host = kubenix.lib.domainFor "openwebui";
