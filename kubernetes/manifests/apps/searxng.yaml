@@ -82,7 +82,7 @@ spec:
   selector:
     app.kubernetes.io/instance: searxng
     app.kubernetes.io/name: searxng
-  type: LoadBalancer
+  type: ClusterIP
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
