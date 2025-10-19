@@ -7,41 +7,46 @@ metadata:
     name: immich-secret
     namespace: apps
 stringData:
-    DB_URL: ENC[AES256_GCM,data:k/Vxm5ceHwKOwFAWs4cWoskXyGMvx+yf2igu/AnC1j6schVFugQ0lVcgyPj0znSz8BceoFnDe1gUiM31QG3BCuuneQ==,iv:AUk0MOgOUrxxuGfT4QHsslWyZXjzskHgN0avPr5xteM=,tag:SKXkp9lsugvk/LxnMYMMxg==,type:str]
-    IMMICH_MACHINE_LEARNING_URL: ENC[AES256_GCM,data:Kdx9PJc40OiUakSG40MJgwWZrhHJF+wcmKqTRIB1OJZaHE0=,iv:lGp69r+QW16pZR9fhVu5bCsLhlhDIBkIahYoC6mSY00=,tag:fAfPaRWbVlviB/v+uGDJAQ==,type:str]
-    REDIS_DBINDEX: ENC[AES256_GCM,data:2A==,iv:qcTuEUawFwEMVE6AFEqCfbHcOHLu7K3CYLIjG3LU3Qc=,tag:oLnnDCcXxOKwzYujehMhPg==,type:str]
-    REDIS_HOSTNAME: ENC[AES256_GCM,data:MnBJ5+S/hDFJVQUXZtM=,iv:gVjdmlaIW43J2skC8c7NXtchvpOGvlfNmfWX8P+ExsE=,tag:RBTeqyBP8A1kzqM7WYeznw==,type:str]
-    REDIS_PASSWORD: ENC[AES256_GCM,data:qFNFQcf6uWQOQe9fnCgqH/8/Gh0rt9AW,iv:wS9h3mkuwVAd5L6570qCZswJFq75dKUG5kdcliTyBio=,tag:UoDhuBvih7Dz+kjhP2wkwA==,type:str]
+    DB_DATABASE_NAME: ENC[AES256_GCM,data:GbieE2/6,iv:nY2Tdt4HLsReYljcUwSEyIL7KcnahR4EgjurEC8Dt2A=,tag:qJo6IYhciYJQc9faDNlEUw==,type:str]
+    DB_HOSTNAME: ENC[AES256_GCM,data:BLLyoR7ErZaqfre2CQ==,iv:C8LAQNrl1O0MEwZ7VcaIVgm4RdsyS4OkzvHI5HABrns=,tag:7UpS01SUaQicbTQiKLOYaA==,type:str]
+    DB_PASSWORD: ENC[AES256_GCM,data:3ED1B7OSRlLp1rmT7/Q/EDanaQ==,iv:k+Gp3RQiEpYCOxEyk/tUn8EZp7cbWQR2dav61LB8j2o=,tag:wcAyPcj2QNjllfY3172uIw==,type:str]
+    DB_URL: ENC[AES256_GCM,data:FYz0SV1D2FvqgCNzogEhBH7ORXIQcjueyCjzMmbqnPyPmD/yUFDD+fynWn2jPj3fnKPgo6v+C2aVfkPnotmuDg67bw==,iv:S+OjfPSZYHKZ33wT3dSBRzhn6IYCD4UXaWPAUMLZ6xs=,tag:bECFZur9lr6jTl7joSmveg==,type:str]
+    DB_USERNAME: ENC[AES256_GCM,data:+cK3+PHPG6s=,iv:GuyaXYkjAC6MvZF4aj2zWw3LCVQtcSU5wVQvSxrKGUs=,tag:GEMzOsdRjrC/5Wgodf37EA==,type:str]
+    IMMICH_MACHINE_LEARNING_URL: ENC[AES256_GCM,data:noBIgwD36FKS3xYlmGTHrSw25WXn7NCjQx03WAIwToDP4ko=,iv:wabo5CEZ08eQvmnFQ2sBBtiHco/LzFnqXH9QUGFqmlo=,tag:tdShQRe8rT+Uo9oRO1wSHA==,type:str]
+    REDIS_DBINDEX: ENC[AES256_GCM,data:BQ==,iv:zOJzhpjUARk6ob6RSNTARQq5forZ3YIQIvQd0QHvKy0=,tag:tLfyJT4R4OFMM7jAifw//Q==,type:str]
+    REDIS_HOSTNAME: ENC[AES256_GCM,data:9pJ97ae9tzHY0dV+atA=,iv:GGU3ssjnZWL3ArUoGi+kTk+PhKWPlvCgc97JcCgA9os=,tag:TqpfJYzkruWHC/YstVxsOw==,type:str]
+    REDIS_PASSWORD: ENC[AES256_GCM,data:UdtFLBp/P68BuTVaK9IwimcDCNSDaa7w,iv:rSXKA0CuVvMVn/SBgc41xjGNM/jz4UW+SflhyQVbuU4=,tag:endmR/T51O86NHIdZ8Xwaw==,type:str]
+    REDIS_URL: ENC[AES256_GCM,data:GMlijCxCelo3ueGBjhz/E/s/wkX8gThmRECl20mrfNvjoTe54AAElOEladFHY6s2BLp3K+x4NA==,iv:zcMRiNaYCEXabYr7drY81zH0CHtj9x8TdoEXGiSlj6w=,tag:YXRaXQ5mb0UESeImb5i4Lg==,type:str]
 sops:
     age:
         - recipient: age16yrhmz8fytj7j9ns80zl40zjcdfd3pdxh48ld7ys7veea774udtqfn9jyx
           enc: |
             -----BEGIN AGE ENCRYPTED FILE-----
-            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBjSlRWOUcxVHNad2RVWHN4
-            NUUyVDdoMzkvOWh0YmNzemZ6ajd5azZQdTJJCk9vNDJhWGsrS2dIVVFBN3lMelg3
-            cTJEYjVJQlZwYzdwUTJBVlJJQUlFQkkKLS0tIHNaTnZYM2hKdldyOEV4eEdBdEFw
-            Mit4S2JIbVF2MFhyWW42d1NwYlR3UTQKF00VwiszMg2/RmkhVAlrh0aEMdXDCiuF
-            gDbBvCYM8CxLvo8U8jvgKeuJacun35mNzufUuZtAmjyuGerCo3mS4w==
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBLbHl3WmRjMzRlZms3enBy
+            eXp0R1p1SUtMSG04SVZ6VW1CNlQzVk9KZnpNCnZ6cndTWWNTUTZweEtVQzYyZEtk
+            c21jVVlPY2NPaEs1bHNrdTBhMlExMFkKLS0tIFBCWGcxWWduQWZrMi9iRnY0b1lL
+            SmI1SmVqSnFIeEFKQ3ZJVlV4NnlxR0EKsSRNYInMOocLjwXMSjX9h54mQPXN5mKm
+            IdF0uyU4MTonRPnGPUQrGZpFeeR08JOHciENzm6TAh58/F5U3l1r2g==
             -----END AGE ENCRYPTED FILE-----
         - recipient: age1jx9qu5p0ycvymrl2gykd9z3w8x8n67jxnatxs49j7qzspjr6asqqf8u35h
           enc: |
             -----BEGIN AGE ENCRYPTED FILE-----
-            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSByMndKYXFVWUl4VVpjQWFr
-            bnpsNk1CNFZyZzIwR3U5Qnd1NG1JaS9PMDJnCk0xb1Ryak9ybHR2czJyaE5ySzNo
-            RWJsTXVYQTQvVkZtTlNLajFGclRhNHcKLS0tIENiVHpiTUs4WFdvSWk2TmV6UThq
-            ZXcxK1BqS3JuejJ1R0t1YXhibnYyaFEK2cCni3dEM6HCRz17pf1NIrphhSAEpyqq
-            v680MctCaRcNP7h54oLxL7vXMxBTz/6qYErkbnESf4Q9UrtxT9VPBA==
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBWYVNHVjdzK0l1VWJXY2gy
+            eU5XbXVOVUdXQU5ZSThldjQ3QVZLUnJGLzBzCjhhckpoNEFZejRUSG1CekJaYkZC
+            ZnFHUkdtYm4rU2tZbmxJYSsyaGdURVkKLS0tIDkxQk8yNXo1eW5zUVBnWncyS0Rr
+            RGgrMi8xdE1icWFuaVZ4RlV1TFlEeGcKz4Pivw/uCl8dxJYcskFXtLhNZNCFX8l6
+            3Z90RwHiNPra9FGWwtULCo3keaSUjyjMTkvVpje22RXTbOr9FOPcLw==
             -----END AGE ENCRYPTED FILE-----
         - recipient: age1myzhwq67gu5zrfk8fvs0p7mh5fk67d20ltwqf9325ya83lm06ytsyax3j2
           enc: |
             -----BEGIN AGE ENCRYPTED FILE-----
-            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSA4cVYwMjdKdjhybDlUeUo4
-            Q2pBZHBLMnRZWVVoaXJFV2U3eWY2UlZidkVjCmQvTFdUMXJhK1B4eEl3d0swVDVY
-            cVJTM0ppc2NnQVF3RXM3cEZEQWJmQjQKLS0tIFVoRDNBcTQxaE42ZldiZXhkMXgw
-            dWJhdUVYM3poRXFGWi9mcWlHc2lENFUKR/ARDQ3CxoeEzQU3zR24k5UYJRf80+2b
-            XBmkVMeOX9YSP9VpSN3t5RXPYDH5RfgyWO92J/Gxjm8o1Ddfqnq5iw==
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBTRm1Tei95eWJhQnJ1K1l4
+            azhoNTl0cWxNTmZxSE1kdExsbWUyV3hiMUhjClZiMWlzZWg0c1MxdUc1TjdoRW9r
+            QUVpS1NrN0dDaWJWUXBXVlBIaTBNMncKLS0tIDJhUkRsRFlyb0hiOG9NM28rS1ZE
+            ZmVuU1NoZXJ5SWh5eDJYckZrem41Q2sK2FqCuBBmhF7/uC8VNrYiYM11sLTR/i6/
+            qZVoaJvmdW56FSgS6KXtplgPnK2PBQ0n9UB+4SBkWedJhkt1FMHC1g==
             -----END AGE ENCRYPTED FILE-----
-    lastmodified: "2025-10-01T02:23:41Z"
-    mac: ENC[AES256_GCM,data:iVvw0bZQFv1poa5lk0jPkNt5DUQZjqtJRNdEadwuSlJIN4IC59VQcCzOymsjl0O5XDLn+i1SqEw735O5PPnb8J46iA4jDnQ9P7wIT9cljxBfzxi13Q5IrIk58B7mH1n+atmb8bv9bZC/C/Q6Nm8134BZs3Q8NesHANalJexjs6A=,iv:au28/EkyCqcAAEstHCSBNydsXDJbX+Pzb0bGiiuvnxQ=,tag:CECUdb5WR+5U1UrgC4jGzw==,type:str]
+    lastmodified: "2025-10-19T14:47:32Z"
+    mac: ENC[AES256_GCM,data:Tz7RTsJHufPKoYypxEMep58r/FDJ0KNHdees4U9H5SvAW5KwZliU6fISLDyuy7zlloxZqzXLFPhzNNVJ99cP4/YUXRrXJrcyf9ww5jPsVJY5qyWDKGqjrbBTOj1nC/HqQ5C/wFrZyYufsjeTZ/KVbotFKpICaXCCvoTvsqHt9rA=,iv:D5CRBNNDkqWALvNbh+2HRtYnuvnOY2PrP1WJ0k7QRDk=,tag:jPLp6t0IfNmDQsQeIqoN7Q==,type:str]
     encrypted_regex: ^(data|stringData)$
     version: 3.10.2
