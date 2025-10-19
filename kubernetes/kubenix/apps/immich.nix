@@ -11,17 +11,14 @@ in
       chart = kubenix.lib.helm.fetch {
         chartUrl = "oci://ghcr.io/immich-app/immich-charts/immich";
         chart = "immich";
-        version = "0.9.3";
-        sha256 = "sha256-Jd4XGcGqJsTZwUu4NLRytS9G2vEY0NIGvU5tYZsMX3M=";
+        version = "0.10.0";
+        sha256 = "sha256-BKCFbfRWwXjK3+9F74hgoIO89S2LYaFcnLDLANM2yH8=";
       };
       includeCRDs = true;
       noHooks = true;
       namespace = namespace;
 
       values = {
-        postgresql.enabled = false;
-        redis.enabled = false;
-
         env = [ ];
 
         envFrom = [
@@ -54,7 +51,7 @@ in
           persistence.cache = {
             enabled = true;
             size = "20Gi";
-            type = "pvc";
+            type = "persistentVolumeClaim";
             accessMode = "ReadWriteOnce";
             storageClass = "rook-ceph-block";
           };
