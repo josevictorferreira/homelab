@@ -19,15 +19,17 @@ in
       namespace = namespace;
 
       values = {
-        env = [ ];
-
-        envFrom = [
-          {
-            secretRef = {
-              name = "immich-secret";
-            };
-          }
-        ];
+        controllers.main.containers.main = {
+          image.tag = "v2.0.0";
+          env = { };
+          envFrom = [
+            {
+              secretRef = {
+                name = "immich-secret";
+              };
+            }
+          ];
+        };
 
         immich = {
           persistence.library.existingClaim = immichLibraryPVC;
@@ -42,9 +44,12 @@ in
 
         machine-learning = {
           enabled = true;
-          image.repository = "ghcr.io/immich-app/immich-machine-learning";
-          image.tag = "v2.0.0@sha256:68bd95ff703a3b4c6a662b7f638bd2e01e3c7aeb2223dc0f142f02a555e24ca4";
-          image.pullPolicy = "IfNotPresent";
+
+          controllers.main.containers.main = {
+            image.repository = "ghcr.io/immich-app/immich-machine-learning";
+            image.tag = "v2.0.0@sha256:68bd95ff703a3b4c6a662b7f638bd2e01e3c7aeb2223dc0f142f02a555e24ca4";
+            image.pullPolicy = "IfNotPresent";
+          };
 
           env.TRANSFORMERS_CACHE = "/cache";
 
@@ -59,9 +64,11 @@ in
 
         server = {
           enabled = true;
-          image.repository = "ghcr.io/immich-app/immich-server";
-          image.tag = "v2.0.0@sha256:d81f4af6a622d0955e5b8e3927da32b3ec882466a7ee8a26906d9cccad4364ca";
-          image.pullPolicy = "IfNotPresent";
+          controllers.main.containers.main = {
+            image.repository = "ghcr.io/immich-app/immich-server";
+            image.tag = "v2.0.0@sha256:d81f4af6a622d0955e5b8e3927da32b3ec882466a7ee8a26906d9cccad4364ca";
+            image.pullPolicy = "IfNotPresent";
+          };
 
           service.main = {
             enabled = true;
