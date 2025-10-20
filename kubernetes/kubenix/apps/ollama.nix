@@ -31,7 +31,7 @@ in
         extraEnv = [
           {
             name = "LD_LIBRARY_PATH";
-            value = "/opt/rocm/lib:/usr/lib/ollama/rocm:$${LD_LIBRARY_PATH}";
+            value = "/opt/rocm/lib:/usr/lib/ollama/rocm:\${LD_LIBRARY_PATH}";
           }
           {
             name = "GGML_CUDA_INIT";
