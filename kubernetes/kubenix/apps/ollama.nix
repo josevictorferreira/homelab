@@ -65,6 +65,10 @@ in
             name = "OLLAMA_DEBUG";
             value = "1";
           }
+          {
+            name = "AMD_LOG_LEVEL";
+            value = "3";
+          }
         ];
 
         models = {
