@@ -40,7 +40,7 @@ spec:
             - name: HSA_OVERRIDE_GFX_VERSION
               value: 10.3.1
             - name: OLLAMA_DEBUG
-              value: '1'
+              value: '3'
           image: ollama/ollama:rocm@sha256:4f1a40333f4a505e2eccc205c19b23f8730fd47be456bf04063d967e8ebb6dbe
           imagePullPolicy: IfNotPresent
           livenessProbe:
@@ -78,13 +78,6 @@ spec:
               name: dev-kfd
             - mountPath: /dev/dri
               name: dev-dri
-            - mountPath: /opt/rocm
-              name: rocm
-            - mountPath: /run/opengl-driver
-              name: opengl-driver
-              readOnly: true
-            - mountPath: /nix/store
-              name: nix-glibc
       securityContext: {}
       serviceAccountName: ollama
       terminationGracePeriodSeconds: 120
@@ -100,18 +93,6 @@ spec:
             path: /dev/dri
             type: Directory
           name: dev-dri
-        - hostPath:
-            path: /opt/rocm
-            type: Directory
-          name: rocm
-        - hostPath:
-            path: /run/opengl-driver
-            type: Directory
-          name: opengl-driver
-        - hostPath:
-            path: /nix/store
-            type: Directory
-          name: nix-glibc
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
