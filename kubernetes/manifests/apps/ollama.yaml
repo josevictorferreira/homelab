@@ -33,6 +33,8 @@ spec:
         - env:
             - name: OLLAMA_HOST
               value: 0.0.0.0:11434
+            - name: LD_LIBRARY_PATH
+              value: /opt/rocm/lib:/usr/lib/ollama/rocm
             - name: GGML_CUDA_INIT
               value: '0'
             - name: ROCR_VISIBLE_DEVICES
