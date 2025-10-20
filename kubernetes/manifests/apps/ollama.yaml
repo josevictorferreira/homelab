@@ -33,20 +33,8 @@ spec:
         - env:
             - name: OLLAMA_HOST
               value: 0.0.0.0:11434
-            - name: LD_LIBRARY_PATH
-              value: /opt/rocm/lib:/run/opengl-driver/lib:/usr/lib/ollama/rocm
-            - name: PATH
-              value: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/rocm/bin
-            - name: HSA_OVERRIDE_GFX_VERSION
-              value: 10.3.0
             - name: OLLAMA_DEBUG
               value: '2'
-            - name: ROCM_PATH
-              value: /opt/rocm
-            - name: ROCM_VISIBLE_DEVICES
-              value: '0'
-            - name: HIP_VISIBLE_DEVICES
-              value: '0'
           image: ollama/ollama:rocm@sha256:4f1a40333f4a505e2eccc205c19b23f8730fd47be456bf04063d967e8ebb6dbe
           imagePullPolicy: IfNotPresent
           lifecycle:
@@ -94,17 +82,6 @@ spec:
           volumeMounts:
             - mountPath: /root/.ollama
               name: ollama-data
-            - mountPath: /dev/kfd
-              name: dev-kfd
-            - mountPath: /dev/dri
-              name: dev-dri
-            - mountPath: /opt/rocm
-              name: rocm
-            - mountPath: /run/opengl-driver
-              name: opengl-driver
-              readOnly: true
-            - mountPath: /nix/store
-              name: nix-glibc
       securityContext: {}
       serviceAccountName: ollama
       terminationGracePeriodSeconds: 120
@@ -112,26 +89,6 @@ spec:
         - name: ollama-data
           persistentVolumeClaim:
             claimName: ollama
-        - hostPath:
-            path: /dev/kfd
-            type: CharDevice
-          name: dev-kfd
-        - hostPath:
-            path: /dev/dri
-            type: Directory
-          name: dev-dri
-        - hostPath:
-            path: /opt/rocm
-            type: Directory
-          name: rocm
-        - hostPath:
-            path: /run/opengl-driver
-            type: Directory
-          name: opengl-driver
-        - hostPath:
-            path: /nix/store
-            type: Directory
-          name: nix-glibc
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
