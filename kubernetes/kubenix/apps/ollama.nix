@@ -42,10 +42,6 @@ in
             value = "10.3.0";
           }
           {
-            name = "GGML_CUDA_INIT";
-            value = "0";
-          }
-          {
             name = "OLLAMA_GPU_LAYERS";
             value = "32";
           }
