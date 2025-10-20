@@ -34,13 +34,17 @@ spec:
             - name: OLLAMA_HOST
               value: 0.0.0.0:11434
             - name: LD_LIBRARY_PATH
-              value: /opt/rocm/lib:/usr/lib/ollama/rocm:$LD_LIBRARY_PATH
+              value: /opt/rocm/lib:/usr/lib/ollama/rocm:$${LD_LIBRARY_PATH}
+            - name: PATH
+              value: /opt/rocm/bin:/usr/lib/ollama/rocm/bin:$${PATH}
             - name: ROCR_VISIBLE_DEVICES
               value: '0'
             - name: HIP_VISIBLE_DEVICES
               value: '0'
             - name: HCC_AMDGPU_TARGET
-              value: gfx1030
+              value: gfx1031
+            - name: HSA_OVERRIDE_GFX_VERSION
+              value: 10.3.0
           image: ollama/ollama:rocm@sha256:4f1a40333f4a505e2eccc205c19b23f8730fd47be456bf04063d967e8ebb6dbe
           imagePullPolicy: IfNotPresent
           livenessProbe:

@@ -25,6 +25,7 @@ in
         libva-utils
         rocmPackages.clr
         rocmPackages.clr.icd
+        rocmPackages.rocmPath
         rocmPackages.rocminfo
         rocmPackages.rocm-smi
         rocmPackages.rocm-runtime
