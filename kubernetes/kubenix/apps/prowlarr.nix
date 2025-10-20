@@ -6,13 +6,12 @@ in
 {
   kubernetes = {
     helm.releases."prowlarr" = {
-      chart = kubenix.lib.helm.fetch
-        {
-          chartUrl = "oci://tccr.io/truecharts/prowlarr";
-          chart = "prowlarr";
-          version = "20.4.2";
-          sha256 = "sha256-YzN+udEKXR4P73M3sQ6RkRlLhNUunD/jv8C9Ve+Qsoo=";
-        };
+      chart = kubenix.lib.helm.fetch {
+        chartUrl = "oci://tccr.io/truecharts/prowlarr";
+        chart = "prowlarr";
+        version = "20.12.2";
+        sha256 = "sha256-JB5R8J0MWUPovWcB0D/+ym8SVt4uOgKYrm7WlFhIXrk=";
+      };
       includeCRDs = true;
       noHooks = true;
       namespace = k8s.namespaces.applications;
@@ -52,8 +51,13 @@ in
             storageClass = "rook-ceph-block";
             targetSelector = {
               main = {
-                main = { mountPath = "/config"; };
-                exportarr = { mountPath = "/config"; readOnly = true; };
+                main = {
+                  mountPath = "/config";
+                };
+                exportarr = {
+                  mountPath = "/config";
+                  readOnly = true;
+                };
               };
             };
           };
@@ -66,12 +70,20 @@ in
             optional = false;
             defaultMode = "0777";
             items = [
-              { key = "custom-indexer"; path = "custom-indexer.yml"; }
+              {
+                key = "custom-indexer";
+                path = "custom-indexer.yml";
+              }
             ];
             targetSelector = {
               main = {
-                main = { mountPath = "/config/Definitions/Custom"; };
-                exportarr = { mountPath = "/config/Definitions/Custom"; readOnly = true; };
+                main = {
+                  mountPath = "/config/Definitions/Custom";
+                };
+                exportarr = {
+                  mountPath = "/config/Definitions/Custom";
+                  readOnly = true;
+                };
               };
             };
           };
@@ -101,9 +113,15 @@ in
           containers = {
             main = {
               probes = {
-                liveness = { path = "/ping"; };
-                readiness = { path = "/ping"; };
-                startup = { type = "tcp"; };
+                liveness = {
+                  path = "/ping";
+                };
+                readiness = {
+                  path = "/ping";
+                };
+                startup = {
+                  type = "tcp";
+                };
               };
               env = {
                 PROWLARR__SERVER__PORT = "9696";
@@ -119,9 +137,24 @@ in
               imageSelector = "exportarrImage";
               args = [ "prowlarr" ];
               probes = {
-                liveness = { enabled = true; type = "http"; path = "/healthz"; port = 9697; };
-                readiness = { enabled = true; type = "http"; path = "/healthz"; port = 9697; };
-                startup = { enabled = true; type = "http"; path = "/healthz"; port = 9697; };
+                liveness = {
+                  enabled = true;
+                  type = "http";
+                  path = "/healthz";
+                  port = 9697;
+                };
+                readiness = {
+                  enabled = true;
+                  type = "http";
+                  path = "/healthz";
+                  port = 9697;
+                };
+                startup = {
+                  enabled = true;
+                  type = "http";
+                  path = "/healthz";
+                  port = 9697;
+                };
               };
               env = {
                 INTERFACE = "0.0.0.0";
