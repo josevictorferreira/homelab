@@ -112,10 +112,6 @@ in
             name = "nix-glibc";
             mountPath = "/nix/store";
           }
-          {
-            name = "libz-hack";
-            mountPath = "/usr/lib64";
-          }
         ];
 
         volumes = [
@@ -151,13 +147,6 @@ in
             name = "nix-glibc";
             hostPath = {
               path = "/nix/store";
-              type = "Directory";
-            };
-          }
-          {
-            name = "libz-hack";
-            hostPath = {
-              path = "/run/current-system/sw/lib";
               type = "Directory";
             };
           }

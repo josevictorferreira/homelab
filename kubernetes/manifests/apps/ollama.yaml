@@ -85,8 +85,6 @@ spec:
               readOnly: true
             - mountPath: /nix/store
               name: nix-glibc
-            - mountPath: /usr/lib64
-              name: libz-hack
       securityContext: {}
       serviceAccountName: ollama
       terminationGracePeriodSeconds: 120
@@ -114,10 +112,6 @@ spec:
             path: /nix/store
             type: Directory
           name: nix-glibc
-        - hostPath:
-            path: /run/current-system/sw/lib
-            type: Directory
-          name: libz-hack
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
