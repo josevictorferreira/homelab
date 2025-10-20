@@ -38,6 +38,10 @@ in
             value = "/opt/rocm/bin:/usr/lib/ollama/rocm/bin:$${PATH}";
           }
           {
+            name = "GGML_CUDA_INIT";
+            value = "0";
+          }
+          {
             name = "ROCR_VISIBLE_DEVICES";
             value = "0";
           }
@@ -52,6 +56,18 @@ in
           {
             name = "HSA_OVERRIDE_GFX_VERSION";
             value = "10.3.0";
+          }
+          {
+            name = "OLLAMA_GPU_LAYERS";
+            value = "32";
+          }
+          {
+            name = "OLLAMA_NUM_PARALLEL";
+            value = "4";
+          }
+          {
+            name = "OLLAMA_LLM_LIBRARY";
+            value = "rocm_v6";
           }
         ];
 
