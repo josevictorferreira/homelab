@@ -43,7 +43,7 @@ in
           # }
           {
             name = "HCC_AMDGPU_TARGET";
-            value = "gfx1031";
+            value = "gfx1030";
           }
           {
             name = "HSA_OVERRIDE_GFX_VERSION";
