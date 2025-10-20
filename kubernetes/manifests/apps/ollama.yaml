@@ -51,6 +51,8 @@ spec:
               value: '4'
             - name: OLLAMA_LLM_LIBRARY
               value: rocm_v6
+            - name: OLLAMA_DEBUG
+              value: '1'
           image: ollama/ollama:rocm@sha256:4f1a40333f4a505e2eccc205c19b23f8730fd47be456bf04063d967e8ebb6dbe
           imagePullPolicy: IfNotPresent
           livenessProbe:
