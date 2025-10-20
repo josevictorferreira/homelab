@@ -41,7 +41,13 @@ spec:
               value: 10.3.0
             - name: OLLAMA_DEBUG
               value: '2'
-          image: ollama/ollama:rocm@sha256:4f1a40333f4a505e2eccc205c19b23f8730fd47be456bf04063d967e8ebb6dbe
+            - name: ROCM_PATH
+              value: /opt/rocm
+            - name: ROCM_VISIBLE_DEVICES
+              value: '0'
+            - name: HIP_VISIBLE_DEVICES
+              value: '0'
+          image: ollama/ollama:0.12.5
           imagePullPolicy: IfNotPresent
           livenessProbe:
             failureThreshold: 6
@@ -78,6 +84,13 @@ spec:
               name: dev-kfd
             - mountPath: /dev/dri
               name: dev-dri
+            - mountPath: /opt/rocm
+              name: rocm
+            - mountPath: /run/opengl-driver
+              name: opengl-driver
+              readOnly: true
+            - mountPath: /nix/store
+              name: nix-glibc
       securityContext: {}
       serviceAccountName: ollama
       terminationGracePeriodSeconds: 120
@@ -93,6 +106,18 @@ spec:
             path: /dev/dri
             type: Directory
           name: dev-dri
+        - hostPath:
+            path: /opt/rocm
+            type: Directory
+          name: rocm
+        - hostPath:
+            path: /run/opengl-driver
+            type: Directory
+          name: opengl-driver
+        - hostPath:
+            path: /nix/store
+            type: Directory
+          name: nix-glibc
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
