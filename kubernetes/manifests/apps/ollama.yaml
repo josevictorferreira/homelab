@@ -47,8 +47,22 @@ spec:
               value: '0'
             - name: HIP_VISIBLE_DEVICES
               value: '0'
-          image: ollama/ollama:0.12.5
+          image: ollama/ollama:rocm@sha256:4f1a40333f4a505e2eccc205c19b23f8730fd47be456bf04063d967e8ebb6dbe
           imagePullPolicy: IfNotPresent
+          lifecycle:
+            postStart:
+              exec:
+                command:
+                  - /bin/sh
+                  - -c
+                  - "while ! /bin/ollama ps > /dev/null 2>&1; do\n  sleep 5\ndone\n\
+                    \n/bin/ollama pull  qwen3-embedding:0.6b\n\n/bin/ollama pull \
+                    \ embeddinggemma:300m\n\n/bin/ollama pull  dimavz/whisper-tiny\n\
+                    \n/bin/ollama run qwen3-embedding:0.6b\n\n/bin/ollama run dimavz/whisper-tiny\n\
+                    /bin/ollama list | awk 'NR>1 {print $1}' | while read model; do\n\
+                    \  echo \"qwen3-embedding:0.6b embeddinggemma:300m dimavz/whisper-tiny:latest\
+                    \ qwen3-embedding:0.6b dimavz/whisper-tiny:latest\" | tr ' ' '\\\
+                    n' | grep -Fqx \"$model\" || /bin/ollama rm \"$model\"\ndone\n"
           livenessProbe:
             failureThreshold: 6
             httpGet:
