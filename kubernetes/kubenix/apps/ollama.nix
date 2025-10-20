@@ -17,16 +17,33 @@ in
       noHooks = true;
       namespace = k8s.namespaces.applications;
       values = {
-        # image = {
-        #   repository = "ollama/ollama";
-        #   tag = "rocm@sha256:4f1a40333f4a505e2eccc205c19b23f8730fd47be456bf04063d967e8ebb6dbe";
-        #   pullPolicy = "IfNotPresent";
-        # };
+        image = {
+          repository = "ollama/ollama";
+          tag = "rocm@sha256:4f1a40333f4a505e2eccc205c19b23f8730fd47be456bf04063d967e8ebb6dbe";
+          pullPolicy = "IfNotPresent";
+        };
 
-        gpu = {
-          enabled = true;
-          type = "amd";
-          number = 1;
+        ollama = {
+          gpu = {
+            enabled = true;
+            type = "amd";
+            number = 1;
+          };
+
+          models = {
+            pull = [
+              "qwen3-embedding:0.6b"
+              "embeddinggemma:300m"
+              "dimavz/whisper-tiny"
+            ];
+
+            run = [
+              "qwen3-embedding:0.6b"
+              "dimavz/whisper-tiny"
+            ];
+
+            clean = true;
+          };
         };
 
         extraEnv = [
@@ -71,21 +88,6 @@ in
             value = "0";
           }
         ];
-
-        models = {
-          pull = [
-            "qwen3-embedding:0.6b"
-            "embeddinggemma:300m"
-            "dimavz/whisper-tiny"
-          ];
-
-          run = [
-            "qwen3-embedding:0.6b"
-            "dimavz/whisper-tiny"
-          ];
-
-          clean = true;
-        };
 
         service = {
           annotations = kubenix.lib.serviceAnnotationFor app;
