@@ -5,13 +5,13 @@ metadata:
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   labels:
-    app: prowlarr-20.4.2
+    app: prowlarr-20.12.2
     app.kubernetes.io/instance: prowlarr
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: prowlarr
-    app.kubernetes.io/version: 2.0.3.5130
+    app.kubernetes.io/version: 2.1.5.5213
     helm-revision: '1'
-    helm.sh/chart: prowlarr-20.4.2
+    helm.sh/chart: prowlarr-20.12.2
     release: prowlarr
   name: prowlarr
   namespace: apps
@@ -28,7 +28,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/cnpg: 2291fc448ae81adfd860632d73e38ffc039fc25959ede77cf692f754199383ee
+        checksum/cnpg: fc940fff4269c53072f7039f0811133e9b83400670af014010bf50d3f13740f4
         checksum/configmaps: e3a9697d882b62fa6f79bd3364b55f7a4b7b4f6cc374b6916075e5d59fef20c4
         checksum/mariadb: 09c85576cb45b1eecd1467732b11ea8fa3363b0105c465f02a6ad64991521d52
         checksum/mongodb: 09c85576cb45b1eecd1467732b11ea8fa3363b0105c465f02a6ad64991521d52
@@ -38,13 +38,13 @@ spec:
         checksum/services: 209fbe54ab4cb7d132d8619768fad07a6901826a29bbf6ddcb7cd4a85b470aed
         checksum/solr: 29c14feeaddbf7762052db593898d274941f539cee681ddc613957587686f347
       labels:
-        app: prowlarr-20.4.2
+        app: prowlarr-20.12.2
         app.kubernetes.io/instance: prowlarr
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: prowlarr
-        app.kubernetes.io/version: 2.0.3.5130
+        app.kubernetes.io/version: 2.1.5.5213
         helm-revision: '1'
-        helm.sh/chart: prowlarr-20.4.2
+        helm.sh/chart: prowlarr-20.12.2
         pod.lifecycle: permanent
         pod.name: main
         release: prowlarr
@@ -108,11 +108,11 @@ spec:
             timeoutSeconds: 5
           resources:
             limits:
-              cpu: 1000m
-              memory: 1500Mi
+              cpu: 1500m
+              memory: 2400Mi
             requests:
-              cpu: 100m
-              memory: 250Mi
+              cpu: 75m
+              memory: 200Mi
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
@@ -217,11 +217,11 @@ spec:
             timeoutSeconds: 5
           resources:
             limits:
-              cpu: 1000m
-              memory: 1500Mi
+              cpu: 1500m
+              memory: 2400Mi
             requests:
-              cpu: 100m
-              memory: 250Mi
+              cpu: 75m
+              memory: 200Mi
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
@@ -303,21 +303,21 @@ spec:
       volumes:
         - emptyDir:
             medium: Memory
-            sizeLimit: 1500Mi
+            sizeLimit: 2400Mi
           name: devshm
         - emptyDir: {}
           name: shared
         - emptyDir:
             medium: Memory
-            sizeLimit: 1500Mi
+            sizeLimit: 2400Mi
           name: tmp
         - emptyDir:
             medium: Memory
-            sizeLimit: 1500Mi
+            sizeLimit: 2400Mi
           name: varlogs
         - emptyDir:
             medium: Memory
-            sizeLimit: 1500Mi
+            sizeLimit: 2400Mi
           name: varrun
         - name: config
           persistentVolumeClaim:
@@ -603,14 +603,14 @@ metadata:
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   labels:
-    app: prowlarr-20.4.2
+    app: prowlarr-20.12.2
     app.kubernetes.io/instance: prowlarr
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: prowlarr
-    app.kubernetes.io/version: 2.0.3.5130
+    app.kubernetes.io/version: 2.1.5.5213
     grafana_dashboard: '1'
     helm-revision: '1'
-    helm.sh/chart: prowlarr-20.4.2
+    helm.sh/chart: prowlarr-20.12.2
     release: prowlarr
   name: prowlarr-dashboard
   namespace: apps
@@ -622,13 +622,13 @@ metadata:
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   labels:
-    app: prowlarr-20.4.2
+    app: prowlarr-20.12.2
     app.kubernetes.io/instance: prowlarr
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: prowlarr
-    app.kubernetes.io/version: 2.0.3.5130
+    app.kubernetes.io/version: 2.1.5.5213
     helm-revision: '1'
-    helm.sh/chart: prowlarr-20.4.2
+    helm.sh/chart: prowlarr-20.12.2
     release: prowlarr
   name: prowlarr-config
   namespace: apps
@@ -647,13 +647,13 @@ metadata:
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   labels:
-    app: prowlarr-20.4.2
+    app: prowlarr-20.12.2
     app.kubernetes.io/instance: prowlarr
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: prowlarr
-    app.kubernetes.io/version: 2.0.3.5130
+    app.kubernetes.io/version: 2.1.5.5213
     helm-revision: '1'
-    helm.sh/chart: prowlarr-20.4.2
+    helm.sh/chart: prowlarr-20.12.2
     release: prowlarr
     service.name: main
   name: prowlarr
@@ -678,13 +678,13 @@ metadata:
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   labels:
-    app: prowlarr-20.4.2
+    app: prowlarr-20.12.2
     app.kubernetes.io/instance: prowlarr
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: prowlarr
-    app.kubernetes.io/version: 2.0.3.5130
+    app.kubernetes.io/version: 2.1.5.5213
     helm-revision: '1'
-    helm.sh/chart: prowlarr-20.4.2
+    helm.sh/chart: prowlarr-20.12.2
     release: prowlarr
     service.name: metrics
   name: prowlarr-metrics
@@ -709,13 +709,13 @@ metadata:
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   labels:
-    app: prowlarr-20.4.2
+    app: prowlarr-20.12.2
     app.kubernetes.io/instance: prowlarr
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: prowlarr
-    app.kubernetes.io/version: 2.0.3.5130
+    app.kubernetes.io/version: 2.1.5.5213
     helm-revision: '1'
-    helm.sh/chart: prowlarr-20.4.2
+    helm.sh/chart: prowlarr-20.12.2
     release: prowlarr
   name: prowlarr
   namespace: apps
@@ -736,17 +736,17 @@ metadata:
   annotations:
     cert-manager.io/cluster-issuer: cloudflare-issuer
     checksum/secrets: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
-    checksum/services: 209fbe54ab4cb7d132d8619768fad07a6901826a29bbf6ddcb7cd4a85b470aed
+    checksum/services: 1bab3c0185734412b7cf8b95e94233dc2edecc29461be0136cf4a3db5d7a97db
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   labels:
-    app: prowlarr-20.4.2
+    app: prowlarr-20.12.2
     app.kubernetes.io/instance: prowlarr
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: prowlarr
-    app.kubernetes.io/version: 2.0.3.5130
+    app.kubernetes.io/version: 2.1.5.5213
     helm-revision: '1'
-    helm.sh/chart: prowlarr-20.4.2
+    helm.sh/chart: prowlarr-20.12.2
     release: prowlarr
   name: prowlarr
   namespace: apps
