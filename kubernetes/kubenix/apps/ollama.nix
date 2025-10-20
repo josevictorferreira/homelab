@@ -55,14 +55,14 @@ in
           #   name = "PATH";
           #   value = "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/rocm/bin";
           # }
-          # {
-          #   name = "HCC_AMDGPU_TARGET";
-          #   value = "gfx1031";
-          # }
-          # {
-          #   name = "HSA_OVERRIDE_GFX_VERSION";
-          #   value = "10.3.0";
-          # }
+          {
+            name = "HCC_AMDGPU_TARGET";
+            value = "gfx1030";
+          }
+          {
+            name = "HSA_OVERRIDE_GFX_VERSION";
+            value = "10.3.0";
+          }
           # {
           #   name = "OLLAMA_GPU_LAYERS";
           #   value = "32";
