@@ -112,9 +112,18 @@ let
                 type = "markets";
                 cache = "1h";
                 markets = [
-                  { symbol = "BTC-USD"; name = "Bitcoin"; }
-                  { symbol = "KAS-USD"; name = "Kaspa"; }
-                  { symbol = "USDBRL=X"; name = "Brazilian Real"; }
+                  {
+                    symbol = "BTC-USD";
+                    name = "Bitcoin";
+                  }
+                  {
+                    symbol = "KAS-USD";
+                    name = "Kaspa";
+                  }
+                  {
+                    symbol = "USDBRL=X";
+                    name = "Brazilian Real";
+                  }
                 ];
               }
               {
@@ -160,6 +169,7 @@ let
                   "weechat/weechat"
                   "alexays/waybar"
                   "jtheoof/swappy"
+                  "sst/opencode"
                 ];
               }
             ];
