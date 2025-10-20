@@ -108,6 +108,10 @@ in
             mountPath = "/run/opengl-driver";
             readOnly = true;
           }
+          {
+            name = "nix-glibc";
+            mountPath = "/nix/store";
+          }
         ];
 
         volumes = [
@@ -136,6 +140,13 @@ in
             name = "opengl-driver";
             hostPath = {
               path = "/run/opengl-driver";
+              type = "Directory";
+            };
+          }
+          {
+            name = "nix-glibc";
+            hostPath = {
+              path = "/nix/store";
               type = "Directory";
             };
           }
