@@ -9,9 +9,9 @@ in
     helm.releases.${app} = {
       chart = kubenix.lib.helm.fetch {
         repo = "https://helm.otwld.com/";
-        chart = "prowlarr";
+        chart = "ollama";
         version = "1.32.0";
-        sha256 = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+        sha256 = "sha256-+4u6sYLNy1jVccN2LRRT86N+dqP1SSBWA+o6HSWfO2o=";
       };
       includeCRDs = true;
       noHooks = true;
@@ -50,7 +50,7 @@ in
         };
 
         resources.limits = {
-          "amd.com/gpu" = 1;
+          "amd.com/gpu" = "1";
         };
 
         persistentVolume = {
