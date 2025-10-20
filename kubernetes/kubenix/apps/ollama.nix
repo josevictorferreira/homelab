@@ -35,7 +35,11 @@ in
           }
           {
             name = "HCC_AMDGPU_TARGET";
-            value = "gfx1030";
+            value = "gfx1031";
+          }
+          {
+            name = "HSA_OVERRIDE_GFX_VERSION";
+            value = "10.3.0";
           }
           {
             name = "OLLAMA_GPU_LAYERS";
