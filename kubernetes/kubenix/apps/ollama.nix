@@ -103,6 +103,10 @@ in
             name = "dev-dri";
             mountPath = "/dev/dri";
           }
+          {
+            name = "rocm";
+            mountPath = "/opt/rocm";
+          }
         ];
 
         volumes = [
@@ -117,6 +121,13 @@ in
             name = "dev-dri";
             hostPath = {
               path = "/dev/dri";
+              type = null;
+            };
+          }
+          {
+            name = "rocm";
+            hostPath = {
+              path = "/opt/rocm";
               type = null;
             };
           }
