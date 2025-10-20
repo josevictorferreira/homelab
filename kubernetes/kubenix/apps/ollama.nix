@@ -29,10 +29,10 @@ in
         };
 
         extraEnv = [
-          {
-            name = "LD_LIBRARY_PATH";
-            value = "/opt/rocm/lib:/usr/lib/ollama/rocm";
-          }
+          # {
+          #   name = "LD_LIBRARY_PATH";
+          #   value = "/opt/rocm/lib:/usr/lib/ollama/rocm";
+          # }
           # {
           #   name = "ROCR_VISIBLE_DEVICES";
           #   value = "0";
@@ -41,14 +41,14 @@ in
           #   name = "HIP_VISIBLE_DEVICES";
           #   value = "0";
           # }
-          {
-            name = "HCC_AMDGPU_TARGET";
-            value = "gfx1030";
-          }
-          {
-            name = "HSA_OVERRIDE_GFX_VERSION";
-            value = "10.3.0";
-          }
+          # {
+          #   name = "HCC_AMDGPU_TARGET";
+          #   value = "gfx1030";
+          # }
+          # {
+          #   name = "HSA_OVERRIDE_GFX_VERSION";
+          #   value = "10.3.0";
+          # }
           # {
           #   name = "OLLAMA_GPU_LAYERS";
           #   value = "32";
