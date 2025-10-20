@@ -92,12 +92,15 @@ spec:
             claimName: ollama
         - hostPath:
             path: /dev/kfd
+            type: CharDevice
           name: dev-kfd
         - hostPath:
             path: /dev/dri
+            type: Directory
           name: dev-dri
         - hostPath:
             path: /opt/rocm
+            type: Directory
           name: rocm
         - hostPath:
             path: /run/opengl-driver

@@ -115,21 +115,21 @@ in
             name = "dev-kfd";
             hostPath = {
               path = "/dev/kfd";
-              type = null;
+              type = "CharDevice";
             };
           }
           {
             name = "dev-dri";
             hostPath = {
               path = "/dev/dri";
-              type = null;
+              type = "Directory";
             };
           }
           {
             name = "rocm";
             hostPath = {
               path = "/opt/rocm";
-              type = null;
+              type = "Directory";
             };
           }
           {
