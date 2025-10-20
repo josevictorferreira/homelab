@@ -33,34 +33,18 @@ in
             name = "LD_LIBRARY_PATH";
             value = "/opt/rocm/lib:/usr/lib/ollama/rocm";
           }
-          # {
-          #   name = "ROCR_VISIBLE_DEVICES";
-          #   value = "0";
-          # }
-          # {
-          #   name = "HIP_VISIBLE_DEVICES";
-          #   value = "0";
-          # }
           {
             name = "HCC_AMDGPU_TARGET";
-            value = "gfx1031";
+            value = "gfx1030";
           }
           {
-            name = "HSA_OVERRIDE_GFX_VERSION";
-            value = "10.3.0";
+            name = "OLLAMA_GPU_LAYERS";
+            value = "32";
           }
-          # {
-          #   name = "OLLAMA_GPU_LAYERS";
-          #   value = "32";
-          # }
-          # {
-          #   name = "OLLAMA_NUM_PARALLEL";
-          #   value = "4";
-          # }
-          # {
-          #   name = "OLLAMA_LLM_LIBRARY";
-          #   value = "rocm_v6";
-          # }
+          {
+            name = "OLLAMA_NUM_PARALLEL";
+            value = "4";
+          }
           {
             name = "OLLAMA_DEBUG";
             value = "1";
