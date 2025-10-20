@@ -41,10 +41,10 @@ in
           #   name = "HIP_VISIBLE_DEVICES";
           #   value = "0";
           # }
-          # {
-          #   name = "HCC_AMDGPU_TARGET";
-          #   value = "gfx1030";
-          # }
+          {
+            name = "HCC_AMDGPU_TARGET";
+            value = "gfx1030";
+          }
           {
             name = "HSA_OVERRIDE_GFX_VERSION";
             value = "10.3.0";
