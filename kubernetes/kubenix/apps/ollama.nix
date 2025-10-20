@@ -29,33 +29,29 @@ in
         };
 
         extraEnv = [
-          {
-            name = "LD_LIBRARY_PATH";
-            value = "/opt/rocm/lib:/usr/lib/ollama/rocm";
-          }
-          {
-            name = "HCC_AMDGPU_TARGET";
-            value = "gfx1031";
-          }
-          {
-            name = "HSA_OVERRIDE_GFX_VERSION";
-            value = "10.3.0";
-          }
-          {
-            name = "OLLAMA_GPU_LAYERS";
-            value = "32";
-          }
-          {
-            name = "OLLAMA_NUM_PARALLEL";
-            value = "4";
-          }
+          # {
+          #   name = "LD_LIBRARY_PATH";
+          #   value = "/opt/rocm/lib:/usr/lib/ollama/rocm";
+          # }
+          # {
+          #   name = "HCC_AMDGPU_TARGET";
+          #   value = "gfx1031";
+          # }
+          # {
+          #   name = "HSA_OVERRIDE_GFX_VERSION";
+          #   value = "10.3.0";
+          # }
+          # {
+          #   name = "OLLAMA_GPU_LAYERS";
+          #   value = "32";
+          # }
+          # {
+          #   name = "OLLAMA_NUM_PARALLEL";
+          #   value = "4";
+          # }
           {
             name = "OLLAMA_DEBUG";
             value = "1";
-          }
-          {
-            name = "AMD_LOG_LEVEL";
-            value = "3";
           }
         ];
 
@@ -89,45 +85,45 @@ in
           size = "60Gi";
           storageClass = "rook-ceph-block";
         };
-
-        volumeMounts = [
-          {
-            name = "dev-kfd";
-            mountPath = "/dev/kfd";
-          }
-          {
-            name = "dev-dri";
-            mountPath = "/dev/dri";
-          }
-          {
-            name = "rocm";
-            mountPath = "/opt/rocm";
-          }
-        ];
-
-        volumes = [
-          {
-            name = "dev-kfd";
-            hostPath = {
-              path = "/dev/kfd";
-              type = null;
-            };
-          }
-          {
-            name = "dev-dri";
-            hostPath = {
-              path = "/dev/dri";
-              type = null;
-            };
-          }
-          {
-            name = "rocm";
-            hostPath = {
-              path = "/opt/rocm";
-              type = null;
-            };
-          }
-        ];
+        #
+        # volumeMounts = [
+        #   {
+        #     name = "dev-kfd";
+        #     mountPath = "/dev/kfd";
+        #   }
+        #   {
+        #     name = "dev-dri";
+        #     mountPath = "/dev/dri";
+        #   }
+        #   {
+        #     name = "rocm";
+        #     mountPath = "/opt/rocm";
+        #   }
+        # ];
+        #
+        # volumes = [
+        #   {
+        #     name = "dev-kfd";
+        #     hostPath = {
+        #       path = "/dev/kfd";
+        #       type = null;
+        #     };
+        #   }
+        #   {
+        #     name = "dev-dri";
+        #     hostPath = {
+        #       path = "/dev/dri";
+        #       type = null;
+        #     };
+        #   }
+        #   {
+        #     name = "rocm";
+        #     hostPath = {
+        #       path = "/opt/rocm";
+        #       type = null;
+        #     };
+        #   }
+        # ];
 
       };
     };
