@@ -35,8 +35,6 @@ spec:
               value: 0.0.0.0:11434
             - name: LD_LIBRARY_PATH
               value: /opt/rocm/lib:/usr/lib/ollama/rocm
-            - name: GGML_CUDA_INIT
-              value: '0'
             - name: ROCR_VISIBLE_DEVICES
               value: '0'
             - name: HIP_VISIBLE_DEVICES
@@ -86,6 +84,10 @@ spec:
           volumeMounts:
             - mountPath: /root/.ollama
               name: ollama-data
+            - mountPath: /dev/kfd
+              name: dev-kfd
+            - mountPath: /dev/dri
+              name: dev-dri
       securityContext: {}
       serviceAccountName: ollama
       terminationGracePeriodSeconds: 120
@@ -93,6 +95,12 @@ spec:
         - name: ollama-data
           persistentVolumeClaim:
             claimName: ollama
+        - hostPath:
+            path: /dev/kfd
+          name: dev-kfd
+        - hostPath:
+            path: /dev/dri
+          name: dev-dri
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
