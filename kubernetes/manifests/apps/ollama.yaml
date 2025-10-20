@@ -33,20 +33,8 @@ spec:
         - env:
             - name: OLLAMA_HOST
               value: 0.0.0.0:11434
-            - name: LD_LIBRARY_PATH
-              value: /opt/rocm/lib:/usr/lib/ollama/rocm
-            - name: HCC_AMDGPU_TARGET
-              value: gfx1031
-            - name: HSA_OVERRIDE_GFX_VERSION
-              value: 10.3.0
-            - name: OLLAMA_GPU_LAYERS
-              value: '32'
-            - name: OLLAMA_NUM_PARALLEL
-              value: '4'
             - name: OLLAMA_DEBUG
               value: '1'
-            - name: AMD_LOG_LEVEL
-              value: '3'
           image: ollama/ollama:rocm@sha256:4f1a40333f4a505e2eccc205c19b23f8730fd47be456bf04063d967e8ebb6dbe
           imagePullPolicy: IfNotPresent
           livenessProbe:
@@ -80,12 +68,6 @@ spec:
           volumeMounts:
             - mountPath: /root/.ollama
               name: ollama-data
-            - mountPath: /dev/kfd
-              name: dev-kfd
-            - mountPath: /dev/dri
-              name: dev-dri
-            - mountPath: /opt/rocm
-              name: rocm
       securityContext: {}
       serviceAccountName: ollama
       terminationGracePeriodSeconds: 120
@@ -93,15 +75,6 @@ spec:
         - name: ollama-data
           persistentVolumeClaim:
             claimName: ollama
-        - hostPath:
-            path: /dev/kfd
-          name: dev-kfd
-        - hostPath:
-            path: /dev/dri
-          name: dev-dri
-        - hostPath:
-            path: /opt/rocm
-          name: rocm
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
