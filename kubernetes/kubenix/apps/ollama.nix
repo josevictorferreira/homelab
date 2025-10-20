@@ -28,6 +28,25 @@ in
           type = "amd";
         };
 
+        extraEnv = [
+          {
+            name = "LD_LIBRARY_PATH";
+            value = "/opt/rocm/lib:/usr/lib/ollama/rocm:$LD_LIBRARY_PATH";
+          }
+          {
+            name = "ROCR_VISIBLE_DEVICES";
+            value = "0";
+          }
+          {
+            name = "HIP_VISIBLE_DEVICES";
+            value = "0";
+          }
+          {
+            name = "HCC_AMDGPU_TARGET";
+            value = "gfx1030";
+          }
+        ];
+
         models = {
           pull = [
             "qwen3-embedding:0.6b"
