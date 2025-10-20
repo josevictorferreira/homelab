@@ -83,6 +83,8 @@ spec:
             - mountPath: /run/opengl-driver
               name: opengl-driver
               readOnly: true
+            - mountPath: /nix/store
+              name: nix-glibc
       securityContext: {}
       serviceAccountName: ollama
       terminationGracePeriodSeconds: 120
@@ -106,6 +108,10 @@ spec:
             path: /run/opengl-driver
             type: Directory
           name: opengl-driver
+        - hostPath:
+            path: /nix/store
+            type: Directory
+          name: nix-glibc
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
