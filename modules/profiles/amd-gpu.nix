@@ -1,17 +1,12 @@
 {
   lib,
   config,
+  pkgs,
   ...
 }:
 
 let
   cfg = config.profiles."amd-gpu";
-  pkgs = import <nixpkgs> {
-    config = {
-      allowUnfree = true;
-      rocmSupport = true;
-    };
-  };
 in
 {
   options.profiles."amd-gpu" = {
@@ -19,19 +14,20 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    systemd.tmpfiles.rules = [ "L+    /opt/rocm/hip   -    -    -     -    ${pkgs.rocmPackages.clr}" ];
+    boot.kernelParams = [ "amdgpu.sg_display=0" ];
+
+    systemd.tmpfiles.rules = [ "L+    /opt/rocm   -    -    -     -    ${pkgs.rocmPackages.clr}" ];
     hardware.cpu.amd.updateMicrocode = true;
+
+    nixpkgs.config.allowUnfree = true;
+    nixpkgs.config.rocmSupport = "rocm";
 
     hardware.graphics = {
       enable = true;
       extraPackages = [
-        pkgs.libva
-        pkgs.libva-utils
-        pkgs.rocmPackages.clr
-        pkgs.rocmPackages.clr.icd
-        pkgs.rocmPackages.rocmPath
+        pkgs.clinfo
         pkgs.rocmPackages.rocminfo
-        pkgs.rocmPackages.rocm-smi
+        pkgs.rocmPackages.rocm-device-libs
         pkgs.rocmPackages.rocm-runtime
       ];
       enable32Bit = true;
@@ -41,6 +37,8 @@ in
       enable = true;
       support32Bit.enable = true;
     };
+
+    virtualisation.containerd.enable = true;
 
     environment.systemPackages = [
       pkgs.pciutils
