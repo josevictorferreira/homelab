@@ -8,7 +8,15 @@
     kubenix.url = "github:hall/kubenix";
   };
 
-  outputs = { self, nixpkgs, sops-nix, deploy-rs, kubenix, ... }@inputs:
+  outputs =
+    {
+      self,
+      nixpkgs,
+      sops-nix,
+      deploy-rs,
+      kubenix,
+      ...
+    }@inputs:
     let
       currentSystem = builtins.currentSystem or "x86_64-linux";
 
@@ -29,15 +37,27 @@
       homelab = homelabEval.config.homelab;
 
       kubenixModule = import ./kubernetes/kubenix {
-        inherit lib pkgs kubenix homelab;
+        inherit
+          lib
+          pkgs
+          kubenix
+          homelab
+          ;
       };
 
-      mkHost = hostName:
+      mkHost =
+        hostName:
         lib.nixosSystem {
           system = homelab.nodes.hosts.${hostName}.system;
           specialArgs = {
             hostConfig = homelab.nodes.hosts.${hostName};
-            inherit lib self inputs hostName homelab;
+            inherit
+              lib
+              self
+              inputs
+              hostName
+              homelab
+              ;
           };
           modules = [
             sops-nix.nixosModules.sops
@@ -46,49 +66,56 @@
         };
     in
     {
-      nixosConfigurations = lib.mergeAttrs (lib.mapAttrs (hostName: _system: mkHost hostName) homelab.nodes.hosts) {
-        "recovery-iso" = lib.nixosSystem {
-          system = "x86_64-linux";
-          modules = [ ./hosts/nixos-recovery-iso.nix ];
-        };
-      };
+      nixosConfigurations =
+        lib.mergeAttrs (lib.mapAttrs (hostName: _system: mkHost hostName) homelab.nodes.hosts)
+          {
+            "recovery-iso" = lib.nixosSystem {
+              system = "x86_64-linux";
+              modules = [ ./hosts/nixos-recovery-iso.nix ];
+            };
+          };
 
       deploy = {
-        nodes = lib.mapAttrs
-          (hostName: hostCfg:
-            let
-              isRemoteNeeded = hostCfg.system != currentSystem;
-              sshUser = homelab.users.admin.username;
-            in
-            {
-              hostname = hostCfg.ipAddress;
-              sshUser = sshUser;
-              fastConnection = true;
-              remoteBuild = isRemoteNeeded;
+        nodes = lib.mapAttrs (
+          hostName: hostCfg:
+          let
+            isRemoteNeeded = hostCfg.system != currentSystem;
+            # sshUser = homelab.users.admin.username;
+            sshUser = "root";
+          in
+          {
+            hostname = hostCfg.ipAddress;
+            sshUser = sshUser;
+            fastConnection = true;
+            remoteBuild = isRemoteNeeded;
 
-              profiles.system = {
-                user = "root";
-                path = deploy-rs.lib.${hostCfg.system}.activate.nixos self.nixosConfigurations.${hostName};
-                autoRollback = true;
-              };
-            }
-          )
-          homelab.nodes.hosts;
+            profiles.system = {
+              user = "root";
+              path = deploy-rs.lib.${hostCfg.system}.activate.nixos self.nixosConfigurations.${hostName};
+              autoRollback = true;
+            };
+          }
+        ) homelab.nodes.hosts;
       };
 
       nodesList = builtins.concatStringsSep "\n" (builtins.attrNames homelab.nodes.hosts);
 
       nodeGroupsList = builtins.concatStringsSep "\n" homelab.nodes.groups;
 
-      deployGroups = (builtins.mapAttrs (_: values: (builtins.concatStringsSep " " (builtins.map (v: "--targets='.#${v}'") values.names))) homelab.nodes.group);
+      deployGroups = (
+        builtins.mapAttrs (
+          _: values: (builtins.concatStringsSep " " (builtins.map (v: "--targets='.#${v}'") values.names))
+        ) homelab.nodes.group
+      );
 
       checks = lib.optionalAttrs (lib.hasAttr currentSystem deploy-rs.lib) {
         ${currentSystem} = deploy-rs.lib.${currentSystem}.deployChecks {
-          nodes = lib.filterAttrs (hostName: hostCfg: homelab.nodes.hosts.${hostName}.system == currentSystem) self.deploy.nodes;
+          nodes = lib.filterAttrs (
+            hostName: hostCfg: homelab.nodes.hosts.${hostName}.system == currentSystem
+          ) self.deploy.nodes;
         };
       };
 
-      packages.${currentSystem}.gen-manifests =
-        kubenixModule.mkRenderer currentSystem pkgs;
+      packages.${currentSystem}.gen-manifests = kubenixModule.mkRenderer currentSystem pkgs;
     };
 }
