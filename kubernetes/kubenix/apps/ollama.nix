@@ -65,6 +65,10 @@ in
             name = "OLLAMA_LLM_LIBRARY";
             value = "rocm_v6";
           }
+          {
+            name = "OLLAMA_DEBUG";
+            value = "1";
+          }
         ];
 
         models = {
