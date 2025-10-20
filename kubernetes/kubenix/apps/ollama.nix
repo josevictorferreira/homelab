@@ -34,10 +34,6 @@ in
             value = "/opt/rocm/lib:/usr/lib/ollama/rocm";
           }
           {
-            name = "GGML_CUDA_INIT";
-            value = "0";
-          }
-          {
             name = "ROCR_VISIBLE_DEVICES";
             value = "0";
           }
@@ -101,6 +97,34 @@ in
           size = "60Gi";
           storageClass = "rook-ceph-block";
         };
+
+        volumeMounts = [
+          {
+            name = "dev-kfd";
+            mountPath = "/dev/kfd";
+          }
+          {
+            name = "dev-dri";
+            mountPath = "/dev/dri";
+          }
+        ];
+
+        volumes = [
+          {
+            name = "dev-kfd";
+            hostPath = {
+              path = "/dev/kfd";
+              type = null;
+            };
+          }
+          {
+            name = "dev-dri";
+            hostPath = {
+              path = "/dev/dri";
+              type = null;
+            };
+          }
+        ];
 
       };
     };
