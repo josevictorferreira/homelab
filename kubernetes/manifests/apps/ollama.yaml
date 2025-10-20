@@ -86,6 +86,8 @@ spec:
               name: dev-kfd
             - mountPath: /dev/dri
               name: dev-dri
+            - mountPath: /opt/rocm
+              name: rocm
       securityContext: {}
       serviceAccountName: ollama
       terminationGracePeriodSeconds: 120
@@ -99,6 +101,9 @@ spec:
         - hostPath:
             path: /dev/dri
           name: dev-dri
+        - hostPath:
+            path: /opt/rocm
+          name: rocm
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
