@@ -1,12 +1,17 @@
 {
   lib,
   config,
-  pkgs,
   ...
 }:
 
 let
   cfg = config.profiles."amd-gpu";
+  pkgs = import <nixpkgs> {
+    config = {
+      allowUnfree = true;
+      rocmSupport = true;
+    };
+  };
 in
 {
   options.profiles."amd-gpu" = {
@@ -19,21 +24,17 @@ in
 
     hardware.graphics = {
       enable = true;
-      extraPackages = with pkgs; [
-        amdvlk
-        libva
-        libva-utils
-        rocmPackages.clr
-        rocmPackages.clr.icd
-        rocmPackages.rocmPath
-        rocmPackages.rocminfo
-        rocmPackages.rocm-smi
-        rocmPackages.rocm-runtime
+      extraPackages = [
+        pkgs.libva
+        pkgs.libva-utils
+        pkgs.rocmPackages.clr
+        pkgs.rocmPackages.clr.icd
+        pkgs.rocmPackages.rocmPath
+        pkgs.rocmPackages.rocminfo
+        pkgs.rocmPackages.rocm-smi
+        pkgs.rocmPackages.rocm-runtime
       ];
       enable32Bit = true;
-      extraPackages32 = with pkgs; [
-        driversi686Linux.amdvlk
-      ];
     };
 
     hardware.amdgpu.amdvlk = {
@@ -41,10 +42,10 @@ in
       support32Bit.enable = true;
     };
 
-    environment.systemPackages = with pkgs; [
-      pciutils
-      vulkan-tools
-      clinfo
+    environment.systemPackages = [
+      pkgs.pciutils
+      pkgs.vulkan-tools
+      pkgs.clinfo
     ];
 
     environment.variables = {

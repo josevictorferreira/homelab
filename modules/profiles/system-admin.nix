@@ -1,4 +1,10 @@
-{ lib, config, pkgs, homelab, ... }:
+{
+  lib,
+  config,
+  pkgs,
+  homelab,
+  ...
+}:
 
 let
   cfg = config.profiles."system-admin";
@@ -31,6 +37,8 @@ in
       htop
       ncdu
     ];
+
+    users.users.root.openssh.authorizedKeys.keys = usersConfig.admin.keys;
 
     users = {
       enable = true;

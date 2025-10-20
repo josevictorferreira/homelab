@@ -13,10 +13,12 @@
   networking.useDHCP = false;
   networking.interfaces.enp1s0 = {
     mtu = 1500;
-    ipv4.addresses = [{
-      address = "10.10.10.240";
-      prefixLength = 24;
-    }];
+    ipv4.addresses = [
+      {
+        address = "10.10.10.240";
+        prefixLength = 24;
+      }
+    ];
     useDHCP = false;
   };
   networking.defaultGateway = {
@@ -88,5 +90,8 @@
 
   isoImage.appendToMenuLabel = " (Homelab Rescue)";
 
-  nix.settings.trusted-users = [ "root" "@wheel" ];
+  nix.settings.trusted-users = [
+    "root"
+    "@wheel"
+  ];
 }
