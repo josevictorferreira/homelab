@@ -29,18 +29,22 @@ in
         };
 
         extraEnv = [
-          # {
-          #   name = "LD_LIBRARY_PATH";
-          #   value = "/opt/rocm/lib:/usr/lib/ollama/rocm";
-          # }
+          {
+            name = "LD_LIBRARY_PATH";
+            value = "/opt/rocm/lib:/run/opengl-driver/lib:/usr/lib/ollama/rocm";
+          }
+          {
+            name = "PATH";
+            value = "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/rocm/bin";
+          }
           # {
           #   name = "HCC_AMDGPU_TARGET";
           #   value = "gfx1031";
           # }
-          # {
-          #   name = "HSA_OVERRIDE_GFX_VERSION";
-          #   value = "10.3.0";
-          # }
+          {
+            name = "HSA_OVERRIDE_GFX_VERSION";
+            value = "10.3.1";
+          }
           # {
           #   name = "OLLAMA_GPU_LAYERS";
           #   value = "32";
@@ -85,45 +89,57 @@ in
           size = "60Gi";
           storageClass = "rook-ceph-block";
         };
-        #
-        # volumeMounts = [
-        #   {
-        #     name = "dev-kfd";
-        #     mountPath = "/dev/kfd";
-        #   }
-        #   {
-        #     name = "dev-dri";
-        #     mountPath = "/dev/dri";
-        #   }
-        #   {
-        #     name = "rocm";
-        #     mountPath = "/opt/rocm";
-        #   }
-        # ];
-        #
-        # volumes = [
-        #   {
-        #     name = "dev-kfd";
-        #     hostPath = {
-        #       path = "/dev/kfd";
-        #       type = null;
-        #     };
-        #   }
-        #   {
-        #     name = "dev-dri";
-        #     hostPath = {
-        #       path = "/dev/dri";
-        #       type = null;
-        #     };
-        #   }
-        #   {
-        #     name = "rocm";
-        #     hostPath = {
-        #       path = "/opt/rocm";
-        #       type = null;
-        #     };
-        #   }
-        # ];
+
+        volumeMounts = [
+          {
+            name = "dev-kfd";
+            mountPath = "/dev/kfd";
+          }
+          {
+            name = "dev-dri";
+            mountPath = "/dev/dri";
+          }
+          {
+            name = "rocm";
+            mountPath = "/opt/rocm";
+          }
+          {
+            name = "opengl-driver";
+            mountPath = "/run/opengl-driver";
+            readOnly = true;
+          }
+        ];
+
+        volumes = [
+          {
+            name = "dev-kfd";
+            hostPath = {
+              path = "/dev/kfd";
+              type = null;
+            };
+          }
+          {
+            name = "dev-dri";
+            hostPath = {
+              path = "/dev/dri";
+              type = null;
+            };
+          }
+          {
+            name = "rocm";
+            hostPath = {
+              path = "/opt/rocm";
+              type = null;
+            };
+          }
+          {
+            name = "opengl-driver";
+            hostPath = {
+              path = "/run/opengl-driver";
+              type = "Directory";
+            };
+          }
+        ];
 
       };
     };
