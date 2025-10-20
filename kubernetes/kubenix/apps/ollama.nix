@@ -55,7 +55,7 @@ in
           # }
           {
             name = "OLLAMA_DEBUG";
-            value = "1";
+            value = "3";
           }
         ];
 
@@ -99,19 +99,19 @@ in
             name = "dev-dri";
             mountPath = "/dev/dri";
           }
-          {
-            name = "rocm";
-            mountPath = "/opt/rocm";
-          }
-          {
-            name = "opengl-driver";
-            mountPath = "/run/opengl-driver";
-            readOnly = true;
-          }
-          {
-            name = "nix-glibc";
-            mountPath = "/nix/store";
-          }
+          # {
+          #   name = "rocm";
+          #   mountPath = "/opt/rocm";
+          # }
+          # {
+          #   name = "opengl-driver";
+          #   mountPath = "/run/opengl-driver";
+          #   readOnly = true;
+          # }
+          # {
+          #   name = "nix-glibc";
+          #   mountPath = "/nix/store";
+          # }
         ];
 
         volumes = [
@@ -129,27 +129,27 @@ in
               type = "Directory";
             };
           }
-          {
-            name = "rocm";
-            hostPath = {
-              path = "/opt/rocm";
-              type = "Directory";
-            };
-          }
-          {
-            name = "opengl-driver";
-            hostPath = {
-              path = "/run/opengl-driver";
-              type = "Directory";
-            };
-          }
-          {
-            name = "nix-glibc";
-            hostPath = {
-              path = "/nix/store";
-              type = "Directory";
-            };
-          }
+          # {
+          #   name = "rocm";
+          #   hostPath = {
+          #     path = "/opt/rocm";
+          #     type = "Directory";
+          #   };
+          # }
+          # {
+          #   name = "opengl-driver";
+          #   hostPath = {
+          #     path = "/run/opengl-driver";
+          #     type = "Directory";
+          #   };
+          # }
+          # {
+          #   name = "nix-glibc";
+          #   hostPath = {
+          #     path = "/nix/store";
+          #     type = "Directory";
+          #   };
+          # }
         ];
 
       };
