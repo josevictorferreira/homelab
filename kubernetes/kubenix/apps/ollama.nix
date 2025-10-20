@@ -17,15 +17,16 @@ in
       noHooks = true;
       namespace = k8s.namespaces.applications;
       values = {
-        image = {
-          repository = "ollama/ollama";
-          tag = "rocm@sha256:4f1a40333f4a505e2eccc205c19b23f8730fd47be456bf04063d967e8ebb6dbe";
-          pullPolicy = "IfNotPresent";
-        };
+        # image = {
+        #   repository = "ollama/ollama";
+        #   tag = "rocm@sha256:4f1a40333f4a505e2eccc205c19b23f8730fd47be456bf04063d967e8ebb6dbe";
+        #   pullPolicy = "IfNotPresent";
+        # };
 
         gpu = {
           enabled = true;
           type = "amd";
+          number = 1;
         };
 
         extraEnv = [
@@ -56,6 +57,18 @@ in
           {
             name = "OLLAMA_DEBUG";
             value = "2";
+          }
+          {
+            name = "ROCM_PATH";
+            value = "/opt/rocm";
+          }
+          {
+            name = "ROCM_VISIBLE_DEVICES";
+            value = "0";
+          }
+          {
+            name = "HIP_VISIBLE_DEVICES";
+            value = "0";
           }
         ];
 
@@ -99,19 +112,19 @@ in
             name = "dev-dri";
             mountPath = "/dev/dri";
           }
-          # {
-          #   name = "rocm";
-          #   mountPath = "/opt/rocm";
-          # }
-          # {
-          #   name = "opengl-driver";
-          #   mountPath = "/run/opengl-driver";
-          #   readOnly = true;
-          # }
-          # {
-          #   name = "nix-glibc";
-          #   mountPath = "/nix/store";
-          # }
+          {
+            name = "rocm";
+            mountPath = "/opt/rocm";
+          }
+          {
+            name = "opengl-driver";
+            mountPath = "/run/opengl-driver";
+            readOnly = true;
+          }
+          {
+            name = "nix-glibc";
+            mountPath = "/nix/store";
+          }
         ];
 
         volumes = [
@@ -129,27 +142,27 @@ in
               type = "Directory";
             };
           }
-          # {
-          #   name = "rocm";
-          #   hostPath = {
-          #     path = "/opt/rocm";
-          #     type = "Directory";
-          #   };
-          # }
-          # {
-          #   name = "opengl-driver";
-          #   hostPath = {
-          #     path = "/run/opengl-driver";
-          #     type = "Directory";
-          #   };
-          # }
-          # {
-          #   name = "nix-glibc";
-          #   hostPath = {
-          #     path = "/nix/store";
-          #     type = "Directory";
-          #   };
-          # }
+          {
+            name = "rocm";
+            hostPath = {
+              path = "/opt/rocm";
+              type = "Directory";
+            };
+          }
+          {
+            name = "opengl-driver";
+            hostPath = {
+              path = "/run/opengl-driver";
+              type = "Directory";
+            };
+          }
+          {
+            name = "nix-glibc";
+            hostPath = {
+              path = "/nix/store";
+              type = "Directory";
+            };
+          }
         ];
 
       };
