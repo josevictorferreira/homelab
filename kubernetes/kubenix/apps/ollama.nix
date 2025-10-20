@@ -43,7 +43,7 @@ in
           # }
           {
             name = "HSA_OVERRIDE_GFX_VERSION";
-            value = "10.3.1";
+            value = "10.3.0";
           }
           # {
           #   name = "OLLAMA_GPU_LAYERS";
@@ -55,7 +55,7 @@ in
           # }
           {
             name = "OLLAMA_DEBUG";
-            value = "3";
+            value = "2";
           }
         ];
 
