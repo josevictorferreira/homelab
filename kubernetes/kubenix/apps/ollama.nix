@@ -31,7 +31,11 @@ in
         extraEnv = [
           {
             name = "LD_LIBRARY_PATH";
-            value = "/opt/rocm/lib:/usr/lib/ollama/rocm:$LD_LIBRARY_PATH";
+            value = "/opt/rocm/lib:/usr/lib/ollama/rocm:$${LD_LIBRARY_PATH}";
+          }
+          {
+            name = "PATH";
+            value = "/opt/rocm/bin:/usr/lib/ollama/rocm/bin:$${PATH}";
           }
           {
             name = "ROCR_VISIBLE_DEVICES";
@@ -43,7 +47,11 @@ in
           }
           {
             name = "HCC_AMDGPU_TARGET";
-            value = "gfx1030";
+            value = "gfx1031";
+          }
+          {
+            name = "HSA_OVERRIDE_GFX_VERSION";
+            value = "10.3.0";
           }
         ];
 
