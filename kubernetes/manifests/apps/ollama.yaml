@@ -33,8 +33,10 @@ spec:
         - env:
             - name: OLLAMA_HOST
               value: 0.0.0.0:11434
+            - name: HSA_OVERRIDE_GFX_VERSION
+              value: 10.3.0
             - name: OLLAMA_DEBUG
-              value: '1'
+              value: '2'
           image: ollama/ollama:rocm@sha256:4f1a40333f4a505e2eccc205c19b23f8730fd47be456bf04063d967e8ebb6dbe
           imagePullPolicy: IfNotPresent
           lifecycle:
@@ -86,9 +88,15 @@ spec:
               name: dev-kfd
             - mountPath: /dev/dri
               name: dev-dri
+      nodeSelector:
+        node.kubernetes.io/amd-gpu: 'true'
       securityContext: {}
       serviceAccountName: ollama
       terminationGracePeriodSeconds: 120
+      tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+          operator: Exists
       volumes:
         - name: ollama-data
           persistentVolumeClaim:
