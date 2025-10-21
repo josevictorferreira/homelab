@@ -60,7 +60,7 @@ in
           # }
           {
             name = "HSA_OVERRIDE_GFX_VERSION";
-            value = "11.0.0";
+            value = "11.0.1";
           }
           # {
           #   name = "OLLAMA_GPU_LAYERS";
@@ -78,10 +78,10 @@ in
           #   name = "ROCM_PATH";
           #   value = "/opt/rocm";
           # }
-          {
-            name = "ROCM_VISIBLE_DEVICES";
-            value = "0";
-          }
+          # {
+          #   name = "ROCM_VISIBLE_DEVICES";
+          #   value = "0";
+          # }
           # {
           #   name = "HIP_VISIBLE_DEVICES";
           #   value = "0";
