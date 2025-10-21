@@ -18,7 +18,7 @@ in
       namespace = k8s.namespaces.applications;
       values = {
         image = {
-          repository = "josevictorferreira/ollama";
+          repository = "ghcr.io/josevictorferreira/ollama";
           tag = "0.12.6-1-g7f551c4-dirty-rocm@sha256:9821f15b80e788074208ea8b6885ee956ffcd7145059aabbfcc8d1b8902a6a95";
           pullPolicy = "IfNotPresent";
         };
