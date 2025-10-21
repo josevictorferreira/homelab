@@ -34,7 +34,9 @@ spec:
             - name: OLLAMA_HOST
               value: 0.0.0.0:11434
             - name: HSA_OVERRIDE_GFX_VERSION
-              value: 9.0.8
+              value: 9.0.6
+            - name: OLLAMA_DEBUG
+              value: '2'
           image: ollama/ollama:rocm@sha256:4f1a40333f4a505e2eccc205c19b23f8730fd47be456bf04063d967e8ebb6dbe
           imagePullPolicy: IfNotPresent
           lifecycle:
