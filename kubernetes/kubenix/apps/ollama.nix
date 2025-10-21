@@ -46,10 +46,10 @@ in
         };
 
         extraEnv = [
-          {
-            name = "HSA_OVERRIDE_GFX_VERSION";
-            value = "9.0.12";
-          }
+          # {
+          #   name = "HSA_OVERRIDE_GFX_VERSION";
+          #   value = "9.0.12";
+          # }
           {
             name = "HIP_VISIBLE_DEVICES";
             value = "all";
