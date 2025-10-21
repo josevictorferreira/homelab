@@ -30,16 +30,16 @@ in
           };
 
           models = {
-            # pull = [
-            #   "qwen3-embedding:0.6b"
-            #   "embeddinggemma:300m"
-            #   "dimavz/whisper-tiny"
-            # ];
-            #
-            # run = [
-            #   "qwen3-embedding:0.6b"
-            #   "dimavz/whisper-tiny"
-            # ];
+            pull = [
+              "qwen3-embedding:0.6b"
+              "embeddinggemma:300m"
+              "dimavz/whisper-tiny"
+            ];
+
+            run = [
+              "qwen3-embedding:0.6b"
+              "dimavz/whisper-tiny"
+            ];
 
             clean = true;
           };
