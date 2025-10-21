@@ -19,7 +19,7 @@ in
       values = {
         image = {
           repository = "ghcr.io/josevictorferreira/ollama";
-          tag = "0.12.6-1-g7f551c4-dirty-rocm@d1d265d065204ff56dfc7dd2eae5010eeace889bd3bde2bc44d05ecbbd85a638";
+          tag = "0.12.6-1-g7f551c4-dirty-rocm@sha256:d1d265d065204ff56dfc7dd2eae5010eeace889bd3bde2bc44d05ecbbd85a638";
           pullPolicy = "IfNotPresent";
         };
 
