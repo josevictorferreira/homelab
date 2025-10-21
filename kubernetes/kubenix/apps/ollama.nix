@@ -30,16 +30,16 @@ in
           };
 
           models = {
-            pull = [
-              "qwen3-embedding:0.6b"
-              "embeddinggemma:300m"
-              "dimavz/whisper-tiny"
-            ];
-
-            run = [
-              "qwen3-embedding:0.6b"
-              "dimavz/whisper-tiny"
-            ];
+            # pull = [
+            #   "qwen3-embedding:0.6b"
+            #   "embeddinggemma:300m"
+            #   "dimavz/whisper-tiny"
+            # ];
+            #
+            # run = [
+            #   "qwen3-embedding:0.6b"
+            #   "dimavz/whisper-tiny"
+            # ];
 
             clean = true;
           };
@@ -75,8 +75,13 @@ in
         };
 
         resources = {
+          requests = {
+            "amd.com/gpu" = "1";
+            memory = "1Gi";
+          };
           limits = {
             "amd.com/gpu" = "1";
+            memory = "4Gi";
           };
         };
 
@@ -85,35 +90,6 @@ in
           size = "60Gi";
           storageClass = "rook-ceph-block";
         };
-        #
-        # volumeMounts = [
-        #   {
-        #     name = "dev-kfd";
-        #     mountPath = "/dev/kfd";
-        #   }
-        #   {
-        #     name = "dev-dri";
-        #     mountPath = "/dev/dri";
-        #   }
-        # ];
-        #
-        # volumes = [
-        #   {
-        #     name = "dev-kfd";
-        #     hostPath = {
-        #       path = "/dev/kfd";
-        #       type = "CharDevice";
-        #     };
-        #   }
-        #   {
-        #     name = "dev-dri";
-        #     hostPath = {
-        #       path = "/dev/dri";
-        #       type = "Directory";
-        #     };
-        #   }
-        # ];
-
       };
     };
   };
