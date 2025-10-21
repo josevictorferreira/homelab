@@ -74,8 +74,10 @@ in
           loadBalancerIP = homelab.kubernetes.loadBalancer.services.${app};
         };
 
-        resources.limits = {
-          "amd.com/gpu" = "1";
+        resources = {
+          limits = {
+            "amd.com/gpu" = "1";
+          };
         };
 
         persistentVolume = {
@@ -83,34 +85,34 @@ in
           size = "60Gi";
           storageClass = "rook-ceph-block";
         };
-
-        volumeMounts = [
-          {
-            name = "dev-kfd";
-            mountPath = "/dev/kfd";
-          }
-          {
-            name = "dev-dri";
-            mountPath = "/dev/dri";
-          }
-        ];
-
-        volumes = [
-          {
-            name = "dev-kfd";
-            hostPath = {
-              path = "/dev/kfd";
-              type = "CharDevice";
-            };
-          }
-          {
-            name = "dev-dri";
-            hostPath = {
-              path = "/dev/dri";
-              type = "Directory";
-            };
-          }
-        ];
+        #
+        # volumeMounts = [
+        #   {
+        #     name = "dev-kfd";
+        #     mountPath = "/dev/kfd";
+        #   }
+        #   {
+        #     name = "dev-dri";
+        #     mountPath = "/dev/dri";
+        #   }
+        # ];
+        #
+        # volumes = [
+        #   {
+        #     name = "dev-kfd";
+        #     hostPath = {
+        #       path = "/dev/kfd";
+        #       type = "CharDevice";
+        #     };
+        #   }
+        #   {
+        #     name = "dev-dri";
+        #     hostPath = {
+        #       path = "/dev/dri";
+        #       type = "Directory";
+        #     };
+        #   }
+        # ];
 
       };
     };

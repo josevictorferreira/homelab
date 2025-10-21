@@ -84,10 +84,6 @@ spec:
           volumeMounts:
             - mountPath: /root/.ollama
               name: ollama-data
-            - mountPath: /dev/kfd
-              name: dev-kfd
-            - mountPath: /dev/dri
-              name: dev-dri
       nodeSelector:
         node.kubernetes.io/amd-gpu: 'true'
       securityContext: {}
@@ -101,14 +97,6 @@ spec:
         - name: ollama-data
           persistentVolumeClaim:
             claimName: ollama
-        - hostPath:
-            path: /dev/kfd
-            type: CharDevice
-          name: dev-kfd
-        - hostPath:
-            path: /dev/dri
-            type: Directory
-          name: dev-dri
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
