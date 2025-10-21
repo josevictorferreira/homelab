@@ -19,7 +19,7 @@ in
       values = {
         image = {
           repository = "ghcr.io/josevictorferreira/ollama";
-          tag = "0.12.6-1-g7f551c4-dirty-rocm@sha256:d1d265d065204ff56dfc7dd2eae5010eeace889bd3bde2bc44d05ecbbd85a638";
+          tag = "0.12.6-1-g7f551c4-dirty-rocm@sha256:68ca90ec1f47a047084a0e6ab355dd5598bcd8644417f0a6633f2c7298c7313f";
           pullPolicy = "IfNotPresent";
         };
 
@@ -48,7 +48,7 @@ in
         extraEnv = [
           {
             name = "HSA_OVERRIDE_GFX_VERSION";
-            value = "9.1.2";
+            value = "9.0.0";
           }
           {
             name = "OLLAMA_DEBUG";
