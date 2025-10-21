@@ -46,10 +46,10 @@ in
         };
 
         extraEnv = [
-          # {
-          #   name = "HSA_OVERRIDE_GFX_VERSION";
-          #   value = "9.0.8";
-          # }
+          {
+            name = "HSA_OVERRIDE_GFX_VERSION";
+            value = "9.0.0";
+          }
           {
             name = "OLLAMA_DEBUG";
             value = "2";

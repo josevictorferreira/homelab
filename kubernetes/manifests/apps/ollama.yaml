@@ -33,6 +33,8 @@ spec:
         - env:
             - name: OLLAMA_HOST
               value: 0.0.0.0:11434
+            - name: HSA_OVERRIDE_GFX_VERSION
+              value: 9.0.0
             - name: OLLAMA_DEBUG
               value: '2'
           image: ghcr.io/josevictorferreira/ollama:0.12.6-1-g7f551c4-dirty-rocm@sha256:9821f15b80e788074208ea8b6885ee956ffcd7145059aabbfcc8d1b8902a6a95
