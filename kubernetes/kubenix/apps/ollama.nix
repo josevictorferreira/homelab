@@ -48,7 +48,11 @@ in
         extraEnv = [
           {
             name = "HSA_OVERRIDE_GFX_VERSION";
-            value = "9.0.8";
+            value = "9.0.6";
+          }
+          {
+            name = "OLLAMA_DEBUG";
+            value = "2";
           }
         ];
 
