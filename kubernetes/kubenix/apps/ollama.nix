@@ -47,6 +47,10 @@ in
 
         extraEnv = [
           {
+            name = "HCC_AMDGPU_TARGET";
+            value = "gfx90c";
+          }
+          {
             name = "HSA_OVERRIDE_GFX_VERSION";
             value = "9.0.0";
           }
