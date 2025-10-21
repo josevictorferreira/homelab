@@ -58,10 +58,10 @@ in
           #   name = "HCC_AMDGPU_TARGET";
           #   value = "gfx1030";
           # }
-          # {
-          #   name = "HSA_OVERRIDE_GFX_VERSION";
-          #   value = "10.3.0";
-          # }
+          {
+            name = "HSA_OVERRIDE_GFX_VERSION";
+            value = "10.3.0";
+          }
           # {
           #   name = "OLLAMA_GPU_LAYERS";
           #   value = "32";
@@ -72,7 +72,7 @@ in
           # }
           {
             name = "OLLAMA_DEBUG";
-            value = "1";
+            value = "2";
           }
           # {
           #   name = "ROCM_PATH";
@@ -86,6 +86,18 @@ in
           #   name = "HIP_VISIBLE_DEVICES";
           #   value = "0";
           # }
+        ];
+
+        nodeSelector = {
+          "node.kubernetes.io/amd-gpu" = "true";
+        };
+
+        tolerations = [
+          {
+            key = "node-role.kubernetes.io/control-plane";
+            operator = "Exists";
+            effect = "NoSchedule";
+          }
         ];
 
         service = {
