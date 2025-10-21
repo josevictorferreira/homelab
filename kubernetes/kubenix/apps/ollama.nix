@@ -18,8 +18,8 @@ in
       namespace = k8s.namespaces.applications;
       values = {
         image = {
-          repository = "ollama/ollama";
-          tag = "rocm@sha256:4f1a40333f4a505e2eccc205c19b23f8730fd47be456bf04063d967e8ebb6dbe";
+          repository = "josevictorferreira/ollama";
+          tag = "0.12.6-1-g7f551c4-dirty-rocm@sha256:9821f15b80e788074208ea8b6885ee956ffcd7145059aabbfcc8d1b8902a6a95";
           pullPolicy = "IfNotPresent";
         };
 
@@ -46,10 +46,10 @@ in
         };
 
         extraEnv = [
-          {
-            name = "HSA_OVERRIDE_GFX_VERSION";
-            value = "9.0.8";
-          }
+          # {
+          #   name = "HSA_OVERRIDE_GFX_VERSION";
+          #   value = "9.0.8";
+          # }
           {
             name = "OLLAMA_DEBUG";
             value = "2";
