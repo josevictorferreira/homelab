@@ -48,7 +48,7 @@ in
         extraEnv = [
           {
             name = "HSA_OVERRIDE_GFX_VERSION";
-            value = "9.0.6";
+            value = "9.0.8";
           }
         ];
 
