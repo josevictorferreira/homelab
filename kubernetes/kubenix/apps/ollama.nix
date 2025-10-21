@@ -55,6 +55,14 @@ in
             value = "9.0.a";
           }
           {
+            name = "HIP_VISIBLE_DEVICES";
+            value = "all";
+          }
+          {
+            name = "ROC_ENABLE_PRE_VEGA";
+            value = "1";
+          }
+          {
             name = "OLLAMA_DEBUG";
             value = "2";
           }
