@@ -47,12 +47,8 @@ in
 
         extraEnv = [
           {
-            name = "HCC_AMDGPU_TARGET";
-            value = "gfx90a";
-          }
-          {
             name = "HSA_OVERRIDE_GFX_VERSION";
-            value = "9.0.a";
+            value = "9.0.12";
           }
           {
             name = "HIP_VISIBLE_DEVICES";
@@ -95,34 +91,34 @@ in
           size = "60Gi";
           storageClass = "rook-ceph-block";
         };
-
-        volumeMounts = [
-          {
-            name = "dev-kfd";
-            mountPath = "/dev/kfd";
-          }
-          {
-            name = "dev-dri";
-            mountPath = "/dev/dri";
-          }
-        ];
-
-        volumes = [
-          {
-            name = "dev-kfd";
-            hostPath = {
-              path = "/dev/kfd";
-              type = "CharDevice";
-            };
-          }
-          {
-            name = "dev-dri";
-            hostPath = {
-              path = "/dev/dri";
-              type = "Directory";
-            };
-          }
-        ];
+        #
+        # volumeMounts = [
+        #   {
+        #     name = "dev-kfd";
+        #     mountPath = "/dev/kfd";
+        #   }
+        #   {
+        #     name = "dev-dri";
+        #     mountPath = "/dev/dri";
+        #   }
+        # ];
+        #
+        # volumes = [
+        #   {
+        #     name = "dev-kfd";
+        #     hostPath = {
+        #       path = "/dev/kfd";
+        #       type = "CharDevice";
+        #     };
+        #   }
+        #   {
+        #     name = "dev-dri";
+        #     hostPath = {
+        #       path = "/dev/dri";
+        #       type = "Directory";
+        #     };
+        #   }
+        # ];
 
       };
     };
