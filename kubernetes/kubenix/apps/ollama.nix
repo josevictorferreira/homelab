@@ -52,7 +52,7 @@ in
           }
           {
             name = "HSA_OVERRIDE_GFX_VERSION";
-            value = "9.0.a";
+            value = "9.0.0";
           }
           {
             name = "OLLAMA_GPU_LAYERS";
