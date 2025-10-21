@@ -39,6 +39,8 @@ spec:
               value: 10.3.0
             - name: OLLAMA_DEBUG
               value: '2'
+            - name: ROCM_VISIBLE_DEVICES
+              value: '0'
           image: ollama/ollama:rocm@sha256:4f1a40333f4a505e2eccc205c19b23f8730fd47be456bf04063d967e8ebb6dbe
           imagePullPolicy: IfNotPresent
           lifecycle:

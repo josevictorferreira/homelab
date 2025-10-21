@@ -78,10 +78,10 @@ in
           #   name = "ROCM_PATH";
           #   value = "/opt/rocm";
           # }
-          # {
-          #   name = "ROCM_VISIBLE_DEVICES";
-          #   value = "0";
-          # }
+          {
+            name = "ROCM_VISIBLE_DEVICES";
+            value = "0";
+          }
           # {
           #   name = "HIP_VISIBLE_DEVICES";
           #   value = "0";
