@@ -48,27 +48,15 @@ in
         extraEnv = [
           {
             name = "HCC_AMDGPU_TARGET";
-            value = "gfx900";
+            value = "gfx90a";
           }
           {
             name = "HSA_OVERRIDE_GFX_VERSION";
-            value = "9.0.0";
-          }
-          {
-            name = "OLLAMA_GPU_LAYERS";
-            value = "32";
-          }
-          {
-            name = "OLLAMA_NUM_PARALLEL";
-            value = "4";
+            value = "9.0.a";
           }
           {
             name = "OLLAMA_DEBUG";
             value = "2";
-          }
-          {
-            name = "ROCM_VISIBLE_DEVICES";
-            value = "1";
           }
         ];
 
