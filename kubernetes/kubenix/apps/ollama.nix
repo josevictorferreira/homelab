@@ -46,21 +46,9 @@ in
         };
 
         extraEnv = [
-          # {
-          #   name = "HSA_OVERRIDE_GFX_VERSION";
-          #   value = "9.0.12";
-          # }
           {
-            name = "HIP_VISIBLE_DEVICES";
-            value = "all";
-          }
-          {
-            name = "ROC_ENABLE_PRE_VEGA";
-            value = "1";
-          }
-          {
-            name = "OLLAMA_DEBUG";
-            value = "2";
+            name = "HSA_OVERRIDE_GFX_VERSION";
+            value = "9.0.6";
           }
         ];
 
@@ -91,34 +79,34 @@ in
           size = "60Gi";
           storageClass = "rook-ceph-block";
         };
-        #
-        # volumeMounts = [
-        #   {
-        #     name = "dev-kfd";
-        #     mountPath = "/dev/kfd";
-        #   }
-        #   {
-        #     name = "dev-dri";
-        #     mountPath = "/dev/dri";
-        #   }
-        # ];
-        #
-        # volumes = [
-        #   {
-        #     name = "dev-kfd";
-        #     hostPath = {
-        #       path = "/dev/kfd";
-        #       type = "CharDevice";
-        #     };
-        #   }
-        #   {
-        #     name = "dev-dri";
-        #     hostPath = {
-        #       path = "/dev/dri";
-        #       type = "Directory";
-        #     };
-        #   }
-        # ];
+
+        volumeMounts = [
+          {
+            name = "dev-kfd";
+            mountPath = "/dev/kfd";
+          }
+          {
+            name = "dev-dri";
+            mountPath = "/dev/dri";
+          }
+        ];
+
+        volumes = [
+          {
+            name = "dev-kfd";
+            hostPath = {
+              path = "/dev/kfd";
+              type = "CharDevice";
+            };
+          }
+          {
+            name = "dev-dri";
+            hostPath = {
+              path = "/dev/dri";
+              type = "Directory";
+            };
+          }
+        ];
 
       };
     };

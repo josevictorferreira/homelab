@@ -33,12 +33,8 @@ spec:
         - env:
             - name: OLLAMA_HOST
               value: 0.0.0.0:11434
-            - name: HIP_VISIBLE_DEVICES
-              value: all
-            - name: ROC_ENABLE_PRE_VEGA
-              value: '1'
-            - name: OLLAMA_DEBUG
-              value: '2'
+            - name: HSA_OVERRIDE_GFX_VERSION
+              value: 9.0.6
           image: ollama/ollama:rocm@sha256:4f1a40333f4a505e2eccc205c19b23f8730fd47be456bf04063d967e8ebb6dbe
           imagePullPolicy: IfNotPresent
           lifecycle:
@@ -86,6 +82,10 @@ spec:
           volumeMounts:
             - mountPath: /root/.ollama
               name: ollama-data
+            - mountPath: /dev/kfd
+              name: dev-kfd
+            - mountPath: /dev/dri
+              name: dev-dri
       nodeSelector:
         node.kubernetes.io/amd-gpu: 'true'
       securityContext: {}
@@ -99,6 +99,14 @@ spec:
         - name: ollama-data
           persistentVolumeClaim:
             claimName: ollama
+        - hostPath:
+            path: /dev/kfd
+            type: CharDevice
+          name: dev-kfd
+        - hostPath:
+            path: /dev/dri
+            type: Directory
+          name: dev-dri
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
