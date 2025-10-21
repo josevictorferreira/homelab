@@ -34,11 +34,11 @@ spec:
             - name: OLLAMA_HOST
               value: 0.0.0.0:11434
             - name: HSA_OVERRIDE_GFX_VERSION
-              value: 11.0.1
+              value: 9.0.0
             - name: OLLAMA_DEBUG
               value: '2'
             - name: ROCM_VISIBLE_DEVICES
-              value: '0'
+              value: '1'
           image: ollama/ollama:rocm@sha256:4f1a40333f4a505e2eccc205c19b23f8730fd47be456bf04063d967e8ebb6dbe
           imagePullPolicy: IfNotPresent
           lifecycle:
