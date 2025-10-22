@@ -89,8 +89,14 @@ in
         };
 
         binaryData = {
-          availableModes = [ "filesystem" ];
-          mode = "filesystem";
+          availableModes = [ "s3" ];
+          mode = "s3";
+          s3 = {
+            host = "rook-ceph-rgw-ceph-objectstore.${homelab.kubernetes.namespaces.storage}.svc.cluster.local";
+            bucketName = bucketName;
+            bucketRegion = "us-east-1";
+            existingSecret = "n8n-env";
+          };
         };
 
         redis.enabled = false;
