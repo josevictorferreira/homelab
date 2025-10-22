@@ -2,7 +2,7 @@
 
 let
   namespace = homelab.kubernetes.namespaces.applications;
-  app = "ntfy";
+  app = "llama-cpp";
 in
 {
   submodules.instances.${app} = {
