@@ -36,7 +36,7 @@ spec:
         - envFrom:
             - secretRef:
                 name: openrouter-secrets
-          image: ghcr.io/josevictorferreira/openrouter-proxy:v0.0.3@sha256:ac96756841bc22c2b573727404d75047eec93dc9e50cbb8778daf2205dc1b899
+          image: ghcr.io/josevictorferreira/openrouter-proxy:v0.0.4
           imagePullPolicy: IfNotPresent
           name: main
           ports:
