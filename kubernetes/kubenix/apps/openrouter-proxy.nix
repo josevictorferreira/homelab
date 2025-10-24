@@ -10,7 +10,7 @@ in
       namespace = "apps";
       image = {
         repository = "ghcr.io/josevictorferreira/openrouter-proxy";
-        tag = "v0.0.4";
+        tag = "v0.0.5";
         pullPolicy = "IfNotPresent";
       };
       port = 8080;
