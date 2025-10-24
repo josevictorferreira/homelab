@@ -6,13 +6,12 @@ in
 {
   kubernetes = {
     helm.releases."rook-ceph-operator" = {
-      chart = kubenix.lib.helm.fetch
-        {
-          repo = "https://charts.rook.io/release";
-          chart = "rook-ceph";
-          version = "1.18.1";
-          sha256 = "sha256-GiCGu/fD//zzOoiV1nkzYUp6UlTWR3mB6/xzWvi+BD8=";
-        };
+      chart = kubenix.lib.helm.fetch {
+        repo = "https://charts.rook.io/release";
+        chart = "rook-ceph";
+        version = "1.18.5";
+        sha256 = "sha256-GG8Y+gAC9pj5VEzQM86CPxIqZgr+1Av8VsiGGziGUFU=";
+      };
       namespace = namespace;
       includeCRDs = true;
       noHooks = false;
