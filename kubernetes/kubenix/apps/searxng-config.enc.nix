@@ -10,13 +10,16 @@ let
     server = {
       base_url = "https://${domain}";
       limiter = false;
+      image_proxy = true;
     };
     search = {
       safe_search = 0;
-      default_lang = "en-US";
-      favicon_resolver = "duckduckgo";
-      autocomplete = "duckduckgo";
-      formats = [ "html" "css" "json" ];
+      default_lang = "";
+      autocomplete = "";
+      formats = [
+        "html"
+        "json"
+      ];
     };
     ui = {
       default_locale = "en";
