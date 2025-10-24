@@ -21,7 +21,7 @@ in
       values = {
         image = {
           repository = "ghcr.io/drakkan/sftpgo";
-          tag = "v2.6.6-alpine";
+          tag = "v2.7.0-alpine@sha256:2262e0e7932bad780a6d843a994dba4f00003bc30f236f5680d8ded095897dd1";
           pullPolicy = "IfNotPresent";
         };
 
@@ -118,7 +118,10 @@ in
             {
               host = "sftpgo.${homelab.domain}";
               paths = [
-                { path = "/"; pathType = "Prefix"; }
+                {
+                  path = "/";
+                  pathType = "Prefix";
+                }
               ];
             }
           ];
@@ -140,7 +143,10 @@ in
             {
               host = "sftpgoapi.${homelab.domain}";
               paths = [
-                { path = "/"; pathType = "Prefix"; }
+                {
+                  path = "/";
+                  pathType = "Prefix";
+                }
               ];
             }
           ];
