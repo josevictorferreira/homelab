@@ -87,12 +87,12 @@ let
                   }
                   {
                     type = "reddit";
-                    subreddit = "minilab";
+                    subreddit = "LocalLLaMA";
                     "show-thumbnails" = true;
                   }
                   {
                     type = "reddit";
-                    subreddit = "homelab";
+                    subreddit = "StableDiffusion";
                     "show-thumbnails" = true;
                   }
                 ];
