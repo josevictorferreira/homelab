@@ -11,8 +11,8 @@ in
       chart = kubenix.lib.helm.fetch {
         chartUrl = "oci://ghcr.io/sftpgo/helm-charts/sftpgo";
         chart = "sftpgo";
-        version = "0.40.0";
-        sha256 = "sha256-BXSGD9IWdy7AVDSVo8a7HFitFutr2v96w2Nypp29blg=";
+        version = "0.41.0";
+        sha256 = "sha256-9RKsmCHmBQ0rkurHwksbP1ueIPtaMDNOO/WgZ7Z0ryg=";
       };
       includeCRDs = true;
       noHooks = true;
@@ -21,7 +21,7 @@ in
       values = {
         image = {
           repository = "ghcr.io/drakkan/sftpgo";
-          tag = "v2.7.0@sha256:24f68c1e6617f3999debde0478f435d375d496c46644b82d3ca154842d4f6c40";
+          tag = "v2.7.0";
           pullPolicy = "IfNotPresent";
         };
 
