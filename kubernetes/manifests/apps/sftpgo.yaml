@@ -8,7 +8,7 @@ metadata:
     app.kubernetes.io/instance: sftpgo
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sftpgo
-    app.kubernetes.io/version: 2.7.0-alpine@sha256:2262e0e7932bad780a6d843a994dba4f00003bc30f236f5680d8ded095897dd1
+    app.kubernetes.io/version: 2.7.0@sha256:24f68c1e6617f3999debde0478f435d375d496c46644b82d3ca154842d4f6c40
     helm.sh/chart: sftpgo-0.40.0
   name: sftpgo
   namespace: apps
@@ -21,7 +21,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: 3e487330972638da127898b68e21137d392ed055e1c3a82d1c1f487b9657523b
+        checksum/config: 59d829d8ec4d6a60a9e8aa209c5a9442ed42b2a50a30bb9047cb8031c4d5c167
       labels:
         app.kubernetes.io/instance: sftpgo
         app.kubernetes.io/name: sftpgo
@@ -47,7 +47,7 @@ spec:
               value: '10000'
             - name: SFTPGO_TELEMETRY__BIND_ADDRESS
               value: ''
-          image: ghcr.io/drakkan/sftpgo:v2.7.0-alpine@sha256:2262e0e7932bad780a6d843a994dba4f00003bc30f236f5680d8ded095897dd1
+          image: ghcr.io/drakkan/sftpgo:v2.7.0@sha256:24f68c1e6617f3999debde0478f435d375d496c46644b82d3ca154842d4f6c40
           imagePullPolicy: IfNotPresent
           livenessProbe:
             httpGet:
@@ -117,7 +117,7 @@ metadata:
     app.kubernetes.io/instance: sftpgo
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sftpgo
-    app.kubernetes.io/version: 2.7.0-alpine@sha256:2262e0e7932bad780a6d843a994dba4f00003bc30f236f5680d8ded095897dd1
+    app.kubernetes.io/version: 2.7.0@sha256:24f68c1e6617f3999debde0478f435d375d496c46644b82d3ca154842d4f6c40
     helm.sh/chart: sftpgo-0.40.0
   name: sftpgo
   namespace: apps
@@ -134,7 +134,7 @@ metadata:
     app.kubernetes.io/instance: sftpgo
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sftpgo
-    app.kubernetes.io/version: 2.7.0-alpine@sha256:2262e0e7932bad780a6d843a994dba4f00003bc30f236f5680d8ded095897dd1
+    app.kubernetes.io/version: 2.7.0@sha256:24f68c1e6617f3999debde0478f435d375d496c46644b82d3ca154842d4f6c40
     helm.sh/chart: sftpgo-0.40.0
   name: sftpgo
   namespace: apps
@@ -158,7 +158,7 @@ metadata:
     app.kubernetes.io/instance: sftpgo
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sftpgo
-    app.kubernetes.io/version: 2.7.0-alpine@sha256:2262e0e7932bad780a6d843a994dba4f00003bc30f236f5680d8ded095897dd1
+    app.kubernetes.io/version: 2.7.0@sha256:24f68c1e6617f3999debde0478f435d375d496c46644b82d3ca154842d4f6c40
     helm.sh/chart: sftpgo-0.40.0
   name: sftpgo
   namespace: apps
@@ -255,7 +255,7 @@ metadata:
     app.kubernetes.io/instance: sftpgo
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sftpgo
-    app.kubernetes.io/version: 2.7.0-alpine@sha256:2262e0e7932bad780a6d843a994dba4f00003bc30f236f5680d8ded095897dd1
+    app.kubernetes.io/version: 2.7.0@sha256:24f68c1e6617f3999debde0478f435d375d496c46644b82d3ca154842d4f6c40
     helm.sh/chart: sftpgo-0.40.0
   name: sftpgo
   namespace: apps
@@ -271,7 +271,7 @@ metadata:
     app.kubernetes.io/instance: sftpgo
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sftpgo
-    app.kubernetes.io/version: 2.7.0-alpine@sha256:2262e0e7932bad780a6d843a994dba4f00003bc30f236f5680d8ded095897dd1
+    app.kubernetes.io/version: 2.7.0@sha256:24f68c1e6617f3999debde0478f435d375d496c46644b82d3ca154842d4f6c40
     helm.sh/chart: sftpgo-0.40.0
   name: sftpgo-api
   namespace: apps
@@ -304,7 +304,7 @@ metadata:
     app.kubernetes.io/instance: sftpgo
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sftpgo
-    app.kubernetes.io/version: 2.7.0-alpine@sha256:2262e0e7932bad780a6d843a994dba4f00003bc30f236f5680d8ded095897dd1
+    app.kubernetes.io/version: 2.7.0@sha256:24f68c1e6617f3999debde0478f435d375d496c46644b82d3ca154842d4f6c40
     helm.sh/chart: sftpgo-0.40.0
   name: sftpgo-ui
   namespace: apps
