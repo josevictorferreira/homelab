@@ -15,7 +15,7 @@ in
       namespace = namespace;
       image = {
         repository = "ghcr.io/0xerr0r/blocky";
-        tag = "v0.27.0@sha256:d4bb3ad54b5b3471341d11609eabb8b3d9da0faf3244da7bb2d210107b2fbc30";
+        tag = "v0.28.1@sha256:e9af552da2b0849f9b3b48ae3169acb2696fdf0ddc65df52e4025c9deef04a60";
         pullPolicy = "IfNotPresent";
       };
       port = 4000;
