@@ -9,8 +9,8 @@ in
       chart = kubenix.lib.helm.fetch {
         repo = "https://charts.rook.io/release";
         chart = "rook-ceph";
-        version = "1.18.5";
-        sha256 = "sha256-GG8Y+gAC9pj5VEzQM86CPxIqZgr+1Av8VsiGGziGUFU=";
+        version = "1.18.7";
+        sha256 = "sha256-HuvG34PBIdiEV07REAM+3C5Wxi2eh5FeaaflcgkqNDM=";
       };
       namespace = namespace;
       includeCRDs = true;

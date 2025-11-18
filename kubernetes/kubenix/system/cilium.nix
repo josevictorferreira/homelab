@@ -3,13 +3,12 @@
 {
   kubernetes = {
     helm.releases."cilium" = {
-      chart = kubenix.lib.helm.fetch
-        {
-          repo = "https://helm.cilium.io";
-          chart = "cilium";
-          version = "1.18.0";
-          sha256 = "sha256-km3mRsCk7NpbTJ8l8C52eweF+u9hqxIhEWALQ8LqN+0=";
-        };
+      chart = kubenix.lib.helm.fetch {
+        repo = "https://helm.cilium.io";
+        chart = "cilium";
+        version = "1.18.4";
+        sha256 = "sha256-+8eiwQ5H5xy8S8/qHMYblGo8vc0IucrvfwLnWLWwrxU=";
+      };
       includeCRDs = true;
       noHooks = true;
       values = {

@@ -27,7 +27,7 @@ spec:
   template:
     metadata:
       annotations:
-        cilium.io/cilium-configmap-checksum: fc70f61a3d8223f7da5492ef088d71ff4762eeea0414dc9ecac82cb233251801
+        cilium.io/cilium-configmap-checksum: c31f5c2e2170c1c1cc843af8825f69ad6b53a27a9186ad0efdf479cb019dd7cf
         kubectl.kubernetes.io/default-container: cilium-agent
       labels:
         app.kubernetes.io/name: cilium-agent
@@ -73,7 +73,7 @@ spec:
               value: '1'
             - name: KUBE_CLIENT_BACKOFF_DURATION
               value: '120'
-          image: quay.io/cilium/cilium:v1.18.0@sha256:dfea023972d06ec183cfa3c9e7809716f85daaff042e573ef366e9ec6a0c0ab2
+          image: quay.io/cilium/cilium:v1.18.4@sha256:49d87af187eeeb9e9e3ec2bc6bd372261a0b5cb2d845659463ba7cc10fe9e45f
           imagePullPolicy: IfNotPresent
           lifecycle:
             postStart:
@@ -206,7 +206,7 @@ spec:
               value: 10.10.10.250
             - name: KUBERNETES_SERVICE_PORT
               value: '6443'
-          image: quay.io/cilium/cilium:v1.18.0@sha256:dfea023972d06ec183cfa3c9e7809716f85daaff042e573ef366e9ec6a0c0ab2
+          image: quay.io/cilium/cilium:v1.18.4@sha256:49d87af187eeeb9e9e3ec2bc6bd372261a0b5cb2d845659463ba7cc10fe9e45f
           imagePullPolicy: IfNotPresent
           name: config
           terminationMessagePolicy: FallbackToLogsOnError
@@ -229,7 +229,7 @@ spec:
               value: /run/cilium/cgroupv2
             - name: BIN_PATH
               value: /opt/cni/bin
-          image: quay.io/cilium/cilium:v1.18.0@sha256:dfea023972d06ec183cfa3c9e7809716f85daaff042e573ef366e9ec6a0c0ab2
+          image: quay.io/cilium/cilium:v1.18.4@sha256:49d87af187eeeb9e9e3ec2bc6bd372261a0b5cb2d845659463ba7cc10fe9e45f
           imagePullPolicy: IfNotPresent
           name: mount-cgroup
           securityContext:
@@ -262,7 +262,7 @@ spec:
           env:
             - name: BIN_PATH
               value: /opt/cni/bin
-          image: quay.io/cilium/cilium:v1.18.0@sha256:dfea023972d06ec183cfa3c9e7809716f85daaff042e573ef366e9ec6a0c0ab2
+          image: quay.io/cilium/cilium:v1.18.4@sha256:49d87af187eeeb9e9e3ec2bc6bd372261a0b5cb2d845659463ba7cc10fe9e45f
           imagePullPolicy: IfNotPresent
           name: apply-sysctl-overwrites
           securityContext:
@@ -288,7 +288,7 @@ spec:
             - /bin/bash
             - -c
             - --
-          image: quay.io/cilium/cilium:v1.18.0@sha256:dfea023972d06ec183cfa3c9e7809716f85daaff042e573ef366e9ec6a0c0ab2
+          image: quay.io/cilium/cilium:v1.18.4@sha256:49d87af187eeeb9e9e3ec2bc6bd372261a0b5cb2d845659463ba7cc10fe9e45f
           imagePullPolicy: IfNotPresent
           name: mount-bpf-fs
           securityContext:
@@ -323,7 +323,7 @@ spec:
               value: 10.10.10.250
             - name: KUBERNETES_SERVICE_PORT
               value: '6443'
-          image: quay.io/cilium/cilium:v1.18.0@sha256:dfea023972d06ec183cfa3c9e7809716f85daaff042e573ef366e9ec6a0c0ab2
+          image: quay.io/cilium/cilium:v1.18.4@sha256:49d87af187eeeb9e9e3ec2bc6bd372261a0b5cb2d845659463ba7cc10fe9e45f
           imagePullPolicy: IfNotPresent
           name: clean-cilium-state
           securityContext:
@@ -349,7 +349,7 @@ spec:
               name: cilium-run
         - command:
             - /install-plugin.sh
-          image: quay.io/cilium/cilium:v1.18.0@sha256:dfea023972d06ec183cfa3c9e7809716f85daaff042e573ef366e9ec6a0c0ab2
+          image: quay.io/cilium/cilium:v1.18.4@sha256:49d87af187eeeb9e9e3ec2bc6bd372261a0b5cb2d845659463ba7cc10fe9e45f
           imagePullPolicy: IfNotPresent
           name: install-cni-binaries
           resources:
@@ -485,7 +485,7 @@ spec:
   template:
     metadata:
       annotations:
-        cilium.io/cilium-configmap-checksum: fc70f61a3d8223f7da5492ef088d71ff4762eeea0414dc9ecac82cb233251801
+        cilium.io/cilium-configmap-checksum: c31f5c2e2170c1c1cc843af8825f69ad6b53a27a9186ad0efdf479cb019dd7cf
         prometheus.io/port: '9963'
         prometheus.io/scrape: 'true'
       labels:
@@ -529,7 +529,7 @@ spec:
               value: 10.10.10.250
             - name: KUBERNETES_SERVICE_PORT
               value: '6443'
-          image: quay.io/cilium/operator-generic:v1.18.0@sha256:398378b4507b6e9db22be2f4455d8f8e509b189470061b0f813f0fabaf944f51
+          image: quay.io/cilium/operator-generic:v1.18.4@sha256:1b22b9ff28affdf574378a70dade4ef835b00b080c2ee2418530809dd62c3012
           imagePullPolicy: IfNotPresent
           livenessProbe:
             httpGet:
@@ -581,6 +581,8 @@ spec:
         - key: node-role.kubernetes.io/master
           operator: Exists
         - key: node.kubernetes.io/not-ready
+          operator: Exists
+        - key: node.cloudprovider.kubernetes.io/uninitialized
           operator: Exists
         - key: node.cilium.io/agent-not-ready
           operator: Exists
@@ -696,6 +698,7 @@ data:
   external-envoy-proxy: 'false'
   health-check-icmp-failure-threshold: '3'
   http-retry-count: '3'
+  http-stream-idle-timeout: '300'
   identity-allocation-mode: crd
   identity-gc-interval: 15m0s
   identity-heartbeat-timeout: 30m0s
