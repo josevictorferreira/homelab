@@ -1,10 +1,9 @@
-{
-  lib,
-  config,
-  hostName,
-  homelab,
-  hostConfig,
-  ...
+{ lib
+, config
+, hostName
+, homelab
+, hostConfig
+, ...
 }:
 
 let

@@ -1,7 +1,6 @@
-{
-  lib,
-  modulesPath,
-  ...
+{ lib
+, modulesPath
+, ...
 }:
 
 {

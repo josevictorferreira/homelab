@@ -102,12 +102,14 @@ rec {
   ];
 
   group = lib.listToAttrs (
-    map (role: {
-      name = role;
-      value = rec {
-        configs = filterByRoles hosts role;
-        names = lib.attrNames configs;
-      };
-    }) groups
+    map
+      (role: {
+        name = role;
+        value = rec {
+          configs = filterByRoles hosts role;
+          names = lib.attrNames configs;
+        };
+      })
+      groups
   );
 }

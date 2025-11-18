@@ -1,4 +1,4 @@
-.PHONY: lgroups check ddeploy deploy gdeploy secrets vmanifests umanifests emanifests gmanifests manifests kubesync wusbiso docker-build docker-login docker-init-repo docker-push help 
+.PHONY: lgroups check ddeploy deploy gdeploy secrets vmanifests umanifests emanifests gmanifests manifests kubesync wusbiso docker-build docker-login docker-init-repo docker-push lint format help 
 
 .DEFAULT_GOAL := help
 
@@ -276,6 +276,16 @@ docker-push: docker-build docker-login docker-init-repo ## Build and push the Do
 	docker push $(DOCKER_FULL_IMAGE)
 	@echo "Image pushed successfully to $(DOCKER_FULL_IMAGE)"
 	@echo "Image is now public at: https://$(DOCKER_REGISTRY)/$(GITHUB_USER)/$(DOCKER_IMAGE_NAME)"
+
+lint: ## Lint the nix files.
+	@echo "Running nix formatter check..."
+	@nix fmt -- --check . || (echo "❌ Some files need formatting. Run 'make format' to fix." && exit 1)
+	@echo "✅ All files are properly formatted."
+
+format: ## Format the nix files.
+	@echo "Formatting nix files..."
+	@nix fmt .
+	@echo "✅ Formatting complete."
 
 help: ## Show this help.
 	@printf "Usage: make [target]\n\nTARGETS:\n"; grep -F "##" $(MAKEFILE_LIST) | grep -Fv "grep -F" | grep -Fv "printf " | sed -e 's/\\$$//' | sed -e 's/##//' | column -t -s ":" | sed -e 's/^/    /'; printf "\n"

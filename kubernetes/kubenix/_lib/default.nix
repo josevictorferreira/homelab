@@ -6,7 +6,7 @@ in
 rec {
   secretsFor = secretName: "ref+sops://${k8sSecretsFile}#${secretName}";
 
-  secretsInlineFor =  secretName: "ref+sops://${k8sSecretsFile}#${secretName}+";
+  secretsInlineFor = secretName: "ref+sops://${k8sSecretsFile}#${secretName}+";
 
   domainFor = serviceName: "${serviceName}.${homelab.domain}";
 
