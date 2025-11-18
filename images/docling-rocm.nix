@@ -1,10 +1,10 @@
-{
-  pkgs ? import <nixpkgs> {
+{ pkgs ? import <nixpkgs> {
     config = {
       allowUnfree = true;
       rocmSupport = true;
     };
-  },
+  }
+,
 }:
 
 let
@@ -19,10 +19,10 @@ let
   uvSyncExtraArgs = "--no-group pypi --group rocm --no-extra flash-attn";
 
   fetchHfModel =
-    {
-      name,
-      repo,
-      hash,
+    { name
+    , repo
+    , hash
+    ,
     }:
     pkgs.fetchzip {
       name = "${name}-model";

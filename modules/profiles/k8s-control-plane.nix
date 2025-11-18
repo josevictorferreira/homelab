@@ -1,10 +1,9 @@
-{
-  lib,
-  config,
-  hostName,
-  hostConfig,
-  homelab,
-  ...
+{ lib
+, config
+, hostName
+, hostConfig
+, homelab
+, ...
 }:
 
 let
@@ -82,16 +81,19 @@ in
     }
     // lib.optionalAttrs cfg.isInit {
       manifests =
-        builtins.listToAttrs (
-          map (fileName: {
-            name = fileName;
-            value = {
-              enable = true;
-              target = fileName;
-              source = "${homelab.paths.manifests}/bootstrap/${fileName}";
-            };
-          }) bootstrapManifestFiles
-        )
+        builtins.listToAttrs
+          (
+            map
+              (fileName: {
+                name = fileName;
+                value = {
+                  enable = true;
+                  target = fileName;
+                  source = "${homelab.paths.manifests}/bootstrap/${fileName}";
+                };
+              })
+              bootstrapManifestFiles
+          )
         // {
           cilium = {
             enable = true;

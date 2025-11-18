@@ -1,8 +1,8 @@
-{
-  pkgs ? import <nixpkgs> { },
-  host ? "0.0.0.0",
-  port ? 8000,
-  tz ? "America/Sao_Paulo",
+{ pkgs ? import <nixpkgs> { }
+, host ? "0.0.0.0"
+, port ? 8000
+, tz ? "America/Sao_Paulo"
+,
 }:
 let
   dockerTools = pkgs.dockerTools;

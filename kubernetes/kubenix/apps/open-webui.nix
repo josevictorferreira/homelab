@@ -1,7 +1,6 @@
-{
-  kubenix,
-  homelab,
-  ...
+{ kubenix
+, homelab
+, ...
 }:
 
 let
