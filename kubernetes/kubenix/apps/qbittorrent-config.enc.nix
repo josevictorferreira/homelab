@@ -102,62 +102,62 @@ let
   '';
   watchedDownloadsConf = {
     "/downloads/monitor" = {
-        "add_torrent_params" = {
-            "category" = "";
-            "download_limit" = -1;
-            "download_path" = "";
-            "inactive_seeding_time_limit" = -2;
-            "operating_mode" = "AutoManaged";
-            "ratio_limit" = -2;
-            "save_path" = "";
-            "seeding_time_limit" = -2;
-            "share_limit_action" = "Default";
-            "skip_checking" = false;
-            "ssl_certificate" = "";
-            "ssl_dh_params" = "";
-            "ssl_private_key" = "";
-            "tags" = [
-            ];
-            "upload_limit" = -1;
-        };
-        "recursive" = false;
+      "add_torrent_params" = {
+        "category" = "";
+        "download_limit" = -1;
+        "download_path" = "";
+        "inactive_seeding_time_limit" = -2;
+        "operating_mode" = "AutoManaged";
+        "ratio_limit" = -2;
+        "save_path" = "";
+        "seeding_time_limit" = -2;
+        "share_limit_action" = "Default";
+        "skip_checking" = false;
+        "ssl_certificate" = "";
+        "ssl_dh_params" = "";
+        "ssl_private_key" = "";
+        "tags" = [
+        ];
+        "upload_limit" = -1;
+      };
+      "recursive" = false;
     };
   };
   categoriesConf = {
     books = {
-        "color" = "#ff9900";
-        "save_path" = "/downloads/books";
-        "sort" = 0;
+      "color" = "#ff9900";
+      "save_path" = "/downloads/books";
+      "sort" = 0;
     };
     games = {
-        "color" = "#ff33cc";
-        "save_path" = "/downloads/games";
-        "sort" = 1;
+      "color" = "#ff33cc";
+      "save_path" = "/downloads/games";
+      "sort" = 1;
     };
     movies = {
-        "color" = "#33ccff";
-        "save_path" = "/downloads/movies";
-        "sort" = 2;
+      "color" = "#33ccff";
+      "save_path" = "/downloads/movies";
+      "sort" = 2;
     };
     nsfw = {
-        "color" = "#ff0066";
-        "save_path" = "/downloads/nsfw";
-        "sort" = 3;
+      "color" = "#ff0066";
+      "save_path" = "/downloads/nsfw";
+      "sort" = 3;
     };
     other = {
-        "color" = "#cccccc";
-        "save_path" = "/downloads/other";
-        "sort" = 9;
+      "color" = "#cccccc";
+      "save_path" = "/downloads/other";
+      "sort" = 9;
     };
     sports = {
-        "color" = "#66ff66";
-        "save_path" = "/downloads/sports";
-        "sort" = 5;
+      "color" = "#66ff66";
+      "save_path" = "/downloads/sports";
+      "sort" = 5;
     };
     tv = {
-        "color" = "#ffff66";
-        "save_path" = "/downloads/tv";
-        "sort" = 6;
+      "color" = "#ffff66";
+      "save_path" = "/downloads/tv";
+      "sort" = 6;
     };
   };
 
