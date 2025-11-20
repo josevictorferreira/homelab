@@ -20,7 +20,7 @@ in
 
       values = {
         controllers.main.containers.main = {
-          image.tag = "v2.0.0";
+          image.tag = "v2.3.1";
           env = { };
           envFrom = [
             {
