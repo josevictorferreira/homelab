@@ -20,7 +20,6 @@ in
 
       values = {
         controllers.main.containers.main = {
-          image.tag = "v2.3.1";
           env = { };
           envFrom = [
             {
@@ -47,7 +46,7 @@ in
 
           controllers.main.containers.main = {
             image.repository = "ghcr.io/immich-app/immich-machine-learning";
-            image.tag = "v2.0.0@sha256:68bd95ff703a3b4c6a662b7f638bd2e01e3c7aeb2223dc0f142f02a555e24ca4";
+            image.tag = "v2.3.1@sha256:379e31b8c75107b0af8141904baa8cc933d7454b88fdb204265ef11749d7d908";
             image.pullPolicy = "IfNotPresent";
           };
 
@@ -66,7 +65,7 @@ in
           enabled = true;
           controllers.main.containers.main = {
             image.repository = "ghcr.io/immich-app/immich-server";
-            image.tag = "v2.0.0@sha256:d81f4af6a622d0955e5b8e3927da32b3ec882466a7ee8a26906d9cccad4364ca";
+            image.tag = "v2.3.1@sha256:f8d06a32b1b2a81053d78e40bf8e35236b9faefb5c3903ce9ca8712c9ed78445";
             image.pullPolicy = "IfNotPresent";
           };
 
