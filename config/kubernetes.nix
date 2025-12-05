@@ -39,6 +39,8 @@
       ollama = "10.10.10.128";
       llama-cpp = "10.10.10.129";
       openrouter-proxy = "10.10.10.130";
+      valoris = "10.10.10.131";
+      valoris-worker = "10.10.10.132";
       rabbitmq = "10.10.10.139";
       nfs = "10.10.10.150";
       grafana = "10.10.10.190";
@@ -51,6 +53,8 @@
       "openwebui"
       "n8n"
       "immich"
+      "valoris_production"
+      "valoris_production_queue"
     ];
   };
 
