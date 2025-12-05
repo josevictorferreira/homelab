@@ -7,7 +7,7 @@
       args = {
         namespace = "apps";
         image = {
-          repository = "josevictorferreira/valoris-server";
+          repository = "ghcr.io/josevictorferreira/valoris-server";
           tag = "latest";
           pullPolicy = "IfNotPresent";
         };
@@ -25,7 +25,7 @@
       args = {
         namespace = "apps";
         image = {
-          repository = "josevictorferreira/valoris-worker";
+          repository = "ghcr.io/josevictorferreira/valoris-worker";
           tag = "latest";
           pullPolicy = "IfNotPresent";
         };
