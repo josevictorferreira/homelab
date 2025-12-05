@@ -13,6 +13,11 @@
         };
         secretName = "valoris-secret";
         port = 3000;
+        values = {
+          defaultPodOptions.imagePullSecrets = [
+            { name = "ghcr-registry-secret"; }
+          ];
+        };
       };
     };
     valoris-worker = {
@@ -26,6 +31,11 @@
         };
         secretName = "valoris-secret";
         port = 3000;
+        values = {
+          defaultPodOptions.imagePullSecrets = [
+            { name = "ghcr-registry-secret"; }
+          ];
+        };
       };
     };
   };
