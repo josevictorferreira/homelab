@@ -35,7 +35,7 @@ spec:
       containers:
         - envFrom:
             - secretRef:
-                name: valoris-secret
+                name: valoris-config
           image: ghcr.io/josevictorferreira/valoris-server:latest
           imagePullPolicy: IfNotPresent
           name: main
@@ -152,7 +152,7 @@ spec:
       containers:
         - envFrom:
             - secretRef:
-                name: valoris-secret
+                name: valoris-config
           image: ghcr.io/josevictorferreira/valoris-worker:latest
           imagePullPolicy: IfNotPresent
           name: main

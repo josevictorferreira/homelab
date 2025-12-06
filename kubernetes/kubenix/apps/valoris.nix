@@ -11,7 +11,7 @@
           tag = "latest";
           pullPolicy = "IfNotPresent";
         };
-        secretName = "valoris-secret";
+        secretName = "valoris-config";
         port = 3000;
         values = {
           defaultPodOptions.imagePullSecrets = [
@@ -29,7 +29,7 @@
           tag = "latest";
           pullPolicy = "IfNotPresent";
         };
-        secretName = "valoris-secret";
+        secretName = "valoris-config";
         port = 3000;
         values = {
           defaultPodOptions.imagePullSecrets = [
