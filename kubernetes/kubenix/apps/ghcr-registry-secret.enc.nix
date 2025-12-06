@@ -9,7 +9,7 @@ in
         metadata = {
           namespace = namespace;
         };
-        data = {
+        stringData = {
           ".dockerconfigjson" = kubenix.lib.secretsFor "ghcr_registry_secret";
         };
       };
