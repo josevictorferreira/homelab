@@ -8,7 +8,7 @@
         namespace = "apps";
         image = {
           repository = "ghcr.io/josevictorferreira/valoris-server";
-          tag = "main-4ec8496";
+          tag = "main-df35547";
           pullPolicy = "IfNotPresent";
         };
         secretName = "valoris-config";
@@ -26,7 +26,7 @@
         namespace = "apps";
         image = {
           repository = "ghcr.io/josevictorferreira/valoris-worker";
-          tag = "main-4ec8496";
+          tag = "main-df35547";
           pullPolicy = "IfNotPresent";
         };
         secretName = "valoris-config";
