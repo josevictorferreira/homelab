@@ -1,5 +1,8 @@
 { ... }:
 
+let
+  imageTag = "main-d78ba83";
+in
 {
   submodules.instances = {
     valoris = {
@@ -8,7 +11,7 @@
         namespace = "apps";
         image = {
           repository = "ghcr.io/josevictorferreira/valoris-server";
-          tag = "main-df35547";
+          tag = imageTag;
           pullPolicy = "IfNotPresent";
         };
         secretName = "valoris-config";
@@ -26,7 +29,7 @@
         namespace = "apps";
         image = {
           repository = "ghcr.io/josevictorferreira/valoris-worker";
-          tag = "main-df35547";
+          tag = imageTag;
           pullPolicy = "IfNotPresent";
         };
         secretName = "valoris-config";
