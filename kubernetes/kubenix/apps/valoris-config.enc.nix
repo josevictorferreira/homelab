@@ -14,6 +14,8 @@ in
           "RAILS_ENV" = "production";
           "VALORIS_DATABASE_HOST" = "postgresql-hl";
           "VALORIS_DATABASE_PASSWORD" = kubenix.lib.secretsFor "postgresql_admin_password";
+          "VALORIS_JOBS_UI_USERNAME" = kubenix.lib.secretsFor "valoris_jobs_ui_username";
+          "VALORIS_JOBS_UI_PASSWORD" = kubenix.lib.secretsFor "valoris_jobs_ui_password";
           "SECRET_KEY_BASE" = kubenix.lib.secretsFor "valoris_secret_key_base";
         };
       };
