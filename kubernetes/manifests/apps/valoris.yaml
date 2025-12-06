@@ -36,7 +36,7 @@ spec:
         - envFrom:
             - secretRef:
                 name: valoris-config
-          image: ghcr.io/josevictorferreira/valoris-server:main-df35547
+          image: ghcr.io/josevictorferreira/valoris-server:main-d78ba83
           imagePullPolicy: IfNotPresent
           name: main
           ports:
@@ -153,7 +153,7 @@ spec:
         - envFrom:
             - secretRef:
                 name: valoris-config
-          image: ghcr.io/josevictorferreira/valoris-worker:main-df35547
+          image: ghcr.io/josevictorferreira/valoris-worker:main-d78ba83
           imagePullPolicy: IfNotPresent
           name: main
           ports:
