@@ -1,7 +1,7 @@
 { ... }:
 
 let
-  imageTag = "main-1af148a";
+  imageTag = "main-0d03b75";
 in
 {
   submodules.instances = {
