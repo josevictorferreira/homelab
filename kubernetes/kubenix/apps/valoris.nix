@@ -1,7 +1,7 @@
 { ... }:
 
 let
-  imageTag = "main-0d03b75";
+  imageTag = "latest";
 in
 {
   submodules.instances = {
@@ -12,7 +12,7 @@ in
         image = {
           repository = "ghcr.io/josevictorferreira/valoris-server";
           tag = imageTag;
-          pullPolicy = "IfNotPresent";
+          pullPolicy = "Always";
         };
         secretName = "valoris-config";
         port = 3000;
@@ -30,7 +30,7 @@ in
         image = {
           repository = "ghcr.io/josevictorferreira/valoris-worker";
           tag = imageTag;
-          pullPolicy = "IfNotPresent";
+          pullPolicy = "Always";
         };
         secretName = "valoris-config";
         port = 3000;
