@@ -11,6 +11,7 @@ in
         };
         stringData = {
           "RAILS_LOG_TO_STDOUT" = "true";
+          "LOG_LEVEL" = "DEBUG";
           "RAILS_ENV" = "production";
           "VALORIS_DATABASE_HOST" = "postgresql-hl";
           "VALORIS_DATABASE_PASSWORD" = kubenix.lib.secretsFor "postgresql_admin_password";
