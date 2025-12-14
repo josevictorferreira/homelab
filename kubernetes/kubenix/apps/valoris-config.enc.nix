@@ -20,6 +20,9 @@ in
           "VALORIS_RES_BROWSER_USERNAME" = kubenix.lib.secretsFor "valoris_res_browser_username";
           "VALORIS_RES_BROWSER_PASSWORD" = kubenix.lib.secretsFor "valoris_res_browser_password";
           "SECRET_KEY_BASE" = kubenix.lib.secretsFor "valoris_secret_key_base";
+          "S3_ENDPOINT" =
+            "http://rook-ceph-rgw-ceph-objectstore.${homelab.kubernetes.namespaces.storage}.svc.cluster.local";
+          "S3_BUCKET" = "valoris-s3";
         };
       };
     };
