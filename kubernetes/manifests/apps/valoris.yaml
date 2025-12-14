@@ -36,6 +36,8 @@ spec:
         - envFrom:
             - secretRef:
                 name: valoris-config
+            - secretRef:
+                name: valoris-s3
           image: ghcr.io/josevictorferreira/valoris-server:latest
           imagePullPolicy: Always
           name: main
@@ -153,6 +155,8 @@ spec:
         - envFrom:
             - secretRef:
                 name: valoris-config
+            - secretRef:
+                name: valoris-s3
           image: ghcr.io/josevictorferreira/valoris-worker:latest
           imagePullPolicy: Always
           name: main
@@ -231,3 +235,15 @@ spec:
     - hosts:
         - valoris-worker.josevictor.me
       secretName: wildcard-tls
+---
+apiVersion: objectbucket.io/v1alpha1
+kind: ObjectBucketClaim
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: linkwarden-s3
+  namespace: apps
+spec:
+  bucketName: valoris-s3
+  storageClassName: rook-ceph-objectstore
