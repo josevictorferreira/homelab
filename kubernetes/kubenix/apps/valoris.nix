@@ -58,7 +58,7 @@ in
 
   kubernetes = {
     resources = {
-      objectbucketclaim."linkwarden-s3" = {
+      objectbucketclaim."valoris-s3" = {
         metadata = {
           namespace = namespace;
         };
