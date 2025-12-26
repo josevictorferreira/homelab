@@ -1,4 +1,4 @@
-.PHONY: lgroups check ddeploy deploy gdeploy secrets vmanifests umanifests emanifests gmanifests manifests kubesync wusbiso docker-build docker-login docker-init-repo docker-push lint format help 
+.PHONY: lgroups check ddeploy deploy gdeploy secrets vmanifests umanifests emanifests gmanifests manifests kubesync wusbiso docker-build docker-login docker-init-repo docker-push lint format backup_postgres restore_postgres help 
 
 .DEFAULT_GOAL := help
 
@@ -286,6 +286,12 @@ format: ## Format the nix files.
 	@echo "Formatting nix files..."
 	@nix fmt .
 	@echo "✅ Formatting complete."
+
+backup_postgres: ## Create a .sql backup of all postgresql data
+	mkdir -p /tmp/backup && pg_dumpall -h 10.10.10.101 -U postgres -f /tmp/backup/full_backup.sql
+
+restore_postgres: ## Restore a .sql backup data to the postgresql
+	psql -h 10.10.10.133 -U postgres -f /tmp/backup/full_backup.sql
 
 help: ## Show this help.
 	@printf "Usage: make [target]\n\nTARGETS:\n"; grep -F "##" $(MAKEFILE_LIST) | grep -Fv "grep -F" | grep -Fv "printf " | sed -e 's/\\$$//' | sed -e 's/##//' | column -t -s ":" | sed -e 's/^/    /'; printf "\n"

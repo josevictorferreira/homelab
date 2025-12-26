@@ -96,7 +96,7 @@ in
 
         postgresql.enabled = false;
         externalPostgresql = {
-          host = "postgresql-hl";
+          host = "postgresql-18-hl";
           existingSecret = secretName;
         };
 
