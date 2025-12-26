@@ -41,6 +41,7 @@
       openrouter-proxy = "10.10.10.130";
       valoris = "10.10.10.131";
       valoris-worker = "10.10.10.132";
+      postgresql-18 = "10.10.10.133";
       rabbitmq = "10.10.10.139";
       nfs = "10.10.10.150";
       grafana = "10.10.10.190";

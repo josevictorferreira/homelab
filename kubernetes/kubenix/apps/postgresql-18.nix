@@ -30,8 +30,8 @@ in
   kubernetes = {
     helm.releases."postgresql-18" = {
       chart = kubenix.lib.helm.fetch {
-        chartUrl = "oci://registry-1.docker.io/bitnamicharts/postgresql-18";
-        chart = "postgresql-18";
+        chartUrl = "oci://registry-1.docker.io/bitnamicharts/postgresql";
+        chart = "postgresql";
         version = "16.7.27";
         sha256 = "sha256-Sl3CjRqPSVl5j8BYNvahUiAZqCUIAK3Xsv/bMFdQ3t8=";
       };
@@ -41,11 +41,11 @@ in
       values = {
         image = image;
 
-        postgresql-18SharedPreloadLibraries = "vchord.so";
+        postgresqlSharedPreloadLibraries = "vchord.so";
 
         global.security.allowInsecureImages = true;
 
-        global.postgresql-18.auth = {
+        global.postgresql.auth = {
           database = "linkwarden";
           existingSecret = "postgresql-auth";
           secretKeys = {
@@ -128,7 +128,7 @@ in
                 {
                   name = "PGPASSWORD";
                   valueFrom.secretKeyRef = {
-                    name = "postgresql-18-auth";
+                    name = "postgresql-auth";
                     key = "admin-password";
                   };
                 }
