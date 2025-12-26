@@ -1,7 +1,8 @@
-{ lib
-, kubenix
-, homelab
-, ...
+{
+  lib,
+  kubenix,
+  homelab,
+  ...
 }:
 
 let
@@ -25,7 +26,7 @@ in
         image = {
           registry = "ghcr.io";
           repository = "linkwarden/linkwarden";
-          tag = "v2.13.0@sha256:bd3565d3f13c2d590f417710819f4c6b4fe19f8b841fc45ab3fe4c61ba12d34f";
+          tag = "v2.13.4@sha256:9f1e69e11c36fcb94d97753479e76a7c66eabb4afd89c0ceb5ff52c0b1849ca5";
         };
 
         linkwarden = {

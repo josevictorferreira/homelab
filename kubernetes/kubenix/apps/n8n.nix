@@ -22,7 +22,7 @@ in
       values = {
         image = {
           repository = "n8nio/n8n";
-          tag = "1.120.2@sha256:59bb2e6ce9acbd151d47e6ad24d75e091fc1ce06c790b1eb165c2be5ef045848";
+          tag = "2.1.4@sha256:85214df20cd7bc020f8e4b0f60f87ea87f0a754ca7ba3d1ccdfc503ccd6e7f9c";
           pullPolicy = "IfNotPresent";
         };
 
