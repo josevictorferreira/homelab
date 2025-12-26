@@ -21,7 +21,7 @@ in
         };
         stringData = {
           "uri" =
-            "postgresql://postgres:${kubenix.lib.secretsFor "postgresql_admin_password"}+@postgresql-hl:5432/linkwarden";
+            "postgresql://postgres:${kubenix.lib.secretsFor "postgresql_admin_password"}+@postgresql-18-hl:5432/linkwarden";
         };
       };
     };
