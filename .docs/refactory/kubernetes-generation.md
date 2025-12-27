@@ -203,25 +203,25 @@ To avoid breaking the workflow, perform all changes in a single commit:
 
 ### Phase 2: Update Configuration Files
 
-- [ ] 2.1 Update `flake.nix`
+- [x] 2.1 Update `flake.nix`
   - Change `./kubernetes/kubenix` to `./modules/kubenix`
 
-- [ ] 2.2 Update `Makefile` - MANIFESTS_DIR variable
+- [x] 2.2 Update `Makefile` - MANIFESTS_DIR variable
   - Change `MANIFESTS_DIR ?= kubernetes/manifests` to `MANIFESTS_DIR ?= .k8s-manifests`
 
-- [ ] 2.3 Update `Makefile` - vmanifests target
+- [x] 2.3 Update `Makefile` - vmanifests target
   - Change `find kubernetes/manifests` to `find .k8s-manifests`
 
-- [ ] 2.4 Update `Makefile` - emanifests target
+- [x] 2.4 Update `Makefile` - emanifests target
   - Change `find kubernetes/manifests` to `find .k8s-manifests`
 
-- [ ] 2.5 Update `Makefile` - gmanifests target
+- [x] 2.5 Update `Makefile` - gmanifests target
   - Change all `kubernetes/manifests` references to `.k8s-manifests`
 
-- [ ] 2.6 Update `.k8s-manifests/flux-system/gotk-sync.yaml`
+- [x] 2.6 Update `.k8s-manifests/flux-system/gotk-sync.yaml`
   - Change `path: ./kubernetes/manifests` to `path: ./.k8s-manifests`
 
-- [ ] 2.7 Check and update `.sops.yaml` if it contains path references
+- [x] 2.7 Check and update `.sops.yaml` if it contains path references
   - Update any `kubernetes/manifests` paths to `.k8s-manifests`
 
 ### Phase 3: Verify and Test Locally
