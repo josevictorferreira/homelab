@@ -226,18 +226,18 @@ To avoid breaking the workflow, perform all changes in a single commit:
 
 ### Phase 3: Verify and Test Locally
 
-- [ ] 3.1 Run `nix flake check` to verify flake syntax is valid
+- [x] 3.1 Run `nix flake check` to verify flake syntax is valid
 
-- [ ] 3.2 Run `make gmanifests` to verify manifest generation
+- [x] 3.2 Run `make gmanifests` to verify manifest generation
   - Confirm output goes to `.k8s-manifests/`
 
-- [ ] 3.3 Run `make vmanifests` to verify secret substitution works
+- [x] 3.3 Run `make vmanifests` to verify secret substitution works
 
-- [ ] 3.4 Run `make emanifests` to verify encryption works
+- [x] 3.4 Run `make emanifests` to verify encryption works
 
-- [ ] 3.5 Run `make manifests` to verify full pipeline
+- [x] 3.5 Run `make manifests` to verify full pipeline
 
-- [ ] 3.6 Run `make lint` to ensure code formatting is correct
+- [x] 3.6 Run `make lint` to ensure code formatting is correct
 
 ### Phase 4: Commit and Deploy
 
