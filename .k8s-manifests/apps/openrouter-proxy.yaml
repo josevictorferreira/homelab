@@ -1,0 +1,114 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/controller: main
+    app.kubernetes.io/instance: openrouter-proxy
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: openrouter-proxy
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: openrouter-proxy
+  namespace: apps
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/controller: main
+      app.kubernetes.io/instance: openrouter-proxy
+      app.kubernetes.io/name: openrouter-proxy
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/controller: main
+        app.kubernetes.io/instance: openrouter-proxy
+        app.kubernetes.io/name: openrouter-proxy
+    spec:
+      automountServiceAccountToken: true
+      containers:
+        - envFrom:
+            - secretRef:
+                name: openrouter-secrets
+          image: ghcr.io/josevictorferreira/openrouter-proxy:v0.0.5
+          imagePullPolicy: IfNotPresent
+          name: main
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+      dnsPolicy: ClusterFirst
+      enableServiceLinks: false
+      hostIPC: false
+      hostNetwork: false
+      hostPID: false
+      serviceAccountName: default
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+    lbipam.cilium.io/ips: 10.10.10.130
+    lbipam.cilium.io/sharing-key: openrouter-proxy
+  labels:
+    app.kubernetes.io/instance: openrouter-proxy
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: openrouter-proxy
+    app.kubernetes.io/service: openrouter-proxy
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: openrouter-proxy
+  namespace: apps
+spec:
+  ports:
+    - name: http
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    app.kubernetes.io/controller: main
+    app.kubernetes.io/instance: openrouter-proxy
+    app.kubernetes.io/name: openrouter-proxy
+  type: LoadBalancer
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: openrouter-proxy
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: openrouter-proxy
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: openrouter-proxy
+  namespace: apps
+spec:
+  ingressClassName: cilium
+  rules:
+    - host: openrouter-proxy.josevictor.me
+      http:
+        paths:
+          - backend:
+              service:
+                name: openrouter-proxy
+                port:
+                  number: 8080
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - openrouter-proxy.josevictor.me
+      secretName: wildcard-tls

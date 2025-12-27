@@ -181,22 +181,22 @@ To avoid breaking the workflow, perform all changes in a single commit:
 
 ### Phase 1: Prepare New Structure
 
-- [ ] 1.1 Create `modules/kubenix` directory
+- [x] 1.1 Create `modules/kubenix` directory
   ```bash
   mkdir -p modules/kubenix
   ```
 
-- [ ] 1.2 Copy kubenix modules to new location
+- [x] 1.2 Copy kubenix modules to new location
   ```bash
   cp -r kubernetes/kubenix/* modules/kubenix/
   ```
 
-- [ ] 1.3 Create `.k8s-manifests` directory
+- [x] 1.3 Create `.k8s-manifests` directory
   ```bash
   mkdir -p .k8s-manifests
   ```
 
-- [ ] 1.4 Copy manifests to new location
+- [x] 1.4 Copy manifests to new location
   ```bash
   cp -r kubernetes/manifests/* .k8s-manifests/
   ```

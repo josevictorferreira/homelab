@@ -1,0 +1,118 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: searxng
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: searxng
+    app.kubernetes.io/version: 2025.8.20-41a4a3e
+    helm.sh/chart: searxng-1.0.0
+  name: searxng
+  namespace: apps
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: searxng
+      app.kubernetes.io/name: searxng
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: searxng
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: searxng
+        app.kubernetes.io/version: 2025.8.20-41a4a3e
+        helm.sh/chart: searxng-1.0.0
+    spec:
+      containers:
+        - envFrom:
+            - secretRef:
+                name: searxng-secret
+          image: ghcr.io/searxng/searxng:2025.8.20-41a4a3e
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          name: searxng
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          volumeMounts:
+            - mountPath: /etc/searxng
+              name: settings
+      volumes:
+        - configMap:
+            items:
+              - key: settings.yml
+                path: settings.yml
+              - key: limiter.toml
+                path: limiter.toml
+            name: searxng-config
+          name: settings
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: searxng
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: searxng
+    app.kubernetes.io/version: 2025.8.20-41a4a3e
+    helm.sh/chart: searxng-1.0.0
+  name: searxng
+  namespace: apps
+spec:
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: http
+  selector:
+    app.kubernetes.io/instance: searxng
+    app.kubernetes.io/name: searxng
+  type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: cloudflare-issuer
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: searxng
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: searxng
+    app.kubernetes.io/version: 2025.8.20-41a4a3e
+    helm.sh/chart: searxng-1.0.0
+  name: searxng
+  namespace: apps
+spec:
+  ingressClassName: cilium
+  rules:
+    - host: searxng.josevictor.me
+      http:
+        paths:
+          - backend:
+              service:
+                name: searxng
+                port:
+                  number: 80
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - searxng.josevictor.me
+      secretName: wildcard-tls

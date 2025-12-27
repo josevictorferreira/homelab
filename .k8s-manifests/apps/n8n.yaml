@@ -1,0 +1,442 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/component: main
+    app.kubernetes.io/instance: n8n
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: n8n
+    app.kubernetes.io/part-of: n8n
+    app.kubernetes.io/version: 1.110.1
+    helm.sh/chart: n8n-1.15.5
+  name: n8n
+  namespace: apps
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: n8n
+      app.kubernetes.io/name: n8n
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        checksum/config: bf16ace09c755f0dae217d76bfa62f3d62ba87958ef533c57ff1f29cd9a6bab8
+      labels:
+        app.kubernetes.io/component: main
+        app.kubernetes.io/instance: n8n
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: n8n
+        app.kubernetes.io/part-of: n8n
+        app.kubernetes.io/version: 1.110.1
+        helm.sh/chart: n8n-1.15.5
+    spec:
+      containers:
+        - env:
+            - name: N8N_HIRING_BANNER_ENABLED
+              value: 'false'
+            - name: NODE_ENV
+              value: production
+            - name: N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS
+              value: 'true'
+            - name: N8N_PORT
+              value: '5678'
+            - name: N8N_DEFAULT_LOCALE
+              value: en
+            - name: GENERIC_TIMEZONE
+              value: America/Sao_Paulo
+            - name: N8N_GRACEFUL_SHUTDOWN_TIMEOUT
+              value: '30'
+            - name: N8N_EDITOR_BASE_URL
+              value: https://n8n.josevictor.me
+            - name: DB_POSTGRESDB_USER
+              value: postgres
+            - name: DB_POSTGRESDB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: postgres-password
+                  name: n8n-env
+                  optional: true
+          envFrom:
+            - configMapRef:
+                name: n8n-database-configmap
+            - configMapRef:
+                name: n8n-logging-configmap
+            - configMapRef:
+                name: n8n-diagnostics-configmap
+            - configMapRef:
+                name: n8n-version-notifications-configmap
+            - configMapRef:
+                name: n8n-public-api-configmap
+            - configMapRef:
+                name: n8n-workflow-history-configmap
+            - configMapRef:
+                name: n8n-task-broker-configmap
+            - configMapRef:
+                name: n8n-metrics-configmap
+            - configMapRef:
+                name: n8n-binary-data-configmap
+            - secretRef:
+                name: n8n-env
+          image: n8nio/n8n:2.1.4@sha256:85214df20cd7bc020f8e4b0f60f87ea87f0a754ca7ba3d1ccdfc503ccd6e7f9c
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+          name: n8n-main
+          ports:
+            - containerPort: 5678
+              name: http
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /healthz/readiness
+              port: http
+          resources: {}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            privileged: false
+            readOnlyRootFilesystem: false
+            runAsGroup: 1000
+            runAsNonRoot: true
+            runAsUser: 1000
+          volumeMounts:
+            - mountPath: /home/node/.n8n
+              name: node-modules
+              readOnly: false
+      securityContext:
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+      serviceAccountName: n8n
+      volumes:
+        - name: node-modules
+          persistentVolumeClaim:
+            claimName: n8n-main-persistence
+---
+apiVersion: v1
+data:
+  N8N_DEFAULT_BINARY_DATA_MODE: default
+kind: ConfigMap
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app: n8n
+    chart: n8n-1.15.5
+    heritage: Helm
+    release: n8n
+  name: n8n-binary-data-configmap
+  namespace: apps
+---
+apiVersion: v1
+data:
+  DB_POSTGRESDB_CONNECTION_TIMEOUT: '20000'
+  DB_POSTGRESDB_DATABASE: n8n
+  DB_POSTGRESDB_HOST: postgresql-18-hl
+  DB_POSTGRESDB_IDLE_CONNECTION_TIMEOUT: '30000'
+  DB_POSTGRESDB_POOL_SIZE: '2'
+  DB_POSTGRESDB_PORT: '5432'
+  DB_POSTGRESDB_SCHEMA: public
+  DB_TYPE: postgresdb
+kind: ConfigMap
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app: n8n
+    chart: n8n-1.15.5
+    heritage: Helm
+    release: n8n
+  name: n8n-database-configmap
+  namespace: apps
+---
+apiVersion: v1
+data:
+  N8N_DIAGNOSTICS_CONFIG_BACKEND: ''
+  N8N_DIAGNOSTICS_CONFIG_FRONTEND: ''
+  N8N_DIAGNOSTICS_ENABLED: 'false'
+  N8N_DIAGNOSTICS_POSTHOG_API_HOST: ''
+  N8N_DIAGNOSTICS_POSTHOG_API_KEY: ''
+  N8N_FRONTEND_SENTRY_DSN: ''
+  N8N_SENTRY_DSN: ''
+kind: ConfigMap
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app: n8n
+    chart: n8n-1.15.5
+    heritage: Helm
+    release: n8n
+  name: n8n-diagnostics-configmap
+  namespace: apps
+---
+apiVersion: v1
+data:
+  N8N_LOG_LEVEL: info
+  N8N_LOG_OUTPUT: console
+kind: ConfigMap
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app: n8n
+    chart: n8n-1.15.5
+    heritage: Helm
+    release: n8n
+  name: n8n-logging-configmap
+  namespace: apps
+---
+apiVersion: v1
+data:
+  N8N_METRICS: 'false'
+  N8N_METRICS_INCLUDE_API_ENDPOINTS: 'false'
+  N8N_METRICS_INCLUDE_API_METHOD_LABEL: 'false'
+  N8N_METRICS_INCLUDE_API_PATH_LABEL: 'false'
+  N8N_METRICS_INCLUDE_API_STATUS_CODE_LABEL: 'false'
+  N8N_METRICS_INCLUDE_CACHE_METRICS: 'false'
+  N8N_METRICS_INCLUDE_CREDENTIAL_TYPE_LABEL: 'false'
+  N8N_METRICS_INCLUDE_DEFAULT_METRICS: 'true'
+  N8N_METRICS_INCLUDE_MESSAGE_EVENT_BUS_METRICS: 'false'
+  N8N_METRICS_INCLUDE_NODE_TYPE_LABEL: 'false'
+  N8N_METRICS_INCLUDE_QUEUE_METRICS: 'false'
+  N8N_METRICS_INCLUDE_WORKFLOW_ID_LABEL: 'false'
+  N8N_METRICS_PREFIX: n8n_
+kind: ConfigMap
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app: n8n
+    chart: n8n-1.15.5
+    heritage: Helm
+    release: n8n
+  name: n8n-metrics-configmap
+  namespace: apps
+---
+apiVersion: v1
+data:
+  N8N_PUBLIC_API_DISABLED: 'false'
+  N8N_PUBLIC_API_ENDPOINT: api
+  N8N_PUBLIC_API_SWAGGERUI_DISABLED: 'false'
+kind: ConfigMap
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app: n8n
+    chart: n8n-1.15.5
+    heritage: Helm
+    release: n8n
+  name: n8n-public-api-configmap
+  namespace: apps
+---
+apiVersion: v1
+data:
+  N8N_RUNNERS_ENABLED: 'true'
+  N8N_RUNNERS_HEARTBEAT_INTERVAL: '30'
+  N8N_RUNNERS_MAX_CONCURRENCY: '5'
+  N8N_RUNNERS_MODE: internal
+  N8N_RUNNERS_TASK_TIMEOUT: '60'
+kind: ConfigMap
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app: n8n
+    chart: n8n-1.15.5
+    heritage: Helm
+    release: n8n
+  name: n8n-task-broker-configmap
+  namespace: apps
+---
+apiVersion: v1
+data:
+  N8N_VERSION_NOTIFICATIONS_ENABLED: 'false'
+kind: ConfigMap
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app: n8n
+    chart: n8n-1.15.5
+    heritage: Helm
+    release: n8n
+  name: n8n-version-notifications-configmap
+  namespace: apps
+---
+apiVersion: v1
+data:
+  N8N_WORKFLOW_HISTORY_ENABLED: 'true'
+  N8N_WORKFLOW_HISTORY_PRUNE_TIME: '336'
+kind: ConfigMap
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app: n8n
+    chart: n8n-1.15.5
+    heritage: Helm
+    release: n8n
+  name: n8n-workflow-history-configmap
+  namespace: apps
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    helm.sh/resource-policy: keep
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/component: persistence
+    app.kubernetes.io/instance: n8n
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: n8n-main-persistence
+    app.kubernetes.io/part-of: n8n
+    app.kubernetes.io/version: 1.110.1
+    helm.sh/chart: n8n-1.15.5
+  name: n8n-main-persistence
+  namespace: apps
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 8Gi
+  storageClassName: rook-ceph-block
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/component: main
+    app.kubernetes.io/instance: n8n
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: n8n
+    app.kubernetes.io/part-of: n8n
+    app.kubernetes.io/version: 1.110.1
+    helm.sh/chart: n8n-1.15.5
+  name: n8n
+  namespace: apps
+spec:
+  ports:
+    - name: http
+      port: 5678
+      protocol: TCP
+      targetPort: http
+  selector:
+    app.kubernetes.io/instance: n8n
+    app.kubernetes.io/name: n8n
+  type: ClusterIP
+---
+apiVersion: v1
+automountServiceAccountToken: true
+kind: ServiceAccount
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/component: main
+    app.kubernetes.io/instance: n8n
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: n8n
+    app.kubernetes.io/part-of: n8n
+    app.kubernetes.io/version: 1.110.1
+    helm.sh/chart: n8n-1.15.5
+  name: n8n
+  namespace: apps
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: cloudflare-issuer
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/component: main
+    app.kubernetes.io/instance: n8n
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: n8n
+    app.kubernetes.io/part-of: n8n
+    app.kubernetes.io/version: 1.110.1
+    helm.sh/chart: n8n-1.15.5
+  name: n8n
+  namespace: apps
+spec:
+  ingressClassName: cilium
+  rules:
+    - host: n8n.josevictor.me
+      http:
+        paths:
+          - backend:
+              service:
+                name: n8n
+                port:
+                  number: 5678
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - n8n.josevictor.me
+      secretName: wildcard-tls
+---
+apiVersion: objectbucket.io/v1alpha1
+kind: ObjectBucketClaim
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: n8n-s3
+  namespace: apps
+spec:
+  bucketName: n8n-files
+  storageClassName: rook-ceph-objectstore
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/component: main
+    app.kubernetes.io/instance: n8n
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: n8n
+    app.kubernetes.io/part-of: n8n
+    app.kubernetes.io/version: 1.110.1
+    helm.sh/chart: n8n-1.15.5
+  name: n8n
+  namespace: apps
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: n8n
+      app.kubernetes.io/name: n8n

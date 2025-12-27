@@ -1,0 +1,522 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/component: primary
+    app.kubernetes.io/instance: postgresql-18
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: postgresql
+    app.kubernetes.io/version: 17.6.0
+    helm.sh/chart: postgresql-16.7.27
+  name: postgresql-18
+  namespace: apps
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: primary
+      app.kubernetes.io/instance: postgresql-18
+      app.kubernetes.io/name: postgresql
+  serviceName: postgresql-18-hl
+  template:
+    metadata:
+      annotations:
+        checksum/extended-configuration: 0d94e92defb53029afb52dcb57a1db8b0b25ead9be62e8823b566fcd64b0ee36
+      labels:
+        app.kubernetes.io/component: primary
+        app.kubernetes.io/instance: postgresql-18
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: postgresql
+        app.kubernetes.io/version: 17.6.0
+        helm.sh/chart: postgresql-16.7.27
+      name: postgresql-18
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/component: primary
+                    app.kubernetes.io/instance: postgresql-18
+                    app.kubernetes.io/name: postgresql
+                topologyKey: kubernetes.io/hostname
+              weight: 1
+      automountServiceAccountToken: false
+      containers:
+        - env:
+            - name: BITNAMI_DEBUG
+              value: 'false'
+            - name: POSTGRESQL_PORT_NUMBER
+              value: '5432'
+            - name: POSTGRESQL_VOLUME_DIR
+              value: /bitnami/postgresql
+            - name: PGDATA
+              value: /bitnami/postgresql/data
+            - name: POSTGRES_PASSWORD_FILE
+              value: /opt/bitnami/postgresql/secrets/admin-password
+            - name: POSTGRES_DATABASE
+              value: linkwarden
+            - name: POSTGRES_INITDB_ARGS
+              value: --data-checksums
+            - name: POSTGRESQL_ENABLE_LDAP
+              value: 'no'
+            - name: POSTGRESQL_ENABLE_TLS
+              value: 'no'
+            - name: POSTGRESQL_LOG_HOSTNAME
+              value: 'false'
+            - name: POSTGRESQL_LOG_CONNECTIONS
+              value: 'false'
+            - name: POSTGRESQL_LOG_DISCONNECTIONS
+              value: 'false'
+            - name: POSTGRESQL_PGAUDIT_LOG_CATALOG
+              value: 'off'
+            - name: POSTGRESQL_CLIENT_MIN_MESSAGES
+              value: error
+            - name: POSTGRESQL_SHARED_PRELOAD_LIBRARIES
+              value: vchord.so
+          image: ghcr.io/josevictorferreira/postgresql-vchord-bitnami:38c40fefe0c58cff6622de77f787634320e1ae5e
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - exec pg_isready -U "postgres" -d "dbname=linkwarden" -h 127.0.0.1
+                  -p 5432
+            failureThreshold: 6
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          name: postgresql
+          ports:
+            - containerPort: 5432
+              name: tcp-postgresql
+          readinessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - -e
+                - 'exec pg_isready -U "postgres" -d "dbname=linkwarden" -h 127.0.0.1
+                  -p 5432
+
+                  [ -f /opt/bitnami/postgresql/tmp/.initialized ] || [ -f /bitnami/postgresql/.initialized
+                  ]
+
+                  '
+            failureThreshold: 6
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          resources:
+            limits:
+              cpu: 150m
+              ephemeral-storage: 1Gi
+              memory: 1Gi
+            requests:
+              cpu: 50m
+              ephemeral-storage: 50Mi
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            privileged: false
+            readOnlyRootFilesystem: true
+            runAsGroup: 1001
+            runAsNonRoot: true
+            runAsUser: 1001
+            seLinuxOptions: {}
+            seccompProfile:
+              type: RuntimeDefault
+          volumeMounts:
+            - mountPath: /tmp
+              name: empty-dir
+              subPath: tmp-dir
+            - mountPath: /opt/bitnami/postgresql/conf
+              name: empty-dir
+              subPath: app-conf-dir
+            - mountPath: /opt/bitnami/postgresql/tmp
+              name: empty-dir
+              subPath: app-tmp-dir
+            - mountPath: /bitnami/postgresql/conf/conf.d/
+              name: postgresql-extended-config
+            - mountPath: /opt/bitnami/postgresql/secrets/
+              name: postgresql-password
+            - mountPath: /dev/shm
+              name: dshm
+            - mountPath: /bitnami/postgresql
+              name: data
+      hostIPC: false
+      hostNetwork: false
+      securityContext:
+        fsGroup: 1001
+        fsGroupChangePolicy: Always
+        supplementalGroups: []
+        sysctls: []
+      serviceAccountName: postgresql-18
+      volumes:
+        - emptyDir: {}
+          name: empty-dir
+        - configMap:
+            name: postgresql-18-extended-configuration
+          name: postgresql-extended-config
+        - name: postgresql-password
+          secret:
+            secretName: postgresql-auth
+        - emptyDir:
+            medium: Memory
+          name: dshm
+  updateStrategy:
+    rollingUpdate: {}
+    type: RollingUpdate
+  volumeClaimTemplates:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        name: data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 8Gi
+        storageClassName: rook-ceph-block
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: postgresql-18-bootstrap-6cafe785
+  namespace: apps
+spec:
+  template:
+    metadata:
+      annotations:
+        checksum/config: 6cafe785c67d7e5d46c68a03d3d1ffc8d71db2ae9d255d544f979687745cdeb6
+    spec:
+      containers:
+        - args:
+            - "set -e\n\t\tpsql -h postgresql-18 -U postgres -c 'ALTER SYSTEM SET\
+              \ shared_preload_libraries = \"vchord.so\"'\n    echo \"Ensuring database\
+              \ 'linkwarden' exists...\"\n    psql -h postgresql-18 -U postgres -d\
+              \ postgres -tAc \"SELECT 1 FROM pg_database WHERE datname='linkwarden'\"\
+              \ | grep -q 1 \\\n      || psql -h postgresql-18 -U postgres -d postgres\
+              \ -c \"CREATE DATABASE \\\"linkwarden\\\";\"\n\n    echo \"Installing\
+              \ pgvecto.rs extension in database 'linkwarden'...\"\n    psql -h postgresql-18\
+              \ -U postgres -d linkwarden -c \"DROP EXTENSION IF EXISTS vectors;CREATE\
+              \ EXTENSION IF NOT EXISTS vchord CASCADE;\" || echo \"Extension installation\
+              \ completed for linkwarden\"\n\n\t\tpsql -h postgresql-18 -U postgres\
+              \ -c 'ALTER SYSTEM SET shared_preload_libraries = \"vchord.so\"'\n \
+              \   echo \"Ensuring database 'openwebui' exists...\"\n    psql -h postgresql-18\
+              \ -U postgres -d postgres -tAc \"SELECT 1 FROM pg_database WHERE datname='openwebui'\"\
+              \ | grep -q 1 \\\n      || psql -h postgresql-18 -U postgres -d postgres\
+              \ -c \"CREATE DATABASE \\\"openwebui\\\";\"\n\n    echo \"Installing\
+              \ pgvecto.rs extension in database 'openwebui'...\"\n    psql -h postgresql-18\
+              \ -U postgres -d openwebui -c \"DROP EXTENSION IF EXISTS vectors;CREATE\
+              \ EXTENSION IF NOT EXISTS vchord CASCADE;\" || echo \"Extension installation\
+              \ completed for openwebui\"\n\n\t\tpsql -h postgresql-18 -U postgres\
+              \ -c 'ALTER SYSTEM SET shared_preload_libraries = \"vchord.so\"'\n \
+              \   echo \"Ensuring database 'n8n' exists...\"\n    psql -h postgresql-18\
+              \ -U postgres -d postgres -tAc \"SELECT 1 FROM pg_database WHERE datname='n8n'\"\
+              \ | grep -q 1 \\\n      || psql -h postgresql-18 -U postgres -d postgres\
+              \ -c \"CREATE DATABASE \\\"n8n\\\";\"\n\n    echo \"Installing pgvecto.rs\
+              \ extension in database 'n8n'...\"\n    psql -h postgresql-18 -U postgres\
+              \ -d n8n -c \"DROP EXTENSION IF EXISTS vectors;CREATE EXTENSION IF NOT\
+              \ EXISTS vchord CASCADE;\" || echo \"Extension installation completed\
+              \ for n8n\"\n\n\t\tpsql -h postgresql-18 -U postgres -c 'ALTER SYSTEM\
+              \ SET shared_preload_libraries = \"vchord.so\"'\n    echo \"Ensuring\
+              \ database 'immich' exists...\"\n    psql -h postgresql-18 -U postgres\
+              \ -d postgres -tAc \"SELECT 1 FROM pg_database WHERE datname='immich'\"\
+              \ | grep -q 1 \\\n      || psql -h postgresql-18 -U postgres -d postgres\
+              \ -c \"CREATE DATABASE \\\"immich\\\";\"\n\n    echo \"Installing pgvecto.rs\
+              \ extension in database 'immich'...\"\n    psql -h postgresql-18 -U\
+              \ postgres -d immich -c \"DROP EXTENSION IF EXISTS vectors;CREATE EXTENSION\
+              \ IF NOT EXISTS vchord CASCADE;\" || echo \"Extension installation completed\
+              \ for immich\"\n\n\t\tpsql -h postgresql-18 -U postgres -c 'ALTER SYSTEM\
+              \ SET shared_preload_libraries = \"vchord.so\"'\n    echo \"Ensuring\
+              \ database 'valoris_production' exists...\"\n    psql -h postgresql-18\
+              \ -U postgres -d postgres -tAc \"SELECT 1 FROM pg_database WHERE datname='valoris_production'\"\
+              \ | grep -q 1 \\\n      || psql -h postgresql-18 -U postgres -d postgres\
+              \ -c \"CREATE DATABASE \\\"valoris_production\\\";\"\n\n    echo \"\
+              Installing pgvecto.rs extension in database 'valoris_production'...\"\
+              \n    psql -h postgresql-18 -U postgres -d valoris_production -c \"\
+              DROP EXTENSION IF EXISTS vectors;CREATE EXTENSION IF NOT EXISTS vchord\
+              \ CASCADE;\" || echo \"Extension installation completed for valoris_production\"\
+              \n\n\t\tpsql -h postgresql-18 -U postgres -c 'ALTER SYSTEM SET shared_preload_libraries\
+              \ = \"vchord.so\"'\n    echo \"Ensuring database 'valoris_production_queue'\
+              \ exists...\"\n    psql -h postgresql-18 -U postgres -d postgres -tAc\
+              \ \"SELECT 1 FROM pg_database WHERE datname='valoris_production_queue'\"\
+              \ | grep -q 1 \\\n      || psql -h postgresql-18 -U postgres -d postgres\
+              \ -c \"CREATE DATABASE \\\"valoris_production_queue\\\";\"\n\n    echo\
+              \ \"Installing pgvecto.rs extension in database 'valoris_production_queue'...\"\
+              \n    psql -h postgresql-18 -U postgres -d valoris_production_queue\
+              \ -c \"DROP EXTENSION IF EXISTS vectors;CREATE EXTENSION IF NOT EXISTS\
+              \ vchord CASCADE;\" || echo \"Extension installation completed for valoris_production_queue\"\
+              \n\n"
+          command:
+            - sh
+            - -c
+          env:
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: admin-password
+                  name: postgresql-auth
+          image: ghcr.io/josevictorferreira/postgresql-vchord-bitnami:38c40fefe0c58cff6622de77f787634320e1ae5e
+          name: psql
+      restartPolicy: OnFailure
+---
+apiVersion: v1
+data:
+  databases: "\t\tpsql -h postgresql-18 -U postgres -c 'ALTER SYSTEM SET shared_preload_libraries\
+    \ = \"vchord.so\"'\n    echo \"Ensuring database 'linkwarden' exists...\"\n  \
+    \  psql -h postgresql-18 -U postgres -d postgres -tAc \"SELECT 1 FROM pg_database\
+    \ WHERE datname='linkwarden'\" | grep -q 1 \\\n      || psql -h postgresql-18\
+    \ -U postgres -d postgres -c \"CREATE DATABASE \\\"linkwarden\\\";\"\n\n    echo\
+    \ \"Installing pgvecto.rs extension in database 'linkwarden'...\"\n    psql -h\
+    \ postgresql-18 -U postgres -d linkwarden -c \"DROP EXTENSION IF EXISTS vectors;CREATE\
+    \ EXTENSION IF NOT EXISTS vchord CASCADE;\" || echo \"Extension installation completed\
+    \ for linkwarden\"\n\n\t\tpsql -h postgresql-18 -U postgres -c 'ALTER SYSTEM SET\
+    \ shared_preload_libraries = \"vchord.so\"'\n    echo \"Ensuring database 'openwebui'\
+    \ exists...\"\n    psql -h postgresql-18 -U postgres -d postgres -tAc \"SELECT\
+    \ 1 FROM pg_database WHERE datname='openwebui'\" | grep -q 1 \\\n      || psql\
+    \ -h postgresql-18 -U postgres -d postgres -c \"CREATE DATABASE \\\"openwebui\\\
+    \";\"\n\n    echo \"Installing pgvecto.rs extension in database 'openwebui'...\"\
+    \n    psql -h postgresql-18 -U postgres -d openwebui -c \"DROP EXTENSION IF EXISTS\
+    \ vectors;CREATE EXTENSION IF NOT EXISTS vchord CASCADE;\" || echo \"Extension\
+    \ installation completed for openwebui\"\n\n\t\tpsql -h postgresql-18 -U postgres\
+    \ -c 'ALTER SYSTEM SET shared_preload_libraries = \"vchord.so\"'\n    echo \"\
+    Ensuring database 'n8n' exists...\"\n    psql -h postgresql-18 -U postgres -d\
+    \ postgres -tAc \"SELECT 1 FROM pg_database WHERE datname='n8n'\" | grep -q 1\
+    \ \\\n      || psql -h postgresql-18 -U postgres -d postgres -c \"CREATE DATABASE\
+    \ \\\"n8n\\\";\"\n\n    echo \"Installing pgvecto.rs extension in database 'n8n'...\"\
+    \n    psql -h postgresql-18 -U postgres -d n8n -c \"DROP EXTENSION IF EXISTS vectors;CREATE\
+    \ EXTENSION IF NOT EXISTS vchord CASCADE;\" || echo \"Extension installation completed\
+    \ for n8n\"\n\n\t\tpsql -h postgresql-18 -U postgres -c 'ALTER SYSTEM SET shared_preload_libraries\
+    \ = \"vchord.so\"'\n    echo \"Ensuring database 'immich' exists...\"\n    psql\
+    \ -h postgresql-18 -U postgres -d postgres -tAc \"SELECT 1 FROM pg_database WHERE\
+    \ datname='immich'\" | grep -q 1 \\\n      || psql -h postgresql-18 -U postgres\
+    \ -d postgres -c \"CREATE DATABASE \\\"immich\\\";\"\n\n    echo \"Installing\
+    \ pgvecto.rs extension in database 'immich'...\"\n    psql -h postgresql-18 -U\
+    \ postgres -d immich -c \"DROP EXTENSION IF EXISTS vectors;CREATE EXTENSION IF\
+    \ NOT EXISTS vchord CASCADE;\" || echo \"Extension installation completed for\
+    \ immich\"\n\n\t\tpsql -h postgresql-18 -U postgres -c 'ALTER SYSTEM SET shared_preload_libraries\
+    \ = \"vchord.so\"'\n    echo \"Ensuring database 'valoris_production' exists...\"\
+    \n    psql -h postgresql-18 -U postgres -d postgres -tAc \"SELECT 1 FROM pg_database\
+    \ WHERE datname='valoris_production'\" | grep -q 1 \\\n      || psql -h postgresql-18\
+    \ -U postgres -d postgres -c \"CREATE DATABASE \\\"valoris_production\\\";\"\n\
+    \n    echo \"Installing pgvecto.rs extension in database 'valoris_production'...\"\
+    \n    psql -h postgresql-18 -U postgres -d valoris_production -c \"DROP EXTENSION\
+    \ IF EXISTS vectors;CREATE EXTENSION IF NOT EXISTS vchord CASCADE;\" || echo \"\
+    Extension installation completed for valoris_production\"\n\n\t\tpsql -h postgresql-18\
+    \ -U postgres -c 'ALTER SYSTEM SET shared_preload_libraries = \"vchord.so\"'\n\
+    \    echo \"Ensuring database 'valoris_production_queue' exists...\"\n    psql\
+    \ -h postgresql-18 -U postgres -d postgres -tAc \"SELECT 1 FROM pg_database WHERE\
+    \ datname='valoris_production_queue'\" | grep -q 1 \\\n      || psql -h postgresql-18\
+    \ -U postgres -d postgres -c \"CREATE DATABASE \\\"valoris_production_queue\\\"\
+    ;\"\n\n    echo \"Installing pgvecto.rs extension in database 'valoris_production_queue'...\"\
+    \n    psql -h postgresql-18 -U postgres -d valoris_production_queue -c \"DROP\
+    \ EXTENSION IF EXISTS vectors;CREATE EXTENSION IF NOT EXISTS vchord CASCADE;\"\
+    \ || echo \"Extension installation completed for valoris_production_queue\"\n"
+kind: ConfigMap
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: postgresql-18-bootstrap
+  namespace: apps
+---
+apiVersion: v1
+data:
+  override.conf: 'shared_preload_libraries = ''vchord.so''
+
+    search_path = ''"$user", public, vectors''
+
+    logging_collector = on
+
+    max_wal_size = 2GB
+
+    min_wal_size = ''512MB''
+
+    shared_buffers = 512MB
+
+    wal_buffers = ''32MB''
+
+    wal_compression = on
+
+    wal_keep_size = ''512MB''
+
+    checkpoint_timeout = ''30min''
+
+    checkpoint_completion_target = 0.9
+
+    effective_cache_size = ''10GB''
+
+    work_mem = ''64MB''
+
+    maintenance_work_mem = ''2GB''
+
+    synchronous_commit = off
+
+    autovacuum_max_workers = 5
+
+    autovacuum_naptime = ''10s''
+
+    autovacuum_vacuum_cost_delay = ''10ms''
+
+    autovacuum_vacuum_cost_limit = 2000
+
+    log_min_duration_statement = 2000
+
+    log_checkpoints = on'
+kind: ConfigMap
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/component: primary
+    app.kubernetes.io/instance: postgresql-18
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: postgresql
+    app.kubernetes.io/version: 17.6.0
+    helm.sh/chart: postgresql-16.7.27
+  name: postgresql-18-extended-configuration
+  namespace: apps
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+    lbipam.cilium.io/ips: 10.10.10.133
+    lbipam.cilium.io/sharing-key: postgresql-18
+  labels:
+    app.kubernetes.io/component: primary
+    app.kubernetes.io/instance: postgresql-18
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: postgresql
+    app.kubernetes.io/version: 17.6.0
+    helm.sh/chart: postgresql-16.7.27
+  name: postgresql-18
+  namespace: apps
+spec:
+  externalTrafficPolicy: Cluster
+  ports:
+    - name: tcp-postgresql
+      port: 5432
+      targetPort: tcp-postgresql
+  selector:
+    app.kubernetes.io/component: primary
+    app.kubernetes.io/instance: postgresql-18
+    app.kubernetes.io/name: postgresql
+  sessionAffinity: None
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/component: primary
+    app.kubernetes.io/instance: postgresql-18
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: postgresql
+    app.kubernetes.io/version: 17.6.0
+    helm.sh/chart: postgresql-16.7.27
+  name: postgresql-18-hl
+  namespace: apps
+spec:
+  clusterIP: None
+  ports:
+    - name: tcp-postgresql
+      port: 5432
+      targetPort: tcp-postgresql
+  publishNotReadyAddresses: true
+  selector:
+    app.kubernetes.io/component: primary
+    app.kubernetes.io/instance: postgresql-18
+    app.kubernetes.io/name: postgresql
+  type: ClusterIP
+---
+apiVersion: v1
+automountServiceAccountToken: false
+kind: ServiceAccount
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: postgresql-18
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: postgresql
+    app.kubernetes.io/version: 17.6.0
+    helm.sh/chart: postgresql-16.7.27
+  name: postgresql-18
+  namespace: apps
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/component: primary
+    app.kubernetes.io/instance: postgresql-18
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: postgresql
+    app.kubernetes.io/version: 17.6.0
+    helm.sh/chart: postgresql-16.7.27
+  name: postgresql-18
+  namespace: apps
+spec:
+  egress:
+    - {}
+  ingress:
+    - ports:
+        - port: 5432
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/component: primary
+      app.kubernetes.io/instance: postgresql-18
+      app.kubernetes.io/name: postgresql
+  policyTypes:
+    - Ingress
+    - Egress
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/component: primary
+    app.kubernetes.io/instance: postgresql-18
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: postgresql
+    app.kubernetes.io/version: 17.6.0
+    helm.sh/chart: postgresql-16.7.27
+  name: postgresql-18
+  namespace: apps
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: primary
+      app.kubernetes.io/instance: postgresql-18
+      app.kubernetes.io/name: postgresql

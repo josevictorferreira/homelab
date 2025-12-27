@@ -1,0 +1,168 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: ollama
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: ollama
+    app.kubernetes.io/version: 0.12.5
+    helm.sh/chart: ollama-1.32.0
+  name: ollama
+  namespace: apps
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: ollama
+      app.kubernetes.io/name: ollama
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: ollama
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: ollama
+        app.kubernetes.io/version: 0.12.5
+        helm.sh/chart: ollama-1.32.0
+    spec:
+      containers:
+        - env:
+            - name: OLLAMA_HOST
+              value: 0.0.0.0:11434
+            - name: HSA_OVERRIDE_GFX_VERSION
+              value: 9.0.0
+            - name: OLLAMA_DEBUG
+              value: '2'
+          image: ghcr.io/josevictorferreira/ollama:0.12.6-1-g7f551c4-dirty-rocm@sha256:68ca90ec1f47a047084a0e6ab355dd5598bcd8644417f0a6633f2c7298c7313f
+          imagePullPolicy: IfNotPresent
+          lifecycle:
+            postStart:
+              exec:
+                command:
+                  - /bin/sh
+                  - -c
+                  - "while ! /bin/ollama ps > /dev/null 2>&1; do\n  sleep 5\ndone\n\
+                    \n/bin/ollama pull  qwen3-embedding:0.6b\n\n/bin/ollama pull \
+                    \ embeddinggemma:300m\n\n/bin/ollama pull  dimavz/whisper-tiny\n\
+                    \n/bin/ollama run qwen3-embedding:0.6b\n\n/bin/ollama run dimavz/whisper-tiny\n\
+                    /bin/ollama list | awk 'NR>1 {print $1}' | while read model; do\n\
+                    \  echo \"qwen3-embedding:0.6b embeddinggemma:300m dimavz/whisper-tiny:latest\
+                    \ qwen3-embedding:0.6b dimavz/whisper-tiny:latest\" | tr ' ' '\\\
+                    n' | grep -Fqx \"$model\" || /bin/ollama rm \"$model\"\ndone\n"
+          livenessProbe:
+            failureThreshold: 6
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          name: ollama
+          ports:
+            - containerPort: 11434
+              name: http
+              protocol: TCP
+          readinessProbe:
+            failureThreshold: 6
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 3
+          resources:
+            limits:
+              amd.com/gpu: '1'
+              memory: 4Gi
+            requests:
+              amd.com/gpu: '1'
+              memory: 1Gi
+          securityContext: {}
+          volumeMounts:
+            - mountPath: /root/.ollama
+              name: ollama-data
+      nodeSelector:
+        node.kubernetes.io/amd-gpu: 'true'
+      securityContext: {}
+      serviceAccountName: ollama
+      terminationGracePeriodSeconds: 120
+      tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+          operator: Exists
+      volumes:
+        - name: ollama-data
+          persistentVolumeClaim:
+            claimName: ollama
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: ollama
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: ollama
+    app.kubernetes.io/version: 0.12.5
+    helm.sh/chart: ollama-1.32.0
+  name: ollama
+  namespace: apps
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 60Gi
+  storageClassName: rook-ceph-block
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+    lbipam.cilium.io/ips: 10.10.10.128
+    lbipam.cilium.io/sharing-key: ollama
+  labels:
+    app.kubernetes.io/instance: ollama
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: ollama
+    app.kubernetes.io/version: 0.12.5
+    helm.sh/chart: ollama-1.32.0
+  name: ollama
+  namespace: apps
+spec:
+  loadBalancerIP: 10.10.10.128
+  ports:
+    - name: http
+      port: 11434
+      protocol: TCP
+      targetPort: http
+  selector:
+    app.kubernetes.io/instance: ollama
+    app.kubernetes.io/name: ollama
+  type: LoadBalancer
+---
+apiVersion: v1
+automountServiceAccountToken: true
+kind: ServiceAccount
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: ollama
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: ollama
+    app.kubernetes.io/version: 0.12.5
+    helm.sh/chart: ollama-1.32.0
+  name: ollama
+  namespace: apps
