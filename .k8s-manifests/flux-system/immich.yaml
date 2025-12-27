@@ -1,0 +1,331 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: immich
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: machine-learning
+    app.kubernetes.io/version: v1.119.0
+    helm.sh/chart: immich-0.9.3
+  name: immich-machine-learning
+  namespace: apps
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: immich
+      app.kubernetes.io/name: machine-learning
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: immich
+        app.kubernetes.io/name: machine-learning
+    spec:
+      automountServiceAccountToken: true
+      containers:
+        - env:
+            - name: TRANSFORMERS_CACHE
+              value: /cache
+          envFrom:
+            - secretRef:
+                name: immich-secret
+          image: ghcr.io/immich-app/immich-machine-learning:v2.0.0@sha256:68bd95ff703a3b4c6a662b7f638bd2e01e3c7aeb2223dc0f142f02a555e24ca4
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /ping
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            timeoutSeconds: 1
+          name: immich-machine-learning
+          ports:
+            - containerPort: 3003
+              name: http
+              protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /ping
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            timeoutSeconds: 1
+          startupProbe:
+            failureThreshold: 60
+            httpGet:
+              path: /ping
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            timeoutSeconds: 1
+          volumeMounts:
+            - mountPath: /cache
+              name: cache
+      dnsPolicy: ClusterFirst
+      enableServiceLinks: true
+      serviceAccountName: default
+      volumes:
+        - name: cache
+          persistentVolumeClaim:
+            claimName: immich-machine-learning-cache
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: immich
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: server
+    app.kubernetes.io/version: v1.119.0
+    helm.sh/chart: immich-0.9.3
+  name: immich-server
+  namespace: apps
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: immich
+      app.kubernetes.io/name: server
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        checksum/config: c3b16c43613cc4ee38d9fe38537238fd196a5c753402bdfe718dfb1aba6bdf39
+      labels:
+        app.kubernetes.io/instance: immich
+        app.kubernetes.io/name: server
+    spec:
+      automountServiceAccountToken: true
+      containers:
+        - env:
+            - name: IMMICH_CONFIG_FILE
+              value: /config/immich-config.yaml
+            - name: IMMICH_TELEMETRY_INCLUDE
+              value: all
+          envFrom:
+            - secretRef:
+                name: immich-secret
+          image: ghcr.io/immich-app/immich-server:v2.0.0@sha256:d81f4af6a622d0955e5b8e3927da32b3ec882466a7ee8a26906d9cccad4364ca
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /api/server/ping
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            timeoutSeconds: 1
+          name: immich-server
+          ports:
+            - containerPort: 2283
+              name: http
+              protocol: TCP
+            - containerPort: 8081
+              name: metrics-api
+              protocol: TCP
+            - containerPort: 8082
+              name: metrics-ms
+              protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /api/server/ping
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            timeoutSeconds: 1
+          startupProbe:
+            failureThreshold: 30
+            httpGet:
+              path: /api/server/ping
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            timeoutSeconds: 1
+          volumeMounts:
+            - mountPath: /config
+              name: config
+            - mountPath: /usr/src/app/upload
+              name: library
+      dnsPolicy: ClusterFirst
+      enableServiceLinks: true
+      serviceAccountName: default
+      volumes:
+        - configMap:
+            name: immich-immich-config
+          name: config
+        - name: library
+          persistentVolumeClaim:
+            claimName: cephfs-shared-storage-images
+---
+apiVersion: v1
+data:
+  immich-config.yaml: "trash:\n  days: 30\n  enabled: true\n"
+kind: ConfigMap
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: immich
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: immich
+    app.kubernetes.io/version: v1.119.0
+    helm.sh/chart: immich-0.9.3
+  name: immich-immich-config
+  namespace: apps
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: immich
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: machine-learning
+    app.kubernetes.io/version: v1.119.0
+    helm.sh/chart: immich-0.9.3
+  name: immich-machine-learning-cache
+  namespace: apps
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+  storageClassName: rook-ceph-block
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: immich
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: machine-learning
+    app.kubernetes.io/service: immich-machine-learning
+    app.kubernetes.io/version: v1.119.0
+    helm.sh/chart: immich-0.9.3
+  name: immich-machine-learning
+  namespace: apps
+spec:
+  ports:
+    - name: http
+      port: 3003
+      protocol: TCP
+      targetPort: http
+  selector:
+    app.kubernetes.io/instance: immich
+    app.kubernetes.io/name: machine-learning
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+    lbipam.cilium.io/ips: 10.10.10.108
+    lbipam.cilium.io/sharing-key: immich
+  labels:
+    app.kubernetes.io/instance: immich
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: server
+    app.kubernetes.io/service: immich-server
+    app.kubernetes.io/version: v1.119.0
+    helm.sh/chart: immich-0.9.3
+  name: immich-server
+  namespace: apps
+spec:
+  ports:
+    - name: http
+      port: 2283
+      protocol: TCP
+      targetPort: http
+    - name: metrics-api
+      port: 8081
+      protocol: TCP
+      targetPort: metrics-api
+    - name: metrics-ms
+      port: 8082
+      protocol: TCP
+      targetPort: metrics-ms
+  selector:
+    app.kubernetes.io/instance: immich
+    app.kubernetes.io/name: server
+  type: LoadBalancer
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: immich
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: server
+    app.kubernetes.io/version: v1.119.0
+    helm.sh/chart: immich-0.9.3
+  name: immich-server
+  namespace: apps
+spec:
+  endpoints:
+    - port: metrics-api
+      scheme: http
+    - port: metrics-ms
+      scheme: http
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: immich
+      app.kubernetes.io/name: server
+      app.kubernetes.io/service: immich-server
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+    nginx.ingress.kubernetes.io/proxy-body-size: '0'
+  labels:
+    app.kubernetes.io/instance: immich
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: server
+    app.kubernetes.io/version: v1.119.0
+    helm.sh/chart: immich-0.9.3
+  name: immich-server
+  namespace: apps
+spec:
+  rules:
+    - host: immich.josevictor.me
+      http:
+        paths:
+          - backend:
+              service:
+                name: immich-server
+                port:
+                  number: 2283
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - immich.josevictor.me
+      secretName: wildcard-tls

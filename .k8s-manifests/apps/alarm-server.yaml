@@ -1,0 +1,120 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/controller: main
+    app.kubernetes.io/instance: alarm-server
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: alarm-server
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: alarm-server
+  namespace: apps
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/controller: main
+      app.kubernetes.io/instance: alarm-server
+      app.kubernetes.io/name: alarm-server
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/controller: main
+        app.kubernetes.io/instance: alarm-server
+        app.kubernetes.io/name: alarm-server
+    spec:
+      automountServiceAccountToken: true
+      containers:
+        - envFrom:
+            - secretRef:
+                name: alarm-server-config
+          image: ghcr.io/josevictorferreira/alarm-server:v0.2.3@sha256:317714c3c6d0939cc89aef10b00cee5dde4dd455b820c98d6cc9dbddc1552626
+          imagePullPolicy: IfNotPresent
+          name: main
+          ports:
+            - containerPort: 8888
+              name: http
+              protocol: TCP
+          resources:
+            limits:
+              memory: 512Mi
+            requests:
+              cpu: 30m
+              memory: 256Mi
+      dnsPolicy: ClusterFirst
+      enableServiceLinks: false
+      hostIPC: false
+      hostNetwork: false
+      hostPID: false
+      serviceAccountName: default
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+    lbipam.cilium.io/ips: 10.10.10.113
+    lbipam.cilium.io/sharing-key: alarm-server
+  labels:
+    app.kubernetes.io/instance: alarm-server
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: alarm-server
+    app.kubernetes.io/service: alarm-server
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: alarm-server
+  namespace: apps
+spec:
+  ports:
+    - name: http
+      port: 8888
+      protocol: TCP
+      targetPort: 8888
+  selector:
+    app.kubernetes.io/controller: main
+    app.kubernetes.io/instance: alarm-server
+    app.kubernetes.io/name: alarm-server
+  type: LoadBalancer
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: alarm-server
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: alarm-server
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: alarm-server
+  namespace: apps
+spec:
+  ingressClassName: cilium
+  rules:
+    - host: alarm-server.josevictor.me
+      http:
+        paths:
+          - backend:
+              service:
+                name: alarm-server
+                port:
+                  number: 8888
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - alarm-server.josevictor.me
+      secretName: wildcard-tls

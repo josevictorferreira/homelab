@@ -1,0 +1,456 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app: rook-ceph-tools
+  name: rook-ceph-tools
+  namespace: rook-ceph
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rook-ceph-tools
+  template:
+    metadata:
+      labels:
+        app: rook-ceph-tools
+    spec:
+      containers:
+        - command:
+            - /bin/bash
+            - -c
+            - "# Replicate the script from toolbox.sh inline so the ceph image\n#\
+              \ can be run directly, instead of requiring the rook toolbox\nCEPH_CONFIG=\"\
+              /etc/ceph/ceph.conf\"\nMON_CONFIG=\"/etc/rook/mon-endpoints\"\nKEYRING_FILE=\"\
+              /etc/ceph/keyring\"\n\n# create a ceph config file in its default location\
+              \ so ceph/rados tools can be used\n# without specifying any arguments\n\
+              write_endpoints() {\n  endpoints=$(cat ${MON_CONFIG})\n\n  # filter\
+              \ out the mon names\n  # external cluster can have numbers or hyphens\
+              \ in mon names, handling them in regex\n  # shellcheck disable=SC2001\n\
+              \  mon_endpoints=$(echo \"${endpoints}\"| sed 's/[a-z0-9_-]\\+=//g')\n\
+              \n  DATE=$(date)\n  echo \"$DATE writing mon endpoints to ${CEPH_CONFIG}:\
+              \ ${endpoints}\"\n    cat <<EOF > ${CEPH_CONFIG}\n[global]\nmon_host\
+              \ = ${mon_endpoints}\n\n[client.admin]\nkeyring = ${KEYRING_FILE}\n\
+              EOF\n}\n\n# watch the endpoints config file and update if the mon endpoints\
+              \ ever change\nwatch_endpoints() {\n  # get the timestamp for the target\
+              \ of the soft link\n  real_path=$(realpath ${MON_CONFIG})\n  initial_time=$(stat\
+              \ -c %Z \"${real_path}\")\n  while true; do\n    real_path=$(realpath\
+              \ ${MON_CONFIG})\n    latest_time=$(stat -c %Z \"${real_path}\")\n\n\
+              \    if [[ \"${latest_time}\" != \"${initial_time}\" ]]; then\n    \
+              \  write_endpoints\n      initial_time=${latest_time}\n    fi\n\n  \
+              \  sleep 10\n  done\n}\n\n# read the secret from an env var (for backward\
+              \ compatibility), or from the secret file\nceph_secret=${ROOK_CEPH_SECRET}\n\
+              if [[ \"$ceph_secret\" == \"\" ]]; then\n  ceph_secret=$(cat /var/lib/rook-ceph-mon/secret.keyring)\n\
+              fi\n\n# create the keyring file\ncat <<EOF > ${KEYRING_FILE}\n[${ROOK_CEPH_USERNAME}]\n\
+              key = ${ceph_secret}\nEOF\n\n# write the initial config file\nwrite_endpoints\n\
+              \n# continuously update the mon endpoints if they fail over\nwatch_endpoints\n"
+          env:
+            - name: ROOK_CEPH_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  key: ceph-username
+                  name: rook-ceph-mon
+          image: quay.io/ceph/ceph:v19.2.3
+          imagePullPolicy: IfNotPresent
+          name: rook-ceph-tools
+          resources:
+            limits:
+              memory: 1Gi
+            requests:
+              cpu: 50m
+              memory: 64Mi
+          securityContext:
+            capabilities:
+              drop:
+                - ALL
+            runAsGroup: 2016
+            runAsNonRoot: true
+            runAsUser: 2016
+          tty: true
+          volumeMounts:
+            - mountPath: /etc/ceph
+              name: ceph-config
+            - mountPath: /etc/rook
+              name: mon-endpoint-volume
+            - mountPath: /var/lib/rook-ceph-mon
+              name: ceph-admin-secret
+      dnsPolicy: ClusterFirstWithHostNet
+      hostNetwork: true
+      serviceAccountName: rook-ceph-default
+      tolerations:
+        - effect: NoExecute
+          key: node.kubernetes.io/unreachable
+          operator: Exists
+          tolerationSeconds: 5
+      volumes:
+        - name: ceph-admin-secret
+          secret:
+            items:
+              - key: ceph-secret
+                path: secret.keyring
+            optional: false
+            secretName: rook-ceph-mon
+        - configMap:
+            items:
+              - key: data
+                path: mon-endpoints
+            name: rook-ceph-mon-endpoints
+          name: mon-endpoint-volume
+        - emptyDir: {}
+          name: ceph-config
+---
+apiVersion: ceph.rook.io/v1
+kind: CephBlockPool
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: replicapool
+  namespace: rook-ceph
+spec:
+  failureDomain: host
+  replicated:
+    size: 3
+---
+apiVersion: ceph.rook.io/v1
+kind: CephCluster
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: rook-ceph
+  namespace: rook-ceph
+spec:
+  cephVersion:
+    allowUnsupported: false
+    image: quay.io/ceph/ceph:v19.2.3
+  cleanupPolicy:
+    allowUninstallWithVolumes: false
+    confirmation: ''
+    sanitizeDisks:
+      dataSource: zero
+      iteration: 1
+      method: quick
+  continueUpgradeAfterChecksEvenIfNotHealthy: false
+  crashCollector:
+    disable: false
+  dashboard:
+    enabled: true
+    ssl: false
+  dataDirHostPath: /var/lib/rook
+  disruptionManagement:
+    managePodBudgets: true
+    osdMaintenanceTimeout: 30
+  healthCheck:
+    daemonHealth:
+      mon:
+        disabled: false
+        interval: 45s
+      osd:
+        disabled: false
+        interval: 60s
+      status:
+        disabled: false
+        interval: 60s
+    livenessProbe:
+      mgr:
+        disabled: false
+      mon:
+        disabled: false
+      osd:
+        disabled: false
+  logCollector:
+    enabled: true
+    maxLogSize: 500M
+    periodicity: daily
+  mgr:
+    allowMultiplePerNode: false
+    count: 2
+  mon:
+    allowMultiplePerNode: false
+    count: 3
+  monitoring:
+    enabled: false
+  network:
+    connections:
+      compression:
+        enabled: false
+      encryption:
+        enabled: false
+      requireMsgr2: false
+    provider: host
+  placement:
+    all:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: node.kubernetes.io/k8s-storage
+                  operator: Exists
+      tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+          operator: Exists
+  priorityClassNames:
+    mgr: system-cluster-critical
+    mon: system-node-critical
+    osd: system-node-critical
+  removeOSDsIfOutAndSafeToRemove: false
+  resources:
+    cleanup:
+      limits:
+        memory: 1Gi
+      requests:
+        cpu: 50m
+        memory: 64Mi
+    crashcollector:
+      limits:
+        memory: 60Mi
+      requests:
+        cpu: 50m
+        memory: 60Mi
+    exporter:
+      limits:
+        memory: 128Mi
+      requests:
+        cpu: 50m
+        memory: 64Mi
+    logcollector:
+      limits:
+        memory: 1Gi
+      requests:
+        cpu: 50m
+        memory: 64Mi
+    mgr:
+      limits:
+        memory: 1Gi
+      requests:
+        cpu: 50m
+        memory: 64Mi
+    mgr-sidecar:
+      limits:
+        memory: 100Mi
+      requests:
+        cpu: 50m
+        memory: 40Mi
+    mon:
+      limits:
+        memory: 2Gi
+      requests:
+        cpu: 50m
+        memory: 64Mi
+    osd:
+      limits:
+        memory: 4Gi
+      requests:
+        cpu: 50m
+        memory: 64Mi
+    prepareosd:
+      requests:
+        cpu: 50m
+        memory: 50Mi
+  skipUpgradeChecks: false
+  storage:
+    nodes:
+      - devices:
+          - name: /dev/disk/by-partlabel/CEPH_OSD_NVME
+          - name: /dev/disk/by-partlabel/CEPH_OSD_SATA
+        name: lab-alpha-cp
+      - devices:
+          - name: /dev/disk/by-partlabel/CEPH_OSD_NVME
+        name: lab-beta-cp
+      - devices:
+          - name: /dev/disk/by-partlabel/CEPH_OSD_NVME
+        name: lab-delta-cp
+      - devices:
+          - name: /dev/disk/by-partlabel/CEPH_OSD_NVME
+          - name: /dev/disk/by-partlabel/CEPH_OSD_SATA
+        name: lab-gamma-wk
+    useAllDevices: false
+    useAllNodes: false
+  upgradeOSDRequiresHealthyPGs: false
+  waitTimeoutForHealthyOSDInMinutes: 10
+---
+apiVersion: ceph.rook.io/v1
+kind: CephFilesystem
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: ceph-filesystem
+  namespace: rook-ceph
+spec:
+  dataPools:
+    - replicated:
+        size: 3
+  metadataPool:
+    replicated:
+      size: 3
+  metadataServer:
+    activeCount: 1
+---
+apiVersion: ceph.rook.io/v1
+kind: CephFilesystemSubVolumeGroup
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: ceph-filesystem-csi
+  namespace: rook-ceph
+spec:
+  filesystemName: ceph-filesystem
+  name: csi
+  pinning:
+    distributed: 1
+---
+apiVersion: ceph.rook.io/v1
+kind: CephObjectStore
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: ceph-objectstore
+  namespace: rook-ceph
+spec:
+  allowUsersInNamespaces:
+    - '*'
+  dataPool:
+    replicated:
+      size: 3
+  gateway:
+    instances: 1
+    port: 80
+    resources:
+      limits:
+        memory: 1Gi
+      requests:
+        cpu: 50m
+        memory: 64Mi
+  metadataPool:
+    replicated:
+      size: 3
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: cloudflare-issuer
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: ceph-objectstore
+  namespace: rook-ceph
+spec:
+  ingressClassName: cilium
+  rules:
+    - host: objectstore.josevictor.me
+      http:
+        paths:
+          - backend:
+              service:
+                name: rook-ceph-rgw-ceph-objectstore
+                port:
+                  number: 80
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - objectstore.josevictor.me
+      secretName: wildcard-tls
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: cloudflare-issuer
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: rook-ceph-dashboard
+  namespace: rook-ceph
+spec:
+  ingressClassName: cilium
+  rules:
+    - host: ceph.josevictor.me
+      http:
+        paths:
+          - backend:
+              service:
+                name: rook-ceph-mgr-dashboard
+                port:
+                  name: http-dashboard
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - ceph.josevictor.me
+      secretName: wildcard-tls
+---
+allowVolumeExpansion: true
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+    storageclass.kubernetes.io/is-default-class: 'true'
+  name: rook-ceph-block
+  namespace: rook-ceph
+parameters:
+  clusterID: rook-ceph
+  csi.storage.k8s.io/controller-expand-secret-name: rook-csi-rbd-provisioner
+  csi.storage.k8s.io/controller-expand-secret-namespace: rook-ceph
+  csi.storage.k8s.io/controller-publish-secret-name: rook-csi-rbd-provisioner
+  csi.storage.k8s.io/controller-publish-secret-namespace: rook-ceph
+  csi.storage.k8s.io/node-stage-secret-name: rook-csi-rbd-node
+  csi.storage.k8s.io/node-stage-secret-namespace: rook-ceph
+  csi.storage.k8s.io/provisioner-secret-name: rook-csi-rbd-provisioner
+  csi.storage.k8s.io/provisioner-secret-namespace: rook-ceph
+  imageFeatures: layering
+  imageFormat: '2'
+  pool: replicapool
+provisioner: rook-ceph.rbd.csi.ceph.com
+reclaimPolicy: Delete
+volumeBindingMode: Immediate
+---
+allowVolumeExpansion: true
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+    storageclass.kubernetes.io/is-default-class: 'false'
+  name: rook-ceph-filesystem
+  namespace: rook-ceph
+parameters:
+  clusterID: rook-ceph
+  csi.storage.k8s.io/controller-expand-secret-name: rook-csi-cephfs-provisioner
+  csi.storage.k8s.io/controller-expand-secret-namespace: rook-ceph
+  csi.storage.k8s.io/controller-publish-secret-name: rook-csi-cephfs-provisioner
+  csi.storage.k8s.io/controller-publish-secret-namespace: rook-ceph
+  csi.storage.k8s.io/node-stage-secret-name: rook-csi-cephfs-node
+  csi.storage.k8s.io/node-stage-secret-namespace: rook-ceph
+  csi.storage.k8s.io/provisioner-secret-name: rook-csi-cephfs-provisioner
+  csi.storage.k8s.io/provisioner-secret-namespace: rook-ceph
+  fsName: ceph-filesystem
+  pool: ceph-filesystem-data0
+provisioner: rook-ceph.cephfs.csi.ceph.com
+reclaimPolicy: Delete
+volumeBindingMode: Immediate
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: rook-ceph-objectstore
+  namespace: rook-ceph
+parameters:
+  objectStoreName: ceph-objectstore
+  objectStoreNamespace: rook-ceph
+provisioner: rook-ceph.ceph.rook.io/bucket
+reclaimPolicy: Delete
+volumeBindingMode: Immediate
