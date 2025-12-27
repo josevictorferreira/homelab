@@ -3,8 +3,8 @@
 let
   namespace = homelab.kubernetes.namespaces.applications;
   mkDatasource = database: {
-    name = "postgres-database-${database}";
-    uid = "postgres-database-${database}";
+    name = "${database}";
+    uid = "${database}";
     type = "postgres";
     access = "proxy";
     url = "${kubenix.lib.serviceHostFor "postgresql-18-hl" "apps"}:5432";
