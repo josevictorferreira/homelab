@@ -36,7 +36,7 @@
 
       homelab = homelabEval.config.homelab;
 
-      kubenixModule = import ./kubernetes/kubenix {
+      kubenixModule = import ./modules/kubenix {
         inherit
           lib
           pkgs
