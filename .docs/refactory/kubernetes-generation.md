@@ -3,7 +3,7 @@
 ## Objective
 
 Reorganize the Kubernetes manifest generation structure to:
-1. Move generated manifests from `kubernetes/manifests` to `.k8s-manifests` (root level)
+1. Move generated manifests from `kubernetes/manifests` to `.k8s` (root level)
 2. Move kubenix modules from `kubernetes/kubenix` to `modules/kubenix`
 3. Maintain full compatibility with FluxCD and existing workflows
 
@@ -37,7 +37,7 @@ homelab/
 
 ```
 homelab/
-├── .k8s-manifests/           # Generated YAML manifests (versioned)
+├── .k8s/           # Generated YAML manifests (versioned)
 │   ├── flux-system/          # FluxCD bootstrap (manually managed)
 │   ├── apps/
 │   ├── bootstrap/
@@ -80,17 +80,17 @@ kubenixModule = import ./modules/kubenix { ... };
 MANIFESTS_DIR ?= kubernetes/manifests
 
 # TO:
-MANIFESTS_DIR ?= .k8s-manifests
+MANIFESTS_DIR ?= .k8s
 ```
 
 Update all hardcoded paths in targets:
-- `vmanifests`: Change `find kubernetes/manifests` → `find .k8s-manifests`
-- `emanifests`: Change `find kubernetes/manifests` → `find .k8s-manifests`
-- `gmanifests`: Change all `kubernetes/manifests` references → `.k8s-manifests`
+- `vmanifests`: Change `find kubernetes/manifests` → `find .k8s`
+- `emanifests`: Change `find kubernetes/manifests` → `find .k8s`
+- `gmanifests`: Change all `kubernetes/manifests` references → `.k8s`
 
 ### 3. FluxCD Sync Configuration
 
-**File:** `.k8s-manifests/flux-system/gotk-sync.yaml`
+**File:** `.k8s/flux-system/gotk-sync.yaml`
 
 ```yaml
 # FROM:
@@ -99,12 +99,12 @@ spec:
 
 # TO:
 spec:
-  path: ./.k8s-manifests
+  path: ./.k8s
 ```
 
 ### 4. `.sops.yaml` (if exists)
 
-Check if there are path-specific encryption rules that reference `kubernetes/manifests` and update them to `.k8s-manifests`.
+Check if there are path-specific encryption rules that reference `kubernetes/manifests` and update them to `.k8s`.
 
 ## Migration Steps
 
@@ -112,14 +112,14 @@ Check if there are path-specific encryption rules that reference `kubernetes/man
 
 1. Create `modules/kubenix` directory
 2. Copy contents from `kubernetes/kubenix` to `modules/kubenix`
-3. Create `.k8s-manifests` directory
-4. Copy contents from `kubernetes/manifests` to `.k8s-manifests`
+3. Create `.k8s` directory
+4. Copy contents from `kubernetes/manifests` to `.k8s`
 
 ### Phase 2: Update Configuration Files
 
 5. Update `flake.nix` to reference `modules/kubenix`
 6. Update `Makefile` with new paths
-7. Update `.k8s-manifests/flux-system/gotk-sync.yaml` with new path
+7. Update `.k8s/flux-system/gotk-sync.yaml` with new path
 8. Update `.sops.yaml` if needed
 
 ### Phase 3: Verify and Test
@@ -141,14 +141,14 @@ Check if there are path-specific encryption rules that reference `kubernetes/man
 
 If issues arise:
 1. Revert FluxCD path change first (most critical)
-2. Restore `kubernetes/manifests` from `.k8s-manifests`
+2. Restore `kubernetes/manifests` from `.k8s`
 3. Restore `kubernetes/kubenix` from `modules/kubenix`
 4. Revert `flake.nix` and `Makefile` changes
 
 ## FluxCD Considerations
 
 - **Critical:** The `gotk-sync.yaml` change must be committed and pushed BEFORE FluxCD tries to reconcile
-- FluxCD will look for the new path in the repository, so the manifests must exist at `.k8s-manifests` in the main branch
+- FluxCD will look for the new path in the repository, so the manifests must exist at `.k8s` in the main branch
 - The `flux-system` folder should be moved as-is to preserve the FluxCD bootstrap configuration
 - After the change, run `flux reconcile kustomization flux-system -n flux-system --with-source` to verify
 
@@ -157,9 +157,9 @@ If issues arise:
 To avoid breaking the workflow, perform all changes in a single commit:
 
 1. Copy (don't move) `kubernetes/kubenix` → `modules/kubenix`
-2. Copy (don't move) `kubernetes/manifests` → `.k8s-manifests`
+2. Copy (don't move) `kubernetes/manifests` → `.k8s`
 3. Update all configuration files (`flake.nix`, `Makefile`, `gotk-sync.yaml`)
-4. Test locally with `make gmanifests` (should write to `.k8s-manifests`)
+4. Test locally with `make gmanifests` (should write to `.k8s`)
 5. Commit ALL changes including both old and new directories
 6. Push to main branch
 7. Verify FluxCD reconciles successfully with `flux events --watch`
@@ -168,7 +168,7 @@ To avoid breaking the workflow, perform all changes in a single commit:
 ## Verification Checklist
 
 - [ ] `nix flake check` passes
-- [ ] `make gmanifests` generates manifests to `.k8s-manifests/`
+- [ ] `make gmanifests` generates manifests to `.k8s/`
 - [ ] `make vmanifests` processes secrets correctly
 - [ ] `make emanifests` encrypts files correctly
 - [ ] `make manifests` runs the full pipeline
@@ -191,14 +191,14 @@ To avoid breaking the workflow, perform all changes in a single commit:
   cp -r kubernetes/kubenix/* modules/kubenix/
   ```
 
-- [x] 1.3 Create `.k8s-manifests` directory
+- [x] 1.3 Create `.k8s` directory
   ```bash
-  mkdir -p .k8s-manifests
+  mkdir -p .k8s
   ```
 
 - [x] 1.4 Copy manifests to new location
   ```bash
-  cp -r kubernetes/manifests/* .k8s-manifests/
+  cp -r kubernetes/manifests/* .k8s/
   ```
 
 ### Phase 2: Update Configuration Files
@@ -207,29 +207,29 @@ To avoid breaking the workflow, perform all changes in a single commit:
   - Change `./kubernetes/kubenix` to `./modules/kubenix`
 
 - [x] 2.2 Update `Makefile` - MANIFESTS_DIR variable
-  - Change `MANIFESTS_DIR ?= kubernetes/manifests` to `MANIFESTS_DIR ?= .k8s-manifests`
+  - Change `MANIFESTS_DIR ?= kubernetes/manifests` to `MANIFESTS_DIR ?= .k8s`
 
 - [x] 2.3 Update `Makefile` - vmanifests target
-  - Change `find kubernetes/manifests` to `find .k8s-manifests`
+  - Change `find kubernetes/manifests` to `find .k8s`
 
 - [x] 2.4 Update `Makefile` - emanifests target
-  - Change `find kubernetes/manifests` to `find .k8s-manifests`
+  - Change `find kubernetes/manifests` to `find .k8s`
 
 - [x] 2.5 Update `Makefile` - gmanifests target
-  - Change all `kubernetes/manifests` references to `.k8s-manifests`
+  - Change all `kubernetes/manifests` references to `.k8s`
 
-- [x] 2.6 Update `.k8s-manifests/flux-system/gotk-sync.yaml`
-  - Change `path: ./kubernetes/manifests` to `path: ./.k8s-manifests`
+- [x] 2.6 Update `.k8s/flux-system/gotk-sync.yaml`
+  - Change `path: ./kubernetes/manifests` to `path: ./.k8s`
 
 - [x] 2.7 Check and update `.sops.yaml` if it contains path references
-  - Update any `kubernetes/manifests` paths to `.k8s-manifests`
+  - Update any `kubernetes/manifests` paths to `.k8s`
 
 ### Phase 3: Verify and Test Locally
 
 - [x] 3.1 Run `nix flake check` to verify flake syntax is valid
 
 - [x] 3.2 Run `make gmanifests` to verify manifest generation
-  - Confirm output goes to `.k8s-manifests/`
+  - Confirm output goes to `.k8s/`
 
 - [x] 3.3 Run `make vmanifests` to verify secret substitution works
 
@@ -243,12 +243,12 @@ To avoid breaking the workflow, perform all changes in a single commit:
 
 - [x] 4.1 Stage all changes (both old and new directories)
   ```bash
-  git add modules/kubenix .k8s-manifests flake.nix Makefile
+  git add modules/kubenix .k8s flake.nix Makefile
   ```
 
 - [x] 4.2 Create migration commit with both structures
   ```bash
-  git commit -m "refactor: migrate kubernetes manifests to .k8s-manifests and kubenix to modules/kubenix"
+  git commit -m "refactor: migrate kubernetes manifests to .k8s and kubenix to modules/kubenix"
   ```
 
 - [ ] 4.3 Push to main branch *(requires user action - currently on feature branch)*
@@ -273,17 +273,17 @@ To avoid breaking the workflow, perform all changes in a single commit:
 
 ### Phase 5: Cleanup
 
-- [ ] 5.1 Remove old `kubernetes/kubenix` directory
+- [x] 5.1 Remove old `kubernetes/kubenix` directory
   ```bash
   rm -rf kubernetes/kubenix
   ```
 
-- [ ] 5.2 Remove old `kubernetes/manifests` directory
+- [x] 5.2 Remove old `kubernetes/manifests` directory
   ```bash
   rm -rf kubernetes/manifests
   ```
 
-- [ ] 5.3 Remove empty `kubernetes` directory
+- [x] 5.3 Remove empty `kubernetes` directory
   ```bash
   rmdir kubernetes
   ```
