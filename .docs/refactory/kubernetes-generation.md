@@ -241,32 +241,32 @@ To avoid breaking the workflow, perform all changes in a single commit:
 
 ### Phase 4: Commit and Deploy
 
-- [ ] 4.1 Stage all changes (both old and new directories)
+- [x] 4.1 Stage all changes (both old and new directories)
   ```bash
   git add modules/kubenix .k8s-manifests flake.nix Makefile
   ```
 
-- [ ] 4.2 Create migration commit with both structures
+- [x] 4.2 Create migration commit with both structures
   ```bash
   git commit -m "refactor: migrate kubernetes manifests to .k8s-manifests and kubenix to modules/kubenix"
   ```
 
-- [ ] 4.3 Push to main branch
+- [ ] 4.3 Push to main branch *(requires user action - currently on feature branch)*
   ```bash
   git push origin main
   ```
 
-- [ ] 4.4 Monitor FluxCD reconciliation
+- [ ] 4.4 Monitor FluxCD reconciliation *(requires cluster access)*
   ```bash
   flux events --watch
   ```
 
-- [ ] 4.5 Verify FluxCD reconciles successfully
+- [ ] 4.5 Verify FluxCD reconciles successfully *(requires cluster access)*
   ```bash
   flux reconcile kustomization flux-system -n flux-system --with-source
   ```
 
-- [ ] 4.6 Verify all Kubernetes resources are healthy
+- [ ] 4.6 Verify all Kubernetes resources are healthy *(requires cluster access)*
   ```bash
   kubectl get all -A
   ```
