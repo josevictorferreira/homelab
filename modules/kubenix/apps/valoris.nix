@@ -18,7 +18,7 @@ in
           pullPolicy = "Always";
         };
         port = 3000;
-        command = [ "bundle" "exec" "bin/rails" "server" ];
+        command = [ "bundle" "exec" "rails" "server" ];
         values = {
           defaultPodOptions.imagePullSecrets = [
             { name = "ghcr-registry-secret"; }
