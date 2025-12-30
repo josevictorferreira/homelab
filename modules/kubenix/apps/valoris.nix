@@ -13,11 +13,12 @@ in
       args = {
         namespace = namespace;
         image = {
-          repository = "ghcr.io/josevictorferreira/valoris-server";
+          repository = "ghcr.io/josevictorferreira/valoris";
           tag = imageTag;
           pullPolicy = "Always";
         };
         port = 3000;
+        command = [ "bundle" "exec" "bin/rails" "server" ];
         values = {
           defaultPodOptions.imagePullSecrets = [
             { name = "ghcr-registry-secret"; }
@@ -36,11 +37,12 @@ in
       args = {
         namespace = namespace;
         image = {
-          repository = "ghcr.io/josevictorferreira/valoris-worker";
+          repository = "ghcr.io/josevictorferreira/valoris";
           tag = imageTag;
           pullPolicy = "Always";
         };
         port = 3000;
+        command = [ "bundle" "exec" "bin/jobs" "start" ];
         values = {
           defaultPodOptions.imagePullSecrets = [
             { name = "ghcr-registry-secret"; }
