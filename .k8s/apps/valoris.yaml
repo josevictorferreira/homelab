@@ -36,7 +36,7 @@ spec:
         - command:
             - bundle
             - exec
-            - bin/rails
+            - rails
             - server
           envFrom:
             - secretRef:
