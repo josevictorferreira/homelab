@@ -7,10 +7,10 @@ in
   kubernetes = {
     helm.releases."prowlarr" = {
       chart = kubenix.lib.helm.fetch {
-        chartUrl = "oci://tccr.io/truecharts/prowlarr";
+        chartUrl = "oci://oci.trueforge.org/truecharts/prowlarr";
         chart = "prowlarr";
-        version = "20.12.2";
-        sha256 = "sha256-JB5R8J0MWUPovWcB0D/+ym8SVt4uOgKYrm7WlFhIXrk=";
+        version = "21.3.7";
+        sha256 = "sha256-+pdCgZ/LtFyCX8hsuqZfG+cA/rwsvGtyhxIcbPFKRCg=";
       };
       includeCRDs = true;
       noHooks = true;

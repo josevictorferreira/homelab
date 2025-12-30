@@ -5,13 +5,13 @@ metadata:
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   labels:
-    app: prowlarr-20.12.2
+    app: prowlarr-21.3.7
     app.kubernetes.io/instance: prowlarr
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: prowlarr
-    app.kubernetes.io/version: 2.1.5.5213
+    app.kubernetes.io/version: 2.3.0.5236
     helm-revision: '1'
-    helm.sh/chart: prowlarr-20.12.2
+    helm.sh/chart: prowlarr-21.3.7
     release: prowlarr
   name: prowlarr
   namespace: apps
@@ -38,13 +38,13 @@ spec:
         checksum/services: 209fbe54ab4cb7d132d8619768fad07a6901826a29bbf6ddcb7cd4a85b470aed
         checksum/solr: 29c14feeaddbf7762052db593898d274941f539cee681ddc613957587686f347
       labels:
-        app: prowlarr-20.12.2
+        app: prowlarr-21.3.7
         app.kubernetes.io/instance: prowlarr
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: prowlarr
-        app.kubernetes.io/version: 2.1.5.5213
+        app.kubernetes.io/version: 2.3.0.5236
         helm-revision: '1'
-        helm.sh/chart: prowlarr-20.12.2
+        helm.sh/chart: prowlarr-21.3.7
         pod.lifecycle: permanent
         pod.name: main
         release: prowlarr
@@ -603,14 +603,14 @@ metadata:
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   labels:
-    app: prowlarr-20.12.2
+    app: prowlarr-21.3.7
     app.kubernetes.io/instance: prowlarr
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: prowlarr
-    app.kubernetes.io/version: 2.1.5.5213
+    app.kubernetes.io/version: 2.3.0.5236
     grafana_dashboard: '1'
     helm-revision: '1'
-    helm.sh/chart: prowlarr-20.12.2
+    helm.sh/chart: prowlarr-21.3.7
     release: prowlarr
   name: prowlarr-dashboard
   namespace: apps
@@ -622,13 +622,13 @@ metadata:
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   labels:
-    app: prowlarr-20.12.2
+    app: prowlarr-21.3.7
     app.kubernetes.io/instance: prowlarr
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: prowlarr
-    app.kubernetes.io/version: 2.1.5.5213
+    app.kubernetes.io/version: 2.3.0.5236
     helm-revision: '1'
-    helm.sh/chart: prowlarr-20.12.2
+    helm.sh/chart: prowlarr-21.3.7
     release: prowlarr
   name: prowlarr-config
   namespace: apps
@@ -647,13 +647,13 @@ metadata:
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   labels:
-    app: prowlarr-20.12.2
+    app: prowlarr-21.3.7
     app.kubernetes.io/instance: prowlarr
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: prowlarr
-    app.kubernetes.io/version: 2.1.5.5213
+    app.kubernetes.io/version: 2.3.0.5236
     helm-revision: '1'
-    helm.sh/chart: prowlarr-20.12.2
+    helm.sh/chart: prowlarr-21.3.7
     release: prowlarr
     service.name: main
   name: prowlarr
@@ -678,13 +678,13 @@ metadata:
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   labels:
-    app: prowlarr-20.12.2
+    app: prowlarr-21.3.7
     app.kubernetes.io/instance: prowlarr
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: prowlarr
-    app.kubernetes.io/version: 2.1.5.5213
+    app.kubernetes.io/version: 2.3.0.5236
     helm-revision: '1'
-    helm.sh/chart: prowlarr-20.12.2
+    helm.sh/chart: prowlarr-21.3.7
     release: prowlarr
     service.name: metrics
   name: prowlarr-metrics
@@ -709,13 +709,13 @@ metadata:
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   labels:
-    app: prowlarr-20.12.2
+    app: prowlarr-21.3.7
     app.kubernetes.io/instance: prowlarr
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: prowlarr
-    app.kubernetes.io/version: 2.1.5.5213
+    app.kubernetes.io/version: 2.3.0.5236
     helm-revision: '1'
-    helm.sh/chart: prowlarr-20.12.2
+    helm.sh/chart: prowlarr-21.3.7
     release: prowlarr
   name: prowlarr
   namespace: apps
@@ -740,13 +740,13 @@ metadata:
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   labels:
-    app: prowlarr-20.12.2
+    app: prowlarr-21.3.7
     app.kubernetes.io/instance: prowlarr
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: prowlarr
-    app.kubernetes.io/version: 2.1.5.5213
+    app.kubernetes.io/version: 2.3.0.5236
     helm-revision: '1'
-    helm.sh/chart: prowlarr-20.12.2
+    helm.sh/chart: prowlarr-21.3.7
     release: prowlarr
   name: prowlarr
   namespace: apps
