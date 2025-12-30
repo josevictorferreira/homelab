@@ -33,12 +33,17 @@ spec:
     spec:
       automountServiceAccountToken: true
       containers:
-        - envFrom:
+        - command:
+            - bundle
+            - exec
+            - bin/rails
+            - server
+          envFrom:
             - secretRef:
                 name: valoris-config
             - secretRef:
                 name: valoris-s3
-          image: ghcr.io/josevictorferreira/valoris-server:latest
+          image: ghcr.io/josevictorferreira/valoris:latest
           imagePullPolicy: Always
           name: main
           ports:
@@ -152,12 +157,17 @@ spec:
     spec:
       automountServiceAccountToken: true
       containers:
-        - envFrom:
+        - command:
+            - bundle
+            - exec
+            - bin/jobs
+            - start
+          envFrom:
             - secretRef:
                 name: valoris-config
             - secretRef:
                 name: valoris-s3
-          image: ghcr.io/josevictorferreira/valoris-worker:latest
+          image: ghcr.io/josevictorferreira/valoris:latest
           imagePullPolicy: Always
           name: main
           ports:
