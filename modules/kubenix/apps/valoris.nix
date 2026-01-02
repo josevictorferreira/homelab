@@ -8,12 +8,36 @@ let
 in
 {
   submodules.instances = {
-    valoris = {
+    valoris-frontend = {
       submodule = "release";
       args = {
         namespace = namespace;
         image = {
-          repository = "ghcr.io/josevictorferreira/valoris";
+          repository = "ghcr.io/josevictorferreira/valoris-frontend";
+          tag = imageTag;
+          pullPolicy = "Always";
+        };
+        port = 3000;
+        command = [ "nginx" "-g" "daemon off;" ];
+        values = {
+          defaultPodOptions.imagePullSecrets = [
+            { name = "ghcr-registry-secret"; }
+          ];
+          controllers.main.containers.main = {
+            envFrom = [
+              { secretRef.name = secretName; }
+              { secretRef.name = "valoris-s3"; }
+            ];
+          };
+        };
+      };
+    };
+    valoris-backend = {
+      submodule = "release";
+      args = {
+        namespace = namespace;
+        image = {
+          repository = "ghcr.io/josevictorferreira/valoris-backend";
           tag = imageTag;
           pullPolicy = "Always";
         };
@@ -37,7 +61,7 @@ in
       args = {
         namespace = namespace;
         image = {
-          repository = "ghcr.io/josevictorferreira/valoris";
+          repository = "ghcr.io/josevictorferreira/valoris-backend";
           tag = imageTag;
           pullPolicy = "Always";
         };
