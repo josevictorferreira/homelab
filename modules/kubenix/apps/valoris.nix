@@ -17,7 +17,7 @@ in
           tag = imageTag;
           pullPolicy = "Always";
         };
-        port = 3000;
+        port = 80;
         command = [ "nginx" "-g" "daemon off;" ];
         values = {
           defaultPodOptions.imagePullSecrets = [
@@ -41,8 +41,8 @@ in
           tag = imageTag;
           pullPolicy = "Always";
         };
-        port = 3000;
-        command = [ "bundle" "exec" "rails" "server" ];
+        port = 80;
+        command = [ "bundle" "exec" "rails" "server" "-p" "80" ];
         values = {
           defaultPodOptions.imagePullSecrets = [
             { name = "ghcr-registry-secret"; }

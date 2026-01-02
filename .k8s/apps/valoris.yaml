@@ -38,6 +38,8 @@ spec:
             - exec
             - rails
             - server
+            - -p
+            - '80'
           envFrom:
             - secretRef:
                 name: valoris-config
@@ -47,7 +49,7 @@ spec:
           imagePullPolicy: Always
           name: main
           ports:
-            - containerPort: 3000
+            - containerPort: 80
               name: http
               protocol: TCP
       dnsPolicy: ClusterFirst
@@ -80,9 +82,9 @@ metadata:
 spec:
   ports:
     - name: http
-      port: 3000
+      port: 80
       protocol: TCP
-      targetPort: 3000
+      targetPort: 80
   selector:
     app.kubernetes.io/controller: main
     app.kubernetes.io/instance: valoris-backend
@@ -114,7 +116,7 @@ spec:
               service:
                 name: valoris-backend
                 port:
-                  number: 3000
+                  number: 80
             path: /
             pathType: Prefix
   tls:
@@ -170,7 +172,7 @@ spec:
           imagePullPolicy: Always
           name: main
           ports:
-            - containerPort: 3000
+            - containerPort: 80
               name: http
               protocol: TCP
       dnsPolicy: ClusterFirst
@@ -203,9 +205,9 @@ metadata:
 spec:
   ports:
     - name: http
-      port: 3000
+      port: 80
       protocol: TCP
-      targetPort: 3000
+      targetPort: 80
   selector:
     app.kubernetes.io/controller: main
     app.kubernetes.io/instance: valoris-frontend
@@ -237,7 +239,7 @@ spec:
               service:
                 name: valoris-frontend
                 port:
-                  number: 3000
+                  number: 80
             path: /
             pathType: Prefix
   tls:
