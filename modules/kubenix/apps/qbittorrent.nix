@@ -30,7 +30,7 @@ in
     helm.releases."qbittorrent" = {
       chart = kubenix.lib.helm.fetch
         {
-          chartUrl = "oci://tccr.io/truecharts/qbittorrent";
+          chartUrl = "oci://oci.trueforge.org/truecharts/qbittorrent";
           chart = "qbittorrent";
           version = "23.3.2";
           sha256 = "sha256-Rks81hetW/b29Dg0PmmresvCuGL3cVuu4leTTZjwSIc=";

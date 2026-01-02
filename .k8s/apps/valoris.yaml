@@ -6,13 +6,13 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/controller: main
-    app.kubernetes.io/instance: valoris
+    app.kubernetes.io/instance: valoris-backend
     app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: valoris
+    app.kubernetes.io/name: valoris-backend
     helm.sh/chart: app-template-4.2.0
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
-  name: valoris
+  name: valoris-backend
   namespace: apps
 spec:
   replicas: 1
@@ -20,16 +20,16 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/controller: main
-      app.kubernetes.io/instance: valoris
-      app.kubernetes.io/name: valoris
+      app.kubernetes.io/instance: valoris-backend
+      app.kubernetes.io/name: valoris-backend
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
         app.kubernetes.io/controller: main
-        app.kubernetes.io/instance: valoris
-        app.kubernetes.io/name: valoris
+        app.kubernetes.io/instance: valoris-backend
+        app.kubernetes.io/name: valoris-backend
     spec:
       automountServiceAccountToken: true
       containers:
@@ -43,7 +43,7 @@ spec:
                 name: valoris-config
             - secretRef:
                 name: valoris-s3
-          image: ghcr.io/josevictorferreira/valoris:latest
+          image: ghcr.io/josevictorferreira/valoris-backend:latest
           imagePullPolicy: Always
           name: main
           ports:
@@ -66,16 +66,16 @@ metadata:
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
     lbipam.cilium.io/ips: 10.10.10.131
-    lbipam.cilium.io/sharing-key: valoris
+    lbipam.cilium.io/sharing-key: valoris-backend
   labels:
-    app.kubernetes.io/instance: valoris
+    app.kubernetes.io/instance: valoris-backend
     app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: valoris
-    app.kubernetes.io/service: valoris
+    app.kubernetes.io/name: valoris-backend
+    app.kubernetes.io/service: valoris-backend
     helm.sh/chart: app-template-4.2.0
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
-  name: valoris
+  name: valoris-backend
   namespace: apps
 spec:
   ports:
@@ -85,8 +85,8 @@ spec:
       targetPort: 3000
   selector:
     app.kubernetes.io/controller: main
-    app.kubernetes.io/instance: valoris
-    app.kubernetes.io/name: valoris
+    app.kubernetes.io/instance: valoris-backend
+    app.kubernetes.io/name: valoris-backend
   type: LoadBalancer
 ---
 apiVersion: networking.k8s.io/v1
@@ -96,30 +96,153 @@ metadata:
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   labels:
-    app.kubernetes.io/instance: valoris
+    app.kubernetes.io/instance: valoris-backend
     app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: valoris
+    app.kubernetes.io/name: valoris-backend
     helm.sh/chart: app-template-4.2.0
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
-  name: valoris
+  name: valoris-backend
   namespace: apps
 spec:
   ingressClassName: cilium
   rules:
-    - host: valoris.josevictor.me
+    - host: valoris-backend.josevictor.me
       http:
         paths:
           - backend:
               service:
-                name: valoris
+                name: valoris-backend
                 port:
                   number: 3000
             path: /
             pathType: Prefix
   tls:
     - hosts:
-        - valoris.josevictor.me
+        - valoris-backend.josevictor.me
+      secretName: wildcard-tls
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/controller: main
+    app.kubernetes.io/instance: valoris-frontend
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: valoris-frontend
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: valoris-frontend
+  namespace: apps
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/controller: main
+      app.kubernetes.io/instance: valoris-frontend
+      app.kubernetes.io/name: valoris-frontend
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/controller: main
+        app.kubernetes.io/instance: valoris-frontend
+        app.kubernetes.io/name: valoris-frontend
+    spec:
+      automountServiceAccountToken: true
+      containers:
+        - command:
+            - nginx
+            - -g
+            - daemon off;
+          envFrom:
+            - secretRef:
+                name: valoris-config
+            - secretRef:
+                name: valoris-s3
+          image: ghcr.io/josevictorferreira/valoris-frontend:latest
+          imagePullPolicy: Always
+          name: main
+          ports:
+            - containerPort: 3000
+              name: http
+              protocol: TCP
+      dnsPolicy: ClusterFirst
+      enableServiceLinks: false
+      hostIPC: false
+      hostNetwork: false
+      hostPID: false
+      imagePullSecrets:
+        - name: ghcr-registry-secret
+      serviceAccountName: default
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+    lbipam.cilium.io/ips: 10.10.10.134
+    lbipam.cilium.io/sharing-key: valoris-frontend
+  labels:
+    app.kubernetes.io/instance: valoris-frontend
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: valoris-frontend
+    app.kubernetes.io/service: valoris-frontend
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: valoris-frontend
+  namespace: apps
+spec:
+  ports:
+    - name: http
+      port: 3000
+      protocol: TCP
+      targetPort: 3000
+  selector:
+    app.kubernetes.io/controller: main
+    app.kubernetes.io/instance: valoris-frontend
+    app.kubernetes.io/name: valoris-frontend
+  type: LoadBalancer
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: valoris-frontend
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: valoris-frontend
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: valoris-frontend
+  namespace: apps
+spec:
+  ingressClassName: cilium
+  rules:
+    - host: valoris-frontend.josevictor.me
+      http:
+        paths:
+          - backend:
+              service:
+                name: valoris-frontend
+                port:
+                  number: 3000
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - valoris-frontend.josevictor.me
       secretName: wildcard-tls
 ---
 apiVersion: apps/v1
@@ -167,7 +290,7 @@ spec:
                 name: valoris-config
             - secretRef:
                 name: valoris-s3
-          image: ghcr.io/josevictorferreira/valoris:latest
+          image: ghcr.io/josevictorferreira/valoris-backend:latest
           imagePullPolicy: Always
           name: main
           ports:
