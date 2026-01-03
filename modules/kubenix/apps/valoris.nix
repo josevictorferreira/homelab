@@ -71,11 +71,14 @@ in
           defaultPodOptions.imagePullSecrets = [
             { name = "ghcr-registry-secret"; }
           ];
-          controllers.main.containers.main = {
-            envFrom = [
-              { secretRef.name = secretName; }
-              { secretRef.name = "valoris-s3"; }
-            ];
+          controllers.main = {
+            replicas = 2;
+            containers.main = {
+              envFrom = [
+                { secretRef.name = secretName; }
+                { secretRef.name = "valoris-s3"; }
+              ];
+            };
           };
         };
       };
