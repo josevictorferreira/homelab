@@ -11,8 +11,8 @@ in
       chart = kubenix.lib.helm.fetch {
         repo = "https://helm.imgproxy.net/";
         chart = "imgproxy";
-        version = "3.30.0";
-        sha256 = "sha256-1GiNnh/wuLx+ubKzd2o+hH0/9TO3yOA5A9re2AVlUNE=";
+        version = "1.1.0";
+        sha256 = "sha256-y6quMzOF1ekDrdgxOOGb90Cq2lDVus281+GfF8mU4bc=";
       };
       includeCRDs = true;
       noHooks = false;
