@@ -24,7 +24,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/env: 22805b1ff46a1401e8240db03d6cd9859cdd5091b728f8a04c285e2f71da36be
+        checksum/env: 47fac417771b4f4d572b72d68be34cfcd5ad64996faa386fdec4c72c9e8bf321
       labels:
         app: imgproxy-imgproxy
         imgproxy: 'true'
@@ -74,6 +74,11 @@ spec:
 apiVersion: v1
 data:
   IMGPROXY_PROMETHEUS_BIND: OjgwODE=
+  IMGPROXY_S3_ENDPOINT: aHR0cDovL3Jvb2stY2VwaC1yZ3ctY2VwaC1vYmplY3RzdG9yZS5yb29rLWNlcGguc3ZjLmNsdXN0ZXIubG9jYWw=
+  IMGPROXY_S3_ENDPOINT_USE_PATH_STYLE: dHJ1ZQ==
+  IMGPROXY_S3_REGION: dXMtZWFzdC0x
+  IMGPROXY_SIGNATURE_SIZE: MzI=
+  IMGPROXY_USE_S3: dHJ1ZQ==
 kind: Secret
 metadata:
   annotations:

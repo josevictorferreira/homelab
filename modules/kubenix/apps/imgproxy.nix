@@ -24,6 +24,14 @@ in
           tag = "v3.30.1@sha256:3b709e4a0e5e8e0e959b556b7031229202b4b8e7e7d955c517ea7abed68ee34d";
         };
 
+        env = {
+          "IMGPROXY_USE_S3" = "true";
+          "IMGPROXY_S3_REGION" = "us-east-1";
+          "IMGPROXY_S3_ENDPOINT" = "http://rook-ceph-rgw-ceph-objectstore.${homelab.kubernetes.namespaces.storage}.svc.cluster.local";
+          "IMGPROXY_S3_ENDPOINT_USE_PATH_STYLE" = "true";
+          "IMGPROXY_SIGNATURE_SIZE" = "32";
+        };
+
         resources.addSecrets = [
           "imgproxy-config"
           "imgproxy-s3"
