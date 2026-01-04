@@ -6,9 +6,9 @@ in
 {
   kubernetes = {
     resources = {
-      secrets."gluetun-vpn-credentials" = {
+      secrets."imgproxy-config" = {
         metadata = {
-          name = "gluetun-vpn-credentials";
+          name = "imgproxy-config";
           namespace = namespace;
         };
         data = {
