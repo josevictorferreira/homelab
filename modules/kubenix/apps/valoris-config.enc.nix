@@ -22,6 +22,7 @@ in
           "SECRET_KEY_BASE" = kubenix.lib.secretsFor "valoris_secret_key_base";
           "S3_ENDPOINT" =
             "http://rook-ceph-rgw-ceph-objectstore.${homelab.kubernetes.namespaces.storage}.svc.cluster.local";
+          "S3_PUBLIC_ENDPOINT" = "https://objectstore.josevictor.me";
           "S3_BUCKET" = "valoris-s3";
         };
       };
