@@ -370,12 +370,19 @@ let
                   "dockerhub:mjmeli/qbittorrent-port-forward-gluetun-server"
                   "immich-app/immich"
                   "rishikanthc/scriberr"
+                  "comfyanonymous/ComfyUI"
+                  "imgproxy/imgproxy"
                   # Work Apps
                   "kong/kong"
                   "keycloak/keycloak"
                   "ruby/ruby"
                   "rails/rails"
                   # Daily Usage
+                  "anthropics/claude-code"
+                  "musistudio/claude-code-router"
+                  "NixOS/nixpkgs"
+                  "NixOS/nix"
+                  "hall/kubenix"
                   "neovim/neovim"
                   "kovidgoyal/kitty"
                   "hyprwm/hyprland"
@@ -388,6 +395,7 @@ let
                   "alexays/waybar"
                   "jtheoof/swappy"
                   "sst/opencode"
+                  "code-yeongyu/oh-my-opencode"
                 ];
               }
             ];
