@@ -11,7 +11,7 @@ in
           name = "imgproxy-config";
           namespace = namespace;
         };
-        data = {
+        stringData = {
           "IMGPROXY_USE_S3" = "true";
           "IMGPROXY_S3_REGION" = "us-east-1";
           "IMGPROXY_S3_ENDPOINT" = "http://rook-ceph-rgw-ceph-objectstore.${homelab.kubernetes.namespaces.storage}.svc.cluster.local";
