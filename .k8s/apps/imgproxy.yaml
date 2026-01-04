@@ -1,0 +1,172 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app: imgproxy-imgproxy
+    chart: imgproxy-1.1.0
+    heritage: Helm
+    release: imgproxy
+  name: imgproxy-imgproxy
+  namespace: apps
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: imgproxy-imgproxy
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        checksum/env: 22805b1ff46a1401e8240db03d6cd9859cdd5091b728f8a04c285e2f71da36be
+      labels:
+        app: imgproxy-imgproxy
+        imgproxy: 'true'
+        release: imgproxy
+    spec:
+      affinity: {}
+      containers:
+        - envFrom:
+            - secretRef:
+                name: imgproxy-imgproxy-env-secrets
+            - secretRef:
+                name: imgproxy-config
+            - secretRef:
+                name: imgproxy-s3
+          image: ghcr.io/imgproxy/imgproxy:v3.30.1@sha256:3b709e4a0e5e8e0e959b556b7031229202b4b8e7e7d955c517ea7abed68ee34d
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 5
+            httpGet:
+              path: /health
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 50
+            successThreshold: 1
+            timeoutSeconds: 5
+          name: imgproxy
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+            - containerPort: 8081
+              name: metrics
+              protocol: TCP
+          readinessProbe:
+            failureThreshold: 5
+            httpGet:
+              path: /health
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          resources: {}
+      nodeSelector: {}
+      tolerations: []
+---
+apiVersion: v1
+data:
+  IMGPROXY_PROMETHEUS_BIND: OjgwODE=
+kind: Secret
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app: imgproxy-imgproxy
+    chart: imgproxy-1.1.0
+    heritage: Helm
+    imgproxy: 'true'
+    release: imgproxy
+  name: imgproxy-imgproxy-env-secrets
+  namespace: apps
+type: kubernetes.io/Opaque
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app: imgproxy
+    chart: imgproxy-1.1.0
+    heritage: Helm
+    imgproxy: 'true'
+    release: imgproxy
+  name: imgproxy-imgproxy
+  namespace: apps
+spec:
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 8080
+    - name: metrics
+      port: 8081
+      protocol: TCP
+      targetPort: 8081
+  selector:
+    app: imgproxy-imgproxy
+  type: ClusterIP
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    imgproxy: 'true'
+    release: prometheus-operator
+  name: imgproxy-imgproxy
+  namespace: apps
+spec:
+  endpoints:
+    - honorLabels: true
+      port: metrics
+  namespaceSelector:
+    matchNames:
+      - apps
+  selector:
+    matchLabels:
+      app: imgproxy
+      imgproxy: 'true'
+  targetLabels:
+    - app
+    - release
+---
+apiVersion: objectbucket.io/v1alpha1
+kind: ObjectBucketClaim
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: imgproxy-s3
+  namespace: apps
+spec:
+  bucketName: imgproxy
+  storageClassName: rook-ceph-objectstore
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    imgproxy: 'true'
+  name: imgproxy-imgproxy-pdb
+  namespace: apps
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: imgproxy-imgproxy
