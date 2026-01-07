@@ -8,7 +8,7 @@ let
 in
 {
   submodules.instances = {
-    valoris-frontend = {
+    valoris = {
       submodule = "release";
       args = {
         namespace = namespace;
