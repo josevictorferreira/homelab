@@ -166,7 +166,7 @@ metadata:
 spec:
   ingressClassName: cilium
   rules:
-    - host: map[host:imgproxy.josevictor.me paths:[map[path:/ pathType:Prefix]]]
+    - host: imgproxy.josevictor.me
       http:
         paths:
           - backend:

@@ -44,15 +44,7 @@ in
             "cert-manager.io/cluster-issuer" = "cloudflare-issuer";
           };
           hosts = [
-            {
-              host = kubenix.lib.domainFor app;
-              paths = [
-                {
-                  path = "/";
-                  pathType = "Prefix";
-                }
-              ];
-            }
+            (kubenix.lib.domainFor app)
           ];
           tls = [
             {
