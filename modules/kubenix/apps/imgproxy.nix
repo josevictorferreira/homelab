@@ -37,6 +37,8 @@ in
           "valoris-s3"
         ];
 
+        resources.service = kubenix.lib.plainServiceFor app;
+
         resources.ingress = {
           enabled = true;
           className = "cilium";
