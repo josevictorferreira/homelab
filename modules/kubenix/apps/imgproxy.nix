@@ -34,10 +34,10 @@ in
 
         resources.addSecrets = [
           "imgproxy-config"
-          "imgproxy-s3"
+          "valoris-s3"
         ];
 
-        ingress = {
+        resources.ingress = {
           enabled = true;
           className = "cilium";
           annotations = {
