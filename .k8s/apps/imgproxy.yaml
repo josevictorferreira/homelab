@@ -38,7 +38,7 @@ spec:
             - secretRef:
                 name: imgproxy-config
             - secretRef:
-                name: imgproxy-s3
+                name: valoris-s3
           image: ghcr.io/imgproxy/imgproxy:v3.30.1@sha256:3b709e4a0e5e8e0e959b556b7031229202b4b8e7e7d955c517ea7abed68ee34d
           imagePullPolicy: IfNotPresent
           livenessProbe:
@@ -147,6 +147,39 @@ spec:
   targetLabels:
     - app
     - release
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: cloudflare-issuer
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app: imgproxy-imgproxy
+    chart: imgproxy-1.1.0
+    heritage: Helm
+    imgproxy: 'true'
+    release: imgproxy
+  name: imgproxy-imgproxy
+  namespace: apps
+spec:
+  ingressClassName: cilium
+  rules:
+    - host: map[host:imgproxy.josevictor.me paths:[map[path:/ pathType:Prefix]]]
+      http:
+        paths:
+          - backend:
+              service:
+                name: imgproxy-imgproxy
+                port:
+                  number: 80
+            path: /
+            pathType: ImplementationSpecific
+  tls:
+    - hosts:
+        - imgproxy.josevictor.me
+      secretName: wildcard-tls
 ---
 apiVersion: objectbucket.io/v1alpha1
 kind: ObjectBucketClaim
