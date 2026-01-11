@@ -24,6 +24,9 @@ in
             "http://rook-ceph-rgw-ceph-objectstore.${homelab.kubernetes.namespaces.storage}.svc.cluster.local";
           "S3_PUBLIC_ENDPOINT" = "https://objectstore.josevictor.me";
           "S3_BUCKET" = "valoris-s3";
+          "IMGPROXY_ENDPOINT" = "http://imgproxy-imgproxy.apps.svc.cluster.local";
+          "IMGPROXY_KEY" = kubenix.lib.secretsFor "imgproxy_key";
+          "IMGPROXY_SALT" = kubenix.lib.secretsFor "imgproxy_salt";
         };
       };
     };
