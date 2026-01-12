@@ -42,6 +42,7 @@ in
         resources.ingress = {
           enabled = true;
           className = "cilium";
+          pathType = "Prefix";
           annotations = {
             "cert-manager.io/cluster-issuer" = "cloudflare-issuer";
           };
