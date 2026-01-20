@@ -27,6 +27,15 @@ in
           "IMGPROXY_ENDPOINT" = "https://${kubenix.lib.domainFor "imgproxy"}";
           "IMGPROXY_KEY" = kubenix.lib.secretsFor "imgproxy_key";
           "IMGPROXY_SALT" = kubenix.lib.secretsFor "imgproxy_salt";
+          "LLM_PROVIDER" = "openrouter";
+          "LLM_BASE_URL" = "https://openrouter.ai/api/v1/chat/completions";
+          "LLM_API_KEY" = kubenix.lib.secretsFor "openrouter_api_key_valoris";
+          "LLM_MODEL" = "mistralai/mistral-small-3.1-24b-instruct";
+          "LLM_TIMEOUT_SECONDS" = "180";
+          "LLM_MAX_RETRIES" = "3";
+          "LLM_FALLBACK_BASE_URL" = "https://openrouter.ai/api/v1/chat/completions";
+          "LLM_FALLBACK_API_KEY" = kubenix.lib.secretsFor "openrouter_api_key_valoris";
+          "LLM_FALLBACK_MODEL" = "mistralai/mistral-small-3.2-24b-instruct";
         };
       };
     };
