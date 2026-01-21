@@ -30,7 +30,7 @@ in
           "LLM_PROVIDER" = "openrouter";
           "LLM_BASE_URL" = "https://openrouter.ai/api/v1/chat/completions";
           "LLM_API_KEY" = kubenix.lib.secretsFor "openrouter_api_key_valoris";
-          "LLM_MODEL" = "mistralai/mistral-small-3.1-24b-instruct";
+          "LLM_MODEL" = "qwen/qwen3-coder-30b-a3b-instruct";
           "LLM_TIMEOUT_SECONDS" = "180";
           "LLM_MAX_RETRIES" = "3";
           "LLM_FALLBACK_BASE_URL" = "https://openrouter.ai/api/v1/chat/completions";
