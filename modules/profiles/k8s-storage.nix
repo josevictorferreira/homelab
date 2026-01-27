@@ -24,6 +24,10 @@ in
       "nfs"
     ];
 
+    # Blacklist nbd module to prevent ceph-volume from hanging when scanning devices
+    # nbd devices cause ceph-bluestore-tool show-label to hang indefinitely
+    boot.blacklistedKernelModules = [ "nbd" ];
+
     systemd.services.containerd.serviceConfig = {
       LimitNOFILE = lib.mkForce null;
     };
