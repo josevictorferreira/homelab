@@ -32,7 +32,7 @@ in
       services = "${root}/modules/services";
       kubernetes = "${root}/kubernetes";
       kubenix = "${kubernetes}/kubenix";
-      manifests = "${kubernetes}/manifests";
+      manifests = "${root}/.k8s";
       secrets = "${root}/secrets";
       config = "${root}/config";
     };
