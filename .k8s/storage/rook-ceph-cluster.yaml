@@ -254,6 +254,7 @@ spec:
         memory: 50Mi
   skipUpgradeChecks: false
   storage:
+    deviceFilter: ^(sd[a-z]+[0-9]*|nvme[0-9]+n[0-9]+p?[0-9]*)$
     nodes:
       - devices:
           - name: /dev/disk/by-partlabel/CEPH_OSD_NVME
