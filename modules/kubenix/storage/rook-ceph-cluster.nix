@@ -119,6 +119,8 @@ in
           storage = {
             useAllNodes = false;
             useAllDevices = false;
+            # Filter to only scan CEPH_OSD_* partlabel devices, prevents ceph-volume from hanging on nbd devices
+            deviceFilter = "^(sd[a-z]+[0-9]*|nvme[0-9]+n[0-9]+p?[0-9]*)$";
             nodes = storageNodesList;
           };
         };
