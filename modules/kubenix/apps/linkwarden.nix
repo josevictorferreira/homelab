@@ -15,8 +15,8 @@ in
       chart = kubenix.lib.helm.fetch {
         chartUrl = "oci://ghcr.io/fmjstudios/helm/linkwarden";
         chart = "linkwarden";
-        version = "0.3.4";
-        sha256 = "sha256-TODO-Get-actual-sha256-for-0.3.4";
+        version = "0.3.3";
+        sha256 = "sha256-rFzutBrDDF4qVj38dYazjv3iUl2uszIJSKWPwrRdX1E=";
       };
       includeCRDs = true;
       noHooks = true;
@@ -25,7 +25,7 @@ in
         image = {
           registry = "ghcr.io";
           repository = "linkwarden/linkwarden";
-          tag = "v2.13.5@sha256:TODO-Get-actual-digest-for-v2.13.5";
+          tag = "v2.13.4@sha256:9f1e69e11c36fcb94d97753479e76a7c66eabb4afd89c0ceb5ff52c0b1849ca5";
         };
 
         linkwarden = {
