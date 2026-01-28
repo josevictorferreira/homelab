@@ -12,8 +12,8 @@ in
       chart = kubenix.lib.helm.fetch {
         repo = "https://community-charts.github.io/helm-charts";
         chart = "n8n";
-        version = "1.15.19";
-        sha256 = "sha256-TODO-Get-actual-sha256-for-1.15.19";
+        version = "1.15.5";
+        sha256 = "sha256-1GiNnh/wuLx+ubKzd2o+hH0/9TO3yOA5A9re2AVlUNE=";
       };
       includeCRDs = true;
       noHooks = false;
@@ -22,7 +22,7 @@ in
       values = {
         image = {
           repository = "n8nio/n8n";
-          tag = "1.117.3@sha256:TODO-Get-actual-digest-for-1.117.3";
+          tag = "2.1.4@sha256:85214df20cd7bc020f8e4b0f60f87ea87f0a754ca7ba3d1ccdfc503ccd6e7f9c";
           pullPolicy = "IfNotPresent";
         };
 

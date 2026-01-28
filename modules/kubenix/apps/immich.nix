@@ -11,8 +11,8 @@ in
       chart = kubenix.lib.helm.fetch {
         chartUrl = "oci://ghcr.io/immich-app/immich-charts/immich";
         chart = "immich";
-        version = "0.10.1";
-        sha256 = "sha256-TODO-Get-actual-sha256-for-0.10.1";
+        version = "0.10.0";
+        sha256 = "sha256-BKCFbfRWwXjK3+9F74hgoIO89S2LYaFcnLDLANM2yH8=";
       };
       includeCRDs = true;
       noHooks = true;
@@ -46,7 +46,7 @@ in
 
           controllers.main.containers.main = {
             image.repository = "ghcr.io/immich-app/immich-machine-learning";
-            image.tag = "v2.5.0@sha256:TODO-Get-actual-digest-for-v2.5.0";
+            image.tag = "v2.3.1@sha256:379e31b8c75107b0af8141904baa8cc933d7454b88fdb204265ef11749d7d908";
             image.pullPolicy = "IfNotPresent";
           };
 
@@ -65,7 +65,7 @@ in
           enabled = true;
           controllers.main.containers.main = {
             image.repository = "ghcr.io/immich-app/immich-server";
-            image.tag = "v2.5.0@sha256:TODO-Get-actual-digest-for-v2.5.0";
+            image.tag = "v2.3.1@sha256:f8d06a32b1b2a81053d78e40bf8e35236b9faefb5c3903ce9ca8712c9ed78445";
             image.pullPolicy = "IfNotPresent";
           };
 
