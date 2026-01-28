@@ -27,7 +27,7 @@ in
               clusterID = "rook-ceph";
               fsName = fsName;
               staticVolume = "true";
-              rootPath = "/volumes/nfs-exports/homelab-nfs/dfd23da6-d80d-48c7-b568-025ec7badd17";
+              rootPath = "/volumes/nfs-exports/homelab-nfs/5a434804-52fc-4e58-b09f-592a37a16a97";
             };
           };
         };
@@ -51,7 +51,7 @@ in
               clusterID = "rook-ceph";
               fsName = fsName;
               staticVolume = "true";
-              rootPath = "/volumes/nfs-exports/homelab-nfs/dfd23da6-d80d-48c7-b568-025ec7badd17/downloads";
+              rootPath = "/volumes/nfs-exports/homelab-nfs/5a434804-52fc-4e58-b09f-592a37a16a97/downloads";
             };
           };
         };
@@ -75,7 +75,7 @@ in
               clusterID = "rook-ceph";
               fsName = fsName;
               staticVolume = "true";
-              rootPath = "/volumes/nfs-exports/homelab-nfs/dfd23da6-d80d-48c7-b568-025ec7badd17/images";
+              rootPath = "/volumes/nfs-exports/homelab-nfs/5a434804-52fc-4e58-b09f-592a37a16a97/images";
             };
           };
         };
