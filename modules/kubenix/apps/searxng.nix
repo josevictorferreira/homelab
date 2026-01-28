@@ -22,7 +22,7 @@ in
 
         image = {
           repository = "ghcr.io/searxng/searxng";
-          tag = "2025.12.26-f95442310@sha256:3c041584da716339860e903ec923b294e6b3d9fbb25cf2d9cc05dc23957c865a";
+          tag = "2026.1.9-b83e88ea7@sha256:TODO-Get-actual-digest-for-2026.1.9";
           pullPolicy = "IfNotPresent";
         };
 
