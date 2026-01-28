@@ -46,7 +46,7 @@ in
 
           controllers.main.containers.main = {
             image.repository = "ghcr.io/immich-app/immich-machine-learning";
-            image.tag = "v2.3.1@sha256:379e31b8c75107b0af8141904baa8cc933d7454b88fdb204265ef11749d7d908";
+            image.tag = "v2.5.0@sha256:5fee7f3e052c3d32d4edecafad68317394daae26f57d895fbd487886083725a7";
             image.pullPolicy = "IfNotPresent";
           };
 
@@ -65,7 +65,7 @@ in
           enabled = true;
           controllers.main.containers.main = {
             image.repository = "ghcr.io/immich-app/immich-server";
-            image.tag = "v2.3.1@sha256:f8d06a32b1b2a81053d78e40bf8e35236b9faefb5c3903ce9ca8712c9ed78445";
+            image.tag = "v2.5.0@sha256:6c011eaa315b871f3207d68f97205d92b3e600104466a75b01eb2c3868e72ca1";
             image.pullPolicy = "IfNotPresent";
           };
 
