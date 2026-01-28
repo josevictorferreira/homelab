@@ -4,7 +4,7 @@ let
   pvName = "cephfs-shared-storage";
   pvcName = "cephfs-shared-storage";
   fsName = "ceph-filesystem";
-  exportPath = "/volumes/nfs-exports/homelab-nfs/dfd23da6-d80d-48c7-b568-025ec7badd17";
+  exportPath = "/volumes/nfs-exports/homelab-nfs/5a434804-52fc-4e58-b09f-592a37a16a97";
   namespace = homelab.kubernetes.namespaces.storage;
 in
 {
