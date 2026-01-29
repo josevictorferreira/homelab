@@ -45,7 +45,7 @@ in
           dashboard.ssl = false;
           network = {
             provider = "host";
-            connections.requireMsgr2 = false;
+            connections.requireMsgr2 = true;
           };
           placement = {
             all = {
@@ -171,6 +171,7 @@ in
             spec = {
               failureDomain = "host";
               replicated.size = 3;
+              deviceClass = "nvme";
             };
             storageClass = {
               enabled = true;
@@ -204,7 +205,10 @@ in
                   replicated.size = 3;
                 }
               ];
-              metadataServer.activeCount = 1;
+              metadataServer = {
+                activeCount = 1;
+                activeStandby = true;
+              };
             };
             storageClass = {
               enabled = true;

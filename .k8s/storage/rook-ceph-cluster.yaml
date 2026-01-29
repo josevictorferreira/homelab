@@ -123,6 +123,7 @@ metadata:
   name: replicapool
   namespace: rook-ceph
 spec:
+  deviceClass: nvme
   failureDomain: host
   replicated:
     size: 3
@@ -192,7 +193,7 @@ spec:
         enabled: false
       encryption:
         enabled: false
-      requireMsgr2: false
+      requireMsgr2: true
     provider: host
   placement:
     all:
@@ -304,6 +305,7 @@ spec:
       size: 3
   metadataServer:
     activeCount: 1
+    activeStandby: true
 ---
 apiVersion: ceph.rook.io/v1
 kind: CephFilesystemSubVolumeGroup
