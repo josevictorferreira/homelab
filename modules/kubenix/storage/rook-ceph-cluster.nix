@@ -1,23 +1,20 @@
-{ lib
-, kubenix
-, homelab
-, ...
+{
+  lib,
+  kubenix,
+  homelab,
+  ...
 }:
 
 let
   namespace = homelab.kubernetes.namespaces.storage;
   domain = homelab.domain;
   storageNodes = homelab.nodes.group."k8s-storage".configs;
-  storageNodesList = lib.mapAttrsToList
-    (name: attrs: {
-      name = name;
-      devices = builtins.map
-        (device: {
-          name = device;
-        })
-        attrs.disks;
-    })
-    storageNodes;
+  storageNodesList = lib.mapAttrsToList (name: attrs: {
+    name = name;
+    devices = builtins.map (device: {
+      name = device;
+    }) attrs.disks;
+  }) storageNodes;
   monitorGroupName = "k8s-control-plane"; # Name of the node group to run monitors on
   monitorHostNames = homelab.nodes.group.${monitorGroupName}.names;
 in
@@ -27,8 +24,8 @@ in
       chart = kubenix.lib.helm.fetch {
         repo = "https://charts.rook.io/release";
         chart = "rook-ceph-cluster";
-        version = "1.18.7";
-        sha256 = "sha256-iesKOxqDmsZ25GboyjGoDV+5O/D8yEkvvRHMvKRlysg=";
+        version = "1.19.0";
+        sha256 = "sha256-GOYYxPe7XWycR8L0pABH8i693nJWzo+9nhFx1UcU9Q8=";
       };
       namespace = namespace;
       includeCRDs = true;
