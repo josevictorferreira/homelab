@@ -25,18 +25,23 @@ spec:
             - "# Replicate the script from toolbox.sh inline so the ceph image\n#\
               \ can be run directly, instead of requiring the rook toolbox\nCEPH_CONFIG=\"\
               /etc/ceph/ceph.conf\"\nMON_CONFIG=\"/etc/rook/mon-endpoints\"\nKEYRING_FILE=\"\
-              /etc/ceph/keyring\"\n\n# create a ceph config file in its default location\
-              \ so ceph/rados tools can be used\n# without specifying any arguments\n\
-              write_endpoints() {\n  endpoints=$(cat ${MON_CONFIG})\n\n  # filter\
-              \ out the mon names\n  # external cluster can have numbers or hyphens\
-              \ in mon names, handling them in regex\n  # shellcheck disable=SC2001\n\
-              \  mon_endpoints=$(echo \"${endpoints}\"| sed 's/[a-z0-9_-]\\+=//g')\n\
-              \n  DATE=$(date)\n  echo \"$DATE writing mon endpoints to ${CEPH_CONFIG}:\
-              \ ${endpoints}\"\n    cat <<EOF > ${CEPH_CONFIG}\n[global]\nmon_host\
-              \ = ${mon_endpoints}\n\n[client.admin]\nkeyring = ${KEYRING_FILE}\n\
-              EOF\n}\n\n# watch the endpoints config file and update if the mon endpoints\
-              \ ever change\nwatch_endpoints() {\n  # get the timestamp for the target\
-              \ of the soft link\n  real_path=$(realpath ${MON_CONFIG})\n  initial_time=$(stat\
+              /etc/ceph/keyring\"\nCONFIG_OVERRIDE=\"/etc/rook-config-override/config\"\
+              \n\n# create a ceph config file in its default location so ceph/rados\
+              \ tools can be used\n# without specifying any arguments\nwrite_endpoints()\
+              \ {\n  endpoints=$(cat ${MON_CONFIG})\n\n  # filter out the mon names\n\
+              \  # external cluster can have numbers or hyphens in mon names, handling\
+              \ them in regex\n  # shellcheck disable=SC2001\n  mon_endpoints=$(echo\
+              \ \"${endpoints}\"| sed 's/[a-z0-9_-]\\+=//g')\n\n  DATE=$(date)\n \
+              \ echo \"$DATE writing mon endpoints to ${CEPH_CONFIG}: ${endpoints}\"\
+              \n    cat <<EOF > ${CEPH_CONFIG}\n[global]\nmon_host = ${mon_endpoints}\n\
+              \n[client.admin]\nkeyring = ${KEYRING_FILE}\nEOF\n\n  # Merge the config\
+              \ override if it exists and is not empty\n  if [ -f \"${CONFIG_OVERRIDE}\"\
+              \ ] && [ -s \"${CONFIG_OVERRIDE}\" ]; then\n    echo \"$DATE merging\
+              \ config override from ${CONFIG_OVERRIDE}\"\n    echo \"\" >> ${CEPH_CONFIG}\n\
+              \    cat ${CONFIG_OVERRIDE} >> ${CEPH_CONFIG}\n  fi\n}\n\n# watch the\
+              \ endpoints config file and update if the mon endpoints ever change\n\
+              watch_endpoints() {\n  # get the timestamp for the target of the soft\
+              \ link\n  real_path=$(realpath ${MON_CONFIG})\n  initial_time=$(stat\
               \ -c %Z \"${real_path}\")\n  while true; do\n    real_path=$(realpath\
               \ ${MON_CONFIG})\n    latest_time=$(stat -c %Z \"${real_path}\")\n\n\
               \    if [[ \"${latest_time}\" != \"${initial_time}\" ]]; then\n    \
@@ -77,6 +82,9 @@ spec:
               name: mon-endpoint-volume
             - mountPath: /var/lib/rook-ceph-mon
               name: ceph-admin-secret
+            - mountPath: /etc/rook-config-override
+              name: rook-config-override
+              readOnly: true
       dnsPolicy: ClusterFirstWithHostNet
       hostNetwork: true
       serviceAccountName: rook-ceph-default
@@ -99,6 +107,10 @@ spec:
                 path: mon-endpoints
             name: rook-ceph-mon-endpoints
           name: mon-endpoint-volume
+        - configMap:
+            name: rook-config-override
+            optional: true
+          name: rook-config-override
         - emptyDir: {}
           name: ceph-config
 ---
