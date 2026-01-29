@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+fail=0
+
+echo "🔍 Running gitleaks to check for secrets in staged files..."
+
+# Get list of staged files (including new untracked files)
+staged_files=$(git diff --cached --name-only)
+staged_new_files=$(git diff --cached --name-only --diff-filter=A)
+all_staged="$staged_files $staged_new_files"
+
+if [ -n "$all_staged" ]; then
+  # Create a temporary directory for the staged files
+  temp_dir=$(mktemp -d)
+  trap "rm -rf $temp_dir" EXIT
+
+  # Extract staged files to temp directory
+  for file in $all_staged; do
+    if [ -f "$file" ]; then
+      mkdir -p "$(dirname "$temp_dir/$file")"
+      git show ":$file" > "$temp_dir/$file" 2>/dev/null || true
+    fi
+  done
+
+  # Run gitleaks on the temp directory with staged content
+  if ! gitleaks detect --source="$temp_dir" --no-git --verbose --exit-code=1 2>&1; then
+    echo ""
+    echo "❌ ERROR: Gitleaks detected potential secrets in your staged changes!"
+    echo ""
+    echo "To fix this:"
+    echo "1. Review the gitleaks output above"
+    echo "2. Remove or redact any secrets from your staged files"
+    echo "3. Use encrypted secrets (.enc.yaml files) for sensitive data"
+    fail=1
+  else
+    echo "✅ No secrets detected in staged files"
+  fi
+else
+  echo "✅ No files staged for commit"
+fi
+
+# check staged .enc.yaml files are encrypted
+for file in $(git diff --cached --name-only -- '*.enc.yaml' '*.enc.yml'); do
+  if ! yq -e 'has("sops") and (.sops.mac // "" != "")' "$file" >/dev/null 2>&1; then
+    echo "❌ ERROR: $file is not encrypted with sops!"
+    fail=1
+  fi
+done
+
+if [ $fail -eq 1 ]; then
+  echo ""
+  echo "Commit aborted!"
+  echo "- For gitleaks issues: Remove secrets from your changes"
+  echo "- For encryption issues: Encrypt files with: make emanifests"
+  exit 1
+fi
+
+echo "✅ Pre-commit checks passed!"
