@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: Secret
+metadata:
+    annotations:
+        kubenix/k8s-version: "1.32"
+        kubenix/project-name: ze-homelab
+    name: sftpgo-config
+    namespace: apps
+stringData:
+    SFTPGO_ADMIN_PASSWORD: ENC[AES256_GCM,data:8gWae+Z5BxZ9xDHcoy3zdE+CggHMfA6XN2gpkW8YnRjX+MumNdQmcsDb1UHS,iv:Eiby0T6DGMrWXIOStf4rCkcQSBKvuTd9hGmnbCdHddQ=,tag:3Q6txUE8NEN2uEbxXG6vvw==,type:str]
+    SFTPGO_ADMIN_USERNAME: ENC[AES256_GCM,data:bjuvDnU=,iv:bwdqJSrM8W7vhbxJwzuvNVyNoV5bGeQ6NJeB9mg+dAg=,tag:wS8f9KgdCFlBUmM8SONwxA==,type:str]
+sops:
+    age:
+        - recipient: age16yrhmz8fytj7j9ns80zl40zjcdfd3pdxh48ld7ys7veea774udtqfn9jyx
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSA1V3BSNUJBSGd6ejIvcVN5
+            QmdyUzNCcDJYZktuM0lkR1V5OWVuWU1ZdnlzClk2ZThjMFRzc09NNWxNSXBGSk4r
+            TFJnbHllQkd0dG5hQURSdkdpbENGckkKLS0tIGVqVW1ET05wVTdrYXpaOTNXcUpu
+            amhXa282OXJTSndtd0hPaXFOeGREK1EKgkG5lw/FSGm2vkTipNVpZC9DAEBea0Ny
+            3XYxAo6A9QqgpfSyJRNng2pGYbbaS+F7Z11yXphdza8F18bepUqPWA==
+            -----END AGE ENCRYPTED FILE-----
+        - recipient: age1jx9qu5p0ycvymrl2gykd9z3w8x8n67jxnatxs49j7qzspjr6asqqf8u35h
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSB0Z3BLak1WOEs4c2t0bDE4
+            TGZHYkhoWldJVGZnUldmNEc3Z3pvNE0wSFMwCjVVb1VqQlF3OGVTeE10VWo2clVM
+            bmZ5VUFaTkZrd1ZPT1ZWcFo0ak03TDgKLS0tIHdTWlJUQ0RsVk4rOUFaUTZSL0lv
+            eHVkV084MW9BL0E5eTN0ZGVTRG5rUU0KaoAXPAZDKQcBRTgvtXYCLjVQkckFRsEm
+            zV/p3K1x3BbX1fU9wXiZDcfZL0YaHSRNFTLWKPSyKccVKpClVLE0/w==
+            -----END AGE ENCRYPTED FILE-----
+        - recipient: age1myzhwq67gu5zrfk8fvs0p7mh5fk67d20ltwqf9325ya83lm06ytsyax3j2
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBvc2dpQWpKd252MmZRQ29o
+            YlF2Q0x2SkkvRE5hOHhmZzhpdU8zOE5pK1NJCkxmVDU1dXE3MmJKVDJUL08vZUZ5
+            R3ZwVk9uNzNjTU5BRi91Yk9pVitiMHMKLS0tIGNEcUFzUElEYjV3dWx6WG1lVnBV
+            eTJybFZ0UWZmZnJKRmV2OUN5bXJFQ1UKwHjZrE+We+XdC3vEOsM48ilDzgM/bg7N
+            juZWDKiFSQMGK9DVZ4H+XTECsSAZsQ+XWfxeGXK4pH4NrGL9ys73yA==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2026-01-30T20:51:56Z"
+    mac: ENC[AES256_GCM,data:ks0RC+EM/uEJZZTtMdofyiOmNCe0XHDOaIkq7W2oWGgQwqeVR6aNbm/HEqsd1Z3WY9/6we1fje4u3q+ok5spBQ8Z7PvUUAOegEct+VnYiGFLR75xtewdKdkoTm/Bkoa1TEMEJy4u/x+95q8aa0gZQ86SDQOXrIIiwr5IPs+7PpY=,iv:ZA7Wl8t2COte10RNdQh/8MvJX7IF2BqZ87LkMZrMMMA=,tag:b9nxZVbw4fnJGIM7SjGaug==,type:str]
+    encrypted_regex: ^(data|stringData)$
+    version: 3.11.0
