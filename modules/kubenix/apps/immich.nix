@@ -34,12 +34,6 @@ in
         immich = {
           persistence.library = {
             existingClaim = immichLibraryPVC;
-            globalMounts = [
-              {
-                path = "/usr/src/app/upload";
-                subPath = "immich";
-              }
-            ];
           };
 
           configuration = {
