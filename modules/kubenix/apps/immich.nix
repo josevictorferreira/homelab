@@ -1,7 +1,8 @@
 { kubenix, homelab, ... }:
 
 let
-  immichLibraryPVC = "cephfs-shared-storage-images";
+  # Use root PVC with subPath to avoid overlapping CephFS mount issues
+  immichLibraryPVC = "cephfs-shared-storage-root";
   app = "immich";
   namespace = homelab.kubernetes.namespaces.applications;
 in
@@ -11,8 +12,8 @@ in
       chart = kubenix.lib.helm.fetch {
         chartUrl = "oci://ghcr.io/immich-app/immich-charts/immich";
         chart = "immich";
-        version = "0.10.0";
-        sha256 = "sha256-BKCFbfRWwXjK3+9F74hgoIO89S2LYaFcnLDLANM2yH8=";
+        version = "0.10.3";
+        sha256 = "sha256-+GGHO1w55A5/oe5gp/lweWXBMy7a/2VdoxlEdlsVnzk=";
       };
       includeCRDs = true;
       noHooks = true;
@@ -31,7 +32,15 @@ in
         };
 
         immich = {
-          persistence.library.existingClaim = immichLibraryPVC;
+          persistence.library = {
+            existingClaim = immichLibraryPVC;
+            globalMounts = [
+              {
+                path = "/usr/src/app/upload";
+                subPath = "images";
+              }
+            ];
+          };
 
           configuration = {
             trash.enabled = true;

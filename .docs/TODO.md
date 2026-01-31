@@ -7,7 +7,7 @@
  - [ ] Add a new UI to qbittorrent(more clean)
  - [ ] Add a new Obsidian sync to cluster
  - [ ] Add CephFS monitoring integrated with Grafana, and add warnings to ntfy.
- - [ ] Fix sftpgo camera image upload to ntfy
+ - [x] Fix sftpgo camera image upload to ntfy
  - [x] Resync all immich images ✅ 2026-01-29 22:45
  - [x] Remove youtube-transcriber from the cluster ✅ 2026-01-29 22:45
  - [x] Remove alarm-server from the cluster ✅ 2026-01-29 22:45
