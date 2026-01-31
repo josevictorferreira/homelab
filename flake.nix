@@ -123,17 +123,20 @@
 
       formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.nixpkgs-fmt);
 
-      packages.${currentSystem}.gen-manifests = kubenixModule.mkRenderer currentSystem pkgs;
+      packages = forAllSystems (system: {
+        gen-manifests = kubenixModule.mkRenderer system nixpkgs.legacyPackages.${system};
+      });
 
-      devShells.${currentSystem}.default = pkgs.mkShell {
-        buildInputs = with pkgs; [
-          fluxcd
-          postgresql # # For debug
-        ];
-
-        shellHook = ''
-          git config core.hooksPath .githooks
-        '';
-      };
+      devShells = forAllSystems (system: {
+        default = nixpkgs.legacyPackages.${system}.mkShell {
+          buildInputs = with nixpkgs.legacyPackages.${system}; [
+            fluxcd
+            postgresql
+          ];
+          shellHook = ''
+            git config core.hooksPath .githooks
+          '';
+        };
+      });
     };
 }
