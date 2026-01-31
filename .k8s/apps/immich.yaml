@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: machine-learning
     app.kubernetes.io/version: v2.0.0
-    helm.sh/chart: immich-0.10.0
+    helm.sh/chart: immich-0.10.3
   name: immich-machine-learning
   namespace: apps
 spec:
@@ -33,8 +33,12 @@ spec:
       automountServiceAccountToken: true
       containers:
         - env:
+            - name: HF_XET_CACHE
+              value: /cache/huggingface-xet
             - name: IMMICH_MACHINE_LEARNING_URL
               value: http://immich-machine-learning:3003
+            - name: MPLCONFIGDIR
+              value: /cache/matplotlib-config
             - name: REDIS_HOSTNAME
               value: immich-valkey
             - name: TRANSFORMERS_CACHE
@@ -99,7 +103,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: server
     app.kubernetes.io/version: v2.0.0
-    helm.sh/chart: immich-0.10.0
+    helm.sh/chart: immich-0.10.3
   name: immich-server
   namespace: apps
 spec:
@@ -189,7 +193,7 @@ spec:
           name: config
         - name: data
           persistentVolumeClaim:
-            claimName: cephfs-shared-storage-images
+            claimName: cephfs-shared-storage-root
 ---
 apiVersion: v1
 data:
@@ -204,7 +208,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: immich
     app.kubernetes.io/version: v2.0.0
-    helm.sh/chart: immich-0.10.0
+    helm.sh/chart: immich-0.10.3
   name: immich-immich-config
   namespace: apps
 ---
@@ -219,7 +223,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: machine-learning
     app.kubernetes.io/version: v2.0.0
-    helm.sh/chart: immich-0.10.0
+    helm.sh/chart: immich-0.10.3
   name: immich-machine-learning
   namespace: apps
 spec:
@@ -242,7 +246,7 @@ metadata:
     app.kubernetes.io/name: machine-learning
     app.kubernetes.io/service: immich-machine-learning
     app.kubernetes.io/version: v2.0.0
-    helm.sh/chart: immich-0.10.0
+    helm.sh/chart: immich-0.10.3
   name: immich-machine-learning
   namespace: apps
 spec:
@@ -271,7 +275,7 @@ metadata:
     app.kubernetes.io/name: server
     app.kubernetes.io/service: immich-server
     app.kubernetes.io/version: v2.0.0
-    helm.sh/chart: immich-0.10.0
+    helm.sh/chart: immich-0.10.3
   name: immich-server
   namespace: apps
 spec:
@@ -305,7 +309,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: server
     app.kubernetes.io/version: v2.0.0
-    helm.sh/chart: immich-0.10.0
+    helm.sh/chart: immich-0.10.3
   name: immich-server
   namespace: apps
 spec:
@@ -336,7 +340,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: server
     app.kubernetes.io/version: v2.0.0
-    helm.sh/chart: immich-0.10.0
+    helm.sh/chart: immich-0.10.3
   name: immich-server
   namespace: apps
 spec:
