@@ -31,8 +31,8 @@ in
       chart = kubenix.lib.helm.fetch {
         chartUrl = "oci://oci.trueforge.org/truecharts/qbittorrent";
         chart = "qbittorrent";
-        version = "23.3.2";
-        sha256 = "sha256-Rks81hetW/b29Dg0PmmresvCuGL3cVuu4leTTZjwSIc=";
+        version = "24.2.20";
+        sha256 = "sha256-FAx4FzJ8g0+zp8Ugoyu+j0zRuee7fWWyZoy7l6Hf6H8=";
       };
       includeCRDs = true;
       noHooks = true;
@@ -41,7 +41,7 @@ in
         image = qbtImage;
         qbitportforwardImage = {
           repository = "docker.io/mjmeli/qbittorrent-port-forward-gluetun-server";
-          tag = "latest@sha256:4bd94ad0d289d3d52facdcb708a019e693c8df41e386f6aee80b870fa90baeec";
+          tag = "2025.12.21.02@sha256:4e30826d2f46bdcf387b6c3a610478ab3856d55fff457f98196e4d48975eb1dd";
           pullPolicy = "IfNotPresent";
         };
         securityContext = {
