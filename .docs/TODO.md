@@ -7,7 +7,6 @@
 - [ ] Add clawdbot to my cluster
 - [ ] Add a matrix server
 - [ ] Configure all services in uptimekuma again
-- [ ] Make qbittorrent downloads working again with VPN configured.
 - [ ] Add a new UI to qbittorrent(more clean)
 - [ ] Add a new Obsidian sync to cluster
 - [ ] Add CephFS monitoring integrated with Grafana, and add warnings to ntfy.
@@ -15,6 +14,7 @@
 - [ ] Backup files from google drive into my homelab, then delete all files from the cloud.
 - [ ] Backup files from gmail into my homelab, then delete all files from the cloud.
 - [ ] Backup all google images photos into my homelab, then delete all files from the cloud.
+- [x] Make qbittorrent downloads working again with VPN configured. ✅ 2026-01-31 11:58
 - [x] Fix sftpgo camera image upload to ntfy
 - [x] Resync all immich images ✅ 2026-01-29 22:45
 - [x] Remove youtube-transcriber from the cluster ✅ 2026-01-29 22:45
