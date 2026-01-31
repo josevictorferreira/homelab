@@ -37,7 +37,7 @@ in
             globalMounts = [
               {
                 path = "/usr/src/app/upload";
-                subPath = "images";
+                subPath = "immich";
               }
             ];
           };
