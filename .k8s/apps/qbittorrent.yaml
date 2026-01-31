@@ -87,6 +87,8 @@ spec:
               value: 'on'
             - name: DOT
               value: 'off'
+            - name: EXCLUDE_NETWORKS
+              value: 10.42.0.0/16,10.43.0.0/16
             - name: FIREWALL
               value: 'on'
             - name: FIREWALL_INPUT_PORTS
