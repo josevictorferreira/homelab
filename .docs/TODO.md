@@ -1,5 +1,6 @@
 # TODO
 
+ - [ ] Plan the backup workflow to be installed in the cluster.
  - [ ] Add clawdbot to my cluster
  - [ ] Add a matrix server
  - [ ] Configure all services in uptimekuma again
@@ -8,6 +9,10 @@
  - [ ] Add a new Obsidian sync to cluster
  - [ ] Fix immich and sync images
  - [ ] Add CephFS monitoring integrated with Grafana, and add warnings to ntfy.
+ - [ ] Backup files from dropbox into my homelab, then delete all files from the cloud.
+ - [ ] Backup files from google drive into my homelab, then delete all files from the cloud.
+ - [ ] Backup files from gmail into my homelab, then delete all files from the cloud.
+ - [ ] Backup all google images photos into my homelab, then delete all files from the cloud.
  - [x] Fix sftpgo camera image upload to ntfy
  - [x] Resync all immich images ✅ 2026-01-29 22:45
  - [x] Remove youtube-transcriber from the cluster ✅ 2026-01-29 22:45

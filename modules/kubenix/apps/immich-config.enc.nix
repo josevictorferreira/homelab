@@ -19,6 +19,7 @@ in
           DB_DATABASE_NAME = "immich";
           IMMICH_MACHINE_LEARNING_URL = "http://immich-machine-learning:3003";
           IMMICH_VERSION = "v2";
+          UPLOAD_LOCATION = "/usr/src/app/upload";
         };
       };
     };
