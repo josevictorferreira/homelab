@@ -5,13 +5,13 @@ metadata:
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   labels:
-    app: qbittorrent-23.3.2
+    app: qbittorrent-24.2.20
     app.kubernetes.io/instance: qbittorrent
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: qbittorrent
-    app.kubernetes.io/version: 5.1.2
+    app.kubernetes.io/version: 5.1.4
     helm-revision: '1'
-    helm.sh/chart: qbittorrent-23.3.2
+    helm.sh/chart: qbittorrent-24.2.20
     release: qbittorrent
   name: qbittorrent
   namespace: apps
@@ -28,7 +28,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/cnpg: 2291fc448ae81adfd860632d73e38ffc039fc25959ede77cf692f754199383ee
+        checksum/cnpg: fc940fff4269c53072f7039f0811133e9b83400670af014010bf50d3f13740f4
         checksum/configmaps: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
         checksum/mariadb: 09c85576cb45b1eecd1467732b11ea8fa3363b0105c465f02a6ad64991521d52
         checksum/mongodb: 09c85576cb45b1eecd1467732b11ea8fa3363b0105c465f02a6ad64991521d52
@@ -38,13 +38,13 @@ spec:
         checksum/services: e956a5c4cf8923876402324a4ea8a601db8255d76b9950b219ec45bfec96e545
         checksum/solr: 29c14feeaddbf7762052db593898d274941f539cee681ddc613957587686f347
       labels:
-        app: qbittorrent-23.3.2
+        app: qbittorrent-24.2.20
         app.kubernetes.io/instance: qbittorrent
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: qbittorrent
-        app.kubernetes.io/version: 5.1.2
+        app.kubernetes.io/version: 5.1.4
         helm-revision: '1'
-        helm.sh/chart: qbittorrent-23.3.2
+        helm.sh/chart: qbittorrent-24.2.20
         pod.lifecycle: permanent
         pod.name: main
         release: qbittorrent
@@ -98,16 +98,16 @@ spec:
           envFrom:
             - secretRef:
                 name: gluetun-vpn-credentials
-          image: tccr.io/tccr/gluetun:v3.40.0@sha256:a8189e29155e0f8142be1500ae068a92b189b1b25abbba036321e74d6389bf2b
+          image: oci.trueforge.org/tccr/gluetun:v3.40.0@sha256:a8189e29155e0f8142be1500ae068a92b189b1b25abbba036321e74d6389bf2b
           imagePullPolicy: IfNotPresent
           name: qbittorrent-gluetun
           resources:
             limits:
-              cpu: 1000m
-              memory: 1500Mi
+              cpu: 1500m
+              memory: 2400Mi
             requests:
-              cpu: 100m
-              memory: 250Mi
+              cpu: 75m
+              memory: 200Mi
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
@@ -201,11 +201,11 @@ spec:
             timeoutSeconds: 5
           resources:
             limits:
-              cpu: 1000m
-              memory: 1500Mi
+              cpu: 1500m
+              memory: 2400Mi
             requests:
-              cpu: 100m
-              memory: 250Mi
+              cpu: 75m
+              memory: 200Mi
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
@@ -325,11 +325,11 @@ spec:
           name: qbittorrent-init-install-vuetorrent
           resources:
             limits:
-              cpu: 1000m
-              memory: 1500Mi
+              cpu: 1500m
+              memory: 2400Mi
             requests:
-              cpu: 100m
-              memory: 250Mi
+              cpu: 75m
+              memory: 200Mi
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
@@ -404,19 +404,19 @@ spec:
           name: config-dir
         - emptyDir:
             medium: Memory
-            sizeLimit: 1500Mi
+            sizeLimit: 2400Mi
           name: devshm
         - emptyDir:
             medium: Memory
-            sizeLimit: 1500Mi
+            sizeLimit: 2400Mi
           name: tmp
         - emptyDir:
             medium: Memory
-            sizeLimit: 1500Mi
+            sizeLimit: 2400Mi
           name: varlogs
         - emptyDir:
             medium: Memory
-            sizeLimit: 1500Mi
+            sizeLimit: 2400Mi
           name: varrun
         - name: config
           persistentVolumeClaim:
@@ -432,13 +432,13 @@ metadata:
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   labels:
-    app: qbittorrent-23.3.2
+    app: qbittorrent-24.2.20
     app.kubernetes.io/instance: qbittorrent
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: qbittorrent
-    app.kubernetes.io/version: 5.1.2
+    app.kubernetes.io/version: 5.1.4
     helm-revision: '1'
-    helm.sh/chart: qbittorrent-23.3.2
+    helm.sh/chart: qbittorrent-24.2.20
     release: qbittorrent
   name: qbittorrent-config
   namespace: apps
@@ -459,13 +459,13 @@ metadata:
     lbipam.cilium.io/ips: 10.10.10.119
     lbipam.cilium.io/sharing-key: qbittorrent
   labels:
-    app: qbittorrent-23.3.2
+    app: qbittorrent-24.2.20
     app.kubernetes.io/instance: qbittorrent
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: qbittorrent
-    app.kubernetes.io/version: 5.1.2
+    app.kubernetes.io/version: 5.1.4
     helm-revision: '1'
-    helm.sh/chart: qbittorrent-23.3.2
+    helm.sh/chart: qbittorrent-24.2.20
     release: qbittorrent
     service.name: main
   name: qbittorrent
@@ -491,13 +491,13 @@ metadata:
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   labels:
-    app: qbittorrent-23.3.2
+    app: qbittorrent-24.2.20
     app.kubernetes.io/instance: qbittorrent
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: qbittorrent
-    app.kubernetes.io/version: 5.1.2
+    app.kubernetes.io/version: 5.1.4
     helm-revision: '1'
-    helm.sh/chart: qbittorrent-23.3.2
+    helm.sh/chart: qbittorrent-24.2.20
     release: qbittorrent
     service.name: torrent
   name: qbittorrent-torrent
@@ -525,17 +525,17 @@ metadata:
   annotations:
     cert-manager.io/cluster-issuer: cloudflare-issuer
     checksum/secrets: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
-    checksum/services: e956a5c4cf8923876402324a4ea8a601db8255d76b9950b219ec45bfec96e545
+    checksum/services: 679331a7d47999fc30ce1c03b38556d783771376cb312c79190d3c5f7419adb7
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   labels:
-    app: qbittorrent-23.3.2
+    app: qbittorrent-24.2.20
     app.kubernetes.io/instance: qbittorrent
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: qbittorrent
-    app.kubernetes.io/version: 5.1.2
+    app.kubernetes.io/version: 5.1.4
     helm-revision: '1'
-    helm.sh/chart: qbittorrent-23.3.2
+    helm.sh/chart: qbittorrent-24.2.20
     release: qbittorrent
   name: qbittorrent
   namespace: apps

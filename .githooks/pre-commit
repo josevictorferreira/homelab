@@ -24,8 +24,13 @@ if [ -n "$all_staged" ]; then
     fi
   done
 
+  # Copy .gitleaksignore if it exists
+  if [ -f ".gitleaksignore" ]; then
+    cp ".gitleaksignore" "$temp_dir/"
+  fi
+
   # Run gitleaks on the temp directory with staged content
-  if ! gitleaks detect --source="$temp_dir" --no-git --verbose --exit-code=1 2>&1; then
+  if ! (cd "$temp_dir" && gitleaks detect --source="." --no-git --verbose --exit-code=1) 2>&1; then
     echo ""
     echo "❌ ERROR: Gitleaks detected potential secrets in your staged changes!"
     echo ""
