@@ -28,13 +28,12 @@ in
 {
   kubernetes = {
     helm.releases."qbittorrent" = {
-      chart = kubenix.lib.helm.fetch
-        {
-          chartUrl = "oci://oci.trueforge.org/truecharts/qbittorrent";
-          chart = "qbittorrent";
-          version = "23.3.2";
-          sha256 = "sha256-Rks81hetW/b29Dg0PmmresvCuGL3cVuu4leTTZjwSIc=";
-        };
+      chart = kubenix.lib.helm.fetch {
+        chartUrl = "oci://oci.trueforge.org/truecharts/qbittorrent";
+        chart = "qbittorrent";
+        version = "23.3.2";
+        sha256 = "sha256-Rks81hetW/b29Dg0PmmresvCuGL3cVuu4leTTZjwSIc=";
+      };
       includeCRDs = true;
       noHooks = true;
       namespace = namespace;
@@ -100,8 +99,14 @@ in
             size = "1Gi";
             storageClass = "rook-ceph-block";
             targetSelector.main = {
-              main = { mountPath = "/config"; readOnly = false; };
-              install-vuetorrent = { mountPath = "/config"; readOnly = false; };
+              main = {
+                mountPath = "/config";
+                readOnly = false;
+              };
+              install-vuetorrent = {
+                mountPath = "/config";
+                readOnly = false;
+              };
             };
           };
           config-dir = {
@@ -142,7 +147,10 @@ in
             type = "pvc";
             existingClaim = pvcName;
             mountPath = "/downloads";
-            targetSelector.main.main = { mountPath = "/downloads"; readOnly = false; };
+            targetSelector.main.main = {
+              mountPath = "/downloads";
+              readOnly = false;
+            };
           };
         };
 
@@ -159,7 +167,10 @@ in
                 type = "init";
                 enabled = true;
                 image = qbtImage;
-                command = [ "sh" "-c" ];
+                command = [
+                  "sh"
+                  "-c"
+                ];
                 args = [ vueTorrentInstallScript ];
                 env.PUID = "2002";
                 env.PGID = "2002";
@@ -204,6 +215,9 @@ in
           container.env = {
             FIREWALL = "on";
             FIREWALL_INPUT_PORTS = "8080,${toString torrentingPort}";
+            DOT = "off";
+            DNS_KEEP_NAMESERVER = "on";
+            EXCLUDE_NETWORKS = "10.42.0.0/16,10.43.0.0/16";
           };
           container.envFrom = [
             {

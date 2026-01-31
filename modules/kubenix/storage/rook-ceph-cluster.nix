@@ -45,7 +45,7 @@ in
           dashboard.ssl = false;
           network = {
             provider = "host";
-            connections.requireMsgr2 = true;
+            connections.requireMsgr2 = false;
           };
           placement = {
             all = {
