@@ -6,6 +6,7 @@
  - [ ] Make qbittorrent downloads working again with VPN configured.
  - [ ] Add a new UI to qbittorrent(more clean)
  - [ ] Add a new Obsidian sync to cluster
+ - [ ] Fix immich and sync images
  - [ ] Add CephFS monitoring integrated with Grafana, and add warnings to ntfy.
  - [x] Fix sftpgo camera image upload to ntfy
  - [x] Resync all immich images ✅ 2026-01-29 22:45
