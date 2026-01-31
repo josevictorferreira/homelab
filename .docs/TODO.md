@@ -1,6 +1,5 @@
 # TODO
 
-- [ ] Fix immich and sync images
 - [ ] Add tailscale to the cluster
 - [ ] Add tailscale vpn auto connect in my mobile phone and on macbook
 - [ ] Plan the backup workflow to be installed in the cluster.
@@ -14,6 +13,7 @@
 - [ ] Backup files from google drive into my homelab, then delete all files from the cloud.
 - [ ] Backup files from gmail into my homelab, then delete all files from the cloud.
 - [ ] Backup all google images photos into my homelab, then delete all files from the cloud.
+- [x] Fix immich and sync images ✅ 2026-01-31 12:11
 - [x] Make qbittorrent downloads working again with VPN configured. ✅ 2026-01-31 11:58
 - [x] Fix sftpgo camera image upload to ntfy
 - [x] Resync all immich images ✅ 2026-01-29 22:45
