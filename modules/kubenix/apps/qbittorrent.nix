@@ -216,8 +216,10 @@ in
             FIREWALL = "on";
             FIREWALL_INPUT_PORTS = "8080,${toString torrentingPort}";
             DOT = "off";
-            DNS_KEEP_NAMESERVER = "on";
-            EXCLUDE_NETWORKS = "10.42.0.0/16,10.43.0.0/16";
+            DNS_KEEP_NAMESERVER = "off";
+            VPN_DNS_ADDRESS = "1.1.1.1,1.0.0.1";
+            FIREWALL_OUTBOUND_SUBNETS = "10.42.0.0/16,10.43.0.0/16,10.10.10.0/24";
+            EXCLUDE_NETWORKS = "10.42.0.0/16,10.43.0.0/16,10.10.10.0/24";
           };
           container.envFrom = [
             {
