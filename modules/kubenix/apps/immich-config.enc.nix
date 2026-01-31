@@ -20,6 +20,7 @@ in
           IMMICH_MACHINE_LEARNING_URL = "http://immich-machine-learning:3003";
           IMMICH_VERSION = "v2";
           UPLOAD_LOCATION = "/data/images/immich";
+          IMMICH_MEDIA_LOCATION = "/data/images/immich";
         };
       };
     };
