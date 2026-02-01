@@ -16,6 +16,7 @@ rec {
         "nixos-server"
         "system-admin"
         "backup-server"
+        "tailscale"
       ];
     };
     lab-alpha-cp = {
@@ -34,6 +35,8 @@ rec {
         "k8s-server"
         "k8s-storage"
         "k8s-control-plane"
+        "tailscale"
+        "tailscale-router"
       ];
     };
     lab-beta-cp = {
@@ -51,6 +54,8 @@ rec {
         "k8s-server"
         "k8s-storage"
         "k8s-control-plane"
+        "tailscale"
+        "tailscale-router"
       ];
     };
     lab-gamma-wk = {
@@ -69,6 +74,7 @@ rec {
         "k8s-server"
         "k8s-storage"
         "k8s-worker"
+        "tailscale"
       ];
     };
     lab-delta-cp = {
@@ -87,6 +93,7 @@ rec {
         "k8s-storage"
         "k8s-control-plane"
         "amd-gpu"
+        "tailscale"
       ];
     };
   };
@@ -102,14 +109,12 @@ rec {
   ];
 
   group = lib.listToAttrs (
-    map
-      (role: {
-        name = role;
-        value = rec {
-          configs = filterByRoles hosts role;
-          names = lib.attrNames configs;
-        };
-      })
-      groups
+    map (role: {
+      name = role;
+      value = rec {
+        configs = filterByRoles hosts role;
+        names = lib.attrNames configs;
+      };
+    }) groups
   );
 }
