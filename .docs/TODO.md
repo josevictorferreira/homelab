@@ -3,13 +3,12 @@
 - [ ] Add clawdbot to my cluster
 - [ ] Add a matrix server
 - [ ] Configure all services in uptimekuma again
-- [ ] Add a new UI to qbittorrent(more clean)
-- [ ] Add a new Obsidian sync to cluster
 - [ ] Add CephFS monitoring integrated with Grafana, and add warnings to ntfy.
 - [ ] Backup files from dropbox into my homelab, then delete all files from the cloud.
 - [ ] Backup files from google drive into my homelab, then delete all files from the cloud.
 - [ ] Backup files from gmail into my homelab, then delete all files from the cloud.
 - [ ] Backup all google images photos into my homelab, then delete all files from the cloud.
+- [x] Add a new UI(`qui`) to qbittorrent(more clean) ✅ 2026-02-01 12:00
 - [x] Add tailscale vpn auto connect in my mobile phone and on macbook ✅ 2026-02-01 11:30
 - [x] Add tailscale to the cluster ✅ 2026-02-01 11:05
 - [x] Plan the backup workflow to be installed in the cluster. ✅ 2026-01-31 18:28
