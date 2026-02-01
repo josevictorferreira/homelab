@@ -1,4 +1,9 @@
-{ lib, config, homelab, ... }:
+{
+  lib,
+  config,
+  homelab,
+  ...
+}:
 
 let
   cfg = config.sops;
@@ -26,6 +31,13 @@ in
       mode = "0400";
     };
 
-    environment.variables.SOPS_AGE_KEY_FILE = "${config.users.users.${cfg.username}.home}/${defaultAgeKeyFile}";
+    sops.secrets."tailscale_auth_key" = {
+      owner = config.users.users.${cfg.username}.name;
+      mode = "0400";
+    };
+
+    environment.variables.SOPS_AGE_KEY_FILE = "${
+      config.users.users.${cfg.username}.home
+    }/${defaultAgeKeyFile}";
   };
 }
