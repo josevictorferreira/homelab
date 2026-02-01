@@ -4,6 +4,8 @@
 **Commit:** 2935f27
 **Branch:** main
 
+> **Before starting any implementation, read `.docs/rules.md` for project-specific lessons and gotchas.**
+
 ## OVERVIEW
 
 NixOS/k3s hybrid homelab: 4 x86 nodes + 1 Pi. Immutable NixOS hosts, kubenix-generated K8s manifests, Flux GitOps.
@@ -60,6 +62,7 @@ kubectl get pv -o custom-columns='NAME:.metadata.name,STORAGE-CLASS:.spec.storag
 | Cluster secrets | `secrets/k8s-secrets.enc.yaml` | Edit via `make secrets` |
 | Storage config | `modules/kubenix/storage/` | Rook-Ceph operator+cluster |
 | Cilium/CNI | `modules/kubenix/system/cilium.nix` | Also handles ingress |
+| Tailscale config | `modules/profiles/tailscale.nix` | Host-level VPN, subnet routing |
 
 ## WORKFLOW
 
@@ -128,13 +131,28 @@ make format     # Fix nix formatting
 
 | Node | IP | Roles |
 |------|----|-------|
-| lab-alpha-cp | 10.10.10.200 | control-plane, storage |
-| lab-beta-cp | 10.10.10.201 | control-plane, storage |
-| lab-gamma-wk | 10.10.10.202 | worker, storage |
-| lab-delta-cp | 10.10.10.203 | control-plane, storage, amd-gpu |
-| lab-pi-bk | 10.10.10.209 | backup-server |
+| lab-alpha-cp | 10.10.10.200 | control-plane, storage, tailscale, tailscale-router |
+| lab-beta-cp | 10.10.10.201 | control-plane, storage, tailscale, tailscale-router |
+| lab-gamma-wk | 10.10.10.202 | worker, storage, tailscale |
+| lab-delta-cp | 10.10.10.203 | control-plane, storage, amd-gpu, tailscale |
+| lab-pi-bk | 10.10.10.209 | backup-server, tailscale |
 
 **VIP**: 10.10.10.250 (HAProxy+Keepalived)
+
+## NETWORK ACCESS
+
+### Tailscale VPN
+All nodes run Tailscale for secure remote access:
+- **Subnet Routers**: lab-alpha-cp, lab-beta-cp advertise 10.10.10.0/24
+- **DNS**: Blocky (10.10.10.100) configured as tailnet nameserver
+- **Use Case**: Access LAN devices (k8s VIP, NAS, etc.) from remote locations
+- **Auth**: Key stored in hosts-secrets.enc.yaml
+
+### Post-Deploy Steps
+After initial Tailscale deployment:
+1. Approve routes in Tailscale admin console (Machines → Edit route settings)
+2. Enable 10.10.10.0/24 for both subnet routers
+3. Connect clients with: `tailscale up --accept-routes`
 
 ## INCIDENT RECORD
 

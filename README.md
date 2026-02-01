@@ -11,10 +11,11 @@ This is a hybrid NixOS/Kubernetes homelab cluster that combines immutable OS con
 
 | Node | IP | Hardware | CPU | Memory | Storage | Roles |
 |------|----|----------|-----|--------|---------|-------|
-| **lab-alpha-cp** | 10.10.10.200 | Intel NUC GK3V | Intel Celeron N5105 (4 cores) | 15Gi | NVMe + SATA Ceph OSDs | k8s-control-plane, k8s-storage, k8s-server, system-admin |
-| **lab-beta-cp** | 10.10.10.201 | Intel NUC T9Plus | Intel N100 (4 cores) | 15Gi | NVMe Ceph OSD | k8s-control-plane, k8s-storage, k8s-server, system-admin |
-| **lab-gamma-wk** | 10.10.10.202 | Intel NUC GK3V | Intel Celeron N5105 (4 cores) | 7.6Gi | NVMe + SATA Ceph OSDs | k8s-worker, k8s-storage, k8s-server, system-admin |
-| **lab-delta-cp** | 10.10.10.203 | AMD Ryzen Beelink EQR5 | AMD Ryzen 5 PRO 5650U (6 cores) | 11Gi | NVMe Ceph OSD | k8s-control-plane, k8s-storage, k8s-server, system-admin, amd-gpu |
+| **lab-alpha-cp** | 10.10.10.200 | Intel NUC GK3V | Intel Celeron N5105 (4 cores) | 15Gi | NVMe + SATA Ceph OSDs | k8s-control-plane, k8s-storage, k8s-server, system-admin, tailscale, tailscale-router |
+| **lab-beta-cp** | 10.10.10.201 | Intel NUC T9Plus | Intel N100 (4 cores) | 15Gi | NVMe Ceph OSD | k8s-control-plane, k8s-storage, k8s-server, system-admin, tailscale, tailscale-router |
+| **lab-gamma-wk** | 10.10.10.202 | Intel NUC GK3V | Intel Celeron N5105 (4 cores) | 7.6Gi | NVMe + SATA Ceph OSDs | k8s-worker, k8s-storage, k8s-server, system-admin, tailscale |
+| **lab-delta-cp** | 10.10.10.203 | AMD Ryzen Beelink EQR5 | AMD Ryzen 5 PRO 5650U (6 cores) | 11Gi | NVMe Ceph OSD | k8s-control-plane, k8s-storage, k8s-server, system-admin, amd-gpu, tailscale |
+| **lab-pi-bk** | 10.10.10.209 | Raspberry Pi 4 | ARM Cortex-A72 | 4Gi | SD Card + USB SSD | backup-server, tailscale |
 
 ### Node Roles System
 
@@ -40,6 +41,15 @@ This is a hybrid NixOS/Kubernetes homelab cluster that combines immutable OS con
 - AMDVLK drivers and Vulkan support
 - Suitable for AI/ML applications
 
+**tailscale** (all 5 nodes)
+- Secure VPN mesh network for remote access
+- All nodes join tailnet for SSH/admin access
+
+**tailscale-router** (2 nodes: alpha, beta)
+- Subnet routers advertising 10.10.10.0/24
+- Provides redundant access to LAN from remote devices
+- Uses internal Blocky DNS (10.10.10.100) for tailnet clients
+
 ### Kubernetes Stack
 
 **Core Components:**
@@ -62,6 +72,7 @@ This is a hybrid NixOS/Kubernetes homelab cluster that combines immutable OS con
 - **Flux v2**: GitOps continuous delivery from git repository
 - **Ceph**: Distributed storage via Rook-Ceph operator
 - **sops-nix**: Integrated secret management with age encryption
+- **Tailscale**: Zero-config VPN mesh for secure remote access to LAN
 
 ### Configuration Management
 
@@ -107,6 +118,14 @@ The cluster runs various self-hosted applications deployed via Kubenix:
 - **Media**: qBittorrent with VPN, SearxNG, YouTube Transcriber
 - **Development**: OpenWebUI, Docling, LibeBooker
 - **Monitoring**: Prometheus + Grafana stack
+
+### Remote Access
+
+**Tailscale VPN** provides secure remote access to the homelab from anywhere:
+- All nodes run Tailscale for SSH/admin access
+- Subnet routers (alpha, beta) advertise 10.10.10.0/24 for full LAN access
+- Internal Blocky DNS (10.10.10.100) configured for tailnet clients
+- Access k8s services, NAS, and all LAN devices remotely via tailnet
 
 ## Repository Structure
 
