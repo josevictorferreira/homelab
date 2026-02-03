@@ -396,6 +396,8 @@ let
                   "jtheoof/swappy"
                   "sst/opencode"
                   "code-yeongyu/oh-my-opencode"
+                  "Opencode-DCP/opencode-dynamic-context-pruning"
+                  "NoeFabris/opencode-antigravity-auth"
                 ];
               }
             ];
