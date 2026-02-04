@@ -1,18 +1,20 @@
-{ lib
-, kubenix
-, homelab
-, ...
+{
+  lib,
+  kubenix,
+  homelab,
+  ...
 }:
 
 let
   namespace = homelab.kubernetes.namespaces.applications;
 
-  dnsHosts = lib.mapAttrsToList
-    (
-      serviceName: ipAddress:
-        "${kubenix.lib.domainFor serviceName} = ${homelab.kubernetes.loadBalancer.address}"
-    )
-    homelab.kubernetes.loadBalancer.services;
+  dnsHosts = lib.mapAttrsToList (
+    serviceName: ipAddress:
+    "${kubenix.lib.domainFor serviceName} = ${homelab.kubernetes.loadBalancer.address}"
+  ) homelab.kubernetes.loadBalancer.services;
+
+  # MagicDNS suffix for Tailscale - forward to unbound on subnet routers
+  magicDnsSuffix = "tail96fefe.ts.net";
 
   blockyConfig = {
     upstreams = {
@@ -22,22 +24,29 @@ let
       strategy = "parallel_best";
     };
 
+    # Conditional forwarding for Tailscale MagicDNS zone
+    # Forwards to unbound on alpha+beta (port 1053) which proxies to 100.100.100.100
+    conditional = {
+      fallbackUpstream = false;
+      mapping = {
+        "${magicDnsSuffix}" = "tcp+udp:10.10.10.200:1053,tcp+udp:10.10.10.201:1053";
+      };
+    };
+
     customDNS = {
       customTTL = "1h";
       filterUnmappedTypes = true;
       mapping = builtins.listToAttrs (
-        map
-          (
-            entry:
-            let
-              parts = lib.splitString " = " entry;
-            in
-            {
-              name = builtins.head parts;
-              value = builtins.elemAt parts 1;
-            }
-          )
-          dnsHosts
+        map (
+          entry:
+          let
+            parts = lib.splitString " = " entry;
+          in
+          {
+            name = builtins.head parts;
+            value = builtins.elemAt parts 1;
+          }
+        ) dnsHosts
       );
     };
 
