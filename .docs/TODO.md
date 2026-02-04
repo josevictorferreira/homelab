@@ -6,8 +6,8 @@
 - [ ] Backup files from gmail into my homelab, then delete all files from the cloud.
 - [ ] Backup all google images photos into my homelab, then delete all files from the cloud.
 - [ ] Add keycloak to the cluster
-- [ ] Add tailscale to the k8s cluster and configure it as sidecar in blocky pod.
 - [ ] Fix raspberry pi not booting.
+- [x] Add tailscale to the k8s cluster and configure it as sidecar in blocky pod. ✅ 2026-02-04 11:24
 - [x] Backup files from dropbox into my homelab, then delete all files from the cloud. ✅ 2026-02-04 10:27
 - [x] Backup all OneDrive files into my homelab, then delete all files from the cloud. ✅ 2026-02-03 21:53
 - [x] Backup files from google drive into my homelab, then delete all files from the cloud. ✅ 2026-02-03 13:36
