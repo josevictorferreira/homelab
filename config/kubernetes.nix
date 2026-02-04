@@ -59,6 +59,7 @@
       "immich"
       "valoris_production"
       "valoris_production_queue"
+      "keycloak"
     ];
   };
 
