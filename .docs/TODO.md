@@ -3,8 +3,6 @@
 - [ ] Add clawdbot to my cluster
 - [ ] Add a matrix server
 - [ ] Add CephFS monitoring integrated with Grafana, and add warnings to ntfy.
-- [ ] Backup files from gmail into my homelab, then delete all files from the cloud.
-- [ ] Backup all google images photos into my homelab, then delete all files from the cloud.
 - [ ] Add keycloak to the cluster
 - [ ] Fix raspberry pi not booting.
 - [x] Add tailscale to the k8s cluster and configure it as sidecar in blocky pod. ✅ 2026-02-04 11:24
