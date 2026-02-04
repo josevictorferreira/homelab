@@ -15,10 +15,10 @@ in
   kubernetes = {
     helm.releases.${app} = {
       chart = kubenix.lib.helm.fetch {
-        repo = "https://codecentric.github.io/helm-charts";
-        chart = "keycloak";
-        version = "18.10.0";
-        sha256 = "sha256-keMWy0v8aG/8N2w5tjTheJ80ja1eUApAylMa/X35J2o=";
+        chartUrl = "oci://registry-1.docker.io/cloudpirates/keycloak";
+        chart = app;
+        version = "0.14.2";
+        sha256 = "sha256-wLz9gXImB232NqOhviNfxXREpXg3oKPMaTUFxPTvPBU=";
       };
       includeCRDs = true;
       noHooks = false;
@@ -27,34 +27,33 @@ in
       values = {
         image = {
           repository = "keycloak/keycloak";
-          tag = "17.0.1";
+          tag = "26.5.2";
         };
 
         # Disable embedded PostgreSQL - use external
-        postgresql = {
+        postgres = {
           enabled = false;
         };
 
         # External PostgreSQL configuration
         database = {
-          vendor = "postgres";
+          type = "postgres";
           host = "postgresql-18-hl";
-          port = 5432;
-          username = "postgres";
-          password = "secret";
-          database = "keycloak";
+          port = "5432";
+          name = "keycloak";
+          existingSecret = secretName;
         };
 
         # Keycloak configuration
         keycloak = {
           hostname = domain;
-          http = {
-            port = 8080;
+          existingSecret = secretName;
+          secretKeys = {
+            adminPasswordKey = "KEYCLOAK_ADMIN_PASSWORD";
           };
-          production = true;
         };
 
-        # Resources for single instance
+        # Resources for single instance (Java needs 1Gi+)
         resources = {
           requests = {
             cpu = "500m";
@@ -64,6 +63,18 @@ in
             cpu = "2000m";
             memory = "2Gi";
           };
+        };
+
+        # Health checks
+        livenessProbe = {
+          enabled = true;
+          initialDelaySeconds = 60;
+          periodSeconds = 30;
+        };
+        readinessProbe = {
+          enabled = true;
+          initialDelaySeconds = 30;
+          periodSeconds = 10;
         };
 
         # Ingress configuration
