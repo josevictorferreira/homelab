@@ -59,8 +59,8 @@ in
           port = 1053;
           access-control = [
             "127.0.0.0/8 allow"
+            "10.0.0.0/16 allow" # Cilium pod CIDR
             "10.10.10.0/24 allow" # LAN nodes
-            "10.42.0.0/16 allow" # k8s pod CIDR
             "10.43.0.0/16 allow" # k8s service CIDR
           ];
           # Disable recursion - we only forward
