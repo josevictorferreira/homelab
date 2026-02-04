@@ -3,13 +3,14 @@
 - [ ] Add clawdbot to my cluster
 - [ ] Add a matrix server
 - [ ] Add CephFS monitoring integrated with Grafana, and add warnings to ntfy.
-- [ ] Add cluster warnings to ntfy again.
 - [ ] Backup files from dropbox into my homelab, then delete all files from the cloud.
-- [ ] Backup files from google drive into my homelab, then delete all files from the cloud.
 - [ ] Backup files from gmail into my homelab, then delete all files from the cloud.
 - [ ] Backup all google images photos into my homelab, then delete all files from the cloud.
 - [ ] Add keycloak to the cluster
 - [ ] Add tailscale to the k8s cluster and configure it as sidecar in blocky pod.
+- [x] Backup all OneDrive files into my homelab, then delete all files from the cloud. ✅ 2026-02-03 21:53
+- [x] Backup files from google drive into my homelab, then delete all files from the cloud. ✅ 2026-02-03 13:36
+- [x] Add cluster warnings to ntfy again. ✅ 2026-02-03 13:19
 - [x] Configure all services in uptimekuma again ✅ 2026-02-03 13:17
 - [x] Add a new UI(`qui`) to qbittorrent(more clean) ✅ 2026-02-01 12:00
 - [x] Add tailscale vpn auto connect in my mobile phone and on macbook ✅ 2026-02-01 11:30
