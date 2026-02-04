@@ -8,12 +8,12 @@ metadata:
     app.kubernetes.io/instance: keycloak
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: keycloak
-    app.kubernetes.io/version: 17.0.1
-    helm.sh/chart: keycloak-18.10.0
+    app.kubernetes.io/version: 26.5.2
+    helm.sh/chart: keycloak-0.14.2
   name: keycloak
   namespace: apps
 spec:
-  podManagementPolicy: Parallel
+  podManagementPolicy: OrderedReady
   replicas: 1
   selector:
     matchLabels:
@@ -22,67 +22,75 @@ spec:
   serviceName: keycloak-headless
   template:
     metadata:
-      annotations:
-        checksum/config-startup: 93904cca4108037ae8aabc327d50edf0d4eb62b6aa344d9307673683d7f064e4
-        checksum/secrets: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
       labels:
         app.kubernetes.io/instance: keycloak
+        app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: keycloak
+        app.kubernetes.io/version: 26.5.2
+        helm.sh/chart: keycloak-0.14.2
     spec:
-      affinity:
-        podAntiAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-            - podAffinityTerm:
-                labelSelector:
-                  matchExpressions:
-                    - key: app.kubernetes.io/component
-                      operator: NotIn
-                      values:
-                        - test
-                  matchLabels:
-                    app.kubernetes.io/instance: keycloak
-                    app.kubernetes.io/name: keycloak
-                topologyKey: failure-domain.beta.kubernetes.io/zone
-              weight: 100
-          requiredDuringSchedulingIgnoredDuringExecution:
-            - labelSelector:
-                matchExpressions:
-                  - key: app.kubernetes.io/component
-                    operator: NotIn
-                    values:
-                      - test
-                matchLabels:
-                  app.kubernetes.io/instance: keycloak
-                  app.kubernetes.io/name: keycloak
-              topologyKey: kubernetes.io/hostname
+      automountServiceAccountToken: false
       containers:
-        - args: []
-          command: []
-          image: keycloak/keycloak:17.0.1
-          imagePullPolicy: IfNotPresent
+        - args:
+            - start-dev
+            - --http-enabled=true
+            - --hostname=keycloak.josevictor.me
+            - --hostname-strict=false
+            - --http-port=8080
+            - --https-port=8443
+            - --db=postgres
+            - --db-url=jdbc:postgresql://postgresql-18-hl:5432/keycloak
+          command:
+            - /opt/keycloak/bin/kc.sh
+          env:
+            - name: KC_HTTP_RELATIVE_PATH
+              value: /
+            - name: KC_BOOTSTRAP_ADMIN_USERNAME
+              value: admin
+            - name: KC_BOOTSTRAP_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: KEYCLOAK_ADMIN_PASSWORD
+                  name: keycloak-env
+            - name: KC_DB
+              value: postgres
+            - name: KC_DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  key: db-username
+                  name: keycloak-env
+            - name: KC_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: db-password
+                  name: keycloak-env
+          image: docker.io/keycloak/keycloak:26.5.2
+          imagePullPolicy: Always
           livenessProbe:
+            failureThreshold: 3
             httpGet:
-              path: /auth/
+              path: /realms/master
               port: http
-            initialDelaySeconds: 0
+              scheme: HTTP
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            successThreshold: 1
             timeoutSeconds: 5
           name: keycloak
           ports:
             - containerPort: 8080
               name: http
               protocol: TCP
-            - containerPort: 8443
-              name: https
-              protocol: TCP
-            - containerPort: 9990
-              name: http-management
-              protocol: TCP
           readinessProbe:
+            failureThreshold: 3
             httpGet:
-              path: /auth/realms/master
+              path: /realms/master
               port: http
+              scheme: HTTP
             initialDelaySeconds: 30
-            timeoutSeconds: 1
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
           resources:
             limits:
               cpu: 2000m
@@ -91,78 +99,80 @@ spec:
               cpu: 500m
               memory: 1Gi
           securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: false
+            runAsGroup: 1001
             runAsNonRoot: true
-            runAsUser: 1000
+            runAsUser: 1001
           startupProbe:
             failureThreshold: 60
             httpGet:
-              path: /auth/
+              path: /realms/master
               port: http
+              scheme: HTTP
             initialDelaySeconds: 30
-            periodSeconds: 5
-            timeoutSeconds: 1
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
           volumeMounts:
-            - mountPath: /opt/jboss/startup-scripts/keycloak.cli
-              name: startup
-              readOnly: true
-              subPath: keycloak.cli
-      enableServiceLinks: true
-      restartPolicy: Always
+            - mountPath: /opt/keycloak/data
+              name: data
+            - mountPath: /tmp
+              name: tmp
+            - mountPath: /opt/keycloak/work
+              name: keycloak-work
+            - mountPath: /opt/keycloak/lib/quarkus
+              name: keycloak-lib-quarkus
+            - mountPath: /opt/keycloak/themes
+              name: keycloak-themes
+            - mountPath: /opt/keycloak/providers
+              name: keycloak-providers
+      initContainers:
+        - command:
+            - sh
+            - -c
+            - cp -r /opt/keycloak/lib/quarkus/* /shared-quarkus/
+          image: docker.io/keycloak/keycloak:26.5.2
+          imagePullPolicy: Always
+          name: copy-quarkus-lib
+          resources:
+            limits:
+              cpu: 2000m
+              memory: 2Gi
+            requests:
+              cpu: 500m
+              memory: 1Gi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: false
+            runAsGroup: 1001
+            runAsNonRoot: true
+            runAsUser: 1001
+          volumeMounts:
+            - mountPath: /shared-quarkus
+              name: keycloak-lib-quarkus
       securityContext:
-        fsGroup: 1000
-      serviceAccountName: keycloak
-      terminationGracePeriodSeconds: 60
+        fsGroup: 1001
+      serviceAccountName: default
       volumes:
-        - configMap:
-            defaultMode: 365
-            items:
-              - key: keycloak.cli
-                path: keycloak.cli
-            name: keycloak-startup
-          name: startup
-  updateStrategy:
-    type: RollingUpdate
----
-apiVersion: v1
-data:
-  keycloak.cli: 'embed-server --server-config=standalone-ha.xml --std-out=echo
-
-    batch
-
-
-    echo Configuring node identifier
-
-
-    ## Sets the node identifier to the node name (= pod name). Node identifiers have
-    to be unique. They can have a
-
-    ## maximum length of 23 characters. Thus, the chart''s fullname template truncates
-    its length accordingly.
-
-    /subsystem=transactions:write-attribute(name=node-identifier, value=${jboss.node.name})
-
-
-    echo Finished configuring node identifier
-
-
-    run-batch
-
-    stop-embedded-server
-
-    '
-kind: ConfigMap
-metadata:
-  annotations:
-    kubenix/k8s-version: '1.32'
-    kubenix/project-name: ze-homelab
-  labels:
-    app.kubernetes.io/instance: keycloak
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: keycloak
-    app.kubernetes.io/version: 17.0.1
-    helm.sh/chart: keycloak-18.10.0
-  name: keycloak-startup
-  namespace: apps
+        - emptyDir: {}
+          name: data
+        - emptyDir: {}
+          name: tmp
+        - emptyDir: {}
+          name: keycloak-work
+        - emptyDir: {}
+          name: keycloak-lib-quarkus
+        - emptyDir: {}
+          name: keycloak-themes
+        - emptyDir: {}
+          name: keycloak-providers
 ---
 apiVersion: v1
 kind: Service
@@ -171,75 +181,50 @@ metadata:
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   labels:
-    app.kubernetes.io/component: headless
     app.kubernetes.io/instance: keycloak
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: keycloak
-    app.kubernetes.io/version: 17.0.1
-    helm.sh/chart: keycloak-18.10.0
+    app.kubernetes.io/version: 26.5.2
+    helm.sh/chart: keycloak-0.14.2
+  name: keycloak
+  namespace: apps
+spec:
+  ports:
+    - name: http
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    app.kubernetes.io/instance: keycloak
+    app.kubernetes.io/name: keycloak
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: keycloak
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: keycloak
+    app.kubernetes.io/version: 26.5.2
+    helm.sh/chart: keycloak-0.14.2
   name: keycloak-headless
   namespace: apps
 spec:
   clusterIP: None
   ports:
     - name: http
-      port: 80
+      port: 8080
       protocol: TCP
-      targetPort: http
+      targetPort: 8080
+  publishNotReadyAddresses: true
   selector:
     app.kubernetes.io/instance: keycloak
     app.kubernetes.io/name: keycloak
   type: ClusterIP
----
-apiVersion: v1
-kind: Service
-metadata:
-  annotations:
-    kubenix/k8s-version: '1.32'
-    kubenix/project-name: ze-homelab
-  labels:
-    app.kubernetes.io/component: http
-    app.kubernetes.io/instance: keycloak
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: keycloak
-    app.kubernetes.io/version: 17.0.1
-    helm.sh/chart: keycloak-18.10.0
-  name: keycloak-http
-  namespace: apps
-spec:
-  ports:
-    - name: http
-      port: 80
-      protocol: TCP
-      targetPort: http
-    - name: https
-      port: 8443
-      protocol: TCP
-      targetPort: https
-    - name: http-management
-      port: 9990
-      protocol: TCP
-      targetPort: http-management
-  selector:
-    app.kubernetes.io/instance: keycloak
-    app.kubernetes.io/name: keycloak
-  type: ClusterIP
----
-apiVersion: v1
-imagePullSecrets: []
-kind: ServiceAccount
-metadata:
-  annotations:
-    kubenix/k8s-version: '1.32'
-    kubenix/project-name: ze-homelab
-  labels:
-    app.kubernetes.io/instance: keycloak
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: keycloak
-    app.kubernetes.io/version: 17.0.1
-    helm.sh/chart: keycloak-18.10.0
-  name: keycloak
-  namespace: apps
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -248,24 +233,26 @@ metadata:
     cert-manager.io/cluster-issuer: cloudflare-issuer
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
+    kubernetes.io/ingress.class: cilium
   labels:
     app.kubernetes.io/instance: keycloak
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: keycloak
-    app.kubernetes.io/version: 17.0.1
-    helm.sh/chart: keycloak-18.10.0
+    app.kubernetes.io/version: 26.5.2
+    helm.sh/chart: keycloak-0.14.2
   name: keycloak
   namespace: apps
 spec:
+  ingressClassName: cilium
   rules:
-    - host: keycloak.keycloak.example.com
+    - host: keycloak.josevictor.me
       http:
         paths:
           - backend:
               service:
-                name: keycloak-http
+                name: keycloak
                 port:
-                  name: http
+                  number: 8080
             path: /
             pathType: Prefix
   tls:
