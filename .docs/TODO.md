@@ -1,7 +1,7 @@
 # TODO
 
 - [ ] Add clawdbot to my cluster
-- [ ] Add a matrix server
+- [x] Add a matrix server ✅ 2026-02-05 18:55
 - [ ] Add CephFS monitoring integrated with Grafana, and add warnings to ntfy.
 - [ ] Fix raspberry pi not booting.
 - [x] Add keycloak to the cluster ✅ 2026-02-05 11:15
