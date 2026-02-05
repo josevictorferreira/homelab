@@ -49,6 +49,11 @@ spec:
             - containerPort: 80
               name: http
               protocol: TCP
+          resources:
+            limits:
+              memory: 512Mi
+            requests:
+              memory: 256Mi
       dnsPolicy: ClusterFirst
       enableServiceLinks: false
       hostIPC: false
@@ -175,6 +180,11 @@ spec:
             - containerPort: 80
               name: http
               protocol: TCP
+          resources:
+            limits:
+              memory: 512Mi
+            requests:
+              memory: 256Mi
       dnsPolicy: ClusterFirst
       enableServiceLinks: false
       hostIPC: false
@@ -299,6 +309,11 @@ spec:
             - containerPort: 3000
               name: http
               protocol: TCP
+          resources:
+            limits:
+              memory: 512Mi
+            requests:
+              memory: 256Mi
       dnsPolicy: ClusterFirst
       enableServiceLinks: false
       hostIPC: false
