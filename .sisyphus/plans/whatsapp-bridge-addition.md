@@ -294,6 +294,15 @@ kubectl -n applications logs deploy/synapse --tail=100 | grep -i "appservice\|ma
 ```
 
 ### Final Checklist
+
+**⚠️ VERIFICATION BLOCKED (2026-02-05):**
+- K8s cluster etcd database degraded - all kubectl operations timeout with "context deadline exceeded"
+- Flux reconciliation initiated (fetched commit 4827e1c) but timed out after 60s
+- Implementation complete (Tasks 1-4), manifests exist, git committed
+- Deployment likely succeeded but cannot be verified until cluster recovers
+- See: `.sisyphus/notepads/whatsapp-bridge-addition/COMPLETION_SUMMARY.md` for details
+
+**Verification Tasks (Pending Cluster Recovery):**
 - [ ] mautrix-whatsapp Deployment running (replicas: 1, Ready)
 - [ ] PVC bound (1Gi, rook-ceph-block)
 - [ ] Bridge logs show startup (QR prompt or "not logged in" acceptable)
