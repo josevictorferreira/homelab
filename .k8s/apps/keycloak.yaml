@@ -34,7 +34,7 @@ spec:
         - args:
             - start-dev
             - --http-enabled=true
-            - --hostname=keycloak.josevictor.me
+            - --hostname=identity.josevictor.me
             - --hostname-strict=false
             - --http-port=8080
             - --https-port=8443
@@ -245,7 +245,7 @@ metadata:
 spec:
   ingressClassName: cilium
   rules:
-    - host: keycloak.josevictor.me
+    - host: identity.josevictor.me
       http:
         paths:
           - backend:
@@ -257,5 +257,5 @@ spec:
             pathType: Prefix
   tls:
     - hosts:
-        - keycloak.josevictor.me
+        - identity.josevictor.me
       secretName: wildcard-tls
