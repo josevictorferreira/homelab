@@ -126,6 +126,8 @@ make format     # Fix nix formatting
 | Remove Ceph finalizers | DATA LOSS |
 | Commit unencrypted secrets | Must be `.enc.yaml` |
 | `make gmanifests` alone | Use `make manifests` for full pipeline |
+| Manually edit secrets files | Will be overwritten; use `make secrets` |
+| Mark task complete if `make manifests` fails | Fix the error first, then mark complete |
 
 ## NODES
 
