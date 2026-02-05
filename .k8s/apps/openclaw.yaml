@@ -1,0 +1,146 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/controller: main
+    app.kubernetes.io/instance: openclaw
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: openclaw
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: openclaw
+  namespace: apps
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/controller: main
+      app.kubernetes.io/instance: openclaw
+      app.kubernetes.io/name: openclaw
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        checksum/configMaps: b6095c07ed6ec35558f36df3c7e8ce01a184be99759671552a34ac43d2b0ea93
+      labels:
+        app.kubernetes.io/controller: main
+        app.kubernetes.io/instance: openclaw
+        app.kubernetes.io/name: openclaw
+    spec:
+      automountServiceAccountToken: true
+      containers:
+        - command:
+            - node
+            - dist/index.js
+            - gateway
+            - --allow-unconfigured
+          envFrom:
+            - secretRef:
+                name: openclaw-secrets
+          image: ghcr.io/openclaw/openclaw:latest@sha256:a02b8193cc9d985dce3479eb1986a326f1e28253275b1c43491ac7923d6167e5
+          imagePullPolicy: IfNotPresent
+          name: main
+          ports:
+            - containerPort: 18789
+              name: http
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /home/node/.openclaw/openclaw.json/openclaw.json
+              name: config
+              readOnly: true
+              subPath: openclaw.json
+            - mountPath: /home/node/.openclaw
+              name: main
+      dnsPolicy: ClusterFirst
+      enableServiceLinks: false
+      hostIPC: false
+      hostNetwork: false
+      hostPID: false
+      serviceAccountName: default
+      volumes:
+        - configMap:
+            items:
+              - key: openclaw.json
+                path: openclaw.json
+            name: openclaw
+          name: config
+        - name: main
+          persistentVolumeClaim:
+            claimName: openclaw
+---
+apiVersion: v1
+data:
+  openclaw.json: '{"gateway":{"bind":"0.0.0.0","port":18789},"logging":{"level":"info"}}'
+kind: ConfigMap
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: openclaw
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: openclaw
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: openclaw
+  namespace: apps
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: openclaw
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: openclaw
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: openclaw
+  namespace: apps
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: rook-ceph-block
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+    lbipam.cilium.io/ips: 10.10.10.140
+    lbipam.cilium.io/sharing-key: openclaw
+  labels:
+    app.kubernetes.io/instance: openclaw
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: openclaw
+    app.kubernetes.io/service: openclaw
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: openclaw
+  namespace: apps
+spec:
+  ports:
+    - name: http
+      port: 18789
+      protocol: TCP
+      targetPort: 18789
+  selector:
+    app.kubernetes.io/controller: main
+    app.kubernetes.io/instance: openclaw
+    app.kubernetes.io/name: openclaw
+  type: LoadBalancer
