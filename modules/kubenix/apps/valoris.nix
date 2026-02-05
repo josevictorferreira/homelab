@@ -18,7 +18,19 @@ in
           pullPolicy = "Always";
         };
         port = 80;
-        command = [ "nginx" "-g" "daemon off;" ];
+        command = [
+          "nginx"
+          "-g"
+          "daemon off;"
+        ];
+        resources = {
+          limits = {
+            memory = "512Mi";
+          };
+          requests = {
+            memory = "256Mi";
+          };
+        };
         values = {
           defaultPodOptions.imagePullSecrets = [
             { name = "ghcr-registry-secret"; }
@@ -42,7 +54,22 @@ in
           pullPolicy = "Always";
         };
         port = 80;
-        command = [ "bundle" "exec" "rails" "server" "-p" "80" ];
+        command = [
+          "bundle"
+          "exec"
+          "rails"
+          "server"
+          "-p"
+          "80"
+        ];
+        resources = {
+          limits = {
+            memory = "512Mi";
+          };
+          requests = {
+            memory = "256Mi";
+          };
+        };
         values = {
           defaultPodOptions.imagePullSecrets = [
             { name = "ghcr-registry-secret"; }
@@ -66,7 +93,20 @@ in
           pullPolicy = "Always";
         };
         port = 3000;
-        command = [ "bundle" "exec" "bin/jobs" "start" ];
+        command = [
+          "bundle"
+          "exec"
+          "bin/jobs"
+          "start"
+        ];
+        resources = {
+          limits = {
+            memory = "512Mi";
+          };
+          requests = {
+            memory = "256Mi";
+          };
+        };
         values = {
           defaultPodOptions.imagePullSecrets = [
             { name = "ghcr-registry-secret"; }
