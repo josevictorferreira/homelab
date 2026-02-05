@@ -196,13 +196,13 @@ metadata:
   annotations:
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
-  name: postgresql-18-bootstrap-4c6e4cf0
+  name: postgresql-18-bootstrap-afe0d782
   namespace: apps
 spec:
   template:
     metadata:
       annotations:
-        checksum/config: 4c6e4cf0ccef47572268cc13752821fa55bfa86e208231fac4d45f5d448b786e
+        checksum/config: afe0d782d1af2c0072be74b4764db8a70fbbcda7c54d4095fe7eb4a25b3625f0
     spec:
       containers:
         - args:
@@ -271,7 +271,45 @@ spec:
               \ in database 'keycloak'...\"\n    psql -h postgresql-18 -U postgres\
               \ -d keycloak -c \"DROP EXTENSION IF EXISTS vectors;CREATE EXTENSION\
               \ IF NOT EXISTS vchord CASCADE;\" || echo \"Extension installation completed\
-              \ for keycloak\"\n\n"
+              \ for keycloak\"\n\n\t\tpsql -h postgresql-18 -U postgres -c 'ALTER\
+              \ SYSTEM SET shared_preload_libraries = \"vchord.so\"'\n    echo \"\
+              Ensuring database 'synapse' exists...\"\n    psql -h postgresql-18 -U\
+              \ postgres -d postgres -tAc \"SELECT 1 FROM pg_database WHERE datname='synapse'\"\
+              \ | grep -q 1 \\\n      || psql -h postgresql-18 -U postgres -d postgres\
+              \ -c \"CREATE DATABASE \\\"synapse\\\";\"\n\n    echo \"Installing pgvecto.rs\
+              \ extension in database 'synapse'...\"\n    psql -h postgresql-18 -U\
+              \ postgres -d synapse -c \"DROP EXTENSION IF EXISTS vectors;CREATE EXTENSION\
+              \ IF NOT EXISTS vchord CASCADE;\" || echo \"Extension installation completed\
+              \ for synapse\"\n\n\t\tpsql -h postgresql-18 -U postgres -c 'ALTER SYSTEM\
+              \ SET shared_preload_libraries = \"vchord.so\"'\n    echo \"Ensuring\
+              \ database 'mautrix_slack' exists...\"\n    psql -h postgresql-18 -U\
+              \ postgres -d postgres -tAc \"SELECT 1 FROM pg_database WHERE datname='mautrix_slack'\"\
+              \ | grep -q 1 \\\n      || psql -h postgresql-18 -U postgres -d postgres\
+              \ -c \"CREATE DATABASE \\\"mautrix_slack\\\";\"\n\n    echo \"Installing\
+              \ pgvecto.rs extension in database 'mautrix_slack'...\"\n    psql -h\
+              \ postgresql-18 -U postgres -d mautrix_slack -c \"DROP EXTENSION IF\
+              \ EXISTS vectors;CREATE EXTENSION IF NOT EXISTS vchord CASCADE;\" ||\
+              \ echo \"Extension installation completed for mautrix_slack\"\n\n\t\t\
+              psql -h postgresql-18 -U postgres -c 'ALTER SYSTEM SET shared_preload_libraries\
+              \ = \"vchord.so\"'\n    echo \"Ensuring database 'mautrix_discord' exists...\"\
+              \n    psql -h postgresql-18 -U postgres -d postgres -tAc \"SELECT 1\
+              \ FROM pg_database WHERE datname='mautrix_discord'\" | grep -q 1 \\\n\
+              \      || psql -h postgresql-18 -U postgres -d postgres -c \"CREATE\
+              \ DATABASE \\\"mautrix_discord\\\";\"\n\n    echo \"Installing pgvecto.rs\
+              \ extension in database 'mautrix_discord'...\"\n    psql -h postgresql-18\
+              \ -U postgres -d mautrix_discord -c \"DROP EXTENSION IF EXISTS vectors;CREATE\
+              \ EXTENSION IF NOT EXISTS vchord CASCADE;\" || echo \"Extension installation\
+              \ completed for mautrix_discord\"\n\n\t\tpsql -h postgresql-18 -U postgres\
+              \ -c 'ALTER SYSTEM SET shared_preload_libraries = \"vchord.so\"'\n \
+              \   echo \"Ensuring database 'mautrix_whatsapp' exists...\"\n    psql\
+              \ -h postgresql-18 -U postgres -d postgres -tAc \"SELECT 1 FROM pg_database\
+              \ WHERE datname='mautrix_whatsapp'\" | grep -q 1 \\\n      || psql -h\
+              \ postgresql-18 -U postgres -d postgres -c \"CREATE DATABASE \\\"mautrix_whatsapp\\\
+              \";\"\n\n    echo \"Installing pgvecto.rs extension in database 'mautrix_whatsapp'...\"\
+              \n    psql -h postgresql-18 -U postgres -d mautrix_whatsapp -c \"DROP\
+              \ EXTENSION IF EXISTS vectors;CREATE EXTENSION IF NOT EXISTS vchord\
+              \ CASCADE;\" || echo \"Extension installation completed for mautrix_whatsapp\"\
+              \n\n"
           command:
             - sh
             - -c
@@ -345,7 +383,41 @@ data:
     \ pgvecto.rs extension in database 'keycloak'...\"\n    psql -h postgresql-18\
     \ -U postgres -d keycloak -c \"DROP EXTENSION IF EXISTS vectors;CREATE EXTENSION\
     \ IF NOT EXISTS vchord CASCADE;\" || echo \"Extension installation completed for\
-    \ keycloak\"\n"
+    \ keycloak\"\n\n\t\tpsql -h postgresql-18 -U postgres -c 'ALTER SYSTEM SET shared_preload_libraries\
+    \ = \"vchord.so\"'\n    echo \"Ensuring database 'synapse' exists...\"\n    psql\
+    \ -h postgresql-18 -U postgres -d postgres -tAc \"SELECT 1 FROM pg_database WHERE\
+    \ datname='synapse'\" | grep -q 1 \\\n      || psql -h postgresql-18 -U postgres\
+    \ -d postgres -c \"CREATE DATABASE \\\"synapse\\\";\"\n\n    echo \"Installing\
+    \ pgvecto.rs extension in database 'synapse'...\"\n    psql -h postgresql-18 -U\
+    \ postgres -d synapse -c \"DROP EXTENSION IF EXISTS vectors;CREATE EXTENSION IF\
+    \ NOT EXISTS vchord CASCADE;\" || echo \"Extension installation completed for\
+    \ synapse\"\n\n\t\tpsql -h postgresql-18 -U postgres -c 'ALTER SYSTEM SET shared_preload_libraries\
+    \ = \"vchord.so\"'\n    echo \"Ensuring database 'mautrix_slack' exists...\"\n\
+    \    psql -h postgresql-18 -U postgres -d postgres -tAc \"SELECT 1 FROM pg_database\
+    \ WHERE datname='mautrix_slack'\" | grep -q 1 \\\n      || psql -h postgresql-18\
+    \ -U postgres -d postgres -c \"CREATE DATABASE \\\"mautrix_slack\\\";\"\n\n  \
+    \  echo \"Installing pgvecto.rs extension in database 'mautrix_slack'...\"\n \
+    \   psql -h postgresql-18 -U postgres -d mautrix_slack -c \"DROP EXTENSION IF\
+    \ EXISTS vectors;CREATE EXTENSION IF NOT EXISTS vchord CASCADE;\" || echo \"Extension\
+    \ installation completed for mautrix_slack\"\n\n\t\tpsql -h postgresql-18 -U postgres\
+    \ -c 'ALTER SYSTEM SET shared_preload_libraries = \"vchord.so\"'\n    echo \"\
+    Ensuring database 'mautrix_discord' exists...\"\n    psql -h postgresql-18 -U\
+    \ postgres -d postgres -tAc \"SELECT 1 FROM pg_database WHERE datname='mautrix_discord'\"\
+    \ | grep -q 1 \\\n      || psql -h postgresql-18 -U postgres -d postgres -c \"\
+    CREATE DATABASE \\\"mautrix_discord\\\";\"\n\n    echo \"Installing pgvecto.rs\
+    \ extension in database 'mautrix_discord'...\"\n    psql -h postgresql-18 -U postgres\
+    \ -d mautrix_discord -c \"DROP EXTENSION IF EXISTS vectors;CREATE EXTENSION IF\
+    \ NOT EXISTS vchord CASCADE;\" || echo \"Extension installation completed for\
+    \ mautrix_discord\"\n\n\t\tpsql -h postgresql-18 -U postgres -c 'ALTER SYSTEM\
+    \ SET shared_preload_libraries = \"vchord.so\"'\n    echo \"Ensuring database\
+    \ 'mautrix_whatsapp' exists...\"\n    psql -h postgresql-18 -U postgres -d postgres\
+    \ -tAc \"SELECT 1 FROM pg_database WHERE datname='mautrix_whatsapp'\" | grep -q\
+    \ 1 \\\n      || psql -h postgresql-18 -U postgres -d postgres -c \"CREATE DATABASE\
+    \ \\\"mautrix_whatsapp\\\";\"\n\n    echo \"Installing pgvecto.rs extension in\
+    \ database 'mautrix_whatsapp'...\"\n    psql -h postgresql-18 -U postgres -d mautrix_whatsapp\
+    \ -c \"DROP EXTENSION IF EXISTS vectors;CREATE EXTENSION IF NOT EXISTS vchord\
+    \ CASCADE;\" || echo \"Extension installation completed for mautrix_whatsapp\"\
+    \n"
 kind: ConfigMap
 metadata:
   annotations:

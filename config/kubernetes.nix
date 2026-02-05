@@ -45,6 +45,7 @@
       valoris = "10.10.10.134";
       imgproxy = "10.10.10.135";
       qui = "10.10.10.136";
+      matrix = "10.10.10.138";
       rabbitmq = "10.10.10.139";
       nfs = "10.10.10.150";
       grafana = "10.10.10.190";
@@ -60,6 +61,10 @@
       "valoris_production"
       "valoris_production_queue"
       "keycloak"
+      "synapse"
+      "mautrix_slack"
+      "mautrix_discord"
+      "mautrix_whatsapp"
     ];
   };
 
