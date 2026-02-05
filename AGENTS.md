@@ -128,6 +128,7 @@ make format     # Fix nix formatting
 | `make gmanifests` alone | Use `make manifests` for full pipeline |
 | Manually edit secrets files | Will be overwritten; use `make secrets` |
 | Mark task complete if `make manifests` fails | Fix the error first, then mark complete |
+| Commit without user permission | Always ask for explicit approval before committing |
 
 ## NODES
 

@@ -12,11 +12,8 @@ in
           namespace = namespace;
         };
         stringData = {
-          # PostgreSQL connection string
+          # PostgreSQL connection
           "postgres-password" = kubenix.lib.secretsFor "postgresql_admin_password";
-
-          # Redis connection (if configured)
-          "redis-password" = kubenix.lib.secretsFor "redis_password";
 
           # Synapse secrets
           "macaroon-secret-key" = kubenix.lib.secretsFor "synapse_macaroon_secret_key";

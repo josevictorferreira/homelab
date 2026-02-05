@@ -46,15 +46,25 @@ in
           # app_service_config_files will be populated when bridges are added
         };
 
-        # External PostgreSQL
+        # External PostgreSQL (use postgres superuser)
         postgresql.enabled = false;
         externalPostgresql = {
           host = "postgresql-18-hl";
           port = 5432;
-          username = "synapse";
+          username = "postgres";
           database = "synapse";
           existingSecret = secretName;
           existingSecretPasswordKey = "postgres-password";
+        };
+
+        # Use existing cluster Redis
+        redis.enabled = false;
+        existingSecret = secretName;
+        externalRedis = {
+          host = "redis-headless";
+          port = 6379;
+          existingSecret = "redis-auth";
+          existingSecretPasswordKey = "redis-password";
         };
 
         # Ingress configuration
