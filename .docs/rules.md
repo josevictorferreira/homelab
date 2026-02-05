@@ -15,9 +15,9 @@
 ## Nix Flake Evaluation
 
 ### Flake Uses Git State, Not Working Directory
-**Lesson:** `make check` evaluates the flake from git state. New files must be `git add`-ed before validation.
-**Context:** Nix flakes are pure and use git to determine the source tree. Unstaged files are invisible to `nix flake check`.
-**Verify:** `git status` - ensure new files are staged
+**Lesson:** `make check` and `make manifests` evaluate the flake from git state. New files must be `git add`-ed before validation/manifest generation.
+**Context:** Nix flakes are pure and use git to determine the source tree. Unstaged files (especially `modules/kubenix/**/*.nix`) are invisible to `nix flake check` and `make manifests`.
+**Verify:** `git status` - ensure new files are staged, then `nix build .#gen-manifests` to confirm discovery
 
 ## Tailscale Integration Pattern
 
@@ -42,3 +42,8 @@
 **Lesson:** Kubernetes StatefulSets forbid updates to most fields. Use `kubectl delete statefulset <name> -n <ns> --cascade=orphan` then `flux reconcile` to recreate.
 **Context:** Standard updates fail with "Forbidden: updates to statefulset spec for fields other than...".
 **Verify:** State recreates successfully with new spec.
+
+### SOPS Secrets Must Be Verified Before Manifest Generation
+**Lesson:** After adding/modifying `secrets/k8s-secrets.enc.yaml`, verify key exists: `sops -d secrets/k8s-secrets.enc.yaml | grep <key>` before `make manifests`.
+**Context:** vals injection during `make vmanifests` fails if secret keys are missing, causing cryptic manifest generation errors. Subagent claims aren't always verified.
+**Verify:** `sops -d secrets/k8s-secrets.enc.yaml | grep <key>` returns expected value
