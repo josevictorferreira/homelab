@@ -25,3 +25,20 @@
 **Lesson:** Use `builtins.elem "tailscale-router" hostConfig.roles` to detect if a node should act as subnet router.
 **Context:** This allows conditional configuration (advertise-routes, useRoutingFeatures) based on role assignment in nodes.nix.
 **Verify:** Check `config/nodes.nix` for role assignment
+
+## Kubernetes Deployment
+
+### OCI Chart Hash Resolution
+**Lesson:** When adding new OCI Helm charts, use a placeholder hash (32 zeros) and let `make manifests` fail with the correct hash in the error message.
+**Context:** Kubenix requires exact SHA256 hashes; multiple format attempts failed until getting from error output.
+**Verify:** Check error output: `wanted: sha256-...`
+
+### CloudPirates Keycloak Secret Keys
+**Lesson:** CloudPirates Keycloak chart requires lowercase secret keys: `db-username`, `db-password`, `KEYCLOAK_ADMIN_PASSWORD`.
+**Context:** Chart validation fails with uppercase keys like `DB_USERNAME` or `DB_PASSWORD`.
+**Verify:** Check chart values.yaml for required key format.
+
+### StatefulSet Updates
+**Lesson:** Kubernetes StatefulSets forbid updates to most fields. Use `kubectl delete statefulset <name> -n <ns> --cascade=orphan` then `flux reconcile` to recreate.
+**Context:** Standard updates fail with "Forbidden: updates to statefulset spec for fields other than...".
+**Verify:** State recreates successfully with new spec.
