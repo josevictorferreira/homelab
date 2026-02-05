@@ -1,0 +1,91 @@
+apiVersion: v1
+kind: Secret
+metadata:
+    annotations:
+        kubenix/k8s-version: "1.32"
+        kubenix/project-name: ze-homelab
+    name: synapse-env
+    namespace: apps
+stringData:
+    form-secret: ENC[AES256_GCM,data:X+3juIicARPyGSuOZjz1X4HthlcKyf2ccaWD5xBrnL5XKf7Lc3/PNNzllDk=,iv:zlX5+c1w4w5oePDsN4Upu7AFyAe8sEKQ+PXo1k0oXqM=,tag:BCQL7DzLhV7pDBfnLgEbTA==,type:str]
+    macaroon-secret-key: ENC[AES256_GCM,data:7+YaL/491RbrVtjLllva/03T9eqro79MaUqvGwu3PLjENo1/RkEknkx/QUQ=,iv:bHiqcAu0pkLsJGmdwERBtxd3/g2XTTGodw30fspUFpU=,tag:9RJ1QhTwNo8UikjtV0oRrA==,type:str]
+    postgres-password: ENC[AES256_GCM,data:3wEqtCY8YWqRQnCUIEpkBVV52A==,iv:3QLpPKbzyfuDbKE3RkuRazQOUUn0Awq63lwiyEqRMPk=,tag:5/qWZxZWL7tRW7OZMler4A==,type:str]
+    redis-password: ENC[AES256_GCM,data:zCIdv5J4+eB7wdNKDau+JVlJY8Iuvz0s,iv:pASAGEEqiCz4s+CsVtSJpOYNFXwRMG3xN6HqM5nD1E4=,tag:DByd0xnSF7wRhiNIZhVfHA==,type:str]
+    registration-shared-secret: ENC[AES256_GCM,data:rp6mmkxrboYrFTZELcnnzxiN8+HyXjEdS+P9hsTbh4gTzk112DKER7RIp3U=,iv:EXUTir622fKaoztMLaxeaNKYdLx/OVN2W13z/zMOD5Q=,tag:+B7VQdZRwQ0JZd/7SqxA9g==,type:str]
+sops:
+    age:
+        - recipient: age16yrhmz8fytj7j9ns80zl40zjcdfd3pdxh48ld7ys7veea774udtqfn9jyx
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBoa0lYdXpzTGxqblBHOE5S
+            bVlncnRMSDRQSDlBQXJiaWpGSXB2TlhuVkJZCnovWVI1QmgwcGVmLzlSYlVpSDlB
+            VEo4V0wydnUyeEtoU0lEOHp1dERhUjgKLS0tIHd1YzNyTmlDdHB3Qzc1MXhnZ3dZ
+            WU5GbVpFKzZjQ01pNm13WjN5bVRIa2cK2Qigy9EgCVW0igOUIHqk4vp73QH7cuep
+            yBhx+1F/iKp/e87O9YvZf8cwwDonkdPXAJxpuDi8V4KAF2uPc3uNig==
+            -----END AGE ENCRYPTED FILE-----
+        - recipient: age1jx9qu5p0ycvymrl2gykd9z3w8x8n67jxnatxs49j7qzspjr6asqqf8u35h
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBTWUVadmUrZklBUGZpZHdD
+            V3Rrb1lEcWdPSHpJdUk0WlAyN0daUkdSaTNFCkRocDZXRTRQUWNCS0xiQjg4SHo0
+            OU1leXBadVk1STV6d1ZJbVVSWUZvYVkKLS0tIExFT0lnQmxsa21KU1pGdWVTNGxj
+            dCs2UFNRRkU0VlRiWnVCS1c2ZlRSbzgKFJ5rvvRNpnI3SU2l1XQIdU8PTZGF3EBS
+            KhT/eKCrkq5z1sMOfMEQEV3uX+ZOs656vkdFnXOzACFyr0Spf4Y1uQ==
+            -----END AGE ENCRYPTED FILE-----
+        - recipient: age1myzhwq67gu5zrfk8fvs0p7mh5fk67d20ltwqf9325ya83lm06ytsyax3j2
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSA3VDFTeW5qakREU0h6elJx
+            bWZEL3hXRUR3N3ZHS2wySzRTdVBMNXk4cG1nCkdkSzl2Z2ZLbGRvU1NyYmdZcDJT
+            VGltdkxYa3BKUHFhbmhRcDVjZHhBYjAKLS0tIEEwQ1N6RVNWaDgxZGdqR1BzQVFF
+            bFQrUU5xZzJwZXg1V2JvOXo5Yk5adHMKwdm8vOjh6f1lfP6+ruV8IWt3x9YVMao6
+            1ssIgblC/M6eEVd9jxdRj+EcX+6dAMhrVu8NXjbU1KdotEbY0jX+Kg==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2026-02-05T14:39:11Z"
+    mac: ENC[AES256_GCM,data:Ps1zqXBnTgf/A/C5jHp1/cOA4mR8PeYGGY69wI6yX1LYP8kPlbm2R4e4SDWNJHhDgoPu657YiksMeSGqS46ZGGBGjoIuCNmhqsPo9Ig3UHqOKbkQqNLTkp2Y7J/11zmm/eaC8LjfSo7AJeKZYGjR0xx98ZBAev1H1ioQGUGEg80=,iv:WyCTIrw4ElTt4CxJRm5dqdJ0eEiLH2U59UCND9ASqsk=,tag:GJ22J/yenLs500bcvi4uLQ==,type:str]
+    encrypted_regex: ^(data|stringData)$
+    version: 3.11.0
+---
+apiVersion: v1
+kind: Secret
+metadata:
+    annotations:
+        kubenix/k8s-version: "1.32"
+        kubenix/project-name: ze-homelab
+    name: synapse-signing-key
+    namespace: apps
+stringData:
+    matrix.josevictor.me.key: ENC[AES256_GCM,data:Rs2/BTidyQW9cSoOjW0pfp3qVsBBgBRiBJ7SV3C8lLmEbbotOmE3KZr5Jb7XnQLZQAVADxtPuKUTRPj/F5MAtFKDSbpDxNOlek+9LwTwO3+mdP07B1RixLEWJPNj7GYdhVEqXlUXVAwT5RO2eYoWBxpKsosHkgY2W9GBDhKSTa/d+EPMda4v+tH93/wQpVIugiMrIYj9g+t8fgncB2vuahB2JX76JWRVKgLQCLQmTLuNC9aqWd3ldwBzyM3O8A+I0fo11RXpTDWrA89h02aTfD5eTfyXLEm/nL0oEs9haVkf6x85ahnr5VQ2VG+ep3CJprfGbzE7pp8vpDwqUpIX0qJPSI5xyCvb8KVUnvXKrVVZA3BHfy+WgjAJMUUxqOivD3f2OF9ko5ZTw8ysw0MC7txoVdqBJtM1t98i8v1E3gWNfurND8rEOMLH0mr/U72Hb4N9BbObxw==,iv:oHUcIeW+Rfd9kiJyGrlv+txq2zqNHxzNJ3DY+XtJy2M=,tag:xbVq/U4WEj86n5dmERLf1g==,type:str]
+sops:
+    age:
+        - recipient: age16yrhmz8fytj7j9ns80zl40zjcdfd3pdxh48ld7ys7veea774udtqfn9jyx
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBoa0lYdXpzTGxqblBHOE5S
+            bVlncnRMSDRQSDlBQXJiaWpGSXB2TlhuVkJZCnovWVI1QmgwcGVmLzlSYlVpSDlB
+            VEo4V0wydnUyeEtoU0lEOHp1dERhUjgKLS0tIHd1YzNyTmlDdHB3Qzc1MXhnZ3dZ
+            WU5GbVpFKzZjQ01pNm13WjN5bVRIa2cK2Qigy9EgCVW0igOUIHqk4vp73QH7cuep
+            yBhx+1F/iKp/e87O9YvZf8cwwDonkdPXAJxpuDi8V4KAF2uPc3uNig==
+            -----END AGE ENCRYPTED FILE-----
+        - recipient: age1jx9qu5p0ycvymrl2gykd9z3w8x8n67jxnatxs49j7qzspjr6asqqf8u35h
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBTWUVadmUrZklBUGZpZHdD
+            V3Rrb1lEcWdPSHpJdUk0WlAyN0daUkdSaTNFCkRocDZXRTRQUWNCS0xiQjg4SHo0
+            OU1leXBadVk1STV6d1ZJbVVSWUZvYVkKLS0tIExFT0lnQmxsa21KU1pGdWVTNGxj
+            dCs2UFNRRkU0VlRiWnVCS1c2ZlRSbzgKFJ5rvvRNpnI3SU2l1XQIdU8PTZGF3EBS
+            KhT/eKCrkq5z1sMOfMEQEV3uX+ZOs656vkdFnXOzACFyr0Spf4Y1uQ==
+            -----END AGE ENCRYPTED FILE-----
+        - recipient: age1myzhwq67gu5zrfk8fvs0p7mh5fk67d20ltwqf9325ya83lm06ytsyax3j2
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSA3VDFTeW5qakREU0h6elJx
+            bWZEL3hXRUR3N3ZHS2wySzRTdVBMNXk4cG1nCkdkSzl2Z2ZLbGRvU1NyYmdZcDJT
+            VGltdkxYa3BKUHFhbmhRcDVjZHhBYjAKLS0tIEEwQ1N6RVNWaDgxZGdqR1BzQVFF
+            bFQrUU5xZzJwZXg1V2JvOXo5Yk5adHMKwdm8vOjh6f1lfP6+ruV8IWt3x9YVMao6
+            1ssIgblC/M6eEVd9jxdRj+EcX+6dAMhrVu8NXjbU1KdotEbY0jX+Kg==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2026-02-05T14:39:11Z"
+    mac: ENC[AES256_GCM,data:Ps1zqXBnTgf/A/C5jHp1/cOA4mR8PeYGGY69wI6yX1LYP8kPlbm2R4e4SDWNJHhDgoPu657YiksMeSGqS46ZGGBGjoIuCNmhqsPo9Ig3UHqOKbkQqNLTkp2Y7J/11zmm/eaC8LjfSo7AJeKZYGjR0xx98ZBAev1H1ioQGUGEg80=,iv:WyCTIrw4ElTt4CxJRm5dqdJ0eEiLH2U59UCND9ASqsk=,tag:GJ22J/yenLs500bcvi4uLQ==,type:str]
+    encrypted_regex: ^(data|stringData)$
+    version: 3.11.0
