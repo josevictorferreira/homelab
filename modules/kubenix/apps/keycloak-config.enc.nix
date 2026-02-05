@@ -11,6 +11,7 @@ in
           namespace = namespace;
         };
         stringData = {
+          "DB_USERNAME" = kubenix.lib.secretsFor "postgresql_admin_username";
           "DB_PASSWORD" = kubenix.lib.secretsFor "postgresql_admin_password";
           "KEYCLOAK_ADMIN_PASSWORD" = kubenix.lib.secretsFor "keycloak_admin_password";
         };
