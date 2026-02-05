@@ -9,7 +9,7 @@ let
   app = "keycloak";
   secretName = "${app}-env";
   namespace = homelab.kubernetes.namespaces.applications;
-  domain = "keycloak.${homelab.domain}";
+  domain = "identity.josevictor.me";
 in
 {
   kubernetes = {
