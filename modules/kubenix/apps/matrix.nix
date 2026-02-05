@@ -42,8 +42,41 @@ in
             }
           ];
 
-          # Bridge configurations removed - to be added later when bridges are configured
+          # Bridge configurations
           # app_service_config_files will be populated when bridges are added
+        };
+
+        extraConfig = {
+          app_service_config_files = [
+            "/synapse/config/conf.d/mautrix-whatsapp-registration.yaml"
+          ];
+        };
+
+        # Mount registration Secret
+        synapse = {
+          extraVolumes = [
+            {
+              name = "mautrix-whatsapp-registration";
+              secret = {
+                secretName = "mautrix-whatsapp-registration";
+                items = [
+                  {
+                    key = "registration.yaml";
+                    path = "mautrix-whatsapp-registration.yaml";
+                  }
+                ];
+              };
+            }
+          ];
+
+          extraVolumeMounts = [
+            {
+              name = "mautrix-whatsapp-registration";
+              mountPath = "/synapse/config/conf.d/mautrix-whatsapp-registration.yaml";
+              subPath = "mautrix-whatsapp-registration.yaml";
+              readOnly = true;
+            }
+          ];
         };
 
         # External PostgreSQL (use postgres superuser)

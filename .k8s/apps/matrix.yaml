@@ -25,8 +25,8 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: 38645df160b0995b9bc1daff8f4629e99febaf30abf6e1d732ccc53abb741a36
-        checksum/secrets: 8965c5f415bb5f0b7905f51b9cd1b5f8edd8dfd4539c20b78ea7ec1b063c3cc4
+        checksum/config: 5289f01b3862b5cd3bf15320f0b1ac26cd958a6c550e79b65455722df28b2d93
+        checksum/secrets: 18d6be02335ae2d31cadbfa6738cbd99c3e58298f6e2005154d9cbcea2a51b61
       labels:
         app.kubernetes.io/component: synapse
         app.kubernetes.io/instance: synapse
@@ -96,6 +96,10 @@ spec:
               name: media
             - mountPath: /tmp
               name: tmpdir
+            - mountPath: /synapse/config/conf.d/mautrix-whatsapp-registration.yaml
+              name: mautrix-whatsapp-registration
+              readOnly: true
+              subPath: mautrix-whatsapp-registration.yaml
       securityContext: {}
       serviceAccountName: default
       volumes:
@@ -118,6 +122,12 @@ spec:
         - name: media
           persistentVolumeClaim:
             claimName: synapse-matrix-synapse
+        - name: mautrix-whatsapp-registration
+          secret:
+            items:
+              - key: registration.yaml
+                path: mautrix-whatsapp-registration.yaml
+            secretName: mautrix-whatsapp-registration
 ---
 apiVersion: batch/v1
 kind: Job
@@ -220,7 +230,8 @@ data:
     \ ##\n\nenable_registration: false\n\n## Metrics ###\n\nenable_metrics: true\n\
     \n## Signing Keys ##\n\nsigning_key_path: \"/synapse/keys/signing.key\"\n\n# The\
     \ trusted servers to download signing keys from.\ntrusted_key_servers:\n  - server_name:\
-    \ matrix.org\n\n## Workers ##\n"
+    \ matrix.org\n\n## Workers ##\n\n## Extra config ##\n\napp_service_config_files:\n\
+    - /synapse/config/conf.d/mautrix-whatsapp-registration.yaml\n"
   log.yaml: "version: 1\nformatters:\n  precise:\n    format: '%(asctime)s - %(name)s\
     \ - %(lineno)d - %(levelname)s - %(request)s- %(message)s'\nfilters:\n  context:\n\
     \    (): synapse.util.logcontext.LoggingContextFilter\n    request: \"\"\nhandlers:\n\
@@ -334,7 +345,7 @@ metadata:
   name: synapse-matrix-synapse
   namespace: apps
 stringData:
-  config.yaml: "## Registration ##\n\nregistration_shared_secret: \"bsbjcDKLjAe0brYGMJc78hin\"\
+  config.yaml: "## Registration ##\n\nregistration_shared_secret: \"gHlgmpCGJc3iHSw1gGSpsP4v\"\
     \n\n## API Configuration ##\n\n## Database configuration ##\n\ndatabase:\n  name:\
     \ \"psycopg2\"\n  args:\n    user: \"postgres\"\n    password: \"@@POSTGRES_PASSWORD@@\"\
     \n    database: \"synapse\"\n    host: \"postgresql-18-hl\"\n    port: 5432\n\
