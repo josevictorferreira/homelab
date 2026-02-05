@@ -1,0 +1,889 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/component: synapse
+    app.kubernetes.io/instance: synapse
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: matrix-synapse
+    app.kubernetes.io/version: 1.146.0
+    helm.sh/chart: matrix-synapse-3.12.19
+  name: synapse-matrix-synapse
+  namespace: apps
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: synapse
+      app.kubernetes.io/instance: synapse
+      app.kubernetes.io/name: matrix-synapse
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        checksum/config: 38645df160b0995b9bc1daff8f4629e99febaf30abf6e1d732ccc53abb741a36
+        checksum/secrets: d15dd41e8480651e23479906093aed3c3b41b3b4f59e343da64d6051d57aa950
+      labels:
+        app.kubernetes.io/component: synapse
+        app.kubernetes.io/instance: synapse
+        app.kubernetes.io/name: matrix-synapse
+    spec:
+      containers:
+        - command:
+            - sh
+            - -c
+            - "export POSTGRES_PASSWORD=$(echo \"${POSTGRES_PASSWORD:-}\" | sed 's/\\\
+              //\\\\\\//g' | sed 's/\\&/\\\\\\&/g') && \\\nexport REDIS_PASSWORD=$(echo\
+              \ \"${REDIS_PASSWORD:-}\" | sed 's/\\//\\\\\\//g' | sed 's/\\&/\\\\\\\
+              &/g') && \\\ncat /synapse/secrets/*.yaml | \\\n  sed -e \"s/@@POSTGRES_PASSWORD@@/${POSTGRES_PASSWORD:-}/\"\
+              \ \\\n      -e \"s/@@REDIS_PASSWORD@@/${REDIS_PASSWORD:-}/\" \\\n  \
+              \       > /synapse/config/conf.d/secrets.yaml\n\nexec python -B -m synapse.app.homeserver\
+              \ \\\n            -c /synapse/config/homeserver.yaml \\\n          \
+              \  -c /synapse/config/conf.d/\n"
+          env:
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: postgres-password
+                  name: synapse-env
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: redis-password
+                  name: synapse-redis
+          image: ghcr.io/element-hq/synapse:v1.146.0
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+          name: synapse
+          ports:
+            - containerPort: 8008
+              name: http
+              protocol: TCP
+            - containerPort: 9093
+              name: replication
+              protocol: TCP
+            - containerPort: 9090
+              name: metrics
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+          resources: {}
+          securityContext: {}
+          startupProbe:
+            failureThreshold: 12
+            httpGet:
+              path: /health
+              port: http
+          volumeMounts:
+            - mountPath: /synapse/config
+              name: config
+            - mountPath: /synapse/config/conf.d
+              name: tmpconf
+            - mountPath: /synapse/secrets
+              name: secrets
+            - mountPath: /synapse/keys
+              name: signingkey
+            - mountPath: /synapse/data
+              name: media
+            - mountPath: /tmp
+              name: tmpdir
+      securityContext: {}
+      serviceAccountName: default
+      volumes:
+        - configMap:
+            name: synapse-matrix-synapse
+          name: config
+        - name: secrets
+          secret:
+            secretName: synapse-matrix-synapse
+        - name: signingkey
+          secret:
+            items:
+              - key: signing.key
+                path: signing.key
+            secretName: synapse-signingkey
+        - emptyDir: {}
+          name: tmpconf
+        - emptyDir: {}
+          name: tmpdir
+        - name: media
+          persistentVolumeClaim:
+            claimName: synapse-matrix-synapse
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/component: master
+    app.kubernetes.io/instance: synapse
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: redis
+    helm.sh/chart: redis-17.17.1
+  name: synapse-redis-master
+  namespace: apps
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: master
+      app.kubernetes.io/instance: synapse
+      app.kubernetes.io/name: redis
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        checksum/configmap: 86bcc953bb473748a3d3dc60b7c11f34e60c93519234d4c37f42e22ada559d47
+        checksum/health: aff24913d801436ea469d8d374b2ddb3ec4c43ee7ab24663d5f8ff1a1b6991a9
+        checksum/scripts: 560c33ff34d845009b51830c332aa05fa211444d1877d3526d3599be7543aaa5
+        checksum/secret: f0f55989fb3bc79b074d1b486abf9d6e59c08bb338057ed1ac2c37620e420b01
+      labels:
+        app.kubernetes.io/component: master
+        app.kubernetes.io/instance: synapse
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: redis
+        helm.sh/chart: redis-17.17.1
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/component: master
+                    app.kubernetes.io/instance: synapse
+                    app.kubernetes.io/name: redis
+                topologyKey: kubernetes.io/hostname
+              weight: 1
+      automountServiceAccountToken: true
+      containers:
+        - args:
+            - -c
+            - /opt/bitnami/scripts/start-scripts/start-master.sh
+          command:
+            - /bin/bash
+          env:
+            - name: BITNAMI_DEBUG
+              value: 'false'
+            - name: REDIS_REPLICATION_MODE
+              value: master
+            - name: ALLOW_EMPTY_PASSWORD
+              value: 'no'
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: redis-password
+                  name: synapse-redis
+            - name: REDIS_TLS_ENABLED
+              value: 'no'
+            - name: REDIS_PORT
+              value: '6379'
+          image: docker.io/bitnamilegacy/redis:7.0.12-debian-11-r34
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - /health/ping_liveness_local.sh 5
+            failureThreshold: 5
+            initialDelaySeconds: 20
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 6
+          name: redis
+          ports:
+            - containerPort: 6379
+              name: redis
+          readinessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - /health/ping_readiness_local.sh 1
+            failureThreshold: 5
+            initialDelaySeconds: 20
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 2
+          resources:
+            limits: {}
+            requests: {}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsGroup: 0
+            runAsNonRoot: true
+            runAsUser: 1001
+            seccompProfile:
+              type: RuntimeDefault
+          volumeMounts:
+            - mountPath: /opt/bitnami/scripts/start-scripts
+              name: start-scripts
+            - mountPath: /health
+              name: health
+            - mountPath: /data
+              name: redis-data
+            - mountPath: /opt/bitnami/redis/mounted-etc
+              name: config
+            - mountPath: /opt/bitnami/redis/etc/
+              name: redis-tmp-conf
+            - mountPath: /tmp
+              name: tmp
+      enableServiceLinks: true
+      securityContext:
+        fsGroup: 1001
+      serviceAccountName: synapse-redis
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - configMap:
+            defaultMode: 493
+            name: synapse-redis-scripts
+          name: start-scripts
+        - configMap:
+            defaultMode: 493
+            name: synapse-redis-health
+          name: health
+        - configMap:
+            name: synapse-redis-configuration
+          name: config
+        - emptyDir: {}
+          name: redis-tmp-conf
+        - emptyDir: {}
+          name: tmp
+        - emptyDir: {}
+          name: redis-data
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  annotations:
+    helm.sh/hook: pre-install
+    helm.sh/hook-delete-policy: hook-succeeded
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/component: signingkey-job
+    app.kubernetes.io/instance: synapse
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: matrix-synapse
+    app.kubernetes.io/version: 1.146.0
+    helm.sh/chart: matrix-synapse-3.12.19
+  name: synapse-signingkey-job
+  namespace: apps
+spec:
+  backoffLimit: 1
+  completions: 1
+  parallelism: 1
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: signingkey-job
+        app.kubernetes.io/instance: synapse
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: matrix-synapse
+        app.kubernetes.io/version: 1.146.0
+        helm.sh/chart: matrix-synapse-3.12.19
+    spec:
+      containers:
+        - command:
+            - sh
+            - -c
+            - "echo \"Generating signing key...\"\nif which generate_signing_key.py\
+              \ >/dev/null; then\n  generate_signing_key.py -o /synapse/keys/signing.key\n\
+              else\n  generate_signing_key -o /synapse/keys/signing.key\nfi\n"
+          image: matrixdotorg/synapse:latest
+          imagePullPolicy: IfNotPresent
+          name: signing-key-generate
+          resources: {}
+          securityContext: {}
+          volumeMounts:
+            - mountPath: /synapse/keys
+              name: matrix-synapse-keys
+        - command:
+            - sh
+            - -c
+            - 'printf "Checking rights to update secret... "
+
+              kubectl auth can-i update secret/${SECRET_NAME}
+
+              /scripts/signing-key.sh
+
+              '
+          env:
+            - name: SECRET_NAME
+              value: synapse-signingkey
+          image: bitnami/kubectl:latest
+          imagePullPolicy: IfNotPresent
+          name: signing-key-upload
+          resources: {}
+          securityContext: {}
+          volumeMounts:
+            - mountPath: /scripts
+              name: scripts
+              readOnly: true
+            - mountPath: /synapse/keys
+              name: matrix-synapse-keys
+              readOnly: true
+      restartPolicy: Never
+      securityContext: {}
+      serviceAccount: synapse-signingkey-job
+      volumes:
+        - configMap:
+            defaultMode: 493
+            name: synapse-matrix-synapse-scripts
+          name: scripts
+        - emptyDir: {}
+          name: matrix-synapse-keys
+  ttlSecondsAfterFinished: 0
+---
+apiVersion: v1
+data:
+  homeserver.yaml: "# NOTE:\n# Secrets are stored in separate configs to better fit\
+    \ K8s concepts\n\n## Server ##\n\nserver_name: \"josevictor.me\"\npublic_baseurl:\
+    \ \"https://matrix.josevictor.me\"\npid_file: /homeserver.pid\nweb_client: False\n\
+    soft_file_limit: 0\nlog_config: \"/synapse/config/log.yaml\"\nreport_stats: false\n\
+    \ninstance_map:\n  main:\n    host: synapse-replication\n    port: 9093\n\n##\
+    \ Ports ##\n\nlisteners:\n  - port: 8008\n    tls: false\n    bind_addresses:\
+    \ [\"::\"]\n    type: http\n    x_forwarded: true\n\n    resources:\n      - names:\
+    \ \n          - client\n          - federation\n        compress: false\n\n  -\
+    \ port: 9090\n    tls: false\n    bind_addresses: [\"::\"]\n    type: http\n\n\
+    \    resources:\n      - names: [metrics]\n        compress: false\n\n  - port:\
+    \ 9093\n    tls: false\n    bind_addresses: [\"::\"]\n    type: http\n\n    resources:\n\
+    \      - names: [replication]\n        compress: false\n\n## Files ##\n\nmedia_store_path:\
+    \ \"/synapse/data/media\"\nuploads_path: \"/synapse/data/uploads\"\n\n## Registration\
+    \ ##\n\nenable_registration: false\n\n## Metrics ###\n\nenable_metrics: true\n\
+    \n## Signing Keys ##\n\nsigning_key_path: \"/synapse/keys/signing.key\"\n\n# The\
+    \ trusted servers to download signing keys from.\ntrusted_key_servers:\n  - server_name:\
+    \ matrix.org\n\n## Workers ##\n"
+  log.yaml: "version: 1\nformatters:\n  precise:\n    format: '%(asctime)s - %(name)s\
+    \ - %(lineno)d - %(levelname)s - %(request)s- %(message)s'\nfilters:\n  context:\n\
+    \    (): synapse.util.logcontext.LoggingContextFilter\n    request: \"\"\nhandlers:\n\
+    \  console:\n    class: logging.StreamHandler\n    formatter: precise\n    filters:\
+    \ [context]\n    level: INFO\nloggers:\n    synapse:\n      level: INFO\nroot:\n\
+    \    level: INFO\n    handlers: [console]\n"
+kind: ConfigMap
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: synapse
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: matrix-synapse
+    app.kubernetes.io/version: 1.146.0
+    helm.sh/chart: matrix-synapse-3.12.19
+  name: synapse-matrix-synapse
+  namespace: apps
+---
+apiVersion: v1
+data:
+  signing-key.sh: "#!/bin/sh\n\nset -eu\n\ncheck_key() {\n  set +e\n\n  echo \"Checking\
+    \ for existing signing key...\"\n  key=\"$(kubectl get secret \"$SECRET_NAME\"\
+    \ -o jsonpath=\"{.data['signing\\.key']}\" 2> /dev/null)\"\n  [ $? -ne 0 ] &&\
+    \ return 1\n  [ -z \"$key\" ] && return 2\n  return 0\n}\n\ncreate_key() {\n \
+    \ echo \"Waiting for new signing key to be generated...\"\n  begin=$(date +%s)\n\
+    \  end=$((begin + 300)) # 5 minutes\n  while true; do\n    [ -f /synapse/keys/signing.key\
+    \ ] && return 0\n    [ \"$(date +%s)\" -gt $end ] && return 1\n    sleep 5\n \
+    \ done\n}\n\nstore_key() {\n  echo \"Storing signing key in Kubernetes secret...\"\
+    \n  kubectl patch secret \"$SECRET_NAME\" -p \"{\\\"data\\\":{\\\"signing.key\\\
+    \":\\\"$(base64 /synapse/keys/signing.key | tr -d '\\n')\\\"}}\"\n}\n\nif check_key;\
+    \ then\n  echo \"Key already in place, exiting.\"\n  exit\nfi\n\nif ! create_key;\
+    \ then\n  echo \"Timed out waiting for a signing key to appear.\"\n  exit 1\n\
+    fi\n\nstore_key\n"
+kind: ConfigMap
+metadata:
+  annotations:
+    helm.sh/hook: pre-install
+    helm.sh/hook-delete-policy: hook-succeeded
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: synapse
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: matrix-synapse
+    app.kubernetes.io/version: 1.146.0
+    helm.sh/chart: matrix-synapse-3.12.19
+  name: synapse-matrix-synapse-scripts
+  namespace: apps
+---
+apiVersion: v1
+data:
+  master.conf: 'dir /data
+
+    # User-supplied master configuration:
+
+    rename-command FLUSHDB ""
+
+    rename-command FLUSHALL ""
+
+    # End of master configuration'
+  redis.conf: '# User-supplied common configuration:
+
+    # Enable AOF https://redis.io/topics/persistence#append-only-file
+
+    appendonly yes
+
+    # Disable RDB persistence, AOF persistence already enabled.
+
+    save ""
+
+    # End of common configuration'
+  replica.conf: 'dir /data
+
+    # User-supplied replica configuration:
+
+    rename-command FLUSHDB ""
+
+    rename-command FLUSHALL ""
+
+    # End of replica configuration'
+kind: ConfigMap
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: synapse
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: redis
+    helm.sh/chart: redis-17.17.1
+  name: synapse-redis-configuration
+  namespace: apps
+---
+apiVersion: v1
+data:
+  ping_liveness_local.sh: "#!/bin/bash\n\n[[ -f $REDIS_PASSWORD_FILE ]] && export\
+    \ REDIS_PASSWORD=\"$(< \"${REDIS_PASSWORD_FILE}\")\"\n[[ -n \"$REDIS_PASSWORD\"\
+    \ ]] && export REDISCLI_AUTH=\"$REDIS_PASSWORD\"\nresponse=$(\n  timeout -s 15\
+    \ $1 \\\n  redis-cli \\\n    -h localhost \\\n    -p $REDIS_PORT \\\n    ping\n\
+    )\nif [ \"$?\" -eq \"124\" ]; then\n  echo \"Timed out\"\n  exit 1\nfi\nresponseFirstWord=$(echo\
+    \ $response | head -n1 | awk '{print $1;}')\nif [ \"$response\" != \"PONG\" ]\
+    \ && [ \"$responseFirstWord\" != \"LOADING\" ] && [ \"$responseFirstWord\" !=\
+    \ \"MASTERDOWN\" ]; then\n  echo \"$response\"\n  exit 1\nfi"
+  ping_liveness_local_and_master.sh: 'script_dir="$(dirname "$0")"
+
+    exit_status=0
+
+    "$script_dir/ping_liveness_local.sh" $1 || exit_status=$?
+
+    "$script_dir/ping_liveness_master.sh" $1 || exit_status=$?
+
+    exit $exit_status'
+  ping_liveness_master.sh: "#!/bin/bash\n\n[[ -f $REDIS_MASTER_PASSWORD_FILE ]] &&\
+    \ export REDIS_MASTER_PASSWORD=\"$(< \"${REDIS_MASTER_PASSWORD_FILE}\")\"\n[[\
+    \ -n \"$REDIS_MASTER_PASSWORD\" ]] && export REDISCLI_AUTH=\"$REDIS_MASTER_PASSWORD\"\
+    \nresponse=$(\n  timeout -s 15 $1 \\\n  redis-cli \\\n    -h $REDIS_MASTER_HOST\
+    \ \\\n    -p $REDIS_MASTER_PORT_NUMBER \\\n    ping\n)\nif [ \"$?\" -eq \"124\"\
+    \ ]; then\n  echo \"Timed out\"\n  exit 1\nfi\nresponseFirstWord=$(echo $response\
+    \ | head -n1 | awk '{print $1;}')\nif [ \"$response\" != \"PONG\" ] && [ \"$responseFirstWord\"\
+    \ != \"LOADING\" ]; then\n  echo \"$response\"\n  exit 1\nfi"
+  ping_readiness_local.sh: "#!/bin/bash\n\n[[ -f $REDIS_PASSWORD_FILE ]] && export\
+    \ REDIS_PASSWORD=\"$(< \"${REDIS_PASSWORD_FILE}\")\"\n[[ -n \"$REDIS_PASSWORD\"\
+    \ ]] && export REDISCLI_AUTH=\"$REDIS_PASSWORD\"\nresponse=$(\n  timeout -s 15\
+    \ $1 \\\n  redis-cli \\\n    -h localhost \\\n    -p $REDIS_PORT \\\n    ping\n\
+    )\nif [ \"$?\" -eq \"124\" ]; then\n  echo \"Timed out\"\n  exit 1\nfi\nif [ \"\
+    $response\" != \"PONG\" ]; then\n  echo \"$response\"\n  exit 1\nfi"
+  ping_readiness_local_and_master.sh: 'script_dir="$(dirname "$0")"
+
+    exit_status=0
+
+    "$script_dir/ping_readiness_local.sh" $1 || exit_status=$?
+
+    "$script_dir/ping_readiness_master.sh" $1 || exit_status=$?
+
+    exit $exit_status'
+  ping_readiness_master.sh: "#!/bin/bash\n\n[[ -f $REDIS_MASTER_PASSWORD_FILE ]] &&\
+    \ export REDIS_MASTER_PASSWORD=\"$(< \"${REDIS_MASTER_PASSWORD_FILE}\")\"\n[[\
+    \ -n \"$REDIS_MASTER_PASSWORD\" ]] && export REDISCLI_AUTH=\"$REDIS_MASTER_PASSWORD\"\
+    \nresponse=$(\n  timeout -s 15 $1 \\\n  redis-cli \\\n    -h $REDIS_MASTER_HOST\
+    \ \\\n    -p $REDIS_MASTER_PORT_NUMBER \\\n    ping\n)\nif [ \"$?\" -eq \"124\"\
+    \ ]; then\n  echo \"Timed out\"\n  exit 1\nfi\nif [ \"$response\" != \"PONG\"\
+    \ ]; then\n  echo \"$response\"\n  exit 1\nfi"
+kind: ConfigMap
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: synapse
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: redis
+    helm.sh/chart: redis-17.17.1
+  name: synapse-redis-health
+  namespace: apps
+---
+apiVersion: v1
+data:
+  start-master.sh: "#!/bin/bash\n\n[[ -f $REDIS_PASSWORD_FILE ]] && export REDIS_PASSWORD=\"\
+    $(< \"${REDIS_PASSWORD_FILE}\")\"\nif [[ -f /opt/bitnami/redis/mounted-etc/master.conf\
+    \ ]];then\n    cp /opt/bitnami/redis/mounted-etc/master.conf /opt/bitnami/redis/etc/master.conf\n\
+    fi\nif [[ -f /opt/bitnami/redis/mounted-etc/redis.conf ]];then\n    cp /opt/bitnami/redis/mounted-etc/redis.conf\
+    \ /opt/bitnami/redis/etc/redis.conf\nfi\nARGS=(\"--port\" \"${REDIS_PORT}\")\n\
+    ARGS+=(\"--requirepass\" \"${REDIS_PASSWORD}\")\nARGS+=(\"--masterauth\" \"${REDIS_PASSWORD}\"\
+    )\nARGS+=(\"--include\" \"/opt/bitnami/redis/etc/redis.conf\")\nARGS+=(\"--include\"\
+    \ \"/opt/bitnami/redis/etc/master.conf\")\nexec redis-server \"${ARGS[@]}\"\n"
+kind: ConfigMap
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: synapse
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: redis
+    helm.sh/chart: redis-17.17.1
+  name: synapse-redis-scripts
+  namespace: apps
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: synapse
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: matrix-synapse
+    app.kubernetes.io/version: 1.146.0
+    helm.sh/chart: matrix-synapse-3.12.19
+  name: synapse-matrix-synapse
+  namespace: apps
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+  storageClassName: rook-ceph-block
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    helm.sh/hook: test-success
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: synapse
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: matrix-synapse
+    app.kubernetes.io/version: 1.146.0
+    helm.sh/chart: matrix-synapse-3.12.19
+  name: synapse-matrix-synapse-test-connection
+  namespace: apps
+spec:
+  containers:
+    - args:
+        - synapse-matrix-synapse:8008/_matrix/client/versions
+      command:
+        - wget
+      image: busybox
+      name: wget
+  restartPolicy: Never
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: synapse
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: matrix-synapse
+    app.kubernetes.io/version: 1.146.0
+    helm.sh/chart: matrix-synapse-3.12.19
+  name: synapse-matrix-synapse
+  namespace: apps
+stringData:
+  config.yaml: "## Registration ##\n\nregistration_shared_secret: \"N7jNsV7M89iQYggZaVmODFA1\"\
+    \n\n## API Configuration ##\n\n## Database configuration ##\n\ndatabase:\n  name:\
+    \ \"psycopg2\"\n  args:\n    user: \"synapse\"\n    password: \"@@POSTGRES_PASSWORD@@\"\
+    \n    database: \"synapse\"\n    host: \"postgresql-18-hl\"\n    port: 5432\n\
+    \    sslmode: \"prefer\"\n    cp_min: 5\n    cp_max: 10\n    \n\n## Redis configuration\
+    \ ##\n\nredis:\n  enabled: true\n  host: \"synapse-redis-master\"\n  port: 6379\n\
+    \  password: \"synapse\"\n"
+---
+apiVersion: v1
+data:
+  redis-password: c3luYXBzZQ==
+kind: Secret
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: synapse
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: redis
+    helm.sh/chart: redis-17.17.1
+  name: synapse-redis
+  namespace: apps
+type: Opaque
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  annotations:
+    argocd.argoproj.io/hook: Skip
+    helm.sh/hook: pre-install
+    helm.sh/hook-delete-policy: never
+    helm.sh/resource-policy: keep
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/component: signingkey-job
+    app.kubernetes.io/instance: synapse
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: matrix-synapse
+    app.kubernetes.io/version: 1.146.0
+    helm.sh/chart: matrix-synapse-3.12.19
+  name: synapse-signingkey
+  namespace: apps
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: synapse
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: matrix-synapse
+    app.kubernetes.io/version: 1.146.0
+    helm.sh/chart: matrix-synapse-3.12.19
+  name: synapse-matrix-synapse
+  namespace: apps
+spec:
+  ports:
+    - name: http
+      port: 8008
+      protocol: TCP
+      targetPort: http
+  selector:
+    app.kubernetes.io/component: synapse
+    app.kubernetes.io/instance: synapse
+    app.kubernetes.io/name: matrix-synapse
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: synapse
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: redis
+    helm.sh/chart: redis-17.17.1
+  name: synapse-redis-headless
+  namespace: apps
+spec:
+  clusterIP: None
+  ports:
+    - name: tcp-redis
+      port: 6379
+      targetPort: redis
+  selector:
+    app.kubernetes.io/instance: synapse
+    app.kubernetes.io/name: redis
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/component: master
+    app.kubernetes.io/instance: synapse
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: redis
+    helm.sh/chart: redis-17.17.1
+  name: synapse-redis-master
+  namespace: apps
+spec:
+  internalTrafficPolicy: Cluster
+  ports:
+    - name: tcp-redis
+      port: 6379
+      targetPort: redis
+  selector:
+    app.kubernetes.io/component: master
+    app.kubernetes.io/instance: synapse
+    app.kubernetes.io/name: redis
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: synapse
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: matrix-synapse
+    app.kubernetes.io/version: 1.146.0
+    helm.sh/chart: matrix-synapse-3.12.19
+  name: synapse-replication
+  namespace: apps
+spec:
+  ports:
+    - name: replication
+      port: 9093
+      protocol: TCP
+      targetPort: replication
+  selector:
+    app.kubernetes.io/component: synapse
+    app.kubernetes.io/instance: synapse
+    app.kubernetes.io/name: matrix-synapse
+  type: ClusterIP
+---
+apiVersion: v1
+automountServiceAccountToken: true
+kind: ServiceAccount
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: synapse
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: redis
+    helm.sh/chart: redis-17.17.1
+  name: synapse-redis
+  namespace: apps
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  annotations:
+    helm.sh/hook: pre-install
+    helm.sh/hook-delete-policy: hook-succeeded
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/component: signingkey-job
+    app.kubernetes.io/instance: synapse
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: matrix-synapse
+    app.kubernetes.io/version: 1.146.0
+    helm.sh/chart: matrix-synapse-3.12.19
+  name: synapse-signingkey-job
+  namespace: apps
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: cloudflare-issuer
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: synapse
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: matrix-synapse
+    app.kubernetes.io/version: 1.146.0
+    helm.sh/chart: matrix-synapse-3.12.19
+  name: synapse-matrix-synapse
+  namespace: apps
+spec:
+  ingressClassName: cilium
+  rules:
+    - host: matrix.josevictor.me
+      http:
+        paths:
+          - backend:
+              service:
+                name: synapse-matrix-synapse
+                port:
+                  number: 8008
+            path: /_matrix
+            pathType: Prefix
+          - backend:
+              service:
+                name: synapse-matrix-synapse
+                port:
+                  number: 8008
+            path: /_synapse
+            pathType: Prefix
+  tls:
+    - hosts:
+        - matrix.josevictor.me
+      secretName: wildcard-tls
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  annotations:
+    helm.sh/hook: pre-install
+    helm.sh/hook-delete-policy: hook-succeeded
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/component: signingkey-job
+    app.kubernetes.io/instance: synapse
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: matrix-synapse
+    app.kubernetes.io/version: 1.146.0
+    helm.sh/chart: matrix-synapse-3.12.19
+  name: synapse-signingkey-job
+  namespace: apps
+rules:
+  - apiGroups:
+      - ''
+    resourceNames:
+      - synapse-signingkey
+    resources:
+      - secrets
+    verbs:
+      - get
+      - update
+      - patch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  annotations:
+    helm.sh/hook: pre-install
+    helm.sh/hook-delete-policy: hook-succeeded
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/component: signingkey-job
+    app.kubernetes.io/instance: synapse
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: matrix-synapse
+    app.kubernetes.io/version: 1.146.0
+    helm.sh/chart: matrix-synapse-3.12.19
+  name: synapse-signingkey-job
+  namespace: apps
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: synapse-signingkey-job
+subjects:
+  - kind: ServiceAccount
+    name: synapse-signingkey-job
+    namespace: apps
