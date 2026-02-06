@@ -67,12 +67,12 @@ in
             metadata.labels = { inherit app; };
             spec = {
               imagePullSecrets = [
-                { name = "ghcr-registry-secret"; }
+                { name = "mau-registry-secret"; }
               ];
               containers = [
                 {
                   name = app;
-                  image = "ghcr.io/mautrix/whatsapp:v0.11.1";
+                  image = "dock.mau.dev/mautrix/whatsapp:v0.11.1";
                   env = [
                     {
                       name = "MAUTRIX_WHATSAPP_DATABASE_URI";
