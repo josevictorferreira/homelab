@@ -112,7 +112,7 @@ in
             { name = "ghcr-registry-secret"; }
           ];
           controllers.main = {
-            replicas = 2;
+            replicas = 1;
             containers.main = {
               envFrom = [
                 { secretRef.name = secretName; }
