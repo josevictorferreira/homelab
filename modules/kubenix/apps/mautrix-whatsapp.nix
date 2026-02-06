@@ -66,6 +66,9 @@ in
           template = {
             metadata.labels = { inherit app; };
             spec = {
+              imagePullSecrets = [
+                { name = "ghcr-registry-secret"; }
+              ];
               containers = [
                 {
                   name = app;

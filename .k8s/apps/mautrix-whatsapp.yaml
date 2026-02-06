@@ -39,6 +39,8 @@ spec:
               name: registration
               readOnly: true
               subPath: registration.yaml
+      imagePullSecrets:
+        - name: ghcr-registry-secret
       volumes:
         - name: data
           persistentVolumeClaim:
