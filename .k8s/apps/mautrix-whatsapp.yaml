@@ -23,7 +23,7 @@ spec:
                 secretKeyRef:
                   key: MAUTRIX_WHATSAPP_POSTGRES_URI
                   name: mautrix-whatsapp-env
-          image: ghcr.io/mautrix/whatsapp:v0.11.1
+          image: dock.mau.dev/mautrix/whatsapp:v0.11.1
           name: mautrix-whatsapp
           ports:
             - containerPort: 29318
@@ -40,7 +40,7 @@ spec:
               readOnly: true
               subPath: registration.yaml
       imagePullSecrets:
-        - name: ghcr-registry-secret
+        - name: mau-registry-secret
       volumes:
         - name: data
           persistentVolumeClaim:
