@@ -38,12 +38,16 @@ in
               url = "http://mautrix-whatsapp.${namespace}.svc.cluster.local:29318";
               as_token = kubenix.lib.secretsInlineFor "mautrix_whatsapp_as_token";
               hs_token = kubenix.lib.secretsInlineFor "mautrix_whatsapp_hs_token";
-              sender_localpart = "whatsapp";
+              sender_localpart = "whatsappbot";
               namespaces = {
                 users = [
                   {
                     exclusive = true;
-                    regex = "@whatsapp_.*";
+                    regex = "@whatsappbot:josevictor\\.me";
+                  }
+                  {
+                    exclusive = true;
+                    regex = "@whatsapp_.*:josevictor\\.me";
                   }
                 ];
                 rooms = [ ];
