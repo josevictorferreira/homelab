@@ -1,6 +1,6 @@
 apiVersion: v1
 data:
-    cloudflare-api-token: ENC[AES256_GCM,data:MjbiywFffbSoC+O3mjxHDKabazCPEFyo/RGCqn4H7lAb0dbSC2XVxbajHli9GLvpz11pB5QqHxk=,iv:5CPVqx7QQbPArg12uRs3iq4tErGTZkPosgxHMxzLLRM=,tag:pHCbykHIa4tzXYnH75tGkQ==,type:str]
+    cloudflare-api-token: ENC[AES256_GCM,data:vdw0+jfGTV2btKDxKdhNEo2xJ470zikk0z0VAkxZTTZgrPeaqIFJKDgElOm0FEzq2YKMg7tf9+8=,iv:irvS646Fk/9UoyzsBMG5wjcVhdY1ZpPXKT+zsI59BeE=,tag:hzkgxNTfT4krqGZS28gdDg==,type:str]
 kind: Secret
 metadata:
     annotations:
@@ -14,31 +14,31 @@ sops:
         - recipient: age16yrhmz8fytj7j9ns80zl40zjcdfd3pdxh48ld7ys7veea774udtqfn9jyx
           enc: |
             -----BEGIN AGE ENCRYPTED FILE-----
-            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBXYVYyQytFMXFSamdJYTVs
-            YUtURnZpeVZYZnc4d0VhUmJ0d2tKbVMxVmcwCnR5MGNaZi9FWmVNYitBemU3SXZY
-            SFBRazBId3Zxc1JteHMyaWp1aE1IUzQKLS0tIGhwSXVBWVlQSzFkcnd5UnlUV2do
-            SEtHODNwekkrUEx4M3Znb0pKd3A1T0UK9C+OHKj57mHyCdlN4HWf2usAnsexv6BV
-            XYn66h7rX76FVINdXdU9BL1jpGk9lUmUYf/+xXgyE2fiEyutDfRi8w==
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSB4NnRKa0gwNjBHYXBFVWNl
+            dVc2Y1QyU1NRTklIL3d2U1pIdGRzem1oLzIwCnVxTU9JRVlJNTBkRFZOS2VoU0pJ
+            bmpkV3JkLzI2SFBKNkdVU0tOb1U4ZWcKLS0tIGI0RG96a3RnWmtQelNYRlpCOW5L
+            bUhtcnZBSFoyNlFIdDEvT2tRUHBrZ0kKljF+RN6rX4YLWvyqTw1zrrOBzxnUVgVq
+            FfMRxwjfgcv4456xxl+dppkFbG3zWoa+0o2hZAQG+eX7MZTzdR2OeA==
             -----END AGE ENCRYPTED FILE-----
         - recipient: age1jx9qu5p0ycvymrl2gykd9z3w8x8n67jxnatxs49j7qzspjr6asqqf8u35h
           enc: |
             -----BEGIN AGE ENCRYPTED FILE-----
-            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBUY1lrWmQ3Y21Xcmc0R2ZY
-            K3ZDdSt6OHJMZ0JaK1VQZUg2NDdVL2wvZDBZCit5Q2pMRlpES0xaT2FDTzM4N1Nw
-            cytzRlRHSS9TN01CMWFoNFdheThwcDQKLS0tIE12anVNdmtXTnVwMGF4T3d5bHBH
-            ejhucWVPbEtRTVFSZUdMVTJzT0ZaaG8Kn/JPUQ2CsbjLnqdREQNu8uAeGCjRLfc3
-            TlyfTTeQXYco/b8vuVqUgxdugkpn6bObd4ga/RwI2KH5hLtdtCEZPg==
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBVVGx4TDM1R0NVSGpFcjNN
+            S0hSTzZiWnFxQ2ttRUUzaU5Qbi94SGxsRW5ZCktkbTBESzZKRm44R3lrZU41NFc4
+            eFpFUnpjekloZ2tIRkEwYnRPYk5aVU0KLS0tIEJTMDEvRGpES2xmaW8rRkVBNVBC
+            dGlGUW45YkZhbGhDazI0VHNMcUdhMDgKKLAj10A2rY3rmdlGqvCZ5I6fk1XNo6bh
+            xdfut2ZoGS8Gg/VsbI9dr9KihY+oxeLqsdCOzMukvN8WW1kyyErt4w==
             -----END AGE ENCRYPTED FILE-----
         - recipient: age1myzhwq67gu5zrfk8fvs0p7mh5fk67d20ltwqf9325ya83lm06ytsyax3j2
           enc: |
             -----BEGIN AGE ENCRYPTED FILE-----
-            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBIdWFCcWVWZFpYU1NWMzZJ
-            Y1FBeEZITTllbkNtRldlZE9OeERmZmtncUVFCnc3a2o5SUxFL3VFYVh4SDN2R3Z0
-            aHZneHRJRXQ0M0pGT2FTdnJEZVBXNlEKLS0tIEUzSXZid2hCSFVGaURwRGxXcnB1
-            UUtQSVJzcjc2T1B0Qm1pd2pJUkNDQnMK3efb0eiZxAnhDOVS0DuSzNGGT88aCT9p
-            H626hykVLWyT5r1a+vHtCZxL05otje5TyGwBM9OmZjnKDgxdeVjzhA==
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBaVHpSSHRFTU43dWlxSG9j
+            eU51OFFPSUlVUGg2dUFTbzBTbC9KNHNQUVVVCnZJMEk4bHRab2ducUVJTmxKYkRu
+            aVZ4UGxzay93ZlJwRzlndDlXbkFDN1UKLS0tIDdaWm1JVjMrVHFpdzdRWG5JczN2
+            c09rSWo4dEFMU1pYYzY5M0VTV0w5cDgKuhuKSDqYw2kyRIWcsiUathnLvi4nV9vW
+            mbRaMO1F7DXbI6Do06dlsVNtWLLKEUp02Sno2qQChLlmqyCh7fNxbw==
             -----END AGE ENCRYPTED FILE-----
-    lastmodified: "2026-02-07T14:02:37Z"
-    mac: ENC[AES256_GCM,data:7ofxXd+wd1Daw/mTbygjvpiJY1dNx+QtEBK4O1qBHkCTShjxUvCvv7dE8zpYHwNrGkjCBG7WLYtvMKCx6n5xA6YOxw0bm0qQEZiMiR2LeZB3Ix7HrqvX/d05vle7eMvxil+495LmCUEFzcU9Ely6oMP8bys13COL2ANPTCdirbI=,iv:osfn917s5LehqspiCTLz2nocHRcboRuvbrB5YOZLDX0=,tag:KovKRL2mPmaAetqk59G6GQ==,type:str]
+    lastmodified: "2026-02-07T14:05:53Z"
+    mac: ENC[AES256_GCM,data:uAx1Jwam5r5m1FIqC42zAJUzdpAVu8r1rQuF3YxFoAYH0/TLXhjwG6pqbCkpLmEp3qG1jxxx2bkddCPjl2+1JQagE78qRhUxNXninG3H8we73atgccMCgmEIA+wtn6/jhQnfZR9FPXQHl4P/jo3diEtElMi5IfsFS3aEn5ruHGk=,iv:kOYlDqkKQzXrMXkaTDJFMW0ATxmjYjPMuaw2rEHc5Fo=,tag:4/dRTOfYB4S/0sPt6QsGpA==,type:str]
     encrypted_regex: ^(data|stringData)$
     version: 3.11.0
