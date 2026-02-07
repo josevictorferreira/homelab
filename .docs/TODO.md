@@ -1,9 +1,9 @@
 # TODO
 
 - [ ] Add clawdbot to my cluster
-- [x] Add a matrix server ✅ 2026-02-05 18:55
 - [ ] Add CephFS monitoring integrated with Grafana, and add warnings to ntfy.
 - [ ] Fix raspberry pi not booting.
+- [x] Add a matrix server ✅ 2026-02-05 18:55
 - [x] Add keycloak to the cluster ✅ 2026-02-05 11:15
 - [x] Add tailscale to the k8s cluster and configure it as sidecar in blocky pod. ✅ 2026-02-04 11:24
 - [x] Backup files from dropbox into my homelab, then delete all files from the cloud. ✅ 2026-02-04 10:27

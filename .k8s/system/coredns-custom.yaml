@@ -1,0 +1,12 @@
+apiVersion: v1
+data:
+  blocky.override: 'forward . 10.10.10.100
+
+    '
+kind: ConfigMap
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: coredns-custom
+  namespace: kube-system
