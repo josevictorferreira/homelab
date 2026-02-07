@@ -60,7 +60,7 @@ in
           stringData = {
             "config.yaml" = kubenix.lib.toYamlStr {
               homeserver = {
-                address = "http://synapse.${namespace}.svc.cluster.local:8008";
+                address = "http://synapse-matrix-synapse.${namespace}.svc.cluster.local:8008";
                 domain = "josevictor.me";
               };
               appservice = {
