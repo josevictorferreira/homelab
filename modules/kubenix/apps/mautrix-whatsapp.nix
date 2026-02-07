@@ -30,34 +30,6 @@ in
         };
       };
 
-      configMaps."${app}-config" = {
-        metadata = { inherit namespace; };
-        data = {
-          "config.yaml" = kubenix.lib.toYamlStr {
-            homeserver = {
-              address = "http://synapse.${namespace}.svc.cluster.local:8008";
-              domain = "josevictor.me";
-            };
-            appservice = {
-              address = "http://${app}.${namespace}.svc.cluster.local:29318";
-              hostname = "0.0.0.0";
-              port = 29318;
-              # Database is provided via environment variable MAUTRIX_WHATSAPP_POSTGRES_URI
-              database = "postgres://will-be-overridden-by-env";
-            };
-            bridge = {
-              relay = {
-                enabled = true;
-              };
-            };
-            logging = {
-              directory = "/data/logs";
-              print_level = "info";
-            };
-          };
-        };
-      };
-
       deployments.${app} = {
         metadata = { inherit namespace; };
         spec = {
@@ -73,15 +45,6 @@ in
                 {
                   name = app;
                   image = "dock.mau.dev/mautrix/whatsapp:v0.11.1";
-                  env = [
-                    {
-                      name = "MAUTRIX_WHATSAPP_DATABASE_URI";
-                      valueFrom.secretKeyRef = {
-                        name = "mautrix-whatsapp-env";
-                        key = "MAUTRIX_WHATSAPP_POSTGRES_URI";
-                      };
-                    }
-                  ];
                   ports = [
                     {
                       name = "http";
@@ -115,7 +78,7 @@ in
                 }
                 {
                   name = "config";
-                  configMap.name = "${app}-config";
+                  secret.secretName = "mautrix-whatsapp-config";
                 }
                 {
                   name = "registration";
