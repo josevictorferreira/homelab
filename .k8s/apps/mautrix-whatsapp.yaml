@@ -17,13 +17,7 @@ spec:
         app: mautrix-whatsapp
     spec:
       containers:
-        - env:
-            - name: MAUTRIX_WHATSAPP_DATABASE_URI
-              valueFrom:
-                secretKeyRef:
-                  key: MAUTRIX_WHATSAPP_POSTGRES_URI
-                  name: mautrix-whatsapp-env
-          image: dock.mau.dev/mautrix/whatsapp:v0.11.1
+        - image: dock.mau.dev/mautrix/whatsapp:v0.11.1
           name: mautrix-whatsapp
           ports:
             - containerPort: 29318
@@ -45,26 +39,12 @@ spec:
         - name: data
           persistentVolumeClaim:
             claimName: mautrix-whatsapp
-        - configMap:
-            name: mautrix-whatsapp-config
-          name: config
+        - name: config
+          secret:
+            secretName: mautrix-whatsapp-config
         - name: registration
           secret:
             secretName: mautrix-whatsapp-registration
----
-apiVersion: v1
-data:
-  config.yaml: "appservice:\n  address: http://mautrix-whatsapp.apps.svc.cluster.local:29318\n\
-    \  database: postgres://will-be-overridden-by-env\n  hostname: 0.0.0.0\n  port:\
-    \ 29318\nbridge:\n  relay:\n    enabled: true\nhomeserver:\n  address: http://synapse.apps.svc.cluster.local:8008\n\
-    \  domain: josevictor.me\nlogging:\n  directory: /data/logs\n  print_level: info\n"
-kind: ConfigMap
-metadata:
-  annotations:
-    kubenix/k8s-version: '1.32'
-    kubenix/project-name: ze-homelab
-  name: mautrix-whatsapp-config
-  namespace: apps
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim

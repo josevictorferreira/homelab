@@ -28,15 +28,6 @@ in
           };
         };
 
-        "mautrix-whatsapp-env" = {
-          metadata = {
-            namespace = namespace;
-          };
-          stringData = {
-            MAUTRIX_WHATSAPP_POSTGRES_URI = "postgres://postgres:${kubenix.lib.secretsInlineFor "postgresql_admin_password"}@postgresql-18-hl.databases.svc.cluster.local:5432/mautrix_whatsapp?sslmode=disable";
-          };
-        };
-
         "mautrix-whatsapp-registration" = {
           metadata = {
             namespace = namespace;
@@ -57,6 +48,56 @@ in
                 ];
                 rooms = [ ];
                 aliases = [ ];
+              };
+            };
+          };
+        };
+
+        "mautrix-whatsapp-config" = {
+          metadata = {
+            namespace = namespace;
+          };
+          stringData = {
+            "config.yaml" = kubenix.lib.toYamlStr {
+              homeserver = {
+                address = "http://synapse.${namespace}.svc.cluster.local:8008";
+                domain = "josevictor.me";
+              };
+              appservice = {
+                address = "http://mautrix-whatsapp.${namespace}.svc.cluster.local:29318";
+                hostname = "0.0.0.0";
+                port = 29318;
+                database = {
+                  type = "postgres";
+                  uri = "postgres://postgres:${kubenix.lib.secretsInlineFor "postgresql_admin_password"}@postgresql-18-hl.databases.svc.cluster.local:5432/mautrix_whatsapp?sslmode=disable";
+                };
+                as_token = kubenix.lib.secretsInlineFor "mautrix_whatsapp_as_token";
+                hs_token = kubenix.lib.secretsInlineFor "mautrix_whatsapp_hs_token";
+                id = "whatsapp";
+                bot = {
+                  username = "whatsappbot";
+                  displayname = "WhatsApp Bridge Bot";
+                };
+              };
+              bridge = {
+                username_template = "whatsapp_{{.}}";
+                displayname_template = "{{if .BusinessName}}{{.BusinessName}}{{else if .PushName}}{{.PushName}}{{else}}{{.JID}}{{end}} (WA)";
+                permissions = {
+                  "*" = "relay";
+                  "@jose:josevictor.me" = "admin";
+                };
+                relay = {
+                  enabled = true;
+                };
+              };
+              logging = {
+                min_level = "info";
+                writers = [
+                  {
+                    type = "stdout";
+                    format = "pretty-colored";
+                  }
+                ];
               };
             };
           };
