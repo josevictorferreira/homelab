@@ -17,7 +17,7 @@ spec:
         app: mautrix-whatsapp
     spec:
       containers:
-        - image: dock.mau.dev/mautrix/whatsapp:v0.2601.0
+        - image: dock.mau.dev/mautrix/whatsapp:v26.01
           name: mautrix-whatsapp
           ports:
             - containerPort: 29318
@@ -25,16 +25,30 @@ spec:
           volumeMounts:
             - mountPath: /data
               name: data
-            - mountPath: /data/config.yaml
-              name: config
-              readOnly: true
-              subPath: config.yaml
-            - mountPath: /data/registration.yaml
-              name: registration
-              readOnly: true
-              subPath: registration.yaml
       imagePullSecrets:
         - name: mau-registry-secret
+      initContainers:
+        - command:
+            - sh
+            - -c
+            - 'cp /config-src/config.yaml /data/config.yaml
+
+              cp /registration-src/registration.yaml /data/registration.yaml
+
+              chmod 644 /data/config.yaml /data/registration.yaml
+
+              '
+          image: busybox:1.37
+          name: copy-config
+          volumeMounts:
+            - mountPath: /data
+              name: data
+            - mountPath: /config-src
+              name: config
+              readOnly: true
+            - mountPath: /registration-src
+              name: registration
+              readOnly: true
       volumes:
         - name: data
           persistentVolumeClaim:
