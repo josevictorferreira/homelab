@@ -123,9 +123,26 @@
 
       formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.nixpkgs-fmt);
 
-      packages = forAllSystems (system: {
-        gen-manifests = kubenixModule.mkRenderer system nixpkgs.legacyPackages.${system};
-      });
+      packages = forAllSystems (
+        system:
+        let
+          sysPkgs = nixpkgs.legacyPackages.${system};
+          commands = import ./modules/commands.nix {
+            pkgs = sysPkgs;
+            inherit lib;
+          };
+        in
+        {
+          gen-manifests = kubenixModule.mkRenderer system sysPkgs;
+          inherit (commands)
+            gmanifests
+            vmanifests
+            umanifests
+            emanifests
+            manifests
+            ;
+        }
+      );
 
       devShells = forAllSystems (system: {
         default = nixpkgs.legacyPackages.${system}.mkShell {
