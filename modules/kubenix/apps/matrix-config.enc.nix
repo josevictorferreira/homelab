@@ -249,10 +249,8 @@ in
             "registration.yaml" = kubenix.lib.toYamlStr {
               id = "discord";
               url = "http://mautrix-discord.${namespace}.svc.cluster.local:29334";
-              # NOTE: mautrix-discord currently disabled; keep placeholders to avoid vals failures.
-              # When enabling, switch to secretsInlineFor + add secrets keys.
-              as_token = "REPLACE_ME";
-              hs_token = "REPLACE_ME";
+              as_token = kubenix.lib.secretsInlineFor "mautrix_discord_as_token";
+              hs_token = kubenix.lib.secretsInlineFor "mautrix_discord_hs_token";
               sender_localpart = "discordbot";
               namespaces = {
                 users = [
@@ -291,10 +289,8 @@ in
                   username = "discordbot";
                   displayname = "Discord Bridge Bot";
                 };
-                # NOTE: mautrix-discord currently disabled; keep placeholders to avoid vals failures.
-                # When enabling, switch to secretsInlineFor + add secrets keys.
-                as_token = "REPLACE_ME";
-                hs_token = "REPLACE_ME";
+                as_token = kubenix.lib.secretsInlineFor "mautrix_discord_as_token";
+                hs_token = kubenix.lib.secretsInlineFor "mautrix_discord_hs_token";
               };
               database = {
                 type = "postgres";
