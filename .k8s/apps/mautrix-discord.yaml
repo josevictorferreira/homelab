@@ -1,0 +1,93 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: mautrix-discord
+  namespace: apps
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mautrix-discord
+  template:
+    metadata:
+      labels:
+        app: mautrix-discord
+    spec:
+      containers:
+        - image: dock.mau.dev/mautrix/discord:v0.7.3
+          name: mautrix-discord
+          ports:
+            - containerPort: 29334
+              name: http
+          volumeMounts:
+            - mountPath: /data
+              name: data
+      imagePullSecrets:
+        - name: mau-registry-secret
+      initContainers:
+        - command:
+            - sh
+            - -c
+            - 'cp /config-src/config.yaml /data/config.yaml
+
+              cp /registration-src/registration.yaml /data/registration.yaml
+
+              chmod 644 /data/config.yaml /data/registration.yaml
+
+              '
+          image: busybox:1.37
+          name: copy-config
+          volumeMounts:
+            - mountPath: /data
+              name: data
+            - mountPath: /config-src
+              name: config
+              readOnly: true
+            - mountPath: /registration-src
+              name: registration
+              readOnly: true
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: mautrix-discord
+        - name: config
+          secret:
+            secretName: mautrix-discord-config
+        - name: registration
+          secret:
+            secretName: mautrix-discord-registration
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: mautrix-discord
+  namespace: apps
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: rook-ceph-block
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: mautrix-discord
+  namespace: apps
+spec:
+  ports:
+    - name: http
+      port: 29334
+      targetPort: 29334
+  selector:
+    app: mautrix-discord
