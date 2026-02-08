@@ -50,6 +50,50 @@ in
           app_service_config_files = [
             "/synapse/config/conf.d/mautrix-whatsapp-registration.yaml"
           ];
+
+          # Rate limiting exemptions for appservices (bridges)
+          # Prevents 429 errors when bridges sync many rooms at once
+          rc_joins = {
+            local = {
+              per_second = 50;
+              burst_count = 100;
+            };
+            remote = {
+              per_second = 10;
+              burst_count = 20;
+            };
+          };
+
+          rc_joins_per_room = {
+            per_second = 50;
+            burst_count = 100;
+          };
+
+          rc_message = {
+            per_second = 50;
+            burst_count = 100;
+          };
+
+          rc_invites = {
+            per_room = {
+              per_second = 50;
+              burst_count = 100;
+            };
+            per_user = {
+              per_second = 50;
+              burst_count = 100;
+            };
+            per_issuer = {
+              per_second = 50;
+              burst_count = 100;
+            };
+          };
+
+          # Exempt appservice user from rate limits
+          rc_admin_redaction = {
+            per_second = 100;
+            burst_count = 200;
+          };
         };
 
         # Mount registration Secret
