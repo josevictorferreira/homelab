@@ -240,6 +240,97 @@ in
             };
           };
         };
+
+        "mautrix-discord-registration" = {
+          metadata = {
+            namespace = namespace;
+          };
+          stringData = {
+            "registration.yaml" = kubenix.lib.toYamlStr {
+              id = "discord";
+              url = "http://mautrix-discord.${namespace}.svc.cluster.local:29334";
+              # NOTE: mautrix-discord currently disabled; keep placeholders to avoid vals failures.
+              # When enabling, switch to secretsInlineFor + add secrets keys.
+              as_token = "REPLACE_ME";
+              hs_token = "REPLACE_ME";
+              sender_localpart = "discordbot";
+              namespaces = {
+                users = [
+                  {
+                    exclusive = true;
+                    regex = "@discordbot:josevictor\\.me";
+                  }
+                  {
+                    exclusive = true;
+                    regex = "@discord_.*:josevictor\\.me";
+                  }
+                ];
+                rooms = [ ];
+                aliases = [ ];
+              };
+            };
+          };
+        };
+
+        "mautrix-discord-config" = {
+          metadata = {
+            namespace = namespace;
+          };
+          stringData = {
+            "config.yaml" = kubenix.lib.toYamlStr {
+              homeserver = {
+                address = "http://synapse-matrix-synapse.${namespace}.svc.cluster.local:8008";
+                domain = "josevictor.me";
+              };
+              appservice = {
+                address = "http://mautrix-discord.${namespace}.svc.cluster.local:29334";
+                hostname = "0.0.0.0";
+                port = 29334;
+                id = "discord";
+                bot = {
+                  username = "discordbot";
+                  displayname = "Discord Bridge Bot";
+                };
+                # NOTE: mautrix-discord currently disabled; keep placeholders to avoid vals failures.
+                # When enabling, switch to secretsInlineFor + add secrets keys.
+                as_token = "REPLACE_ME";
+                hs_token = "REPLACE_ME";
+              };
+              database = {
+                type = "postgres";
+                uri = "postgres://postgres:${kubenix.lib.secretsInlineFor "postgresql_admin_password"}@postgresql-18-hl.${namespace}.svc.cluster.local:5432/mautrix_discord?sslmode=disable";
+              };
+              bridge = {
+                username_template = "discord_{{.}}";
+                command_prefix = "!dc";
+                permissions = {
+                  "*" = "relay";
+                  "@jose:josevictor.me" = "admin";
+                  "@admin:josevictor.me" = "admin";
+                };
+                encryption = {
+                  allow = false;
+                };
+                relay = {
+                  enabled = true;
+                  message_formats = {
+                    "m.text" = "<b>{{ .Sender.Displayname }}</b>: {{ .Message }}";
+                    "m.notice" = "<b>{{ .Sender.Displayname }}</b>: {{ .Message }}";
+                  };
+                };
+              };
+              logging = {
+                min_level = "info";
+                writers = [
+                  {
+                    type = "stdout";
+                    format = "pretty-colored";
+                  }
+                ];
+              };
+            };
+          };
+        };
       };
 
       # ConfigMap for user provisioning script
