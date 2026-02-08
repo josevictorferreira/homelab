@@ -47,3 +47,20 @@
 **Lesson:** After adding/modifying `secrets/k8s-secrets.enc.yaml`, verify key exists: `sops -d secrets/k8s-secrets.enc.yaml | grep <key>` before `make manifests`.
 **Context:** vals injection during `make vmanifests` fails if secret keys are missing, causing cryptic manifest generation errors. Subagent claims aren't always verified.
 **Verify:** `sops -d secrets/k8s-secrets.enc.yaml | grep <key>` returns expected value
+
+## Mautrix Bridge Configuration
+
+### Bridge Config Structure Varies by Type
+**Lesson:** mautrix-whatsapp uses root-level `database:`, but mautrix-discord requires `appservice.database:` (nested). Check upstream example-config.yaml for each bridge.
+**Context:** Different mautrix bridges have different config schemas. Discord fails with "appservice.database not configured" if database is at root level.
+**Verify:** Compare `database:` placement in generated config against upstream example-config.yaml
+
+### Never Use Placeholder Values for Secrets
+**Lesson:** Always use `kubenix.lib.secretsInlineFor "key_name"` in Nix configs, never hardcode "REPLACE_ME" or other placeholders.
+**Context:** Placeholders bypass the vals/SOPS injection pipeline and end up literally in the generated YAML, causing auth failures.
+**Verify:** `grep -r "REPLACE_ME\|PLACEHOLDER" modules/kubenix/apps/` should return nothing before committing
+
+### Underscore Prefix Disables Kubenix Modules
+**Lesson:** Files prefixed with `_` (e.g., `_mautrix-discord.nix`) are ignored by kubenix. Rename to enable: `git mv _file.nix file.nix`.
+**Context:** Kubenix ignores `_*` files to allow WIP/disabled modules. Forgotten underscore = missing deployment.
+**Verify:** `ls modules/kubenix/apps/*.nix | grep -v "^_"` shows all active modules
