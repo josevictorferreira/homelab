@@ -69,6 +69,22 @@ in
                 displayname_template = "{{or .BusinessName .PushName .JID}} (WA)";
                 os_name = "Mautrix-WhatsApp bridge";
                 browser_name = "unknown";
+
+                # History sync settings - sync ALL conversations including DMs
+                history_sync = {
+                  # -1 = sync ALL conversations (groups AND private chats)
+                  max_initial_conversations = -1;
+                  # Request full sync (1 year instead of 3 months)
+                  request_full_sync = true;
+                  # Wait for history sync payloads before starting backfill
+                  dispatch_wait = "1m";
+                  # Media request settings
+                  media_requests = {
+                    auto_request_media = true;
+                    request_method = "immediate";
+                    max_async_handle = 2;
+                  };
+                };
               };
 
               # Homeserver connection
@@ -108,6 +124,10 @@ in
               bridge = {
                 username_template = "whatsapp_{{.}}";
                 command_prefix = "!wa";
+                # Enable private chat portal metadata
+                private_chat_portal_meta = true;
+                # Create a space for rooms
+                personal_filtering_spaces = true;
                 permissions = {
                   "*" = "relay";
                   "@jose:josevictor.me" = "admin";
