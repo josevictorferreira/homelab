@@ -4,6 +4,10 @@ let
   app = "synapse";
   secretName = "${app}-env";
   namespace = homelab.kubernetes.namespaces.applications;
+
+  # NOTE: mautrix-discord currently disabled (app file is _mautrix-discord.nix)
+  # Keep this false until mautrix_discord_* secrets exist and bridge is enabled.
+  enableDiscord = false;
 in
 {
   kubernetes = {
@@ -49,7 +53,8 @@ in
         extraConfig = {
           app_service_config_files = [
             "/synapse/config/conf.d/mautrix-whatsapp-registration.yaml"
-          ];
+          ]
+          ++ (if enableDiscord then [ "/synapse/config/conf.d/mautrix-discord-registration.yaml" ] else [ ]);
 
           # Rate limiting exemptions for appservices (bridges)
           # Prevents 429 errors when bridges sync many rooms at once
@@ -111,7 +116,26 @@ in
                 ];
               };
             }
-          ];
+          ]
+          ++ (
+            if enableDiscord then
+              [
+                {
+                  name = "mautrix-discord-registration";
+                  secret = {
+                    secretName = "mautrix-discord-registration";
+                    items = [
+                      {
+                        key = "registration.yaml";
+                        path = "mautrix-discord-registration.yaml";
+                      }
+                    ];
+                  };
+                }
+              ]
+            else
+              [ ]
+          );
 
           extraVolumeMounts = [
             {
@@ -120,7 +144,20 @@ in
               subPath = "mautrix-whatsapp-registration.yaml";
               readOnly = true;
             }
-          ];
+          ]
+          ++ (
+            if enableDiscord then
+              [
+                {
+                  name = "mautrix-discord-registration";
+                  mountPath = "/synapse/config/conf.d/mautrix-discord-registration.yaml";
+                  subPath = "mautrix-discord-registration.yaml";
+                  readOnly = true;
+                }
+              ]
+            else
+              [ ]
+          );
         };
 
         # External PostgreSQL (use postgres superuser)
