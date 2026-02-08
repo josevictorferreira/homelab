@@ -302,10 +302,10 @@ kubectl -n applications logs deploy/synapse --tail=100 | grep -i "appservice\|ma
 - Deployment likely succeeded but cannot be verified until cluster recovers
 - See: `.sisyphus/notepads/whatsapp-bridge-addition/COMPLETION_SUMMARY.md` for details
 
-**Verification Tasks (Pending Cluster Recovery):**
-- [ ] mautrix-whatsapp Deployment running (replicas: 1, Ready)
-- [ ] PVC bound (1Gi, rook-ceph-block)
-- [ ] Bridge logs show startup (QR prompt or "not logged in" acceptable)
-- [ ] Synapse logs show appservice loaded
-- [ ] Registration YAML mounted in both bridge and Synapse
-- [ ] No errors in bridge or Synapse logs
+**Verification Tasks (COMPLETED 2026-02-08):**
+- [x] mautrix-whatsapp Deployment running (replicas: 1, Ready)
+- [x] PVC bound (1Gi, rook-ceph-block)
+- [x] Bridge logs show startup (QR prompt or "not logged in" acceptable)
+- [x] Synapse logs show appservice loaded
+- [x] Registration YAML mounted in both bridge and Synapse
+- [x] No errors in bridge or Synapse logs
