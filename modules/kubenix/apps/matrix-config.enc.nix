@@ -291,10 +291,10 @@ in
                 };
                 as_token = kubenix.lib.secretsInlineFor "mautrix_discord_as_token";
                 hs_token = kubenix.lib.secretsInlineFor "mautrix_discord_hs_token";
-              };
-              database = {
-                type = "postgres";
-                uri = "postgres://postgres:${kubenix.lib.secretsInlineFor "postgresql_admin_password"}@postgresql-18-hl.${namespace}.svc.cluster.local:5432/mautrix_discord?sslmode=disable";
+                database = {
+                  type = "postgres";
+                  uri = "postgres://postgres:${kubenix.lib.secretsInlineFor "postgresql_admin_password"}@postgresql-18-hl.${namespace}.svc.cluster.local:5432/mautrix_discord?sslmode=disable";
+                };
               };
               bridge = {
                 username_template = "discord_{{.}}";
