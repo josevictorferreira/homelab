@@ -89,6 +89,7 @@ in
                 permissions = {
                   "*" = "relay";
                   "@jose:josevictor.me" = "admin";
+                  "@admin:josevictor.me" = "admin";
                 };
                 relay = {
                   enabled = true;
