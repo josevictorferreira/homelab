@@ -146,6 +146,9 @@ let
           if [ "$ROLLBACK_NEEDED" = true ] && [ $exit_code -ne 0 ]; then
             echo ""
             echo "ERROR: Pipeline failed. Rolling back .k8s to previous state..."
+            # Remove untracked .tmp files created during vals eval
+            find ${manifestsDir} -type f -name '*.yaml.tmp' -delete 2>/dev/null || true
+            find ${manifestsDir} -type f -name '*.yml.tmp' -delete 2>/dev/null || true
             git checkout ${manifestsDir}
             echo "Rollback complete. .k8s folder restored to git state."
           fi
