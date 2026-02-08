@@ -41,10 +41,41 @@ in
               imagePullSecrets = [
                 { name = "mau-registry-secret"; }
               ];
+              initContainers = [
+                {
+                  name = "copy-config";
+                  image = "busybox:1.37";
+                  command = [
+                    "sh"
+                    "-c"
+                    ''
+                      cp /config-src/config.yaml /data/config.yaml
+                      cp /registration-src/registration.yaml /data/registration.yaml
+                      chmod 644 /data/config.yaml /data/registration.yaml
+                    ''
+                  ];
+                  volumeMounts = [
+                    {
+                      name = "data";
+                      mountPath = "/data";
+                    }
+                    {
+                      name = "config";
+                      mountPath = "/config-src";
+                      readOnly = true;
+                    }
+                    {
+                      name = "registration";
+                      mountPath = "/registration-src";
+                      readOnly = true;
+                    }
+                  ];
+                }
+              ];
               containers = [
                 {
                   name = app;
-                  image = "dock.mau.dev/mautrix/whatsapp:v0.2601.0";
+                  image = "dock.mau.dev/mautrix/whatsapp:v26.01";
                   ports = [
                     {
                       name = "http";
@@ -55,18 +86,6 @@ in
                     {
                       name = "data";
                       mountPath = "/data";
-                    }
-                    {
-                      name = "config";
-                      mountPath = "/data/config.yaml";
-                      subPath = "config.yaml";
-                      readOnly = true;
-                    }
-                    {
-                      name = "registration";
-                      mountPath = "/data/registration.yaml";
-                      subPath = "registration.yaml";
-                      readOnly = true;
                     }
                   ];
                 }
