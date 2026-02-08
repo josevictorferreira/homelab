@@ -135,11 +135,25 @@
         {
           gen-manifests = kubenixModule.mkRenderer system sysPkgs;
           inherit (commands)
-            gmanifests
-            vmanifests
-            umanifests
-            emanifests
+            lgroups
+            check
+            lint
+            format
+            ddeploy
+            deploy
+            gdeploy
+            secrets
             manifests
+            kubesync
+            reconcile
+            events
+            wusbiso
+            docker-build
+            docker-login
+            docker-init-repo
+            docker-push
+            backup-postgres
+            restore-postgres
             ;
         }
       );

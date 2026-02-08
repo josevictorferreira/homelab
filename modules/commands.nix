@@ -1,12 +1,26 @@
 # Nix-based CLI commands for homelab management
-# Provides typed, reproducible commands with proper dependencies
+# All logic lives here; Makefile just calls `nix run .#<command>`
 { pkgs, lib }:
 
 let
   manifestsDir = ".k8s";
   lockFile = "manifests.lock";
 
-  # Check if vals is available in pkgs
+  # Configuration
+  controlPlaneIp = "10.10.10.200";
+  clusterIp = "10.10.10.250";
+  port = "6443";
+  username = "josevictor";
+  remoteKubeconfig = "/etc/rancher/k3s/k3s.yaml";
+  clusterName = "ze-homelab";
+
+  # Docker configuration
+  dockerImageName = "docling-serve-rocm";
+  dockerTag = "latest";
+  githubUser = "josevictorferreira";
+  dockerRegistry = "ghcr.io";
+  dockerFullImage = "${dockerRegistry}/${githubUser}/${dockerImageName}:${dockerTag}";
+
   valsPkg = pkgs.vals or null;
 
   mkCommand =
@@ -18,115 +32,95 @@ let
       meta = { inherit description; };
     };
 
-  # Individual manifest stages
-  gmanifests =
-    mkCommand "gmanifests" "Generate k8s manifests from kubenix"
-      [ pkgs.coreutils pkgs.findutils pkgs.nix ]
+  # ============================================================================
+  # Flake/Nix commands
+  # ============================================================================
+
+  lgroups = mkCommand "lgroups" "List available node groups" [ pkgs.nix ] ''
+    nix eval --raw .#nodeGroupsList --read-only --quiet | tr ' ' '\n'
+  '';
+
+  check = mkCommand "check" "Check if the flake is valid" [ pkgs.nix pkgs.git ] ''
+    git config core.hooksPath .githooks 2>/dev/null || true
+    nix flake check --show-trace --all-systems --impure
+  '';
+
+  lint = mkCommand "lint" "Check nix formatting" [ pkgs.nix ] ''
+    echo "Running nix formatter check..."
+    if nix fmt -- --check .; then
+      echo "All files are properly formatted."
+    else
+      echo "Some files need formatting. Run 'make format' to fix."
+      exit 1
+    fi
+  '';
+
+  format = mkCommand "format" "Format nix files" [ pkgs.nix ] ''
+    echo "Formatting nix files..."
+    nix fmt .
+    echo "Formatting complete."
+  '';
+
+  # ============================================================================
+  # Deploy commands
+  # ============================================================================
+
+  ddeploy = mkCommand "ddeploy" "Dry deploy host (interactive)" [ pkgs.nix pkgs.fzf ] ''
+    AVAILABLE_NODES="$(nix eval --raw .#nodesList --read-only --quiet)"
+    SEL="$(printf '%s\n' $AVAILABLE_NODES | tr -d '\r' | fzf --prompt='host> ' --height=40% --border --preview 'printf "%s\n" {}')"
+    echo "Deploying host: $SEL"
+    nix run github:serokell/deploy-rs -- \
+      --debug-logs \
+      --dry-activate \
+      ".#$SEL" \
+      -- \
+      --impure \
+      --show-trace
+  '';
+
+  deploy = mkCommand "deploy" "Deploy host (interactive)" [ pkgs.nix pkgs.fzf ] ''
+    AVAILABLE_NODES="$(nix eval --raw .#nodesList --read-only --quiet)"
+    SEL="$(printf '%s\n' $AVAILABLE_NODES | tr -d '\r' | fzf --prompt='host> ' --height=40% --border --preview 'printf "%s\n" {}')"
+    echo "Deploying host: $SEL"
+    nix run github:serokell/deploy-rs -- \
+      --debug-logs \
+      --auto-rollback true \
+      ".#$SEL" \
+      -- \
+      --impure \
+      --show-trace
+  '';
+
+  gdeploy = mkCommand "gdeploy" "Deploy hosts by group (interactive)" [ pkgs.nix pkgs.fzf ] ''
+    AVAILABLE_GROUPS="$(nix eval --raw .#nodeGroupsList --read-only --quiet)"
+    SEL="$(printf '%s\n' $AVAILABLE_GROUPS | tr -d '\r' | fzf --prompt='group> ' --height=40% --border --preview 'printf "%s\n" {}')"
+    echo "Deploying group: $SEL"
+    targets="$(nix eval --raw ".#deployGroups.$SEL")"
+    echo "Targets: $targets"
+    nix flake check --show-trace --all-systems --impure
+    eval "nix run github:serokell/deploy-rs -- --skip-checks --auto-rollback true $targets"
+  '';
+
+  # ============================================================================
+  # Secrets
+  # ============================================================================
+
+  secrets =
+    mkCommand "secrets" "Edit secrets files (interactive)" [ pkgs.findutils pkgs.fzf pkgs.sops ]
       ''
-        set -euo pipefail
-        HOMELAB_REPO_PATH="$PWD" nix build .#gen-manifests --impure --show-trace
-        find ${manifestsDir} -mindepth 1 -maxdepth 1 -type d \
-          ! \( -name 'flux-system' \) -exec rm -rf {} +
-        cp -rf result/* ${manifestsDir}
-        rm -rf result
-        find ${manifestsDir} -type f -exec chmod 0644 {} +
-        find ${manifestsDir} -type d -exec chmod 0755 {} +
+        SEL="$(find secrets -type f | fzf --prompt='secret> ' --height=40% --border --preview 'command -v bat >/dev/null 2>&1 && bat --style=plain --color=always {} || head -n 200 {}')"
+        if [ -z "$SEL" ]; then
+          echo "No file selected."
+          exit 1
+        fi
+        echo "Opening with sops: $SEL"
+        sops "$SEL"
       '';
 
-  vmanifests =
-    mkCommand "vmanifests" "Inject secrets using vals"
-      (
-        [
-          pkgs.coreutils
-          pkgs.findutils
-          pkgs.yq
-        ]
-        ++ lib.optional (valsPkg != null) valsPkg
-      )
-      ''
-        set -euo pipefail
+  # ============================================================================
+  # Manifests (full pipeline with git rollback)
+  # ============================================================================
 
-        vals_eval() {
-          if command -v vals >/dev/null 2>&1; then
-            vals eval -f "$1"
-          else
-            nix run nixpkgs#vals -- eval -f "$1"
-          fi
-        }
-
-        find ${manifestsDir} -mindepth 2 -type f \
-          \( -name '*.enc.yaml' -o -name '*.enc.yml' \) \
-          -not -path '${manifestsDir}/flux-system/*' -print0 \
-          | while IFS= read -r -d "" f; do
-            if yq -e 'select(has("sops") and (.sops.mac // "" != ""))' "''${f}" >/dev/null 2>&1; then
-              echo "Skipping (already encrypted): ''${f}"
-            else
-              echo "Replacing ''${f}"
-              vals_eval "''${f}" > "''${f}.tmp"
-              if [ -s "''${f}.tmp" ]; then
-                mv "''${f}.tmp" "''${f}"
-                echo "Replaced ''${f}"
-              else
-                echo "No replacements made in ''${f}"
-                rm -f "''${f}.tmp"
-              fi
-            fi
-          done
-      '';
-
-  umanifests =
-    mkCommand "umanifests" "Restore unchanged encrypted files from git"
-      [ pkgs.coreutils pkgs.findutils pkgs.gawk pkgs.git ]
-      ''
-        set -euo pipefail
-        LOCK_FILE="${lockFile}"
-        touch "''${LOCK_FILE}"
-        tmp="''${LOCK_FILE}.tmp"
-        : > "''${tmp}"
-
-        find ${manifestsDir} -mindepth 2 -type f \
-          \( -name '*.enc.yaml' -o -name '*.enc.yml' \) \
-          -not -path '${manifestsDir}/flux-system/*' -print0 \
-          | while IFS= read -r -d "" f; do
-            new_sum="$(sha256sum "''${f}" | cut -d' ' -f1)"
-            old_sum="$(awk -v p="''${f}" 'BEGIN{FS="\t"} $1==p {print $2}' "''${LOCK_FILE}" || true)"
-
-            if [ "''${new_sum}" = "''${old_sum}" ]; then
-              if git ls-files --error-unmatch "''${f}" >/dev/null 2>&1; then
-                git checkout -- "''${f}"
-                echo "Restored unchanged (keeping encrypted from git): ''${f}"
-              else
-                echo "Unchanged (untracked, left plain): ''${f}"
-              fi
-            else
-              echo "Changed: ''${f}"
-            fi
-
-            printf '%s\t%s\n' "''${f}" "''${new_sum}" >> "''${tmp}"
-          done
-
-        mv "''${tmp}" "''${LOCK_FILE}"
-      '';
-
-  emanifests =
-    mkCommand "emanifests" "Encrypt manifests with sops"
-      [ pkgs.coreutils pkgs.findutils pkgs.sops pkgs.yq ]
-      ''
-        set -euo pipefail
-        find ${manifestsDir} -mindepth 2 -type f \
-          \( -name '*.enc.yaml' -o -name '*.enc.yml' \) \
-          -not -path '${manifestsDir}/flux-system/*' -print0 \
-          | while IFS= read -r -d "" f; do
-            if yq -e 'select(has("sops") and (.sops.mac // "" != ""))' "''${f}" >/dev/null 2>&1; then
-              echo "Skipping (already encrypted): ''${f}"
-            else
-              echo "Encrypting ''${f}"
-              sops --encrypt --in-place "''${f}"
-            fi
-          done
-      '';
-
-  # Combined manifests command with rollback protection
   manifests =
     mkCommand "manifests" "Full manifest pipeline with rollback on failure"
       (
@@ -142,10 +136,9 @@ let
         ++ lib.optional (valsPkg != null) valsPkg
       )
       ''
-        set -euo pipefail
+        git config core.hooksPath .githooks 2>/dev/null || true
 
-        # Rollback mechanism: backup .k8s state before modifications
-        BACKUP_DIR="$(mktemp -d)"
+        # Rollback mechanism: use git checkout on failure
         ROLLBACK_NEEDED=false
 
         cleanup() {
@@ -153,19 +146,11 @@ let
           if [ "$ROLLBACK_NEEDED" = true ] && [ $exit_code -ne 0 ]; then
             echo ""
             echo "ERROR: Pipeline failed. Rolling back .k8s to previous state..."
-            rm -rf ${manifestsDir}/*
-            cp -rf "$BACKUP_DIR"/* ${manifestsDir}/ 2>/dev/null || true
-            echo "Rollback complete. .k8s folder restored to pre-run state."
+            git checkout ${manifestsDir}
+            echo "Rollback complete. .k8s folder restored to git state."
           fi
-          rm -rf "$BACKUP_DIR"
         }
         trap cleanup EXIT
-
-        # Backup current .k8s state
-        if [ -d "${manifestsDir}" ]; then
-          cp -rf ${manifestsDir}/* "$BACKUP_DIR"/ 2>/dev/null || true
-          ROLLBACK_NEEDED=true
-        fi
 
         vals_eval() {
           if command -v vals >/dev/null 2>&1; then
@@ -174,6 +159,8 @@ let
             nix run nixpkgs#vals -- eval -f "$1"
           fi
         }
+
+        ROLLBACK_NEEDED=true
 
         echo "[1/4] gmanifests"
         HOMELAB_REPO_PATH="$PWD" nix build .#gen-manifests --impure --show-trace
@@ -251,13 +238,243 @@ let
         echo "Done."
       '';
 
+  # ============================================================================
+  # Kubernetes
+  # ============================================================================
+
+  kubesync =
+    mkCommand "kubesync" "Sync kubeconfig from cluster"
+      [
+        pkgs.coreutils
+        pkgs.openssh
+        pkgs.kubectl
+      ]
+      ''
+        LOCAL_KUBECONFIG="$HOME/.kube/config"
+
+        kubectl config delete-user "${username}" >/dev/null 2>&1 || true
+        kubectl config delete-cluster "${clusterName}" >/dev/null 2>&1 || true
+        kubectl config delete-context "${clusterName}" >/dev/null 2>&1 || true
+
+        tmpdir="$(mktemp -d)"
+        tmpkc="$tmpdir/k3s.yaml"
+
+        ssh -4 ${username}@${controlPlaneIp} "sudo cat ${remoteKubeconfig}" > "$tmpkc"
+
+        oldctx="$(KUBECONFIG="$tmpkc" kubectl config current-context)"
+        oldcluster="$(KUBECONFIG="$tmpkc" kubectl config view --raw=true -o jsonpath="{.contexts[?(@.name==\"$oldctx\")].context.cluster}")"
+        olduser="$(KUBECONFIG="$tmpkc" kubectl config view --raw=true -o jsonpath="{.contexts[?(@.name==\"$oldctx\")].context.user}")"
+
+        ca_b64="$(KUBECONFIG="$tmpkc" kubectl config view --raw=true -o jsonpath="{.clusters[?(@.name==\"$oldcluster\")].cluster.certificate-authority-data}")"
+        clientcrt_b64="$(KUBECONFIG="$tmpkc" kubectl config view --raw=true -o jsonpath="{.users[?(@.name==\"$olduser\")].user.client-certificate-data}")"
+        clientkey_b64="$(KUBECONFIG="$tmpkc" kubectl config view --raw=true -o jsonpath="{.users[?(@.name==\"$olduser\")].user.client-key-data}")"
+
+        echo "$ca_b64" | base64 -d >"$tmpdir/ca.crt"
+        echo "$clientcrt_b64" | base64 -d >"$tmpdir/client.crt"
+        echo "$clientkey_b64" | base64 -d >"$tmpdir/client.key"
+
+        mkdir -p "$(dirname "$LOCAL_KUBECONFIG")"
+        [ -f "$LOCAL_KUBECONFIG" ] && cp "$LOCAL_KUBECONFIG" "$LOCAL_KUBECONFIG.bak" || true
+
+        KUBECONFIG="$LOCAL_KUBECONFIG" kubectl config set-cluster "${clusterName}" --embed-certs=true --server="https://${clusterIp}:${port}" --certificate-authority="$tmpdir/ca.crt"
+        KUBECONFIG="$LOCAL_KUBECONFIG" kubectl config set-credentials "${username}" --embed-certs=true --client-certificate="$tmpdir/client.crt" --client-key="$tmpdir/client.key"
+        KUBECONFIG="$LOCAL_KUBECONFIG" kubectl config set-context "${clusterName}" --cluster="${clusterName}" --user="${username}"
+        KUBECONFIG="$LOCAL_KUBECONFIG" kubectl config use-context "${clusterName}" >/dev/null
+
+        chmod 600 "$LOCAL_KUBECONFIG"
+        rm -rf "$tmpdir"
+
+        echo "OK: cluster/user/context written -> $LOCAL_KUBECONFIG"
+      '';
+
+  reconcile = mkCommand "reconcile" "Reconcile flux with main branch" [ pkgs.fluxcd ] ''
+    flux reconcile kustomization flux-system -n flux-system --with-source
+  '';
+
+  events = mkCommand "events" "Watch flux events" [ pkgs.fluxcd ] ''
+    flux events --watch
+  '';
+
+  # ============================================================================
+  # USB ISO
+  # ============================================================================
+
+  wusbiso =
+    mkCommand "wusbiso" "Build and write recovery ISO to USB"
+      [
+        pkgs.coreutils
+        pkgs.nix
+        pkgs.gptfdisk
+        pkgs.util-linux
+      ]
+      ''
+        if [ -d result/iso ]; then
+          echo "Recovery ISO already built. Skipping build."
+        else
+          echo "Building recovery ISO..."
+          nix build .#nixosConfigurations.recovery-iso.config.system.build.isoImage
+        fi
+
+        ISO="$(readlink -f result/iso/recovery-iso-*.iso)"
+        DEV="$(readlink -f /dev/disk/by-id/usb-* 2>/dev/null || true)"
+
+        echo "Recovery ISO: $ISO"
+
+        if [ -z "$DEV" ]; then
+          echo "No USB drive found. Please connect a USB drive and try again."
+          exit 1
+        fi
+
+        sudo sgdisk --zap-all "$DEV"
+        sudo wipefs -a "$DEV"
+        sudo blkdiscard -f "$DEV" || true
+        sudo dd if="$ISO" of="$DEV" bs=4M status=progress conv=fsync
+        sync
+
+        echo "Recovery ISO written to $DEV"
+        sudo eject "$DEV" 2>/dev/null || true
+        echo "Done. You can now boot from the USB drive."
+      '';
+
+  # ============================================================================
+  # Docker
+  # ============================================================================
+
+  docker-build = mkCommand "docker-build" "Build Docker image" [ pkgs.nix pkgs.docker ] ''
+    echo "Building Docker image ${dockerImageName}:${dockerTag}..."
+    nix-build images/${dockerImageName}.nix && docker load < result
+    echo "Tagging image as ${dockerFullImage}..."
+    docker tag localhost/${dockerImageName}:${dockerTag} ${dockerFullImage}
+    echo "Image built and tagged successfully: ${dockerFullImage}"
+  '';
+
+  docker-login =
+    mkCommand "docker-login" "Login to GitHub Container Registry" [ pkgs.docker pkgs.gh ]
+      ''
+        if [ -n "''${GITHUB_TOKEN:-}" ]; then
+          echo "Logging in using GITHUB_TOKEN..."
+          echo "$GITHUB_TOKEN" | docker login ${dockerRegistry} -u ${githubUser} --password-stdin
+          echo "Successfully authenticated with GITHUB_TOKEN"
+        elif command -v gh >/dev/null 2>&1; then
+          echo "Logging in using GitHub CLI..."
+          GH_TOKEN="$(gh auth token)"
+          if [ -n "$GH_TOKEN" ]; then
+            echo "$GH_TOKEN" | docker login ${dockerRegistry} -u ${githubUser} --password-stdin
+            echo "Successfully authenticated with GitHub CLI"
+          else
+            echo "GitHub CLI not authenticated. Please run: gh auth login"
+            exit 1
+          fi
+        else
+          echo "Error: Neither GitHub CLI nor GITHUB_TOKEN is available"
+          echo "Please install GitHub CLI or set GITHUB_TOKEN environment variable"
+          exit 1
+        fi
+      '';
+
+  docker-init-repo =
+    mkCommand "docker-init-repo" "Initialize GitHub Container Registry repo" [ pkgs.gh ]
+      ''
+        echo "Checking if repository exists..."
+        if gh api /user/packages/container/${dockerImageName} >/dev/null 2>&1; then
+          echo "Repository already exists"
+        else
+          echo "Creating repository using GitHub CLI..."
+          if gh api --method POST \
+              -H "Accept: application/vnd.github.v3+json" \
+              /user/packages \
+              -f name='${dockerImageName}' \
+              -f package_type='container' \
+              -f visibility='public'; then
+            echo "Repository created successfully"
+          else
+            echo "Will try to create repository on first push instead"
+          fi
+        fi
+      '';
+
+  docker-push =
+    mkCommand "docker-push" "Build and push Docker image to GHCR" [ pkgs.nix pkgs.docker pkgs.gh ]
+      ''
+        # Build
+        echo "Building Docker image ${dockerImageName}:${dockerTag}..."
+        nix-build images/${dockerImageName}.nix && docker load < result
+        echo "Tagging image as ${dockerFullImage}..."
+        docker tag localhost/${dockerImageName}:${dockerTag} ${dockerFullImage}
+        echo "Image built and tagged successfully: ${dockerFullImage}"
+
+        # Login
+        if [ -n "''${GITHUB_TOKEN:-}" ]; then
+          echo "Logging in using GITHUB_TOKEN..."
+          echo "$GITHUB_TOKEN" | docker login ${dockerRegistry} -u ${githubUser} --password-stdin
+        elif command -v gh >/dev/null 2>&1; then
+          echo "Logging in using GitHub CLI..."
+          GH_TOKEN="$(gh auth token)"
+          if [ -n "$GH_TOKEN" ]; then
+            echo "$GH_TOKEN" | docker login ${dockerRegistry} -u ${githubUser} --password-stdin
+          else
+            echo "GitHub CLI not authenticated. Please run: gh auth login"
+            exit 1
+          fi
+        else
+          echo "Error: Neither GitHub CLI nor GITHUB_TOKEN is available"
+          exit 1
+        fi
+
+        # Init repo
+        echo "Checking if repository exists..."
+        if ! gh api /user/packages/container/${dockerImageName} >/dev/null 2>&1; then
+          gh api --method POST \
+            -H "Accept: application/vnd.github.v3+json" \
+            /user/packages \
+            -f name='${dockerImageName}' \
+            -f package_type='container' \
+            -f visibility='public' || true
+        fi
+
+        # Push
+        echo "Pushing image to ${dockerFullImage}..."
+        docker push ${dockerFullImage}
+        echo "Image pushed successfully to ${dockerFullImage}"
+        echo "Image is now public at: https://${dockerRegistry}/${githubUser}/${dockerImageName}"
+      '';
+
+  # ============================================================================
+  # Postgres backup/restore
+  # ============================================================================
+
+  backup-postgres = mkCommand "backup-postgres" "Backup all postgresql data" [ pkgs.postgresql ] ''
+    mkdir -p /tmp/backup
+    pg_dumpall -h 10.10.10.101 -U postgres -f /tmp/backup/full_backup.sql
+    echo "Backup saved to /tmp/backup/full_backup.sql"
+  '';
+
+  restore-postgres = mkCommand "restore-postgres" "Restore postgresql backup" [ pkgs.postgresql ] ''
+    psql -h 10.10.10.133 -U postgres -f /tmp/backup/full_backup.sql
+    echo "Restore complete"
+  '';
+
 in
 {
   inherit
-    gmanifests
-    vmanifests
-    umanifests
-    emanifests
+    lgroups
+    check
+    lint
+    format
+    ddeploy
+    deploy
+    gdeploy
+    secrets
     manifests
+    kubesync
+    reconcile
+    events
+    wusbiso
+    docker-build
+    docker-login
+    docker-init-repo
+    docker-push
+    backup-postgres
+    restore-postgres
     ;
 }
