@@ -5,9 +5,8 @@ let
   secretName = "${app}-env";
   namespace = homelab.kubernetes.namespaces.applications;
 
-  # NOTE: mautrix-discord currently disabled (app file is _mautrix-discord.nix)
-  # Keep this false until mautrix_discord_* secrets exist and bridge is enabled.
-  enableDiscord = false;
+  # mautrix-discord is enabled - secrets exist in k8s-secrets.enc.yaml
+  enableDiscord = true;
 in
 {
   kubernetes = {
