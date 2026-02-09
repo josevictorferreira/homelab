@@ -25,8 +25,8 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: 9e07e763d176052cb906b5ff57474ef19f12fe848ff859be8815b743f20c08c8
-        checksum/secrets: 62de97ffcb0e8ae353c4d3cf46a52b11f3db569829635312455b1bc85bb4c420
+        checksum/config: 35c3f0543e2577f5176b33a88687a47eaaa4dbca7948c61463a3bda4d4572e53
+        checksum/secrets: c20555045ed2d97b960affc56f4d5a002a6c778a77a5035df87d6c9f840aaa2a
       labels:
         app.kubernetes.io/component: synapse
         app.kubernetes.io/instance: synapse
@@ -100,6 +100,10 @@ spec:
               name: mautrix-whatsapp-registration
               readOnly: true
               subPath: mautrix-whatsapp-registration.yaml
+            - mountPath: /synapse/config/conf.d/mautrix-discord-registration.yaml
+              name: mautrix-discord-registration
+              readOnly: true
+              subPath: mautrix-discord-registration.yaml
       securityContext: {}
       serviceAccountName: default
       volumes:
@@ -128,6 +132,12 @@ spec:
               - key: registration.yaml
                 path: mautrix-whatsapp-registration.yaml
             secretName: mautrix-whatsapp-registration
+        - name: mautrix-discord-registration
+          secret:
+            items:
+              - key: registration.yaml
+                path: mautrix-discord-registration.yaml
+            secretName: mautrix-discord-registration
 ---
 apiVersion: batch/v1
 kind: Job
@@ -231,13 +241,13 @@ data:
     \n## Signing Keys ##\n\nsigning_key_path: \"/synapse/keys/signing.key\"\n\n# The\
     \ trusted servers to download signing keys from.\ntrusted_key_servers:\n  - server_name:\
     \ matrix.org\n\n## Workers ##\n\n## Extra config ##\n\napp_service_config_files:\n\
-    - /synapse/config/conf.d/mautrix-whatsapp-registration.yaml\nrc_admin_redaction:\n\
-    \  burst_count: 200\n  per_second: 100\nrc_invites:\n  per_issuer:\n    burst_count:\
-    \ 100\n    per_second: 50\n  per_room:\n    burst_count: 100\n    per_second:\
-    \ 50\n  per_user:\n    burst_count: 100\n    per_second: 50\nrc_joins:\n  local:\n\
-    \    burst_count: 100\n    per_second: 50\n  remote:\n    burst_count: 20\n  \
-    \  per_second: 10\nrc_joins_per_room:\n  burst_count: 100\n  per_second: 50\n\
-    rc_message:\n  burst_count: 100\n  per_second: 50\n"
+    - /synapse/config/conf.d/mautrix-whatsapp-registration.yaml\n- /synapse/config/conf.d/mautrix-discord-registration.yaml\n\
+    rc_admin_redaction:\n  burst_count: 200\n  per_second: 100\nrc_invites:\n  per_issuer:\n\
+    \    burst_count: 100\n    per_second: 50\n  per_room:\n    burst_count: 100\n\
+    \    per_second: 50\n  per_user:\n    burst_count: 100\n    per_second: 50\nrc_joins:\n\
+    \  local:\n    burst_count: 100\n    per_second: 50\n  remote:\n    burst_count:\
+    \ 20\n    per_second: 10\nrc_joins_per_room:\n  burst_count: 100\n  per_second:\
+    \ 50\nrc_message:\n  burst_count: 100\n  per_second: 50\n"
   log.yaml: "version: 1\nformatters:\n  precise:\n    format: '%(asctime)s - %(name)s\
     \ - %(lineno)d - %(levelname)s - %(request)s- %(message)s'\nfilters:\n  context:\n\
     \    (): synapse.util.logcontext.LoggingContextFilter\n    request: \"\"\nhandlers:\n\
@@ -351,7 +361,7 @@ metadata:
   name: synapse-matrix-synapse
   namespace: apps
 stringData:
-  config.yaml: "## Registration ##\n\nregistration_shared_secret: \"LMDAxpRruVdM2srLjNuUYzcp\"\
+  config.yaml: "## Registration ##\n\nregistration_shared_secret: \"KsdCJinN4mrOdLzhW1Gg5p4e\"\
     \n\n## API Configuration ##\n\n## Database configuration ##\n\ndatabase:\n  name:\
     \ \"psycopg2\"\n  args:\n    user: \"postgres\"\n    password: \"@@POSTGRES_PASSWORD@@\"\
     \n    database: \"synapse\"\n    host: \"postgresql-18-hl\"\n    port: 5432\n\

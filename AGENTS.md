@@ -45,22 +45,6 @@ homelab/
 - NEVER commit plaintext passwords, tokens, or API keys
 - NEVER use placeholder values like "REPLACE_ME" or "CHANGEME"
 - ALWAYS use SOPS-encrypted secrets with `kubenix.lib.secretsFor` or `kubenix.lib.secretsInlineFor`
-- For apps that don't support vals references, use an init container with `vals` CLI to resolve secrets at runtime
-
-### If Application Doesn't Support Vals
-
-Use an init container pattern:
-```yaml
-initContainers:
-  - name: resolve-secrets
-    image: ghcr.io/helmfile/vals:latest
-    command:
-      - sh
-      - -c
-      - |
-        vals eval -f /config-src/config.yaml > /data/config.yaml
-        cp /registration-src/registration.yaml /data/registration.yaml
-```
 
 ### Before ANY Ceph Operation
 
@@ -97,10 +81,10 @@ make manifests  # Full pipeline: generate → inject secrets → encrypt → loc
 ```
 
 Pipeline stages:
-1. `gmanifests` - Nix → YAML via kubenix
-2. `vmanifests` - vals injects secrets (ref+sops://...)
-3. `umanifests` - Restore unchanged encrypted files from git
-4. `emanifests` - SOPS encrypt .enc.yaml files
+1. - Nix → YAML via kubenix
+2. - vals injects secrets (ref+sops://...)
+3. - Restore unchanged encrypted files from git
+4. - SOPS encrypt .enc.yaml files
 
 ### NixOS Deployment
 
