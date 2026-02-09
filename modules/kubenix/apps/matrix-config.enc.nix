@@ -11,6 +11,16 @@ let
     SYNAPSE_URL="http://synapse-matrix-synapse.${namespace}.svc.cluster.local:8008"
     SHARED_SECRET="$REGISTRATION_SHARED_SECRET"
 
+    echo "Checking if user provisioning has already completed..."
+    # Check if all users already exist - if so, exit early
+    admin_exists=$(curl -s -o /dev/null -w "%{http_code}" "$SYNAPSE_URL/_matrix/client/v3/register/available?username=admin" || echo "000")
+    jose_exists=$(curl -s -o /dev/null -w "%{http_code}" "$SYNAPSE_URL/_matrix/client/v3/register/available?username=jose" || echo "000")
+
+    if [ "$admin_exists" = "400" ] && [ "$jose_exists" = "400" ]; then
+      echo "All users already exist. Provisioning already completed, skipping..."
+      exit 0
+    fi
+
     echo "Waiting for Synapse to be ready..."
     until curl -sf "$SYNAPSE_URL/_matrix/client/versions" > /dev/null 2>&1; do
       echo "Synapse not ready, waiting..."
@@ -341,7 +351,7 @@ in
         };
       };
 
-      # Job to provision users after Synapse starts
+      # Job to provision users after Synapse and bridges are ready
       jobs = {
         "synapse-user-provisioning" = {
           metadata = {
@@ -349,10 +359,39 @@ in
           };
           spec = {
             ttlSecondsAfterFinished = 300;
-            backoffLimit = 3;
+            backoffLimit = 2;
             template = {
               spec = {
-                restartPolicy = "OnFailure";
+                restartPolicy = "Never";
+                initContainers = [
+                  {
+                    name = "wait-for-synapse";
+                    image = "busybox:1.37";
+                    command = [
+                      "/bin/sh"
+                      "-c"
+                      "echo 'Waiting for Synapse...'; until wget -qO- http://synapse-matrix-synapse.${namespace}.svc.cluster.local:8008/_matrix/client/versions > /dev/null 2>&1; do echo 'Synapse not ready, waiting...'; sleep 5; done; echo 'Synapse is ready!'"
+                    ];
+                  }
+                  {
+                    name = "wait-for-whatsapp";
+                    image = "busybox:1.37";
+                    command = [
+                      "/bin/sh"
+                      "-c"
+                      "echo 'Waiting for mautrix-whatsapp...'; until wget -qO- http://mautrix-whatsapp.${namespace}.svc.cluster.local:29318/metrics > /dev/null 2>&1 || wget -qO- http://mautrix-whatsapp.${namespace}.svc.cluster.local:29318 > /dev/null 2>&1; do echo 'mautrix-whatsapp not ready, waiting...'; sleep 5; done; echo 'mautrix-whatsapp is ready!'"
+                    ];
+                  }
+                  {
+                    name = "wait-for-discord";
+                    image = "busybox:1.37";
+                    command = [
+                      "/bin/sh"
+                      "-c"
+                      "echo 'Waiting for mautrix-discord...'; until wget -qO- http://mautrix-discord.${namespace}.svc.cluster.local:29334/metrics > /dev/null 2>&1 || wget -qO- http://mautrix-discord.${namespace}.svc.cluster.local:29334 > /dev/null 2>&1; do echo 'mautrix-discord not ready, waiting...'; sleep 5; done; echo 'mautrix-discord is ready!'"
+                    ];
+                  }
+                ];
                 containers = [
                   {
                     name = "provision-users";
