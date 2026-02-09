@@ -64,3 +64,13 @@
 **Lesson:** Files prefixed with `_` (e.g., `_mautrix-discord.nix`) are ignored by kubenix. Rename to enable: `git mv _file.nix file.nix`.
 **Context:** Kubenix ignores `_*` files to allow WIP/disabled modules. Forgotten underscore = missing deployment.
 **Verify:** `ls modules/kubenix/apps/*.nix | grep -v "^_"` shows all active modules
+
+### mautrix-discord Bot Token Login Process
+**Lesson:** Unlike WhatsApp bridge, mautrix-discord requires interactive login via Matrix - the bot token cannot be pre-configured in the config file.
+**Context:** The Discord bot token (`mautrix_discord_bot_token`) is stored in SOPS for reference but must be provided interactively. After deployment, users must:
+1. Create a Discord bot at https://discord.com/developers/applications
+2. Enable "Server Members Intent" and "Message Content Intent" under Privileged Gateway Intents
+3. Copy the bot token
+4. In Matrix, start a DM with `@discordbot:josevictor.me`
+5. Send: `login bot <token>`
+**Verify:** Bridge shows as "connected" in pod logs after login
