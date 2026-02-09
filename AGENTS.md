@@ -38,6 +38,30 @@ homelab/
 
 3. **NEVER assume Flux recreation is safe** - Ceph CR deletion = data loss
 
+## CRITICAL: SECURITY - NEVER HARDCODE SECRETS
+
+**FORBIDDEN: Hardcoding secret values in any file**
+
+- NEVER commit plaintext passwords, tokens, or API keys
+- NEVER use placeholder values like "REPLACE_ME" or "CHANGEME"
+- ALWAYS use SOPS-encrypted secrets with `kubenix.lib.secretsFor` or `kubenix.lib.secretsInlineFor`
+- For apps that don't support vals references, use an init container with `vals` CLI to resolve secrets at runtime
+
+### If Application Doesn't Support Vals
+
+Use an init container pattern:
+```yaml
+initContainers:
+  - name: resolve-secrets
+    image: ghcr.io/helmfile/vals:latest
+    command:
+      - sh
+      - -c
+      - |
+        vals eval -f /config-src/config.yaml > /data/config.yaml
+        cp /registration-src/registration.yaml /data/registration.yaml
+```
+
 ### Before ANY Ceph Operation
 
 ```bash
