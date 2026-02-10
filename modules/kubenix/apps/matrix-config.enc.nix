@@ -337,6 +337,99 @@ in
             };
           };
         };
+
+        "mautrix-slack-registration" = {
+          metadata = {
+            namespace = namespace;
+          };
+          stringData = {
+            "registration.yaml" = kubenix.lib.toYamlStr {
+              id = "slack";
+              url = "http://mautrix-slack.${namespace}.svc.cluster.local:29333";
+              as_token = kubenix.lib.secretsInlineFor "mautrix_slack_as_token";
+              hs_token = kubenix.lib.secretsInlineFor "mautrix_slack_hs_token";
+              sender_localpart = "slackbot";
+              namespaces = {
+                users = [
+                  {
+                    exclusive = true;
+                    regex = "@slackbot:josevictor\\.me";
+                  }
+                  {
+                    exclusive = true;
+                    regex = "@slack_.*:josevictor\\.me";
+                  }
+                ];
+                rooms = [ ];
+                aliases = [ ];
+              };
+            };
+          };
+        };
+
+        "mautrix-slack-config" = {
+          metadata = {
+            namespace = namespace;
+          };
+          stringData = {
+            "config.yaml" = kubenix.lib.toYamlStr {
+              homeserver = {
+                address = "http://synapse-matrix-synapse.${namespace}.svc.cluster.local:8008";
+                domain = "josevictor.me";
+              };
+
+              appservice = {
+                address = "http://mautrix-slack.${namespace}.svc.cluster.local:29333";
+                hostname = "0.0.0.0";
+                port = 29333;
+                id = "slack";
+                bot = {
+                  username = "slackbot";
+                  displayname = "Slack Bridge Bot";
+                };
+                as_token = kubenix.lib.secretsInlineFor "mautrix_slack_as_token";
+                hs_token = kubenix.lib.secretsInlineFor "mautrix_slack_hs_token";
+                database = {
+                  type = "postgres";
+                  uri = "postgres://postgres:${kubenix.lib.secretsInlineFor "postgresql_admin_password"}@postgresql-18-hl.${namespace}.svc.cluster.local:5432/mautrix_slack?sslmode=disable";
+                };
+              };
+
+              bridge = {
+                username_template = "slack_{{.}}";
+                command_prefix = "!slack";
+                permissions = {
+                  "@jose:josevictor.me" = "admin";
+                };
+                kick_matrix_users = true;
+                encryption = {
+                  allow = false;
+                };
+              };
+
+              backfill = {
+                enabled = true;
+                max_initial_messages = 0;
+              };
+
+              slack = {
+                backfill = {
+                  conversation_count = -1;
+                };
+              };
+
+              logging = {
+                min_level = "info";
+                writers = [
+                  {
+                    type = "stdout";
+                    format = "pretty-colored";
+                  }
+                ];
+              };
+            };
+          };
+        };
       };
 
       # ConfigMap for user provisioning script
