@@ -7,6 +7,9 @@ let
 
   # mautrix-discord is enabled - secrets exist in k8s-secrets.enc.yaml
   enableDiscord = true;
+
+  # mautrix-slack is enabled - secrets exist in k8s-secrets.enc.yaml
+  enableSlack = true;
 in
 {
   kubernetes = {
@@ -53,7 +56,8 @@ in
           app_service_config_files = [
             "/synapse/config/conf.d/mautrix-whatsapp-registration.yaml"
           ]
-          ++ (if enableDiscord then [ "/synapse/config/conf.d/mautrix-discord-registration.yaml" ] else [ ]);
+          ++ (if enableDiscord then [ "/synapse/config/conf.d/mautrix-discord-registration.yaml" ] else [ ])
+          ++ (if enableSlack then [ "/synapse/config/conf.d/mautrix-slack-registration.yaml" ] else [ ]);
 
           # Rate limiting exemptions for appservices (bridges)
           # Prevents 429 errors when bridges sync many rooms at once
@@ -134,6 +138,25 @@ in
               ]
             else
               [ ]
+          )
+          ++ (
+            if enableSlack then
+              [
+                {
+                  name = "mautrix-slack-registration";
+                  secret = {
+                    secretName = "mautrix-slack-registration";
+                    items = [
+                      {
+                        key = "registration.yaml";
+                        path = "mautrix-slack-registration.yaml";
+                      }
+                    ];
+                  };
+                }
+              ]
+            else
+              [ ]
           );
 
           extraVolumeMounts = [
@@ -151,6 +174,19 @@ in
                   name = "mautrix-discord-registration";
                   mountPath = "/synapse/config/conf.d/mautrix-discord-registration.yaml";
                   subPath = "mautrix-discord-registration.yaml";
+                  readOnly = true;
+                }
+              ]
+            else
+              [ ]
+          )
+          ++ (
+            if enableSlack then
+              [
+                {
+                  name = "mautrix-slack-registration";
+                  mountPath = "/synapse/config/conf.d/mautrix-slack-registration.yaml";
+                  subPath = "mautrix-slack-registration.yaml";
                   readOnly = true;
                 }
               ]

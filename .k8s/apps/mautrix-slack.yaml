@@ -1,0 +1,93 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: mautrix-slack
+  namespace: apps
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mautrix-slack
+  template:
+    metadata:
+      labels:
+        app: mautrix-slack
+    spec:
+      containers:
+        - image: dock.mau.dev/mautrix/slack:latest
+          name: mautrix-slack
+          ports:
+            - containerPort: 29333
+              name: http
+          volumeMounts:
+            - mountPath: /data
+              name: data
+      imagePullSecrets:
+        - name: mau-registry-secret
+      initContainers:
+        - command:
+            - sh
+            - -c
+            - 'cp /config-src/config.yaml /data/config.yaml
+
+              cp /registration-src/registration.yaml /data/registration.yaml
+
+              chmod 644 /data/config.yaml /data/registration.yaml
+
+              '
+          image: busybox:1.37
+          name: copy-config
+          volumeMounts:
+            - mountPath: /data
+              name: data
+            - mountPath: /config-src
+              name: config
+              readOnly: true
+            - mountPath: /registration-src
+              name: registration
+              readOnly: true
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: mautrix-slack
+        - name: config
+          secret:
+            secretName: mautrix-slack-config
+        - name: registration
+          secret:
+            secretName: mautrix-slack-registration
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: mautrix-slack
+  namespace: apps
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: rook-ceph-block
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: mautrix-slack
+  namespace: apps
+spec:
+  ports:
+    - name: http
+      port: 29333
+      targetPort: 29333
+  selector:
+    app: mautrix-slack

@@ -378,6 +378,11 @@ in
                 domain = "josevictor.me";
               };
 
+              database = {
+                type = "postgres";
+                uri = "postgres://postgres:${kubenix.lib.secretsInlineFor "postgresql_admin_password"}@postgresql-18-hl.${namespace}.svc.cluster.local:5432/mautrix_slack?sslmode=disable";
+              };
+
               appservice = {
                 address = "http://mautrix-slack.${namespace}.svc.cluster.local:29333";
                 hostname = "0.0.0.0";
@@ -389,33 +394,25 @@ in
                 };
                 as_token = kubenix.lib.secretsInlineFor "mautrix_slack_as_token";
                 hs_token = kubenix.lib.secretsInlineFor "mautrix_slack_hs_token";
-                database = {
-                  type = "postgres";
-                  uri = "postgres://postgres:${kubenix.lib.secretsInlineFor "postgresql_admin_password"}@postgresql-18-hl.${namespace}.svc.cluster.local:5432/mautrix_slack?sslmode=disable";
-                };
+                username_template = "slack_{{.}}";
               };
 
               bridge = {
-                username_template = "slack_{{.}}";
                 command_prefix = "!slack";
                 permissions = {
+                  "*" = "relay";
                   "@jose:josevictor.me" = "admin";
                 };
-                kick_matrix_users = true;
+                relay = {
+                  enabled = false;
+                };
                 encryption = {
                   allow = false;
                 };
               };
 
               backfill = {
-                enabled = true;
-                max_initial_messages = 0;
-              };
-
-              slack = {
-                backfill = {
-                  conversation_count = -1;
-                };
+                enabled = false;
               };
 
               logging = {
