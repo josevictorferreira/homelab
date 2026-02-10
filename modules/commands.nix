@@ -42,7 +42,13 @@ let
 
   check = mkCommand "check" "Check if the flake is valid" [ pkgs.nix pkgs.git ] ''
     git config core.hooksPath .githooks 2>/dev/null || true
-    nix flake check --show-trace --all-systems --impure
+    # NOTE: `--all-systems` will fail without remote builders for other systems.
+    # Opt-in via ALL_SYSTEMS=1.
+    if [ "''${ALL_SYSTEMS:-}" = "1" ]; then
+      nix flake check --show-trace --all-systems --impure
+    else
+      nix flake check --show-trace --impure
+    fi
   '';
 
   lint = mkCommand "lint" "Check nix formatting" [ pkgs.nix ] ''
@@ -97,7 +103,11 @@ let
     echo "Deploying group: $SEL"
     targets="$(nix eval --raw ".#deployGroups.$SEL")"
     echo "Targets: $targets"
-    nix flake check --show-trace --all-systems --impure
+    if [ "''${ALL_SYSTEMS:-}" = "1" ]; then
+      nix flake check --show-trace --all-systems --impure
+    else
+      nix flake check --show-trace --impure
+    fi
     eval "nix run github:serokell/deploy-rs -- --skip-checks --auto-rollback true $targets"
   '';
 
