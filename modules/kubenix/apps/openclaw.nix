@@ -32,7 +32,7 @@ in
       };
       config = {
         filename = "openclaw.json";
-        mountPath = "/home/node/.openclaw/openclaw.json";
+        mountPath = "/home/node/.openclaw";
         data = {
           gateway = {
             port = 18789;
