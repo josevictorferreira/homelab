@@ -25,7 +25,7 @@ in
         ];
         resources = {
           limits = {
-            memory = "512Mi";
+            memory = "1Gi";
           };
           requests = {
             memory = "256Mi";
