@@ -51,9 +51,9 @@
 ## Mautrix Bridge Configuration
 
 ### Bridge Config Structure Varies by Type
-**Lesson:** mautrix-whatsapp uses root-level `database:`, but mautrix-discord requires `appservice.database:` (nested). Check upstream example-config.yaml for each bridge.
-**Context:** Different mautrix bridges have different config schemas. Discord fails with "appservice.database not configured" if database is at root level.
-**Verify:** Compare `database:` placement in generated config against upstream example-config.yaml
+**Lesson:** mautrix-whatsapp uses root-level `database:`, but mautrix-discord requires `appservice.database:` (nested). mautrix-slack uses bridgev2 format with `database:` at root level but `username_template:` moved from appservice to root.
+**Context:** Different mautrix bridges have different config schemas. Slack fails with "Legacy bridge config detected" if using pre-bridgev2 structure. Generate example config from bridge image first.
+**Verify:** Generate with `docker run --rm dock.mau.dev/mautrix/slack:latest -e` then compare structure to generated config
 
 ### Never Use Placeholder Values for Secrets
 **Lesson:** Always use `kubenix.lib.secretsInlineFor "key_name"` in Nix configs, never hardcode "REPLACE_ME" or other placeholders.
