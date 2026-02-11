@@ -99,14 +99,6 @@ in
           "bin/jobs"
           "start"
         ];
-        resources = {
-          limits = {
-            memory = "512Mi";
-          };
-          requests = {
-            memory = "256Mi";
-          };
-        };
         values = {
           defaultPodOptions.imagePullSecrets = [
             { name = "ghcr-registry-secret"; }
