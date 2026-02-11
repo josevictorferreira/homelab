@@ -51,7 +51,7 @@ spec:
               name: http
               protocol: TCP
           volumeMounts:
-            - mountPath: /home/node/.openclaw/openclaw.json/openclaw.json
+            - mountPath: /home/node/.openclaw/openclaw.json
               name: config
               readOnly: true
               subPath: openclaw.json
