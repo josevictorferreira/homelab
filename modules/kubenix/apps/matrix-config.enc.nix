@@ -103,19 +103,6 @@ in
             "matrix.josevictor.me.key" = kubenix.lib.secretsFor "synapse_signing_key";
           };
         };
-
-        # User provisioning secrets
-        "synapse-user-provisioning" = {
-          metadata = {
-            namespace = namespace;
-          };
-          stringData = {
-            "registration-shared-secret" = kubenix.lib.secretsFor "synapse_registration_shared_secret";
-            "admin-password" = kubenix.lib.secretsFor "synapse_admin_password";
-            "jose-password" = kubenix.lib.secretsFor "synapse_jose_password";
-          };
-        };
-
         "mautrix-whatsapp-registration" = {
           metadata = {
             namespace = namespace;
@@ -421,115 +408,6 @@ in
                   {
                     type = "stdout";
                     format = "pretty-colored";
-                  }
-                ];
-              };
-            };
-          };
-        };
-      };
-
-      # ConfigMap for user provisioning script
-      configMaps = {
-        "synapse-user-provisioning" = {
-          metadata = {
-            namespace = namespace;
-          };
-          data = {
-            "provision-users.sh" = userProvisioningScript;
-          };
-        };
-      };
-
-      # Job to provision users after Synapse and bridges are ready
-      jobs = {
-        "synapse-user-provisioning" = {
-          metadata = {
-            namespace = namespace;
-          };
-          spec = {
-            ttlSecondsAfterFinished = 300;
-            backoffLimit = 2;
-            template = {
-              spec = {
-                restartPolicy = "Never";
-                initContainers = [
-                  {
-                    name = "wait-for-synapse";
-                    image = "busybox:1.37";
-                    command = [
-                      "/bin/sh"
-                      "-c"
-                      "echo 'Waiting for Synapse...'; until wget -qO- http://synapse-matrix-synapse.${namespace}.svc.cluster.local:8008/_matrix/client/versions > /dev/null 2>&1; do echo 'Synapse not ready, waiting...'; sleep 5; done; echo 'Synapse is ready!'"
-                    ];
-                  }
-                  {
-                    name = "wait-for-whatsapp";
-                    image = "busybox:1.37";
-                    command = [
-                      "/bin/sh"
-                      "-c"
-                      "echo 'Waiting for mautrix-whatsapp...'; until wget -qO- http://mautrix-whatsapp.${namespace}.svc.cluster.local:29318/metrics > /dev/null 2>&1 || wget -qO- http://mautrix-whatsapp.${namespace}.svc.cluster.local:29318 > /dev/null 2>&1; do echo 'mautrix-whatsapp not ready, waiting...'; sleep 5; done; echo 'mautrix-whatsapp is ready!'"
-                    ];
-                  }
-                  {
-                    name = "wait-for-discord";
-                    image = "busybox:1.37";
-                    command = [
-                      "/bin/sh"
-                      "-c"
-                      "echo 'Waiting for mautrix-discord...'; until wget -qO- http://mautrix-discord.${namespace}.svc.cluster.local:29334/metrics > /dev/null 2>&1 || wget -qO- http://mautrix-discord.${namespace}.svc.cluster.local:29334 > /dev/null 2>&1; do echo 'mautrix-discord not ready, waiting...'; sleep 5; done; echo 'mautrix-discord is ready!'"
-                    ];
-                  }
-                ];
-                containers = [
-                  {
-                    name = "provision-users";
-                    image = "alpine:3.21";
-                    command = [
-                      "/bin/sh"
-                      "-c"
-                      "apk add --no-cache curl jq openssl && /scripts/provision-users.sh"
-                    ];
-                    env = [
-                      {
-                        name = "REGISTRATION_SHARED_SECRET";
-                        valueFrom.secretKeyRef = {
-                          name = "synapse-user-provisioning";
-                          key = "registration-shared-secret";
-                        };
-                      }
-                      {
-                        name = "ADMIN_PASSWORD";
-                        valueFrom.secretKeyRef = {
-                          name = "synapse-user-provisioning";
-                          key = "admin-password";
-                        };
-                      }
-                      {
-                        name = "JOSE_PASSWORD";
-                        valueFrom.secretKeyRef = {
-                          name = "synapse-user-provisioning";
-                          key = "jose-password";
-                        };
-                      }
-                    ];
-                    volumeMounts = [
-                      {
-                        name = "scripts";
-                        mountPath = "/scripts";
-                        readOnly = true;
-                      }
-                    ];
-                  }
-                ];
-                volumes = [
-                  {
-                    name = "scripts";
-                    configMap = {
-                      name = "synapse-user-provisioning";
-                      defaultMode = 493;
-                    };
                   }
                 ];
               };
