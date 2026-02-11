@@ -30,13 +30,14 @@ in
         accessMode = "ReadWriteOnce";
         globalMounts = [ { path = "/home/node/.openclaw"; } ];
       };
+      # Config mounted to /config, then copied by initContainer to PVC
       config = {
         filename = "openclaw.json";
-        mountPath = "/home/node/.openclaw";
+        mountPath = "/config";
         data = {
           gateway = {
             port = 18789;
-            bind = "0.0.0.0";
+            bind = "lan";
           };
           logging = {
             level = "info";
@@ -45,6 +46,18 @@ in
       };
       values = {
         ingress.main.enabled = false;
+        # InitContainer copies config from ConfigMap to PVC
+        controllers.main.initContainers.copy-config = {
+          image = {
+            repository = "busybox";
+            tag = "latest";
+          };
+          command = [
+            "sh"
+            "-c"
+            "cp /config/openclaw.json /home/node/.openclaw/openclaw.json && chown 1000:1000 /home/node/.openclaw/openclaw.json"
+          ];
+        };
       };
     };
   };

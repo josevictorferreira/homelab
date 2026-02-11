@@ -27,7 +27,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/configMaps: b6095c07ed6ec35558f36df3c7e8ce01a184be99759671552a34ac43d2b0ea93
+        checksum/configMaps: 02560979c8e47228a64d9b590e84311147d1b14c490952cf2a526c2b399e24a6
       labels:
         app.kubernetes.io/controller: main
         app.kubernetes.io/instance: openclaw
@@ -51,7 +51,7 @@ spec:
               name: http
               protocol: TCP
           volumeMounts:
-            - mountPath: /home/node/.openclaw/openclaw.json
+            - mountPath: /config/openclaw.json
               name: config
               readOnly: true
               subPath: openclaw.json
@@ -62,6 +62,21 @@ spec:
       hostIPC: false
       hostNetwork: false
       hostPID: false
+      initContainers:
+        - command:
+            - sh
+            - -c
+            - cp /config/openclaw.json /home/node/.openclaw/openclaw.json && chown
+              1000:1000 /home/node/.openclaw/openclaw.json
+          image: busybox:latest
+          name: copy-config
+          volumeMounts:
+            - mountPath: /config/openclaw.json
+              name: config
+              readOnly: true
+              subPath: openclaw.json
+            - mountPath: /home/node/.openclaw
+              name: main
       serviceAccountName: default
       volumes:
         - configMap:
@@ -76,7 +91,7 @@ spec:
 ---
 apiVersion: v1
 data:
-  openclaw.json: '{"gateway":{"bind":"0.0.0.0","port":18789},"logging":{"level":"info"}}'
+  openclaw.json: '{"gateway":{"bind":"lan","port":18789},"logging":{"level":"info"}}'
 kind: ConfigMap
 metadata:
   annotations:
