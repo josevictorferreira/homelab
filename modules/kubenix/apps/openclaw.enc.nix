@@ -30,7 +30,6 @@ in
         accessMode = "ReadWriteOnce";
         globalMounts = [ { path = "/home/node/.openclaw"; } ];
       };
-      # Config mounted to /config, then copied by initContainer to PVC
       config = {
         filename = "openclaw.json";
         mountPath = "/config";
@@ -49,7 +48,7 @@ in
             defaults = {
               workspace = "/home/node/.openclaw/workspace";
               model = {
-                primary = "moonshot/kimi-k2.5";
+                primary = "kimi-coding/k2p5";
               };
               userTimezone = "America/Sao_Paulo";
               timeoutSeconds = 600;
@@ -80,12 +79,11 @@ in
           logging = {
             level = "info";
           };
-          # Matrix channel configuration
           channels = {
             matrix = {
               enabled = true;
               homeserver = "http://synapse-matrix-synapse:8008";
-              accessToken = kubenix.lib.secretsFor "openclaw_matrix_token";
+              accessToken = kubenix.lib.secretsInlineFor "openclaw_matrix_token";
               userId = "@openclaw:josevictor.me";
               encryption = false;
               dm = {
@@ -95,21 +93,19 @@ in
               groupPolicy = "disabled";
             };
           };
-          # Environment variables for API keys
           env = {
-            MOONSHOT_API_KEY = kubenix.lib.secretsFor "moonshot_api_key";
+            MOONSHOT_API_KEY = kubenix.lib.secretsInlineFor "moonshot_api_key";
           };
-          # Model providers configuration
           models = {
             mode = "merge";
             providers = {
-              moonshot = {
-                baseUrl = "https://api.moonshot.ai/v1";
+              kimi-coding = {
+                baseUrl = "https://api.kimi.com/coding";
                 apiKey = "\${MOONSHOT_API_KEY}";
-                api = "openai-completions";
+                api = "anthropic-messages";
                 models = [
                   {
-                    id = "kimi-k2.5";
+                    id = "k2p5";
                     name = "Kimi K2.5";
                     reasoning = false;
                     input = [ "text" ];
@@ -124,7 +120,6 @@ in
       };
       values = {
         ingress.main.enabled = false;
-        # InitContainer copies config from ConfigMap to PVC
         controllers.main.initContainers.copy-config = {
           image = {
             repository = "busybox";
@@ -136,7 +131,6 @@ in
             "cp /config/openclaw.json /home/node/.openclaw/openclaw.json && chown 1000:1000 /home/node/.openclaw/openclaw.json"
           ];
         };
-        # InitContainer to install Matrix plugin
         controllers.main.initContainers.install-matrix-plugin = {
           image = {
             repository = "ghcr.io/openclaw/openclaw";
