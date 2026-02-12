@@ -120,42 +120,77 @@ in
       };
       values = {
         ingress.main.enabled = false;
-        controllers.main.initContainers.copy-config = {
-          image = {
-            repository = "busybox";
-            tag = "latest";
-          };
-          command = [
-            "sh"
-            "-c"
-            "cp /config/openclaw.json /home/node/.openclaw/openclaw.json && chown 1000:1000 /home/node/.openclaw/openclaw.json"
-          ];
+        # Hide the bundled (dep-less) matrix plugin so only our persistent copy loads
+        # Only mount on main container, NOT init containers
+        persistence.hide-bundled-matrix = {
+          type = "emptyDir";
+          advancedMounts.main.main = [ { path = "/app/extensions/matrix"; } ];
         };
-        controllers.main.initContainers.install-matrix-plugin = {
-          image = {
-            repository = "ghcr.io/openclaw/openclaw";
-            tag = "latest@sha256:a02b8193cc9d985dce3479eb1986a326f1e28253275b1c43491ac7923d6167e5";
+        controllers.main.initContainers = {
+          copy-config = {
+            image = {
+              repository = "busybox";
+              tag = "latest";
+            };
+            securityContext = {
+              runAsUser = 0;
+              runAsGroup = 0;
+            };
+            command = [
+              "sh"
+              "-c"
+              "cp /config/openclaw.json /home/node/.openclaw/openclaw.json && chown -R 1000:1000 /home/node/.openclaw"
+            ];
           };
-          command = [
-            "sh"
-            "-c"
-            ''
-              if [ -d /home/node/.openclaw/extensions/matrix/node_modules/@vector-im ]; then
-                echo "Matrix plugin already installed"
-                exit 0
-              fi
-              echo "Installing Matrix plugin..."
-              mkdir -p /home/node/.openclaw/extensions
-              cp -r /app/extensions/matrix /home/node/.openclaw/extensions/
-              cd /home/node/.openclaw/extensions/matrix
-              # Remove devDependencies that use workspace:* protocol
-              cat package.json | grep -v "devDependencies\|workspace" | sed 's/,\s*}/}/g' > package.json.tmp
-              mv package.json.tmp package.json
-              npm install
-              chown -R 1000:1000 /home/node/.openclaw/extensions
-              echo "Matrix plugin installed successfully"
-            ''
-          ];
+          install-matrix-plugin = {
+            image = {
+              repository = "ghcr.io/openclaw/openclaw";
+              tag = "latest@sha256:a02b8193cc9d985dce3479eb1986a326f1e28253275b1c43491ac7923d6167e5";
+              pullPolicy = "IfNotPresent";
+            };
+            securityContext = {
+              runAsUser = 0;
+              runAsGroup = 0;
+            };
+            command = [
+              "sh"
+              "-c"
+              ''
+                set -e
+
+                PLUGIN_DIR="/home/node/.openclaw/extensions/matrix"
+
+                # Check if already installed with all deps
+                if [ -d "$PLUGIN_DIR/node_modules/@vector-im/matrix-bot-sdk" ] && \
+                   [ -d "$PLUGIN_DIR/node_modules/markdown-it" ]; then
+                  echo "Matrix plugin deps already installed"
+                  chown -R 1000:1000 /home/node/.openclaw
+                  exit 0
+                fi
+
+                echo "Setting up matrix plugin in persistent volume..."
+
+                # Copy plugin source from bundled location (not hidden here - emptyDir only on main)
+                rm -rf "$PLUGIN_DIR"
+                mkdir -p "$PLUGIN_DIR"
+                cp -r /app/extensions/matrix/* "$PLUGIN_DIR/"
+
+                # Remove devDependencies (workspace ref) from package.json
+                cd "$PLUGIN_DIR"
+                sed -i '/"devDependencies"/,/}/d' package.json
+                # Remove trailing comma before closing brace if any
+                sed -i ':a;N;$!ba;s/,\n}/\n}/g' package.json
+
+                echo "Installing dependencies with pnpm..."
+                pnpm install --no-frozen-lockfile 2>&1
+
+                # Fix ownership
+                chown -R 1000:1000 /home/node/.openclaw
+
+                echo "Matrix plugin installed successfully"
+              ''
+            ];
+          };
         };
       };
     };
