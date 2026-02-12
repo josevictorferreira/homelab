@@ -1,0 +1,319 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    annotations:
+        kubenix/k8s-version: "1.32"
+        kubenix/project-name: ze-homelab
+    labels:
+        app.kubernetes.io/controller: main
+        app.kubernetes.io/instance: openclaw
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: openclaw
+        helm.sh/chart: app-template-4.2.0
+        kubenix/module-name: release
+        kubenix/module-version: 1.0.0
+    name: openclaw
+    namespace: apps
+spec:
+    replicas: 1
+    revisionHistoryLimit: 3
+    selector:
+        matchLabels:
+            app.kubernetes.io/controller: main
+            app.kubernetes.io/instance: openclaw
+            app.kubernetes.io/name: openclaw
+    strategy:
+        type: Recreate
+    template:
+        metadata:
+            annotations:
+                checksum/configMaps: e3b108132ada1617c4bfcfca646e1a95d9b318b66c064dfa324f825570c2a676
+            labels:
+                app.kubernetes.io/controller: main
+                app.kubernetes.io/instance: openclaw
+                app.kubernetes.io/name: openclaw
+        spec:
+            automountServiceAccountToken: true
+            containers:
+                - command:
+                    - node
+                    - dist/index.js
+                    - gateway
+                    - --allow-unconfigured
+                  envFrom:
+                    - secretRef:
+                        name: openclaw-secrets
+                  image: ghcr.io/openclaw/openclaw:latest@sha256:a02b8193cc9d985dce3479eb1986a326f1e28253275b1c43491ac7923d6167e5
+                  imagePullPolicy: IfNotPresent
+                  name: main
+                  ports:
+                    - containerPort: 18789
+                      name: http
+                      protocol: TCP
+                  volumeMounts:
+                    - mountPath: /config/openclaw.json
+                      name: config
+                      readOnly: true
+                      subPath: openclaw.json
+                    - mountPath: /home/node/.openclaw
+                      name: main
+            dnsPolicy: ClusterFirst
+            enableServiceLinks: false
+            hostIPC: false
+            hostNetwork: false
+            hostPID: false
+            initContainers:
+                - command:
+                    - sh
+                    - -c
+                    - cp /config/openclaw.json /home/node/.openclaw/openclaw.json && chown 1000:1000 /home/node/.openclaw/openclaw.json
+                  image: busybox:latest
+                  name: copy-config
+                  volumeMounts:
+                    - mountPath: /config/openclaw.json
+                      name: config
+                      readOnly: true
+                      subPath: openclaw.json
+                    - mountPath: /home/node/.openclaw
+                      name: main
+                - command:
+                    - sh
+                    - -c
+                    - |
+                      if [ -d /home/node/.openclaw/extensions/matrix/node_modules/@vector-im ]; then
+                        echo "Matrix plugin already installed"
+                        exit 0
+                      fi
+                      echo "Installing Matrix plugin..."
+                      mkdir -p /home/node/.openclaw/extensions
+                      cp -r /app/extensions/matrix /home/node/.openclaw/extensions/
+                      cd /home/node/.openclaw/extensions/matrix
+                      # Remove devDependencies that use workspace:* protocol
+                      cat package.json | grep -v "devDependencies\|workspace" | sed 's/,\s*}/}/g' > package.json.tmp
+                      mv package.json.tmp package.json
+                      npm install
+                      chown -R 1000:1000 /home/node/.openclaw/extensions
+                      echo "Matrix plugin installed successfully"
+                  image: ghcr.io/openclaw/openclaw:latest@sha256:a02b8193cc9d985dce3479eb1986a326f1e28253275b1c43491ac7923d6167e5
+                  name: install-matrix-plugin
+                  volumeMounts:
+                    - mountPath: /config/openclaw.json
+                      name: config
+                      readOnly: true
+                      subPath: openclaw.json
+                    - mountPath: /home/node/.openclaw
+                      name: main
+            serviceAccountName: default
+            volumes:
+                - configMap:
+                    items:
+                        - key: openclaw.json
+                          path: openclaw.json
+                    name: openclaw
+                  name: config
+                - name: main
+                  persistentVolumeClaim:
+                    claimName: openclaw
+sops:
+    age:
+        - recipient: age16yrhmz8fytj7j9ns80zl40zjcdfd3pdxh48ld7ys7veea774udtqfn9jyx
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBRcEh5eXVJbDU1WDNHTSsz
+            K3lkbENUYzF5UU5DY2xTWjAvYWh0ZW8xMzJBCklCZzg2V1RYMkI1bGJWT0RveU9P
+            dFlEYU9aU2ZZajFOWEovdkJBWG91cDgKLS0tIHVocm5KNFZIV3BYamdIT210YkJv
+            VkdyTnpNN3N1di9YVzdYdTBDV21SOTQKqtz9IEj/0yauN86uzrqidfvfMb1SP5IQ
+            myrX5cgJtdys4gLNsjzMxdhL6ZfQcDLygwtlYhwg3BoDxV1w1u1eEw==
+            -----END AGE ENCRYPTED FILE-----
+        - recipient: age1jx9qu5p0ycvymrl2gykd9z3w8x8n67jxnatxs49j7qzspjr6asqqf8u35h
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBiZjhON0dYaWQ1UkZnVzJx
+            eG5uZXQrR3JDN3NINW10SGZwQXBGRzZGTFhjCkJYd1dndzBXR3YwR2xQRHFDRXRv
+            TncxQzFCY3hoQXVZZHZ4bG9yek9qNFEKLS0tIFJXWWJWUGhhRlNacnBSSFBYenRL
+            bG9hREhLaENOZE5DUlBmcGZlUUpPRDAKT9eq5rfJ49zAxY6CNjvkk/I8I5BGUfQU
+            Q8e42v+LWCXH3EJloVnd3+RAxK6Mwi2rRHlRJ6SGNJcebVxG3YJf/A==
+            -----END AGE ENCRYPTED FILE-----
+        - recipient: age1myzhwq67gu5zrfk8fvs0p7mh5fk67d20ltwqf9325ya83lm06ytsyax3j2
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSA5UHNoUjl3K0N2UVZ0Wjli
+            eThjTW41L1d1SEpNOHppOTd6K3YvSDcvNzFBCllKeEZ5cUxrL2tmMU1PdUdqZXhp
+            bko5bDF2dHhaNVZIeE5Gc3d5RzNRTHMKLS0tIGpMbzNhSENMZm40bVMwdFB2b2R4
+            MEV0bVF5OW1DMmlVZ1B1aXJxQ1hJQzgKWF9XL6WfQ3K6V1+9J7sjU9xk2PtGHYu/
+            KWJuuD4fJAV1qYiSb+A67p7fm3uRTnqsEcI/vR/wWfSN5mrIqVVdJg==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2026-02-12T15:57:46Z"
+    mac: ENC[AES256_GCM,data:hco4m3lp4jfFh1jTyXYLp08zuEs+I5tYXoeu6K7DXvCSwjEFp7Vgd+AGgZu1H7ogo/nNeh5qDXUMvMnailtzYP27QwBzqXKsZmsaa7CeYFitQev1GftTSyqlpM5uBHsyc1/s7TfXeq7+TxDZW44YGzo5Y4rEkQrcGha9qgqlq/4=,iv:FV6JYI8jtQ19CbaB/GonLC40U5HgiEQR4Lnkh4Rn32A=,tag:mvFj88Go4ARMapjl+htJFA==,type:str]
+    encrypted_regex: ^(data|stringData)$
+    version: 3.10.2
+---
+apiVersion: v1
+data:
+    openclaw.json: ENC[AES256_GCM,data:9a/eQ1iC0GQbOBQe7LxKpvtAXwGHE1/cpN+DHm8xePYjKqFHcbLXF8VlzYvrsZfuREuGXGN/PiNQgvjgE10zg5pWCpc6MiFza42XXUKkYaWLld4lRLNBHnuGH6UYLFz9UR4Gq6uRjP0MXYOgscs9RZJhoVDM7P10HusFaS4QTjdPjCIEkuLAatC6fYnJcECLj34RZIh6Cz+zFH7GG6ALXPKmMC7crHeHndlUQ3LDcbfcxbamcX/QGcat3WzVREVO9DaJm8RSY8c9moPyBjSBitpCoizP6fKIJsmA5Zv3mBv9il1n2+FniQI+bmLR55oAwzq4cPedcddnZuaz/MWq0hFONIqR7yklf29KwBFSEdRP/fGVh5A+fCHFPrRFNp9SGrc79MskKRbIydi8lCgu34Ep3HMFQS455Fy1c/GvoZZvAIdJ8PdTxWCm2jWEN46vqQxOSLOLUirhog2TvBDHO5DQiaGWMEsuA0WyUedxytnmFVSKDUWr29gnQEXqHWM/Rl5oA19pqtPOm8ATpZtrVKtCLUhKP5bwep6/VLY3nOwplTwPmEGLuBoiaKANHxTHe0iYax+RvzZLCJZ9KdAvf12QYDWDmDVMpQTgfm+jfvvjcqsBw3f4jSL1zhQcECwOIL8ZDDCLiJHVxmA6WfuChUjG+DjFV5fJSrtNogYlNGCyt7I8PTZjYQP1P2pzAgvs5LCNhEzpP9LzYuGOgBo6zOBeI84nqWU9WyrePitXly7qr22OMC3xVwxn1wHXLfoXouhuf543rtVal2IkpzyT1pWni4T1b7e6BanD0c/InXddwfLTJFztVDj6WcjHvC8H1WtRd8V6c0Lb0RYIhz2s5pUjBA+IC1uoJhv/JtDT7i5N/uLwajip70Y+Kb+Qx5vLDh/16LVYl/rmgXXbrWBz4mz2S2KFm06ZX0l56m37Ca8FmSZgZNRHGAcBhaW2O4R8oXfDgQqccfznI/ED0T15NH4uuytFWd7C1uuHKhyDIOupEEVt0Y0cTGMj9ra04O47mIvi65NnvQPlHdRWjljCW9KAnX6JtWmtHsiPY6dW0qfpSzOFy1JVCubZMg9+ulckmVUF4uxNRwgKXCxOSeKBwzurGa5HAVNLv7N+5HMuVwyYuQJ1HCWU5qbs6bUA7TBn7xPLKRIsQMzQxeIz7yTW9qM/he2oPEJDOgUWifGrA53pY+rJVv2Ud6kqKprQ4I4+/nKR7MzDlCheM2BELk3EfAqXhFfrv5uBd5pDTmN9jvULKW4iVhzd02Rfr1I4OvxnNo7MAKJnojnKV0SfBSn9qihfKpmSoWZxInGYmbiyR+dMFO0DsJimY7B3ZHweMGmSKqBlpk4aE2KR9iZ4EKvpmEPVILEqKzD55lJxzhdI1gSaDFG2IGdkEQZwBYn1HnLkwTIam/+YohurhoqiDWIZ9MgzAVplHDlcSEFc2txpFK9mHZ5ZlgR0JFPudgpWyNgTWK98A4R7ussfv54xH2jMj3dhTL9GRTAAu9lUxkJyx/dKvkGqFjUz0dCD9Ba0pt3UVzg=,iv:j7kHC5H4OaDUmTSFqn1u3j+7UJEHvqWs6oYQrP7gK80=,tag:cZKhM2KdJ4539AISqQSwow==,type:str]
+kind: ConfigMap
+metadata:
+    annotations:
+        kubenix/k8s-version: "1.32"
+        kubenix/project-name: ze-homelab
+    labels:
+        app.kubernetes.io/instance: openclaw
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: openclaw
+        helm.sh/chart: app-template-4.2.0
+        kubenix/module-name: release
+        kubenix/module-version: 1.0.0
+    name: openclaw
+    namespace: apps
+sops:
+    age:
+        - recipient: age16yrhmz8fytj7j9ns80zl40zjcdfd3pdxh48ld7ys7veea774udtqfn9jyx
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBRcEh5eXVJbDU1WDNHTSsz
+            K3lkbENUYzF5UU5DY2xTWjAvYWh0ZW8xMzJBCklCZzg2V1RYMkI1bGJWT0RveU9P
+            dFlEYU9aU2ZZajFOWEovdkJBWG91cDgKLS0tIHVocm5KNFZIV3BYamdIT210YkJv
+            VkdyTnpNN3N1di9YVzdYdTBDV21SOTQKqtz9IEj/0yauN86uzrqidfvfMb1SP5IQ
+            myrX5cgJtdys4gLNsjzMxdhL6ZfQcDLygwtlYhwg3BoDxV1w1u1eEw==
+            -----END AGE ENCRYPTED FILE-----
+        - recipient: age1jx9qu5p0ycvymrl2gykd9z3w8x8n67jxnatxs49j7qzspjr6asqqf8u35h
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBiZjhON0dYaWQ1UkZnVzJx
+            eG5uZXQrR3JDN3NINW10SGZwQXBGRzZGTFhjCkJYd1dndzBXR3YwR2xQRHFDRXRv
+            TncxQzFCY3hoQXVZZHZ4bG9yek9qNFEKLS0tIFJXWWJWUGhhRlNacnBSSFBYenRL
+            bG9hREhLaENOZE5DUlBmcGZlUUpPRDAKT9eq5rfJ49zAxY6CNjvkk/I8I5BGUfQU
+            Q8e42v+LWCXH3EJloVnd3+RAxK6Mwi2rRHlRJ6SGNJcebVxG3YJf/A==
+            -----END AGE ENCRYPTED FILE-----
+        - recipient: age1myzhwq67gu5zrfk8fvs0p7mh5fk67d20ltwqf9325ya83lm06ytsyax3j2
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSA5UHNoUjl3K0N2UVZ0Wjli
+            eThjTW41L1d1SEpNOHppOTd6K3YvSDcvNzFBCllKeEZ5cUxrL2tmMU1PdUdqZXhp
+            bko5bDF2dHhaNVZIeE5Gc3d5RzNRTHMKLS0tIGpMbzNhSENMZm40bVMwdFB2b2R4
+            MEV0bVF5OW1DMmlVZ1B1aXJxQ1hJQzgKWF9XL6WfQ3K6V1+9J7sjU9xk2PtGHYu/
+            KWJuuD4fJAV1qYiSb+A67p7fm3uRTnqsEcI/vR/wWfSN5mrIqVVdJg==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2026-02-12T15:57:46Z"
+    mac: ENC[AES256_GCM,data:hco4m3lp4jfFh1jTyXYLp08zuEs+I5tYXoeu6K7DXvCSwjEFp7Vgd+AGgZu1H7ogo/nNeh5qDXUMvMnailtzYP27QwBzqXKsZmsaa7CeYFitQev1GftTSyqlpM5uBHsyc1/s7TfXeq7+TxDZW44YGzo5Y4rEkQrcGha9qgqlq/4=,iv:FV6JYI8jtQ19CbaB/GonLC40U5HgiEQR4Lnkh4Rn32A=,tag:mvFj88Go4ARMapjl+htJFA==,type:str]
+    encrypted_regex: ^(data|stringData)$
+    version: 3.10.2
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+    annotations:
+        kubenix/k8s-version: "1.32"
+        kubenix/project-name: ze-homelab
+    labels:
+        app.kubernetes.io/instance: openclaw
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: openclaw
+        helm.sh/chart: app-template-4.2.0
+        kubenix/module-name: release
+        kubenix/module-version: 1.0.0
+    name: openclaw
+    namespace: apps
+spec:
+    accessModes:
+        - ReadWriteOnce
+    resources:
+        requests:
+            storage: 10Gi
+    storageClassName: rook-ceph-block
+sops:
+    age:
+        - recipient: age16yrhmz8fytj7j9ns80zl40zjcdfd3pdxh48ld7ys7veea774udtqfn9jyx
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBRcEh5eXVJbDU1WDNHTSsz
+            K3lkbENUYzF5UU5DY2xTWjAvYWh0ZW8xMzJBCklCZzg2V1RYMkI1bGJWT0RveU9P
+            dFlEYU9aU2ZZajFOWEovdkJBWG91cDgKLS0tIHVocm5KNFZIV3BYamdIT210YkJv
+            VkdyTnpNN3N1di9YVzdYdTBDV21SOTQKqtz9IEj/0yauN86uzrqidfvfMb1SP5IQ
+            myrX5cgJtdys4gLNsjzMxdhL6ZfQcDLygwtlYhwg3BoDxV1w1u1eEw==
+            -----END AGE ENCRYPTED FILE-----
+        - recipient: age1jx9qu5p0ycvymrl2gykd9z3w8x8n67jxnatxs49j7qzspjr6asqqf8u35h
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBiZjhON0dYaWQ1UkZnVzJx
+            eG5uZXQrR3JDN3NINW10SGZwQXBGRzZGTFhjCkJYd1dndzBXR3YwR2xQRHFDRXRv
+            TncxQzFCY3hoQXVZZHZ4bG9yek9qNFEKLS0tIFJXWWJWUGhhRlNacnBSSFBYenRL
+            bG9hREhLaENOZE5DUlBmcGZlUUpPRDAKT9eq5rfJ49zAxY6CNjvkk/I8I5BGUfQU
+            Q8e42v+LWCXH3EJloVnd3+RAxK6Mwi2rRHlRJ6SGNJcebVxG3YJf/A==
+            -----END AGE ENCRYPTED FILE-----
+        - recipient: age1myzhwq67gu5zrfk8fvs0p7mh5fk67d20ltwqf9325ya83lm06ytsyax3j2
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSA5UHNoUjl3K0N2UVZ0Wjli
+            eThjTW41L1d1SEpNOHppOTd6K3YvSDcvNzFBCllKeEZ5cUxrL2tmMU1PdUdqZXhp
+            bko5bDF2dHhaNVZIeE5Gc3d5RzNRTHMKLS0tIGpMbzNhSENMZm40bVMwdFB2b2R4
+            MEV0bVF5OW1DMmlVZ1B1aXJxQ1hJQzgKWF9XL6WfQ3K6V1+9J7sjU9xk2PtGHYu/
+            KWJuuD4fJAV1qYiSb+A67p7fm3uRTnqsEcI/vR/wWfSN5mrIqVVdJg==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2026-02-12T15:57:46Z"
+    mac: ENC[AES256_GCM,data:hco4m3lp4jfFh1jTyXYLp08zuEs+I5tYXoeu6K7DXvCSwjEFp7Vgd+AGgZu1H7ogo/nNeh5qDXUMvMnailtzYP27QwBzqXKsZmsaa7CeYFitQev1GftTSyqlpM5uBHsyc1/s7TfXeq7+TxDZW44YGzo5Y4rEkQrcGha9qgqlq/4=,iv:FV6JYI8jtQ19CbaB/GonLC40U5HgiEQR4Lnkh4Rn32A=,tag:mvFj88Go4ARMapjl+htJFA==,type:str]
+    encrypted_regex: ^(data|stringData)$
+    version: 3.10.2
+---
+apiVersion: v1
+kind: Service
+metadata:
+    annotations:
+        kubenix/k8s-version: "1.32"
+        kubenix/project-name: ze-homelab
+        lbipam.cilium.io/ips: 10.10.10.140
+        lbipam.cilium.io/sharing-key: openclaw
+    labels:
+        app.kubernetes.io/instance: openclaw
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: openclaw
+        app.kubernetes.io/service: openclaw
+        helm.sh/chart: app-template-4.2.0
+        kubenix/module-name: release
+        kubenix/module-version: 1.0.0
+    name: openclaw
+    namespace: apps
+spec:
+    ports:
+        - name: http
+          port: 18789
+          protocol: TCP
+          targetPort: 18789
+    selector:
+        app.kubernetes.io/controller: main
+        app.kubernetes.io/instance: openclaw
+        app.kubernetes.io/name: openclaw
+    type: LoadBalancer
+sops:
+    age:
+        - recipient: age16yrhmz8fytj7j9ns80zl40zjcdfd3pdxh48ld7ys7veea774udtqfn9jyx
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBRcEh5eXVJbDU1WDNHTSsz
+            K3lkbENUYzF5UU5DY2xTWjAvYWh0ZW8xMzJBCklCZzg2V1RYMkI1bGJWT0RveU9P
+            dFlEYU9aU2ZZajFOWEovdkJBWG91cDgKLS0tIHVocm5KNFZIV3BYamdIT210YkJv
+            VkdyTnpNN3N1di9YVzdYdTBDV21SOTQKqtz9IEj/0yauN86uzrqidfvfMb1SP5IQ
+            myrX5cgJtdys4gLNsjzMxdhL6ZfQcDLygwtlYhwg3BoDxV1w1u1eEw==
+            -----END AGE ENCRYPTED FILE-----
+        - recipient: age1jx9qu5p0ycvymrl2gykd9z3w8x8n67jxnatxs49j7qzspjr6asqqf8u35h
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBiZjhON0dYaWQ1UkZnVzJx
+            eG5uZXQrR3JDN3NINW10SGZwQXBGRzZGTFhjCkJYd1dndzBXR3YwR2xQRHFDRXRv
+            TncxQzFCY3hoQXVZZHZ4bG9yek9qNFEKLS0tIFJXWWJWUGhhRlNacnBSSFBYenRL
+            bG9hREhLaENOZE5DUlBmcGZlUUpPRDAKT9eq5rfJ49zAxY6CNjvkk/I8I5BGUfQU
+            Q8e42v+LWCXH3EJloVnd3+RAxK6Mwi2rRHlRJ6SGNJcebVxG3YJf/A==
+            -----END AGE ENCRYPTED FILE-----
+        - recipient: age1myzhwq67gu5zrfk8fvs0p7mh5fk67d20ltwqf9325ya83lm06ytsyax3j2
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSA5UHNoUjl3K0N2UVZ0Wjli
+            eThjTW41L1d1SEpNOHppOTd6K3YvSDcvNzFBCllKeEZ5cUxrL2tmMU1PdUdqZXhp
+            bko5bDF2dHhaNVZIeE5Gc3d5RzNRTHMKLS0tIGpMbzNhSENMZm40bVMwdFB2b2R4
+            MEV0bVF5OW1DMmlVZ1B1aXJxQ1hJQzgKWF9XL6WfQ3K6V1+9J7sjU9xk2PtGHYu/
+            KWJuuD4fJAV1qYiSb+A67p7fm3uRTnqsEcI/vR/wWfSN5mrIqVVdJg==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2026-02-12T15:57:46Z"
+    mac: ENC[AES256_GCM,data:hco4m3lp4jfFh1jTyXYLp08zuEs+I5tYXoeu6K7DXvCSwjEFp7Vgd+AGgZu1H7ogo/nNeh5qDXUMvMnailtzYP27QwBzqXKsZmsaa7CeYFitQev1GftTSyqlpM5uBHsyc1/s7TfXeq7+TxDZW44YGzo5Y4rEkQrcGha9qgqlq/4=,iv:FV6JYI8jtQ19CbaB/GonLC40U5HgiEQR4Lnkh4Rn32A=,tag:mvFj88Go4ARMapjl+htJFA==,type:str]
+    encrypted_regex: ^(data|stringData)$
+    version: 3.10.2

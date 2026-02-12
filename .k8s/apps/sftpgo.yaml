@@ -47,9 +47,6 @@ spec:
               value: '10000'
             - name: SFTPGO_TELEMETRY__BIND_ADDRESS
               value: ''
-          envFrom:
-            - secretRef:
-                name: sftpgo-config
           image: ghcr.io/drakkan/sftpgo:v2.7.0
           imagePullPolicy: IfNotPresent
           livenessProbe:
