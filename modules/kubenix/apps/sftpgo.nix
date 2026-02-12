@@ -25,13 +25,13 @@ in
           pullPolicy = "IfNotPresent";
         };
 
-        envFrom = [
-          {
-            secretRef = {
-              name = "sftpgo-config";
-            };
-          }
-        ];
+        # envFrom = [
+        #   {
+        #     secretRef = {
+        #       name = "sftpgo-config";
+        #     };
+        #   }
+        # ];
 
         securityContext = {
           runAsUser = 2002;
