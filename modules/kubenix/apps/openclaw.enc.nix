@@ -32,7 +32,7 @@ in
           npm install --omit=dev --no-package-lock --legacy-peer-deps 2>&1 || echo "WARN: npm install in extension dir failed"
           echo "Running doctor --fix to enable matrix plugin..."
           cd /app
-          node dist/index.js doctor --fix 2>&1 || echo "WARN: doctor --fix failed"
+          (node dist/index.js doctor --fix 2>&1) || echo "WARN: doctor --fix exited non-zero"
           echo "Starting gateway..."
           exec node dist/index.js gateway run --allow-unconfigured
         ''
