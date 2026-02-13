@@ -20,13 +20,11 @@ in
         "sh"
         "-c"
         ''
-          set -e
-
-          # Enable bundled matrix plugin (disabled by default)
+          # Run each CLI command in a subshell so process.exit() doesn't kill parent
           echo "Enabling matrix plugin..."
-          node dist/index.js plugins enable matrix 2>&1 || true
+          (node dist/index.js plugins enable matrix 2>&1) || true
           echo "Running doctor fix..."
-          node dist/index.js doctor --fix 2>&1 || true
+          (node dist/index.js doctor --fix 2>&1) || true
           echo "Starting gateway..."
           exec node dist/index.js gateway run --allow-unconfigured
         ''
