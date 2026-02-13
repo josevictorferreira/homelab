@@ -19,7 +19,34 @@ in
       command = [
         "sh"
         "-c"
-        "rm -rf /app/extensions/matrix && ln -sf /home/node/.openclaw/extensions/matrix /app/extensions/matrix && exec node dist/index.js gateway run --allow-unconfigured"
+        ''
+          set -e
+
+          PLUGIN_DIR="$HOME/.config/openclaw/extensions/matrix"
+
+          # Install matrix plugin if not already present
+          if [ ! -f "$PLUGIN_DIR/openclaw.plugin.json" ] || \
+             [ ! -d "$PLUGIN_DIR/node_modules" ]; then
+            echo "Installing matrix plugin from bundled source..."
+            node dist/index.js plugins install ./extensions/matrix 2>&1 || {
+              echo "CLI install failed, trying manual install..."
+              rm -rf "$PLUGIN_DIR"
+              mkdir -p "$PLUGIN_DIR"
+              cp -r /app/extensions/matrix/* "$PLUGIN_DIR/"
+              cd "$PLUGIN_DIR"
+              sed -i '/"devDependencies"/,/}/d' package.json
+              sed -i ':a;N;$!ba;s/,\n}/\n}/g' package.json
+              pnpm install --no-frozen-lockfile 2>&1
+            }
+            echo "Matrix plugin installed."
+          else
+            echo "Matrix plugin already installed."
+          fi
+
+          # Fix config issues and start gateway
+          node dist/index.js doctor --fix 2>&1 || true
+          exec node dist/index.js gateway run --allow-unconfigured
+        ''
       ];
       persistence = {
         enabled = true;
@@ -72,6 +99,7 @@ in
             deny = [ "browser" ];
           };
           gateway = {
+            mode = "local";
             port = 18789;
             bind = "lan";
           };
@@ -124,6 +152,9 @@ in
           runAsUser = 0;
           runAsGroup = 0;
         };
+        # XDG_CONFIG_HOME on persistent volume so plugin installs survive restarts
+        controllers.main.containers.main.env.XDG_CONFIG_HOME = "/home/node/.config";
+        controllers.main.containers.main.env.HOME = "/home/node";
         # Tailscale sidecar for tailnet access (kernel mode)
         controllers.main.containers.tailscale = {
           image = {
@@ -167,79 +198,21 @@ in
           hostPath = "/dev/net/tun";
           advancedMounts.main.tailscale = [ { path = "/dev/net/tun"; } ];
         };
-        # Bundled matrix plugin replaced by symlink at startup (see command)
-        # persistent copy at /home/node/.openclaw/extensions/matrix has full deps
-        controllers.main.initContainers = {
-          copy-config = {
-            image = {
-              repository = "busybox";
-              tag = "latest";
-            };
-            securityContext = {
-              runAsUser = 0;
-              runAsGroup = 0;
-            };
-            command = [
-              "sh"
-              "-c"
-              "mkdir -p /home/node/.openclaw && cp /config/openclaw.json /home/node/.openclaw/openclaw.json"
-            ];
+        # Copy config to persistent volume; matrix plugin installed at startup
+        controllers.main.initContainers.copy-config = {
+          image = {
+            repository = "busybox";
+            tag = "latest";
           };
-          install-matrix-plugin = {
-            image = {
-              repository = "ghcr.io/openclaw/openclaw";
-              tag = "latest@sha256:a02b8193cc9d985dce3479eb1986a326f1e28253275b1c43491ac7923d6167e5";
-              pullPolicy = "IfNotPresent";
-            };
-            securityContext = {
-              runAsUser = 0;
-              runAsGroup = 0;
-            };
-            command = [
-              "sh"
-              "-c"
-              ''
-                set -e
-
-                PLUGIN_DIR="/home/node/.openclaw/extensions/matrix"
-
-                # Check if already installed with all deps (including native binary)
-                if [ -d "$PLUGIN_DIR/node_modules/@vector-im/matrix-bot-sdk" ] && \
-                   [ -d "$PLUGIN_DIR/node_modules/markdown-it" ] && \
-                   [ -d "$PLUGIN_DIR/node_modules/@matrix-org/matrix-sdk-crypto-nodejs-linux-x64-gnu" ]; then
-                  echo "Matrix plugin deps already installed"
-                  exit 0
-                fi
-
-                echo "Setting up matrix plugin in persistent volume..."
-
-                # Copy plugin source from bundled location (not hidden here - emptyDir only on main)
-                rm -rf "$PLUGIN_DIR"
-                mkdir -p "$PLUGIN_DIR"
-                cp -r /app/extensions/matrix/* "$PLUGIN_DIR/"
-
-                # Remove devDependencies (workspace ref) from package.json
-                cd "$PLUGIN_DIR"
-                sed -i '/"devDependencies"/,/}/d' package.json
-                # Remove trailing comma before closing brace if any
-                sed -i ':a;N;$!ba;s/,\n}/\n}/g' package.json
-
-                # Allow native module build scripts (pnpm v10+ blocks them by default)
-                # Without this, @matrix-org/matrix-sdk-crypto-nodejs postinstall won't run
-                # and the platform-specific binary won't be downloaded
-                node -e "
-                  const pkg = JSON.parse(require('fs').readFileSync('package.json','utf8'));
-                  pkg.pnpm = { onlyBuiltDependencies: ['@matrix-org/matrix-sdk-crypto-nodejs'] };
-                  require('fs').writeFileSync('package.json', JSON.stringify(pkg, null, 2));
-                "
-
-                echo "Installing dependencies with pnpm..."
-                pnpm install --no-frozen-lockfile 2>&1
-
-                echo "Matrix plugin installed successfully"
-              ''
-            ];
+          securityContext = {
+            runAsUser = 0;
+            runAsGroup = 0;
           };
+          command = [
+            "sh"
+            "-c"
+            "mkdir -p /home/node/.openclaw && cp /config/openclaw.json /home/node/.openclaw/openclaw.json"
+          ];
         };
       };
     };
