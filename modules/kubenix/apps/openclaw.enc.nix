@@ -20,9 +20,9 @@ in
         "sh"
         "-c"
         ''
-          # Run each CLI command in a subshell so process.exit() doesn't kill parent
-          echo "Enabling matrix plugin..."
-          (node dist/index.js plugins enable matrix 2>&1) || true
+          # Clean up old plugin copies that cause "duplicate plugin id" conflicts
+          rm -rf /home/node/.openclaw/extensions/matrix
+          # doctor --fix enables discovered plugins and fixes config issues
           echo "Running doctor fix..."
           (node dist/index.js doctor --fix 2>&1) || true
           echo "Starting gateway..."
@@ -178,6 +178,11 @@ in
           type = "hostPath";
           hostPath = "/dev/net/tun";
           advancedMounts.main.tailscale = [ { path = "/dev/net/tun"; } ];
+        };
+        # Hide bundled matrix plugin to prevent "duplicate plugin id" with installed copy
+        persistence.hide-bundled-matrix = {
+          type = "emptyDir";
+          advancedMounts.main.main = [ { path = "/app/extensions/matrix"; } ];
         };
         # Copy config to persistent volume; matrix plugin installed at startup
         controllers.main.initContainers.copy-config = {
