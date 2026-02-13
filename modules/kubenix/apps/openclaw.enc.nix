@@ -189,7 +189,7 @@ in
             TS_HOSTNAME = "openclaw";
             TS_USERSPACE = "false";
             TS_STATE_DIR = "/var/lib/tailscale";
-            TS_ACCEPT_DNS = "true";
+            TS_ACCEPT_DNS = "false";
             TS_AUTH_ONCE = "true";
             TS_KUBE_SECRET = "";
           };
