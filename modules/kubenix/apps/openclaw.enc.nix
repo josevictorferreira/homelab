@@ -22,8 +22,11 @@ in
         ''
           echo "Installing matrix plugin deps into extension dir..."
           cd /app/extensions/matrix
+          # Strip workspace: protocol deps that npm can't handle
+          sed -i '/"openclaw":/d' package.json
           npm install --omit=dev --no-package-lock --ignore-scripts --legacy-peer-deps 2>&1 || echo "WARN: npm install in extension dir failed"
           echo "Starting gateway..."
+          cd /app
           exec node dist/index.js gateway run --allow-unconfigured
         ''
       ];
