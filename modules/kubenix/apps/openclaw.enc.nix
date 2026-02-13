@@ -29,7 +29,7 @@ in
             delete pkg.devDependencies;
             fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2));
           "
-          npm install --omit=dev --no-package-lock --ignore-scripts --legacy-peer-deps 2>&1 || echo "WARN: npm install in extension dir failed"
+          npm install --omit=dev --no-package-lock --legacy-peer-deps 2>&1 || echo "WARN: npm install in extension dir failed"
           echo "Starting gateway..."
           cd /app
           exec node dist/index.js gateway run --allow-unconfigured
