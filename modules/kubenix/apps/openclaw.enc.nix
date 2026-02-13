@@ -142,6 +142,26 @@ in
           runAsUser = 0;
           runAsGroup = 0;
         };
+        # Tailscale kernel-mode overwrites resolv.conf with MagicDNS (100.100.100.100)
+        # which can't resolve K8s service names. Use explicit dnsConfig with cluster DNS.
+        controllers.main.pod.dnsPolicy = "None";
+        controllers.main.pod.dnsConfig = {
+          nameservers = [
+            "10.43.0.10"
+            "100.100.100.100"
+          ];
+          searches = [
+            "apps.svc.cluster.local"
+            "svc.cluster.local"
+            "cluster.local"
+          ];
+          options = [
+            {
+              name = "ndots";
+              value = "5";
+            }
+          ];
+        };
         # XDG_CONFIG_HOME on persistent volume so plugin installs survive restarts
         controllers.main.containers.main.env.XDG_CONFIG_HOME = "/home/node/.config";
         controllers.main.containers.main.env.HOME = "/home/node";
