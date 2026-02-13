@@ -20,9 +20,15 @@ in
         "sh"
         "-c"
         ''
-          # Clean up old plugin copies that cause "duplicate plugin id" conflicts
+          # Link installed matrix plugin (with node_modules) to the discovery scan path
+          # CONFIG_DIR = ~/.openclaw, so extensions are scanned at ~/.openclaw/extensions/
+          # The installed copy at ~/.config/openclaw/extensions/matrix has proper deps
+          mkdir -p /home/node/.openclaw/extensions
           rm -rf /home/node/.openclaw/extensions/matrix
-          # doctor --fix enables discovered plugins and fixes config issues
+          ln -sf /home/node/.config/openclaw/extensions/matrix /home/node/.openclaw/extensions/matrix
+          echo "Matrix plugin linked to discovery path"
+          ls -la /home/node/.openclaw/extensions/matrix/
+          # doctor --fix applies pending config changes
           echo "Running doctor fix..."
           (node dist/index.js doctor --fix 2>&1) || true
           echo "Starting gateway..."
