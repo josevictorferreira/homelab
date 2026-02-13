@@ -20,6 +20,15 @@ in
         "sh"
         "-c"
         ''
+          echo "Installing matrix plugin dependencies..."
+          cd /app
+          npm install --no-save --no-audit --no-fund \
+            @vector-im/matrix-bot-sdk@0.8.0-element.3 \
+            @matrix-org/matrix-sdk-crypto-nodejs@^0.4.0 \
+            markdown-it@14.1.0 \
+            music-metadata@^11.11.2 \
+            zod@^4.3.6 \
+            2>&1 || echo "WARN: npm install failed, continuing anyway..."
           echo "Starting gateway..."
           exec node dist/index.js gateway run --allow-unconfigured
         ''
