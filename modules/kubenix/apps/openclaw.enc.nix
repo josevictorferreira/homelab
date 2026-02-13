@@ -30,9 +30,21 @@ in
             fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2));
           "
           npm install --omit=dev --no-package-lock --legacy-peer-deps 2>&1 || echo "WARN: npm install in extension dir failed"
-          echo "Running doctor --fix to enable matrix plugin..."
+          echo "Ensuring matrix plugin is enabled in config..."
           cd /app
-          (node dist/index.js doctor --fix 2>&1) || echo "WARN: doctor --fix exited non-zero"
+          node -e "
+            const fs = require('fs');
+            const cfgPath = '/home/node/.openclaw/openclaw.json';
+            const cfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
+            if (!cfg.plugins) cfg.plugins = {};
+            if (!cfg.plugins.entries) cfg.plugins.entries = {};
+            if (!cfg.plugins.entries.matrix) cfg.plugins.entries.matrix = {};
+            cfg.plugins.entries.matrix.enabled = true;
+            if (!cfg.plugins.allow) cfg.plugins.allow = [];
+            if (!cfg.plugins.allow.includes('matrix')) cfg.plugins.allow.push('matrix');
+            fs.writeFileSync(cfgPath, JSON.stringify(cfg, null, 2));
+            console.log('Config updated: matrix plugin enabled');
+          "
           echo "Starting gateway..."
           exec node dist/index.js gateway run --allow-unconfigured
         ''
