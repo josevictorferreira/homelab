@@ -22,29 +22,12 @@ in
         ''
           set -e
 
-          PLUGIN_DIR="$HOME/.config/openclaw/extensions/matrix"
-
-          # Install matrix plugin if not already present
-          if [ ! -f "$PLUGIN_DIR/openclaw.plugin.json" ] || \
-             [ ! -d "$PLUGIN_DIR/node_modules" ]; then
-            echo "Installing matrix plugin from bundled source..."
-            node dist/index.js plugins install ./extensions/matrix 2>&1 || {
-              echo "CLI install failed, trying manual install..."
-              rm -rf "$PLUGIN_DIR"
-              mkdir -p "$PLUGIN_DIR"
-              cp -r /app/extensions/matrix/* "$PLUGIN_DIR/"
-              cd "$PLUGIN_DIR"
-              sed -i '/"devDependencies"/,/}/d' package.json
-              sed -i ':a;N;$!ba;s/,\n}/\n}/g' package.json
-              pnpm install --no-frozen-lockfile 2>&1
-            }
-            echo "Matrix plugin installed."
-          else
-            echo "Matrix plugin already installed."
-          fi
-
-          # Fix config issues and start gateway
+          # Enable bundled matrix plugin (disabled by default)
+          echo "Enabling matrix plugin..."
+          node dist/index.js plugins enable matrix 2>&1 || true
+          echo "Running doctor fix..."
           node dist/index.js doctor --fix 2>&1 || true
+          echo "Starting gateway..."
           exec node dist/index.js gateway run --allow-unconfigured
         ''
       ];
