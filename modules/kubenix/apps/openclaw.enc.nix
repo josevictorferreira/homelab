@@ -160,9 +160,10 @@ in
 
                 PLUGIN_DIR="/home/node/.openclaw/extensions/matrix"
 
-                # Check if already installed with all deps
+                # Check if already installed with all deps (including native binary)
                 if [ -d "$PLUGIN_DIR/node_modules/@vector-im/matrix-bot-sdk" ] && \
-                   [ -d "$PLUGIN_DIR/node_modules/markdown-it" ]; then
+                   [ -d "$PLUGIN_DIR/node_modules/markdown-it" ] && \
+                   [ -d "$PLUGIN_DIR/node_modules/@matrix-org/matrix-sdk-crypto-nodejs-linux-x64-gnu" ]; then
                   echo "Matrix plugin deps already installed"
                   chown -R 1000:1000 /home/node/.openclaw
                   exit 0
@@ -180,6 +181,15 @@ in
                 sed -i '/"devDependencies"/,/}/d' package.json
                 # Remove trailing comma before closing brace if any
                 sed -i ':a;N;$!ba;s/,\n}/\n}/g' package.json
+
+                # Allow native module build scripts (pnpm v10+ blocks them by default)
+                # Without this, @matrix-org/matrix-sdk-crypto-nodejs postinstall won't run
+                # and the platform-specific binary won't be downloaded
+                node -e "
+                  const pkg = JSON.parse(require('fs').readFileSync('package.json','utf8'));
+                  pkg.pnpm = { onlyBuiltDependencies: ['@matrix-org/matrix-sdk-crypto-nodejs'] };
+                  require('fs').writeFileSync('package.json', JSON.stringify(pkg, null, 2));
+                "
 
                 echo "Installing dependencies with pnpm..."
                 pnpm install --no-frozen-lockfile 2>&1

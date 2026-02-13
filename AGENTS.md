@@ -6,6 +6,16 @@
 
 > **Before starting any implementation, read `.docs/rules.md` for project-specific lessons and gotchas.**
 
+## AGENT SESSION RULES
+
+**ALWAYS follow these rules in every agent session:**
+
+1. **Never run destructive/patching commands directly in the kubernetes cluster** using `kubectl` or Kubernetes MCP - Always use declarative config written in Nix
+2. **Never edit `.k8s/*.yaml` files directly** - Always autogenerate using `make manifests`
+3. **Never commit and push without the user consent** - Always ask for explicit approval
+4. **Never change the secrets without the user consent** - Always ask for explicit approval
+5. **Never hardcode secrets into files** - Always use `kubenix.lib.secretsFor "secret_key"` or `kubenix.lib.secretsInlineFor "secret_key"`; files containing secrets must always end in `.enc.nix`
+
 ## OVERVIEW
 
 NixOS/k3s hybrid homelab: 4 x86 nodes + 1 Pi. Immutable NixOS hosts, kubenix-generated K8s manifests, Flux GitOps.
