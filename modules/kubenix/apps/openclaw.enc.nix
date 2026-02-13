@@ -20,17 +20,6 @@ in
         "sh"
         "-c"
         ''
-          # Link installed matrix plugin (with node_modules) to the discovery scan path
-          # CONFIG_DIR = ~/.openclaw, so extensions are scanned at ~/.openclaw/extensions/
-          # The installed copy at ~/.config/openclaw/extensions/matrix has proper deps
-          mkdir -p /home/node/.openclaw/extensions
-          rm -rf /home/node/.openclaw/extensions/matrix
-          ln -sf /home/node/.config/openclaw/extensions/matrix /home/node/.openclaw/extensions/matrix
-          echo "Matrix plugin linked to discovery path"
-          ls -la /home/node/.openclaw/extensions/matrix/
-          # doctor --fix applies pending config changes
-          echo "Running doctor fix..."
-          (node dist/index.js doctor --fix 2>&1) || true
           echo "Starting gateway..."
           exec node dist/index.js gateway run --allow-unconfigured
         ''
@@ -84,6 +73,9 @@ in
               "fetch"
             ];
             deny = [ "browser" ];
+          };
+          plugins = {
+            allow = [ "matrix" ];
           };
           gateway = {
             mode = "local";
@@ -185,11 +177,6 @@ in
           hostPath = "/dev/net/tun";
           advancedMounts.main.tailscale = [ { path = "/dev/net/tun"; } ];
         };
-        # Hide bundled matrix plugin to prevent "duplicate plugin id" with installed copy
-        persistence.hide-bundled-matrix = {
-          type = "emptyDir";
-          advancedMounts.main.main = [ { path = "/app/extensions/matrix"; } ];
-        };
         # Copy config to persistent volume; matrix plugin installed at startup
         controllers.main.initContainers.copy-config = {
           image = {
@@ -203,7 +190,7 @@ in
           command = [
             "sh"
             "-c"
-            "mkdir -p /home/node/.openclaw && cp /config/openclaw.json /home/node/.openclaw/openclaw.json"
+            "mkdir -p /home/node/.openclaw && cp /config/openclaw.json /home/node/.openclaw/openclaw.json && rm -rf /home/node/.openclaw/extensions /home/node/.config/openclaw/extensions"
           ];
         };
       };
