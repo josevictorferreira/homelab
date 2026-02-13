@@ -19,7 +19,7 @@ in
       command = [
         "sh"
         "-c"
-        "node dist/index.js doctor --fix && node dist/index.js gateway --allow-unconfigured"
+        "rm -rf /app/extensions/matrix && ln -sf /home/node/.openclaw/extensions/matrix /app/extensions/matrix && exec node dist/index.js gateway run --allow-unconfigured"
       ];
       persistence = {
         enabled = true;
@@ -167,12 +167,8 @@ in
           hostPath = "/dev/net/tun";
           advancedMounts.main.tailscale = [ { path = "/dev/net/tun"; } ];
         };
-        # Hide the bundled (dep-less) matrix plugin so only our persistent copy loads
-        # Only mount on main container, NOT init containers
-        persistence.hide-bundled-matrix = {
-          type = "emptyDir";
-          advancedMounts.main.main = [ { path = "/app/extensions/matrix"; } ];
-        };
+        # Bundled matrix plugin replaced by symlink at startup (see command)
+        # persistent copy at /home/node/.openclaw/extensions/matrix has full deps
         controllers.main.initContainers = {
           copy-config = {
             image = {
