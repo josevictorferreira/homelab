@@ -30,8 +30,10 @@ in
             fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2));
           "
           npm install --omit=dev --no-package-lock --legacy-peer-deps 2>&1 || echo "WARN: npm install in extension dir failed"
-          echo "Starting gateway..."
+          echo "Running doctor --fix to enable matrix plugin..."
           cd /app
+          node dist/index.js doctor --fix 2>&1 || echo "WARN: doctor --fix failed"
+          echo "Starting gateway..."
           exec node dist/index.js gateway run --allow-unconfigured
         ''
       ];
