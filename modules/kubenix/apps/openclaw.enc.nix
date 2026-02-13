@@ -118,9 +118,20 @@ in
               userId = "@openclaw:josevictor.me";
               encryption = false;
               dm = {
-                policy = "pairing";
-                allowFrom = [ "@jose:josevictor.me" ];
+                policy = "allowlist";
+                allowFrom = [
+                  "@jose:josevictor.me"
+                  "@admin:josevictor.me"
+                  "@zeh:josevictor.me"
+                ];
               };
+              autoJoin = "allowlist";
+              autoJoinAllowList = [
+                "@jose:josevictor.me"
+                "@admin:josevictor.me"
+                "@zeh:josevictor.me"
+              ];
+              mediaMaxMb = 50;
               groupPolicy = "disabled";
             };
           };
@@ -215,6 +226,12 @@ in
           size = "1Gi";
           accessMode = "ReadWriteOnce";
           advancedMounts.main.tailscale = [ { path = "/var/lib/tailscale"; } ];
+        };
+        # CephFS shared storage (obsidian, documents, downloads, etc.)
+        persistence.shared-storage = {
+          type = "persistentVolumeClaim";
+          existingClaim = "cephfs-shared-storage-root";
+          advancedMounts.main.main = [ { path = "/home/node/shared"; } ];
         };
         # tun device for kernel-mode tailscale
         persistence.dev-tun = {
