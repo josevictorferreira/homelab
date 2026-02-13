@@ -28,7 +28,7 @@ in
         storageClass = "rook-ceph-block";
         size = "10Gi";
         accessMode = "ReadWriteOnce";
-        globalMounts = [ { path = "/home/node/.openclaw"; } ];
+        globalMounts = [ { path = "/home/node"; } ];
       };
       config = {
         filename = "openclaw.json";
@@ -120,6 +120,54 @@ in
       };
       values = {
         ingress.main.enabled = false;
+        # Main container runs as root so agent can install packages
+        controllers.main.containers.main.securityContext = {
+          runAsUser = 0;
+          runAsGroup = 0;
+        };
+        # Tailscale sidecar for tailnet access (kernel mode)
+        controllers.main.containers.tailscale = {
+          image = {
+            repository = "tailscale/tailscale";
+            tag = "latest";
+          };
+          securityContext = {
+            runAsUser = 0;
+            runAsGroup = 0;
+            capabilities.add = [
+              "NET_ADMIN"
+              "NET_RAW"
+            ];
+          };
+          env = {
+            TS_AUTHKEY = {
+              valueFrom.secretKeyRef = {
+                name = "openclaw-secrets";
+                key = "TS_AUTHKEY";
+              };
+            };
+            TS_HOSTNAME = "openclaw";
+            TS_USERSPACE = "false";
+            TS_STATE_DIR = "/var/lib/tailscale";
+            TS_ACCEPT_DNS = "true";
+            TS_AUTH_ONCE = "true";
+            TS_KUBE_SECRET = "";
+          };
+        };
+        # Tailscale state persistence
+        persistence.tailscale-state = {
+          type = "persistentVolumeClaim";
+          storageClass = "rook-ceph-block";
+          size = "1Gi";
+          accessMode = "ReadWriteOnce";
+          advancedMounts.main.tailscale = [ { path = "/var/lib/tailscale"; } ];
+        };
+        # tun device for kernel-mode tailscale
+        persistence.dev-tun = {
+          type = "hostPath";
+          hostPath = "/dev/net/tun";
+          advancedMounts.main.tailscale = [ { path = "/dev/net/tun"; } ];
+        };
         # Hide the bundled (dep-less) matrix plugin so only our persistent copy loads
         # Only mount on main container, NOT init containers
         persistence.hide-bundled-matrix = {
@@ -139,7 +187,7 @@ in
             command = [
               "sh"
               "-c"
-              "cp /config/openclaw.json /home/node/.openclaw/openclaw.json && chown -R 1000:1000 /home/node/.openclaw"
+              "mkdir -p /home/node/.openclaw && cp /config/openclaw.json /home/node/.openclaw/openclaw.json"
             ];
           };
           install-matrix-plugin = {
@@ -165,7 +213,6 @@ in
                    [ -d "$PLUGIN_DIR/node_modules/markdown-it" ] && \
                    [ -d "$PLUGIN_DIR/node_modules/@matrix-org/matrix-sdk-crypto-nodejs-linux-x64-gnu" ]; then
                   echo "Matrix plugin deps already installed"
-                  chown -R 1000:1000 /home/node/.openclaw
                   exit 0
                 fi
 
@@ -193,9 +240,6 @@ in
 
                 echo "Installing dependencies with pnpm..."
                 pnpm install --no-frozen-lockfile 2>&1
-
-                # Fix ownership
-                chown -R 1000:1000 /home/node/.openclaw
 
                 echo "Matrix plugin installed successfully"
               ''
