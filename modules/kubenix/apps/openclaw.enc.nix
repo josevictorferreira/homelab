@@ -20,25 +20,9 @@ in
         "sh"
         "-c"
         ''
-          echo "Installing matrix plugin dependencies..."
-          cd /app
-          PNPM_STORE=$(pnpm store path 2>/dev/null || echo "/root/.local/share/pnpm/store/v10")
-          pnpm add --save-peer=false --ignore-workspace --store-dir "$PNPM_STORE" \
-            @vector-im/matrix-bot-sdk@0.8.0-element.3 \
-            @matrix-org/matrix-sdk-crypto-nodejs@^0.4.0 \
-            markdown-it@14.1.0 \
-            music-metadata@^11.11.2 \
-            zod@^4.3.6 \
-            2>&1 || {
-            echo "WARN: pnpm failed, trying npm..."
-            npm install --no-save --no-package-lock --legacy-peer-deps \
-              @vector-im/matrix-bot-sdk@0.8.0-element.3 \
-              @matrix-org/matrix-sdk-crypto-nodejs@^0.4.0 \
-              markdown-it@14.1.0 \
-              music-metadata@^11.11.2 \
-              zod@^4.3.6 \
-              2>&1 || echo "WARN: npm also failed, continuing anyway..."
-          }
+          echo "Installing matrix plugin deps into extension dir..."
+          cd /app/extensions/matrix
+          npm install --omit=dev --no-package-lock --ignore-scripts --legacy-peer-deps 2>&1 || echo "WARN: npm install in extension dir failed"
           echo "Starting gateway..."
           exec node dist/index.js gateway run --allow-unconfigured
         ''
