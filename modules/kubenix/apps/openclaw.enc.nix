@@ -17,10 +17,9 @@ in
       replicas = 1;
       secretName = "openclaw-secrets";
       command = [
-        "node"
-        "dist/index.js"
-        "gateway"
-        "--allow-unconfigured"
+        "sh"
+        "-c"
+        "node dist/index.js doctor --fix && node dist/index.js gateway --allow-unconfigured"
       ];
       persistence = {
         enabled = true;
