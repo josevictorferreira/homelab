@@ -98,6 +98,15 @@ in
               "fetch"
             ];
             deny = [ "browser" ];
+            media = {
+              audio = {
+                enabled = true;
+                maxBytes = 20971520;
+                models = [
+
+                ];
+              };
+            };
           };
           plugins = {
             allow = [ "matrix" ];
@@ -131,7 +140,7 @@ in
                 "@admin:josevictor.me"
                 "@zeh:josevictor.me"
               ];
-              mediaMaxMb = 50;
+              mediaMaxMb = 150;
               groupPolicy = "disabled";
             };
           };
@@ -162,13 +171,10 @@ in
       };
       values = {
         ingress.main.enabled = false;
-        # Main container runs as root so agent can install packages
         controllers.main.containers.main.securityContext = {
           runAsUser = 0;
           runAsGroup = 0;
         };
-        # Tailscale kernel-mode overwrites resolv.conf with MagicDNS (100.100.100.100)
-        # which can't resolve K8s service names. Use explicit dnsConfig with cluster DNS.
         controllers.main.pod.dnsPolicy = "None";
         controllers.main.pod.dnsConfig = {
           nameservers = [
@@ -187,10 +193,8 @@ in
             }
           ];
         };
-        # XDG_CONFIG_HOME on persistent volume so plugin installs survive restarts
         controllers.main.containers.main.env.XDG_CONFIG_HOME = "/home/node/.config";
         controllers.main.containers.main.env.HOME = "/home/node";
-        # Tailscale sidecar for tailnet access (kernel mode)
         controllers.main.containers.tailscale = {
           image = {
             repository = "tailscale/tailscale";
@@ -219,7 +223,6 @@ in
             TS_KUBE_SECRET = "";
           };
         };
-        # Tailscale state persistence
         persistence.tailscale-state = {
           type = "persistentVolumeClaim";
           storageClass = "rook-ceph-block";
@@ -227,19 +230,16 @@ in
           accessMode = "ReadWriteOnce";
           advancedMounts.main.tailscale = [ { path = "/var/lib/tailscale"; } ];
         };
-        # CephFS shared storage (obsidian, documents, downloads, etc.)
         persistence.shared-storage = {
           type = "persistentVolumeClaim";
           existingClaim = "cephfs-shared-storage-root";
           advancedMounts.main.main = [ { path = "/home/node/shared"; } ];
         };
-        # tun device for kernel-mode tailscale
         persistence.dev-tun = {
           type = "hostPath";
           hostPath = "/dev/net/tun";
           advancedMounts.main.tailscale = [ { path = "/dev/net/tun"; } ];
         };
-        # Copy config to persistent volume; matrix plugin installed at startup
         controllers.main.initContainers.copy-config = {
           image = {
             repository = "busybox";
