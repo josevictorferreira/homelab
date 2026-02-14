@@ -10,7 +10,7 @@ in
       namespace = namespace;
       image = {
         repository = "ghcr.io/openclaw/openclaw";
-        tag = "latest@sha256:a02b8193cc9d985dce3479eb1986a326f1e28253275b1c43491ac7923d6167e5";
+        tag = "2026.2.13@sha256:6026771358490d22af93dc462aa99e1c9d10fed1f6067aecd83a0c86bc8abafe";
         pullPolicy = "IfNotPresent";
       };
       port = 18789;
@@ -95,9 +95,25 @@ in
               "read"
               "write"
               "edit"
-              "fetch"
+              "matrix"
+              "process"
+              "web_search"
+              "web_fetch"
+              "canvas"
+              "nodes"
+              "image"
+              "message"
+              "cron"
+              "gateway"
+              "browser"
+              "sessions_list"
+              "sessions_history"
+              "sessions_send"
+              "sessions_spawn"
+              "session_status"
+              "agents_list"
             ];
-            deny = [ "browser" ];
+            deny = [ ];
             media = {
               audio = {
                 enabled = true;
