@@ -103,7 +103,22 @@ in
                 enabled = true;
                 maxBytes = 20971520;
                 models = [
-
+                  {
+                    type = "cli";
+                    command = "npx";
+                    args = [
+                      "-y"
+                      "@google/gemini-cli"
+                      "--api-key"
+                      "\${GEMINI_API_KEY}"
+                      "-p"
+                      "Transcribe this audio file: {{`{{`}}MediaPath{{`}}`}}"
+                    ];
+                    timeoutSeconds = 60;
+                    env = {
+                      GEMINI_API_KEY = "\${GEMINI_API_KEY}";
+                    };
+                  }
                 ];
               };
             };
