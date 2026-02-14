@@ -15,8 +15,9 @@ let
     # Check if all users already exist - if so, exit early
     admin_exists=$(curl -s -o /dev/null -w "%{http_code}" "$SYNAPSE_URL/_matrix/client/v3/register/available?username=admin" || echo "000")
     jose_exists=$(curl -s -o /dev/null -w "%{http_code}" "$SYNAPSE_URL/_matrix/client/v3/register/available?username=jose" || echo "000")
+    zeh_exists=$(curl -s -o /dev/null -w "%{http_code}" "$SYNAPSE_URL/_matrix/client/v3/register/available?username=zeh" || echo "000")
 
-    if [ "$admin_exists" = "400" ] && [ "$jose_exists" = "400" ]; then
+    if [ "$admin_exists" = "400" ] && [ "$jose_exists" = "400" ] && [ "$zeh_exists" = "400" ]; then
       echo "All users already exist. Provisioning already completed, skipping..."
       exit 0
     fi
@@ -76,6 +77,7 @@ let
     echo "Starting user provisioning..."
     register_user "admin" "$ADMIN_PASSWORD" "Admin" true
     register_user "jose" "$JOSE_PASSWORD" "Jose Victor" false
+    register_user "zeh" "$ZEH_PASSWORD" "Zeh" true
     echo "User provisioning complete!"
   '';
 in
@@ -207,6 +209,7 @@ in
                   "*" = "relay";
                   "@jose:josevictor.me" = "admin";
                   "@admin:josevictor.me" = "admin";
+                  "@zeh:josevictor.me" = "admin";
                 };
                 relay = {
                   enabled = true;
@@ -300,6 +303,7 @@ in
                   "*" = "relay";
                   "@jose:josevictor.me" = "admin";
                   "@admin:josevictor.me" = "admin";
+                  "@zeh:josevictor.me" = "admin";
                 };
                 encryption = {
                   allow = false;
@@ -390,6 +394,7 @@ in
                   "*" = "relay";
                   "@jose:josevictor.me" = "admin";
                   "@admin:josevictor.me" = "admin";
+                  "@zeh:josevictor.me" = "admin";
                 };
                 relay = {
                   enabled = false;
