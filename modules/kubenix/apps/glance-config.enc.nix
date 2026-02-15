@@ -372,6 +372,7 @@ let
                   "rishikanthc/scriberr"
                   "comfyanonymous/ComfyUI"
                   "imgproxy/imgproxy"
+                  "openclaw/openclaw"
                   # Work Apps
                   "kong/kong"
                   "keycloak/keycloak"
