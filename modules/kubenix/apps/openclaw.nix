@@ -328,14 +328,15 @@ in
 
               # Install ffmpeg if not present
               if [ ! -f /home/node/.local/bin/ffmpeg ]; then
-              echo "Installing ffmpeg..."
-              curl -L -o /home/node/.local/bin/ffmpeg https://github.com/eugeneware/ffmpeg-static/releases/download/b6.0/ffmpeg-linux-x64 \
-                && chmod +x /home/node/.local/bin/ffmpeg
-              echo "Installing uv..."
-              curl -LsSf https://astral.sh/uv/install.sh | UV_INSTALL_DIR=/home/node/.local/bin sh
-              echo "Installing Gemini CLI..."
-              npm install -g @google/gemini-cli --prefix /home/node/.local
-              echo "Tools installed successfully"
+                echo "Installing ffmpeg..."
+                curl -L -o /home/node/.local/bin/ffmpeg https://github.com/eugeneware/ffmpeg-static/releases/download/b6.0/ffmpeg-linux-x64 \
+                  && chmod +x /home/node/.local/bin/ffmpeg
+                echo "Installing uv..."
+                curl -LsSf https://astral.sh/uv/install.sh | UV_INSTALL_DIR=/home/node/.local/bin sh
+                echo "Installing Gemini CLI..."
+                npm install -g @google/gemini-cli --prefix /home/node/.local
+                echo "Tools installed successfully"
+              fi
             ''
           ];
         };
