@@ -48,6 +48,11 @@
 **Context:** vals injection during `make vmanifests` fails if secret keys are missing, causing cryptic manifest generation errors. Subagent claims aren't always verified.
 **Verify:** `sops -d secrets/k8s-secrets.enc.yaml | grep <key>` returns expected value
 
+### Kubenix Secrets for Environment Variables Require Explicit Definition
+**Lesson:** When adding env vars with `valueFrom.secretKeyRef`, the key must be explicitly defined in the kubenix Secret config (e.g., `*-config.enc.nix`) using `kubenix.lib.secretsFor`, not just exist in `secrets/k8s-secrets.enc.yaml`.
+**Context:** `kubenix.lib.secretsInlineFor` injects into JSON configs, but `valueFrom.secretKeyRef` reads from K8s Secret resources. The key must be declared in both places: source secrets file AND kubenix Secret definition.
+**Verify:** Check generated manifest: `sops -d .k8s/apps/<app>-config.enc.yaml | grep <KEY_NAME>`
+
 ## Mautrix Bridge Configuration
 
 ### Bridge Config Structure Varies by Type
