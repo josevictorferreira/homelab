@@ -313,30 +313,65 @@ in
         };
         controllers.main.initContainers.install-tools = {
           image = {
-            repository = "busybox";
-            tag = "latest";
+            repository = "node";
+            tag = "22-slim";
           };
           securityContext = {
             runAsUser = 0;
             runAsGroup = 0;
           };
           command = [
-            "sh"
+            "bash"
             "-c"
             ''
+              set -e
               mkdir -p /home/node/.local/bin
+              chown -R 1000:1000 /home/node/.local
 
-              # Install ffmpeg if not present
+              # Install ffmpeg
               if [ ! -f /home/node/.local/bin/ffmpeg ]; then
                 echo "Installing ffmpeg..."
-                curl -L -o /home/node/.local/bin/ffmpeg https://github.com/eugeneware/ffmpeg-static/releases/download/b6.0/ffmpeg-linux-x64 \
-                  && chmod +x /home/node/.local/bin/ffmpeg
-                echo "Installing uv..."
-                curl -LsSf https://astral.sh/uv/install.sh | UV_INSTALL_DIR=/home/node/.local/bin sh
-                echo "Installing Gemini CLI..."
-                npm install -g @google/gemini-cli --prefix /home/node/.local
-                echo "Tools installed successfully"
+                apt-get update && apt-get install -y curl xz-utils
+                curl -fsSL -o /tmp/ffmpeg.tar.xz https://github.com/eugeneware/ffmpeg-static/releases/download/b6.0/ffmpeg-linux-x64.tar.xz
+                echo "Archive contents:"
+                tar -tf /tmp/ffmpeg.tar.xz
+                tar -xf /tmp/ffmpeg.tar.xz -C /tmp/
+                # Find and move the ffmpeg binary
+                find /tmp -name "ffmpeg" -type f -exec mv {} /home/node/.local/bin/ffmpeg \;
+                chmod +x /home/node/.local/bin/ffmpeg
+                rm -f /tmp/ffmpeg.tar.xz
+                echo "ffmpeg installed successfully"
+              else
+                echo "ffmpeg already exists, skipping..."
               fi
+
+              # Install uv
+              if [ ! -f /home/node/.local/bin/uv ]; then
+                echo "Installing uv..."
+                curl -fsSL https://astral.sh/uv/install.sh | UV_INSTALL_DIR=/home/node/.local/bin sh
+                echo "uv installed successfully"
+              else
+                echo "uv already exists, skipping..."
+              fi
+
+              # Install Gemini CLI
+              if [ ! -f /home/node/.local/bin/gemini ]; then
+                echo "Installing Gemini CLI..."
+                # Install locally then create symlink
+                mkdir -p /home/node/.local/lib/node_modules
+                npm install @google/gemini-cli --prefix /home/node/.local/lib
+                # Create symlink to the binary
+                ln -sf /home/node/.local/lib/lib/node_modules/.bin/gemini /home/node/.local/bin/gemini || \
+                ln -sf /home/node/.local/lib/node_modules/.bin/gemini /home/node/.local/bin/gemini
+                echo "Gemini CLI installed successfully"
+              else
+                echo "Gemini CLI already exists, skipping..."
+              fi
+
+              # Set ownership
+              chown -R 1000:1000 /home/node/.local
+              ls -la /home/node/.local/bin/
+              echo "All tools installed successfully!"
             ''
           ];
         };
