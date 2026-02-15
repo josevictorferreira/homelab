@@ -10,7 +10,7 @@ in
       namespace = namespace;
       image = {
         repository = "ghcr.io/openclaw/openclaw";
-        tag = "2026.2.13@sha256:6026771358490d22af93dc462aa99e1c9d10fed1f6067aecd83a0c86bc8abafe";
+        tag = "2026.2.14@sha256:ace6f32961c4d574cb189d0007ec778408a9c02502f38af9ded6c864bae0f454";
         pullPolicy = "IfNotPresent";
       };
       port = 18789;
@@ -95,13 +95,11 @@ in
               "read"
               "write"
               "edit"
-              "matrix"
               "process"
               "web_search"
               "web_fetch"
               "canvas"
               "nodes"
-              "image"
               "message"
               "cron"
               "gateway"
