@@ -131,9 +131,6 @@ in
                       "Transcribe this audio file: {{`{{`}}MediaPath{{`}}`}}"
                     ];
                     timeoutSeconds = 60;
-                    env = {
-                      GEMINI_API_KEY = "\${GEMINI_API_KEY}";
-                    };
                   }
                 ];
               };
