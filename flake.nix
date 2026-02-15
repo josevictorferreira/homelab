@@ -130,6 +130,7 @@
           commands = import ./modules/commands.nix {
             pkgs = sysPkgs;
             inherit lib;
+            deploy-rs-pkg = deploy-rs.packages.${system}.default;
           };
         in
         {
@@ -139,9 +140,9 @@
             check
             lint
             format
-            ddeploy
-            deploy
-            gdeploy
+            run-ddeploy
+            run-deploy
+            run-gdeploy
             secrets
             manifests
             kubesync

@@ -1,6 +1,10 @@
 # Nix-based CLI commands for homelab management
 # All logic lives here; Makefile just calls `nix run .#<command>`
-{ pkgs, lib }:
+{
+  pkgs,
+  lib,
+  deploy-rs-pkg ? null,
+}:
 
 let
   manifestsDir = ".k8s";
@@ -71,24 +75,26 @@ let
   # Deploy commands
   # ============================================================================
 
-  ddeploy = mkCommand "ddeploy" "Dry deploy host (interactive)" [ pkgs.nix pkgs.fzf ] ''
-    AVAILABLE_NODES="$(nix eval --raw .#nodesList --read-only --quiet)"
-    SEL="$(printf '%s\n' $AVAILABLE_NODES | tr -d '\r' | fzf --prompt='host> ' --height=40% --border --preview 'printf "%s\n" {}')"
-    echo "Deploying host: $SEL"
-    nix run github:serokell/deploy-rs -- \
-      --debug-logs \
-      --dry-activate \
-      ".#$SEL" \
-      -- \
-      --impure \
-      --show-trace
-  '';
+  ddeploy =
+    mkCommand "run-ddeploy" "Dry deploy host (interactive)" [ pkgs.nix pkgs.fzf deploy-rs-pkg ]
+      ''
+        AVAILABLE_NODES="$(nix eval --raw .#nodesList --read-only --quiet)"
+        SEL="$(printf '%s\n' "$AVAILABLE_NODES" | tr -d '\r' | fzf --prompt='host> ' --height=40% --border --preview 'printf "%s\n" {}')"
+        echo "Deploying host: $SEL"
+        deploy \
+          --debug-logs \
+          --dry-activate \
+          ".#$SEL" \
+          -- \
+          --impure \
+          --show-trace
+      '';
 
-  deploy = mkCommand "deploy" "Deploy host (interactive)" [ pkgs.nix pkgs.fzf ] ''
+  deploy = mkCommand "run-deploy" "Deploy host (interactive)" [ pkgs.nix pkgs.fzf deploy-rs-pkg ] ''
     AVAILABLE_NODES="$(nix eval --raw .#nodesList --read-only --quiet)"
-    SEL="$(printf '%s\n' $AVAILABLE_NODES | tr -d '\r' | fzf --prompt='host> ' --height=40% --border --preview 'printf "%s\n" {}')"
+    SEL="$(printf '%s\n' "$AVAILABLE_NODES" | tr -d '\r' | fzf --prompt='host> ' --height=40% --border --preview 'printf "%s\n" {}')"
     echo "Deploying host: $SEL"
-    nix run github:serokell/deploy-rs -- \
+    deploy \
       --debug-logs \
       --auto-rollback true \
       ".#$SEL" \
@@ -97,19 +103,21 @@ let
       --show-trace
   '';
 
-  gdeploy = mkCommand "gdeploy" "Deploy hosts by group (interactive)" [ pkgs.nix pkgs.fzf ] ''
-    AVAILABLE_GROUPS="$(nix eval --raw .#nodeGroupsList --read-only --quiet)"
-    SEL="$(printf '%s\n' $AVAILABLE_GROUPS | tr -d '\r' | fzf --prompt='group> ' --height=40% --border --preview 'printf "%s\n" {}')"
-    echo "Deploying group: $SEL"
-    targets="$(nix eval --raw ".#deployGroups.$SEL")"
-    echo "Targets: $targets"
-    if [ "''${ALL_SYSTEMS:-}" = "1" ]; then
-      nix flake check --show-trace --all-systems --impure
-    else
-      nix flake check --show-trace --impure
-    fi
-    eval "nix run github:serokell/deploy-rs -- --skip-checks --auto-rollback true $targets"
-  '';
+  gdeploy =
+    mkCommand "run-gdeploy" "Deploy hosts by group (interactive)" [ pkgs.nix pkgs.fzf deploy-rs-pkg ]
+      ''
+        AVAILABLE_GROUPS="$(nix eval --raw .#nodeGroupsList --read-only --quiet)"
+        SEL="$(printf '%s\n' "$AVAILABLE_GROUPS" | tr -d '\r' | fzf --prompt='group> ' --height=40% --border --preview 'printf "%s\n" {}')"
+        echo "Deploying group: $SEL"
+        targets="$(nix eval --raw ".#deployGroups.$SEL")"
+        echo "Targets: $targets"
+        if [ "''${ALL_SYSTEMS:-}" = "1" ]; then
+          nix flake check --show-trace --all-systems --impure
+        else
+          nix flake check --show-trace --impure
+        fi
+        eval "deploy --skip-checks --auto-rollback true $targets"
+      '';
 
   # ============================================================================
   # Secrets
