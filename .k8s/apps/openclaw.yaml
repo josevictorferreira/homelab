@@ -186,12 +186,13 @@ spec:
             - sh
             - -c
             - "mkdir -p /home/node/.local/bin\n\n# Install ffmpeg if not present\n\
-              if [ ! -f /home/node/.local/bin/ffmpeg ]; then\necho \"Installing ffmpeg...\"\
-              \ncurl -L -o /home/node/.local/bin/ffmpeg https://github.com/eugeneware/ffmpeg-static/releases/download/b6.0/ffmpeg-linux-x64\
-              \ \\\n  && chmod +x /home/node/.local/bin/ffmpeg\necho \"Installing\
-              \ uv...\"\ncurl -LsSf https://astral.sh/uv/install.sh | UV_INSTALL_DIR=/home/node/.local/bin\
-              \ sh\necho \"Installing Gemini CLI...\"\nnpm install -g @google/gemini-cli\
-              \ --prefix /home/node/.local\necho \"Tools installed successfully\"\n"
+              if [ ! -f /home/node/.local/bin/ffmpeg ]; then\n  echo \"Installing\
+              \ ffmpeg...\"\n  curl -L -o /home/node/.local/bin/ffmpeg https://github.com/eugeneware/ffmpeg-static/releases/download/b6.0/ffmpeg-linux-x64\
+              \ \\\n    && chmod +x /home/node/.local/bin/ffmpeg\n  echo \"Installing\
+              \ uv...\"\n  curl -LsSf https://astral.sh/uv/install.sh | UV_INSTALL_DIR=/home/node/.local/bin\
+              \ sh\n  echo \"Installing Gemini CLI...\"\n  npm install -g @google/gemini-cli\
+              \ --prefix /home/node/.local\n  echo \"Tools installed successfully\"\
+              \nfi\n"
           image: busybox:latest
           name: install-tools
           securityContext:
