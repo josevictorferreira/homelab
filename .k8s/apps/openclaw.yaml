@@ -188,9 +188,12 @@ spec:
             - "set -e\nmkdir -p /home/node/.local/bin\nchown -R 1000:1000 /home/node/.local\n\
               \n# Install ffmpeg\nif [ ! -f /home/node/.local/bin/ffmpeg ]; then\n\
               \  echo \"Installing ffmpeg...\"\n  apt-get update && apt-get install\
-              \ -y curl\n  # Download from evermeet.cx (reliable static builds)\n\
-              \  curl -fsSL -o /home/node/.local/bin/ffmpeg \"https://evermeet.cx/ffmpeg/getrelease/ffmpeg/64/static\"\
-              \n  chmod +x /home/node/.local/bin/ffmpeg\n  echo \"ffmpeg installed\
+              \ -y curl xz-utils\n  # Download from BtbN GitHub releases (reliable\
+              \ static builds)\n  curl -fsSL -o /tmp/ffmpeg.tar.xz \"https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-linux64-gpl.tar.xz\"\
+              \n  tar -xf /tmp/ffmpeg.tar.xz -C /tmp/\n  # Find the ffmpeg binary\
+              \ in the extracted folder\n  find /tmp -name \"ffmpeg\" -type f -executable\
+              \ -exec cp {} /home/node/.local/bin/ffmpeg \\;\n  chmod +x /home/node/.local/bin/ffmpeg\n\
+              \  rm -rf /tmp/ffmpeg.tar.xz /tmp/ffmpeg*\n  echo \"ffmpeg installed\
               \ successfully\"\nelse\n  echo \"ffmpeg already exists, skipping...\"\
               \nfi\n\n# Install uv\nif [ ! -f /home/node/.local/bin/uv ]; then\n \
               \ echo \"Installing uv...\"\n  curl -fsSL https://astral.sh/uv/install.sh\
