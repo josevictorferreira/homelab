@@ -114,6 +114,14 @@ in
               "agents_list"
             ];
             deny = [ ];
+            web = {
+              search = {
+                provider = "searxng";
+                searxng = {
+                  baseUrl = "http://searxng.apps.svc.cluster.local";
+                };
+              };
+            };
             media = {
               audio = {
                 enabled = true;
