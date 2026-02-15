@@ -1,4 +1,4 @@
-{ kubenix, homelab, ... }:
+{ homelab, ... }:
 
 let
   namespace = homelab.kubernetes.namespaces.applications;
@@ -147,7 +147,7 @@ in
             matrix = {
               enabled = true;
               homeserver = "http://synapse-matrix-synapse:8008";
-              accessToken = kubenix.lib.secretsInlineFor "openclaw_matrix_token";
+              accessToken = "\${OPENCLAW_MATRIX_TOKEN}";
               userId = "@openclaw:josevictor.me";
               encryption = false;
               dm = {
@@ -169,7 +169,7 @@ in
             };
           };
           env = {
-            MOONSHOT_API_KEY = kubenix.lib.secretsInlineFor "moonshot_api_key";
+            MOONSHOT_API_KEY = "\${MOONSHOT_API_KEY}";
           };
           models = {
             mode = "merge";
@@ -219,6 +219,8 @@ in
         };
         controllers.main.containers.main.env.XDG_CONFIG_HOME = "/home/node/.config";
         controllers.main.containers.main.env.HOME = "/home/node";
+        controllers.main.containers.main.env.PATH =
+          "/home/node/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin";
         controllers.main.containers.main.env.GEMINI_API_KEY = {
           valueFrom.secretKeyRef = {
             name = "openclaw-secrets";
@@ -307,6 +309,34 @@ in
             "sh"
             "-c"
             "mkdir -p /home/node/.openclaw && cp /config/openclaw.json /home/node/.openclaw/openclaw.json && rm -rf /home/node/.openclaw/extensions /home/node/.config/openclaw/extensions"
+          ];
+        };
+        controllers.main.initContainers.install-tools = {
+          image = {
+            repository = "busybox";
+            tag = "latest";
+          };
+          securityContext = {
+            runAsUser = 0;
+            runAsGroup = 0;
+          };
+          command = [
+            "sh"
+            "-c"
+            ''
+              mkdir -p /home/node/.local/bin
+
+              # Install ffmpeg if not present
+              if [ ! -f /home/node/.local/bin/ffmpeg ]; then
+              echo "Installing ffmpeg..."
+              curl -L -o /home/node/.local/bin/ffmpeg https://github.com/eugeneware/ffmpeg-static/releases/download/b6.0/ffmpeg-linux-x64 \
+                && chmod +x /home/node/.local/bin/ffmpeg
+              echo "Installing uv..."
+              curl -LsSf https://astral.sh/uv/install.sh | UV_INSTALL_DIR=/home/node/.local/bin sh
+              echo "Installing Gemini CLI..."
+              npm install -g @google/gemini-cli --prefix /home/node/.local
+              echo "Tools installed successfully"
+            ''
           ];
         };
       };

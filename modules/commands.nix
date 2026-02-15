@@ -177,13 +177,11 @@ let
 
         # Check if secrets file changed - if so, force regeneration
         secretsFile="secrets/k8s-secrets.enc.yaml"
-        secretsChanged=false
         if [ -f "''${secretsFile}" ]; then
           currentSecretsSum="$(sha256sum "''${secretsFile}" | cut -d' ' -f1)"
           storedSecretsSum="$(awk -v p="__secrets_checksum__" 'BEGIN{FS="\t"} $1==p {print $2}' "${lockFile}" 2>/dev/null || true)"
           if [ "''${currentSecretsSum}" != "''${storedSecretsSum}" ]; then
             echo "Secrets file changed - forcing regeneration of all manifests"
-            secretsChanged=true
             # Remove generated yaml files to force fresh generation
             find ${manifestsDir} -mindepth 2 -type f \
               \( -name '*.enc.yaml' -o -name '*.enc.yml' \) \
