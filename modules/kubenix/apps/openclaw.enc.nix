@@ -248,7 +248,7 @@ in
         controllers.main.containers.main.env.OPENCLAW_MATRIX_TOKEN = {
           valueFrom.secretKeyRef = {
             name = "openclaw-secrets";
-            key = "openclaw_matrix_token";
+            key = "OPENCLAW_MATRIX_TOKEN";
           };
         };
         controllers.main.containers.tailscale = {
