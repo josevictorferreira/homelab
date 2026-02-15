@@ -1,7 +1,7 @@
 { pkgs, homelab, ... }:
 
 let
-  k8sSecretsFile = "${homelab.paths.secrets}/k8s-secrets.enc.yaml";
+  k8sSecretsFile = "secrets/k8s-secrets.enc.yaml";
 in
 rec {
   secretsFor = secretName: "ref+sops://${k8sSecretsFile}#${secretName}";
