@@ -229,6 +229,24 @@ in
             key = "GEMINI_API_KEY";
           };
         };
+        controllers.main.containers.main.env.OPENROUTER_API_KEY = {
+          valueFrom.secretKeyRef = {
+            name = "openclaw-secrets";
+            key = "OPENROUTER_API_KEY";
+          };
+        };
+        controllers.main.containers.main.env.MINIMAX_API_KEY = {
+          valueFrom.secretKeyRef = {
+            name = "openclaw-secrets";
+            key = "MINIMAX_API_KEY";
+          };
+        };
+        controllers.main.containers.main.env.KIMI_API_KEY = {
+          valueFrom.secretKeyRef = {
+            name = "openclaw-secrets";
+            key = "KIMI_API_KEY";
+          };
+        };
         controllers.main.containers.tailscale = {
           image = {
             repository = "tailscale/tailscale";
