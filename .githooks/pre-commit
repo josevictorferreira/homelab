@@ -47,7 +47,7 @@ else
 fi
 
 # check staged .enc.yaml files are encrypted
-for file in $(git diff --cached --name-only -- '*.enc.yaml' '*.enc.yml'); do
+for file in $(git diff --cached --name-only --diff-filter=d -- '*.enc.yaml' '*.enc.yml'); do
   if ! yq -e 'has("sops") and (.sops.mac // "" != "")' "$file" >/dev/null 2>&1; then
     echo "❌ ERROR: $file is not encrypted with sops!"
     fail=1

@@ -32,6 +32,7 @@ pkgs.dockerTools.buildImage {
       nodeEnv
       pkgs.cacert
       pkgs.uv
+      pkgs.ffmpeg
     ];
     pathsToLink = [ "/bin" ];
   };
