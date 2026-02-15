@@ -31,6 +31,7 @@ pkgs.dockerTools.buildImage {
     paths = [
       nodeEnv
       pkgs.cacert
+      pkgs.uv
     ];
     pathsToLink = [ "/bin" ];
   };
@@ -63,6 +64,9 @@ pkgs.dockerTools.buildImage {
     export HOME=/home/node
     export NPM_CONFIG_PREFIX=/opt/node-global
     export PATH="/opt/node-global/bin:$PATH"
+
+    # Install @google/gemini-cli globally so it's available as a binary
+    npm install -g @google/gemini-cli
 
     # Switch to node user context for npm install
     su - node -c "

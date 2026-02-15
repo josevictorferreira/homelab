@@ -121,10 +121,8 @@ in
                 models = [
                   {
                     type = "cli";
-                    command = "npx";
+                    command = "gemini";
                     args = [
-                      "-y"
-                      "@google/gemini-cli"
                       "--api-key"
                       "\${GEMINI_API_KEY}"
                       "-p"
@@ -245,6 +243,12 @@ in
           valueFrom.secretKeyRef = {
             name = "openclaw-secrets";
             key = "KIMI_API_KEY";
+          };
+        };
+        controllers.main.containers.main.env.OPENCLAW_MATRIX_TOKEN = {
+          valueFrom.secretKeyRef = {
+            name = "openclaw-secrets";
+            key = "openclaw_matrix_token";
           };
         };
         controllers.main.containers.tailscale = {
