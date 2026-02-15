@@ -332,11 +332,11 @@ in
               if [ ! -f /home/node/.local/bin/ffmpeg ]; then
                 echo "Installing ffmpeg..."
                 apt-get update && apt-get install -y curl xz-utils
-                # Download from BtbN GitHub releases (reliable static builds)
-                curl -fsSL -o /tmp/ffmpeg.tar.xz "https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-linux64-gpl.tar.xz"
+                # Download from John Van Sickle (reliable static builds)
+                curl -fsSL -o /tmp/ffmpeg.tar.xz "https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz"
                 tar -xf /tmp/ffmpeg.tar.xz -C /tmp/
-                # Find the ffmpeg binary in the extracted folder
-                find /tmp -name "ffmpeg" -type f -executable -exec cp {} /home/node/.local/bin/ffmpeg \;
+                # Find the ffmpeg binary in the extracted folder (it's usually in a subdirectory)
+                find /tmp -name "ffmpeg" -type f -executable | head -1 | xargs -I {} cp {} /home/node/.local/bin/ffmpeg
                 chmod +x /home/node/.local/bin/ffmpeg
                 rm -rf /tmp/ffmpeg.tar.xz /tmp/ffmpeg*
                 echo "ffmpeg installed successfully"
