@@ -223,6 +223,12 @@ in
         };
         controllers.main.containers.main.env.XDG_CONFIG_HOME = "/home/node/.config";
         controllers.main.containers.main.env.HOME = "/home/node";
+        controllers.main.containers.main.env.GEMINI_API_KEY = {
+          valueFrom.secretKeyRef = {
+            name = "openclaw-secrets";
+            key = "GEMINI_API_KEY";
+          };
+        };
         controllers.main.containers.tailscale = {
           image = {
             repository = "tailscale/tailscale";
