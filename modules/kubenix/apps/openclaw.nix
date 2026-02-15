@@ -331,15 +331,10 @@ in
               # Install ffmpeg
               if [ ! -f /home/node/.local/bin/ffmpeg ]; then
                 echo "Installing ffmpeg..."
-                apt-get update && apt-get install -y curl xz-utils
-                curl -fsSL -o /tmp/ffmpeg.tar.xz https://github.com/eugeneware/ffmpeg-static/releases/download/b6.0/ffmpeg-linux-x64.tar.xz
-                echo "Archive contents:"
-                tar -tf /tmp/ffmpeg.tar.xz
-                tar -xf /tmp/ffmpeg.tar.xz -C /tmp/
-                # Find and move the ffmpeg binary
-                find /tmp -name "ffmpeg" -type f -exec mv {} /home/node/.local/bin/ffmpeg \;
+                apt-get update && apt-get install -y curl
+                # Download from evermeet.cx (reliable static builds)
+                curl -fsSL -o /home/node/.local/bin/ffmpeg "https://evermeet.cx/ffmpeg/getrelease/ffmpeg/64/static"
                 chmod +x /home/node/.local/bin/ffmpeg
-                rm -f /tmp/ffmpeg.tar.xz
                 echo "ffmpeg installed successfully"
               else
                 echo "ffmpeg already exists, skipping..."

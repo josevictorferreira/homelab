@@ -188,14 +188,12 @@ spec:
             - "set -e\nmkdir -p /home/node/.local/bin\nchown -R 1000:1000 /home/node/.local\n\
               \n# Install ffmpeg\nif [ ! -f /home/node/.local/bin/ffmpeg ]; then\n\
               \  echo \"Installing ffmpeg...\"\n  apt-get update && apt-get install\
-              \ -y curl xz-utils\n  curl -fsSL -o /tmp/ffmpeg.tar.xz https://github.com/eugeneware/ffmpeg-static/releases/download/b6.0/ffmpeg-linux-x64.tar.xz\n\
-              \  echo \"Archive contents:\"\n  tar -tf /tmp/ffmpeg.tar.xz\n  tar -xf\
-              \ /tmp/ffmpeg.tar.xz -C /tmp/\n  # Find and move the ffmpeg binary\n\
-              \  find /tmp -name \"ffmpeg\" -type f -exec mv {} /home/node/.local/bin/ffmpeg\
-              \ \\;\n  chmod +x /home/node/.local/bin/ffmpeg\n  rm -f /tmp/ffmpeg.tar.xz\n\
-              \  echo \"ffmpeg installed successfully\"\nelse\n  echo \"ffmpeg already\
-              \ exists, skipping...\"\nfi\n\n# Install uv\nif [ ! -f /home/node/.local/bin/uv\
-              \ ]; then\n  echo \"Installing uv...\"\n  curl -fsSL https://astral.sh/uv/install.sh\
+              \ -y curl\n  # Download from evermeet.cx (reliable static builds)\n\
+              \  curl -fsSL -o /home/node/.local/bin/ffmpeg \"https://evermeet.cx/ffmpeg/getrelease/ffmpeg/64/static\"\
+              \n  chmod +x /home/node/.local/bin/ffmpeg\n  echo \"ffmpeg installed\
+              \ successfully\"\nelse\n  echo \"ffmpeg already exists, skipping...\"\
+              \nfi\n\n# Install uv\nif [ ! -f /home/node/.local/bin/uv ]; then\n \
+              \ echo \"Installing uv...\"\n  curl -fsSL https://astral.sh/uv/install.sh\
               \ | UV_INSTALL_DIR=/home/node/.local/bin sh\n  echo \"uv installed successfully\"\
               \nelse\n  echo \"uv already exists, skipping...\"\nfi\n\n# Install Gemini\
               \ CLI\nif [ ! -f /home/node/.local/bin/gemini ]; then\n  echo \"Installing\
