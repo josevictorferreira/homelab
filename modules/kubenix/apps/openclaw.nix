@@ -119,14 +119,13 @@ in
                 models = [
                   {
                     type = "cli";
-                    command = "gemini";
+                    command = "whisper";
                     args = [
-                      "--api-key"
-                      "\${GEMINI_API_KEY}"
-                      "-p"
-                      "Transcribe this audio file: {{`{{`}}MediaPath{{`}}`}}"
+                      "--model"
+                      "/home/node/.local/share/whisper/ggml-base.bin"
+                      "{{`{{`}}MediaPath{{`}}`}}"
                     ];
-                    timeoutSeconds = 60;
+                    timeoutSeconds = 45;
                   }
                 ];
               };
@@ -375,6 +374,16 @@ in
                 echo "whisper.cpp installed successfully"
               else
                 echo "whisper.cpp already exists, skipping..."
+              fi
+
+              # Download whisper model if not exists
+              mkdir -p /home/node/.local/share/whisper
+              if [ ! -f /home/node/.local/share/whisper/ggml-base.bin ]; then
+                echo "Downloading whisper base model..."
+                curl -fsSL -o /home/node/.local/share/whisper/ggml-base.bin "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.bin"
+                echo "Whisper base model downloaded successfully"
+              else
+                echo "Whisper base model already exists, skipping..."
               fi
 
               # Set ownership
