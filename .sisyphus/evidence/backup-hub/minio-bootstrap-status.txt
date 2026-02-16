@@ -1,0 +1,21 @@
+● minio-bootstrap.service - Provision MinIO buckets, policies and per-service credentials
+     Loaded: loaded (/etc/systemd/system/minio-bootstrap.service; enabled; preset: ignored)
+     Active: active (exited) since Mon 2026-02-16 16:49:30 -03; 20s ago
+ Invocation: d447f37d0088484a9c9d815ba60efe7d
+    Process: 47656 ExecStart=/nix/store/ykv5xg2ihfxqbzkbla2fcv04igzl0hia-unit-script-minio-bootstrap-start/bin/minio-bootstrap-start (code=exited, status=0/SUCCESS)
+   Main PID: 47656 (code=exited, status=0/SUCCESS)
+         IP: 31.3K in, 34.8K out
+         IO: 76K read, 0B written
+   Mem peak: 139.8M
+        CPU: 10.349s
+
+Feb 16 16:49:29 lab-pi-bk minio-bootstrap-start[47656]: Policy rgw-backup-rw attached to YZDY20XCCNXBG4GHS4MF
+Feb 16 16:49:29 lab-pi-bk minio-bootstrap-start[48007]: Created policy `etcd-backup-rw` successfully.
+Feb 16 16:49:29 lab-pi-bk minio-bootstrap-start[47656]: Policy etcd-backup-rw OK
+Feb 16 16:49:30 lab-pi-bk minio-bootstrap-start[48028]: Added user `TER5KR3JPTNQYMMFSBZR` successfully.
+Feb 16 16:49:30 lab-pi-bk minio-bootstrap-start[47656]: User TER5KR3JPTNQYMMFSBZR created
+Feb 16 16:49:30 lab-pi-bk minio-bootstrap-start[48039]: Attached Policies: [etcd-backup-rw]
+Feb 16 16:49:30 lab-pi-bk minio-bootstrap-start[48039]: To User: TER5KR3JPTNQYMMFSBZR
+Feb 16 16:49:30 lab-pi-bk minio-bootstrap-start[47656]: Policy etcd-backup-rw attached to TER5KR3JPTNQYMMFSBZR
+Feb 16 16:49:30 lab-pi-bk minio-bootstrap-start[47656]: MinIO bootstrap complete
+Feb 16 16:49:30 lab-pi-bk systemd[1]: Finished Provision MinIO buckets, policies and per-service credentials.

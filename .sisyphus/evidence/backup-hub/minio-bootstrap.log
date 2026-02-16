@@ -1,0 +1,237 @@
+Feb 16 16:42:06 lab-pi-bk systemd[1]: Starting Provision MinIO buckets, policies and per-service credentials...
+Feb 16 16:42:08 lab-pi-bk minio-bootstrap-start[45438]: MinIO ready
+Feb 16 16:42:08 lab-pi-bk minio-bootstrap-start[45517]: mc: <ERROR> Unable to get mcConfigDir. exec: "getent": executable file not found in $PATH.
+Feb 16 16:42:08 lab-pi-bk minio-bootstrap-start[45438]: Bucket homelab-backup-velero OK
+Feb 16 16:42:08 lab-pi-bk minio-bootstrap-start[45525]: mc: <ERROR> Unable to get mcConfigDir. exec: "getent": executable file not found in $PATH.
+Feb 16 16:42:08 lab-pi-bk minio-bootstrap-start[45438]: Bucket homelab-backup-postgres OK
+Feb 16 16:42:08 lab-pi-bk minio-bootstrap-start[45533]: mc: <ERROR> Unable to get mcConfigDir. exec: "getent": executable file not found in $PATH.
+Feb 16 16:42:08 lab-pi-bk minio-bootstrap-start[45438]: Bucket homelab-backup-rgw OK
+Feb 16 16:42:08 lab-pi-bk minio-bootstrap-start[45542]: mc: <ERROR> Unable to get mcConfigDir. exec: "getent": executable file not found in $PATH.
+Feb 16 16:42:08 lab-pi-bk minio-bootstrap-start[45438]: Bucket homelab-backup-etcd OK
+Feb 16 16:42:08 lab-pi-bk minio-bootstrap-start[45566]: mc: <ERROR> Unable to get mcConfigDir. exec: "getent": executable file not found in $PATH.
+Feb 16 16:42:08 lab-pi-bk minio-bootstrap-start[45438]: ILM expire-14d on homelab-backup-velero OK
+Feb 16 16:42:08 lab-pi-bk minio-bootstrap-start[45590]: mc: <ERROR> Unable to get mcConfigDir. exec: "getent": executable file not found in $PATH.
+Feb 16 16:42:08 lab-pi-bk minio-bootstrap-start[45438]: ILM expire-14d on homelab-backup-postgres OK
+Feb 16 16:42:09 lab-pi-bk minio-bootstrap-start[45614]: mc: <ERROR> Unable to get mcConfigDir. exec: "getent": executable file not found in $PATH.
+Feb 16 16:42:09 lab-pi-bk minio-bootstrap-start[45438]: ILM expire-14d on homelab-backup-rgw OK
+Feb 16 16:42:09 lab-pi-bk minio-bootstrap-start[45637]: mc: <ERROR> Unable to get mcConfigDir. exec: "getent": executable file not found in $PATH.
+Feb 16 16:42:09 lab-pi-bk minio-bootstrap-start[45438]: ILM expire-14d on homelab-backup-etcd OK
+Feb 16 16:42:09 lab-pi-bk minio-bootstrap-start[45655]: mc: <ERROR> Unable to get mcConfigDir. exec: "getent": executable file not found in $PATH.
+Feb 16 16:42:09 lab-pi-bk systemd[1]: minio-bootstrap.service: Main process exited, code=exited, status=1/FAILURE
+Feb 16 16:42:09 lab-pi-bk systemd[1]: minio-bootstrap.service: Failed with result 'exit-code'.
+Feb 16 16:42:09 lab-pi-bk systemd[1]: Failed to start Provision MinIO buckets, policies and per-service credentials.
+Feb 16 16:42:09 lab-pi-bk systemd[1]: minio-bootstrap.service: Consumed 1.226s CPU time, 6.9M memory peak, 698B incoming IP traffic, 536B outgoing IP traffic.
+Feb 16 16:49:23 lab-pi-bk systemd[1]: Starting Provision MinIO buckets, policies and per-service credentials...
+Feb 16 16:49:23 lab-pi-bk minio-bootstrap-start[47656]: MinIO ready
+Feb 16 16:49:23 lab-pi-bk minio-bootstrap-start[47675]: Bucket created successfully `pi/homelab-backup-velero`.
+Feb 16 16:49:23 lab-pi-bk minio-bootstrap-start[47656]: Bucket homelab-backup-velero OK
+Feb 16 16:49:24 lab-pi-bk minio-bootstrap-start[47704]: Bucket created successfully `pi/homelab-backup-postgres`.
+Feb 16 16:49:24 lab-pi-bk minio-bootstrap-start[47656]: Bucket homelab-backup-postgres OK
+Feb 16 16:49:24 lab-pi-bk minio-bootstrap-start[47714]: Bucket created successfully `pi/homelab-backup-rgw`.
+Feb 16 16:49:24 lab-pi-bk minio-bootstrap-start[47656]: Bucket homelab-backup-rgw OK
+Feb 16 16:49:24 lab-pi-bk minio-bootstrap-start[47725]: Bucket created successfully `pi/homelab-backup-etcd`.
+Feb 16 16:49:24 lab-pi-bk minio-bootstrap-start[47656]: Bucket homelab-backup-etcd OK
+Feb 16 16:49:24 lab-pi-bk minio-bootstrap-start[47735]: pi/homelab-backup-velero versioning is enabled
+Feb 16 16:49:24 lab-pi-bk minio-bootstrap-start[47756]: mc: <ERROR> Invalid command usage, flag provided but not defined: -id
+Feb 16 16:49:24 lab-pi-bk minio-bootstrap-start[47756]: SUPPORTED FLAGS:
+Feb 16 16:49:24 lab-pi-bk minio-bootstrap-start[47756]:    --prefix value                      object prefix
+Feb 16 16:49:24 lab-pi-bk minio-bootstrap-start[47756]:    --tags value                        key value pairs of the form '<key1>=<value1>&<key2>=<value2>&<key3>=<value3>'
+Feb 16 16:49:24 lab-pi-bk minio-bootstrap-start[47756]:    --size-lt value                     objects with size less than this value will be selected for the lifecycle action
+Feb 16 16:49:24 lab-pi-bk minio-bootstrap-start[47756]:    --size-gt value                     objects with size greater than this value will be selected for the lifecycle action
+Feb 16 16:49:24 lab-pi-bk minio-bootstrap-start[47756]:    --expire-days value                 number of days to expire
+Feb 16 16:49:24 lab-pi-bk minio-bootstrap-start[47756]:    --expire-delete-marker              expire zombie delete markers
+Feb 16 16:49:24 lab-pi-bk minio-bootstrap-start[47756]:    --transition-days value             number of days to transition
+Feb 16 16:49:24 lab-pi-bk minio-bootstrap-start[47756]:    --transition-tier value             remote tier name to transition
+Feb 16 16:49:24 lab-pi-bk minio-bootstrap-start[47756]:    --noncurrent-expire-days value      number of days to expire noncurrent versions
+Feb 16 16:49:24 lab-pi-bk minio-bootstrap-start[47756]:    --noncurrent-expire-newer value     number of newer noncurrent versions to retain (default: 0)
+Feb 16 16:49:24 lab-pi-bk minio-bootstrap-start[47756]:    --noncurrent-transition-days value  number of days to transition noncurrent versions (default: 0)
+Feb 16 16:49:24 lab-pi-bk minio-bootstrap-start[47756]:    --noncurrent-transition-tier value  remote tier name to transition
+Feb 16 16:49:24 lab-pi-bk minio-bootstrap-start[47756]:    --expire-all-object-versions        expire all object versions
+Feb 16 16:49:24 lab-pi-bk minio-bootstrap-start[47756]:    --config-dir value, -C value        path to configuration folder (default: "/root/.mc") [$MC_CONFIG_DIR]
+Feb 16 16:49:24 lab-pi-bk minio-bootstrap-start[47756]:    --quiet, -q                         disable progress bar display [$MC_QUIET]
+Feb 16 16:49:24 lab-pi-bk minio-bootstrap-start[47756]:    --disable-pager, --dp               disable mc internal pager and print to raw stdout [$MC_DISABLE_PAGER]
+Feb 16 16:49:24 lab-pi-bk minio-bootstrap-start[47756]:    --no-color                          disable color theme [$MC_NO_COLOR]
+Feb 16 16:49:24 lab-pi-bk minio-bootstrap-start[47756]:    --json                              enable JSON lines formatted output [$MC_JSON]
+Feb 16 16:49:24 lab-pi-bk minio-bootstrap-start[47756]:    --debug                             enable debug output [$MC_DEBUG]
+Feb 16 16:49:24 lab-pi-bk minio-bootstrap-start[47756]:    --resolve value                     resolves HOST[:PORT] to an IP address. Example: minio.local:9000=10.10.75.1 [$MC_RESOLVE]
+Feb 16 16:49:24 lab-pi-bk minio-bootstrap-start[47756]:    --insecure                          disable SSL certificate verification [$MC_INSECURE]
+Feb 16 16:49:24 lab-pi-bk minio-bootstrap-start[47756]:    --limit-upload value                limits uploads to a maximum rate in KiB/s, MiB/s, GiB/s. (default: unlimited) [$MC_LIMIT_UPLOAD]
+Feb 16 16:49:24 lab-pi-bk minio-bootstrap-start[47756]:    --limit-download value              limits downloads to a maximum rate in KiB/s, MiB/s, GiB/s. (default: unlimited) [$MC_LIMIT_DOWNLOAD]
+Feb 16 16:49:24 lab-pi-bk minio-bootstrap-start[47756]:    --custom-header value, -H value     add custom HTTP header to the request. 'key:value' format.
+Feb 16 16:49:24 lab-pi-bk minio-bootstrap-start[47756]:    --help, -h                          show help
+Feb 16 16:49:24 lab-pi-bk minio-bootstrap-start[47656]: ILM expire-14d on homelab-backup-velero OK
+Feb 16 16:49:24 lab-pi-bk minio-bootstrap-start[47767]: pi/homelab-backup-postgres versioning is enabled
+Feb 16 16:49:24 lab-pi-bk minio-bootstrap-start[47792]: mc: <ERROR> Invalid command usage, flag provided but not defined: -id
+Feb 16 16:49:24 lab-pi-bk minio-bootstrap-start[47792]: SUPPORTED FLAGS:
+Feb 16 16:49:24 lab-pi-bk minio-bootstrap-start[47792]:    --prefix value                      object prefix
+Feb 16 16:49:24 lab-pi-bk minio-bootstrap-start[47792]:    --tags value                        key value pairs of the form '<key1>=<value1>&<key2>=<value2>&<key3>=<value3>'
+Feb 16 16:49:24 lab-pi-bk minio-bootstrap-start[47792]:    --size-lt value                     objects with size less than this value will be selected for the lifecycle action
+Feb 16 16:49:24 lab-pi-bk minio-bootstrap-start[47792]:    --size-gt value                     objects with size greater than this value will be selected for the lifecycle action
+Feb 16 16:49:24 lab-pi-bk minio-bootstrap-start[47792]:    --expire-days value                 number of days to expire
+Feb 16 16:49:24 lab-pi-bk minio-bootstrap-start[47792]:    --expire-delete-marker              expire zombie delete markers
+Feb 16 16:49:24 lab-pi-bk minio-bootstrap-start[47792]:    --transition-days value             number of days to transition
+Feb 16 16:49:24 lab-pi-bk minio-bootstrap-start[47792]:    --transition-tier value             remote tier name to transition
+Feb 16 16:49:24 lab-pi-bk minio-bootstrap-start[47792]:    --noncurrent-expire-days value      number of days to expire noncurrent versions
+Feb 16 16:49:24 lab-pi-bk minio-bootstrap-start[47792]:    --noncurrent-expire-newer value     number of newer noncurrent versions to retain (default: 0)
+Feb 16 16:49:24 lab-pi-bk minio-bootstrap-start[47792]:    --noncurrent-transition-days value  number of days to transition noncurrent versions (default: 0)
+Feb 16 16:49:24 lab-pi-bk minio-bootstrap-start[47792]:    --noncurrent-transition-tier value  remote tier name to transition
+Feb 16 16:49:24 lab-pi-bk minio-bootstrap-start[47792]:    --expire-all-object-versions        expire all object versions
+Feb 16 16:49:24 lab-pi-bk minio-bootstrap-start[47792]:    --config-dir value, -C value        path to configuration folder (default: "/root/.mc") [$MC_CONFIG_DIR]
+Feb 16 16:49:24 lab-pi-bk minio-bootstrap-start[47792]:    --quiet, -q                         disable progress bar display [$MC_QUIET]
+Feb 16 16:49:24 lab-pi-bk minio-bootstrap-start[47792]:    --disable-pager, --dp               disable mc internal pager and print to raw stdout [$MC_DISABLE_PAGER]
+Feb 16 16:49:24 lab-pi-bk minio-bootstrap-start[47792]:    --no-color                          disable color theme [$MC_NO_COLOR]
+Feb 16 16:49:24 lab-pi-bk minio-bootstrap-start[47792]:    --json                              enable JSON lines formatted output [$MC_JSON]
+Feb 16 16:49:24 lab-pi-bk minio-bootstrap-start[47792]:    --debug                             enable debug output [$MC_DEBUG]
+Feb 16 16:49:24 lab-pi-bk minio-bootstrap-start[47792]:    --resolve value                     resolves HOST[:PORT] to an IP address. Example: minio.local:9000=10.10.75.1 [$MC_RESOLVE]
+Feb 16 16:49:24 lab-pi-bk minio-bootstrap-start[47792]:    --insecure                          disable SSL certificate verification [$MC_INSECURE]
+Feb 16 16:49:24 lab-pi-bk minio-bootstrap-start[47792]:    --limit-upload value                limits uploads to a maximum rate in KiB/s, MiB/s, GiB/s. (default: unlimited) [$MC_LIMIT_UPLOAD]
+Feb 16 16:49:24 lab-pi-bk minio-bootstrap-start[47792]:    --limit-download value              limits downloads to a maximum rate in KiB/s, MiB/s, GiB/s. (default: unlimited) [$MC_LIMIT_DOWNLOAD]
+Feb 16 16:49:24 lab-pi-bk minio-bootstrap-start[47792]:    --custom-header value, -H value     add custom HTTP header to the request. 'key:value' format.
+Feb 16 16:49:24 lab-pi-bk minio-bootstrap-start[47792]:    --help, -h                          show help
+Feb 16 16:49:24 lab-pi-bk minio-bootstrap-start[47656]: ILM expire-14d on homelab-backup-postgres OK
+Feb 16 16:49:25 lab-pi-bk minio-bootstrap-start[47802]: pi/homelab-backup-rgw versioning is enabled
+Feb 16 16:49:25 lab-pi-bk minio-bootstrap-start[47825]: mc: <ERROR> Invalid command usage, flag provided but not defined: -id
+Feb 16 16:49:25 lab-pi-bk minio-bootstrap-start[47825]: SUPPORTED FLAGS:
+Feb 16 16:49:25 lab-pi-bk minio-bootstrap-start[47825]:    --prefix value                      object prefix
+Feb 16 16:49:25 lab-pi-bk minio-bootstrap-start[47825]:    --tags value                        key value pairs of the form '<key1>=<value1>&<key2>=<value2>&<key3>=<value3>'
+Feb 16 16:49:25 lab-pi-bk minio-bootstrap-start[47825]:    --size-lt value                     objects with size less than this value will be selected for the lifecycle action
+Feb 16 16:49:25 lab-pi-bk minio-bootstrap-start[47825]:    --size-gt value                     objects with size greater than this value will be selected for the lifecycle action
+Feb 16 16:49:25 lab-pi-bk minio-bootstrap-start[47825]:    --expire-days value                 number of days to expire
+Feb 16 16:49:25 lab-pi-bk minio-bootstrap-start[47825]:    --expire-delete-marker              expire zombie delete markers
+Feb 16 16:49:25 lab-pi-bk minio-bootstrap-start[47825]:    --transition-days value             number of days to transition
+Feb 16 16:49:25 lab-pi-bk minio-bootstrap-start[47825]:    --transition-tier value             remote tier name to transition
+Feb 16 16:49:25 lab-pi-bk minio-bootstrap-start[47825]:    --noncurrent-expire-days value      number of days to expire noncurrent versions
+Feb 16 16:49:25 lab-pi-bk minio-bootstrap-start[47825]:    --noncurrent-expire-newer value     number of newer noncurrent versions to retain (default: 0)
+Feb 16 16:49:25 lab-pi-bk minio-bootstrap-start[47825]:    --noncurrent-transition-days value  number of days to transition noncurrent versions (default: 0)
+Feb 16 16:49:25 lab-pi-bk minio-bootstrap-start[47825]:    --noncurrent-transition-tier value  remote tier name to transition
+Feb 16 16:49:25 lab-pi-bk minio-bootstrap-start[47825]:    --expire-all-object-versions        expire all object versions
+Feb 16 16:49:25 lab-pi-bk minio-bootstrap-start[47825]:    --config-dir value, -C value        path to configuration folder (default: "/root/.mc") [$MC_CONFIG_DIR]
+Feb 16 16:49:25 lab-pi-bk minio-bootstrap-start[47825]:    --quiet, -q                         disable progress bar display [$MC_QUIET]
+Feb 16 16:49:25 lab-pi-bk minio-bootstrap-start[47825]:    --disable-pager, --dp               disable mc internal pager and print to raw stdout [$MC_DISABLE_PAGER]
+Feb 16 16:49:25 lab-pi-bk minio-bootstrap-start[47825]:    --no-color                          disable color theme [$MC_NO_COLOR]
+Feb 16 16:49:25 lab-pi-bk minio-bootstrap-start[47825]:    --json                              enable JSON lines formatted output [$MC_JSON]
+Feb 16 16:49:25 lab-pi-bk minio-bootstrap-start[47825]:    --debug                             enable debug output [$MC_DEBUG]
+Feb 16 16:49:25 lab-pi-bk minio-bootstrap-start[47825]:    --resolve value                     resolves HOST[:PORT] to an IP address. Example: minio.local:9000=10.10.75.1 [$MC_RESOLVE]
+Feb 16 16:49:25 lab-pi-bk minio-bootstrap-start[47825]:    --insecure                          disable SSL certificate verification [$MC_INSECURE]
+Feb 16 16:49:25 lab-pi-bk minio-bootstrap-start[47825]:    --limit-upload value                limits uploads to a maximum rate in KiB/s, MiB/s, GiB/s. (default: unlimited) [$MC_LIMIT_UPLOAD]
+Feb 16 16:49:25 lab-pi-bk minio-bootstrap-start[47825]:    --limit-download value              limits downloads to a maximum rate in KiB/s, MiB/s, GiB/s. (default: unlimited) [$MC_LIMIT_DOWNLOAD]
+Feb 16 16:49:25 lab-pi-bk minio-bootstrap-start[47825]:    --custom-header value, -H value     add custom HTTP header to the request. 'key:value' format.
+Feb 16 16:49:25 lab-pi-bk minio-bootstrap-start[47825]:    --help, -h                          show help
+Feb 16 16:49:25 lab-pi-bk minio-bootstrap-start[47656]: ILM expire-14d on homelab-backup-rgw OK
+Feb 16 16:49:25 lab-pi-bk minio-bootstrap-start[47836]: pi/homelab-backup-etcd versioning is enabled
+Feb 16 16:49:25 lab-pi-bk minio-bootstrap-start[47856]: mc: <ERROR> Invalid command usage, flag provided but not defined: -id
+Feb 16 16:49:25 lab-pi-bk minio-bootstrap-start[47856]: SUPPORTED FLAGS:
+Feb 16 16:49:25 lab-pi-bk minio-bootstrap-start[47856]:    --prefix value                      object prefix
+Feb 16 16:49:25 lab-pi-bk minio-bootstrap-start[47856]:    --tags value                        key value pairs of the form '<key1>=<value1>&<key2>=<value2>&<key3>=<value3>'
+Feb 16 16:49:25 lab-pi-bk minio-bootstrap-start[47856]:    --size-lt value                     objects with size less than this value will be selected for the lifecycle action
+Feb 16 16:49:25 lab-pi-bk minio-bootstrap-start[47856]:    --size-gt value                     objects with size greater than this value will be selected for the lifecycle action
+Feb 16 16:49:25 lab-pi-bk minio-bootstrap-start[47856]:    --expire-days value                 number of days to expire
+Feb 16 16:49:25 lab-pi-bk minio-bootstrap-start[47856]:    --expire-delete-marker              expire zombie delete markers
+Feb 16 16:49:25 lab-pi-bk minio-bootstrap-start[47856]:    --transition-days value             number of days to transition
+Feb 16 16:49:25 lab-pi-bk minio-bootstrap-start[47856]:    --transition-tier value             remote tier name to transition
+Feb 16 16:49:25 lab-pi-bk minio-bootstrap-start[47856]:    --noncurrent-expire-days value      number of days to expire noncurrent versions
+Feb 16 16:49:25 lab-pi-bk minio-bootstrap-start[47856]:    --noncurrent-expire-newer value     number of newer noncurrent versions to retain (default: 0)
+Feb 16 16:49:25 lab-pi-bk minio-bootstrap-start[47856]:    --noncurrent-transition-days value  number of days to transition noncurrent versions (default: 0)
+Feb 16 16:49:25 lab-pi-bk minio-bootstrap-start[47856]:    --noncurrent-transition-tier value  remote tier name to transition
+Feb 16 16:49:25 lab-pi-bk minio-bootstrap-start[47856]:    --expire-all-object-versions        expire all object versions
+Feb 16 16:49:25 lab-pi-bk minio-bootstrap-start[47856]:    --config-dir value, -C value        path to configuration folder (default: "/root/.mc") [$MC_CONFIG_DIR]
+Feb 16 16:49:25 lab-pi-bk minio-bootstrap-start[47856]:    --quiet, -q                         disable progress bar display [$MC_QUIET]
+Feb 16 16:49:25 lab-pi-bk minio-bootstrap-start[47856]:    --disable-pager, --dp               disable mc internal pager and print to raw stdout [$MC_DISABLE_PAGER]
+Feb 16 16:49:25 lab-pi-bk minio-bootstrap-start[47856]:    --no-color                          disable color theme [$MC_NO_COLOR]
+Feb 16 16:49:25 lab-pi-bk minio-bootstrap-start[47856]:    --json                              enable JSON lines formatted output [$MC_JSON]
+Feb 16 16:49:25 lab-pi-bk minio-bootstrap-start[47856]:    --debug                             enable debug output [$MC_DEBUG]
+Feb 16 16:49:25 lab-pi-bk minio-bootstrap-start[47856]:    --resolve value                     resolves HOST[:PORT] to an IP address. Example: minio.local:9000=10.10.75.1 [$MC_RESOLVE]
+Feb 16 16:49:25 lab-pi-bk minio-bootstrap-start[47856]:    --insecure                          disable SSL certificate verification [$MC_INSECURE]
+Feb 16 16:49:25 lab-pi-bk minio-bootstrap-start[47856]:    --limit-upload value                limits uploads to a maximum rate in KiB/s, MiB/s, GiB/s. (default: unlimited) [$MC_LIMIT_UPLOAD]
+Feb 16 16:49:25 lab-pi-bk minio-bootstrap-start[47856]:    --limit-download value              limits downloads to a maximum rate in KiB/s, MiB/s, GiB/s. (default: unlimited) [$MC_LIMIT_DOWNLOAD]
+Feb 16 16:49:25 lab-pi-bk minio-bootstrap-start[47856]:    --custom-header value, -H value     add custom HTTP header to the request. 'key:value' format.
+Feb 16 16:49:25 lab-pi-bk minio-bootstrap-start[47856]:    --help, -h                          show help
+Feb 16 16:49:25 lab-pi-bk minio-bootstrap-start[47656]: ILM expire-14d on homelab-backup-etcd OK
+Feb 16 16:49:25 lab-pi-bk minio-bootstrap-start[47869]: Created policy `velero-backup-rw` successfully.
+Feb 16 16:49:25 lab-pi-bk minio-bootstrap-start[47656]: Policy velero-backup-rw OK
+Feb 16 16:49:26 lab-pi-bk minio-bootstrap-start[47889]: Added user `SOHD8AV582OKMLWCIH3Q` successfully.
+Feb 16 16:49:26 lab-pi-bk minio-bootstrap-start[47656]: User SOHD8AV582OKMLWCIH3Q created
+Feb 16 16:49:26 lab-pi-bk minio-bootstrap-start[47900]: Attached Policies: [velero-backup-rw]
+Feb 16 16:49:26 lab-pi-bk minio-bootstrap-start[47900]: To User: SOHD8AV582OKMLWCIH3Q
+Feb 16 16:49:26 lab-pi-bk minio-bootstrap-start[47656]: Policy velero-backup-rw attached to SOHD8AV582OKMLWCIH3Q
+Feb 16 16:49:27 lab-pi-bk minio-bootstrap-start[47916]: Created policy `postgres-backup-rw` successfully.
+Feb 16 16:49:27 lab-pi-bk minio-bootstrap-start[47656]: Policy postgres-backup-rw OK
+Feb 16 16:49:27 lab-pi-bk minio-bootstrap-start[47937]: Added user `50NEM289BGPLXDBZMX1H` successfully.
+Feb 16 16:49:27 lab-pi-bk minio-bootstrap-start[47656]: User 50NEM289BGPLXDBZMX1H created
+Feb 16 16:49:28 lab-pi-bk minio-bootstrap-start[47947]: Attached Policies: [postgres-backup-rw]
+Feb 16 16:49:28 lab-pi-bk minio-bootstrap-start[47947]: To User: 50NEM289BGPLXDBZMX1H
+Feb 16 16:49:28 lab-pi-bk minio-bootstrap-start[47656]: Policy postgres-backup-rw attached to 50NEM289BGPLXDBZMX1H
+Feb 16 16:49:28 lab-pi-bk minio-bootstrap-start[47961]: Created policy `rgw-backup-rw` successfully.
+Feb 16 16:49:28 lab-pi-bk minio-bootstrap-start[47656]: Policy rgw-backup-rw OK
+Feb 16 16:49:28 lab-pi-bk minio-bootstrap-start[47983]: Added user `YZDY20XCCNXBG4GHS4MF` successfully.
+Feb 16 16:49:28 lab-pi-bk minio-bootstrap-start[47656]: User YZDY20XCCNXBG4GHS4MF created
+Feb 16 16:49:29 lab-pi-bk minio-bootstrap-start[47993]: Attached Policies: [rgw-backup-rw]
+Feb 16 16:49:29 lab-pi-bk minio-bootstrap-start[47993]: To User: YZDY20XCCNXBG4GHS4MF
+Feb 16 16:49:29 lab-pi-bk minio-bootstrap-start[47656]: Policy rgw-backup-rw attached to YZDY20XCCNXBG4GHS4MF
+Feb 16 16:49:29 lab-pi-bk minio-bootstrap-start[48007]: Created policy `etcd-backup-rw` successfully.
+Feb 16 16:49:29 lab-pi-bk minio-bootstrap-start[47656]: Policy etcd-backup-rw OK
+Feb 16 16:49:30 lab-pi-bk minio-bootstrap-start[48028]: Added user `TER5KR3JPTNQYMMFSBZR` successfully.
+Feb 16 16:49:30 lab-pi-bk minio-bootstrap-start[47656]: User TER5KR3JPTNQYMMFSBZR created
+Feb 16 16:49:30 lab-pi-bk minio-bootstrap-start[48039]: Attached Policies: [etcd-backup-rw]
+Feb 16 16:49:30 lab-pi-bk minio-bootstrap-start[48039]: To User: TER5KR3JPTNQYMMFSBZR
+Feb 16 16:49:30 lab-pi-bk minio-bootstrap-start[47656]: Policy etcd-backup-rw attached to TER5KR3JPTNQYMMFSBZR
+Feb 16 16:49:30 lab-pi-bk minio-bootstrap-start[47656]: MinIO bootstrap complete
+Feb 16 16:49:30 lab-pi-bk systemd[1]: Finished Provision MinIO buckets, policies and per-service credentials.
+Feb 16 16:53:12 lab-pi-bk systemd[1]: minio-bootstrap.service: Deactivated successfully.
+Feb 16 16:53:12 lab-pi-bk systemd[1]: Stopped Provision MinIO buckets, policies and per-service credentials.
+Feb 16 16:53:16 lab-pi-bk systemd[1]: Starting Provision MinIO buckets, policies and per-service credentials...
+Feb 16 16:53:16 lab-pi-bk minio-bootstrap-start[50174]: MinIO ready
+Feb 16 16:53:16 lab-pi-bk minio-bootstrap-start[50190]: Bucket created successfully `pi/homelab-backup-velero`.
+Feb 16 16:53:16 lab-pi-bk minio-bootstrap-start[50174]: Bucket homelab-backup-velero OK
+Feb 16 16:53:16 lab-pi-bk minio-bootstrap-start[50219]: Bucket created successfully `pi/homelab-backup-postgres`.
+Feb 16 16:53:16 lab-pi-bk minio-bootstrap-start[50174]: Bucket homelab-backup-postgres OK
+Feb 16 16:53:16 lab-pi-bk minio-bootstrap-start[50229]: Bucket created successfully `pi/homelab-backup-rgw`.
+Feb 16 16:53:16 lab-pi-bk minio-bootstrap-start[50174]: Bucket homelab-backup-rgw OK
+Feb 16 16:53:16 lab-pi-bk minio-bootstrap-start[50239]: Bucket created successfully `pi/homelab-backup-etcd`.
+Feb 16 16:53:16 lab-pi-bk minio-bootstrap-start[50174]: Bucket homelab-backup-etcd OK
+Feb 16 16:53:16 lab-pi-bk minio-bootstrap-start[50249]: pi/homelab-backup-velero versioning is enabled
+Feb 16 16:53:17 lab-pi-bk minio-bootstrap-start[50259]: Lifecycle configuration rule added with ID `d69nbbfr5b0a4hnqn0g0` to pi/homelab-backup-velero.
+Feb 16 16:53:17 lab-pi-bk minio-bootstrap-start[50174]: ILM expire-14d on homelab-backup-velero OK
+Feb 16 16:53:17 lab-pi-bk minio-bootstrap-start[50269]: pi/homelab-backup-postgres versioning is enabled
+Feb 16 16:53:17 lab-pi-bk minio-bootstrap-start[50281]: Lifecycle configuration rule added with ID `d69nbbfr5b0a4v2cs49g` to pi/homelab-backup-postgres.
+Feb 16 16:53:17 lab-pi-bk minio-bootstrap-start[50174]: ILM expire-14d on homelab-backup-postgres OK
+Feb 16 16:53:17 lab-pi-bk minio-bootstrap-start[50296]: pi/homelab-backup-rgw versioning is enabled
+Feb 16 16:53:17 lab-pi-bk minio-bootstrap-start[50307]: Lifecycle configuration rule added with ID `d69nbbfr5b0a55irdsq0` to pi/homelab-backup-rgw.
+Feb 16 16:53:17 lab-pi-bk minio-bootstrap-start[50174]: ILM expire-14d on homelab-backup-rgw OK
+Feb 16 16:53:17 lab-pi-bk minio-bootstrap-start[50317]: pi/homelab-backup-etcd versioning is enabled
+Feb 16 16:53:17 lab-pi-bk minio-bootstrap-start[50327]: Lifecycle configuration rule added with ID `d69nbbfr5b0a50jhd6eg` to pi/homelab-backup-etcd.
+Feb 16 16:53:17 lab-pi-bk minio-bootstrap-start[50174]: ILM expire-14d on homelab-backup-etcd OK
+Feb 16 16:53:17 lab-pi-bk minio-bootstrap-start[50340]: Created policy `velero-backup-rw` successfully.
+Feb 16 16:53:17 lab-pi-bk minio-bootstrap-start[50174]: Policy velero-backup-rw OK
+Feb 16 16:53:18 lab-pi-bk minio-bootstrap-start[50350]: Removed user `SOHD8AV582OKMLWCIH3Q` successfully.
+Feb 16 16:53:18 lab-pi-bk minio-bootstrap-start[50360]: Added user `SOHD8AV582OKMLWCIH3Q` successfully.
+Feb 16 16:53:18 lab-pi-bk minio-bootstrap-start[50174]: User SOHD8AV582OKMLWCIH3Q created
+Feb 16 16:53:19 lab-pi-bk minio-bootstrap-start[50371]: Attached Policies: [velero-backup-rw]
+Feb 16 16:53:19 lab-pi-bk minio-bootstrap-start[50371]: To User: SOHD8AV582OKMLWCIH3Q
+Feb 16 16:53:19 lab-pi-bk minio-bootstrap-start[50174]: Policy velero-backup-rw attached to SOHD8AV582OKMLWCIH3Q
+Feb 16 16:53:19 lab-pi-bk minio-bootstrap-start[50385]: Created policy `postgres-backup-rw` successfully.
+Feb 16 16:53:19 lab-pi-bk minio-bootstrap-start[50174]: Policy postgres-backup-rw OK
+Feb 16 16:53:19 lab-pi-bk minio-bootstrap-start[50395]: Removed user `50NEM289BGPLXDBZMX1H` successfully.
+Feb 16 16:53:19 lab-pi-bk minio-bootstrap-start[50406]: Added user `50NEM289BGPLXDBZMX1H` successfully.
+Feb 16 16:53:19 lab-pi-bk minio-bootstrap-start[50174]: User 50NEM289BGPLXDBZMX1H created
+Feb 16 16:53:20 lab-pi-bk minio-bootstrap-start[50416]: Attached Policies: [postgres-backup-rw]
+Feb 16 16:53:20 lab-pi-bk minio-bootstrap-start[50416]: To User: 50NEM289BGPLXDBZMX1H
+Feb 16 16:53:20 lab-pi-bk minio-bootstrap-start[50174]: Policy postgres-backup-rw attached to 50NEM289BGPLXDBZMX1H
+Feb 16 16:53:20 lab-pi-bk minio-bootstrap-start[50430]: Created policy `rgw-backup-rw` successfully.
+Feb 16 16:53:20 lab-pi-bk minio-bootstrap-start[50174]: Policy rgw-backup-rw OK
+Feb 16 16:53:21 lab-pi-bk minio-bootstrap-start[50441]: Removed user `YZDY20XCCNXBG4GHS4MF` successfully.
+Feb 16 16:53:21 lab-pi-bk minio-bootstrap-start[50451]: Added user `YZDY20XCCNXBG4GHS4MF` successfully.
+Feb 16 16:53:21 lab-pi-bk minio-bootstrap-start[50174]: User YZDY20XCCNXBG4GHS4MF created
+Feb 16 16:53:22 lab-pi-bk minio-bootstrap-start[50461]: Attached Policies: [rgw-backup-rw]
+Feb 16 16:53:22 lab-pi-bk minio-bootstrap-start[50461]: To User: YZDY20XCCNXBG4GHS4MF
+Feb 16 16:53:22 lab-pi-bk minio-bootstrap-start[50174]: Policy rgw-backup-rw attached to YZDY20XCCNXBG4GHS4MF
+Feb 16 16:53:22 lab-pi-bk minio-bootstrap-start[50478]: Created policy `etcd-backup-rw` successfully.
+Feb 16 16:53:22 lab-pi-bk minio-bootstrap-start[50174]: Policy etcd-backup-rw OK
+Feb 16 16:53:22 lab-pi-bk minio-bootstrap-start[50489]: Removed user `TER5KR3JPTNQYMMFSBZR` successfully.
+Feb 16 16:53:23 lab-pi-bk minio-bootstrap-start[50499]: Added user `TER5KR3JPTNQYMMFSBZR` successfully.
+Feb 16 16:53:23 lab-pi-bk minio-bootstrap-start[50174]: User TER5KR3JPTNQYMMFSBZR created
+Feb 16 16:53:23 lab-pi-bk minio-bootstrap-start[50510]: Attached Policies: [etcd-backup-rw]
+Feb 16 16:53:23 lab-pi-bk minio-bootstrap-start[50510]: To User: TER5KR3JPTNQYMMFSBZR
+Feb 16 16:53:23 lab-pi-bk minio-bootstrap-start[50174]: Policy etcd-backup-rw attached to TER5KR3JPTNQYMMFSBZR
+Feb 16 16:53:23 lab-pi-bk minio-bootstrap-start[50174]: MinIO bootstrap complete
+Feb 16 16:53:23 lab-pi-bk systemd[1]: Finished Provision MinIO buckets, policies and per-service credentials.
