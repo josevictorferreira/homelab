@@ -1,0 +1,7 @@
+    0     0 nixos-fw-accept  tcp  --  end0   *       0.0.0.0/0            0.0.0.0/0            tcp dpt:111
+    0     0 nixos-fw-accept  tcp  --  end0   *       0.0.0.0/0            0.0.0.0/0            tcp dpt:2049
+    0     0 nixos-fw-accept  tcp  --  end0   *       0.0.0.0/0            0.0.0.0/0            tcp dpt:9000
+    0     0 nixos-fw-accept  tcp  --  end0   *       0.0.0.0/0            0.0.0.0/0            tcp dpt:9001
+    0     0 nixos-fw-accept  udp  --  end0   *       0.0.0.0/0            0.0.0.0/0            udp dpt:111
+    0     0 nixos-fw-accept  udp  --  end0   *       0.0.0.0/0            0.0.0.0/0            udp dpt:2049
+  107  6420 ACCEPT     udp  --  *      *       0.0.0.0/0            0.0.0.0/0            udp dpt:41641
