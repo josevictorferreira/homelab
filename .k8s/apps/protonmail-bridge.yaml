@@ -42,7 +42,9 @@ spec:
               name: data
       initContainers:
         - args:
-            - "set -e\nexport GNUPGHOME=/root/.gnupg\nexport PASSWORD_STORE_DIR=/root/.password-store\n\
+            - "set -e\n\n# Install libfido2-1 dependency required by bridge v3.22.0+\n\
+              echo \"Installing libfido2-1...\"\napt-get update && apt-get install\
+              \ -y libfido2-1\n\nexport GNUPGHOME=/root/.gnupg\nexport PASSWORD_STORE_DIR=/root/.password-store\n\
               \n# Check if pass is already initialized\nif [ -d \"$PASSWORD_STORE_DIR/.gpg-id\"\
               \ ] || [ -f \"$PASSWORD_STORE_DIR/.gpg-id\" ]; then\n  echo \"pass already\
               \ initialized, skipping\"\n  exit 0\nfi\n\necho \"Initializing GPG and\
