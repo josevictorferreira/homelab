@@ -67,7 +67,10 @@ spec:
                   if sha256sum -c full.sql.zst.sha256; then\n  echo \"sha256 OK\"\n\
                   else\n  echo \"ERROR: sha256 mismatch\"\n  exit 1\nfi\n\necho \"\
                   Decompressing...\"\nzstd -dc /tmp/full.sql.zst > /tmp/full.sql\n\
-                  rm /tmp/full.sql.zst\n\necho \"Restoring into scratch Postgres...\"\
+                  rm /tmp/full.sql.zst\n\n# pg_dumpall includes ALTER ROLE postgres\
+                  \ WITH PASSWORD which changes scratch\n# password to prod password.\
+                  \ Use prod password so \\connect commands succeed.\nexport PGPASSWORD=\"\
+                  $PROD_PGPASSWORD\"\n\necho \"Restoring into scratch Postgres...\"\
                   \n# ON_ERROR_STOP omitted: pg_dumpall includes \"CREATE ROLE postgres\"\
                   \n# which always errors on a fresh instance. Smoke queries validate\
                   \ success.\npsql -h localhost -U postgres -f /tmp/full.sql > /tmp/restore.log\
@@ -113,6 +116,11 @@ spec:
                     secretKeyRef:
                       key: AWS_SECRET_ACCESS_KEY
                       name: postgres-backup-s3-credentials
+                - name: PROD_PGPASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      key: admin-password
+                      name: postgresql-auth
               image: ghcr.io/josevictorferreira/backup-toolbox@sha256:143dc0beafb3865fdd37d5a85bb814654063061af96e610ea53a2e9900c2da55
               name: restore
               resources:

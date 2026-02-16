@@ -67,6 +67,10 @@ let
     zstd -dc /tmp/full.sql.zst > /tmp/full.sql
     rm /tmp/full.sql.zst
 
+    # pg_dumpall includes ALTER ROLE postgres WITH PASSWORD which changes scratch
+    # password to prod password. Use prod password so \connect commands succeed.
+    export PGPASSWORD="$PROD_PGPASSWORD"
+
     echo "Restoring into scratch Postgres..."
     # ON_ERROR_STOP omitted: pg_dumpall includes "CREATE ROLE postgres"
     # which always errors on a fresh instance. Smoke queries validate success.
@@ -219,6 +223,13 @@ in
                   valueFrom.secretKeyRef = {
                     name = "postgres-backup-s3-credentials";
                     key = "AWS_SECRET_ACCESS_KEY";
+                  };
+                }
+                {
+                  name = "PROD_PGPASSWORD";
+                  valueFrom.secretKeyRef = {
+                    name = "postgresql-auth";
+                    key = "admin-password";
                   };
                 }
               ];
