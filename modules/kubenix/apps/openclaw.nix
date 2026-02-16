@@ -356,11 +356,10 @@ in
               # Install Gemini CLI
               if [ ! -f /home/node/.local/bin/gemini ]; then
                 echo "Installing Gemini CLI..."
-                # Install locally then create symlink
+                # Install locally - npm creates lib/ inside prefix
                 mkdir -p /home/node/.local/lib/node_modules
-                npm install @google/gemini-cli --prefix /home/node/.local/lib
-                # Create symlink to the binary
-                ln -sf /home/node/.local/lib/lib/node_modules/.bin/gemini /home/node/.local/bin/gemini || \
+                npm install @google/gemini-cli --prefix /home/node/.local
+                # Create symlink to the binary (npm puts it in prefix/lib/node_modules/.bin/)
                 ln -sf /home/node/.local/lib/node_modules/.bin/gemini /home/node/.local/bin/gemini
                 echo "Gemini CLI installed successfully"
               else
