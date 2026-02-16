@@ -366,6 +366,17 @@ in
                 echo "Gemini CLI already exists, skipping..."
               fi
 
+              # Install whisper.cpp
+              if [ ! -f /home/node/.local/bin/whisper ]; then
+                echo "Installing whisper.cpp..."
+                # Download whisper.cpp release binary
+                curl -fsSL -o /home/node/.local/bin/whisper "https://github.com/ggerganov/whisper.cpp/releases/download/v1.7.4/whisper-cli-x64"
+                chmod +x /home/node/.local/bin/whisper
+                echo "whisper.cpp installed successfully"
+              else
+                echo "whisper.cpp already exists, skipping..."
+              fi
+
               # Set ownership
               chown -R 1000:1000 /home/node/.local
               ls -la /home/node/.local/bin/
