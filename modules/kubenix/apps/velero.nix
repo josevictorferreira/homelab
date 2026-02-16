@@ -3,10 +3,10 @@
 let
   namespace = "velero";
 in
-{
-  kubernetes.namespaces.${namespace} = { };
 
+{
   kubernetes.helm.releases.velero = {
+    includeCRDs = false;
     chart = kubenix.lib.helm.fetch {
       repo = "https://vmware-tanzu.github.io/helm-charts";
       chart = "velero";
@@ -14,31 +14,12 @@ in
       sha256 = "0qycxy93p8d3m2fq6f10zyaqlnkvh31dka6ag9z0nwncdz33v3mk";
     };
     namespace = namespace;
-    includeCRDs = true;
-
     values = {
       configuration = {
-        backupStorageLocation = [
-          {
-            name = "default";
-            bucket = "homelab-backup-velero";
-            config = {
-              region = "minio";
-              s3ForcePathStyle = true;
-              s3Url = "http://10.10.10.209:9000";
-            };
-            provider = "aws";
-          }
-        ];
-        volumeSnapshotLocation = [
-          {
-            name = "default";
-            provider = "aws";
-          }
-        ];
+        backupStorageLocation = [ ];
+        volumeSnapshotLocation = [ ];
       };
 
-      # Use FSB (file system backup) via Kopia
       deployNodeAgent = true;
 
       credentials = {
@@ -58,19 +39,49 @@ in
           ];
         }
       ];
-
-      schedules = {
-        daily-backup = {
-          disabled = false;
-          schedule = "0 3 * * *";
-          template = {
-            ttl = "336h"; # 14 days
-            includedNamespaces = [ "*" ];
-            snapshotVolumes = false; # Use FSB instead of VolumeSnapshots
-            defaultVolumesToFsBackup = false; # Opt-in via annotation
-          };
-        };
-      };
     };
   };
+
+  kubernetes.objects = [
+    {
+      apiVersion = "velero.io/v1";
+      kind = "BackupStorageLocation";
+      metadata = {
+        name = "default";
+        namespace = namespace;
+      };
+      spec = {
+        provider = "aws";
+        objectStorage = {
+          bucket = "homelab-backup-velero";
+        };
+        config = {
+          region = "minio";
+          s3ForcePathStyle = "true";
+          s3Url = "http://10.10.10.209:9000";
+        };
+        credential = {
+          name = "velero-s3-credentials";
+          key = "cloud";
+        };
+      };
+    }
+    {
+      apiVersion = "velero.io/v1";
+      kind = "Schedule";
+      metadata = {
+        name = "daily-backup";
+        namespace = namespace;
+      };
+      spec = {
+        schedule = "0 3 * * *";
+        template = {
+          ttl = "336h";
+          includedNamespaces = [ "*" ];
+          snapshotVolumes = false;
+          defaultVolumesToFsBackup = false;
+        };
+      };
+    }
+  ];
 }
