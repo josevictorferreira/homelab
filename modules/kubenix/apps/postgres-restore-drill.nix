@@ -48,8 +48,8 @@ let
     LATEST_DIR=$(dirname "$LATEST")
 
     echo "Downloading backup + checksum..."
-    mc cp "backup/${minioBucket}/$LATEST" /tmp/full.sql.zst
-    mc cp "backup/${minioBucket}/$LATEST_DIR/full.sql.zst.sha256" /tmp/full.sql.zst.sha256
+    mc cp "backup/${minioBucket}/postgresql-18/$LATEST" /tmp/full.sql.zst
+    mc cp "backup/${minioBucket}/postgresql-18/$LATEST_DIR/full.sql.zst.sha256" /tmp/full.sql.zst.sha256
 
     echo "Verifying sha256..."
     cd /tmp
