@@ -7,8 +7,8 @@
 let
   namespace = homelab.kubernetes.namespaces.applications;
   toolboxImage = "ghcr.io/josevictorferreira/backup-toolbox@sha256:143dc0beafb3865fdd37d5a85bb814654063061af96e610ea53a2e9900c2da55";
-  # Use official Bitnami Postgres 18 for scratch instance
-  postgresImage = "docker.io/bitnami/postgresql:18.1.0-debian-12-r1";
+  # Same custom Postgres 18 image used by postgresql-18 service
+  postgresImage = "ghcr.io/josevictorferreira/postgresql-vchord-bitnami:38c40fefe0c58cff6622de77f787634320e1ae5e";
   minioEndpoint = "http://10.10.10.209:9000";
   minioBucket = "homelab-backup-postgres";
 
@@ -133,6 +133,10 @@ in
           imagePullSecrets = [
             { name = "ghcr-registry-secret"; }
           ];
+          # Bitnami postgres runs as uid 1001; fsGroup ensures emptyDir writable
+          securityContext = {
+            fsGroup = 1001;
+          };
           volumes = [
             {
               name = "scratch-data";
