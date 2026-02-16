@@ -32,6 +32,5 @@ in
       "d ${cfg.dataDir} 0750 minio minio -"
     ];
 
-    networking.firewall.allowedTCPPorts = [ 9000 9001 ];
   };
 }
