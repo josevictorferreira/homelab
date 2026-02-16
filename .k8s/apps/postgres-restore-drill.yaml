@@ -59,8 +59,8 @@ spec:
                   \ -d' ' -f2- || true)\n\nif [ -z \"$LATEST\" ]; then\n  echo \"\
                   ERROR: No backup found in MinIO\"\n  exit 1\nfi\necho \"Latest backup:\
                   \ $LATEST\"\n\nLATEST_DIR=$(dirname \"$LATEST\")\n\necho \"Downloading\
-                  \ backup + checksum...\"\nmc cp \"backup/homelab-backup-postgres/$LATEST\"\
-                  \ /tmp/full.sql.zst\nmc cp \"backup/homelab-backup-postgres/$LATEST_DIR/full.sql.zst.sha256\"\
+                  \ backup + checksum...\"\nmc cp \"backup/homelab-backup-postgres/postgresql-18/$LATEST\"\
+                  \ /tmp/full.sql.zst\nmc cp \"backup/homelab-backup-postgres/postgresql-18/$LATEST_DIR/full.sql.zst.sha256\"\
                   \ /tmp/full.sql.zst.sha256\n\necho \"Verifying sha256...\"\ncd /tmp\n\
                   if sha256sum -c full.sql.zst.sha256; then\n  echo \"sha256 OK\"\n\
                   else\n  echo \"ERROR: sha256 mismatch\"\n  exit 1\nfi\n\necho \"\
