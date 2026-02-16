@@ -374,9 +374,9 @@ in
                       fi
 
               # Install whisper.cpp (compile from source since no binaries available)
-              if [ ! -f /home/node/.local/bin/whisper ]; then
-                echo "Installing whisper.cpp..."
-                apt-get update && apt-get install -y git build-essential
+                      if [ ! -f /home/node/.local/bin/whisper ]; then
+                        echo "Installing whisper.cpp..."
+                        apt-get update && apt-get install -y git build-essential cmake
                 cd /tmp
                 git clone --depth 1 https://github.com/ggerganov/whisper.cpp.git
                 cd whisper.cpp
