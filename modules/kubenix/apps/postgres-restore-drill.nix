@@ -6,7 +6,7 @@
 }:
 let
   namespace = homelab.kubernetes.namespaces.applications;
-  toolboxImage = "ghcr.io/josevictorferreira/backup-toolbox@sha256:95d0ce6cff55a0a1d9243b6a0712b8ee31079392aed40a8059ae62b661c1adf7";
+  toolboxImage = "ghcr.io/josevictorferreira/backup-toolbox@sha256:143dc0beafb3865fdd37d5a85bb814654063061af96e610ea53a2e9900c2da55";
   # Use official Bitnami Postgres 18 for scratch instance
   postgresImage = "docker.io/bitnami/postgresql:18.1.0-debian-12-r1";
   minioEndpoint = "http://10.10.10.209:9000";
