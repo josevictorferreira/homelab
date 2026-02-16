@@ -1,10 +1,9 @@
-{
-  lib,
-  config,
-  pkgs,
-  hostName,
-  homelab,
-  ...
+{ lib
+, config
+, pkgs
+, hostName
+, homelab
+, ...
 }:
 
 let
@@ -46,9 +45,10 @@ in
         Type = "oneshot";
         RemainAfterExit = true;
       };
-      path = [
-        pkgs.zfs
-        pkgs.gnugrep
+      path = with pkgs; [
+        zfs
+        gnugrep
+        coreutils
       ];
       script = ''
         # Already imported — nothing to do
@@ -57,6 +57,7 @@ in
           zfs set mountpoint=none backup-pool 2>/dev/null || true
           zfs set mountpoint=/mnt/backups backup-pool/data 2>/dev/null || true
           zfs mount -a 2>/dev/null || true
+          mkdir -p /mnt/backups/minio && chown minio:minio /mnt/backups/minio
           exit 0
         fi
 
@@ -69,6 +70,7 @@ in
               zfs set mountpoint=none backup-pool
               zfs set mountpoint=/mnt/backups backup-pool/data
               zfs mount -a 2>/dev/null || true
+              mkdir -p /mnt/backups/minio && chown minio:minio /mnt/backups/minio
               exit 0
             fi
             echo "Import attempt failed, retrying..."
