@@ -56,10 +56,6 @@ in
                     ''
                       set -e
 
-                      # Install libfido2-1 dependency required by bridge v3.22.0+
-                      echo "Installing libfido2-1..."
-                      apt-get update && apt-get install -y libfido2-1
-
                       export GNUPGHOME=/root/.gnupg
                       export PASSWORD_STORE_DIR=/root/.password-store
 
@@ -108,6 +104,15 @@ in
                 {
                   name = app;
                   image = "shenxn/protonmail-bridge:build";
+                  command = [
+                    "sh"
+                    "-c"
+                  ];
+                  args = [
+                    ''
+                      apt-get update && apt-get install -y libfido2-1 && exec /protonmail/entrypoint.sh
+                    ''
+                  ];
                   ports = [
                     {
                       name = "smtp";
