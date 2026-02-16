@@ -206,9 +206,15 @@ spec:
               \ --prefix /home/node/.local\n  # Create symlink to the binary (npm\
               \ puts it in prefix/lib/node_modules/.bin/)\n  ln -sf /home/node/.local/lib/node_modules/.bin/gemini\
               \ /home/node/.local/bin/gemini\n  echo \"Gemini CLI installed successfully\"\
-              \nelse\n  echo \"Gemini CLI already exists, skipping...\"\nfi\n\n# Set\
-              \ ownership\nchown -R 1000:1000 /home/node/.local\nls -la /home/node/.local/bin/\n\
-              echo \"All tools installed successfully!\"\n"
+              \nelse\n  echo \"Gemini CLI already exists, skipping...\"\nfi\n\n# Install\
+              \ whisper.cpp\nif [ ! -f /home/node/.local/bin/whisper ]; then\n  echo\
+              \ \"Installing whisper.cpp...\"\n  # Download whisper.cpp release binary\n\
+              \  curl -fsSL -o /home/node/.local/bin/whisper \"https://github.com/ggerganov/whisper.cpp/releases/download/v1.7.4/whisper-cli-x64\"\
+              \n  chmod +x /home/node/.local/bin/whisper\n  echo \"whisper.cpp installed\
+              \ successfully\"\nelse\n  echo \"whisper.cpp already exists, skipping...\"\
+              \nfi\n\n# Set ownership\nchown -R 1000:1000 /home/node/.local\nls -la\
+              \ /home/node/.local/bin/\necho \"All tools installed successfully!\"\
+              \n"
           image: node:22-slim
           name: install-tools
           securityContext:

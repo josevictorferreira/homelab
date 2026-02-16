@@ -1,20 +1,23 @@
-{
-  lib,
-  kubenix,
-  homelab,
-  ...
+{ lib
+, kubenix
+, homelab
+, ...
 }:
 
 let
   namespace = homelab.kubernetes.namespaces.storage;
   domain = homelab.domain;
   storageNodes = homelab.nodes.group."k8s-storage".configs;
-  storageNodesList = lib.mapAttrsToList (name: attrs: {
-    name = name;
-    devices = builtins.map (device: {
-      name = device;
-    }) attrs.disks;
-  }) storageNodes;
+  storageNodesList = lib.mapAttrsToList
+    (name: attrs: {
+      name = name;
+      devices = builtins.map
+        (device: {
+          name = device;
+        })
+        attrs.disks;
+    })
+    storageNodes;
   monitorGroupName = "k8s-control-plane"; # Name of the node group to run monitors on
   monitorHostNames = homelab.nodes.group.${monitorGroupName}.names;
 in
