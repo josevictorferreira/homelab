@@ -104,14 +104,10 @@ in
                 {
                   name = app;
                   image = "shenxn/protonmail-bridge:build";
-                  command = [
+                  args = [
                     "sh"
                     "-c"
-                  ];
-                  args = [
-                    ''
-                      apt-get update && apt-get install -y libfido2-1 && exec /protonmail/entrypoint.sh
-                    ''
+                    "apt-get update && apt-get install -y libfido2-1 && exec /protonmail/entrypoint.sh"
                   ];
                   ports = [
                     {

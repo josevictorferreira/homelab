@@ -19,12 +19,9 @@ spec:
     spec:
       containers:
         - args:
-            - 'apt-get update && apt-get install -y libfido2-1 && exec /protonmail/entrypoint.sh
-
-              '
-          command:
             - sh
             - -c
+            - apt-get update && apt-get install -y libfido2-1 && exec /protonmail/entrypoint.sh
           image: shenxn/protonmail-bridge:build
           name: protonmail-bridge
           ports:
