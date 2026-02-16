@@ -18,7 +18,14 @@ spec:
         app: protonmail-bridge
     spec:
       containers:
-        - image: shenxn/protonmail-bridge:build
+        - args:
+            - 'apt-get update && apt-get install -y libfido2-1 && exec /protonmail/entrypoint.sh
+
+              '
+          command:
+            - sh
+            - -c
+          image: shenxn/protonmail-bridge:build
           name: protonmail-bridge
           ports:
             - containerPort: 25
@@ -42,9 +49,7 @@ spec:
               name: data
       initContainers:
         - args:
-            - "set -e\n\n# Install libfido2-1 dependency required by bridge v3.22.0+\n\
-              echo \"Installing libfido2-1...\"\napt-get update && apt-get install\
-              \ -y libfido2-1\n\nexport GNUPGHOME=/root/.gnupg\nexport PASSWORD_STORE_DIR=/root/.password-store\n\
+            - "set -e\n\nexport GNUPGHOME=/root/.gnupg\nexport PASSWORD_STORE_DIR=/root/.password-store\n\
               \n# Check if pass is already initialized\nif [ -d \"$PASSWORD_STORE_DIR/.gpg-id\"\
               \ ] || [ -f \"$PASSWORD_STORE_DIR/.gpg-id\" ]; then\n  echo \"pass already\
               \ initialized, skipping\"\n  exit 0\nfi\n\necho \"Initializing GPG and\
