@@ -329,75 +329,77 @@ in
             "bash"
             "-c"
             ''
-              set -e
-              mkdir -p /home/node/.local/bin
-              chown -R 1000:1000 /home/node/.local
+                      set -e
+                      mkdir -p /home/node/.local/bin
+                      chown -R 1000:1000 /home/node/.local
 
-              # Install curl first (needed for all downloads)
-              apt-get update && apt-get install -y curl xz-utils
+                      # Install curl first (needed for all downloads)
+                      apt-get update && apt-get install -y curl xz-utils
 
-              # Install ffmpeg
-              if [ ! -f /home/node/.local/bin/ffmpeg ]; then
-                echo "Installing ffmpeg..."
-                # Download from John Van Sickle (reliable static builds)
-                curl -fsSL -o /tmp/ffmpeg.tar.xz "https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz"
-                tar -xf /tmp/ffmpeg.tar.xz -C /tmp/
-                # Find the ffmpeg binary in the extracted folder (it's usually in a subdirectory)
-                find /tmp -name "ffmpeg" -type f -executable | head -1 | xargs -I {} cp {} /home/node/.local/bin/ffmpeg
-                chmod +x /home/node/.local/bin/ffmpeg
-                rm -rf /tmp/ffmpeg.tar.xz /tmp/ffmpeg*
-                echo "ffmpeg installed successfully"
-              else
-                echo "ffmpeg already exists, skipping..."
-              fi
+                      # Install ffmpeg
+                      if [ ! -f /home/node/.local/bin/ffmpeg ]; then
+                        echo "Installing ffmpeg..."
+                        # Download from John Van Sickle (reliable static builds)
+                        curl -fsSL -o /tmp/ffmpeg.tar.xz "https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz"
+                        tar -xf /tmp/ffmpeg.tar.xz -C /tmp/
+                        # Find the ffmpeg binary in the extracted folder (it's usually in a subdirectory)
+                        find /tmp -name "ffmpeg" -type f -executable | head -1 | xargs -I {} cp {} /home/node/.local/bin/ffmpeg
+                        chmod +x /home/node/.local/bin/ffmpeg
+                        rm -rf /tmp/ffmpeg.tar.xz /tmp/ffmpeg*
+                        echo "ffmpeg installed successfully"
+                      else
+                        echo "ffmpeg already exists, skipping..."
+                      fi
 
-              # Install uv
-              if [ ! -f /home/node/.local/bin/uv ]; then
-                echo "Installing uv..."
-                curl -fsSL https://astral.sh/uv/install.sh | UV_INSTALL_DIR=/home/node/.local/bin sh
-                echo "uv installed successfully"
-              else
-                echo "uv already exists, skipping..."
-              fi
+                      # Install uv
+                      if [ ! -f /home/node/.local/bin/uv ]; then
+                        echo "Installing uv..."
+                        curl -fsSL https://astral.sh/uv/install.sh | UV_INSTALL_DIR=/home/node/.local/bin sh
+                        echo "uv installed successfully"
+                      else
+                        echo "uv already exists, skipping..."
+                      fi
 
-              # Install Gemini CLI
-              if [ ! -f /home/node/.local/bin/gemini ]; then
-                echo "Installing Gemini CLI..."
-                # Install locally - npm creates lib/ inside prefix
-                mkdir -p /home/node/.local/lib/node_modules
-                npm install @google/gemini-cli --prefix /home/node/.local
-                # Create symlink to the binary (npm puts it in prefix/lib/node_modules/.bin/)
-                ln -sf /home/node/.local/lib/node_modules/.bin/gemini /home/node/.local/bin/gemini
-                echo "Gemini CLI installed successfully"
-              else
-                echo "Gemini CLI already exists, skipping..."
-              fi
+                      # Install Gemini CLI
+                      if [ ! -f /home/node/.local/bin/gemini ]; then
+                        echo "Installing Gemini CLI..."
+                        # Install locally - npm creates lib/ inside prefix
+                        mkdir -p /home/node/.local/lib/node_modules
+                        npm install @google/gemini-cli --prefix /home/node/.local
+                        # Create symlink to the binary (npm puts it in prefix/lib/node_modules/.bin/)
+                        ln -sf /home/node/.local/lib/node_modules/.bin/gemini /home/node/.local/bin/gemini
+                        echo "Gemini CLI installed successfully"
+                      else
+                        echo "Gemini CLI already exists, skipping..."
+                      fi
 
-              # Install whisper.cpp
+              # Install whisper.cpp (compile from source since no binaries available)
               if [ ! -f /home/node/.local/bin/whisper ]; then
                 echo "Installing whisper.cpp..."
-                # Download whisper.cpp release binary
-                curl -fsSL -o /home/node/.local/bin/whisper "https://github.com/ggerganov/whisper.cpp/releases/download/v1.7.4/whisper-cli-x64"
-                chmod +x /home/node/.local/bin/whisper
-                echo "whisper.cpp installed successfully"
-              else
-                echo "whisper.cpp already exists, skipping..."
+                apt-get update && apt-get install -y git build-essential
+                cd /tmp
+                git clone --depth 1 https://github.com/ggerganov/whisper.cpp.git
+                cd whisper.cpp
+                make -j$(nproc)
+                cp main /home/node/.local/bin/whisper
+                cd /
+                rm -rf /tmp/whisper.cpp
               fi
 
-              # Download whisper model if not exists
-              mkdir -p /home/node/.local/share/whisper
-              if [ ! -f /home/node/.local/share/whisper/ggml-base.bin ]; then
-                echo "Downloading whisper base model..."
-                curl -fsSL -o /home/node/.local/share/whisper/ggml-base.bin "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.bin"
-                echo "Whisper base model downloaded successfully"
-              else
-                echo "Whisper base model already exists, skipping..."
-              fi
+                      # Download whisper model if not exists
+                      mkdir -p /home/node/.local/share/whisper
+                      if [ ! -f /home/node/.local/share/whisper/ggml-base.bin ]; then
+                        echo "Downloading whisper base model..."
+                        curl -fsSL -o /home/node/.local/share/whisper/ggml-base.bin "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.bin"
+                        echo "Whisper base model downloaded successfully"
+                      else
+                        echo "Whisper base model already exists, skipping..."
+                      fi
 
-              # Set ownership
-              chown -R 1000:1000 /home/node/.local
-              ls -la /home/node/.local/bin/
-              echo "All tools installed successfully!"
+                      # Set ownership
+                      chown -R 1000:1000 /home/node/.local
+                      ls -la /home/node/.local/bin/
+                      echo "All tools installed successfully!"
             ''
           ];
         };
