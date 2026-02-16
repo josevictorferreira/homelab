@@ -45,6 +45,8 @@ spec:
                   name: scratch-data
             - args:
                 - "set -euo pipefail\necho \"=== Postgres restore drill starting ===\"\
+                  \n\n# Scratch postgres password (ephemeral, matches POSTGRESQL_PASSWORD\
+                  \ on scratch-postgres container)\nexport PGPASSWORD=\"scratch-drill\"\
                   \n\necho \"Waiting for scratch Postgres to accept connections...\"\
                   \nfor i in $(seq 1 60); do\n  if psql -h localhost -U postgres -Atc\
                   \ \"SELECT 1\" 2>/dev/null | grep -q 1; then\n    echo \"Scratch\

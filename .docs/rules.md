@@ -107,3 +107,20 @@
 **Lesson:** When Flux kustomize fails with duplicate resource errors, use `kubectl apply -f <manifest>` directly instead of waiting for GitOps reconciliation.
 **Context:** Flux may fail with "may not add resource with an already registered id" errors due to kustomization issues. Manual apply bypasses the problem while keeping manifests in git.
 **Verify:** `kubectl get pod -n <ns>` shows resources running after manual apply
+
+## Velero Backup Configuration
+
+### Velero BSL Updates Require Recreation
+**Lesson:** When changing BackupStorageLocation fields (like region or bucket), delete the BSL CR to force recreation: `kubectl delete bsl default -n velero`.
+**Context:** Kubernetes/Velero often ignores updates to existing BSLs or fails to reload them properly.
+**Verify:** `kubectl get bsl default -n velero -o yaml` matches new config.
+
+### MinIO S3 Client Compatibility
+**Lesson:** Always set `s3ForcePathStyle: true` and a valid region (e.g. `minio` or `us-east-1`) when using MinIO as target.
+**Context:** Without explicit path style and region, the AWS SDK used by Velero fails to connect to MinIO.
+**Verify:** `kubectl get bsl default -n velero -o yaml` shows `s3ForcePathStyle: true`.
+
+### Enable Kopia for Filesystem Backups
+**Lesson:** To enable PVC filesystem backups, explicitly set `deployNodeAgent: true` in Velero Helm chart values.
+**Context:** Default chart values may disable the node agent (formerly Restic daemonset), preventing FS backups.
+**Verify:** `kubectl get pods -n velero -l name=node-agent` shows running pods.
