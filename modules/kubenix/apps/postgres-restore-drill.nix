@@ -159,6 +159,10 @@ in
               image = postgresImage;
               env = [
                 {
+                  name = "ALLOW_EMPTY_PASSWORD";
+                  value = "yes";
+                }
+                {
                   name = "POSTGRESQL_ENABLE_TRUST_AUTH";
                   value = "yes";
                 }
