@@ -140,9 +140,9 @@
             check
             lint
             format
-            run-ddeploy
-            run-deploy
-            run-gdeploy
+            run_ddeploy
+            run_deploy
+            run_gdeploy
             secrets
             manifests
             kubesync

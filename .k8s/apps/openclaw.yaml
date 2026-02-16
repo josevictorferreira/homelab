@@ -201,15 +201,14 @@ spec:
               \ | UV_INSTALL_DIR=/home/node/.local/bin sh\n  echo \"uv installed successfully\"\
               \nelse\n  echo \"uv already exists, skipping...\"\nfi\n\n# Install Gemini\
               \ CLI\nif [ ! -f /home/node/.local/bin/gemini ]; then\n  echo \"Installing\
-              \ Gemini CLI...\"\n  # Install locally then create symlink\n  mkdir\
-              \ -p /home/node/.local/lib/node_modules\n  npm install @google/gemini-cli\
-              \ --prefix /home/node/.local/lib\n  # Create symlink to the binary\n\
-              \  ln -sf /home/node/.local/lib/lib/node_modules/.bin/gemini /home/node/.local/bin/gemini\
-              \ || \\\n  ln -sf /home/node/.local/lib/node_modules/.bin/gemini /home/node/.local/bin/gemini\n\
-              \  echo \"Gemini CLI installed successfully\"\nelse\n  echo \"Gemini\
-              \ CLI already exists, skipping...\"\nfi\n\n# Set ownership\nchown -R\
-              \ 1000:1000 /home/node/.local\nls -la /home/node/.local/bin/\necho \"\
-              All tools installed successfully!\"\n"
+              \ Gemini CLI...\"\n  # Install locally - npm creates lib/ inside prefix\n\
+              \  mkdir -p /home/node/.local/lib/node_modules\n  npm install @google/gemini-cli\
+              \ --prefix /home/node/.local\n  # Create symlink to the binary (npm\
+              \ puts it in prefix/lib/node_modules/.bin/)\n  ln -sf /home/node/.local/lib/node_modules/.bin/gemini\
+              \ /home/node/.local/bin/gemini\n  echo \"Gemini CLI installed successfully\"\
+              \nelse\n  echo \"Gemini CLI already exists, skipping...\"\nfi\n\n# Set\
+              \ ownership\nchown -R 1000:1000 /home/node/.local\nls -la /home/node/.local/bin/\n\
+              echo \"All tools installed successfully!\"\n"
           image: node:22-slim
           name: install-tools
           securityContext:
