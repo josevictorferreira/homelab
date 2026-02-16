@@ -56,7 +56,7 @@ in
           bucket = "homelab-backup-velero";
         };
         config = {
-          region = "minio";
+          region = "sa-east-1";
           s3ForcePathStyle = "true";
           s3Url = "http://10.10.10.209:9000";
         };
