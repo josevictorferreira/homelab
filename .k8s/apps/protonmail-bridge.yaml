@@ -40,6 +40,27 @@ spec:
           volumeMounts:
             - mountPath: /root
               name: data
+      initContainers:
+        - args:
+            - "set -e\nexport GNUPGHOME=/root/.gnupg\nexport PASSWORD_STORE_DIR=/root/.password-store\n\
+              \n# Check if pass is already initialized\nif [ -d \"$PASSWORD_STORE_DIR/.gpg-id\"\
+              \ ] || [ -f \"$PASSWORD_STORE_DIR/.gpg-id\" ]; then\n  echo \"pass already\
+              \ initialized, skipping\"\n  exit 0\nfi\n\necho \"Initializing GPG and\
+              \ pass...\"\n\n# Create GPG home if not exists\nmkdir -p \"$GNUPGHOME\"\
+              \nchmod 700 \"$GNUPGHOME\"\n\n# Generate GPG key batch\ncat > /tmp/gpg-gen.conf\
+              \ <<EOF\n%echo Generating Bridge key\nKey-Type: RSA\nKey-Length: 2048\n\
+              Name-Real: Bridge\nName-Email: bridge@localhost\nExpire-Date: 0\n%no-protection\n\
+              %commit\n%echo done\nEOF\n\ngpg --batch --gen-key /tmp/gpg-gen.conf\n\
+              \n# Initialize pass with the Bridge key\npass init \"Bridge\"\n\necho\
+              \ \"pass initialization complete\"\n"
+          command:
+            - sh
+            - -c
+          image: shenxn/protonmail-bridge:build
+          name: init-pass
+          volumeMounts:
+            - mountPath: /root
+              name: data
       volumes:
         - name: data
           persistentVolumeClaim:
