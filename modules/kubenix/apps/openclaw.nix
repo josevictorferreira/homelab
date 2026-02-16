@@ -381,7 +381,7 @@ in
                 git clone --depth 1 https://github.com/ggerganov/whisper.cpp.git
                 cd whisper.cpp
                 make -j$(nproc)
-                cp main /home/node/.local/bin/whisper
+                cp build/bin/main /home/node/.local/bin/whisper
                 cd /
                 rm -rf /tmp/whisper.cpp
               fi

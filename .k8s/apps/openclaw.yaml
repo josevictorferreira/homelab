@@ -222,7 +222,7 @@ spec:
               \ ]; then\n          echo \"Installing whisper.cpp...\"\n          apt-get\
               \ update && apt-get install -y git build-essential cmake\n  cd /tmp\n\
               \  git clone --depth 1 https://github.com/ggerganov/whisper.cpp.git\n\
-              \  cd whisper.cpp\n  make -j$(nproc)\n  cp main /home/node/.local/bin/whisper\n\
+              \  cd whisper.cpp\n  make -j$(nproc)\n  cp build/bin/main /home/node/.local/bin/whisper\n\
               \  cd /\n  rm -rf /tmp/whisper.cpp\nfi\n\n        # Download whisper\
               \ model if not exists\n        mkdir -p /home/node/.local/share/whisper\n\
               \        if [ ! -f /home/node/.local/share/whisper/ggml-base.bin ];\
