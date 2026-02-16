@@ -111,6 +111,8 @@ spec:
                   cpu: 100m
                   ephemeral-storage: 2Gi
                   memory: 256Mi
+          imagePullSecrets:
+            - name: ghcr-registry-secret
           restartPolicy: OnFailure
   schedule: 30 2 * * *
   successfulJobsHistoryLimit: 3
