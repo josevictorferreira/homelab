@@ -130,6 +130,9 @@ in
         activeDeadlineSeconds = 1200;
         template.spec = {
           restartPolicy = "Never";
+          imagePullSecrets = [
+            { name = "ghcr-registry-secret"; }
+          ];
           volumes = [
             {
               name = "scratch-data";

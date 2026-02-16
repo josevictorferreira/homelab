@@ -117,6 +117,8 @@ spec:
                   cpu: 100m
                   ephemeral-storage: 4Gi
                   memory: 256Mi
+          imagePullSecrets:
+            - name: ghcr-registry-secret
           restartPolicy: Never
           volumes:
             - emptyDir:
