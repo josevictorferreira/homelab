@@ -1,0 +1,5 @@
+HTTP/1.1 200 OK
+MinIO reachable from apps namespace at http://10.10.10.209:9000/minio/health/ready
+Server: MinIO
+Region: sa-east-1
+Test: kubectl run minio-check --rm -i --restart=Never --image=curlimages/curl:8.5.0 -n apps -- -sS -I http://10.10.10.209:9000/minio/health/ready

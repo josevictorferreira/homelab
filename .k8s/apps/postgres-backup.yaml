@@ -1,0 +1,117 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: postgres-backup
+  namespace: apps
+spec:
+  concurrencyPolicy: Forbid
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        spec:
+          containers:
+            - args:
+                - 'set -euo pipefail
+
+                  echo "=== Postgres backup starting ==="
+
+                  DATE_PREFIX=$(date +%Y/%m/%d)
+
+                  OBJ_PREFIX="postgresql-18/$DATE_PREFIX"
+
+
+                  echo "Setting up mc alias..."
+
+                  mc alias set backup "$MINIO_ENDPOINT" "$AWS_ACCESS_KEY_ID" "$AWS_SECRET_ACCESS_KEY"
+
+
+                  echo "Running pg_dumpall..."
+
+                  pg_dumpall -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" > /tmp/full.sql
+
+
+                  echo "Compressing with zstd..."
+
+                  zstd -T0 /tmp/full.sql -o /tmp/full.sql.zst
+
+                  rm /tmp/full.sql
+
+
+                  echo "Computing sha256..."
+
+                  sha256sum /tmp/full.sql.zst > /tmp/full.sql.zst.sha256
+
+
+                  echo "Uploading to MinIO (tmp)..."
+
+                  mc cp /tmp/full.sql.zst "backup/homelab-backup-postgres/$OBJ_PREFIX/full.sql.zst.tmp"
+
+                  mc cp /tmp/full.sql.zst.sha256 "backup/homelab-backup-postgres/$OBJ_PREFIX/full.sql.zst.sha256.tmp"
+
+
+                  echo "Renaming to final (atomic)..."
+
+                  mc mv "backup/homelab-backup-postgres/$OBJ_PREFIX/full.sql.zst.tmp"
+                  "backup/homelab-backup-postgres/$OBJ_PREFIX/full.sql.zst"
+
+                  mc mv "backup/homelab-backup-postgres/$OBJ_PREFIX/full.sql.zst.sha256.tmp"
+                  "backup/homelab-backup-postgres/$OBJ_PREFIX/full.sql.zst.sha256"
+
+
+                  echo "Cleanup..."
+
+                  rm -f /tmp/full.sql.zst /tmp/full.sql.zst.sha256
+
+
+                  echo "=== Postgres backup complete ==="
+
+                  mc ls "backup/homelab-backup-postgres/$OBJ_PREFIX/"
+
+                  '
+              command:
+                - bash
+                - -c
+              env:
+                - name: PGHOST
+                  value: postgresql-18-hl
+                - name: PGPORT
+                  value: '5432'
+                - name: PGUSER
+                  value: postgres
+                - name: MINIO_ENDPOINT
+                  value: http://10.10.10.209:9000
+                - name: PGPASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      key: admin-password
+                      name: postgresql-auth
+                - name: AWS_ACCESS_KEY_ID
+                  valueFrom:
+                    secretKeyRef:
+                      key: AWS_ACCESS_KEY_ID
+                      name: postgres-backup-s3-credentials
+                - name: AWS_SECRET_ACCESS_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      key: AWS_SECRET_ACCESS_KEY
+                      name: postgres-backup-s3-credentials
+              image: ghcr.io/josevictorferreira/backup-toolbox@sha256:95d0ce6cff55a0a1d9243b6a0712b8ee31079392aed40a8059ae62b661c1adf7
+              name: backup
+              resources:
+                limits:
+                  cpu: 500m
+                  ephemeral-storage: 4Gi
+                  memory: 512Mi
+                requests:
+                  cpu: 100m
+                  ephemeral-storage: 2Gi
+                  memory: 256Mi
+          restartPolicy: OnFailure
+  schedule: 30 2 * * *
+  successfulJobsHistoryLimit: 3
+  timeZone: America/Sao_Paulo

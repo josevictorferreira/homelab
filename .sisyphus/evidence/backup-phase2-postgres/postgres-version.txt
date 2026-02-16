@@ -1,0 +1,4 @@
+PostgreSQL 18.1 on aarch64-unknown-linux-gnu, compiled by gcc (GCC) 14.2.0, 64-bit
+Source: kubectl exec -n apps pod/postgresql-18-0 -- psql -U postgres -Atc "SELECT version();"
+Image: ghcr.io/josevictorferreira/postgresql-vchord-bitnami (Bitnami PostgreSQL 18)
+Host: postgresql-18-hl:5432
