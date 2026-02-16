@@ -1,0 +1,127 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: postgres-restore-drill
+  namespace: apps
+spec:
+  concurrencyPolicy: Forbid
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 1200
+      backoffLimit: 1
+      template:
+        spec:
+          containers:
+            - env:
+                - name: POSTGRESQL_PASSWORD
+                  value: scratch-drill
+                - name: POSTGRESQL_POSTGRES_PASSWORD
+                  value: scratch-drill
+                - name: BITNAMI_DEBUG
+                  value: 'true'
+              image: docker.io/bitnami/postgresql:18.1.0-debian-12-r1
+              name: scratch-postgres
+              readinessProbe:
+                exec:
+                  command:
+                    - pg_isready
+                    - -U
+                    - postgres
+                initialDelaySeconds: 5
+                periodSeconds: 5
+              resources:
+                limits:
+                  cpu: 500m
+                  memory: 512Mi
+                requests:
+                  cpu: 100m
+                  memory: 256Mi
+              volumeMounts:
+                - mountPath: /bitnami/postgresql
+                  name: scratch-data
+            - args:
+                - "set -euo pipefail\necho \"=== Postgres restore drill starting ===\"\
+                  \n\necho \"Waiting for scratch Postgres to accept connections...\"\
+                  \nfor i in $(seq 1 60); do\n  if psql -h localhost -U postgres -Atc\
+                  \ \"SELECT 1\" 2>/dev/null | grep -q 1; then\n    echo \"Scratch\
+                  \ Postgres ready after ${i}s\"\n    break\n  fi\n  if [ \"$i\" -eq\
+                  \ 60 ]; then\n    echo \"ERROR: Scratch Postgres did not become\
+                  \ ready in 60s\"\n    exit 1\n  fi\n  sleep 1\ndone\n\necho \"Setting\
+                  \ up mc alias...\"\nmc alias set backup \"$MINIO_ENDPOINT\" \"$AWS_ACCESS_KEY_ID\"\
+                  \ \"$AWS_SECRET_ACCESS_KEY\"\n\necho \"Finding latest backup...\"\
+                  \nLATEST=$(mc ls --recursive --json \"backup/homelab-backup-postgres/postgresql-18/\"\
+                  \ | \\\n  jq -r 'select(.key | test(\"full\\\\.sql\\\\.zst$\"))\
+                  \ | .lastModified + \" \" + .key' | \\\n  sort -r | head -1 | awk\
+                  \ '{print $2}' || true)\n\nif [ -z \"$LATEST\" ]; then\n  echo \"\
+                  ERROR: No backup found in MinIO\"\n  exit 1\nfi\necho \"Latest backup:\
+                  \ $LATEST\"\n\nLATEST_DIR=$(dirname \"$LATEST\")\n\necho \"Downloading\
+                  \ backup + checksum...\"\nmc cp \"backup/homelab-backup-postgres/$LATEST\"\
+                  \ /tmp/full.sql.zst\nmc cp \"backup/homelab-backup-postgres/$LATEST_DIR/full.sql.zst.sha256\"\
+                  \ /tmp/full.sql.zst.sha256\n\necho \"Verifying sha256...\"\ncd /tmp\n\
+                  if sha256sum -c full.sql.zst.sha256; then\n  echo \"sha256 OK\"\n\
+                  else\n  echo \"ERROR: sha256 mismatch\"\n  exit 1\nfi\n\necho \"\
+                  Decompressing...\"\nzstd -dc /tmp/full.sql.zst > /tmp/full.sql\n\
+                  rm /tmp/full.sql.zst\n\necho \"Restoring into scratch Postgres...\"\
+                  \nif psql -h localhost -U postgres -v ON_ERROR_STOP=1 -f /tmp/full.sql;\
+                  \ then\n  echo \"restore OK\"\nelse\n  echo \"ERROR: restore failed\"\
+                  \n  exit 1\nfi\nrm /tmp/full.sql\n\necho \"Running smoke checks...\"\
+                  \nSMOKE_OK=true\n\n# Basic connectivity\nif ! psql -h localhost\
+                  \ -U postgres -Atc \"SELECT 1\" | grep -q 1; then\n  echo \"FAIL:\
+                  \ basic SELECT 1\"\n  SMOKE_OK=false\nfi\n\n# Check expected databases\
+                  \ exist\nACTUAL_DBS=$(psql -h localhost -U postgres -Atc \"SELECT\
+                  \ datname FROM pg_database WHERE datistemplate = false ORDER BY\
+                  \ 1;\")\nfor db in linkwarden openwebui n8n immich valoris_production\
+                  \ valoris_production_queue keycloak synapse mautrix_slack mautrix_discord\
+                  \ mautrix_whatsapp; do\n  if echo \"$ACTUAL_DBS\" | grep -qw \"\
+                  $db\"; then\n    echo \"OK: database $db exists\"\n  else\n    echo\
+                  \ \"FAIL: database $db missing\"\n    SMOKE_OK=false\n  fi\ndone\n\
+                  \n# Check each DB has at least 1 table\nfor db in linkwarden openwebui\
+                  \ n8n immich valoris_production valoris_production_queue keycloak\
+                  \ synapse mautrix_slack mautrix_discord mautrix_whatsapp; do\n \
+                  \ TABLE_COUNT=$(psql -h localhost -U postgres -d \"$db\" -Atc \"\
+                  SELECT count(*) FROM information_schema.tables WHERE table_schema\
+                  \ = 'public';\" 2>/dev/null || echo \"0\")\n  if [ \"$TABLE_COUNT\"\
+                  \ -gt 0 ]; then\n    echo \"OK: $db has $TABLE_COUNT tables\"\n\
+                  \  else\n    echo \"WARN: $db has 0 public tables (may be expected)\"\
+                  \n  fi\ndone\n\nif [ \"$SMOKE_OK\" = true ]; then\n  echo \"smoke\
+                  \ OK\"\n  echo \"=== Postgres restore drill complete ===\"\n  exit\
+                  \ 0\nelse\n  echo \"ERROR: smoke checks failed\"\n  exit 1\nfi\n"
+              command:
+                - bash
+                - -c
+              env:
+                - name: MINIO_ENDPOINT
+                  value: http://10.10.10.209:9000
+                - name: AWS_ACCESS_KEY_ID
+                  valueFrom:
+                    secretKeyRef:
+                      key: AWS_ACCESS_KEY_ID
+                      name: postgres-backup-s3-credentials
+                - name: AWS_SECRET_ACCESS_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      key: AWS_SECRET_ACCESS_KEY
+                      name: postgres-backup-s3-credentials
+              image: ghcr.io/josevictorferreira/backup-toolbox@sha256:95d0ce6cff55a0a1d9243b6a0712b8ee31079392aed40a8059ae62b661c1adf7
+              name: restore
+              resources:
+                limits:
+                  cpu: 500m
+                  ephemeral-storage: 8Gi
+                  memory: 512Mi
+                requests:
+                  cpu: 100m
+                  ephemeral-storage: 4Gi
+                  memory: 256Mi
+          restartPolicy: Never
+          volumes:
+            - emptyDir:
+                sizeLimit: 8Gi
+              name: scratch-data
+  schedule: 0 3 * * 0
+  successfulJobsHistoryLimit: 3
+  timeZone: America/Sao_Paulo
