@@ -245,7 +245,7 @@ in
         controllers.main.containers.main.env.ELEVENLABS_API_KEY = {
           valueFrom.secretKeyRef = {
             name = "openclaw-secrets";
-            key = "elevenlabs_api_key";
+            key = "ELEVENLABS_API_KEY";
           };
         };
         controllers.main.containers.tailscale = {
