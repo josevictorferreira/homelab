@@ -191,11 +191,11 @@ spec:
             - bash
             - -c
             - "set -e\nmkdir -p /home/node/.local/bin\nchown -R 1000:1000 /home/node/.local\n\
-              \n# Install curl first (needed for all downloads)\napt-get update &&\
-              \ apt-get install -y curl xz-utils\n\n# Install ffmpeg\nif [ ! -f /home/node/.local/bin/ffmpeg\
-              \ ]; then\n  echo \"Installing ffmpeg...\"\n  # Download from John Van\
-              \ Sickle (reliable static builds)\n  curl -fsSL -o /tmp/ffmpeg.tar.xz\
-              \ \"https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz\"\
+              \n# Install curl and jq (needed for downloads and JSON processing)\n\
+              apt-get update && apt-get install -y curl xz-utils jq\n\n# Install ffmpeg\n\
+              if [ ! -f /home/node/.local/bin/ffmpeg ]; then\n  echo \"Installing\
+              \ ffmpeg...\"\n  # Download from John Van Sickle (reliable static builds)\n\
+              \  curl -fsSL -o /tmp/ffmpeg.tar.xz \"https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz\"\
               \n  tar -xf /tmp/ffmpeg.tar.xz -C /tmp/\n  # Find the ffmpeg binary\
               \ in the extracted folder (it's usually in a subdirectory)\n  find /tmp\
               \ -name \"ffmpeg\" -type f -executable | head -1 | xargs -I {} cp {}\
