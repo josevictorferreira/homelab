@@ -365,8 +365,8 @@ in
               mkdir -p /home/node/.local/bin
               chown -R 1000:1000 /home/node/.local
 
-              # Install curl first (needed for all downloads)
-              apt-get update && apt-get install -y curl xz-utils
+              # Install curl and jq (needed for downloads and JSON processing)
+              apt-get update && apt-get install -y curl xz-utils jq
 
               # Install ffmpeg
               if [ ! -f /home/node/.local/bin/ffmpeg ]; then
