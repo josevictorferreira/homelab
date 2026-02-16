@@ -1,0 +1,180 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+    annotations:
+        kubenix/k8s-version: "1.32"
+        kubenix/project-name: ze-homelab
+    name: protonmail-bridge
+    namespace: apps
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: protonmail-bridge
+    serviceName: protonmail-bridge
+    template:
+        metadata:
+            labels:
+                app: protonmail-bridge
+        spec:
+            containers:
+                - image: shenxn/protonmail-bridge:build
+                  name: protonmail-bridge
+                  ports:
+                    - containerPort: 25
+                      name: smtp
+                    - containerPort: 143
+                      name: imap
+                  readinessProbe:
+                    initialDelaySeconds: 10
+                    periodSeconds: 10
+                    tcpSocket:
+                        port: 143
+                  resources:
+                    limits:
+                        cpu: 500m
+                        memory: 512Mi
+                    requests:
+                        cpu: 100m
+                        memory: 256Mi
+                  volumeMounts:
+                    - mountPath: /root
+                      name: data
+            volumes:
+                - name: data
+                  persistentVolumeClaim:
+                    claimName: protonmail-bridge
+sops:
+    age:
+        - recipient: age16yrhmz8fytj7j9ns80zl40zjcdfd3pdxh48ld7ys7veea774udtqfn9jyx
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBNbHI3QU9yVzlNNlUzdndy
+            WHprS3M2N1o0azhKdW5sMnp1dURhNFRaYUNRCjljb3RlR3NrMXM0elhnakdIdDdD
+            cjhabXdPdFZCMW1GTW9zaFdndUZla1UKLS0tIDcvcWVkNTc0TFdMUEVrWFVUYUw2
+            UGVZZVJNU2M3MCtqeHVlMUdvMXJsWGcK2zXDI44kw0UiA3JzBekQvMZ6nAFjhs1Y
+            WhkxUtf1RLQSO6+FIpvszWgnYDQyzxHHPEtHXRC871BQLUtJrndB4w==
+            -----END AGE ENCRYPTED FILE-----
+        - recipient: age1jx9qu5p0ycvymrl2gykd9z3w8x8n67jxnatxs49j7qzspjr6asqqf8u35h
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBZVnJxTUVNMTYzMERGd1NW
+            TVNWbHRDcGZ6VWhDUXNEYzYrbFZKczRiTDMwCjlOcFVCYkNlVmJZVlNMdURDb0tE
+            WGdZOXFYQzc4bVN5RGNNY09pT2E4N1EKLS0tIHhrSitIczEwQ2ppRE00UHdwN3JW
+            UE9tcmxoeEFERFpYa0M4YzdBVmI2WTgKb/j5rhm7NQa2s9QDr6QKmU1Mxf/Vc23g
+            w70agbFWml+9m1AIZIynwFZLpaJ+AqsrGQX9h9hCURjcIyvsV15ZeQ==
+            -----END AGE ENCRYPTED FILE-----
+        - recipient: age1myzhwq67gu5zrfk8fvs0p7mh5fk67d20ltwqf9325ya83lm06ytsyax3j2
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSB3R1FsSVgvQ09uZmx2a1F5
+            S0tERjI0bGlTRHNmcW45UTNMalBTeFN6cWdZCmtqWjdSNEJIcm9ob0RkSXBieTdC
+            MkVIcHRwYmlBNjh0dThsZWpYZVRnMVUKLS0tIFpaL2hzNTI1YzRZcWl2SFNnYzd2
+            WmZaZGVzdnJvZW1ONmVpc0pnbGRuOEkKvvD6g97a5OfPBjXMEo8yX6vUNyjZ1jrp
+            2boxp2qqoO0XUosGbOYZdaq9kIK3J8mONsZZUi54gc5gQ02MX+AvSQ==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2026-02-16T20:06:12Z"
+    mac: ENC[AES256_GCM,data:iQa6SGwLaVaFLYhZa11zvsxDCgFk1Afw7Bv/MVOpEmIS5XPsAtduCOQDdjB5/ItglVFp/6/CvQnqGHB0R7Kfiqby//5fMnuOyNbWLHnYO2r6orUXmQU2NfUMT0G3gjuw/mpNt7BuG/UUQqC66V0/4HeT6xJc9jpNxQUcElc2AH4=,iv:d9JpkZQH2IQt8t45r3jr22ESaonOJWkm+sy95xL2L+g=,tag:k/rMD3Xl73YRycYp6SyXkA==,type:str]
+    encrypted_regex: ^(data|stringData)$
+    version: 3.10.2
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+    annotations:
+        kubenix/k8s-version: "1.32"
+        kubenix/project-name: ze-homelab
+    name: protonmail-bridge
+    namespace: apps
+spec:
+    accessModes:
+        - ReadWriteOnce
+    resources:
+        requests:
+            storage: 1Gi
+    storageClassName: rook-ceph-block
+sops:
+    age:
+        - recipient: age16yrhmz8fytj7j9ns80zl40zjcdfd3pdxh48ld7ys7veea774udtqfn9jyx
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBNbHI3QU9yVzlNNlUzdndy
+            WHprS3M2N1o0azhKdW5sMnp1dURhNFRaYUNRCjljb3RlR3NrMXM0elhnakdIdDdD
+            cjhabXdPdFZCMW1GTW9zaFdndUZla1UKLS0tIDcvcWVkNTc0TFdMUEVrWFVUYUw2
+            UGVZZVJNU2M3MCtqeHVlMUdvMXJsWGcK2zXDI44kw0UiA3JzBekQvMZ6nAFjhs1Y
+            WhkxUtf1RLQSO6+FIpvszWgnYDQyzxHHPEtHXRC871BQLUtJrndB4w==
+            -----END AGE ENCRYPTED FILE-----
+        - recipient: age1jx9qu5p0ycvymrl2gykd9z3w8x8n67jxnatxs49j7qzspjr6asqqf8u35h
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBZVnJxTUVNMTYzMERGd1NW
+            TVNWbHRDcGZ6VWhDUXNEYzYrbFZKczRiTDMwCjlOcFVCYkNlVmJZVlNMdURDb0tE
+            WGdZOXFYQzc4bVN5RGNNY09pT2E4N1EKLS0tIHhrSitIczEwQ2ppRE00UHdwN3JW
+            UE9tcmxoeEFERFpYa0M4YzdBVmI2WTgKb/j5rhm7NQa2s9QDr6QKmU1Mxf/Vc23g
+            w70agbFWml+9m1AIZIynwFZLpaJ+AqsrGQX9h9hCURjcIyvsV15ZeQ==
+            -----END AGE ENCRYPTED FILE-----
+        - recipient: age1myzhwq67gu5zrfk8fvs0p7mh5fk67d20ltwqf9325ya83lm06ytsyax3j2
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSB3R1FsSVgvQ09uZmx2a1F5
+            S0tERjI0bGlTRHNmcW45UTNMalBTeFN6cWdZCmtqWjdSNEJIcm9ob0RkSXBieTdC
+            MkVIcHRwYmlBNjh0dThsZWpYZVRnMVUKLS0tIFpaL2hzNTI1YzRZcWl2SFNnYzd2
+            WmZaZGVzdnJvZW1ONmVpc0pnbGRuOEkKvvD6g97a5OfPBjXMEo8yX6vUNyjZ1jrp
+            2boxp2qqoO0XUosGbOYZdaq9kIK3J8mONsZZUi54gc5gQ02MX+AvSQ==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2026-02-16T20:06:12Z"
+    mac: ENC[AES256_GCM,data:iQa6SGwLaVaFLYhZa11zvsxDCgFk1Afw7Bv/MVOpEmIS5XPsAtduCOQDdjB5/ItglVFp/6/CvQnqGHB0R7Kfiqby//5fMnuOyNbWLHnYO2r6orUXmQU2NfUMT0G3gjuw/mpNt7BuG/UUQqC66V0/4HeT6xJc9jpNxQUcElc2AH4=,iv:d9JpkZQH2IQt8t45r3jr22ESaonOJWkm+sy95xL2L+g=,tag:k/rMD3Xl73YRycYp6SyXkA==,type:str]
+    encrypted_regex: ^(data|stringData)$
+    version: 3.10.2
+---
+apiVersion: v1
+kind: Service
+metadata:
+    annotations:
+        kubenix/k8s-version: "1.32"
+        kubenix/project-name: ze-homelab
+    name: protonmail-bridge
+    namespace: apps
+spec:
+    ports:
+        - name: smtp
+          port: 25
+          targetPort: 25
+        - name: imap
+          port: 143
+          targetPort: 143
+    selector:
+        app: protonmail-bridge
+sops:
+    age:
+        - recipient: age16yrhmz8fytj7j9ns80zl40zjcdfd3pdxh48ld7ys7veea774udtqfn9jyx
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBNbHI3QU9yVzlNNlUzdndy
+            WHprS3M2N1o0azhKdW5sMnp1dURhNFRaYUNRCjljb3RlR3NrMXM0elhnakdIdDdD
+            cjhabXdPdFZCMW1GTW9zaFdndUZla1UKLS0tIDcvcWVkNTc0TFdMUEVrWFVUYUw2
+            UGVZZVJNU2M3MCtqeHVlMUdvMXJsWGcK2zXDI44kw0UiA3JzBekQvMZ6nAFjhs1Y
+            WhkxUtf1RLQSO6+FIpvszWgnYDQyzxHHPEtHXRC871BQLUtJrndB4w==
+            -----END AGE ENCRYPTED FILE-----
+        - recipient: age1jx9qu5p0ycvymrl2gykd9z3w8x8n67jxnatxs49j7qzspjr6asqqf8u35h
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBZVnJxTUVNMTYzMERGd1NW
+            TVNWbHRDcGZ6VWhDUXNEYzYrbFZKczRiTDMwCjlOcFVCYkNlVmJZVlNMdURDb0tE
+            WGdZOXFYQzc4bVN5RGNNY09pT2E4N1EKLS0tIHhrSitIczEwQ2ppRE00UHdwN3JW
+            UE9tcmxoeEFERFpYa0M4YzdBVmI2WTgKb/j5rhm7NQa2s9QDr6QKmU1Mxf/Vc23g
+            w70agbFWml+9m1AIZIynwFZLpaJ+AqsrGQX9h9hCURjcIyvsV15ZeQ==
+            -----END AGE ENCRYPTED FILE-----
+        - recipient: age1myzhwq67gu5zrfk8fvs0p7mh5fk67d20ltwqf9325ya83lm06ytsyax3j2
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSB3R1FsSVgvQ09uZmx2a1F5
+            S0tERjI0bGlTRHNmcW45UTNMalBTeFN6cWdZCmtqWjdSNEJIcm9ob0RkSXBieTdC
+            MkVIcHRwYmlBNjh0dThsZWpYZVRnMVUKLS0tIFpaL2hzNTI1YzRZcWl2SFNnYzd2
+            WmZaZGVzdnJvZW1ONmVpc0pnbGRuOEkKvvD6g97a5OfPBjXMEo8yX6vUNyjZ1jrp
+            2boxp2qqoO0XUosGbOYZdaq9kIK3J8mONsZZUi54gc5gQ02MX+AvSQ==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2026-02-16T20:06:12Z"
+    mac: ENC[AES256_GCM,data:iQa6SGwLaVaFLYhZa11zvsxDCgFk1Afw7Bv/MVOpEmIS5XPsAtduCOQDdjB5/ItglVFp/6/CvQnqGHB0R7Kfiqby//5fMnuOyNbWLHnYO2r6orUXmQU2NfUMT0G3gjuw/mpNt7BuG/UUQqC66V0/4HeT6xJc9jpNxQUcElc2AH4=,iv:d9JpkZQH2IQt8t45r3jr22ESaonOJWkm+sy95xL2L+g=,tag:k/rMD3Xl73YRycYp6SyXkA==,type:str]
+    encrypted_regex: ^(data|stringData)$
+    version: 3.10.2
