@@ -75,7 +75,7 @@ let
   # Deploy commands
   # ============================================================================
 
-  ddeploy =
+  run_ddeploy =
     mkCommand "run-ddeploy" "Dry deploy host (interactive)" [ pkgs.nix pkgs.fzf deploy-rs-pkg ]
       ''
         AVAILABLE_NODES="$(nix eval --raw .#nodesList --read-only --quiet)"
@@ -90,20 +90,22 @@ let
           --show-trace
       '';
 
-  deploy = mkCommand "run-deploy" "Deploy host (interactive)" [ pkgs.nix pkgs.fzf deploy-rs-pkg ] ''
-    AVAILABLE_NODES="$(nix eval --raw .#nodesList --read-only --quiet)"
-    SEL="$(printf '%s\n' "$AVAILABLE_NODES" | tr -d '\r' | fzf --prompt='host> ' --height=40% --border --preview 'printf "%s\n" {}')"
-    echo "Deploying host: $SEL"
-    deploy \
-      --debug-logs \
-      --auto-rollback true \
-      ".#$SEL" \
-      -- \
-      --impure \
-      --show-trace
-  '';
+  run_deploy =
+    mkCommand "run-deploy" "Deploy host (interactive)" [ pkgs.nix pkgs.fzf deploy-rs-pkg ]
+      ''
+        AVAILABLE_NODES="$(nix eval --raw .#nodesList --read-only --quiet)"
+        SEL="$(printf '%s\n' "$AVAILABLE_NODES" | tr -d '\r' | fzf --prompt='host> ' --height=40% --border --preview 'printf "%s\n" {}')"
+        echo "Deploying host: $SEL"
+        deploy \
+          --debug-logs \
+          --auto-rollback true \
+          ".#$SEL" \
+          -- \
+          --impure \
+          --show-trace
+      '';
 
-  gdeploy =
+  run_gdeploy =
     mkCommand "run-gdeploy" "Deploy hosts by group (interactive)" [ pkgs.nix pkgs.fzf deploy-rs-pkg ]
       ''
         AVAILABLE_GROUPS="$(nix eval --raw .#nodeGroupsList --read-only --quiet)"
@@ -501,9 +503,9 @@ in
     check
     lint
     format
-    ddeploy
-    deploy
-    gdeploy
+    run_ddeploy
+    run_deploy
+    run_gdeploy
     secrets
     manifests
     kubesync

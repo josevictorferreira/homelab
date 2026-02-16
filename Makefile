@@ -11,13 +11,13 @@ check: ## Check if the flake is valid.
 	@nix run .#check
 
 ddeploy: ## Dry deploy host.
-	@nix run .#run-ddeploy
+	@nix run .#run_ddeploy
 
 deploy: ## Deploy host.
-	@nix run .#run-deploy
+	@nix run .#run_deploy
 
 gdeploy: ## Deploy hosts that belong to a group.
-	@nix run .#run-gdeploy
+	@nix run .#run_gdeploy
 
 secrets: ## Edit the secrets files.
 	@nix run .#secrets
