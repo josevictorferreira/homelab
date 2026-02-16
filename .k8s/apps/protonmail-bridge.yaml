@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: protonmail-bridge
+  namespace: apps
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: protonmail-bridge
+  serviceName: protonmail-bridge
+  template:
+    metadata:
+      labels:
+        app: protonmail-bridge
+    spec:
+      containers:
+        - image: shenxn/protonmail-bridge:build
+          name: protonmail-bridge
+          ports:
+            - containerPort: 25
+              name: smtp
+            - containerPort: 143
+              name: imap
+          readinessProbe:
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            tcpSocket:
+              port: 143
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 256Mi
+          volumeMounts:
+            - mountPath: /root
+              name: data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: protonmail-bridge
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: protonmail-bridge
+  namespace: apps
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: rook-ceph-block
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: protonmail-bridge
+  namespace: apps
+spec:
+  ports:
+    - name: smtp
+      port: 25
+      targetPort: 25
+    - name: imap
+      port: 143
+      targetPort: 143
+  selector:
+    app: protonmail-bridge
