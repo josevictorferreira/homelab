@@ -60,7 +60,7 @@ spec:
             - name: ELEVENLABS_API_KEY
               valueFrom:
                 secretKeyRef:
-                  key: elevenlabs_api_key
+                  key: ELEVENLABS_API_KEY
                   name: openclaw-secrets
             - name: GEMINI_API_KEY
               valueFrom:
