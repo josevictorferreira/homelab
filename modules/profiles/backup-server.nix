@@ -130,6 +130,7 @@ in
         curl
         coreutils
         jq
+        getent # required by mc to resolve config dir
       ];
       script = ''
         ## Wait for MinIO readiness (up to 60s)
@@ -161,12 +162,11 @@ in
           # Enable versioning (required for some ILM features)
           mc version enable "pi/$b" 2>/dev/null || true
 
-          # Remove existing expire-14d rule if present, then re-add
-          mc ilm rule rm "pi/$b" --id "expire-14d" 2>/dev/null || true
-          mc ilm rule add "pi/$b" \
-            --id "expire-14d" \
-            --expiry-days 14 \
-            --noncurrent-expire-days 14 || true
+          # Add expiry rule (idempotent — adds if none exists)
+          mc ilm rule add \
+            --expire-days 14 \
+            --noncurrent-expire-days 14 \
+            "pi/$b" || true
           echo "ILM expire-14d on $b OK"
         done
 
