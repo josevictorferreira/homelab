@@ -1,0 +1,2 @@
+ILM Rule: expire-days 14, noncurrent-expire-days 14
+Source: modules/profiles/backup-server.nix minio-bootstrap - mc ilm rule add --expire-days 14 --noncurrent-expire-days 14 pi/homelab-backup-postgres

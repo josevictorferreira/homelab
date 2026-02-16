@@ -1,0 +1,4 @@
+Bucket: homelab-backup-postgres
+Status: EXISTS (provisioned by minio-bootstrap systemd service on lab-pi-bk)
+Source: modules/profiles/backup-server.nix minio-bootstrap oneshot
+Versioning: enabled
