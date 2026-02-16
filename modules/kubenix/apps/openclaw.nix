@@ -113,6 +113,16 @@ in
             ];
             deny = [ ];
           };
+          messages = {
+            # ackReactionScope = "group-mentions";
+            tts = {
+              auto = "always";
+              provider = "elevenlabs";
+              elevenlabs = {
+                apiKey = "\${ELEVENLABS_API_KEY}";
+              };
+            };
+          };
           plugins = {
             allow = [ "matrix" ];
           };
