@@ -14,9 +14,12 @@
   boot.kernelModules = [ "usb_storage" ];
   boot.extraModulePackages = [ ];
 
-  # Blacklist UAS driver — SanDisk USB drives crash with UAS on Pi 4B's VL805 controller.
-  # Forces fallback to usb-storage (BOT protocol) which is stable.
+  # SanDisk Extreme Pro (0781:55af) + Pi 4B VL805 USB controller workarounds:
+  # - Blacklist UAS driver (crashes with SCSI INQUIRY timeouts)
+  # - Force usb-storage quirk "u" flag (ignore UAS, use BOT protocol) so
+  #   the builtin usb-storage driver auto-binds at boot
   boot.blacklistedKernelModules = [ "uas" ];
+  boot.kernelParams = [ "usb-storage.quirks=0781:55af:u" ];
   boot.modprobeConfig.enable = true;
 
   fileSystems."/" =
