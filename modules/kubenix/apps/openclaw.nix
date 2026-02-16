@@ -4,6 +4,42 @@ let
   namespace = homelab.kubernetes.namespaces.applications;
 in
 {
+  # RBAC: full cluster access for OpenClaw pod
+  kubernetes.resources.serviceAccounts.openclaw = {
+    metadata.namespace = namespace;
+  };
+
+  kubernetes.resources.clusterRoles.openclaw-cluster-admin = {
+    metadata = { };
+    rules = [
+      {
+        apiGroups = [ "*" ];
+        resources = [ "*" ];
+        verbs = [ "*" ];
+      }
+      {
+        nonResourceURLs = [ "*" ];
+        verbs = [ "*" ];
+      }
+    ];
+  };
+
+  kubernetes.resources.clusterRoleBindings.openclaw-cluster-admin = {
+    metadata = { };
+    roleRef = {
+      apiGroup = "rbac.authorization.k8s.io";
+      kind = "ClusterRole";
+      name = "openclaw-cluster-admin";
+    };
+    subjects = [
+      {
+        kind = "ServiceAccount";
+        name = "openclaw";
+        inherit namespace;
+      }
+    ];
+  };
+
   submodules.instances.openclaw = {
     submodule = "release";
     args = {
@@ -161,6 +197,8 @@ in
           };
           env = {
             MOONSHOT_API_KEY = "\${MOONSHOT_API_KEY}";
+            ELEVENLABS_API_KEY = "\${ELEVENLABS_API_KEY}";
+            OPENROUTER_API_KEY = "\${OPENCLAW_MATRIX_TOKEN}";
           };
           models = {
             mode = "merge";
@@ -190,6 +228,8 @@ in
           runAsUser = 0;
           runAsGroup = 0;
         };
+        controllers.main.serviceAccount.name = "openclaw";
+        defaultPodOptions.automountServiceAccountToken = true;
         controllers.main.pod.dnsPolicy = "None";
         controllers.main.pod.dnsConfig = {
           nameservers = [
