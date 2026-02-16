@@ -218,16 +218,17 @@ spec:
               \ /home/node/.local/bin/gemini\n          echo \"Gemini CLI installed\
               \ successfully\"\n        else\n          echo \"Gemini CLI already\
               \ exists, skipping...\"\n        fi\n\n# Install whisper.cpp (compile\
-              \ from source since no binaries available)\nif [ ! -f /home/node/.local/bin/whisper\
-              \ ]; then\n  echo \"Installing whisper.cpp...\"\n  apt-get update &&\
-              \ apt-get install -y git build-essential\n  cd /tmp\n  git clone --depth\
-              \ 1 https://github.com/ggerganov/whisper.cpp.git\n  cd whisper.cpp\n\
-              \  make -j$(nproc)\n  cp main /home/node/.local/bin/whisper\n  cd /\n\
-              \  rm -rf /tmp/whisper.cpp\nfi\n\n        # Download whisper model if\
-              \ not exists\n        mkdir -p /home/node/.local/share/whisper\n   \
-              \     if [ ! -f /home/node/.local/share/whisper/ggml-base.bin ]; then\n\
-              \          echo \"Downloading whisper base model...\"\n          curl\
-              \ -fsSL -o /home/node/.local/share/whisper/ggml-base.bin \"https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.bin\"\
+              \ from source since no binaries available)\n        if [ ! -f /home/node/.local/bin/whisper\
+              \ ]; then\n          echo \"Installing whisper.cpp...\"\n          apt-get\
+              \ update && apt-get install -y git build-essential cmake\n  cd /tmp\n\
+              \  git clone --depth 1 https://github.com/ggerganov/whisper.cpp.git\n\
+              \  cd whisper.cpp\n  make -j$(nproc)\n  cp main /home/node/.local/bin/whisper\n\
+              \  cd /\n  rm -rf /tmp/whisper.cpp\nfi\n\n        # Download whisper\
+              \ model if not exists\n        mkdir -p /home/node/.local/share/whisper\n\
+              \        if [ ! -f /home/node/.local/share/whisper/ggml-base.bin ];\
+              \ then\n          echo \"Downloading whisper base model...\"\n     \
+              \     curl -fsSL -o /home/node/.local/share/whisper/ggml-base.bin \"\
+              https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.bin\"\
               \n          echo \"Whisper base model downloaded successfully\"\n  \
               \      else\n          echo \"Whisper base model already exists, skipping...\"\
               \n        fi\n\n        # Set ownership\n        chown -R 1000:1000\
