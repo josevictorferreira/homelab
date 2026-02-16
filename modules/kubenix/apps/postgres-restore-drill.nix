@@ -18,6 +18,9 @@ let
     set -euo pipefail
     echo "=== Postgres restore drill starting ==="
 
+    # Scratch postgres password (ephemeral, matches POSTGRESQL_PASSWORD on scratch-postgres container)
+    export PGPASSWORD="scratch-drill"
+
     echo "Waiting for scratch Postgres to accept connections..."
     for i in $(seq 1 60); do
       if psql -h localhost -U postgres -Atc "SELECT 1" 2>/dev/null | grep -q 1; then

@@ -41,15 +41,15 @@ Implement Phase 3 of the backup strategy: Filesystem & K8s Objects (Velero).
 Deploy a functional Velero instance that backs up K8s resources and marked PVCs to the off-site Pi MinIO.
 
 ### Concrete Deliverables
-- [ ] `modules/kubenix/apps/velero.nix`
-- [ ] `modules/kubenix/apps/velero-config.enc.nix`
-- [ ] Verified backups in MinIO
+- [x] `modules/kubenix/apps/velero.nix`
+- [x] `modules/kubenix/apps/velero-config.enc.nix`
+- [x] Verified backups in MinIO
 
 ### Definition of Done
-- [ ] `kubectl get pod -n velero` shows Running
-- [ ] `velero backup-location get` shows Available
-- [ ] Manual backup completes successfully
-- [ ] Data verified in MinIO bucket
+- [x] `kubectl get pod -n velero` shows Running
+- [x] `velero backup-location get` shows Available
+- [x] Manual backup completes successfully
+- [x] Data verified in MinIO bucket
 
 ### Must Have
 - Kopia/FSB enabled (`deployNodeAgent: true`)
@@ -104,7 +104,7 @@ Critical Path: Task 1 → Task 2/3 → Task 4 → Task 5
 
 ## TODOs
 
-- [ ] 1. **Add Secrets to k8s-secrets.enc.yaml**
+- [x] 1. **Add Secrets to k8s-secrets.enc.yaml**
 
   **What to do**:
   - Instruct user to run `make secrets` and add `minio_velero_access_key_id` and `minio_velero_secret_access_key`.
@@ -125,7 +125,7 @@ Critical Path: Task 1 → Task 2/3 → Task 4 → Task 5
     Expected Result: Returns both keys (exit code 0)
   ```
 
-- [ ] 2. **Create Velero Config Module**
+- [x] 2. **Create Velero Config Module**
 
   **What to do**:
   - Create `modules/kubenix/apps/velero-config.enc.nix`.
@@ -148,7 +148,7 @@ Critical Path: Task 1 → Task 2/3 → Task 4 → Task 5
     Expected Result: Success (or at least valid Nix syntax check)
   ```
 
-- [ ] 3. **Create Velero App Module**
+- [x] 3. **Create Velero App Module**
 
   **What to do**:
   - Create `modules/kubenix/apps/velero.nix`.
@@ -174,7 +174,7 @@ Critical Path: Task 1 → Task 2/3 → Task 4 → Task 5
       2. Check for "deployNodeAgent" = true
   ```
 
-- [ ] 4. **Deploy Velero**
+- [x] 4. **Deploy Velero**
 
   **What to do**:
   - Run `make manifests`.
@@ -195,7 +195,7 @@ Critical Path: Task 1 → Task 2/3 → Task 4 → Task 5
     Expected Result: velero-server and node-agent pods Running
   ```
 
-- [ ] 5. **Verify Backup & Restore**
+- [x] 5. **Verify Backup & Restore**
 
   **What to do**:
   - Trigger manual backup: `velero backup create verification-test --wait`.
@@ -220,13 +220,13 @@ Critical Path: Task 1 → Task 2/3 → Task 4 → Task 5
 
 ## Final Verification Wave
 
-- [ ] F1. **Plan Compliance Audit**
+- [x] F1. **Plan Compliance Audit**
   Verify all files created and secrets referenced correctly.
-  Output: `VERDICT: APPROVE/REJECT`
+  Output: `VERDICT: APPROVE`
 
-- [ ] F2. **Functional Check**
+- [x] F2. **Functional Check**
   Verify backup capability.
-  Output: `Backup [PASS/FAIL] | Restore [SKIPPED] | VERDICT`
+  Output: `Backup [PASS] | Restore [SKIPPED] | VERDICT: APPROVE`
 
 ---
 
@@ -239,7 +239,7 @@ kubectl get pods -n velero
 ```
 
 ### Final Checklist
-- [ ] Secrets added
-- [ ] Velero deployed
-- [ ] Node Agent running
-- [ ] Backup verified in MinIO
+- [x] Secrets added
+- [x] Velero deployed
+- [x] Node Agent running
+- [x] Backup verified in MinIO
