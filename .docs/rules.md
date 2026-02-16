@@ -70,6 +70,20 @@
 **Context:** Kubenix ignores `_*` files to allow WIP/disabled modules. Forgotten underscore = missing deployment.
 **Verify:** `ls modules/kubenix/apps/*.nix | grep -v "^_"` shows all active modules
 
+## NixOS Systemd Services
+
+### Systemd PATH Is Minimal — Explicitly Declare All Binary Dependencies
+**Lesson:** NixOS systemd services have a stripped PATH. If a script calls a tool indirectly (e.g., `mc` calls `getent`), add the transitive dependency to `path = [ pkgs.getent ]`. Always test with a deploy, not just `make check`.
+**Context:** `mc` (minio-client) calls `getent` internally to resolve home dir. `pkgs.getent` is a separate package from `glibc.bin` on aarch64. `make check` won't catch missing runtime PATH deps.
+**Verify:** After deploy: `journalctl -u <service> --no-pager | grep -i "not found\|error"`
+
+### MinIO Client (`mc`) CLI Flags Vary by Version
+**Lesson:** Always check `mc <subcommand> --help` on the target host before scripting `mc` commands. Flags like `--id` for `mc ilm rule add` don't exist in all versions; use only what `--help` confirms.
+**Context:** `mc ilm rule add --id expire-14d --expire-days 14` fails silently (unknown flag). The correct form is `mc ilm rule add --expire-days 14 pi/bucket`.
+**Verify:** `ssh root@<host> 'mc <subcommand> --help'` before writing bootstrap scripts
+
+## Mautrix Bridge Configuration
+
 ### mautrix-discord Bot Token Login Process
 **Lesson:** Unlike WhatsApp bridge, mautrix-discord requires interactive login via Matrix - the bot token cannot be pre-configured in the config file.
 **Context:** The Discord bot token (`mautrix_discord_bot_token`) is stored in SOPS for reference but must be provided interactively. After deployment, users must:
@@ -79,3 +93,17 @@
 4. In Matrix, start a DM with `@discordbot:josevictor.me`
 5. Send: `login bot <token>`
 **Verify:** Bridge shows as "connected" in pod logs after login
+
+## ProtonMail Bridge Deployment
+
+### Password Store Initialization Required
+**Lesson:** ProtonMail Bridge requires `pass` password manager initialized with GPG key before first run. Add an init container to generate GPG key and run `pass init`.
+**Context:** The bridge stores credentials using `pass` which needs a GPG key. Without initialization, bridge fails with "pass not initialized: exit status 1: Error: password store is empty."
+**Verify:** Init container logs show "pass initialized successfully" and bridge logs show "Generating bridge vault key"
+
+## Flux GitOps
+
+### Flux Kustomize Failures Require Manual Intervention
+**Lesson:** When Flux kustomize fails with duplicate resource errors, use `kubectl apply -f <manifest>` directly instead of waiting for GitOps reconciliation.
+**Context:** Flux may fail with "may not add resource with an already registered id" errors due to kustomization issues. Manual apply bypasses the problem while keeping manifests in git.
+**Verify:** `kubectl get pod -n <ns>` shows resources running after manual apply
