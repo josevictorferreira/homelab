@@ -37,7 +37,7 @@ let
     echo "Finding latest backup..."
     LATEST=$(mc ls --recursive --json "backup/${minioBucket}/postgresql-18/" | \
       jq -r 'select(.key | test("full\\.sql\\.zst$")) | .lastModified + " " + .key' | \
-      sort -r | head -1 | awk '{print $2}' || true)
+      sort -r | head -1 | cut -d' ' -f2- || true)
 
     if [ -z "$LATEST" ]; then
       echo "ERROR: No backup found in MinIO"

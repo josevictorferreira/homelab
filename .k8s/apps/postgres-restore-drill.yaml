@@ -55,8 +55,8 @@ spec:
                   \ \"$AWS_SECRET_ACCESS_KEY\"\n\necho \"Finding latest backup...\"\
                   \nLATEST=$(mc ls --recursive --json \"backup/homelab-backup-postgres/postgresql-18/\"\
                   \ | \\\n  jq -r 'select(.key | test(\"full\\\\.sql\\\\.zst$\"))\
-                  \ | .lastModified + \" \" + .key' | \\\n  sort -r | head -1 | awk\
-                  \ '{print $2}' || true)\n\nif [ -z \"$LATEST\" ]; then\n  echo \"\
+                  \ | .lastModified + \" \" + .key' | \\\n  sort -r | head -1 | cut\
+                  \ -d' ' -f2- || true)\n\nif [ -z \"$LATEST\" ]; then\n  echo \"\
                   ERROR: No backup found in MinIO\"\n  exit 1\nfi\necho \"Latest backup:\
                   \ $LATEST\"\n\nLATEST_DIR=$(dirname \"$LATEST\")\n\necho \"Downloading\
                   \ backup + checksum...\"\nmc cp \"backup/homelab-backup-postgres/$LATEST\"\
