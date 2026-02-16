@@ -250,6 +250,12 @@ in
             key = "OPENCLAW_MATRIX_TOKEN";
           };
         };
+        controllers.main.containers.main.env.ELEVENLABS_API_KEY = {
+          valueFrom.secretKeyRef = {
+            name = "openclaw-secrets";
+            key = "elevenlabs_api_key";
+          };
+        };
         controllers.main.containers.tailscale = {
           image = {
             repository = "tailscale/tailscale";
@@ -327,10 +333,12 @@ in
               mkdir -p /home/node/.local/bin
               chown -R 1000:1000 /home/node/.local
 
+              # Install curl first (needed for all downloads)
+              apt-get update && apt-get install -y curl xz-utils
+
               # Install ffmpeg
               if [ ! -f /home/node/.local/bin/ffmpeg ]; then
                 echo "Installing ffmpeg..."
-                apt-get update && apt-get install -y curl xz-utils
                 # Download from John Van Sickle (reliable static builds)
                 curl -fsSL -o /tmp/ffmpeg.tar.xz "https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz"
                 tar -xf /tmp/ffmpeg.tar.xz -C /tmp/
