@@ -54,6 +54,9 @@ in
         # Already imported — nothing to do
         if zpool list backup-pool &>/dev/null; then
           echo "backup-pool already imported"
+          zfs set mountpoint=none backup-pool 2>/dev/null || true
+          zfs set mountpoint=/mnt/backups backup-pool/data 2>/dev/null || true
+          zfs mount -a 2>/dev/null || true
           exit 0
         fi
 
@@ -61,7 +64,13 @@ in
         for i in $(seq 1 180); do
           if zpool import -d /dev/disk/by-id 2>/dev/null | grep -q "backup-pool"; then
             echo "backup-pool found, importing..."
-            zpool import -d /dev/disk/by-id -N backup-pool && exit 0
+            if zpool import -d /dev/disk/by-id -f backup-pool; then
+              echo "Pool imported, setting mountpoint..."
+              zfs set mountpoint=none backup-pool
+              zfs set mountpoint=/mnt/backups backup-pool/data
+              zfs mount -a 2>/dev/null || true
+              exit 0
+            fi
             echo "Import attempt failed, retrying..."
           fi
           sleep 1
@@ -70,18 +79,6 @@ in
         echo "WARNING: backup-pool not found after 180s" >&2
         exit 1
       '';
-    };
-
-    # Mount with nofail — boot NEVER blocks on this
-    fileSystems."/mnt/backups" = {
-      device = "backup-pool";
-      fsType = "zfs";
-      options = [
-        "nofail"
-        "noauto"
-        "x-systemd.requires=zpool-import-backup.service"
-        "x-systemd.after=zpool-import-backup.service"
-      ];
     };
 
     services.nfs.server = {
@@ -97,13 +94,10 @@ in
       rootCredentialsFile = "/run/secrets/minio_credentials";
     };
 
-    # MinIO only starts after ZFS mount succeeds
+    # MinIO only starts after ZFS pool is imported and mounted
     systemd.services.minio = {
-      after = [
-        "mnt-backups.mount"
-        "zpool-import-backup.service"
-      ];
-      requires = [ "mnt-backups.mount" ];
+      after = [ "zpool-import-backup.service" ];
+      requires = [ "zpool-import-backup.service" ];
     };
 
     services.wakeOnLanObserver = {
