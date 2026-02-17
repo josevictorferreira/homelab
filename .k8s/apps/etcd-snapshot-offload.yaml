@@ -1,0 +1,70 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/name: etcd-snapshot-offload
+  name: etcd-snapshot-offload
+  namespace: apps
+spec:
+  concurrencyPolicy: Forbid
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 600
+      backoffLimit: 1
+      template:
+        spec:
+          containers:
+            - command:
+                - /bin/sh
+                - -c
+                - "#!/bin/sh\nset -euo pipefail\n\necho \"=== etcd snapshot offload:\
+                  \ $(date -Iseconds) ===\"\n\n# Configure mc alias\nmc alias set\
+                  \ backup http://10.10.10.209:9000 \"$AWS_ACCESS_KEY_ID\" \"$AWS_SECRET_ACCESS_KEY\"\
+                  \n\n# Get hostname for path partitioning\nNODE=$(cat /etc/hostname\
+                  \ 2>/dev/null || hostname)\n\necho \"Node: $NODE\"\necho \"Scanning\
+                  \ snapshots in /snapshots/ ...\"\n\nUPLOADED=0\nSKIPPED=0\n\nfor\
+                  \ snap in /snapshots/etcd-snapshot-*; do\n  [ -f \"$snap\" ] ||\
+                  \ continue\n  FILENAME=$(basename \"$snap\")\n  REMOTE_PATH=\"backup/homelab-backup-etcd/$NODE/$FILENAME\"\
+                  \n\n  # Skip if already uploaded (idempotent)\n  if mc stat \"$REMOTE_PATH\"\
+                  \ >/dev/null 2>&1; then\n    SKIPPED=$((SKIPPED + 1))\n    continue\n\
+                  \  fi\n\n  echo \"Uploading: $FILENAME\"\n  mc cp \"$snap\" \"$REMOTE_PATH\"\
+                  \n  UPLOADED=$((UPLOADED + 1))\ndone\n\necho \"=== Done: uploaded=$UPLOADED\
+                  \ skipped=$SKIPPED ===\"\n"
+              envFrom:
+                - secretRef:
+                    name: etcd-snapshot-offload-s3-credentials
+              image: ghcr.io/josevictorferreira/backup-toolbox@sha256:143dc0beafb3865fdd37d5a85bb814654063061af96e610ea53a2e9900c2da55
+              name: offload
+              resources:
+                limits:
+                  cpu: 500m
+                  memory: 256Mi
+                requests:
+                  cpu: 100m
+                  memory: 128Mi
+              volumeMounts:
+                - mountPath: /snapshots
+                  name: etcd-snapshots
+                  readOnly: true
+          nodeSelector:
+            node-role.kubernetes.io/master: 'true'
+          restartPolicy: Never
+          tolerations:
+            - effect: NoSchedule
+              key: node-role.kubernetes.io/master
+              operator: Exists
+            - effect: NoSchedule
+              key: node-role.kubernetes.io/control-plane
+              operator: Exists
+          volumes:
+            - hostPath:
+                path: /var/lib/rancher/k3s/server/db/snapshots
+                type: Directory
+              name: etcd-snapshots
+  schedule: 30 */12 * * *
+  successfulJobsHistoryLimit: 3
+  timeZone: America/Sao_Paulo
