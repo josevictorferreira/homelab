@@ -198,6 +198,8 @@ in
               };
 
               # Bridge settings
+              # NOTE: mautrix-whatsapp does NOT support room_name_template (GitHub issue #795 open)
+              # Only user displayname_template is available in the network section above
               bridge = {
                 username_template = "whatsapp_{{.}}";
                 command_prefix = "!wa";
@@ -298,6 +300,9 @@ in
               };
               bridge = {
                 username_template = "discord_{{.}}";
+                # Room naming pattern: discord/servername/channelname
+                channel_name_template = "discord/{{.GuildName}}/{{if or (eq .Type 3) (eq .Type 4)}}{{.Name}}{{else}}{{.Name}}{{end}}";
+                guild_name_template = "{{.Name}}";
                 command_prefix = "!dc";
                 permissions = {
                   "*" = "relay";
@@ -386,6 +391,13 @@ in
                 as_token = kubenix.lib.secretsInlineFor "mautrix_slack_as_token";
                 hs_token = kubenix.lib.secretsInlineFor "mautrix_slack_hs_token";
                 username_template = "slack_{{.}}";
+              };
+
+              # Slack connector settings (bridgev2 format)
+              connector = {
+                # Room naming pattern: slack/workspacename/channelname
+                channel_name_template = "slack/{{.Team.Name}}/{{.Name}}";
+                team_name_template = "{{.Name}}";
               };
 
               bridge = {
