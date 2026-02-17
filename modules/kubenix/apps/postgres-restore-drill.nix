@@ -137,7 +137,7 @@ in
       failedJobsHistoryLimit = 3;
       jobTemplate.spec = {
         backoffLimit = 1;
-        activeDeadlineSeconds = 1200;
+        activeDeadlineSeconds = 2700;
         template.spec = {
           restartPolicy = "Never";
           imagePullSecrets = [
