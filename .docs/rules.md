@@ -134,3 +134,15 @@
 **Lesson:** To enable PVC filesystem backups, explicitly set `deployNodeAgent: true` in Velero Helm chart values.
 **Context:** Default chart values may disable the node agent (formerly Restic daemonset), preventing FS backups.
 **Verify:** `kubectl get pods -n velero -l name=node-agent` shows running pods.
+
+## Postgres Backup & Restore Drill
+
+### Use Trust Auth for Ephemeral Scratch Postgres
+**Lesson:** Always use `ALLOW_EMPTY_PASSWORD=yes` + `POSTGRESQL_ENABLE_TRUST_AUTH=yes` for scratch/ephemeral Bitnami postgres. `pg_dumpall` includes `ALTER ROLE postgres WITH PASSWORD` which changes the scratch password mid-restore, breaking subsequent `\connect` commands. Trust auth eliminates all password issues. `ALLOW_EMPTY_PASSWORD` is required separately for Bitnami entrypoint to start.
+**Context:** Three approaches failed before trust auth: scratch-only password (breaks after ALTER ROLE), prod password (breaks initial connect), ON_ERROR_STOP removal (masks real errors).
+**Verify:** Check scratch-postgres container env has both `ALLOW_EMPTY_PASSWORD=yes` and `POSTGRESQL_ENABLE_TRUST_AUTH=yes`
+
+### Size activeDeadlineSeconds for Large SQL Restores
+**Lesson:** For `pg_dumpall` restore jobs, set `activeDeadlineSeconds` to 3x the expected restore time. A 1.5 GiB uncompressed dump takes ~25-30 min on emptyDir-backed scratch postgres. Current setting: 2700s (45min).
+**Context:** 1200s (20min) caused DeadlineExceeded on a job that was actively restoring successfully. Waiting 20+ min only to hit a timeout wastes significant debugging time.
+**Verify:** `grep activeDeadlineSeconds modules/kubenix/apps/postgres-restore-drill.nix` — should be ≥ 2700
