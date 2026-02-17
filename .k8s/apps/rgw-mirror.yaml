@@ -1,0 +1,75 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: rgw-mirror
+  namespace: apps
+spec:
+  concurrencyPolicy: Forbid
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        spec:
+          containers:
+            - args:
+                - "set -euo pipefail\necho \"=== RGW → MinIO mirror starting ===\"\
+                  \nDATE=$(date +%Y/%m/%d)\nFAILED=0\nREPORT=/tmp/sync-report.txt\n\
+                  : > \"$REPORT\"\n\nexport RCLONE_CONFIG_RGW_TYPE=s3\nexport RCLONE_CONFIG_RGW_PROVIDER=Ceph\n\
+                  export RCLONE_CONFIG_RGW_ENDPOINT=\"http://rook-ceph-rgw-ceph-objectstore.rook-ceph.svc.cluster.local\"\
+                  \nexport RCLONE_CONFIG_RGW_NO_CHECK_BUCKET=true\n\nexport RCLONE_CONFIG_MINIO_TYPE=s3\n\
+                  export RCLONE_CONFIG_MINIO_PROVIDER=Minio\nexport RCLONE_CONFIG_MINIO_ENDPOINT=\"\
+                  http://10.10.10.209:9000\"\n\nBUCKETS=\"imgproxy linkwarden-files\
+                  \ n8n-files open-webui-files valoris-s3\"\n\nfor BUCKET in $BUCKETS;\
+                  \ do\n  echo \"--- Syncing $BUCKET ---\"\n  if rclone sync \"rgw:$BUCKET\"\
+                  \ \"minio:homelab-backup-rgw/$BUCKET\" \\\n    --checksum \\\n \
+                  \   --delete-after \\\n    --retries 10 \\\n    --retries-sleep\
+                  \ 5s \\\n    --transfers 4 \\\n    --checkers 8 \\\n    --stats-one-line\
+                  \ \\\n    --stats 30s \\\n    --log-level INFO 2>&1 | tee \"/tmp/rclone-$BUCKET.log\"\
+                  ; then\n    echo \"OK  $BUCKET\" >> \"$REPORT\"\n  else\n    echo\
+                  \ \"FAIL $BUCKET\" >> \"$REPORT\"\n    FAILED=$(($FAILED + 1))\n\
+                  \  fi\ndone\n\necho \"--- Uploading report ---\"\nrclone copy \"\
+                  $REPORT\" \"minio:homelab-backup-rgw/_reports/$DATE/\" \\\n  --log-level\
+                  \ INFO\n\nif [ \"$FAILED\" -gt 0 ]; then\n  echo \"=== $FAILED bucket(s)\
+                  \ failed ===\"\n  cat \"$REPORT\"\n  exit 1\nfi\n\necho \"=== RGW\
+                  \ → MinIO mirror complete ===\"\ncat \"$REPORT\"\n"
+              command:
+                - sh
+                - -c
+              env:
+                - name: RCLONE_CONFIG_RGW_ACCESS_KEY_ID
+                  valueFrom:
+                    secretKeyRef:
+                      key: RCLONE_CONFIG_RGW_ACCESS_KEY_ID
+                      name: rgw-mirror-s3-credentials
+                - name: RCLONE_CONFIG_RGW_SECRET_ACCESS_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      key: RCLONE_CONFIG_RGW_SECRET_ACCESS_KEY
+                      name: rgw-mirror-s3-credentials
+                - name: RCLONE_CONFIG_MINIO_ACCESS_KEY_ID
+                  valueFrom:
+                    secretKeyRef:
+                      key: RCLONE_CONFIG_MINIO_ACCESS_KEY_ID
+                      name: rgw-mirror-s3-credentials
+                - name: RCLONE_CONFIG_MINIO_SECRET_ACCESS_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      key: RCLONE_CONFIG_MINIO_SECRET_ACCESS_KEY
+                      name: rgw-mirror-s3-credentials
+              image: rclone/rclone@sha256:0000000000000000000000000000000000000000000000000000000000000000
+              name: rgw-mirror
+              resources:
+                limits:
+                  cpu: '1'
+                  memory: 512Mi
+                requests:
+                  cpu: 200m
+                  memory: 256Mi
+          restartPolicy: OnFailure
+  schedule: 0 4 * * *
+  successfulJobsHistoryLimit: 3
+  timeZone: America/Sao_Paulo

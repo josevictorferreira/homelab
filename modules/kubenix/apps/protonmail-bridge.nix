@@ -109,7 +109,7 @@ in
                   command = [
                     "sh"
                     "-c"
-                    "apt-get update && apt-get install -y libfido2-1 && sh /protonmail/entrypoint.sh"
+                    "apt-get update && apt-get install -y libfido2-1 && echo 'Bridge ready - run: /protonmail/proton-bridge --cli' && sleep infinity"
                   ];
                   ports = [
                     {
