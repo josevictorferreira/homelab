@@ -18,10 +18,10 @@ spec:
         app: protonmail-bridge
     spec:
       containers:
-        - args:
+        - command:
             - sh
             - -c
-            - apt-get update && apt-get install -y libfido2-1 && exec /protonmail/entrypoint.sh
+            - apt-get update && apt-get install -y libfido2-1 && sh /protonmail/entrypoint.sh
           image: shenxn/protonmail-bridge:build
           name: protonmail-bridge
           ports:
@@ -41,6 +41,8 @@ spec:
             requests:
               cpu: 100m
               memory: 256Mi
+          stdin: true
+          tty: true
           volumeMounts:
             - mountPath: /root
               name: data
