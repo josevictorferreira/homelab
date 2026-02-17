@@ -109,7 +109,37 @@ in
                   command = [
                     "sh"
                     "-c"
-                    "apt-get update && apt-get install -y libfido2-1 && echo 'Bridge ready - run: /protonmail/proton-bridge --cli' && sleep infinity"
+                    ''
+                      set -e
+
+                      # Install required libraries and socat for proxy
+                      apt-get update
+                      apt-get install -y libfido2-1 socat
+
+                      echo "Starting ProtonMail Bridge..."
+
+                      # Start bridge in background
+                      /protonmail/proton-bridge --noninteractive &
+                      BRIDGE_PID=$!
+
+                      # Wait for bridge to start listening
+                      sleep 5
+
+                      echo "Bridge started on PID $BRIDGE_PID"
+                      echo "Setting up port forwarding..."
+
+                      # Forward external 0.0.0.0:143 -> 127.0.0.1:1143
+                      socat TCP-LISTEN:143,fork,reuseaddr TCP:127.0.0.1:1143 &
+
+                      # Forward external 0.0.0.0:25 -> 127.0.0.1:1025
+                      socat TCP-LISTEN:25,fork,reuseaddr TCP:127.0.0.1:1025 &
+
+                      echo "Port forwarding active: 143->1143, 25->1025"
+                      echo "Bridge is ready for connections"
+
+                      # Wait for bridge process
+                      wait $BRIDGE_PID
+                    ''
                   ];
                   ports = [
                     {
