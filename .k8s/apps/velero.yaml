@@ -17,10 +17,6 @@ spec:
       name: node-agent
   template:
     metadata:
-      annotations:
-        prometheus.io/path: /metrics
-        prometheus.io/port: '8085'
-        prometheus.io/scrape: 'true'
       labels:
         app.kubernetes.io/instance: velero
         app.kubernetes.io/managed-by: Helm
@@ -115,10 +111,6 @@ spec:
     type: Recreate
   template:
     metadata:
-      annotations:
-        prometheus.io/path: /metrics
-        prometheus.io/port: '8085'
-        prometheus.io/scrape: 'true'
       labels:
         app.kubernetes.io/instance: velero
         app.kubernetes.io/managed-by: Helm
@@ -331,6 +323,59 @@ metadata:
     helm.sh/chart: velero-11.3.2
   name: velero-server-upgrade-crds
   namespace: velero
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: velero
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: velero
+    helm.sh/chart: velero-11.3.2
+  name: node-agent
+  namespace: velero
+spec:
+  namespaceSelector:
+    matchNames:
+      - velero
+  podMetricsEndpoints:
+    - interval: 30s
+      port: http-monitoring
+      scrapeTimeout: 10s
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: velero
+      app.kubernetes.io/name: velero
+      name: node-agent
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: velero
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: velero
+    helm.sh/chart: velero-11.3.2
+  name: velero
+  namespace: velero
+spec:
+  endpoints:
+    - interval: 30s
+      port: http-monitoring
+      scrapeTimeout: 10s
+  namespaceSelector:
+    matchNames:
+      - velero
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: velero
+      app.kubernetes.io/name: velero
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole

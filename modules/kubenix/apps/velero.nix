@@ -22,6 +22,18 @@ in
 
       deployNodeAgent = true;
 
+      metrics = {
+        enabled = true;
+        scrapeInterval = "30s";
+        serviceMonitor = {
+          enabled = true;
+          autodetect = true;
+        };
+        nodeAgentPodMonitor = {
+          enabled = true;
+        };
+      };
+
       credentials = {
         useSecret = true;
         existingSecret = "velero-s3-credentials";
