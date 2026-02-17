@@ -1,5 +1,6 @@
 { lib
 , config
+, pkgs
 , hostName
 , hostConfig
 , homelab
@@ -70,6 +71,16 @@ in
       mode = "0400";
     };
 
+    # MinIO credentials for etcd snapshot offload
+    sops.secrets.minio_etcd_access_key_id = {
+      owner = "root";
+      mode = "0400";
+    };
+    sops.secrets.minio_etcd_secret_access_key = {
+      owner = "root";
+      mode = "0400";
+    };
+
     services.k3s = {
       enable = serviceEnabled;
       role = "server";
@@ -132,6 +143,92 @@ in
         fi
         sync
         echo -e "\n => reboot now to complete k3s cleanup!"
+      '';
+    };
+
+    systemd.timers.k3s-etcd-offload = {
+      description = "Upload k3s etcd snapshots to MinIO";
+      wantedBy = [ "timers.target" ];
+      after = [ "k3s.service" ];
+      timerConfig = {
+        OnCalendar = "hourly";
+        RandomizedDelaySec = "15m";
+        Persistent = true;
+      };
+    };
+
+    systemd.services.k3s-etcd-offload = {
+      description = "Upload k3s etcd snapshots to MinIO";
+      after = [ "k3s.service" "network-online.target" ];
+      wants = [ "network-online.target" ];
+      serviceConfig = {
+        Type = "oneshot";
+        ReadOnlyPaths = [ "/var/lib/rancher/k3s/server/db/snapshots" ];
+        Environment = "MC_CONFIG_DIR=/run/k3s-etcd-offload";
+        RuntimeDirectory = "k3s-etcd-offload";
+      };
+      path = [
+        pkgs.minio-client
+        pkgs.coreutils
+        pkgs.findutils
+        pkgs.gnugrep
+        pkgs.getent
+      ];
+      script = ''
+        set -euo pipefail
+
+        SNAPSHOT_DIR="/var/lib/rancher/k3s/server/db/snapshots"
+        HOSTNAME=$(hostname)
+        MINIO_ENDPOINT="http://10.10.10.209:9000"
+        BUCKET="homelab-backup-etcd"
+        STATE_FILE="/var/lib/k3s-etcd-offload/uploaded.list"
+
+        # Read MinIO creds from sops-nix secrets
+        AK=$(cat /run/secrets/minio_etcd_access_key_id)
+        SK=$(cat /run/secrets/minio_etcd_secret_access_key)
+
+        # Configure mc
+        mc alias set etcd "''${MINIO_ENDPOINT}" "''${AK}" "''${SK}"
+
+        # Ensure state dir exists
+        mkdir -p /var/lib/k3s-etcd-offload
+        touch "''${STATE_FILE}"
+
+        # Find snapshot files (skip files modified in last 60s to avoid uploading in-progress snapshots)
+        find "''${SNAPSHOT_DIR}" -type f -name '*.db' -not -newermt '60 seconds ago' | sort | while read -r SNAP; do
+          BASENAME=$(basename "''${SNAP}")
+
+          # Skip if already uploaded
+          if grep -qxF "''${BASENAME}" "''${STATE_FILE}"; then
+            echo "SKIP: ''${BASENAME} (already uploaded)"
+            continue
+          fi
+
+          echo "Uploading: ''${BASENAME}"
+
+          # Compute sha256
+          sha256sum "''${SNAP}" > "/tmp/''${BASENAME}.sha256"
+
+          # Upload snapshot + checksum
+          mc cp "''${SNAP}" "etcd/''${BUCKET}/''${HOSTNAME}/''${BASENAME}"
+          mc cp "/tmp/''${BASENAME}.sha256" "etcd/''${BUCKET}/''${HOSTNAME}/''${BASENAME}.sha256"
+          rm -f "/tmp/''${BASENAME}.sha256"
+
+          # Record as uploaded
+          echo "''${BASENAME}" >> "''${STATE_FILE}"
+          echo "OK: ''${BASENAME} uploaded"
+        done
+
+        # Prune state file: keep only entries for snapshots that still exist locally
+        TEMP=$(mktemp)
+        while IFS= read -r line; do
+          if [ -f "''${SNAPSHOT_DIR}/''${line}" ]; then
+            echo "''${line}"
+          fi
+        done < "''${STATE_FILE}" > "''${TEMP}"
+        mv "''${TEMP}" "''${STATE_FILE}"
+
+        echo "=== etcd offload complete ==="
       '';
     };
   };

@@ -1,4 +1,4 @@
-.PHONY: lgroups check ddeploy deploy gdeploy secrets manifests kubesync wusbiso docker-build docker-login docker-init-repo docker-push lint format backup-postgres restore-postgres reconcile events help
+.PHONY: lgroups check ddeploy deploy gdeploy secrets manifests kubesync wusbiso docker-build docker-login docker-init-repo docker-push lint format backup-postgres restore-postgres reconcile events backup-rgw backup-etcd backup-verify help
 
 .DEFAULT_GOAL := help
 
@@ -60,6 +60,20 @@ backup-postgres: ## Create a .sql backup of all postgresql data.
 
 restore-postgres: ## Restore a .sql backup data to the postgresql.
 	@nix run .#restore-postgres
+
+backup-rgw: ## Trigger ad-hoc RGW→MinIO mirror job.
+	@kubectl create job --from=cronjob/rgw-mirror -n applications rgw-mirror-manual-$$(date +%s) && echo "Job created. Watch: kubectl get jobs -n applications -w"
+
+backup-etcd: ## Trigger ad-hoc etcd snapshot offload on all control-plane nodes.
+	@for host in lab-alpha-cp lab-beta-cp lab-delta-cp; do echo "=== $$host ===" && ssh root@$$host systemctl start k3s-etcd-offload && ssh root@$$host journalctl -u k3s-etcd-offload --no-pager -n 20; done
+
+backup-verify: ## Verify backup health: RGW mirror + etcd offload + postgres + velero.
+	@echo "=== RGW Mirror (last 3 jobs) ===" && kubectl get jobs -n applications -l job-name -o custom-columns='NAME:.metadata.name,STATUS:.status.conditions[0].type,AGE:.metadata.creationTimestamp' --sort-by=.metadata.creationTimestamp 2>/dev/null | grep rgw-mirror | tail -3; \
+	echo "=== MinIO RGW bucket ===" && ssh root@lab-pi-bk "mc ls pi/homelab-backup-rgw/ 2>/dev/null | head -10"; \
+	echo "=== MinIO etcd snapshots ===" && ssh root@lab-pi-bk "mc ls pi/homelab-backup-etcd/ 2>/dev/null"; \
+	echo "=== Postgres backup ===" && ssh root@lab-pi-bk "mc ls pi/homelab-backup-postgres/ 2>/dev/null | tail -3"; \
+	echo "=== Velero BSL ===" && kubectl get bsl -n velero 2>/dev/null; \
+	echo "=== Done ==="
 
 help: ## Show this help.
 	@printf "Usage: make [target]\n\nTARGETS:\n"; grep -F "##" $(MAKEFILE_LIST) | grep -Fv "grep -F" | grep -Fv "printf " | sed -e 's/\\$$//' | sed -e 's/##//' | column -t -s ":" | sed -e 's/^/    /'; printf "\n"

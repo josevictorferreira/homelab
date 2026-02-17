@@ -43,6 +43,11 @@
 **Context:** Standard updates fail with "Forbidden: updates to statefulset spec for fields other than...".
 **Verify:** State recreates successfully with new spec.
 
+### Use `sops --set` to Add Keys to Encrypted Files
+**Lesson:** Never decrypt→edit→re-encrypt SOPS files (`sops -d > plain && edit && sops -e plain > enc`). This corrupts encryption metadata. Use `sops --set '["key"] "value"' secrets/file.enc.yaml` to add keys in-place.
+**Context:** Re-encrypting with `sops -e` produces different metadata/MAC, corrupting the file. `sops --set` modifies atomically.
+**Verify:** `sops -d secrets/file.enc.yaml | grep <new_key>` returns expected value after `--set`
+
 ### SOPS Secrets Must Be Verified Before Manifest Generation
 **Lesson:** After adding/modifying `secrets/k8s-secrets.enc.yaml`, verify key exists: `sops -d secrets/k8s-secrets.enc.yaml | grep <key>` before `make manifests`.
 **Context:** vals injection during `make vmanifests` fails if secret keys are missing, causing cryptic manifest generation errors. Subagent claims aren't always verified.
