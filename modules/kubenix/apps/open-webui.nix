@@ -1,6 +1,7 @@
-{ kubenix
-, homelab
-, ...
+{
+  kubenix,
+  homelab,
+  ...
 }:
 
 let
@@ -23,7 +24,7 @@ in
       values = {
         image = {
           repository = "ghcr.io/open-webui/open-webui";
-          tag = "v0.7.2@sha256:16d9a3615b45f14a0c89f7ad7a3bf151f923ed32c2e68f9204eb17d1ce40774b";
+          tag = "v0.8.3@sha256:205e9cf23b66553643b065afcdeffb7f86b35bf36e0ce643dc56946a911954b7";
           pullPolicy = "IfNotPresent";
         };
         ollama.enabled = false;
