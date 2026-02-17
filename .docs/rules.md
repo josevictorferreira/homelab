@@ -101,6 +101,16 @@
 **Context:** The bridge stores credentials using `pass` which needs a GPG key. Without initialization, bridge fails with "pass not initialized: exit status 1: Error: password store is empty."
 **Verify:** Init container logs show "pass initialized successfully" and bridge logs show "Generating bridge vault key"
 
+### Auto-Updated Binary Requires Runtime Dependencies
+**Lesson:** ProtonMail Bridge auto-updates on first run, potentially requiring libraries not in base image. Check logs for "error while loading shared libraries" and install missing packages in main container (not init container).
+**Context:** Bridge v3.19 auto-updated to v3.22 requiring `libfido2.so.1`. Init containers have separate filesystems - libraries must be installed in main container where bridge actually runs.
+**Verify:** `kubectl logs` shows successful startup without library errors; `ldd /protonmail/proton-bridge` shows all libraries resolved
+
+### Enable TTY/Stdin for Interactive CLI Access
+**Lesson:** Containers running interactive CLIs need `tty: true` and `stdin: true` in spec to support `kubectl attach` or exec-based interaction.
+**Context:** Without TTY enabled, `kubectl attach` fails with "container did not allocate one" and interactive commands don't work properly.
+**Verify:** `kubectl attach -it <pod>` provides interactive prompt; check `kubectl get pod <pod> -o yaml | grep -A2 "tty:"`
+
 ## Flux GitOps
 
 ### Flux Kustomize Failures Require Manual Intervention
