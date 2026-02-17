@@ -140,6 +140,18 @@
 **Context:** Default chart values may disable the node agent (formerly Restic daemonset), preventing FS backups.
 **Verify:** `kubectl get pods -n velero -l name=node-agent` shows running pods.
 
+## Prometheus & Grafana Monitoring
+
+### Query Prometheus Directly via kubectl exec, Not Grafana MCP
+**Lesson:** Grafana MCP `query_prometheus` has broken time format parsing. Use `kubectl exec -n monitoring prometheus-kube-prometheus-stack-prometheus-0 -c prometheus -- wget -qO- 'http://localhost:9090/api/v1/query?query=<promql>'` instead.
+**Context:** MCP rejects all time formats ("now", unix timestamps). Direct Prometheus API via kubectl exec is reliable and faster.
+**Verify:** `kubectl exec -n monitoring prometheus-kube-prometheus-stack-prometheus-0 -c prometheus -- wget -qO- 'http://localhost:9090/api/v1/query?query=up'`
+
+### Cross-Architecture NixOS Deploy to Pi (aarch64)
+**Lesson:** Cannot cross-compile x86_64→aarch64 via `nixos-rebuild --target-host`. SSH into the Pi and rebuild from GitHub: `ssh root@10.10.10.209 "nixos-rebuild switch --flake github:josevictorferreira/homelab#lab-pi-bk"`.
+**Context:** `--target-host` tries to build locally (wrong arch). `--build-host` on Pi via local flake path also fails. Pi must build natively from a remote flake ref.
+**Verify:** `ssh root@10.10.10.209 "nixos-rebuild switch --flake github:josevictorferreira/homelab#lab-pi-bk"` completes without arch errors
+
 ## Postgres Backup & Restore Drill
 
 ### Use Trust Auth for Ephemeral Scratch Postgres
