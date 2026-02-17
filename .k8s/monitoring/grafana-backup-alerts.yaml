@@ -1,0 +1,115 @@
+apiVersion: v1
+data:
+  backup-rules.yaml: "apiVersion: 1\ngroups:\n- folder: Backup Alerts\n  interval:\
+    \ 5m\n  name: Backup - MinIO\n  orgId: 1\n  rules:\n  - annotations:\n      description:\
+    \ MinIO cluster is {{ $value }}% full.\n      summary: MinIO storage usage above\
+    \ 85%\n    condition: C\n    data:\n    - datasourceUid: prometheus\n      model:\n\
+    \        expr: 100 * (1 - (minio_cluster_capacity_usable_free_bytes / minio_cluster_capacity_usable_total_bytes))\n\
+    \          > 85\n        intervalMs: 1000\n        maxDataPoints: 43200\n    \
+    \    refId: A\n      refId: A\n      relativeTimeRange:\n        from: 600\n \
+    \       to: 0\n    - datasourceUid: __expr__\n      model:\n        conditions:\n\
+    \        - evaluator:\n            params:\n            - 0\n            type:\
+    \ gt\n        expression: A\n        refId: C\n        type: threshold\n     \
+    \ refId: C\n      relativeTimeRange:\n        from: 600\n        to: 0\n    for:\
+    \ 30m\n    labels:\n      severity: warning\n    title: MinIO Capacity Warning\
+    \ (>85%)\n    uid: backup-minio-capacity-warning\n  - annotations:\n      description:\
+    \ MinIO cluster is {{ $value }}% full. Backups may fail.\n      summary: MinIO\
+    \ storage above 95%\n    condition: C\n    data:\n    - datasourceUid: prometheus\n\
+    \      model:\n        expr: 100 * (1 - (minio_cluster_capacity_usable_free_bytes\
+    \ / minio_cluster_capacity_usable_total_bytes))\n          > 95\n        intervalMs:\
+    \ 1000\n        maxDataPoints: 43200\n        refId: A\n      refId: A\n     \
+    \ relativeTimeRange:\n        from: 600\n        to: 0\n    - datasourceUid: __expr__\n\
+    \      model:\n        conditions:\n        - evaluator:\n            params:\n\
+    \            - 0\n            type: gt\n        expression: A\n        refId:\
+    \ C\n        type: threshold\n      refId: C\n      relativeTimeRange:\n     \
+    \   from: 600\n        to: 0\n    for: 15m\n    labels:\n      severity: critical\n\
+    \    title: MinIO Capacity Critical (>95%)\n    uid: backup-minio-capacity-critical\n\
+    - folder: Backup Alerts\n  interval: 5m\n  name: Backup - Velero\n  orgId: 1\n\
+    \  rules:\n  - annotations:\n      description: Velero backup had failures in\
+    \ the last hour.\n      summary: Velero backup failed\n    condition: C\n    data:\n\
+    \    - datasourceUid: prometheus\n      model:\n        expr: increase(velero_backup_failure_total[1h])\
+    \ > 0\n        intervalMs: 1000\n        maxDataPoints: 43200\n        refId:\
+    \ A\n      refId: A\n      relativeTimeRange:\n        from: 600\n        to:\
+    \ 0\n    - datasourceUid: __expr__\n      model:\n        conditions:\n      \
+    \  - evaluator:\n            params:\n            - 0\n            type: gt\n\
+    \        expression: A\n        refId: C\n        type: threshold\n      refId:\
+    \ C\n      relativeTimeRange:\n        from: 600\n        to: 0\n    for: 5m\n\
+    \    labels:\n      severity: critical\n    title: Velero Backup Failure\n   \
+    \ uid: backup-velero-failure\n  - annotations:\n      description: Velero backup\
+    \ had partial failures in the last hour.\n      summary: Velero backup partially\
+    \ failed\n    condition: C\n    data:\n    - datasourceUid: prometheus\n     \
+    \ model:\n        expr: increase(velero_backup_partial_failure_total[1h]) > 0\n\
+    \        intervalMs: 1000\n        maxDataPoints: 43200\n        refId: A\n  \
+    \    refId: A\n      relativeTimeRange:\n        from: 600\n        to: 0\n  \
+    \  - datasourceUid: __expr__\n      model:\n        conditions:\n        - evaluator:\n\
+    \            params:\n            - 0\n            type: gt\n        expression:\
+    \ A\n        refId: C\n        type: threshold\n      refId: C\n      relativeTimeRange:\n\
+    \        from: 600\n        to: 0\n    for: 5m\n    labels:\n      severity: warning\n\
+    \    title: Velero Backup Partial Failure\n    uid: backup-velero-partial-failure\n\
+    \  - annotations:\n      description: Schedule daily-backup has not succeeded\
+    \ in over 26 hours.\n      summary: No successful Velero backup in 26+ hours\n\
+    \    condition: C\n    data:\n    - datasourceUid: prometheus\n      model:\n\
+    \        expr: time() - velero_backup_last_successful_timestamp{schedule=\"daily-backup\"\
+    }\n          > 93600\n        intervalMs: 1000\n        maxDataPoints: 43200\n\
+    \        refId: A\n      refId: A\n      relativeTimeRange:\n        from: 600\n\
+    \        to: 0\n    - datasourceUid: __expr__\n      model:\n        conditions:\n\
+    \        - evaluator:\n            params:\n            - 0\n            type:\
+    \ gt\n        expression: A\n        refId: C\n        type: threshold\n     \
+    \ refId: C\n      relativeTimeRange:\n        from: 600\n        to: 0\n    for:\
+    \ 15m\n    labels:\n      severity: critical\n    title: Velero Daily Backup Stale\
+    \ (>26h)\n    uid: backup-velero-stale\n- folder: Backup Alerts\n  interval: 5m\n\
+    \  name: Backup - Postgres\n  orgId: 1\n  rules:\n  - annotations:\n      description:\
+    \ A postgres-backup job has failed in the last 6 hours.\n      summary: Postgres\
+    \ backup job failed\n    condition: C\n    data:\n    - datasourceUid: prometheus\n\
+    \      model:\n        expr: increase(kube_job_status_failed{namespace=\"apps\"\
+    , job_name=~\"postgres-backup.*\"}[6h])\n          > 0\n        intervalMs: 1000\n\
+    \        maxDataPoints: 43200\n        refId: A\n      refId: A\n      relativeTimeRange:\n\
+    \        from: 600\n        to: 0\n    - datasourceUid: __expr__\n      model:\n\
+    \        conditions:\n        - evaluator:\n            params:\n            -\
+    \ 0\n            type: gt\n        expression: A\n        refId: C\n        type:\
+    \ threshold\n      refId: C\n      relativeTimeRange:\n        from: 600\n   \
+    \     to: 0\n    for: 5m\n    labels:\n      severity: critical\n    title: Postgres\
+    \ Backup Job Failed\n    uid: backup-pg-job-failed\n  - annotations:\n      description:\
+    \ CronJob postgres-backup has not succeeded in over 26 hours.\n      summary:\
+    \ No successful postgres backup in 26+ hours\n    condition: C\n    data:\n  \
+    \  - datasourceUid: prometheus\n      model:\n        expr: time() - kube_cronjob_status_last_successful_time{namespace=\"\
+    apps\",\n          cronjob=\"postgres-backup\"} > 93600\n        intervalMs: 1000\n\
+    \        maxDataPoints: 43200\n        refId: A\n      refId: A\n      relativeTimeRange:\n\
+    \        from: 600\n        to: 0\n    - datasourceUid: __expr__\n      model:\n\
+    \        conditions:\n        - evaluator:\n            params:\n            -\
+    \ 0\n            type: gt\n        expression: A\n        refId: C\n        type:\
+    \ threshold\n      refId: C\n      relativeTimeRange:\n        from: 600\n   \
+    \     to: 0\n    for: 15m\n    labels:\n      severity: critical\n    title: Postgres\
+    \ Backup Stale (>26h)\n    uid: backup-pg-stale\n  - annotations:\n      description:\
+    \ A postgres-restore-drill job has failed in the last 7 days.\n      summary:\
+    \ Postgres restore drill failed\n    condition: C\n    data:\n    - datasourceUid:\
+    \ prometheus\n      model:\n        expr: increase(kube_job_status_failed{namespace=\"\
+    apps\", job_name=~\"postgres-restore-drill.*\"}[168h])\n          > 0\n      \
+    \  intervalMs: 1000\n        maxDataPoints: 43200\n        refId: A\n      refId:\
+    \ A\n      relativeTimeRange:\n        from: 600\n        to: 0\n    - datasourceUid:\
+    \ __expr__\n      model:\n        conditions:\n        - evaluator:\n        \
+    \    params:\n            - 0\n            type: gt\n        expression: A\n \
+    \       refId: C\n        type: threshold\n      refId: C\n      relativeTimeRange:\n\
+    \        from: 600\n        to: 0\n    for: 5m\n    labels:\n      severity: warning\n\
+    \    title: Postgres Restore Drill Failed\n    uid: backup-pg-drill-failed\n \
+    \ - annotations:\n      description: CronJob postgres-restore-drill has not succeeded\
+    \ in over 7 days.\n      summary: No successful postgres restore drill in 7+ days\n\
+    \    condition: C\n    data:\n    - datasourceUid: prometheus\n      model:\n\
+    \        expr: time() - kube_cronjob_status_last_successful_time{namespace=\"\
+    apps\",\n          cronjob=\"postgres-restore-drill\"} > 604800\n        intervalMs:\
+    \ 1000\n        maxDataPoints: 43200\n        refId: A\n      refId: A\n     \
+    \ relativeTimeRange:\n        from: 600\n        to: 0\n    - datasourceUid: __expr__\n\
+    \      model:\n        conditions:\n        - evaluator:\n            params:\n\
+    \            - 0\n            type: gt\n        expression: A\n        refId:\
+    \ C\n        type: threshold\n      refId: C\n      relativeTimeRange:\n     \
+    \   from: 600\n        to: 0\n    for: 30m\n    labels:\n      severity: warning\n\
+    \    title: Postgres Restore Drill Stale (>7d)\n    uid: backup-pg-drill-stale\n"
+kind: ConfigMap
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    grafana_alert: '1'
+  name: grafana-alerting-backup-rules
+  namespace: monitoring
