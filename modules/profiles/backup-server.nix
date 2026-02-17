@@ -102,6 +102,7 @@ in
     systemd.services.minio = {
       after = [ "zpool-import-backup.service" ];
       requires = [ "zpool-import-backup.service" ];
+      environment.MINIO_PROMETHEUS_AUTH_TYPE = "public";
     };
 
     # Boot-only oneshot: provisions MinIO buckets, policies, per-service creds
