@@ -91,7 +91,7 @@ in
           ttl = "336h";
           includedNamespaces = [ "*" ];
           snapshotVolumes = false;
-          defaultVolumesToFsBackup = false;
+          defaultVolumesToFsBackup = true;
         };
       };
     }

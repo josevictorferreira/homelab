@@ -525,7 +525,7 @@ metadata:
 spec:
   schedule: 0 3 * * *
   template:
-    defaultVolumesToFsBackup: false
+    defaultVolumesToFsBackup: true
     includedNamespaces:
       - '*'
     snapshotVolumes: false

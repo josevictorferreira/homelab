@@ -1,7 +1,7 @@
 { kubenix, homelab, ... }:
 let
   namespace = homelab.kubernetes.namespaces.applications;
-  image = "rclone/rclone@sha256:0000000000000000000000000000000000000000000000000000000000000000";
+  image = "rclone/rclone@sha256:40ec2cb10bbfcf78e5cbbdf2c7180fd821a115ee3b589d19fc4e92d13293d378";
   rgwEndpoint = kubenix.lib.objectStoreEndpoint;
   minioEndpoint = "http://10.10.10.209:9000";
   minioBucket = "homelab-backup-rgw";
