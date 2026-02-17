@@ -12,7 +12,7 @@ in
         spec = {
           accessModes = [ "ReadWriteOnce" ];
           storageClassName = "rook-ceph-block";
-          resources.requests.storage = "1Gi";
+          resources.requests.storage = "10Gi";
         };
       };
 
