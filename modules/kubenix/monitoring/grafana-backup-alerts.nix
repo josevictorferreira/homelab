@@ -87,6 +87,15 @@ let
             summary = "MinIO storage above 95%";
             description = "MinIO cluster is {{ $value }}% full. Backups may fail.";
           })
+          (mkPromRule {
+            uid = "backup-minio-shared-bucket-large";
+            title = "Shared Backup Bucket Size Large (>100GB)";
+            expr = "minio_bucket_usage_total_bytes{bucket=\"homelab-backup-shared\"} > 107374182400";
+            forDuration = "1h";
+            severity = "warning";
+            summary = "Shared backup bucket exceeds 100GB";
+            description = "Bucket homelab-backup-shared is {{ $value | humanize1024 }}B. Consider retention cleanup.";
+          })
         ];
       }
       {
