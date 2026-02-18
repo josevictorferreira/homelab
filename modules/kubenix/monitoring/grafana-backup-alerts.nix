@@ -189,6 +189,31 @@ let
           })
         ];
       }
+      {
+        orgId = 1;
+        name = "Backup - Proton Drive Sync";
+        folder = "Backup Alerts";
+        interval = "5m";
+        rules = [
+          (mkPromRule {
+            uid = "backup-proton-sync-job-failed";
+            title = "Proton Sync Job Failure";
+            expr = ''increase(kube_job_status_failed{namespace="apps", job_name=~"shared-subfolders-proton-sync.*"}[6h]) > 0'';
+            severity = "warning";
+            summary = "Shared subfolders Proton Drive sync job failed";
+            description = "A shared-subfolders-proton-sync job has failed in the last 6 hours.";
+          })
+          (mkPromRule {
+            uid = "backup-proton-sync-stale";
+            title = "Proton Sync Staleness";
+            expr = ''time() - kube_cronjob_status_last_successful_time{namespace="apps", cronjob="shared-subfolders-proton-sync"} > 93600'';
+            forDuration = "15m";
+            severity = "critical";
+            summary = "Shared subfolders Proton Drive sync has not succeeded in 26h";
+            description = "CronJob shared-subfolders-proton-sync has not succeeded in over 26 hours.";
+          })
+        ];
+      }
     ];
   };
 in
