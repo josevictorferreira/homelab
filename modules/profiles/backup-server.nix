@@ -150,7 +150,7 @@ in
         ## Admin connection via env (no alias file with creds on disk)
         export MC_HOST_pi="http://''${MINIO_ROOT_USER}:''${MINIO_ROOT_PASSWORD}@127.0.0.1:9000"
 
-        BUCKETS="homelab-backup-velero homelab-backup-postgres homelab-backup-rgw homelab-backup-etcd"
+        BUCKETS="homelab-backup-velero homelab-backup-postgres homelab-backup-rgw homelab-backup-etcd homelab-backup-shared"
 
         ## Create buckets (idempotent)
         for b in $BUCKETS; do
@@ -172,7 +172,7 @@ in
         done
 
         ## Per-service creds + policies
-        SERVICES="velero postgres rgw etcd"
+        SERVICES="velero postgres rgw etcd shared"
         for svc in $SERVICES; do
           BUCKET="homelab-backup-$svc"
           AK_FILE="/run/secrets/minio_''${svc}_access_key_id"
