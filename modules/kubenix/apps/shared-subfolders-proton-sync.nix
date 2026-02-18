@@ -240,7 +240,7 @@ in
     spec = {
       accessModes = [ "ReadWriteOnce" ];
       resources.requests.storage = "1Gi";
-      storageClassName = "longhorn";
+      storageClassName = "rook-ceph-block";
     };
   };
 
@@ -253,7 +253,7 @@ in
     spec = {
       accessModes = [ "ReadWriteOnce" ];
       resources.requests.storage = "5Gi";
-      storageClassName = "longhorn";
+      storageClassName = "rook-ceph-block";
     };
   };
 
