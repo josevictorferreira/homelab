@@ -1,0 +1,192 @@
+warning: Git tree '/home/josevictor/Workspace/homelab' is dirty
+[1/4] gmanifests
+warning: Git tree '/home/josevictor/Workspace/homelab' is dirty
+these 4 derivations will be built:
+  /nix/store/gcwmbr2623xxhlfkp881fy6k333vv9j6-to-json.drv
+  /nix/store/lsa5qkyy6bm7mkngqj2mki5aa1vj6yb8-to-json.drv
+  /nix/store/6r2jvzda52h0m3dil5b5pzd0742rk94c-ze-homelab-generated.yaml.drv
+  /nix/store/llgj4xz0jlh0h4vknrfmdm251kqd8w3m-gen-k8s-manifests.drv
+building '/nix/store/gcwmbr2623xxhlfkp881fy6k333vv9j6-to-json.drv'...
+building '/nix/store/lsa5qkyy6bm7mkngqj2mki5aa1vj6yb8-to-json.drv'...
+building '/nix/store/6r2jvzda52h0m3dil5b5pzd0742rk94c-ze-homelab-generated.yaml.drv'...
+building '/nix/store/llgj4xz0jlh0h4vknrfmdm251kqd8w3m-gen-k8s-manifests.drv'...
+[2/4] vmanifests
+Replacing .k8s/apps/blocky-config.enc.yaml
+sops: successfully retrieved key=secrets/k8s-secrets.enc.yaml
+Replaced .k8s/apps/blocky-config.enc.yaml
+Replacing .k8s/apps/cephfs-user-secret.enc.yaml
+sops: successfully retrieved key=secrets/k8s-secrets.enc.yaml
+Replaced .k8s/apps/cephfs-user-secret.enc.yaml
+Replacing .k8s/apps/etcd-snapshot-offload-s3-credentials.enc.yaml
+sops: successfully retrieved key=secrets/k8s-secrets.enc.yaml
+Replaced .k8s/apps/etcd-snapshot-offload-s3-credentials.enc.yaml
+Replacing .k8s/apps/ghcr-registry-secret.enc.yaml
+sops: successfully retrieved key=secrets/k8s-secrets.enc.yaml
+Replaced .k8s/apps/ghcr-registry-secret.enc.yaml
+Replacing .k8s/apps/glance-config.enc.yaml
+sops: successfully retrieved key=secrets/k8s-secrets.enc.yaml
+Replaced .k8s/apps/glance-config.enc.yaml
+Replacing .k8s/apps/gluetun-vpn-credentials.enc.yaml
+sops: successfully retrieved key=secrets/k8s-secrets.enc.yaml
+Replaced .k8s/apps/gluetun-vpn-credentials.enc.yaml
+Replacing .k8s/apps/imgproxy-config.enc.yaml
+sops: successfully retrieved key=secrets/k8s-secrets.enc.yaml
+Replaced .k8s/apps/imgproxy-config.enc.yaml
+Replacing .k8s/apps/immich-config.enc.yaml
+sops: successfully retrieved key=secrets/k8s-secrets.enc.yaml
+Replaced .k8s/apps/immich-config.enc.yaml
+Replacing .k8s/apps/keycloak-config.enc.yaml
+sops: successfully retrieved key=secrets/k8s-secrets.enc.yaml
+Replaced .k8s/apps/keycloak-config.enc.yaml
+Replacing .k8s/apps/linkwarden-secrets.enc.yaml
+sops: successfully retrieved key=secrets/k8s-secrets.enc.yaml
+sops: successfully retrieved key=secrets/k8s-secrets.enc.yaml
+Replaced .k8s/apps/linkwarden-secrets.enc.yaml
+Replacing .k8s/apps/matrix-config.enc.yaml
+sops: successfully retrieved key=secrets/k8s-secrets.enc.yaml
+sops: successfully retrieved key=secrets/k8s-secrets.enc.yaml
+sops: successfully retrieved key=secrets/k8s-secrets.enc.yaml
+sops: successfully retrieved key=secrets/k8s-secrets.enc.yaml
+sops: successfully retrieved key=secrets/k8s-secrets.enc.yaml
+sops: successfully retrieved key=secrets/k8s-secrets.enc.yaml
+sops: successfully retrieved key=secrets/k8s-secrets.enc.yaml
+sops: successfully retrieved key=secrets/k8s-secrets.enc.yaml
+Replaced .k8s/apps/matrix-config.enc.yaml
+Replacing .k8s/apps/mau-registry-secret.enc.yaml
+sops: successfully retrieved key=secrets/k8s-secrets.enc.yaml
+Replaced .k8s/apps/mau-registry-secret.enc.yaml
+Replacing .k8s/apps/n8n-enc.enc.yaml
+sops: successfully retrieved key=secrets/k8s-secrets.enc.yaml
+Replaced .k8s/apps/n8n-enc.enc.yaml
+Replacing .k8s/apps/ntfy-secrets.enc.yaml
+sops: successfully retrieved key=secrets/k8s-secrets.enc.yaml
+Replaced .k8s/apps/ntfy-secrets.enc.yaml
+Replacing .k8s/apps/open-webui-secrets.enc.yaml
+sops: successfully retrieved key=secrets/k8s-secrets.enc.yaml
+Replaced .k8s/apps/open-webui-secrets.enc.yaml
+Replacing .k8s/apps/openclaw-config.enc.yaml
+sops: successfully retrieved key=secrets/k8s-secrets.enc.yaml
+Replaced .k8s/apps/openclaw-config.enc.yaml
+Replacing .k8s/apps/openrouter-secrets.enc.yaml
+sops: successfully retrieved key=secrets/k8s-secrets.enc.yaml
+Replaced .k8s/apps/openrouter-secrets.enc.yaml
+Replacing .k8s/apps/postgres-backup-s3-credentials.enc.yaml
+sops: successfully retrieved key=secrets/k8s-secrets.enc.yaml
+Replaced .k8s/apps/postgres-backup-s3-credentials.enc.yaml
+Replacing .k8s/apps/postgresql-auth.enc.yaml
+sops: successfully retrieved key=secrets/k8s-secrets.enc.yaml
+sops: successfully retrieved key=secrets/k8s-secrets.enc.yaml
+Replaced .k8s/apps/postgresql-auth.enc.yaml
+Replacing .k8s/apps/prowlarr-custom-definition.enc.yaml
+sops: successfully retrieved key=secrets/k8s-secrets.enc.yaml
+Replaced .k8s/apps/prowlarr-custom-definition.enc.yaml
+Replacing .k8s/apps/qbittorrent-config.enc.yaml
+sops: successfully retrieved key=secrets/k8s-secrets.enc.yaml
+Replaced .k8s/apps/qbittorrent-config.enc.yaml
+Replacing .k8s/apps/rabbitmq-auth.enc.yaml
+sops: successfully retrieved key=secrets/k8s-secrets.enc.yaml
+Replaced .k8s/apps/rabbitmq-auth.enc.yaml
+Replacing .k8s/apps/redis-auth.enc.yaml
+sops: successfully retrieved key=secrets/k8s-secrets.enc.yaml
+Replaced .k8s/apps/redis-auth.enc.yaml
+Replacing .k8s/apps/rgw-mirror-s3-credentials.enc.yaml
+sops: successfully retrieved key=secrets/k8s-secrets.enc.yaml
+Replaced .k8s/apps/rgw-mirror-s3-credentials.enc.yaml
+Replacing .k8s/apps/s3-credentials.enc.yaml
+sops: successfully retrieved key=secrets/k8s-secrets.enc.yaml
+Replaced .k8s/apps/s3-credentials.enc.yaml
+Replacing .k8s/apps/searxng-config.enc.yaml
+sops: successfully retrieved key=secrets/k8s-secrets.enc.yaml
+sops: successfully retrieved key=secrets/k8s-secrets.enc.yaml
+Replaced .k8s/apps/searxng-config.enc.yaml
+Replacing .k8s/apps/sftpgo-config.enc.yaml
+sops: successfully retrieved key=secrets/k8s-secrets.enc.yaml
+Replaced .k8s/apps/sftpgo-config.enc.yaml
+Replacing .k8s/apps/shared-subfolders-backup-s3-credentials.enc.yaml
+sops: successfully retrieved key=secrets/k8s-secrets.enc.yaml
+Replaced .k8s/apps/shared-subfolders-backup-s3-credentials.enc.yaml
+Replacing .k8s/apps/valoris-config.enc.yaml
+sops: successfully retrieved key=secrets/k8s-secrets.enc.yaml
+Replaced .k8s/apps/valoris-config.enc.yaml
+Replacing .k8s/apps/velero-config.enc.yaml
+sops: successfully retrieved key=secrets/k8s-secrets.enc.yaml
+Replaced .k8s/apps/velero-config.enc.yaml
+Replacing .k8s/monitoring/grafana-admin.enc.yaml
+sops: successfully retrieved key=secrets/k8s-secrets.enc.yaml
+Replaced .k8s/monitoring/grafana-admin.enc.yaml
+Replacing .k8s/storage/cephfs-smb-export-secret.enc.yaml
+sops: successfully retrieved key=secrets/k8s-secrets.enc.yaml
+sops: successfully retrieved key=secrets/k8s-secrets.enc.yaml
+Replaced .k8s/storage/cephfs-smb-export-secret.enc.yaml
+Replacing .k8s/system/cloudflare-api-token.enc.yaml
+sops: successfully retrieved key=secrets/k8s-secrets.enc.yaml
+Replaced .k8s/system/cloudflare-api-token.enc.yaml
+[3/4] umanifests
+Restored unchanged (keeping encrypted from git): .k8s/apps/blocky-config.enc.yaml
+Restored unchanged (keeping encrypted from git): .k8s/apps/cephfs-user-secret.enc.yaml
+Restored unchanged (keeping encrypted from git): .k8s/apps/etcd-snapshot-offload-s3-credentials.enc.yaml
+Restored unchanged (keeping encrypted from git): .k8s/apps/ghcr-registry-secret.enc.yaml
+Restored unchanged (keeping encrypted from git): .k8s/apps/glance-config.enc.yaml
+Restored unchanged (keeping encrypted from git): .k8s/apps/gluetun-vpn-credentials.enc.yaml
+Restored unchanged (keeping encrypted from git): .k8s/apps/imgproxy-config.enc.yaml
+Restored unchanged (keeping encrypted from git): .k8s/apps/immich-config.enc.yaml
+Restored unchanged (keeping encrypted from git): .k8s/apps/keycloak-config.enc.yaml
+Restored unchanged (keeping encrypted from git): .k8s/apps/linkwarden-secrets.enc.yaml
+Restored unchanged (keeping encrypted from git): .k8s/apps/matrix-config.enc.yaml
+Restored unchanged (keeping encrypted from git): .k8s/apps/mau-registry-secret.enc.yaml
+Restored unchanged (keeping encrypted from git): .k8s/apps/n8n-enc.enc.yaml
+Restored unchanged (keeping encrypted from git): .k8s/apps/ntfy-secrets.enc.yaml
+Restored unchanged (keeping encrypted from git): .k8s/apps/open-webui-secrets.enc.yaml
+Restored unchanged (keeping encrypted from git): .k8s/apps/openclaw-config.enc.yaml
+Restored unchanged (keeping encrypted from git): .k8s/apps/openrouter-secrets.enc.yaml
+Restored unchanged (keeping encrypted from git): .k8s/apps/postgres-backup-s3-credentials.enc.yaml
+Restored unchanged (keeping encrypted from git): .k8s/apps/postgresql-auth.enc.yaml
+Restored unchanged (keeping encrypted from git): .k8s/apps/prowlarr-custom-definition.enc.yaml
+Restored unchanged (keeping encrypted from git): .k8s/apps/qbittorrent-config.enc.yaml
+Restored unchanged (keeping encrypted from git): .k8s/apps/rabbitmq-auth.enc.yaml
+Restored unchanged (keeping encrypted from git): .k8s/apps/redis-auth.enc.yaml
+Restored unchanged (keeping encrypted from git): .k8s/apps/rgw-mirror-s3-credentials.enc.yaml
+Restored unchanged (keeping encrypted from git): .k8s/apps/s3-credentials.enc.yaml
+Restored unchanged (keeping encrypted from git): .k8s/apps/searxng-config.enc.yaml
+Restored unchanged (keeping encrypted from git): .k8s/apps/sftpgo-config.enc.yaml
+Restored unchanged (keeping encrypted from git): .k8s/apps/shared-subfolders-backup-s3-credentials.enc.yaml
+Restored unchanged (keeping encrypted from git): .k8s/apps/valoris-config.enc.yaml
+Restored unchanged (keeping encrypted from git): .k8s/apps/velero-config.enc.yaml
+Restored unchanged (keeping encrypted from git): .k8s/monitoring/grafana-admin.enc.yaml
+Restored unchanged (keeping encrypted from git): .k8s/storage/cephfs-smb-export-secret.enc.yaml
+Restored unchanged (keeping encrypted from git): .k8s/system/cloudflare-api-token.enc.yaml
+[4/4] emanifests
+Skipping (already encrypted): .k8s/apps/blocky-config.enc.yaml
+Skipping (already encrypted): .k8s/apps/cephfs-user-secret.enc.yaml
+Skipping (already encrypted): .k8s/apps/etcd-snapshot-offload-s3-credentials.enc.yaml
+Skipping (already encrypted): .k8s/apps/ghcr-registry-secret.enc.yaml
+Skipping (already encrypted): .k8s/apps/glance-config.enc.yaml
+Skipping (already encrypted): .k8s/apps/gluetun-vpn-credentials.enc.yaml
+Skipping (already encrypted): .k8s/apps/imgproxy-config.enc.yaml
+Skipping (already encrypted): .k8s/apps/immich-config.enc.yaml
+Skipping (already encrypted): .k8s/apps/keycloak-config.enc.yaml
+Skipping (already encrypted): .k8s/apps/linkwarden-secrets.enc.yaml
+Skipping (already encrypted): .k8s/apps/matrix-config.enc.yaml
+Skipping (already encrypted): .k8s/apps/mau-registry-secret.enc.yaml
+Skipping (already encrypted): .k8s/apps/n8n-enc.enc.yaml
+Skipping (already encrypted): .k8s/apps/ntfy-secrets.enc.yaml
+Skipping (already encrypted): .k8s/apps/open-webui-secrets.enc.yaml
+Skipping (already encrypted): .k8s/apps/openclaw-config.enc.yaml
+Skipping (already encrypted): .k8s/apps/openrouter-secrets.enc.yaml
+Skipping (already encrypted): .k8s/apps/postgres-backup-s3-credentials.enc.yaml
+Skipping (already encrypted): .k8s/apps/postgresql-auth.enc.yaml
+Skipping (already encrypted): .k8s/apps/prowlarr-custom-definition.enc.yaml
+Skipping (already encrypted): .k8s/apps/qbittorrent-config.enc.yaml
+Skipping (already encrypted): .k8s/apps/rabbitmq-auth.enc.yaml
+Skipping (already encrypted): .k8s/apps/redis-auth.enc.yaml
+Skipping (already encrypted): .k8s/apps/rgw-mirror-s3-credentials.enc.yaml
+Skipping (already encrypted): .k8s/apps/s3-credentials.enc.yaml
+Skipping (already encrypted): .k8s/apps/searxng-config.enc.yaml
+Skipping (already encrypted): .k8s/apps/sftpgo-config.enc.yaml
+Skipping (already encrypted): .k8s/apps/shared-subfolders-backup-s3-credentials.enc.yaml
+Skipping (already encrypted): .k8s/apps/valoris-config.enc.yaml
+Skipping (already encrypted): .k8s/apps/velero-config.enc.yaml
+Skipping (already encrypted): .k8s/monitoring/grafana-admin.enc.yaml
+Skipping (already encrypted): .k8s/storage/cephfs-smb-export-secret.enc.yaml
+Skipping (already encrypted): .k8s/system/cloudflare-api-token.enc.yaml
+Done.

@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: flaresolverr
+  namespace: apps
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: flaresolverr
+  template:
+    metadata:
+      labels:
+        app: flaresolverr
+    spec:
+      containers:
+        - env:
+            - name: PORT
+              value: '8191'
+            - name: LOG_LEVEL
+              value: info
+            - name: TZ
+              value: Etc/UTC
+          image: ghcr.io/flaresolverr/flaresolverr:v3.4.6
+          livenessProbe:
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            tcpSocket:
+              port: 8191
+          name: flaresolverr
+          ports:
+            - containerPort: 8191
+              name: http
+              protocol: TCP
+          readinessProbe:
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            tcpSocket:
+              port: 8191
+          resources:
+            limits:
+              cpu: '2'
+              memory: 2Gi
+            requests:
+              cpu: 200m
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true
+      terminationGracePeriodSeconds: 60
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: flaresolverr
+  namespace: apps
+spec:
+  ports:
+    - name: http
+      port: 8191
+      targetPort: 8191
+  selector:
+    app: flaresolverr
+  type: ClusterIP
