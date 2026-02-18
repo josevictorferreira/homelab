@@ -140,6 +140,13 @@
 **Context:** Default chart values may disable the node agent (formerly Restic daemonset), preventing FS backups.
 **Verify:** `kubectl get pods -n velero -l name=node-agent` shows running pods.
 
+## Kubernetes Container Security
+
+### runAsNonRoot Fails with Non-Numeric Users
+**Lesson:** Don't use `runAsNonRoot: true` when container images use non-numeric users. Kubernetes can't verify string usernames (like `flaresolverr`) are non-root. Instead use `allowPrivilegeEscalation: false` + `capabilities: { drop = [ "ALL" ]; }`.
+**Context:** FlareSolverr image uses user `flaresolverr` (not UID 1000). Setting `runAsNonRoot: true` causes `CreateContainerConfigError: cannot verify user is non-root`.
+**Verify:** Check `kubectl describe pod` shows `CreateContainerConfigError` with message about non-numeric user.
+
 ## Prometheus & Grafana Monitoring
 
 ### Query Prometheus Directly via kubectl exec, Not Grafana MCP
