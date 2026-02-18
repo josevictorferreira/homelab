@@ -1,0 +1,77 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: shared-subfolders-restore-drill
+  namespace: apps
+spec:
+  concurrencyPolicy: Forbid
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 1800
+      backoffLimit: 1
+      template:
+        spec:
+          containers:
+            - args:
+                - "set -euo pipefail\necho \"=== Shared subfolders restore drill starting\
+                  \ ===\"\n\necho \"Setting up mc alias...\"\nmc alias set backup\
+                  \ \"$MINIO_ENDPOINT\" \"$AWS_ACCESS_KEY_ID\" \"$AWS_SECRET_ACCESS_KEY\"\
+                  \n\necho \"Finding latest backup...\"\nLATEST=$(mc ls --recursive\
+                  \ --json \"backup/homelab-backup-shared/\" | \\\n  jq -r 'select(.key\
+                  \ | test(\"shared-subfolders\\\\.tar\\\\.zst$\")) | .lastModified\
+                  \ + \" \" + .key' | \\\n  sort -r | head -1 | cut -d' ' -f2- ||\
+                  \ true)\n\nif [ -z \"$LATEST\" ]; then\n  echo \"ERROR: No backup\
+                  \ found in MinIO\"\n  exit 1\nfi\necho \"Latest backup: $LATEST\"\
+                  \n\nLATEST_DIR=$(dirname \"$LATEST\")\n\necho \"Downloading backup\
+                  \ + checksum...\"\nmc cp \"backup/homelab-backup-shared/$LATEST\"\
+                  \ /tmp/shared-subfolders.tar.zst\nmc cp \"backup/homelab-backup-shared/$LATEST_DIR/shared-subfolders.tar.zst.sha256\"\
+                  \ /tmp/shared-subfolders.tar.zst.sha256\n\necho \"Verifying sha256...\"\
+                  \ncd /tmp\nif sha256sum -c shared-subfolders.tar.zst.sha256; then\n\
+                  \  echo \"sha256 OK\"\nelse\n  echo \"ERROR: sha256 mismatch\"\n\
+                  \  exit 1\nfi\n\necho \"Extracting archive...\"\nmkdir -p /tmp/extracted\n\
+                  zstd -dc /tmp/shared-subfolders.tar.zst | tar -xf - -C /tmp/extracted\n\
+                  rm /tmp/shared-subfolders.tar.zst\n\necho \"Verifying expected folders\
+                  \ exist...\"\nSMOKE_OK=true\nfor folder in notetaking images backups;\
+                  \ do\n  if [ -d \"/tmp/extracted/$folder\" ]; then\n    echo \"\
+                  OK: folder $folder exists\"\n  else\n    echo \"FAIL: folder $folder\
+                  \ missing\"\n    SMOKE_OK=false\n  fi\ndone\n\nif [ \"$SMOKE_OK\"\
+                  \ = true ]; then\n  echo \"smoke OK\"\n  echo \"=== Shared subfolders\
+                  \ restore drill complete ===\"\n  exit 0\nelse\n  echo \"ERROR:\
+                  \ folder verification failed\"\n  exit 1\nfi\n"
+              command:
+                - bash
+                - -c
+              env:
+                - name: MINIO_ENDPOINT
+                  value: http://10.10.10.209:9000
+                - name: AWS_ACCESS_KEY_ID
+                  valueFrom:
+                    secretKeyRef:
+                      key: AWS_ACCESS_KEY_ID
+                      name: shared-subfolders-backup-s3-credentials
+                - name: AWS_SECRET_ACCESS_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      key: AWS_SECRET_ACCESS_KEY
+                      name: shared-subfolders-backup-s3-credentials
+              image: ghcr.io/josevictorferreira/backup-toolbox@sha256:143dc0beafb3865fdd37d5a85bb814654063061af96e610ea53a2e9900c2da55
+              name: restore
+              resources:
+                limits:
+                  cpu: 500m
+                  ephemeral-storage: 8Gi
+                  memory: 512Mi
+                requests:
+                  cpu: 100m
+                  ephemeral-storage: 4Gi
+                  memory: 256Mi
+          imagePullSecrets:
+            - name: ghcr-registry-secret
+          restartPolicy: Never
+  schedule: 0 4 * * 0
+  successfulJobsHistoryLimit: 3
+  timeZone: America/Sao_Paulo
