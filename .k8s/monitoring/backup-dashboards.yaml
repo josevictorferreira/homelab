@@ -2125,3 +2125,145 @@ metadata:
     grafana_dashboard: '1'
   name: minio-dashboard
   namespace: monitoring
+---
+apiVersion: v1
+data:
+  shared-backup-dashboard.json: "{\n  \"annotations\": {\n    \"list\": [\n      {\n\
+    \        \"builtIn\": 1,\n        \"datasource\": {\n          \"type\": \"datasource\"\
+    ,\n          \"uid\": \"grafana\"\n        },\n        \"enable\": true,\n   \
+    \     \"hide\": true,\n        \"iconColor\": \"rgba(0, 211, 255, 1)\",\n    \
+    \    \"name\": \"Annotations & Alerts\",\n        \"type\": \"dashboard\"\n  \
+    \    }\n    ]\n  },\n  \"editable\": true,\n  \"fiscalYearStartMonth\": 0,\n \
+    \ \"graphTooltip\": 0,\n  \"id\": null,\n  \"links\": [],\n  \"liveNow\": false,\n\
+    \  \"panels\": [\n    {\n      \"datasource\": {\n        \"type\": \"prometheus\"\
+    ,\n        \"uid\": \"${datasource}\"\n      },\n      \"fieldConfig\": {\n  \
+    \      \"defaults\": {\n          \"color\": {\n            \"mode\": \"thresholds\"\
+    \n          },\n          \"mappings\": [],\n          \"thresholds\": {\n   \
+    \         \"mode\": \"absolute\",\n            \"steps\": [\n              {\n\
+    \                \"color\": \"green\",\n                \"value\": null\n    \
+    \          },\n              {\n                \"color\": \"red\",\n        \
+    \        \"value\": 93600\n              }\n            ]\n          },\n    \
+    \      \"unit\": \"dtdurations\"\n        },\n        \"overrides\": []\n    \
+    \  },\n      \"gridPos\": {\n        \"h\": 4,\n        \"w\": 6,\n        \"\
+    x\": 0,\n        \"y\": 0\n      },\n      \"id\": 1,\n      \"options\": {\n\
+    \        \"colorMode\": \"value\",\n        \"graphMode\": \"none\",\n       \
+    \ \"justifyMode\": \"auto\",\n        \"orientation\": \"auto\",\n        \"reduceOptions\"\
+    : {\n          \"calcs\": [\"lastNotNull\"],\n          \"fields\": \"\",\n  \
+    \        \"values\": false\n        },\n        \"textMode\": \"auto\"\n     \
+    \ },\n      \"pluginVersion\": \"10.3.1\",\n      \"targets\": [\n        {\n\
+    \          \"datasource\": {\n            \"type\": \"prometheus\",\n        \
+    \    \"uid\": \"${datasource}\"\n          },\n          \"expr\": \"time() -\
+    \ kube_cronjob_status_last_successful_time{namespace=\\\"apps\\\", cronjob=\\\"\
+    shared-subfolders-backup\\\"}\",\n          \"refId\": \"A\"\n        }\n    \
+    \  ],\n      \"title\": \"MinIO Backup Age\",\n      \"type\": \"stat\"\n    },\n\
+    \    {\n      \"datasource\": {\n        \"type\": \"prometheus\",\n        \"\
+    uid\": \"${datasource}\"\n      },\n      \"fieldConfig\": {\n        \"defaults\"\
+    : {\n          \"color\": {\n            \"mode\": \"thresholds\"\n          },\n\
+    \          \"mappings\": [],\n          \"thresholds\": {\n            \"mode\"\
+    : \"absolute\",\n            \"steps\": [\n              {\n                \"\
+    color\": \"green\",\n                \"value\": null\n              },\n     \
+    \         {\n                \"color\": \"yellow\",\n                \"value\"\
+    : 93600\n              },\n              {\n                \"color\": \"red\"\
+    ,\n                \"value\": 172800\n              }\n            ]\n       \
+    \   },\n          \"unit\": \"dtdurations\"\n        },\n        \"overrides\"\
+    : []\n      },\n      \"gridPos\": {\n        \"h\": 4,\n        \"w\": 6,\n \
+    \       \"x\": 6,\n        \"y\": 0\n      },\n      \"id\": 2,\n      \"options\"\
+    : {\n        \"colorMode\": \"value\",\n        \"graphMode\": \"none\",\n   \
+    \     \"justifyMode\": \"auto\",\n        \"orientation\": \"auto\",\n       \
+    \ \"reduceOptions\": {\n          \"calcs\": [\"lastNotNull\"],\n          \"\
+    fields\": \"\",\n          \"values\": false\n        },\n        \"textMode\"\
+    : \"auto\"\n      },\n      \"pluginVersion\": \"10.3.1\",\n      \"targets\"\
+    : [\n        {\n          \"datasource\": {\n            \"type\": \"prometheus\"\
+    ,\n            \"uid\": \"${datasource}\"\n          },\n          \"expr\": \"\
+    time() - kube_cronjob_status_last_successful_time{namespace=\\\"apps\\\", cronjob=\\\
+    \"shared-subfolders-proton-sync\\\"}\",\n          \"refId\": \"A\"\n        }\n\
+    \      ],\n      \"title\": \"Proton Sync Age\",\n      \"type\": \"stat\"\n \
+    \   },\n    {\n      \"datasource\": {\n        \"type\": \"prometheus\",\n  \
+    \      \"uid\": \"${datasource}\"\n      },\n      \"fieldConfig\": {\n      \
+    \  \"defaults\": {\n          \"color\": {\n            \"mode\": \"palette-classic\"\
+    \n          },\n          \"custom\": {\n            \"axisCenteredZero\": false,\n\
+    \            \"axisColorMode\": \"text\",\n            \"axisLabel\": \"\",\n\
+    \            \"axisPlacement\": \"auto\",\n            \"barAlignment\": 0,\n\
+    \            \"drawStyle\": \"line\",\n            \"fillOpacity\": 10,\n    \
+    \        \"gradientMode\": \"none\",\n            \"hideFrom\": {\n          \
+    \    \"legend\": false,\n              \"tooltip\": false,\n              \"viz\"\
+    : false\n            },\n            \"insertNulls\": false,\n            \"lineInterpolation\"\
+    : \"linear\",\n            \"lineWidth\": 1,\n            \"pointSize\": 5,\n\
+    \            \"scaleDistribution\": {\n              \"type\": \"linear\"\n  \
+    \          },\n            \"showPoints\": \"never\",\n            \"spanNulls\"\
+    : false,\n            \"stacking\": {\n              \"group\": \"A\",\n     \
+    \         \"mode\": \"none\"\n            },\n            \"thresholdsStyle\"\
+    : {\n              \"mode\": \"off\"\n            }\n          },\n          \"\
+    mappings\": [],\n          \"thresholds\": {\n            \"mode\": \"absolute\"\
+    ,\n            \"steps\": [\n              {\n                \"color\": \"green\"\
+    ,\n                \"value\": null\n              }\n            ]\n         \
+    \ },\n          \"unit\": \"bytes\"\n        },\n        \"overrides\": []\n \
+    \     },\n      \"gridPos\": {\n        \"h\": 8,\n        \"w\": 12,\n      \
+    \  \"x\": 12,\n        \"y\": 0\n      },\n      \"id\": 3,\n      \"options\"\
+    : {\n        \"legend\": {\n          \"calcs\": [],\n          \"displayMode\"\
+    : \"list\",\n          \"placement\": \"bottom\",\n          \"showLegend\": true\n\
+    \        },\n        \"tooltip\": {\n          \"mode\": \"multi\",\n        \
+    \  \"sort\": \"none\"\n        }\n      },\n      \"pluginVersion\": \"10.3.1\"\
+    ,\n      \"targets\": [\n        {\n          \"datasource\": {\n            \"\
+    type\": \"prometheus\",\n            \"uid\": \"${datasource}\"\n          },\n\
+    \          \"expr\": \"minio_bucket_usage_total_bytes{bucket=\\\"homelab-backup-shared\\\
+    \"}\",\n          \"legendFormat\": \"Bucket Size\",\n          \"refId\": \"\
+    A\"\n        }\n      ],\n      \"title\": \"Backup Bucket Size\",\n      \"type\"\
+    : \"timeseries\"\n    },\n    {\n      \"datasource\": {\n        \"type\": \"\
+    prometheus\",\n        \"uid\": \"${datasource}\"\n      },\n      \"fieldConfig\"\
+    : {\n        \"defaults\": {\n          \"color\": {\n            \"mode\": \"\
+    thresholds\"\n          },\n          \"custom\": {\n            \"align\": \"\
+    auto\",\n            \"cellOptions\": {\n              \"type\": \"auto\"\n  \
+    \          },\n            \"inspect\": false\n          },\n          \"mappings\"\
+    : [],\n          \"thresholds\": {\n            \"mode\": \"absolute\",\n    \
+    \        \"steps\": [\n              {\n                \"color\": \"green\",\n\
+    \                \"value\": null\n              }\n            ]\n          },\n\
+    \          \"unit\": \"dtdurations\"\n        },\n        \"overrides\": [\n \
+    \         {\n            \"matcher\": {\n              \"id\": \"byName\",\n \
+    \             \"options\": \"Success\"\n            },\n            \"properties\"\
+    : [\n              {\n                \"id\": \"custom.cellOptions\",\n      \
+    \          \"value\": {\n                  \"mode\": \"basic\",\n            \
+    \      \"type\": \"color-background\"\n                }\n              },\n \
+    \             {\n                \"id\": \"thresholds\",\n                \"value\"\
+    : {\n                  \"mode\": \"absolute\",\n                  \"steps\": [\n\
+    \                    {\n                      \"color\": \"green\",\n        \
+    \              \"value\": null\n                    },\n                    {\n\
+    \                      \"color\": \"red\",\n                      \"value\": 93600\n\
+    \                    }\n                  ]\n                }\n             \
+    \ }\n            ]\n          }\n        ]\n      },\n      \"gridPos\": {\n \
+    \       \"h\": 4,\n        \"w\": 12,\n        \"x\": 0,\n        \"y\": 4\n \
+    \     },\n      \"id\": 4,\n      \"options\": {\n        \"showHeader\": true\n\
+    \      },\n      \"pluginVersion\": \"10.3.1\",\n      \"targets\": [\n      \
+    \  {\n          \"datasource\": {\n            \"type\": \"prometheus\",\n   \
+    \         \"uid\": \"${datasource}\"\n          },\n          \"expr\": \"time()\
+    \ - kube_cronjob_status_last_successful_time{namespace=\\\"apps\\\", cronjob=\\\
+    \"shared-subfolders-backup\\\"}\",\n          \"format\": \"table\",\n       \
+    \   \"instant\": true,\n          \"refId\": \"A\"\n        }\n      ],\n    \
+    \  \"title\": \"Backup Job Status\",\n      \"transformations\": [\n        {\n\
+    \          \"id\": \"organize\",\n          \"options\": {\n            \"excludeByName\"\
+    : {\n              \"Time\": true,\n              \"__name__\": true,\n      \
+    \        \"container\": true,\n              \"endpoint\": true,\n           \
+    \   \"instance\": true,\n              \"job\": true,\n              \"namespace\"\
+    : true,\n              \"prometheus\": true,\n              \"service\": true\n\
+    \            },\n            \"indexByName\": {},\n            \"renameByName\"\
+    : {\n              \"Value\": \"Age (ago)\"\n            }\n          }\n    \
+    \    }\n      ],\n      \"type\": \"table\"\n    }\n  ],\n  \"refresh\": \"30s\"\
+    ,\n  \"schemaVersion\": 38,\n  \"style\": \"dark\",\n  \"tags\": [\"backup\",\
+    \ \"shared\", \"minio\", \"proton\"],\n  \"templating\": {\n    \"list\": [\n\
+    \      {\n        \"current\": {\n          \"selected\": false,\n          \"\
+    text\": \"Prometheus\",\n          \"value\": \"prometheus\"\n        },\n   \
+    \     \"hide\": 0,\n        \"includeAll\": false,\n        \"label\": \"Datasource\"\
+    ,\n        \"multi\": false,\n        \"name\": \"datasource\",\n        \"options\"\
+    : [],\n        \"query\": \"prometheus\",\n        \"refresh\": 1,\n        \"\
+    regex\": \"\",\n        \"skipUrlSync\": false,\n        \"type\": \"datasource\"\
+    \n      }\n    ]\n  },\n  \"time\": {\n    \"from\": \"now-24h\",\n    \"to\"\
+    : \"now\"\n  },\n  \"timepicker\": {},\n  \"timezone\": \"browser\",\n  \"title\"\
+    : \"Shared Subfolders Backup\",\n  \"uid\": \"shared-backup-dashboard\",\n  \"\
+    version\": 1,\n  \"weekStart\": \"\"\n}\n"
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/part-of: backup-observability
+    grafana_dashboard: '1'
+  name: shared-backup-dashboard
+  namespace: monitoring
