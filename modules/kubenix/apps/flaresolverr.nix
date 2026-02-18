@@ -56,7 +56,6 @@ in
                 };
               };
               securityContext = {
-                runAsNonRoot = true;
                 allowPrivilegeEscalation = false;
                 capabilities = {
                   drop = [ "ALL" ];
