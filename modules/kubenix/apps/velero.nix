@@ -90,6 +90,7 @@ in
         template = {
           ttl = "336h";
           includedNamespaces = [ "*" ];
+          excludedNamespaces = [ "rook-ceph" ];
           snapshotVolumes = false;
           defaultVolumesToFsBackup = true;
         };

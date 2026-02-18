@@ -526,6 +526,8 @@ spec:
   schedule: 0 3 * * *
   template:
     defaultVolumesToFsBackup: true
+    excludedNamespaces:
+      - rook-ceph
     includedNamespaces:
       - '*'
     snapshotVolumes: false
