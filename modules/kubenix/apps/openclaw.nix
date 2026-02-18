@@ -115,6 +115,10 @@ in
               };
               userTimezone = "America/Sao_Paulo";
               timeoutSeconds = 600;
+              memorySearch = {
+                provider = "gemini";
+                model = "gemini-embedding-001";
+              };
             };
           };
           session = {
