@@ -148,6 +148,16 @@ in
               "agents_list"
             ];
             deny = [ ];
+            web = {
+              search = {
+                provider = "perplexity";
+                perplexity = {
+                  baseUrl = "https://openrouter.ai/api/v1";
+                  model = "perplexity/sonar-pro";
+                  apiKey = "\${OPENROUTER_API_KEY}";
+                };
+              };
+            };
           };
           messages = {
             # ackReactionScope = "group-mentions";
