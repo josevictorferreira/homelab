@@ -67,6 +67,11 @@ spec:
                 secretKeyRef:
                   key: GEMINI_API_KEY
                   name: openclaw-secrets
+            - name: GITHUB_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  key: GITHUB_TOKEN
+                  name: openclaw-secrets
             - name: HOME
               value: /home/node
             - name: KIMI_API_KEY
@@ -191,11 +196,11 @@ spec:
             - bash
             - -c
             - "set -e\nmkdir -p /home/node/.local/bin\nchown -R 1000:1000 /home/node/.local\n\
-              \n# Install curl and jq (needed for downloads and JSON processing)\n\
-              apt-get update && apt-get install -y curl xz-utils jq\n\n# Install ffmpeg\n\
-              if [ ! -f /home/node/.local/bin/ffmpeg ]; then\n  echo \"Installing\
-              \ ffmpeg...\"\n  # Download from John Van Sickle (reliable static builds)\n\
-              \  curl -fsSL -o /tmp/ffmpeg.tar.xz \"https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz\"\
+              \n# Install curl, jq, git, and other deps\napt-get update && apt-get\
+              \ install -y curl xz-utils jq git\n\n# Install ffmpeg\nif [ ! -f /home/node/.local/bin/ffmpeg\
+              \ ]; then\n  echo \"Installing ffmpeg...\"\n  # Download from John Van\
+              \ Sickle (reliable static builds)\n  curl -fsSL -o /tmp/ffmpeg.tar.xz\
+              \ \"https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz\"\
               \n  tar -xf /tmp/ffmpeg.tar.xz -C /tmp/\n  # Find the ffmpeg binary\
               \ in the extracted folder (it's usually in a subdirectory)\n  find /tmp\
               \ -name \"ffmpeg\" -type f -executable | head -1 | xargs -I {} cp {}\
@@ -212,9 +217,19 @@ spec:
               \ --prefix /home/node/.local\n  # Create symlink to the binary (npm\
               \ puts it in prefix/lib/node_modules/.bin/)\n  ln -sf /home/node/.local/lib/node_modules/.bin/gemini\
               \ /home/node/.local/bin/gemini\n  echo \"Gemini CLI installed successfully\"\
-              \nelse\n  echo \"Gemini CLI already exists, skipping...\"\nfi\n\n# Set\
-              \ ownership\nchown -R 1000:1000 /home/node/.local\nls -la /home/node/.local/bin/\n\
-              echo \"All tools installed successfully!\"\n"
+              \nelse\n  echo \"Gemini CLI already exists, skipping...\"\nfi\n\n# Install\
+              \ GitHub CLI (gh)\nif [ ! -f /home/node/.local/bin/gh ]; then\n  echo\
+              \ \"Installing GitHub CLI...\"\n  # Download latest gh CLI release for\
+              \ Linux amd64\n  curl -fsSL -o /tmp/gh.tar.gz \"https://github.com/cli/cli/releases/latest/download/gh_$(curl\
+              \ -s https://api.github.com/repos/cli/cli/releases/latest | jq -r '.tag_name'\
+              \ | sed 's/v//')_linux_amd64.tar.gz\"\n  tar -xzf /tmp/gh.tar.gz -C\
+              \ /tmp/\n  # Find and copy the gh binary\n  find /tmp -name \"gh\" -type\
+              \ f -executable | head -1 | xargs -I {} cp {} /home/node/.local/bin/gh\n\
+              \  chmod +x /home/node/.local/bin/gh\n  rm -rf /tmp/gh.tar.gz /tmp/gh_*\n\
+              \  echo \"GitHub CLI installed successfully\"\nelse\n  echo \"GitHub\
+              \ CLI already exists, skipping...\"\nfi\n\n# Set ownership\nchown -R\
+              \ 1000:1000 /home/node/.local\nls -la /home/node/.local/bin/\necho \"\
+              All tools installed successfully!\"\n"
           image: node:22-slim
           name: install-tools
           securityContext:

@@ -298,6 +298,12 @@ in
             key = "ELEVENLABS_API_KEY";
           };
         };
+        controllers.main.containers.main.env.GITHUB_TOKEN = {
+          valueFrom.secretKeyRef = {
+            name = "openclaw-secrets";
+            key = "GITHUB_TOKEN";
+          };
+        };
         controllers.main.containers.tailscale = {
           image = {
             repository = "tailscale/tailscale";
@@ -375,8 +381,8 @@ in
               mkdir -p /home/node/.local/bin
               chown -R 1000:1000 /home/node/.local
 
-              # Install curl and jq (needed for downloads and JSON processing)
-              apt-get update && apt-get install -y curl xz-utils jq
+              # Install curl, jq, git, and other deps
+              apt-get update && apt-get install -y curl xz-utils jq git
 
               # Install ffmpeg
               if [ ! -f /home/node/.local/bin/ffmpeg ]; then
@@ -413,6 +419,21 @@ in
                 echo "Gemini CLI installed successfully"
               else
                 echo "Gemini CLI already exists, skipping..."
+              fi
+
+              # Install GitHub CLI (gh)
+              if [ ! -f /home/node/.local/bin/gh ]; then
+                echo "Installing GitHub CLI..."
+                # Download latest gh CLI release for Linux amd64
+                curl -fsSL -o /tmp/gh.tar.gz "https://github.com/cli/cli/releases/latest/download/gh_$(curl -s https://api.github.com/repos/cli/cli/releases/latest | jq -r '.tag_name' | sed 's/v//')_linux_amd64.tar.gz"
+                tar -xzf /tmp/gh.tar.gz -C /tmp/
+                # Find and copy the gh binary
+                find /tmp -name "gh" -type f -executable | head -1 | xargs -I {} cp {} /home/node/.local/bin/gh
+                chmod +x /home/node/.local/bin/gh
+                rm -rf /tmp/gh.tar.gz /tmp/gh_*
+                echo "GitHub CLI installed successfully"
+              else
+                echo "GitHub CLI already exists, skipping..."
               fi
 
               # Set ownership
