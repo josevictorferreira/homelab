@@ -18,6 +18,7 @@ in
       KIMI_API_KEY = kubenix.lib.secretsFor "moonshot_api_key";
       OPENCLAW_MATRIX_TOKEN = kubenix.lib.secretsFor "openclaw_matrix_token";
       ELEVENLABS_API_KEY = kubenix.lib.secretsFor "elevenlabs_api_key";
+      GITHUB_TOKEN = kubenix.lib.secretsFor "github_token";
     };
   };
 }
