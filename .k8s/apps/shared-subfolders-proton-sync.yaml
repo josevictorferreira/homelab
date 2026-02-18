@@ -130,7 +130,7 @@ spec:
   resources:
     requests:
       storage: 1Gi
-  storageClassName: longhorn
+  storageClassName: rook-ceph-block
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -146,7 +146,7 @@ spec:
   resources:
     requests:
       storage: 5Gi
-  storageClassName: longhorn
+  storageClassName: rook-ceph-block
 ---
 apiVersion: v1
 kind: Service
