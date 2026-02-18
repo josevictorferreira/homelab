@@ -164,6 +164,31 @@ let
           })
         ];
       }
+      {
+        orgId = 1;
+        name = "Backup - Shared Subfolders";
+        folder = "Backup Alerts";
+        interval = "5m";
+        rules = [
+          (mkPromRule {
+            uid = "backup-shared-job-failed";
+            title = "Shared Subfolders Backup Job Failed";
+            expr = ''increase(kube_job_status_failed{namespace="apps", job_name=~"shared-subfolders-backup.*"}[6h]) > 0'';
+            severity = "critical";
+            summary = "Shared subfolders backup job failed";
+            description = "A shared-subfolders-backup job has failed in the last 6 hours.";
+          })
+          (mkPromRule {
+            uid = "backup-shared-stale";
+            title = "Shared Subfolders Backup Stale (>26h)";
+            expr = ''time() - kube_cronjob_status_last_successful_time{namespace="apps", cronjob="shared-subfolders-backup"} > 93600'';
+            forDuration = "15m";
+            severity = "critical";
+            summary = "No successful shared subfolders backup in 26+ hours";
+            description = "CronJob shared-subfolders-backup has not succeeded in over 26 hours.";
+          })
+        ];
+      }
     ];
   };
 in
