@@ -7,7 +7,7 @@
 
 let
   namespace = homelab.kubernetes.namespaces.applications;
-  toolboxImage = "ghcr.io/josevictorferreira/backup-toolbox@sha256:143dc0beafb3865fdd37d5a85bb814654063061af96e610ea53a2e9900c2da55";
+  toolboxImage = "ghcr.io/josevictorferreira/backup-toolbox@sha256:0aa0a7f737c74a89b340d004ea5ddf434df3a0f722a706c910e9c70c215debae";
   minioEndpoint = "http://10.10.10.209:9000";
   minioBucket = "homelab-backup-shared";
 

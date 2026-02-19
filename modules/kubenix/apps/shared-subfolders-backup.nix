@@ -1,7 +1,7 @@
 { kubenix, homelab, ... }:
 let
   namespace = homelab.kubernetes.namespaces.applications;
-  image = "ghcr.io/josevictorferreira/backup-toolbox@sha256:143dc0beafb3865fdd37d5a85bb814654063061af96e610ea53a2e9900c2da55";
+  image = "ghcr.io/josevictorferreira/backup-toolbox@sha256:0aa0a7f737c74a89b340d004ea5ddf434df3a0f722a706c910e9c70c215debae";
   minioEndpoint = "http://10.10.10.209:9000";
   bucket = "homelab-backup-shared";
 
@@ -38,17 +38,17 @@ let
     FIRST=true
     for folder in notetaking images backups; do
       if [ -d "$SOURCE_ROOT/$folder" ]; then
-        find "$SOURCE_ROOT/$folder" -type f ! -name ".DS_Store" ! -name "Thumbs.db" -print0 2>/dev/null | while IFS= read -r -d '''' file; do
-          SIZE="$(stat -c%s "''''file" 2>/dev/null || echo 0)"
-          MTIME="$(stat -c%Y "''''file" 2>/dev/null || echo 0)"
-          RELPATH="''''{file#''''SOURCE_ROOT/}"
+        while IFS= read -r -d $'\0' file; do
+          SIZE="$(stat -c%s "$file" 2>/dev/null || echo 0)"
+          MTIME="$(stat -c%Y "$file" 2>/dev/null || echo 0)"
+          RELPATH="''${file#$SOURCE_ROOT/}"
           if [ "$FIRST" = true ]; then
             FIRST=false
           else
             echo "," >> "$MANIFEST_FILE"
           fi
           echo -n "        {\"path\": \"$RELPATH\", \"size\": $SIZE, \"mtime\": $MTIME}" >> "$MANIFEST_FILE"
-        done
+        done < <(find "$SOURCE_ROOT/$folder" -type f ! -name ".DS_Store" ! -name "Thumbs.db" -print0 2>/dev/null)
       fi
     done
 
