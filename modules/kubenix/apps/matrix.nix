@@ -34,9 +34,15 @@ in
         # Deployment strategy - must be Recreate for RWO PVCs
         # RollingUpdate causes Multi-Attach errors since the PVC can only
         # be mounted to one pod at a time
-        synapse.strategy = {
-          type = "Recreate";
-          rollingUpdate = null;
+        synapse = {
+          strategy = {
+            type = "Recreate";
+            rollingUpdate = null;
+          };
+          # Increase startup probe - Synapse takes >2 min to start with bridges
+          startupProbe = {
+            failureThreshold = 30; # 5 minutes (30 * 10s period)
+          };
         };
 
         serverName = "josevictor.me";
