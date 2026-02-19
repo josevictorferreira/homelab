@@ -15,6 +15,7 @@ dockerTools.buildImage {
       postgresql # pg_dumpall, psql
       pkgs.zstd
       pkgs.minio-client # mc
+      pkgs.rclone # rclone for sync backups
       pkgs.bash
       pkgs.coreutils
       pkgs.cacert # CA certs for HTTPS

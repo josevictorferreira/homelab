@@ -10,28 +10,42 @@ let
 
     DATE="$(date +%Y-%m-%d)"
     TIMESTAMP="$(date +%Y%m%d_%H%M%S)"
-    ARCHIVE_NAME="shared-$DATE"
-    ARCHIVE_FILE="$ARCHIVE_NAME.tar.zst"
-    SHA256_FILE="$ARCHIVE_FILE.sha256"
-    MANIFEST_FILE="$ARCHIVE_NAME.manifest.json"
+    MANIFEST_FILE="manifest-$DATE.json"
 
     SOURCE_ROOT="/shared"
-    DEST_PREFIX="$DATE"
 
-    echo "=== Starting shared subfolders backup ==="
+    echo "=== Starting shared subfolders backup (rclone sync) ==="
     echo "Date: $DATE"
     echo "Timestamp: $TIMESTAMP"
     echo "Folders to backup: notetaking images backups"
+    echo "Destination: s3:${bucket}/"
 
+    # Create rclone config
+    mkdir -p "$HOME/.config/rclone"
+    cat > "$HOME/.config/rclone/rclone.conf" <<EOF
+    [minio]
+    type = s3
+    provider = Minio
+    env_auth = false
+    access_key_id = $AWS_ACCESS_KEY_ID
+    secret_access_key = $AWS_SECRET_ACCESS_KEY
+    endpoint = $MINIO_ENDPOINT
+    region = us-east-1
+    force_path_style = true
+    EOF
+
+    # Generate manifest of files
+    echo "Generating manifest..."
     WORKDIR="/tmp/backup-$TIMESTAMP"
     mkdir -p "$WORKDIR"
     cd "$WORKDIR"
 
-    echo "Creating manifest..."
     echo "{" > "$MANIFEST_FILE"
     echo "  \"backup_date\": \"$DATE\"," >> "$MANIFEST_FILE"
     echo "  \"timestamp\": \"$TIMESTAMP\"," >> "$MANIFEST_FILE"
     echo "  \"source_root\": \"/shared\"," >> "$MANIFEST_FILE"
+    echo "  \"method\": \"rclone-sync\"," >> "$MANIFEST_FILE"
+    echo "  \"destination\": \"s3:${bucket}/current/\"," >> "$MANIFEST_FILE"
     echo "  \"folders\": [\"notetaking\", \"images\", \"backups\"]," >> "$MANIFEST_FILE"
     echo "  \"files\": [" >> "$MANIFEST_FILE"
 
@@ -57,43 +71,39 @@ let
     echo "      \"exclusions\": [\".DS_Store\", \"Thumbs.db\"]" >> "$MANIFEST_FILE"
     echo "    }" >> "$MANIFEST_FILE"
 
-    echo "Creating tar.zst archive..."
-    tar --zstd -cf "$ARCHIVE_FILE" \
-      --exclude=".DS_Store" \
-      --exclude="Thumbs.db" \
-      -C "$SOURCE_ROOT" \
-      notetaking images backups
+    # Ensure bucket exists
+    echo "Ensuring bucket exists..."
+    rclone mkdir "minio:${bucket}"
 
-    echo "Generating SHA256 checksum..."
-    sha256sum "$ARCHIVE_FILE" > "$SHA256_FILE"
+    # Sync each folder individually with filters
+    echo "Starting rclone sync..."
+    for folder in notetaking images backups; do
+      if [ -d "$SOURCE_ROOT/$folder" ]; then
+        echo "Syncing folder: $folder"
+        rclone sync "$SOURCE_ROOT/$folder" "minio:${bucket}/current/$folder/" \
+          --exclude ".DS_Store" \
+          --exclude "Thumbs.db" \
+          --fast-list \
+          --transfers 4 \
+          --checksum \
+          --stats-one-line \
+          --stats 30s \
+          --log-level INFO
+      else
+        echo "Warning: folder $folder not found, skipping"
+      fi
+    done
 
-    echo "Archive size: $(du -h "$ARCHIVE_FILE" | cut -f1)"
+    # Upload manifest
+    echo "Uploading manifest..."
+    rclone copy "$MANIFEST_FILE" "minio:${bucket}/manifests/"
 
-    echo "Uploading to MinIO..."
-    mc alias set shared "$MINIO_ENDPOINT" "$AWS_ACCESS_KEY_ID" "$AWS_SECRET_ACCESS_KEY"
-    mc mb --ignore-existing "shared/${bucket}"
-
-    mc cp "$ARCHIVE_FILE" "shared/${bucket}/$DEST_PREFIX/$ARCHIVE_FILE.tmp"
-    mc mv "shared/${bucket}/$DEST_PREFIX/$ARCHIVE_FILE.tmp" "shared/${bucket}/$DEST_PREFIX/$ARCHIVE_FILE"
-
-    mc cp "$SHA256_FILE" "shared/${bucket}/$DEST_PREFIX/$SHA256_FILE.tmp"
-    mc mv "shared/${bucket}/$DEST_PREFIX/$SHA256_FILE.tmp" "shared/${bucket}/$DEST_PREFIX/$SHA256_FILE"
-
-    mc cp "$MANIFEST_FILE" "shared/${bucket}/$DEST_PREFIX/$MANIFEST_FILE.tmp"
-    mc mv "shared/${bucket}/$DEST_PREFIX/$MANIFEST_FILE.tmp" "shared/${bucket}/$DEST_PREFIX/$MANIFEST_FILE"
-
-    echo "Verifying uploads..."
-    mc stat "shared/${bucket}/$DEST_PREFIX/$ARCHIVE_FILE"
-    mc stat "shared/${bucket}/$DEST_PREFIX/$SHA256_FILE"
-    mc stat "shared/${bucket}/$DEST_PREFIX/$MANIFEST_FILE"
-
-    echo "Verifying checksum..."
-    mc cat "shared/${bucket}/$DEST_PREFIX/$ARCHIVE_FILE" | sha256sum -c "$SHA256_FILE"
-
+    # Clean up
     rm -rf "$WORKDIR"
 
     echo "=== Backup completed successfully ==="
-    echo "Archive: s3://${bucket}/$DEST_PREFIX/$ARCHIVE_FILE"
+    echo "Destination: s3:${bucket}/current/"
+    echo "Manifest: s3:${bucket}/manifests/$MANIFEST_FILE"
   '';
 in
 {
@@ -146,12 +156,12 @@ in
                 requests = {
                   cpu = "100m";
                   memory = "256Mi";
-                  ephemeral-storage = "2Gi";
+                  ephemeral-storage = "256Mi";
                 };
                 limits = {
                   cpu = "1000m";
                   memory = "1Gi";
-                  ephemeral-storage = "10Gi";
+                  ephemeral-storage = "512Mi";
                 };
               };
               volumeMounts = [
