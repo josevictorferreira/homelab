@@ -36,6 +36,7 @@ in
         # be mounted to one pod at a time
         synapse.strategy = {
           type = "Recreate";
+          rollingUpdate = null;
         };
 
         serverName = "josevictor.me";
