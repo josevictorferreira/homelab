@@ -17,23 +17,29 @@ spec:
           containers:
             - args:
                 - "set -euo pipefail\n\nDATE=\"$(date +%Y-%m-%d)\"\nTIMESTAMP=\"$(date\
-                  \ +%Y%m%d_%H%M%S)\"\nARCHIVE_NAME=\"shared-$DATE\"\nARCHIVE_FILE=\"\
-                  $ARCHIVE_NAME.tar.zst\"\nSHA256_FILE=\"$ARCHIVE_FILE.sha256\"\n\
-                  MANIFEST_FILE=\"$ARCHIVE_NAME.manifest.json\"\n\nSOURCE_ROOT=\"\
-                  /shared\"\nDEST_PREFIX=\"$DATE\"\n\necho \"=== Starting shared subfolders\
-                  \ backup ===\"\necho \"Date: $DATE\"\necho \"Timestamp: $TIMESTAMP\"\
-                  \necho \"Folders to backup: notetaking images backups\"\n\nWORKDIR=\"\
-                  /tmp/backup-$TIMESTAMP\"\nmkdir -p \"$WORKDIR\"\ncd \"$WORKDIR\"\
-                  \n\necho \"Creating manifest...\"\necho \"{\" > \"$MANIFEST_FILE\"\
-                  \necho \"  \\\"backup_date\\\": \\\"$DATE\\\",\" >> \"$MANIFEST_FILE\"\
+                  \ +%Y%m%d_%H%M%S)\"\nMANIFEST_FILE=\"manifest-$DATE.json\"\n\nSOURCE_ROOT=\"\
+                  /shared\"\n\necho \"=== Starting shared subfolders backup (rclone\
+                  \ sync) ===\"\necho \"Date: $DATE\"\necho \"Timestamp: $TIMESTAMP\"\
+                  \necho \"Folders to backup: notetaking images backups\"\necho \"\
+                  Destination: s3:homelab-backup-shared/\"\n\n# Create rclone config\n\
+                  mkdir -p \"$HOME/.config/rclone\"\ncat > \"$HOME/.config/rclone/rclone.conf\"\
+                  \ <<EOF\n[minio]\ntype = s3\nprovider = Minio\nenv_auth = false\n\
+                  access_key_id = $AWS_ACCESS_KEY_ID\nsecret_access_key = $AWS_SECRET_ACCESS_KEY\n\
+                  endpoint = $MINIO_ENDPOINT\nregion = us-east-1\nforce_path_style\
+                  \ = true\nEOF\n\n# Generate manifest of files\necho \"Generating\
+                  \ manifest...\"\nWORKDIR=\"/tmp/backup-$TIMESTAMP\"\nmkdir -p \"\
+                  $WORKDIR\"\ncd \"$WORKDIR\"\n\necho \"{\" > \"$MANIFEST_FILE\"\n\
+                  echo \"  \\\"backup_date\\\": \\\"$DATE\\\",\" >> \"$MANIFEST_FILE\"\
                   \necho \"  \\\"timestamp\\\": \\\"$TIMESTAMP\\\",\" >> \"$MANIFEST_FILE\"\
                   \necho \"  \\\"source_root\\\": \\\"/shared\\\",\" >> \"$MANIFEST_FILE\"\
-                  \necho \"  \\\"folders\\\": [\\\"notetaking\\\", \\\"images\\\"\
-                  , \\\"backups\\\"],\" >> \"$MANIFEST_FILE\"\necho \"  \\\"files\\\
-                  \": [\" >> \"$MANIFEST_FILE\"\n\nFIRST=true\nfor folder in notetaking\
-                  \ images backups; do\n  if [ -d \"$SOURCE_ROOT/$folder\" ]; then\n\
-                  \    while IFS= read -r -d $'\\0' file; do\n      SIZE=\"$(stat\
-                  \ -c%s \"$file\" 2>/dev/null || echo 0)\"\n      MTIME=\"$(stat\
+                  \necho \"  \\\"method\\\": \\\"rclone-sync\\\",\" >> \"$MANIFEST_FILE\"\
+                  \necho \"  \\\"destination\\\": \\\"s3:homelab-backup-shared/current/\\\
+                  \",\" >> \"$MANIFEST_FILE\"\necho \"  \\\"folders\\\": [\\\"notetaking\\\
+                  \", \\\"images\\\", \\\"backups\\\"],\" >> \"$MANIFEST_FILE\"\n\
+                  echo \"  \\\"files\\\": [\" >> \"$MANIFEST_FILE\"\n\nFIRST=true\n\
+                  for folder in notetaking images backups; do\n  if [ -d \"$SOURCE_ROOT/$folder\"\
+                  \ ]; then\n    while IFS= read -r -d $'\\0' file; do\n      SIZE=\"\
+                  $(stat -c%s \"$file\" 2>/dev/null || echo 0)\"\n      MTIME=\"$(stat\
                   \ -c%Y \"$file\" 2>/dev/null || echo 0)\"\n      RELPATH=\"${file#$SOURCE_ROOT/}\"\
                   \n      if [ \"$FIRST\" = true ]; then\n        FIRST=false\n  \
                   \    else\n        echo \",\" >> \"$MANIFEST_FILE\"\n      fi\n\
@@ -44,29 +50,21 @@ spec:
                   \ \"\" >> \"$MANIFEST_FILE\"\necho \"      ],\" >> \"$MANIFEST_FILE\"\
                   \necho \"      \\\"exclusions\\\": [\\\".DS_Store\\\", \\\"Thumbs.db\\\
                   \"]\" >> \"$MANIFEST_FILE\"\necho \"    }\" >> \"$MANIFEST_FILE\"\
-                  \n\necho \"Creating tar.zst archive...\"\ntar --zstd -cf \"$ARCHIVE_FILE\"\
-                  \ \\\n  --exclude=\".DS_Store\" \\\n  --exclude=\"Thumbs.db\" \\\
-                  \n  -C \"$SOURCE_ROOT\" \\\n  notetaking images backups\n\necho\
-                  \ \"Generating SHA256 checksum...\"\nsha256sum \"$ARCHIVE_FILE\"\
-                  \ > \"$SHA256_FILE\"\n\necho \"Archive size: $(du -h \"$ARCHIVE_FILE\"\
-                  \ | cut -f1)\"\n\necho \"Uploading to MinIO...\"\nmc alias set shared\
-                  \ \"$MINIO_ENDPOINT\" \"$AWS_ACCESS_KEY_ID\" \"$AWS_SECRET_ACCESS_KEY\"\
-                  \nmc mb --ignore-existing \"shared/homelab-backup-shared\"\n\nmc\
-                  \ cp \"$ARCHIVE_FILE\" \"shared/homelab-backup-shared/$DEST_PREFIX/$ARCHIVE_FILE.tmp\"\
-                  \nmc mv \"shared/homelab-backup-shared/$DEST_PREFIX/$ARCHIVE_FILE.tmp\"\
-                  \ \"shared/homelab-backup-shared/$DEST_PREFIX/$ARCHIVE_FILE\"\n\n\
-                  mc cp \"$SHA256_FILE\" \"shared/homelab-backup-shared/$DEST_PREFIX/$SHA256_FILE.tmp\"\
-                  \nmc mv \"shared/homelab-backup-shared/$DEST_PREFIX/$SHA256_FILE.tmp\"\
-                  \ \"shared/homelab-backup-shared/$DEST_PREFIX/$SHA256_FILE\"\n\n\
-                  mc cp \"$MANIFEST_FILE\" \"shared/homelab-backup-shared/$DEST_PREFIX/$MANIFEST_FILE.tmp\"\
-                  \nmc mv \"shared/homelab-backup-shared/$DEST_PREFIX/$MANIFEST_FILE.tmp\"\
-                  \ \"shared/homelab-backup-shared/$DEST_PREFIX/$MANIFEST_FILE\"\n\
-                  \necho \"Verifying uploads...\"\nmc stat \"shared/homelab-backup-shared/$DEST_PREFIX/$ARCHIVE_FILE\"\
-                  \nmc stat \"shared/homelab-backup-shared/$DEST_PREFIX/$SHA256_FILE\"\
-                  \nmc stat \"shared/homelab-backup-shared/$DEST_PREFIX/$MANIFEST_FILE\"\
-                  \n\necho \"Verifying checksum...\"\nmc cat \"shared/homelab-backup-shared/$DEST_PREFIX/$ARCHIVE_FILE\"\
-                  \ | sha256sum -c \"$SHA256_FILE\"\n\nrm -rf \"$WORKDIR\"\n\necho\
-                  \ \"=== Backup completed successfully ===\"\necho \"Archive: s3://homelab-backup-shared/$DEST_PREFIX/$ARCHIVE_FILE\"\
+                  \n\n# Ensure bucket exists\necho \"Ensuring bucket exists...\"\n\
+                  rclone mkdir \"minio:homelab-backup-shared\"\n\n# Sync each folder\
+                  \ individually with filters\necho \"Starting rclone sync...\"\n\
+                  for folder in notetaking images backups; do\n  if [ -d \"$SOURCE_ROOT/$folder\"\
+                  \ ]; then\n    echo \"Syncing folder: $folder\"\n    rclone sync\
+                  \ \"$SOURCE_ROOT/$folder\" \"minio:homelab-backup-shared/current/$folder/\"\
+                  \ \\\n      --exclude \".DS_Store\" \\\n      --exclude \"Thumbs.db\"\
+                  \ \\\n      --fast-list \\\n      --transfers 4 \\\n      --checksum\
+                  \ \\\n      --stats-one-line \\\n      --stats 30s \\\n      --log-level\
+                  \ INFO\n  else\n    echo \"Warning: folder $folder not found, skipping\"\
+                  \n  fi\ndone\n\n# Upload manifest\necho \"Uploading manifest...\"\
+                  \nrclone copy \"$MANIFEST_FILE\" \"minio:homelab-backup-shared/manifests/\"\
+                  \n\n# Clean up\nrm -rf \"$WORKDIR\"\n\necho \"=== Backup completed\
+                  \ successfully ===\"\necho \"Destination: s3:homelab-backup-shared/current/\"\
+                  \necho \"Manifest: s3:homelab-backup-shared/manifests/$MANIFEST_FILE\"\
                   \n"
               command:
                 - bash
@@ -89,11 +87,11 @@ spec:
               resources:
                 limits:
                   cpu: 1000m
-                  ephemeral-storage: 10Gi
+                  ephemeral-storage: 512Mi
                   memory: 1Gi
                 requests:
                   cpu: 100m
-                  ephemeral-storage: 2Gi
+                  ephemeral-storage: 256Mi
                   memory: 256Mi
               volumeMounts:
                 - mountPath: /shared
