@@ -300,9 +300,9 @@ in
               };
               bridge = {
                 username_template = "discord_{{.}}";
-                # Room naming pattern: discord/servername/channelname
-                channel_name_template = "discord/{{.GuildName}}/{{if or (eq .Type 3) (eq .Type 4)}}{{.Name}}{{else}}{{.Name}}{{end}}";
-                guild_name_template = "{{.Name}}";
+                displayname_template = ''{{or .GlobalName .Username}}{{if and .Discriminator (ne .Discriminator "0")}}#{{.Discriminator}}{{end}}'';
+                channel_name_template = "discord/{{.GuildName}}/{{if .ParentName}}{{.ParentName}}/{{end}}{{.Name}}";
+                guild_name_template = "discord/{{.Name}}";
                 command_prefix = "!dc";
                 permissions = {
                   "*" = "relay";
