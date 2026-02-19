@@ -112,6 +112,7 @@ in
         backoffLimit = 2;
         template.spec = {
           restartPolicy = "OnFailure";
+          imagePullSecrets = [ { name = "ghcr-registry-secret"; } ];
           containers = [
             {
               name = "backup";

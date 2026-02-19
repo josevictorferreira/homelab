@@ -26,7 +26,11 @@ spec:
     metadata:
       annotations:
         checksum/config: 618844adc5b3f88ba7f8aeabf0cd12715167626f7fcf0a1659ef83d8d02e220d
+<<<<<<< HEAD
         checksum/secrets: 2a111da2592f4ef6fdecd726939f3df0428c09c9ff1ef7a3d1f1854a62e39876
+=======
+        checksum/secrets: 8806cc823685f98bc37a6606a504b6e9b4a8f4f12dd65f8a39c5e9aa521f1871
+>>>>>>> e2217de (💄 Update Matrix registration secret and add image pull secret to backup service)
       labels:
         app.kubernetes.io/component: synapse
         app.kubernetes.io/instance: synapse
@@ -372,7 +376,11 @@ metadata:
   name: synapse-matrix-synapse
   namespace: apps
 stringData:
+<<<<<<< HEAD
   config.yaml: "## Registration ##\n\nregistration_shared_secret: \"MunrjvhB2n2o7q4g3mVORLtc\"\
+=======
+  config.yaml: "## Registration ##\n\nregistration_shared_secret: \"HO4vlQ4E6K61U3I9LBvIW0PA\"\
+>>>>>>> e2217de (💄 Update Matrix registration secret and add image pull secret to backup service)
     \n\n## API Configuration ##\n\n## Database configuration ##\n\ndatabase:\n  name:\
     \ \"psycopg2\"\n  args:\n    user: \"postgres\"\n    password: \"@@POSTGRES_PASSWORD@@\"\
     \n    database: \"synapse\"\n    host: \"postgresql-18-hl\"\n    port: 5432\n\
