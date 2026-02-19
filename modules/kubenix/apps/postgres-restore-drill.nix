@@ -6,7 +6,7 @@
 }:
 let
   namespace = homelab.kubernetes.namespaces.applications;
-  toolboxImage = "ghcr.io/josevictorferreira/backup-toolbox@sha256:143dc0beafb3865fdd37d5a85bb814654063061af96e610ea53a2e9900c2da55";
+  toolboxImage = "ghcr.io/josevictorferreira/backup-toolbox@sha256:0aa0a7f737c74a89b340d004ea5ddf434df3a0f722a706c910e9c70c215debae";
   # Same custom Postgres 18 image used by postgresql-18 service
   postgresImage = "ghcr.io/josevictorferreira/postgresql-vchord-bitnami:38c40fefe0c58cff6622de77f787634320e1ae5e";
   minioEndpoint = "http://10.10.10.209:9000";

@@ -21,6 +21,8 @@ dockerTools.buildImage {
       pkgs.gnugrep
       pkgs.getent # needed by mc for home dir resolution
       pkgs.jq # JSON parsing for mc output
+      pkgs.gnutar # tar command
+      pkgs.gzip # gzip for tar.gz
     ];
     pathsToLink = [
       "/bin"

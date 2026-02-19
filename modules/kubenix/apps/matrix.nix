@@ -31,6 +31,13 @@ in
           pullPolicy = "IfNotPresent";
         };
 
+        # Deployment strategy - must be Recreate for RWO PVCs
+        # RollingUpdate causes Multi-Attach errors since the PVC can only
+        # be mounted to one pod at a time
+        synapse.strategy = {
+          type = "Recreate";
+        };
+
         serverName = "josevictor.me";
         publicServerName = "matrix.josevictor.me";
         publicBaseurl = "https://matrix.josevictor.me/";
