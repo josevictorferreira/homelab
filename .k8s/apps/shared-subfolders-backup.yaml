@@ -99,6 +99,8 @@ spec:
                 - mountPath: /shared
                   name: shared-storage
                   readOnly: true
+          imagePullSecrets:
+            - name: ghcr-registry-secret
           restartPolicy: OnFailure
           volumes:
             - name: shared-storage
