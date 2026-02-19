@@ -30,7 +30,7 @@ let
     access_key_id = $AWS_ACCESS_KEY_ID
     secret_access_key = $AWS_SECRET_ACCESS_KEY
     endpoint = $MINIO_ENDPOINT
-    region = us-east-1
+    region = sa-east-1
     force_path_style = true
     EOF
 

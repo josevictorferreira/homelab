@@ -25,7 +25,7 @@ spec:
                   mkdir -p \"$HOME/.config/rclone\"\ncat > \"$HOME/.config/rclone/rclone.conf\"\
                   \ <<EOF\n[minio]\ntype = s3\nprovider = Minio\nenv_auth = false\n\
                   access_key_id = $AWS_ACCESS_KEY_ID\nsecret_access_key = $AWS_SECRET_ACCESS_KEY\n\
-                  endpoint = $MINIO_ENDPOINT\nregion = us-east-1\nforce_path_style\
+                  endpoint = $MINIO_ENDPOINT\nregion = sa-east-1\nforce_path_style\
                   \ = true\nEOF\n\n# Generate manifest of files\necho \"Generating\
                   \ manifest...\"\nWORKDIR=\"/tmp/backup-$TIMESTAMP\"\nmkdir -p \"\
                   $WORKDIR\"\ncd \"$WORKDIR\"\n\necho \"{\" > \"$MANIFEST_FILE\"\n\
