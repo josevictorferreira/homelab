@@ -46,7 +46,7 @@ in
       namespace = namespace;
       image = {
         repository = "ghcr.io/openclaw/openclaw";
-        tag = "2026.2.15@sha256:20fb8df4e6c6d893de5b8445394583258fdf0f98179e82cdfa24062c6bed5de0";
+        tag = "2026.2.19@sha256:5352d3ababbc12237fda60fe00a25237441eb7bb5e3d3062a6b0b5fbd938734d";
         pullPolicy = "IfNotPresent";
       };
       port = 18789;
