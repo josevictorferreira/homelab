@@ -264,6 +264,7 @@ in
         };
         controllers.main.containers.main.env.XDG_CONFIG_HOME = "/home/node/.config";
         controllers.main.containers.main.env.HOME = "/home/node";
+        controllers.main.containers.main.env.TZ = "America/Sao_Paulo";
         controllers.main.containers.main.env.PATH =
           "/home/node/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin";
         controllers.main.containers.main.env.GEMINI_API_KEY = {
