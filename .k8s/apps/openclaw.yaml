@@ -96,6 +96,8 @@ spec:
                   name: openclaw-secrets
             - name: PATH
               value: /home/node/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+            - name: TZ
+              value: America/Sao_Paulo
             - name: XDG_CONFIG_HOME
               value: /home/node/.config
           envFrom:
