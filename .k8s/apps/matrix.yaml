@@ -26,7 +26,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 618844adc5b3f88ba7f8aeabf0cd12715167626f7fcf0a1659ef83d8d02e220d
-        checksum/secrets: ba9eeb38327236dbf67371c8af17b67ddcc901ce27d1cdbed711ed30747c6a6a
+        checksum/secrets: 18835218ea88d89ae854e31b4638565d79619f6f5a1327dbdadab6c57bb12b13
       labels:
         app.kubernetes.io/component: synapse
         app.kubernetes.io/instance: synapse
@@ -372,7 +372,7 @@ metadata:
   name: synapse-matrix-synapse
   namespace: apps
 stringData:
-  config.yaml: "## Registration ##\n\nregistration_shared_secret: \"6AcHDBdsIfLqycka0ICpzFKl\"\
+  config.yaml: "## Registration ##\n\nregistration_shared_secret: \"LiNxO218rogscu990HzLCl5O\"\
     \n\n## API Configuration ##\n\n## Database configuration ##\n\ndatabase:\n  name:\
     \ \"psycopg2\"\n  args:\n    user: \"postgres\"\n    password: \"@@POSTGRES_PASSWORD@@\"\
     \n    database: \"synapse\"\n    host: \"postgresql-18-hl\"\n    port: 5432\n\
