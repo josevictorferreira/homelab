@@ -118,9 +118,9 @@ in
               {
                 id = "main";
                 identity = {
-                  name = "Clawd";
-                  theme = "helpful AI assistant";
-                  emoji = "🦞";
+                  name = "Mel";
+                  theme = "minha fiel assistente";
+                  emoji = "🐕"; # dog emoji
                 };
               }
             ];
@@ -180,14 +180,22 @@ in
             };
           };
           messages = {
-            # ackReactionScope = "group-mentions";
             tts = {
               auto = "always";
               provider = "elevenlabs";
+              summaryModel = "google/gemini-2.0-flash";
               elevenlabs = {
                 apiKey = "\${ELEVENLABS_API_KEY}";
                 voiceId = "GOkMqfyKMLVUcYfO2WbB";
                 modelId = "eleven_multilingual_v2";
+                seed = 91;
+                voiceSettings = {
+                  stability = 0.5;
+                  similarityBoost = 0.75;
+                  style = 0.0;
+                  useSpeakerBoost = true;
+                  speed = 1.0;
+                };
               };
             };
           };
@@ -230,15 +238,14 @@ in
               dmPolicy = "allowlist";
               allowFrom = [
                 "\${WHATSAPP_NUMBER}"
-                "\${WHATSAPP_NUMBER_TWO}"
               ];
-              groupPolicy = "open";
-              # groupAllowFrom = [ "\${WHATSAPP_NUMBER}" ];
-              # ackReaction = {
-              #   emoji = "👀";
-              #   direct = true;
-              #   group = "mentions";
-              # };
+              groupPolicy = "allowlist";
+              groupAllowFrom = [ "\${WHATSAPP_NUMBER}" ];
+              ackReaction = {
+                emoji = "👀";
+                direct = true;
+                group = "mentions";
+              };
             };
           };
           env = {
