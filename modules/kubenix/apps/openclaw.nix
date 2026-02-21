@@ -66,24 +66,25 @@ in
             fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2));
           "
           npm install --omit=dev --no-package-lock --legacy-peer-deps 2>&1 || echo "WARN: npm install in extension dir failed"
-          echo "Substituting env vars and enabling plugins in config..."
+          echo "Ensuring matrix plugin is enabled in config..."
           cd /app
           node -e "
             const fs = require('fs');
             const cfgPath = '/home/node/.openclaw/openclaw.json';
-            let content = fs.readFileSync(cfgPath, 'utf8');
-            // Substitute env vars like ''\${VAR_NAME}
-            content = content.replace(/\\\\?\''\$\{([A-Z_][A-Z0-9_]*)\}/g, (match, varName) => {
-              const val = process.env[varName];
-              if (val === undefined) {
-                console.warn('Warning: env var ' + varName + ' not set, leaving placeholder');
-                return match;
+            let raw = fs.readFileSync(cfgPath, 'utf8');
+            // Substitute known env var placeholders
+            const vars = [
+              'OPENCLAW_MATRIX_TOKEN', 'ELEVENLABS_API_KEY', 'MOONSHOT_API_KEY',
+              'OPENROUTER_API_KEY', 'WHATSAPP_NUMBER', 'WHATSAPP_BOT_NUMBER'
+            ];
+            vars.forEach(name => {
+              const val = process.env[name];
+              if (val) {
+                raw = raw.split('\x24{' + name + '}').join(val);
+                console.log('Substituted:', name);
               }
-              console.log('Substituted: ' + varName);
-              return val;
             });
-            const cfg = JSON.parse(content);
-            // Enable matrix and whatsapp plugins
+            const cfg = JSON.parse(raw);
             if (!cfg.plugins) cfg.plugins = {};
             if (!cfg.plugins.entries) cfg.plugins.entries = {};
             if (!cfg.plugins.entries.matrix) cfg.plugins.entries.matrix = {};
