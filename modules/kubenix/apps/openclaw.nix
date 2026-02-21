@@ -209,7 +209,6 @@ in
               groupPolicy = "disabled";
             };
             whatsapp = {
-              enabled = true;
               dmPolicy = "allowlist";
               allowFrom = [ "\${WHATSAPP_NUMBER}" ];
               groupPolicy = "allowlist";
