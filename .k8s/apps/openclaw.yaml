@@ -208,8 +208,8 @@ spec:
             - "set -e\nmkdir -p /home/node/.local/bin\nchown -R 1000:1000 /home/node/.local\n\
               \n# Install curl, jq, git, python3-pip and other deps\napt-get update\
               \ && apt-get install -y curl xz-utils jq git python3-pip\n\n# Install\
-              \ requests library for Python\npip3 install --no-cache-dir requests\
-              \ --break-system-packages\n\n# Install ffmpeg\nif [ ! -f /home/node/.local/bin/ffmpeg\
+              \ requests library for Python in user directory\npip3 install --user\
+              \ --no-cache-dir requests\n\n# Install ffmpeg\nif [ ! -f /home/node/.local/bin/ffmpeg\
               \ ]; then\n  echo \"Installing ffmpeg...\"\n  # Download from John Van\
               \ Sickle (reliable static builds)\n  curl -fsSL -o /tmp/ffmpeg.tar.xz\
               \ \"https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz\"\
