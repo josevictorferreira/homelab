@@ -1,4 +1,4 @@
-.PHONY: lgroups check ddeploy deploy gdeploy secrets manifests kubesync wusbiso docker-build docker-login docker-init-repo docker-push lint format backup-postgres restore-postgres reconcile events backup-rgw backup-etcd backup-verify help
+.PHONY: lgroups check ddeploy deploy gdeploy secrets manifests kubesync wusbiso docker-build docker-login docker-init-repo docker-push lint format backup-postgres restore-postgres reconcile events backup-rgw backup-etcd backup-verify images images-outdated images-check help
 
 .DEFAULT_GOAL := help
 
@@ -74,6 +74,20 @@ backup-verify: ## Verify backup health: RGW mirror + etcd offload + postgres + v
 	echo "=== Postgres backup ===" && ssh root@lab-pi-bk "mc ls pi/homelab-backup-postgres/ 2>/dev/null | tail -3"; \
 	echo "=== Velero BSL ===" && kubectl get bsl -n velero 2>/dev/null; \
 	echo "=== Done ==="
+
+images: ## List all container images used in kubenix.
+	@./scripts/kubenix-image-updater scan
+
+images-outdated: ## Show container images with available updates.
+	@./scripts/kubenix-image-updater outdated
+
+images-check: ## Check specific image for updates. Usage: make images-check IMAGE=ghcr.io/immich-app/immich-server:v2.5.2
+	@if [ -z "$(IMAGE)" ]; then \
+		echo "Usage: make images-check IMAGE=<image-ref>"; \
+		echo "Example: make images-check IMAGE=ghcr.io/immich-app/immich-server:v2.5.2"; \
+		exit 1; \
+	fi
+	@./scripts/kubenix-image-updater check "$(IMAGE)" --with-digest
 
 help: ## Show this help.
 	@printf "Usage: make [target]\n\nTARGETS:\n"; grep -F "##" $(MAKEFILE_LIST) | grep -Fv "grep -F" | grep -Fv "printf " | sed -e 's/\\$$//' | sed -e 's/##//' | column -t -s ":" | sed -e 's/^/    /'; printf "\n"

@@ -1,9 +1,9 @@
 # Nix-based CLI commands for homelab management
 # All logic lives here; Makefile just calls `nix run .#<command>`
-{ pkgs
-, lib
-, deploy-rs-pkg ? null
-,
+{
+  pkgs,
+  lib,
+  deploy-rs-pkg ? null,
 }:
 
 let
@@ -496,6 +496,31 @@ let
     echo "Restore complete"
   '';
 
+  # ============================================================================
+  # Image Updater
+  # ============================================================================
+
+  image-scan =
+    mkCommand "image-scan" "List all container images in kubenix"
+      [ pkgs.findutils pkgs.gnugrep pkgs.gawk pkgs.jq ]
+      ''
+        ${./image-updater.sh} scan
+      '';
+
+  image-outdated =
+    mkCommand "image-outdated" "Check for outdated images"
+      [ pkgs.findutils pkgs.gnugrep pkgs.gawk pkgs.jq pkgs.skopeo ]
+      ''
+        ${./image-updater.sh} outdated
+      '';
+
+  image-updater =
+    mkCommand "image-updater" "Image updater utility"
+      [ pkgs.findutils pkgs.gnugrep pkgs.gawk pkgs.jq pkgs.skopeo ]
+      ''
+        ${./image-updater.sh} "''${@:-help}"
+      '';
+
 in
 {
   inherit
@@ -518,5 +543,8 @@ in
     docker-push
     backup-postgres
     restore-postgres
+    image-scan
+    image-outdated
+    image-updater
     ;
 }
