@@ -186,6 +186,8 @@ in
               provider = "elevenlabs";
               elevenlabs = {
                 apiKey = "\${ELEVENLABS_API_KEY}";
+                voiceId = "GOkMqfyKMLVUcYfO2WbB";
+                modelId = "eleven_multilingual_v2";
               };
             };
           };
