@@ -6,15 +6,17 @@
     sops-nix.url = "github:Mic92/sops-nix";
     deploy-rs.url = "github:serokell/deploy-rs";
     kubenix.url = "github:hall/kubenix";
+    nix-openclaw.url = "git+https://github.com/openclaw/nix-openclaw?ref=main";
   };
 
   outputs =
-    { self
-    , nixpkgs
-    , sops-nix
-    , deploy-rs
-    , kubenix
-    , ...
+    {
+      self,
+      nixpkgs,
+      sops-nix,
+      deploy-rs,
+      kubenix,
+      ...
     }@inputs:
     let
       currentSystem = builtins.currentSystem or "x86_64-linux";
@@ -80,28 +82,26 @@
           };
 
       deploy = {
-        nodes = lib.mapAttrs
-          (
-            hostName: hostCfg:
-              let
-                isRemoteNeeded = hostCfg.system != currentSystem;
-                # sshUser = homelab.users.admin.username;
-                sshUser = "root";
-              in
-              {
-                hostname = hostCfg.ipAddress;
-                sshUser = sshUser;
-                fastConnection = true;
-                remoteBuild = isRemoteNeeded;
+        nodes = lib.mapAttrs (
+          hostName: hostCfg:
+          let
+            isRemoteNeeded = hostCfg.system != currentSystem;
+            # sshUser = homelab.users.admin.username;
+            sshUser = "root";
+          in
+          {
+            hostname = hostCfg.ipAddress;
+            sshUser = sshUser;
+            fastConnection = true;
+            remoteBuild = isRemoteNeeded;
 
-                profiles.system = {
-                  user = "root";
-                  path = deploy-rs.lib.${hostCfg.system}.activate.nixos self.nixosConfigurations.${hostName};
-                  autoRollback = true;
-                };
-              }
-          )
-          homelab.nodes.hosts;
+            profiles.system = {
+              user = "root";
+              path = deploy-rs.lib.${hostCfg.system}.activate.nixos self.nixosConfigurations.${hostName};
+              autoRollback = true;
+            };
+          }
+        ) homelab.nodes.hosts;
       };
 
       nodesList = builtins.concatStringsSep "\n" (builtins.attrNames homelab.nodes.hosts);
@@ -109,20 +109,16 @@
       nodeGroupsList = builtins.concatStringsSep "\n" homelab.nodes.groups;
 
       deployGroups = (
-        builtins.mapAttrs
-          (
-            _: values: (builtins.concatStringsSep " " (builtins.map (v: "--targets='.#${v}'") values.names))
-          )
-          homelab.nodes.group
+        builtins.mapAttrs (
+          _: values: (builtins.concatStringsSep " " (builtins.map (v: "--targets='.#${v}'") values.names))
+        ) homelab.nodes.group
       );
 
       checks = lib.optionalAttrs (lib.hasAttr currentSystem deploy-rs.lib) {
         ${currentSystem} = deploy-rs.lib.${currentSystem}.deployChecks {
-          nodes = lib.filterAttrs
-            (
-              hostName: hostCfg: homelab.nodes.hosts.${hostName}.system == currentSystem
-            )
-            self.deploy.nodes;
+          nodes = lib.filterAttrs (
+            hostName: hostCfg: homelab.nodes.hosts.${hostName}.system == currentSystem
+          ) self.deploy.nodes;
         };
       };
 
@@ -137,9 +133,14 @@
             inherit lib;
             deploy-rs-pkg = deploy-rs.packages.${system}.default;
           };
+          openclawNixImage = import ./images/openclaw-nix {
+            pkgs = sysPkgs;
+            inherit inputs system;
+          };
         in
         {
           gen-manifests = kubenixModule.mkRenderer system sysPkgs;
+          openclaw-nix-image = openclawNixImage;
           inherit (commands)
             lgroups
             check
