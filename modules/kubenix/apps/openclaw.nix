@@ -429,7 +429,13 @@ in
               apt-get update && apt-get install -y curl xz-utils jq git python3-pip
 
               # Install requests library for Python in user directory
-              pip3 install --user --no-cache-dir requests
+              if [ ! -d /home/node/.local/lib/python3.*/site-packages/requests ]; then
+                echo "Installing requests library..."
+                pip3 install --user --no-cache-dir --break-system-packages requests
+                echo "requests installed successfully"
+              else
+                echo "requests already exists, skipping..."
+              fi
 
               # Install ffmpeg
               if [ ! -f /home/node/.local/bin/ffmpeg ]; then
