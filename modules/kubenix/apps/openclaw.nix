@@ -425,8 +425,11 @@ in
               mkdir -p /home/node/.local/bin
               chown -R 1000:1000 /home/node/.local
 
-              # Install curl, jq, git, and other deps
-              apt-get update && apt-get install -y curl xz-utils jq git
+              # Install curl, jq, git, python3-pip and other deps
+              apt-get update && apt-get install -y curl xz-utils jq git python3-pip
+
+              # Install requests library for Python
+              pip3 install --no-cache-dir requests --break-system-packages
 
               # Install ffmpeg
               if [ ! -f /home/node/.local/bin/ffmpeg ]; then
