@@ -66,20 +66,35 @@ in
             fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2));
           "
           npm install --omit=dev --no-package-lock --legacy-peer-deps 2>&1 || echo "WARN: npm install in extension dir failed"
-          echo "Ensuring matrix plugin is enabled in config..."
+          echo "Substituting env vars and enabling plugins in config..."
           cd /app
           node -e "
             const fs = require('fs');
             const cfgPath = '/home/node/.openclaw/openclaw.json';
-            const cfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
+            let content = fs.readFileSync(cfgPath, 'utf8');
+            // Substitute env vars like ''\${VAR_NAME}
+            content = content.replace(/\\\\?\''\$\{([A-Z_][A-Z0-9_]*)\}/g, (match, varName) => {
+              const val = process.env[varName];
+              if (val === undefined) {
+                console.warn('Warning: env var ' + varName + ' not set, leaving placeholder');
+                return match;
+              }
+              console.log('Substituted: ' + varName);
+              return val;
+            });
+            const cfg = JSON.parse(content);
+            // Enable matrix and whatsapp plugins
             if (!cfg.plugins) cfg.plugins = {};
             if (!cfg.plugins.entries) cfg.plugins.entries = {};
             if (!cfg.plugins.entries.matrix) cfg.plugins.entries.matrix = {};
             cfg.plugins.entries.matrix.enabled = true;
+            if (!cfg.plugins.entries.whatsapp) cfg.plugins.entries.whatsapp = {};
+            cfg.plugins.entries.whatsapp.enabled = true;
             if (!cfg.plugins.allow) cfg.plugins.allow = [];
             if (!cfg.plugins.allow.includes('matrix')) cfg.plugins.allow.push('matrix');
+            if (!cfg.plugins.allow.includes('whatsapp')) cfg.plugins.allow.push('whatsapp');
             fs.writeFileSync(cfgPath, JSON.stringify(cfg, null, 2));
-            console.log('Config updated: matrix plugin enabled');
+            console.log('Config updated: plugins enabled, env vars substituted');
           "
           echo "Starting gateway..."
           exec node dist/index.js gateway run --allow-unconfigured
