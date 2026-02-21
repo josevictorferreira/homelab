@@ -208,6 +208,18 @@ in
               mediaMaxMb = 150;
               groupPolicy = "disabled";
             };
+            whatsapp = {
+              enabled = true;
+              dmPolicy = "allowlist";
+              allowFrom = [ "\${WHATSAPP_NUMBER}" ];
+              groupPolicy = "allowlist";
+              groupAllowFrom = [ "\${WHATSAPP_NUMBER}" ];
+              ackReaction = {
+                emoji = "👀";
+                direct = true;
+                group = "mentions";
+              };
+            };
           };
           env = {
             MOONSHOT_API_KEY = "\${MOONSHOT_API_KEY}";
