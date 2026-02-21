@@ -198,7 +198,7 @@ in
             bind = "lan";
           };
           logging = {
-            level = "info";
+            level = "debug";
           };
           channels = {
             matrix = {
@@ -227,13 +227,13 @@ in
             whatsapp = {
               dmPolicy = "allowlist";
               allowFrom = [ "\${WHATSAPP_NUMBER}" ];
-              groupPolicy = "allowlist";
-              groupAllowFrom = [ "\${WHATSAPP_NUMBER}" ];
-              ackReaction = {
-                emoji = "👀";
-                direct = true;
-                group = "mentions";
-              };
+              groupPolicy = "open";
+              # groupAllowFrom = [ "\${WHATSAPP_NUMBER}" ];
+              # ackReaction = {
+              #   emoji = "👀";
+              #   direct = true;
+              #   group = "mentions";
+              # };
             };
           };
           env = {
