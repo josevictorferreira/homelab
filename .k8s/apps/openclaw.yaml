@@ -44,18 +44,27 @@ spec:
               \ JSON.parse(fs.readFileSync('package.json', 'utf8'));\n  delete pkg.devDependencies;\n\
               \  fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2));\n\
               \"\nnpm install --omit=dev --no-package-lock --legacy-peer-deps 2>&1\
-              \ || echo \"WARN: npm install in extension dir failed\"\necho \"Ensuring\
-              \ matrix plugin is enabled in config...\"\ncd /app\nnode -e \"\n  const\
-              \ fs = require('fs');\n  const cfgPath = '/home/node/.openclaw/openclaw.json';\n\
-              \  const cfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));\n  if (!cfg.plugins)\
-              \ cfg.plugins = {};\n  if (!cfg.plugins.entries) cfg.plugins.entries\
-              \ = {};\n  if (!cfg.plugins.entries.matrix) cfg.plugins.entries.matrix\
-              \ = {};\n  cfg.plugins.entries.matrix.enabled = true;\n  if (!cfg.plugins.allow)\
+              \ || echo \"WARN: npm install in extension dir failed\"\necho \"Substituting\
+              \ env vars and enabling plugins in config...\"\ncd /app\nnode -e \"\n\
+              \  const fs = require('fs');\n  const cfgPath = '/home/node/.openclaw/openclaw.json';\n\
+              \  let content = fs.readFileSync(cfgPath, 'utf8');\n  // Substitute\
+              \ env vars like ${VAR_NAME}\n  content = content.replace(/\\\\\\\\?\\\
+              $\\{([A-Z_][A-Z0-9_]*)\\}/g, (match, varName) => {\n    const val =\
+              \ process.env[varName];\n    if (val === undefined) {\n      console.warn('Warning:\
+              \ env var ' + varName + ' not set, leaving placeholder');\n      return\
+              \ match;\n    }\n    console.log('Substituted: ' + varName);\n    return\
+              \ val;\n  });\n  const cfg = JSON.parse(content);\n  // Enable matrix\
+              \ and whatsapp plugins\n  if (!cfg.plugins) cfg.plugins = {};\n  if\
+              \ (!cfg.plugins.entries) cfg.plugins.entries = {};\n  if (!cfg.plugins.entries.matrix)\
+              \ cfg.plugins.entries.matrix = {};\n  cfg.plugins.entries.matrix.enabled\
+              \ = true;\n  if (!cfg.plugins.entries.whatsapp) cfg.plugins.entries.whatsapp\
+              \ = {};\n  cfg.plugins.entries.whatsapp.enabled = true;\n  if (!cfg.plugins.allow)\
               \ cfg.plugins.allow = [];\n  if (!cfg.plugins.allow.includes('matrix'))\
-              \ cfg.plugins.allow.push('matrix');\n  fs.writeFileSync(cfgPath, JSON.stringify(cfg,\
-              \ null, 2));\n  console.log('Config updated: matrix plugin enabled');\n\
-              \"\necho \"Starting gateway...\"\nexec node dist/index.js gateway run\
-              \ --allow-unconfigured\n"
+              \ cfg.plugins.allow.push('matrix');\n  if (!cfg.plugins.allow.includes('whatsapp'))\
+              \ cfg.plugins.allow.push('whatsapp');\n  fs.writeFileSync(cfgPath, JSON.stringify(cfg,\
+              \ null, 2));\n  console.log('Config updated: plugins enabled, env vars\
+              \ substituted');\n\"\necho \"Starting gateway...\"\nexec node dist/index.js\
+              \ gateway run --allow-unconfigured\n"
           env:
             - name: ELEVENLABS_API_KEY
               valueFrom:
