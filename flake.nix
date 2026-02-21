@@ -161,6 +161,9 @@
             docker-push
             backup-postgres
             restore-postgres
+            image-updater
+            image-scan
+            image-outdated
             ;
         }
       );
