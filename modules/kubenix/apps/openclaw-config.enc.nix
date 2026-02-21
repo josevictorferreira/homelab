@@ -20,6 +20,7 @@ in
       ELEVENLABS_API_KEY = kubenix.lib.secretsFor "elevenlabs_api_key";
       GITHUB_TOKEN = kubenix.lib.secretsFor "github_token";
       WHATSAPP_NUMBER = kubenix.lib.secretsFor "whatsapp_number";
+      WHATSAPP_NUMBER_TWO = kubenix.lib.secretsFor "whatsapp_number_two";
       WHATSAPP_BOT_NUMBER = kubenix.lib.secretsFor "whatsapp_bot_number";
     };
   };

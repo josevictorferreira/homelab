@@ -226,7 +226,10 @@ in
             };
             whatsapp = {
               dmPolicy = "allowlist";
-              allowFrom = [ "\${WHATSAPP_NUMBER}" ];
+              allowFrom = [
+                "\${WHATSAPP_NUMBER}"
+                "\${WHATSAPP_NUMBER_TWO}"
+              ];
               groupPolicy = "open";
               # groupAllowFrom = [ "\${WHATSAPP_NUMBER}" ];
               # ackReaction = {
