@@ -170,3 +170,20 @@
 **Lesson:** For `pg_dumpall` restore jobs, set `activeDeadlineSeconds` to 3x the expected restore time. A 1.5 GiB uncompressed dump takes ~25-30 min on emptyDir-backed scratch postgres. Current setting: 2700s (45min).
 **Context:** 1200s (20min) caused DeadlineExceeded on a job that was actively restoring successfully. Waiting 20+ min only to hit a timeout wastes significant debugging time.
 **Verify:** `grep activeDeadlineSeconds modules/kubenix/apps/postgres-restore-drill.nix` — should be ≥ 2700
+
+## Nix OCI Image Building
+
+### streamLayeredImage Produces Executable Script
+**Lesson:** `dockerTools.streamLayeredImage` outputs a shell script that streams to stdout, not a tarball. Use `./result | podman load` or `result | docker load`, NOT `podman load < result`.
+**Context:** Unlike `buildImage` which produces a static tarball, the streaming variant is an executable for memory-efficient loading. Direct file redirection fails with "archive/tar: invalid tar header".
+**Verify:** `file result` shows "POSIX shell script" not "POSIX tar archive"
+
+### FOD npm Builds Need Sandbox Bypass
+**Lesson:** `buildNpmPackage` with network access requires `__noChroot = true;` which needs `nix.extraOptions = "allow-dirty = true"` in nix.conf. For CI/pure builds, use placeholder hash and update from error message (like OCI charts).
+**Context:** Nix sandbox blocks network. FOD derivation with `__noChroot` fails with "disabled in 'allowed-impure-functions' settings" unless explicitly allowed.
+**Verify:** Build error shows "hash mismatch" (expected) or "network access denied" (need sandbox bypass)
+
+### OpenClaw Matrix Extension Has Empty node_modules
+**Lesson:** nix-openclaw bundles extensions at `/lib/openclaw/extensions/` but `node_modules` directories are EMPTY. Matrix plugin requires 5 npm packages (matrix-bot-sdk, matrix-sdk-crypto-nodejs, markdown-it, music-metadata, zod) - must pre-install in image.
+**Context:** Unlike WhatsApp which bundles deps in core (Baileys), Matrix uses external packages with native bindings. Runtime npm install would break `--network=none` operation.
+**Verify:** `ls /lib/openclaw/extensions/matrix/node_modules` - if empty, deps missing
