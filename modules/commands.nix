@@ -497,29 +497,11 @@ let
   '';
 
   # ============================================================================
-  # Image Updater
+  # Image Updater (imported from modules/commands/image-updater.nix)
   # ============================================================================
 
-  image-scan =
-    mkCommand "image-scan" "List all container images in kubenix"
-      [ pkgs.findutils pkgs.gnugrep pkgs.gawk pkgs.jq ]
-      ''
-        ${./image-updater.sh} scan
-      '';
-
-  image-outdated =
-    mkCommand "image-outdated" "Check for outdated images"
-      [ pkgs.findutils pkgs.gnugrep pkgs.gawk pkgs.jq pkgs.skopeo ]
-      ''
-        ${./image-updater.sh} outdated
-      '';
-
-  image-updater =
-    mkCommand "image-updater" "Image updater utility"
-      [ pkgs.findutils pkgs.gnugrep pkgs.gawk pkgs.jq pkgs.skopeo ]
-      ''
-        ${./image-updater.sh} "''${@:-help}"
-      '';
+  imageCommands = import ./commands/image-updater.nix { inherit pkgs lib; };
+  inherit (imageCommands) image-scan image-outdated image-updater;
 
   # ============================================================================
   # OpenClaw Container Image
@@ -547,7 +529,7 @@ let
 
         # Load into podman
         echo "[2/4] Loading image into podman..."
-        podman load < result
+        ./result | podman load
         rm -f result
 
         # Tag for registry
