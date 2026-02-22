@@ -11,65 +11,125 @@ let
     inputs.nix-openclaw.packages.${system}.openclaw-gateway
       or (throw "nix-openclaw input not available");
 
-  # Matrix plugin dependencies - pre-installed for offline support
-  # These are needed for the @openclaw/matrix plugin to work without runtime npm install
-  # NOTE: Disabled for smoke test due to sandbox restrictions - matrix plugin will need network for npm install
-  matrixPluginDeps = pkgs.runCommand "openclaw-matrix-plugin-deps" { } ''
-    mkdir -p $out/lib/openclaw/extensions/matrix
-    # Create empty node_modules placeholder - matrix plugin will install deps at runtime
-    mkdir -p $out/lib/openclaw/extensions/matrix/node_modules
-  '';
+  # Matrix plugin dependencies - FOD build using npm
+  # Dependencies from nix-openclaw matrix extension package.json:
+  # - @matrix-org/matrix-sdk-crypto-nodejs: ^0.4.0
+  # - @vector-im/matrix-bot-sdk: 0.8.0-element.3
+  # - markdown-it: 14.1.1
+  # - music-metadata: ^11.12.1
+  # - zod: ^4.3.6
+  matrixPluginDeps = pkgs.buildNpmPackage {
+    pname = "openclaw-matrix-plugin-deps";
+    version = "1.0.0";
+
+    src = pkgs.writeTextDir "package.json" (
+      builtins.toJSON {
+        name = "openclaw-matrix-plugin";
+        version = "1.0.0";
+        dependencies = {
+          "@matrix-org/matrix-sdk-crypto-nodejs" = "0.4.0";
+          "@vector-im/matrix-bot-sdk" = "0.8.0-element.3";
+          "markdown-it" = "14.1.1";
+          "music-metadata" = "11.12.1";
+          "zod" = "4.3.6";
+        };
+      }
+    );
+
+    npmDepsHash = "sha256-UviJ9mGUxwezhcaUbRcQUlYsEmzxkP1I4Bh8WGz3OzM=";
+
+    # Copy vendored package-lock.json
+    postPatch = ''
+      cp ${./matrix-plugin-package-lock.json} package-lock.json
+    '';
+
+    # Don't run any build scripts, just install deps
+    dontNpmBuild = true;
+
+    # Install to a unique path to avoid merge conflicts
+    installPhase = ''
+      mkdir -p $out/matrix-deps
+      cp -r node_modules $out/matrix-deps/
+    '';
+  };
 
   # Entrypoint script source (just the text, we copy it in extraCommands)
   entrypointScriptText = builtins.readFile ./entrypoint.sh;
 
-  # Config template - wrapped in a derivation that puts it in /etc/openclaw/
-  configTemplate = pkgs.runCommand "openclaw-config-template" { } ''
+  # Build a custom rootfs that includes openclaw + matrix deps
+  # Using mkDerivation instead of buildEnv to have full control over symlinks
+  openclawRootfs = pkgs.runCommand "openclaw-rootfs" { } ''
+    # Start with toolchain packages (these go to standard paths)
+    # Copy bin directories
+    mkdir -p $out/bin
+    for pkg in ${pkgs.curl} ${pkgs.jq} ${pkgs.gnused} ${pkgs.git} ${pkgs.python3} ${pkgs.uv} ${pkgs.ffmpeg} ${pkgs.github-cli} ${pkgs.gemini-cli} ${pkgs.nodejs_22} ${pkgs.procps} ${openclawGateway}; do
+      if [ -d "$pkg/bin" ]; then
+        cp -rsf "$pkg/bin"/* $out/bin/ 2>/dev/null || true
+      fi
+    done
+
+    # Copy lib directories
+    # For openclawGateway, use -rL (dereference) to create real copies, not symlinks
+    # This allows us to modify the matrix extension's node_modules
+    mkdir -p $out/lib
+    for pkg in ${pkgs.python3} ${pkgs.nodejs_22}; do
+      if [ -d "$pkg/lib" ]; then
+        cp -rsf "$pkg/lib"/* $out/lib/ 2>/dev/null || true
+      fi
+    done
+    # Copy openclawGateway lib with dereferenced symlinks (writable copies)
+    if [ -d "${openclawGateway}/lib" ]; then
+      cp -rL "${openclawGateway}/lib"/* $out/lib/ 2>/dev/null || true
+    fi
+
+    # Copy etc directories (except ssl certs - handled separately)
+    mkdir -p $out/etc
+    for pkg in ${pkgs.tzdata}; do
+      if [ -d "$pkg/etc" ]; then
+        cp -rsf "$pkg/etc"/* $out/etc/ 2>/dev/null || true
+      fi
+    done
+
+    # Copy share/zoneinfo
+    mkdir -p $out/share
+    if [ -d "${pkgs.tzdata}/share/zoneinfo" ]; then
+      mkdir -p $out/share/zoneinfo
+      cp -rsf ${pkgs.tzdata}/share/zoneinfo/* $out/share/zoneinfo/ 2>/dev/null || true
+    fi
+
+    # Copy ssl certs from cacert
+    mkdir -p $out/etc/ssl/certs
+    cp -rsf ${pkgs.cacert}/etc/ssl/certs/* $out/etc/ssl/certs/ 2>/dev/null || true
+
+    # Copy python requests
+    if [ -d "${pkgs.python3Packages.requests}/lib" ]; then
+      cp -rsf ${pkgs.python3Packages.requests}/lib/* $out/lib/ 2>/dev/null || true
+    fi
+
+    # Add config template
     mkdir -p $out/etc/openclaw
-    cat ${./config-template.json5} > $out/etc/openclaw/config-template.json5
+    cp ${./config-template.json5} $out/etc/openclaw/config-template.json5
+
+    # NOW: Fill the matrix extension's node_modules with our deps
+    # This is safe because $out/lib is real files now, not symlinks
+    if [ -d "${matrixPluginDeps}/matrix-deps/node_modules" ]; then
+      # Make writable (files from nix store are read-only)
+      chmod -R u+w $out/lib/openclaw/extensions/matrix/ || true
+      # Remove empty node_modules and replace with populated one
+      rm -rf $out/lib/openclaw/extensions/matrix/node_modules
+      cp -r ${matrixPluginDeps}/matrix-deps/node_modules $out/lib/openclaw/extensions/matrix/
+    fi
   '';
 in
 dockerTools.buildImage {
   name = "localhost/openclaw-nix";
   tag = "dev";
 
-  contents = pkgs.buildEnv {
-    name = "openclaw-rootfs";
-    paths = [
-    configTemplate
-      # OpenClaw gateway binary
-      openclawGateway
-
-      # Pre-installed plugin dependencies for offline support
-      matrixPluginDeps
-
-      # Core tools from toolchain
-      pkgs.curl
-      pkgs.jq
-      pkgs.gnused
-      pkgs.git
-      pkgs.python3
-      pkgs.python3Packages.requests
-      pkgs.uv
-      pkgs.ffmpeg
-      pkgs.github-cli
-      pkgs.gemini-cli
-      pkgs.nodejs_22
-
-      # Supporting packages
-      pkgs.cacert
-      pkgs.coreutils
-      pkgs.bash
-      pkgs.procps
-      pkgs.tzdata
-
-    ];
-    pathsToLink = [
-      "/bin"
-      "/etc"
-      "/share/zoneinfo"
-    ];
-  };
+  copyToRoot = [
+    openclawRootfs
+    pkgs.coreutils
+    pkgs.bash
+  ];
 
   extraCommands = ''
     # Create required directories with proper permissions
@@ -84,7 +144,11 @@ dockerTools.buildImage {
   '';
 
   config = {
-    Entrypoint = [ "/bin/sh" "-c" "/entrypoint.sh" ];
+    Entrypoint = [
+      "/bin/sh"
+      "-c"
+      "/entrypoint.sh"
+    ];
     ExposedPorts = {
       "18789/tcp" = { };
     };

@@ -164,6 +164,7 @@
             image-updater
             image-scan
             image-outdated
+            push-openclaw
             ;
         }
       );
