@@ -20,23 +20,23 @@ let
     mkdir -p $out/lib/openclaw/extensions/matrix/node_modules
   '';
 
-  # Entrypoint script
-  entrypointScript = pkgs.writeShellScriptBin "entrypoint.sh" (builtins.readFile ./entrypoint.sh);
+  # Entrypoint script source (just the text, we copy it in extraCommands)
+  entrypointScriptText = builtins.readFile ./entrypoint.sh;
 
-  # Config template
-  configTemplate = pkgs.writeTextFile {
-    name = "config-template.json5";
-    text = builtins.readFile ./config-template.json5;
-    destination = "/etc/openclaw/config-template.json5";
-  };
+  # Config template - wrapped in a derivation that puts it in /etc/openclaw/
+  configTemplate = pkgs.runCommand "openclaw-config-template" { } ''
+    mkdir -p $out/etc/openclaw
+    cat ${./config-template.json5} > $out/etc/openclaw/config-template.json5
+  '';
 in
-dockerTools.streamLayeredImage {
+dockerTools.buildImage {
   name = "localhost/openclaw-nix";
   tag = "dev";
 
   contents = pkgs.buildEnv {
     name = "openclaw-rootfs";
     paths = [
+    configTemplate
       # OpenClaw gateway binary
       openclawGateway
 
@@ -46,6 +46,7 @@ dockerTools.streamLayeredImage {
       # Core tools from toolchain
       pkgs.curl
       pkgs.jq
+      pkgs.gnused
       pkgs.git
       pkgs.python3
       pkgs.python3Packages.requests
@@ -62,9 +63,6 @@ dockerTools.streamLayeredImage {
       pkgs.procps
       pkgs.tzdata
 
-      # Entrypoint and config
-      entrypointScript
-      configTemplate
     ];
     pathsToLink = [
       "/bin"
@@ -74,38 +72,19 @@ dockerTools.streamLayeredImage {
   };
 
   extraCommands = ''
-    # Ensure tmp directories exist and are world-writable
-    mkdir -p ./tmp ./var/tmp
+    # Create required directories with proper permissions
+    mkdir -p ./config ./state ./logs ./tmp ./var/tmp
     chmod 1777 ./tmp ./var/tmp
 
-    # Create required directories for OpenClaw
-    mkdir -p ./config
-    mkdir -p ./state ./state/home ./state/openclaw ./state/workspace ./state/bin ./state/npm ./state/cache
-    mkdir -p ./logs
-
-    # Timezone link
-    mkdir -p ./usr/share
-    ln -s /share/zoneinfo ./usr/share/zoneinfo
-
-    # Provide /usr/bin/env for shebangs
-    mkdir -p ./usr/bin
-    ln -s /bin/env ./usr/bin/env
-
-    # Provide /bin/sh for scripts
-    ln -s /bin/bash ./bin/sh || true
-
-    # Copy entrypoint to root
-    cp ${entrypointScript}/bin/entrypoint.sh ./entrypoint.sh
+    # Create entrypoint script from source text
+    cat > ./entrypoint.sh << 'ENTRYPOINT_EOF'
+    ${entrypointScriptText}
+    ENTRYPOINT_EOF
     chmod +x ./entrypoint.sh
-
-    # Copy matrix plugin dependencies into the openclaw extensions directory
-    # This allows the matrix plugin to find its dependencies without runtime npm install
-    mkdir -p ./lib/openclaw/extensions/matrix
-    cp -r ${matrixPluginDeps}/lib/openclaw/extensions/matrix/node_modules ./lib/openclaw/extensions/matrix/
   '';
 
   config = {
-    Cmd = [ "/entrypoint.sh" ];
+    Entrypoint = [ "/bin/sh" "-c" "/entrypoint.sh" ];
     ExposedPorts = {
       "18789/tcp" = { };
     };
@@ -137,6 +116,4 @@ dockerTools.streamLayeredImage {
       "TZ=America/Sao_Paulo"
     ];
   };
-
-  maxLayers = 120;
 }
