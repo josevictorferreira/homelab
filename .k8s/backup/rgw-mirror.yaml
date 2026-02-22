@@ -5,7 +5,7 @@ metadata:
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   name: rgw-mirror
-  namespace: apps
+  namespace: backup
 spec:
   concurrencyPolicy: Forbid
   failedJobsHistoryLimit: 3

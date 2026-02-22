@@ -1,7 +1,7 @@
 { kubenix, homelab, ... }:
 
 let
-  namespace = "velero";
+  namespace = homelab.kubernetes.namespaces.backup;
 in
 {
   kubernetes.resources.secrets."velero-s3-credentials" = {

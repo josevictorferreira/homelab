@@ -1,6 +1,6 @@
 { kubenix, homelab, ... }:
 let
-  namespace = homelab.kubernetes.namespaces.applications;
+  namespace = homelab.kubernetes.namespaces.backup;
 in
 {
   kubernetes.resources.secrets."etcd-snapshot-offload-s3-credentials" = {

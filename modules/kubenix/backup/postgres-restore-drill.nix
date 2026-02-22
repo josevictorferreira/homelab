@@ -5,7 +5,7 @@
   ...
 }:
 let
-  namespace = homelab.kubernetes.namespaces.applications;
+  namespace = homelab.kubernetes.namespaces.backup;
   toolboxImage = "ghcr.io/josevictorferreira/backup-toolbox@sha256:08bda3ee3383b093cc0ed74d42ed9b167ecb92dd7c01e090a542d0a75dec8abb";
   # Same custom Postgres 18 image used by postgresql-18 service
   postgresImage = "ghcr.io/josevictorferreira/postgresql-vchord-bitnami:38c40fefe0c58cff6622de77f787634320e1ae5e";

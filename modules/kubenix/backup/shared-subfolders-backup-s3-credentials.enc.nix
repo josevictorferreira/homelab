@@ -1,6 +1,6 @@
 { kubenix, homelab, ... }:
 let
-  namespace = homelab.kubernetes.namespaces.applications;
+  namespace = homelab.kubernetes.namespaces.backup;
 in
 {
   kubernetes.resources.secrets."shared-subfolders-backup-s3-credentials" = {
