@@ -21,57 +21,79 @@ let
     set -euo pipefail
     echo "=== Shared subfolders restore drill starting ==="
 
-    echo "Setting up mc alias..."
-    mc alias set backup "$MINIO_ENDPOINT" "$AWS_ACCESS_KEY_ID" "$AWS_SECRET_ACCESS_KEY"
+    # Create rclone config (same as backup script)
+    mkdir -p "$HOME/.config/rclone"
+    ACCESS_KEY="$(echo -n "$AWS_ACCESS_KEY_ID" | tr -d '\n\r')"
+    SECRET_KEY="$(echo -n "$AWS_SECRET_ACCESS_KEY" | tr -d '\n\r')"
 
-    echo "Finding latest backup..."
-    LATEST=$(mc ls --recursive --json "backup/${minioBucket}/" | \
-      jq -r 'select(.key | test("shared-subfolders\\.tar\\.zst$")) | .lastModified + " " + .key' | \
-      sort -r | head -1 | cut -d' ' -f2- || true)
+    cat > "$HOME/.config/rclone/rclone.conf" <<EOF
+    [minio]
+    type = s3
+    provider = Minio
+    env_auth = false
+    access_key_id = $ACCESS_KEY
+    secret_access_key = $SECRET_KEY
+    endpoint = $MINIO_ENDPOINT
+    region = sa-east-1
+    force_path_style = true
+    EOF
 
-    if [ -z "$LATEST" ]; then
-      echo "ERROR: No backup found in MinIO"
-      exit 1
-    fi
-    echo "Latest backup: $LATEST"
+    echo "Verifying backup exists in MinIO..."
 
-    LATEST_DIR=$(dirname "$LATEST")
-
-    echo "Downloading backup + checksum..."
-    mc cp "backup/${minioBucket}/$LATEST" /tmp/shared-subfolders.tar.zst
-    mc cp "backup/${minioBucket}/$LATEST_DIR/shared-subfolders.tar.zst.sha256" /tmp/shared-subfolders.tar.zst.sha256
-
-    echo "Verifying sha256..."
-    cd /tmp
-    if sha256sum -c shared-subfolders.tar.zst.sha256; then
-      echo "sha256 OK"
-    else
-      echo "ERROR: sha256 mismatch"
-      exit 1
-    fi
-
-    echo "Extracting archive..."
-    mkdir -p /tmp/extracted
-    zstd -dc /tmp/shared-subfolders.tar.zst | tar -xf - -C /tmp/extracted
-    rm /tmp/shared-subfolders.tar.zst
-
-    echo "Verifying expected folders exist..."
+    # Check that the current/ folder structure exists
     SMOKE_OK=true
+    TOTAL_FILES=0
+
     for folder in ${builtins.toString expectedFolders}; do
-      if [ -d "/tmp/extracted/$folder" ]; then
-        echo "OK: folder $folder exists"
+      echo "Checking folder: $folder"
+
+      # Count files in this folder
+      COUNT=$(rclone lsl "minio:${minioBucket}/current/$folder/" 2>/dev/null | wc -l || echo "0")
+
+      if [ "$COUNT" -gt 0 ]; then
+        echo "OK: folder $folder exists with $COUNT items"
+        TOTAL_FILES=$((TOTAL_FILES + COUNT))
       else
-        echo "FAIL: folder $folder missing"
+        echo "FAIL: folder $folder is empty or missing"
         SMOKE_OK=false
       fi
     done
 
-    if [ "$SMOKE_OK" = true ]; then
+    echo "Total files in backup: $TOTAL_FILES"
+
+    # Verify latest manifest exists
+    echo "Checking manifest..."
+    LATEST_MANIFEST=$(rclone lsl "minio:${minioBucket}/manifests/" 2>/dev/null | sort -k2 | tail -1 || true)
+
+    if [ -n "$LATEST_MANIFEST" ]; then
+      echo "OK: Found manifest - $LATEST_MANIFEST"
+    else
+      echo "WARN: No manifest found (backup may not have completed)"
+    fi
+
+    # Sample verification: download a random file and check it's not empty
+    echo "Sampling verification..."
+    SAMPLE_FILE=$(rclone lsf "minio:${minioBucket}/current/notetaking/" 2>/dev/null | head -1 || true)
+
+    if [ -n "$SAMPLE_FILE" ]; then
+      echo "Downloading sample file: $SAMPLE_FILE"
+      rclone copy "minio:${minioBucket}/current/notetaking/$SAMPLE_FILE" /tmp/sample/ 2>/dev/null || true
+
+      if [ -f "/tmp/sample/$SAMPLE_FILE" ] && [ -s "/tmp/sample/$SAMPLE_FILE" ]; then
+        SIZE=$(stat -c%s "/tmp/sample/$SAMPLE_FILE" 2>/dev/null || echo "unknown")
+        echo "OK: Sample file downloaded successfully (size: $SIZE bytes)"
+        rm -rf /tmp/sample
+      else
+        echo "WARN: Could not verify sample file"
+      fi
+    fi
+
+    if [ "$SMOKE_OK" = true ] && [ "$TOTAL_FILES" -gt 0 ]; then
       echo "smoke OK"
       echo "=== Shared subfolders restore drill complete ==="
       exit 0
     else
-      echo "ERROR: folder verification failed"
+      echo "ERROR: Backup verification failed"
       exit 1
     fi
   '';
