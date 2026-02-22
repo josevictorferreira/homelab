@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: Secret
+metadata:
+    annotations:
+        kubenix/k8s-version: "1.32"
+        kubenix/project-name: ze-homelab
+    name: velero-s3-credentials
+    namespace: backup
+stringData:
+    cloud: ENC[AES256_GCM,data:GavOB+9XNiWV9BeM6ktmjVPZnz46DA8VCk3waboYiWbNIuMbsAOhZYL31hbmdXIseJzQAVy2u/oui08r7DXr2Pq8KVesb1GUxI8prh3az9NRW+STFAx1/stf9L/eu8WAUbRd+m+DqECxoH4rtr5oAQ==,iv:0ZjHrBfiUA5Bv5wXja/vdmdauOI3XLeh4rJU24dK/dc=,tag:B1/nfQeYE2oJ8DBVLJdiYQ==,type:str]
+sops:
+    age:
+        - recipient: age16yrhmz8fytj7j9ns80zl40zjcdfd3pdxh48ld7ys7veea774udtqfn9jyx
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSB5ZEhjcWJUWXN3aElmVjdT
+            VFkxVDRIai9VaGx1Q3A5dVgyV3RwdVJFemp3ClR6SHVRVXA5dW5vTzIvK1ZldkxU
+            OHFkeFE0bzZxaHZHT013eTdZRUNoT0kKLS0tIDk4QXBMY1cvalNWcXdYVjJaKzl5
+            cm5wWU1vMkM4eWR3b2g4a1ZaVmJDTGcKsRz/Mz5Fs9AN7ylYhslpaNeFGsv1yBZF
+            vG9f1Rq6wjzVIoe45CrCu7jNmu6nw6yBqMMOTJJzTIwblUPrCw9nXw==
+            -----END AGE ENCRYPTED FILE-----
+        - recipient: age1jx9qu5p0ycvymrl2gykd9z3w8x8n67jxnatxs49j7qzspjr6asqqf8u35h
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBVUDQrNE9mNThyK1lORngx
+            WllnWXh5SmxrMlFNck81Y21WOTZSZm0rZTM4CjdLbGZPTXhoTE1ab01lcmNkcjhD
+            TWtCUDdEa1V6dzE4Z29DbmdsdnRvMG8KLS0tIFU4bldWRFVkcm9jRDFwU1ltbVU3
+            Q3MvU3ZIUzVYMnRaNXMrWTA3SDFnR2cKBBesi6L1MLbz4PlnXmoG0HaQZhOUDrxk
+            +uYI69lqSyxtHOarjlcQOGdNgM3IeA9RBPv6lNdZ2Wap9VthFED80w==
+            -----END AGE ENCRYPTED FILE-----
+        - recipient: age1myzhwq67gu5zrfk8fvs0p7mh5fk67d20ltwqf9325ya83lm06ytsyax3j2
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSAwc2RlT0RhVnJmbmpOVW5w
+            YmpWSDd4Z0hGNjZoV2FjemtIdURYUisvVndZClFVNzFJS1JIVGlYRnNVOENZYWh5
+            clVmUkpNUVQ1aFRFeHBFdjdDbWpvS0kKLS0tIHNjRzNFZjBJOWRDVjh0cGVPSTFF
+            cUZweGhMa1ptSGZFM1VRTmdhWndqdTQKB9lLuP8Zj7qszbwFSqO5CGqqWg+NeTwZ
+            4yqZDJGJIvn44SJH9rZ0KdQok7898U+GfAbjFBf0z0M0QhruM1I9xA==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2026-02-22T22:34:10Z"
+    mac: ENC[AES256_GCM,data:tSoH6eT0Qd4LcAVqf1SwYk3hl7IGkMtttnlneq0jvb4iYJiC96UndhlbHj+vpX64+ZiTXnHSeWajFF/EZ7akk2omEOPvccL1d+OlwanWf9oMnqeGJ9q2PRbKa8dY/ntoxa0p18DCBvcnLJpORbf3TnoLfTLDtgcwdV6i3MVI/Ms=,iv:bExlPNhKm+xuqyUCt6QF0u8eBhwUL+EDQoEtCUSogdg=,tag:ihdHvlgUE5Bcm0nwLMo7yw==,type:str]
+    encrypted_regex: ^(data|stringData)$
+    version: 3.10.2
