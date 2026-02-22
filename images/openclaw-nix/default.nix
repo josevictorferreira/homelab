@@ -56,6 +56,10 @@ let
   # Entrypoint script source (just the text, we copy it in extraCommands)
   entrypointScriptText = builtins.readFile ./entrypoint.sh;
 
+  # OpenClaw configuration as Nix attrset, rendered to JSON at build time
+  openclawConfig = import ./config.nix;
+  openclawConfigJson = pkgs.writeText "openclaw-config.json" (builtins.toJSON openclawConfig);
+
   # Build a custom rootfs that includes openclaw + matrix deps
   # Using runCommand for full control over the file tree
   openclawRootfs = pkgs.runCommand "openclaw-rootfs" { } ''
@@ -121,9 +125,9 @@ let
       cp -rsf ${pkgs.python3Packages.requests}/lib/* $out/lib/ 2>/dev/null || true
     fi
 
-    # Add config template
+    # Add config template (generated from Nix attrset)
     mkdir -p $out/etc/openclaw
-    cp ${./config-template.json5} $out/etc/openclaw/config-template.json5
+    cp ${openclawConfigJson} $out/etc/openclaw/config-template.json
 
     # Fill the matrix extension's node_modules with our deps
     if [ -d "${matrixPluginDeps}/matrix-deps/node_modules" ]; then

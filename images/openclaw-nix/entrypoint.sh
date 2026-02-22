@@ -6,7 +6,7 @@ set -e
 
 CONFIG_DIR="/config"
 CONFIG_FILE="${CONFIG_DIR}/openclaw.json"
-TEMPLATE_FILE="/etc/openclaw/config-template.json5"
+TEMPLATE_FILE="/etc/openclaw/config-template.json"
 
 # Allowlisted environment variables (security: only substitute known vars)
 ALLOWLIST="OPENCLAW_MATRIX_TOKEN ELEVENLABS_API_KEY MOONSHOT_API_KEY OPENROUTER_API_KEY WHATSAPP_NUMBER WHATSAPP_BOT_NUMBER"
