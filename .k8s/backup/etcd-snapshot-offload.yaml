@@ -7,7 +7,7 @@ metadata:
   labels:
     app.kubernetes.io/name: etcd-snapshot-offload
   name: etcd-snapshot-offload
-  namespace: apps
+  namespace: backup
 spec:
   concurrencyPolicy: Forbid
   failedJobsHistoryLimit: 3

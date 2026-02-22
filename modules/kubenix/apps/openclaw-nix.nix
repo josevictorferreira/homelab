@@ -242,6 +242,9 @@ in
         # Service account for cluster-admin RBAC
         controllers.main.serviceAccount.name = "openclaw-nix";
         defaultPodOptions.automountServiceAccountToken = true;
+        defaultPodOptions.imagePullSecrets = [
+          { name = "ghcr-registry-secret"; }
+        ];
 
         # DNS config: cluster DNS + Tailscale MagicDNS
         controllers.main.pod.dnsPolicy = "None";

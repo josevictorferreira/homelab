@@ -12,6 +12,14 @@ metadata:
   annotations:
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
+  name: backup
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
   name: cert-manager
 ---
 apiVersion: v1

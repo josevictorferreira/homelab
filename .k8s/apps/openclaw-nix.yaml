@@ -158,6 +158,8 @@ spec:
       hostIPC: false
       hostNetwork: false
       hostPID: false
+      imagePullSecrets:
+        - name: ghcr-registry-secret
       serviceAccountName: openclaw-nix
       volumes:
         - configMap:

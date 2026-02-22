@@ -5,7 +5,7 @@ metadata:
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   name: postgres-backup
-  namespace: apps
+  namespace: backup
 spec:
   concurrencyPolicy: Forbid
   failedJobsHistoryLimit: 3
@@ -78,7 +78,7 @@ spec:
                 - -c
               env:
                 - name: PGHOST
-                  value: postgresql-18-hl
+                  value: postgresql-18-hl.apps.svc.cluster.local
                 - name: PGPORT
                   value: '5432'
                 - name: PGUSER
