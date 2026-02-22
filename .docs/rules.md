@@ -173,10 +173,20 @@
 
 ## Nix OCI Image Building
 
-### streamLayeredImage Produces Executable Script
-**Lesson:** `dockerTools.streamLayeredImage` outputs a shell script that streams to stdout, not a tarball. Use `./result | podman load` or `result | docker load`, NOT `podman load < result`.
-**Context:** Unlike `buildImage` which produces a static tarball, the streaming variant is an executable for memory-efficient loading. Direct file redirection fails with "archive/tar: invalid tar header".
-**Verify:** `file result` shows "POSIX shell script" not "POSIX tar archive"
+### Use buildImage for Podman Compatibility
+**Lesson:** Prefer `dockerTools.buildImage` over `streamLayeredImage` for podman. `buildImage` produces a tarball that loads directly with `podman load < result`. `streamLayeredImage` produces a streaming script that can timeout or fail with podman.
+**Context:** Both work with Docker, but podman handles tarballs more reliably than streaming scripts.
+**Verify:** `file result` shows "gzip compressed data" not "POSIX shell script"
+
+### Copy Custom Files in extraCommands, Not pathsToLink
+**Lesson:** When using `buildImage`, manually copy entrypoint scripts and config templates in `extraCommands` using `cp`. Don't rely on `pathsToLink` to include `/`.
+**Context:** `pathsToLink` only affects symlinking from derivation outputs, not ad-hoc files. Custom files need explicit `cp` commands in `extraCommands`.
+**Verify:** `podman run --rm --entrypoint "" <image> ls -la /entrypoint.sh /etc/openclaw/`
+
+### Include ALL Runtime Dependencies in OCI Image PATH
+**Lesson:** Container entrypoints need ALL binaries in the image PATH. Commonly missed: `gnused` (for shell scripts), `coreutils` (for basic commands). Test with `podman exec <container> which sed`.
+**Context:** Unlike NixOS where PATH is managed by the system, containers only have what you explicitly include. A shell script using `sed` will fail if `gnused` isn't in the derivation.
+**Verify:** `podman run --rm --entrypoint "" <image> sh -c 'which sed && which cat && which ls'`
 
 ### FOD npm Builds Need Sandbox Bypass
 **Lesson:** `buildNpmPackage` with network access requires `__noChroot = true;` which needs `nix.extraOptions = "allow-dirty = true"` in nix.conf. For CI/pure builds, use placeholder hash and update from error message (like OCI charts).
