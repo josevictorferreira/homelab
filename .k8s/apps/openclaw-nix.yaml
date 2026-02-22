@@ -1,0 +1,348 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/controller: main
+    app.kubernetes.io/instance: openclaw-nix
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: openclaw-nix
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: openclaw-nix
+  namespace: apps
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/controller: main
+      app.kubernetes.io/instance: openclaw-nix
+      app.kubernetes.io/name: openclaw-nix
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        checksum/configMaps: 0fca7386f23c08969f2b4b863db461a35eef6899ec6d9b70f56ee6089f125e05
+      labels:
+        app.kubernetes.io/controller: main
+        app.kubernetes.io/instance: openclaw-nix
+        app.kubernetes.io/name: openclaw-nix
+    spec:
+      automountServiceAccountToken: true
+      containers:
+        - env:
+            - name: ELEVENLABS_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: ELEVENLABS_API_KEY
+                  name: openclaw-secrets
+            - name: GEMINI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: GEMINI_API_KEY
+                  name: openclaw-secrets
+            - name: GITHUB_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  key: GITHUB_TOKEN
+                  name: openclaw-secrets
+            - name: HOME
+              value: /state/home
+            - name: KIMI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: KIMI_API_KEY
+                  name: openclaw-secrets
+            - name: MINIMAX_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: MINIMAX_API_KEY
+                  name: openclaw-secrets
+            - name: OPENCLAW_CONFIG_PATH
+              value: /config/openclaw.json
+            - name: OPENCLAW_DATA_DIR
+              value: /state/openclaw
+            - name: OPENCLAW_MATRIX_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  key: OPENCLAW_MATRIX_TOKEN
+                  name: openclaw-secrets
+            - name: OPENROUTER_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: OPENROUTER_API_KEY
+                  name: openclaw-secrets
+            - name: TZ
+              value: America/Sao_Paulo
+          envFrom:
+            - secretRef:
+                name: openclaw-secrets
+          image: ghcr.io/josevictorferreira/openclaw-nix:latest
+          imagePullPolicy: Always
+          name: main
+          ports:
+            - containerPort: 18789
+              name: http
+              protocol: TCP
+          securityContext:
+            runAsGroup: 0
+            runAsUser: 0
+          volumeMounts:
+            - mountPath: /etc/openclaw/config-template.json
+              name: config
+              readOnly: true
+              subPath: config-template.json
+            - mountPath: /logs
+              name: logs
+            - mountPath: /config
+              name: scratch-config
+            - mountPath: /state
+              name: state
+            - mountPath: /home/node/.openclaw/workspace
+              name: workspace
+              subPath: openclaw
+        - env:
+            - name: TS_ACCEPT_DNS
+              value: 'false'
+            - name: TS_AUTHKEY
+              valueFrom:
+                secretKeyRef:
+                  key: TS_AUTHKEY
+                  name: openclaw-secrets
+            - name: TS_AUTH_ONCE
+              value: 'true'
+            - name: TS_HOSTNAME
+              value: openclaw-nix
+            - name: TS_KUBE_SECRET
+              value: ''
+            - name: TS_STATE_DIR
+              value: /var/lib/tailscale
+            - name: TS_USERSPACE
+              value: 'false'
+          image: tailscale/tailscale:latest
+          name: tailscale
+          securityContext:
+            capabilities:
+              add:
+                - NET_ADMIN
+                - NET_RAW
+            runAsGroup: 0
+            runAsUser: 0
+          volumeMounts:
+            - mountPath: /etc/openclaw/config-template.json
+              name: config
+              readOnly: true
+              subPath: config-template.json
+            - mountPath: /dev/net/tun
+              name: dev-tun
+            - mountPath: /var/lib/tailscale
+              name: tailscale-state
+      dnsConfig:
+        nameservers:
+          - 10.43.0.10
+          - 100.100.100.100
+        options:
+          - name: ndots
+            value: '5'
+        searches:
+          - apps.svc.cluster.local
+          - svc.cluster.local
+          - cluster.local
+      dnsPolicy: None
+      enableServiceLinks: false
+      hostIPC: false
+      hostNetwork: false
+      hostPID: false
+      serviceAccountName: openclaw-nix
+      volumes:
+        - configMap:
+            items:
+              - key: config-template.json
+                path: config-template.json
+            name: openclaw-nix
+          name: config
+        - hostPath:
+            path: /dev/net/tun
+          name: dev-tun
+        - name: logs
+          persistentVolumeClaim:
+            claimName: openclaw-nix-logs
+        - emptyDir: {}
+          name: scratch-config
+        - name: state
+          persistentVolumeClaim:
+            claimName: openclaw-nix-state
+        - name: tailscale-state
+          persistentVolumeClaim:
+            claimName: openclaw-nix-tailscale-state
+        - name: workspace
+          persistentVolumeClaim:
+            claimName: cephfs-shared-storage-root
+---
+apiVersion: v1
+data:
+  config-template.json: '{"agents":{"defaults":{"memorySearch":{"model":"gemini-embedding-001","provider":"gemini"},"model":{"primary":"kimi-coding/k2p5"},"timeoutSeconds":600,"userTimezone":"America/Sao_Paulo","workspace":"/home/node/.openclaw/workspace"},"list":[{"id":"main","identity":{"emoji":"🐕","name":"Mel","theme":"minha
+    fiel assistente"}}]},"channels":{"matrix":{"accessToken":"${OPENCLAW_MATRIX_TOKEN}","autoJoin":"allowlist","autoJoinAllowList":["@jose:josevictor.me","@admin:josevictor.me","@zeh:josevictor.me"],"dm":{"allowFrom":["@jose:josevictor.me","@admin:josevictor.me","@zeh:josevictor.me"],"policy":"allowlist"},"enabled":true,"encryption":false,"groupPolicy":"disabled","homeserver":"http://synapse-matrix-synapse:8008","mediaMaxMb":150,"userId":"@openclaw:josevictor.me"},"whatsapp":{"ackReaction":{"direct":true,"emoji":"👀","group":"mentions"},"allowFrom":["${WHATSAPP_NUMBER}"],"dmPolicy":"allowlist","groupAllowFrom":["${WHATSAPP_NUMBER}"],"groupPolicy":"allowlist"}},"env":{"ELEVENLABS_API_KEY":"${ELEVENLABS_API_KEY}","MOONSHOT_API_KEY":"${MOONSHOT_API_KEY}","OPENROUTER_API_KEY":"${OPENCLAW_MATRIX_TOKEN}"},"gateway":{"bind":"lan","mode":"local","port":18789},"logging":{"level":"debug"},"messages":{"tts":{"auto":"always","elevenlabs":{"apiKey":"${ELEVENLABS_API_KEY}","modelId":"eleven_multilingual_v2","seed":91,"voiceId":"GOkMqfyKMLVUcYfO2WbB","voiceSettings":{"similarityBoost":0.75,"speed":1.0,"stability":0.5,"style":0.0,"useSpeakerBoost":true}},"provider":"elevenlabs","summaryModel":"google/gemini-2.0-flash"}},"models":{"mode":"merge","providers":{"kimi-coding":{"api":"anthropic-messages","apiKey":"${MOONSHOT_API_KEY}","baseUrl":"https://api.kimi.com/coding","models":[{"contextWindow":256000,"id":"k2p5","input":["text"],"maxTokens":8192,"name":"Kimi
+    K2.5","reasoning":false}]}}},"plugins":{"allow":["matrix","whatsapp"]},"session":{"idleMinutes":60,"reset":{"atHour":4,"mode":"daily"},"scope":"per-sender"},"tools":{"allow":["exec","read","write","edit","process","web_search","web_fetch","canvas","nodes","message","cron","gateway","browser","sessions_list","sessions_history","sessions_send","sessions_spawn","session_status","agents_list"],"deny":[],"web":{"search":{"perplexity":{"apiKey":"${OPENROUTER_API_KEY}","baseUrl":"https://openrouter.ai/api/v1","model":"perplexity/sonar-pro"},"provider":"perplexity"}}}}'
+kind: ConfigMap
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: openclaw-nix
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: openclaw-nix
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: openclaw-nix
+  namespace: apps
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: openclaw-nix
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: openclaw-nix
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: openclaw-nix-logs
+  namespace: apps
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: rook-ceph-block
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: openclaw-nix
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: openclaw-nix
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: openclaw-nix-state
+  namespace: apps
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: rook-ceph-block
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: openclaw-nix
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: openclaw-nix
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: openclaw-nix-tailscale-state
+  namespace: apps
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: rook-ceph-block
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+    lbipam.cilium.io/ips: 10.10.10.141
+    lbipam.cilium.io/sharing-key: openclaw-nix
+  labels:
+    app.kubernetes.io/instance: openclaw-nix
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: openclaw-nix
+    app.kubernetes.io/service: openclaw-nix
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: openclaw-nix
+  namespace: apps
+spec:
+  ports:
+    - name: http
+      port: 18789
+      protocol: TCP
+      targetPort: 18789
+  selector:
+    app.kubernetes.io/controller: main
+    app.kubernetes.io/instance: openclaw-nix
+    app.kubernetes.io/name: openclaw-nix
+  type: ClusterIP
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: openclaw-nix
+  namespace: apps
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: openclaw-nix-cluster-admin
+rules:
+  - apiGroups:
+      - '*'
+    resources:
+      - '*'
+    verbs:
+      - '*'
+  - nonResourceURLs:
+      - '*'
+    verbs:
+      - '*'
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: openclaw-nix-cluster-admin
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: openclaw-nix-cluster-admin
+subjects:
+  - kind: ServiceAccount
+    name: openclaw-nix
+    namespace: apps
