@@ -21,7 +21,7 @@ let
   '';
   qbtImage = {
     repository = "ghcr.io/home-operations/qbittorrent";
-    tag = "5.1.2@sha256:9dd0164cc23e9c937e0af27fd7c3f627d1df30c182cf62ed34d3f129c55dc0e8";
+    tag = "5.1.4@sha256:56ecd30a7f5e1357daf5eea2a6935134d329b7b268a3a9b9c67041b65fb87fc6";
     pullPolicy = "IfNotPresent";
   };
 in

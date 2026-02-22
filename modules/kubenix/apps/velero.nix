@@ -42,7 +42,8 @@ in
       initContainers = [
         {
           name = "velero-plugin-for-aws";
-          image = "velero/velero-plugin-for-aws:v1.10.0";
+          image = "velero/velero-plugin-for-aws:v1.13.2@sha256:25c3a0a043fc396a0593a3da0aa16ed1f39df74883bda42c4588fc8877b72bde
+";
           volumeMounts = [
             {
               mountPath = "/target";
