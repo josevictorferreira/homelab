@@ -384,7 +384,7 @@ let
 
   docker-build = mkCommand "docker-build" "Build Docker image" [ pkgs.nix pkgs.docker ] ''
     echo "Building Docker image ${dockerImageName}:${dockerTag}..."
-    nix-build images/${dockerImageName}.nix && docker load < result
+    nix-build oci-images/${dockerImageName}.nix && docker load < result
     echo "Tagging image as ${dockerFullImage}..."
     docker tag localhost/${dockerImageName}:${dockerTag} ${dockerFullImage}
     echo "Image built and tagged successfully: ${dockerFullImage}"
@@ -438,47 +438,47 @@ let
   docker-push =
     mkCommand "docker-push" "Build and push Docker image to GHCR" [ pkgs.nix pkgs.docker pkgs.gh ]
       ''
-        # Build
-        echo "Building Docker image ${dockerImageName}:${dockerTag}..."
-        nix-build images/${dockerImageName}.nix && docker load < result
-        echo "Tagging image as ${dockerFullImage}..."
-        docker tag localhost/${dockerImageName}:${dockerTag} ${dockerFullImage}
-        echo "Image built and tagged successfully: ${dockerFullImage}"
+                # Build
+                echo "Building Docker image ${dockerImageName}:${dockerTag}..."
+        nix-build oci-images/${dockerImageName}.nix && docker load < result
+                echo "Tagging image as ${dockerFullImage}..."
+                docker tag localhost/${dockerImageName}:${dockerTag} ${dockerFullImage}
+                echo "Image built and tagged successfully: ${dockerFullImage}"
 
-        # Login
-        if [ -n "''${GITHUB_TOKEN:-}" ]; then
-          echo "Logging in using GITHUB_TOKEN..."
-          echo "$GITHUB_TOKEN" | docker login ${dockerRegistry} -u ${githubUser} --password-stdin
-        elif command -v gh >/dev/null 2>&1; then
-          echo "Logging in using GitHub CLI..."
-          GH_TOKEN="$(gh auth token)"
-          if [ -n "$GH_TOKEN" ]; then
-            echo "$GH_TOKEN" | docker login ${dockerRegistry} -u ${githubUser} --password-stdin
-          else
-            echo "GitHub CLI not authenticated. Please run: gh auth login"
-            exit 1
-          fi
-        else
-          echo "Error: Neither GitHub CLI nor GITHUB_TOKEN is available"
-          exit 1
-        fi
+                # Login
+                if [ -n "''${GITHUB_TOKEN:-}" ]; then
+                  echo "Logging in using GITHUB_TOKEN..."
+                  echo "$GITHUB_TOKEN" | docker login ${dockerRegistry} -u ${githubUser} --password-stdin
+                elif command -v gh >/dev/null 2>&1; then
+                  echo "Logging in using GitHub CLI..."
+                  GH_TOKEN="$(gh auth token)"
+                  if [ -n "$GH_TOKEN" ]; then
+                    echo "$GH_TOKEN" | docker login ${dockerRegistry} -u ${githubUser} --password-stdin
+                  else
+                    echo "GitHub CLI not authenticated. Please run: gh auth login"
+                    exit 1
+                  fi
+                else
+                  echo "Error: Neither GitHub CLI nor GITHUB_TOKEN is available"
+                  exit 1
+                fi
 
-        # Init repo
-        echo "Checking if repository exists..."
-        if ! gh api /user/packages/container/${dockerImageName} >/dev/null 2>&1; then
-          gh api --method POST \
-            -H "Accept: application/vnd.github.v3+json" \
-            /user/packages \
-            -f name='${dockerImageName}' \
-            -f package_type='container' \
-            -f visibility='public' || true
-        fi
+                # Init repo
+                echo "Checking if repository exists..."
+                if ! gh api /user/packages/container/${dockerImageName} >/dev/null 2>&1; then
+                  gh api --method POST \
+                    -H "Accept: application/vnd.github.v3+json" \
+                    /user/packages \
+                    -f name='${dockerImageName}' \
+                    -f package_type='container' \
+                    -f visibility='public' || true
+                fi
 
-        # Push
-        echo "Pushing image to ${dockerFullImage}..."
-        docker push ${dockerFullImage}
-        echo "Image pushed successfully to ${dockerFullImage}"
-        echo "Image is now public at: https://${dockerRegistry}/${githubUser}/${dockerImageName}"
+                # Push
+                echo "Pushing image to ${dockerFullImage}..."
+                docker push ${dockerFullImage}
+                echo "Image pushed successfully to ${dockerFullImage}"
+                echo "Image is now public at: https://${dockerRegistry}/${githubUser}/${dockerImageName}"
       '';
 
   # ============================================================================
@@ -562,6 +562,57 @@ let
         echo "  View at: https://''${REGISTRY}/''${GITHUB_USER}/''${IMAGE_NAME}"
       '';
 
+  ghcr-size =
+    mkCommand "ghcr-size" "Check GHCR image compressed size without downloading"
+      [ pkgs.skopeo pkgs.python3 pkgs.coreutils ]
+      ''
+                set -e
+
+                IMAGE="''${1:?Usage: ghcr-size <user/package:tag>}"
+                REGISTRY="ghcr.io"
+
+                # Add ghcr.io prefix if not already a full URL
+                case "$IMAGE" in
+                  ghcr.io/*) REF="docker://''${IMAGE}" ;;
+                  *) REF="docker://''${REGISTRY}/''${IMAGE}" ;;
+                esac
+
+                echo "Inspecting ''${REF}..."
+                skopeo inspect --raw "''${REF}" | python3 -c '
+        import json, sys
+        m = json.load(sys.stdin)
+
+        # Handle manifest list (multi-arch) — pick first manifest and inspect it
+        if m.get("mediaType", "") in ("application/vnd.oci.image.index.v1+json", "application/vnd.docker.distribution.manifest.list.v2+json"):
+            manifests = m.get("manifests", [])
+            print(f"Multi-arch image with {len(manifests)} platform(s):")
+            for mf in manifests:
+                p = mf.get("platform", {})
+                arch = p.get("architecture", "?")
+                os_name = p.get("os", "?")
+                size = mf.get("size", 0)
+                print(f"  {os_name}/{arch} - {size} bytes (manifest)")
+            print()
+            print("Tip: specify platform with skopeo --override-os/--override-arch")
+            sys.exit(0)
+
+        layers = m.get("layers", [])
+        config = m.get("config", {})
+        config_size = config.get("size", 0) if config else 0
+        total = sum(l.get("size", 0) for l in layers) + config_size
+
+        if total >= 1024**3:
+            human = f"{total / 1024**3:.2f} GB"
+        elif total >= 1024**2:
+            human = f"{total / 1024**2:.1f} MB"
+        else:
+            human = f"{total / 1024:.1f} KB"
+
+        print(f"Compressed size: {human} ({total:,} bytes)")
+        print(f"Layers: {len(layers)}")
+        '
+      '';
+
 in
 {
   inherit
@@ -588,5 +639,6 @@ in
     image-outdated
     image-updater
     push-openclaw
+    ghcr-size
     ;
 }

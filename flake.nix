@@ -133,7 +133,7 @@
             inherit lib;
             deploy-rs-pkg = deploy-rs.packages.${system}.default;
           };
-          openclawNixImage = import ./images/openclaw-nix {
+          openclawNixImage = import ./oci-images/openclaw-nix {
             pkgs = sysPkgs;
             inherit inputs system;
           };
@@ -165,6 +165,7 @@
             image-scan
             image-outdated
             push-openclaw
+            ghcr-size
             ;
         }
       );

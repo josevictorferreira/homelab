@@ -1,4 +1,4 @@
-.PHONY: lgroups check ddeploy deploy gdeploy secrets manifests kubesync wusbiso docker-build docker-login docker-init-repo docker-push lint format backup-postgres restore-postgres reconcile events backup-rgw backup-etcd backup-verify images images-outdated images-check push-openclaw help
+.PHONY: lgroups check ddeploy deploy gdeploy secrets manifests kubesync wusbiso docker-build docker-login docker-init-repo docker-push lint format backup-postgres restore-postgres reconcile events backup-rgw backup-etcd backup-verify images images-outdated images-check push-openclaw ghcr-size help
 
 .DEFAULT_GOAL := help
 
@@ -91,6 +91,9 @@ images-check: ## Check specific image for updates. Usage: make images-check IMAG
 
 push-openclaw: ## Build and push openclaw-nix image to GHCR (manual deploy).
 	@nix run .#push-openclaw
+
+ghcr-size: ## Check GHCR image size without downloading. Usage: make ghcr-size IMAGE=user/package:tag
+	@nix run .#ghcr-size -- $(IMAGE)
 
 help: ## Show this help.
 	@printf "Usage: make [target]\n\nTARGETS:\n"; grep -F "##" $(MAKEFILE_LIST) | grep -Fv "grep -F" | grep -Fv "printf " | sed -e 's/\\$$//' | sed -e 's/##//' | column -t -s ":" | sed -e 's/^/    /'; printf "\n"

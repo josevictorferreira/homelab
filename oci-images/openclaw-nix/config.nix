@@ -1,4 +1,4 @@
-# images/openclaw-nix/config.nix
+# oci-images/openclaw-nix/config.nix
 # OpenClaw gateway configuration as Nix attrset
 # Rendered to JSON at build time. ${ENV} placeholders are substituted at runtime by entrypoint.sh
 {
