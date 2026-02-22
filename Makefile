@@ -1,4 +1,4 @@
-.PHONY: lgroups check ddeploy deploy gdeploy secrets manifests kubesync wusbiso docker-build docker-login docker-init-repo docker-push lint format backup-postgres restore-postgres reconcile events backup-rgw backup-etcd backup-verify images images-outdated images-check help
+.PHONY: lgroups check ddeploy deploy gdeploy secrets manifests kubesync wusbiso docker-build docker-login docker-init-repo docker-push lint format backup-postgres restore-postgres reconcile events backup-rgw backup-etcd backup-verify images images-outdated images-check push-openclaw help
 
 .DEFAULT_GOAL := help
 
@@ -88,6 +88,9 @@ images-check: ## Check specific image for updates. Usage: make images-check IMAG
 		exit 1; \
 	fi
 	@./scripts/kubenix-image-updater check "$(IMAGE)" --with-digest
+
+push-openclaw: ## Build and push openclaw-nix image to GHCR (manual deploy).
+	@nix run .#push-openclaw
 
 help: ## Show this help.
 	@printf "Usage: make [target]\n\nTARGETS:\n"; grep -F "##" $(MAKEFILE_LIST) | grep -Fv "grep -F" | grep -Fv "printf " | sed -e 's/\\$$//' | sed -e 's/##//' | column -t -s ":" | sed -e 's/^/    /'; printf "\n"
