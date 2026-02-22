@@ -1,0 +1,164 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: shared-subfolders-proton-sync
+  namespace: apps
+spec:
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 3600
+      backoffLimit: 2
+      template:
+        spec:
+          containers:
+            - args:
+                - "set -euo pipefail\n\necho \"=== Proton Drive Sync: MinIO → Proton\
+                  \ ===\"\necho \"Date: $(date -Iseconds)\"\necho \"Source: $MINIO_BUCKET/current/\"\
+                  \necho \"Dest: $PROTON_DEST_PATH\"\n\n# Check if authenticated (credentials.enc\
+                  \ exists)\nif [ ! -f /config/proton-drive-sync/credentials.enc ];\
+                  \ then\n  echo \"ERROR: Not authenticated. Run auth bootstrap job\
+                  \ first.\"\n  echo \"kubectl create job --from=cronjob/proton-drive-auth-bootstrap\
+                  \ proton-drive-auth-manual -n apps\"\n  exit 1\nfi\n\n# Install\
+                  \ dependencies\napk add --no-cache rclone zstd curl jq\n\n# Configure\
+                  \ rclone for MinIO\nmkdir -p ~/.config/rclone\ncat > ~/.config/rclone/rclone.conf\
+                  \ << EOF\n[minio]\ntype = s3\nprovider = Minio\nenv_auth = false\n\
+                  access_key_id = \\${MINIO_ACCESS_KEY_ID}\nsecret_access_key = \\\
+                  ${MINIO_SECRET_ACCESS_KEY}\nendpoint = $MINIO_URL\nregion = sa-east-1\n\
+                  force_path_style = true\nEOF\n\n# Get date for archive naming\n\
+                  TODAY=$(date +%Y-%m-%d)\nYEAR=$(date +%Y)\nMONTH=$(date +%m)\nDAY=$(date\
+                  \ +%d)\nTIMESTAMP=$(date +%Y%m%d_%H%M%S)\n\necho \"\"\necho \"===\
+                  \ Creating archive from MinIO current/ ===\"\n\n# Download current\
+                  \ backup from MinIO\nSYNC_DIR=/tmp/proton-sync-$TIMESTAMP\nmkdir\
+                  \ -p $SYNC_DIR/shared\n\necho \"Downloading from MinIO...\"\nrclone\
+                  \ copy minio:$MINIO_BUCKET/current/ $SYNC_DIR/shared/ --progress\
+                  \ \\\n  --exclude \".DS_Store\" \\\n  --exclude \"Thumbs.db\"\n\n\
+                  # Check if we got any files\nFILE_COUNT=$(find $SYNC_DIR/shared\
+                  \ -type f | wc -l)\nif [ \"$FILE_COUNT\" -eq 0 ]; then\n  echo \"\
+                  WARNING: No files found in MinIO current/\"\n  rm -rf $SYNC_DIR\n\
+                  \  exit 0\nfi\n\necho \"Downloaded $FILE_COUNT files\"\n\n# Create\
+                  \ tar.zst archive\nARCHIVE_NAME=\"shared-subfolders-$TODAY.tar.zst\"\
+                  \necho \"\"\necho \"=== Creating archive: $ARCHIVE_NAME ===\"\n\
+                  cd $SYNC_DIR\ntar -cf - shared | zstd -19 -o $ARCHIVE_NAME\n\n#\
+                  \ Generate checksum\nsha256sum $ARCHIVE_NAME > ${ARCHIVE_NAME}.sha256\n\
+                  \nARCHIVE_SIZE=$(stat -c%s $ARCHIVE_NAME)\necho \"Archive size:\
+                  \ $ARCHIVE_SIZE bytes\"\n\n# Create sync config for proton-drive-sync\n\
+                  mkdir -p /tmp/proton-config\ncat > /tmp/proton-config/sync.json\
+                  \ << EOF\n{\n  \"syncs\": [\n    {\n      \"localPath\": \"$SYNC_DIR\"\
+                  ,\n      \"remotePath\": \"$PROTON_DEST_PATH/$YEAR/$MONTH/$DAY\"\
+                  ,\n      \"direction\": \"up\"\n    }\n  ]\n}\nEOF\n\n# Run proton-drive-sync\n\
+                  echo \"\"\necho \"=== Uploading to Proton Drive ===\"\ncd /tmp/proton-config\n\
+                  proton-drive-sync sync --config ./sync.json || {\n  echo \"WARNING:\
+                  \ Proton sync had errors (best-effort)\"\n}\n\n# Generate report\n\
+                  echo \"\"\necho \"=== Sync report ===\"\nREPORT_FILE=\"/tmp/proton-sync-report-$TODAY.json\"\
+                  \ncat > $REPORT_FILE << EOF\n{\n  \"timestamp\": \"$(date -Iseconds)\"\
+                  ,\n  \"date\": \"$TODAY\",\n  \"source_bucket\": \"$MINIO_BUCKET\"\
+                  ,\n  \"source_prefix\": \"current/\",\n  \"destination_path\": \"\
+                  $PROTON_DEST_PATH/$YEAR/$MONTH/$DAY\",\n  \"archive_name\": \"$ARCHIVE_NAME\"\
+                  ,\n  \"archive_size\": $ARCHIVE_SIZE,\n  \"files_archived\": $FILE_COUNT,\n\
+                  \  \"status\": \"completed\"\n}\nEOF\n\ncat $REPORT_FILE\n\n# Cleanup\n\
+                  rm -rf $SYNC_DIR\n\necho \"\"\necho \"=== Sync complete ===\"\n"
+              command:
+                - sh
+                - -c
+              env:
+                - name: KEYRING_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      key: KEYRING_PASSWORD
+                      name: shared-subfolders-proton-sync-config
+                - name: PROTON_USERNAME
+                  valueFrom:
+                    secretKeyRef:
+                      key: PROTON_USERNAME
+                      name: shared-subfolders-proton-sync-config
+                - name: PROTON_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      key: PROTON_PASSWORD
+                      name: shared-subfolders-proton-sync-config
+                - name: TZ
+                  value: America/Sao_Paulo
+                - name: MINIO_URL
+                  value: http://10.10.10.209:9000
+                - name: MINIO_BUCKET
+                  value: homelab-backup-shared
+                - name: PROTON_DEST_PATH
+                  value: /Backups/homelab/shared-archives
+              image: ghcr.io/damianb-bitflipper/proton-drive-sync:latest
+              name: shared-subfolders-proton-sync
+              resources:
+                limits:
+                  cpu: 1000m
+                  ephemeral-storage: 10Gi
+                  memory: 1Gi
+                requests:
+                  cpu: 100m
+                  ephemeral-storage: 2Gi
+                  memory: 256Mi
+              volumeMounts:
+                - mountPath: /config/proton-drive-sync
+                  name: proton-config
+                - mountPath: /state/proton-drive-sync
+                  name: proton-state
+          restartPolicy: Never
+          volumes:
+            - name: proton-config
+              persistentVolumeClaim:
+                claimName: shared-subfolders-proton-sync-config
+            - name: proton-state
+              persistentVolumeClaim:
+                claimName: shared-subfolders-proton-sync-state
+  schedule: 0 3 * * *
+  timeZone: America/Sao_Paulo
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: shared-subfolders-proton-sync-config
+  namespace: apps
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: rook-ceph-block
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: shared-subfolders-proton-sync-state
+  namespace: apps
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: rook-ceph-block
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: shared-subfolders-proton-sync
+  namespace: apps
+spec:
+  ports:
+    - name: dashboard
+      port: 4242
+      targetPort: 4242
+  selector:
+    app: shared-subfolders-proton-sync

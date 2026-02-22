@@ -96,18 +96,18 @@ in
 
                   echo "=== Proton Drive Sync: MinIO → Proton ==="
                   echo "Date: $(date -Iseconds)"
-                  echo "Source: $MINIO_BUCKET"
+                  echo "Source: $MINIO_BUCKET/current/"
                   echo "Dest: $PROTON_DEST_PATH"
 
                   # Check if authenticated (credentials.enc exists)
                   if [ ! -f /config/proton-drive-sync/credentials.enc ]; then
-                    echo "ERROR: Not authenticated. Run auth job first."
-                    echo "kubectl create job --from=cronjob/${name} ${name}-manual -n ${namespace}"
+                    echo "ERROR: Not authenticated. Run auth bootstrap job first."
+                    echo "kubectl create job --from=cronjob/proton-drive-auth-bootstrap proton-drive-auth-manual -n ${namespace}"
                     exit 1
                   fi
 
-                  # Install rclone for MinIO access
-                  apk add --no-cache rclone zstd curl
+                  # Install dependencies
+                  apk add --no-cache rclone zstd curl jq
 
                   # Configure rclone for MinIO
                   mkdir -p ~/.config/rclone
@@ -119,45 +119,51 @@ in
                   access_key_id = \''${MINIO_ACCESS_KEY_ID}
                   secret_access_key = \''${MINIO_SECRET_ACCESS_KEY}
                   endpoint = $MINIO_URL
-
-                  [proton]
-                  type = protondrive
-                  username = $PROTON_USERNAME
-                  password = $PROTON_PASSWORD
+                  region = sa-east-1
+                  force_path_style = true
                   EOF
 
-                  # Get today's date
+                  # Get date for archive naming
                   TODAY=$(date +%Y-%m-%d)
                   YEAR=$(date +%Y)
                   MONTH=$(date +%m)
                   DAY=$(date +%d)
+                  TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 
                   echo ""
-                  echo "=== Syncing archives for $TODAY ==="
+                  echo "=== Creating archive from MinIO current/ ==="
 
-                  # List files in MinIO bucket for today
-                  echo "Listing MinIO objects..."
-                  rclone ls minio:$MINIO_BUCKET/$YEAR/$MONTH/$DAY/ 2>/dev/null || echo "No objects found for today"
+                  # Download current backup from MinIO
+                  SYNC_DIR=/tmp/proton-sync-$TIMESTAMP
+                  mkdir -p $SYNC_DIR/shared
 
-                  # Sync to Proton Drive using proton-drive-sync
-                  # First, mount/sync via rclone to a temp dir, then use proton-drive-sync
-                  SYNC_DIR=/tmp/proton-sync-$TODAY
-                  mkdir -p $SYNC_DIR
+                  echo "Downloading from MinIO..."
+                  rclone copy minio:$MINIO_BUCKET/current/ $SYNC_DIR/shared/ --progress \
+                    --exclude ".DS_Store" \
+                    --exclude "Thumbs.db"
 
-                  # Copy today's archives from MinIO
-                  echo ""
-                  echo "=== Downloading from MinIO ==="
-                  rclone copy minio:$MINIO_BUCKET/$YEAR/$MONTH/$DAY/ $SYNC_DIR/ --progress || true
-
-                  if [ -z "$(ls -A $SYNC_DIR 2>/dev/null)" ]; then
-                    echo "WARNING: No archives found in MinIO for $TODAY"
+                  # Check if we got any files
+                  FILE_COUNT=$(find $SYNC_DIR/shared -type f | wc -l)
+                  if [ "$FILE_COUNT" -eq 0 ]; then
+                    echo "WARNING: No files found in MinIO current/"
+                    rm -rf $SYNC_DIR
                     exit 0
                   fi
 
-                  # List files to sync
+                  echo "Downloaded $FILE_COUNT files"
+
+                  # Create tar.zst archive
+                  ARCHIVE_NAME="shared-subfolders-$TODAY.tar.zst"
                   echo ""
-                  echo "=== Files to sync ==="
-                  ls -la $SYNC_DIR/
+                  echo "=== Creating archive: $ARCHIVE_NAME ==="
+                  cd $SYNC_DIR
+                  tar -cf - shared | zstd -19 -o $ARCHIVE_NAME
+
+                  # Generate checksum
+                  sha256sum $ARCHIVE_NAME > ''${ARCHIVE_NAME}.sha256
+
+                  ARCHIVE_SIZE=$(stat -c%s $ARCHIVE_NAME)
+                  echo "Archive size: $ARCHIVE_SIZE bytes"
 
                   # Create sync config for proton-drive-sync
                   mkdir -p /tmp/proton-config
@@ -175,7 +181,7 @@ in
 
                   # Run proton-drive-sync
                   echo ""
-                  echo "=== Syncing to Proton Drive ==="
+                  echo "=== Uploading to Proton Drive ==="
                   cd /tmp/proton-config
                   proton-drive-sync sync --config ./sync.json || {
                     echo "WARNING: Proton sync had errors (best-effort)"
@@ -183,27 +189,23 @@ in
 
                   # Generate report
                   echo ""
-                  echo "=== Generating sync report ==="
+                  echo "=== Sync report ==="
                   REPORT_FILE="/tmp/proton-sync-report-$TODAY.json"
                   cat > $REPORT_FILE << EOF
                   {
                     "timestamp": "$(date -Iseconds)",
                     "date": "$TODAY",
                     "source_bucket": "$MINIO_BUCKET",
-                    "source_prefix": "$YEAR/$MONTH/$DAY",
+                    "source_prefix": "current/",
                     "destination_path": "$PROTON_DEST_PATH/$YEAR/$MONTH/$DAY",
-                    "files_synced": $(ls -1 $SYNC_DIR 2>/dev/null | wc -l),
+                    "archive_name": "$ARCHIVE_NAME",
+                    "archive_size": $ARCHIVE_SIZE,
+                    "files_archived": $FILE_COUNT,
                     "status": "completed"
                   }
                   EOF
 
                   cat $REPORT_FILE
-
-                  # Upload report back to MinIO
-                  echo ""
-                  echo "=== Uploading report to MinIO ==="
-                  export MC_HOST_minio="$MINIO_URL"
-                  mc cp $REPORT_FILE minio/$MINIO_BUCKET/_reports/$YEAR/$MONTH/$DAY/proton-sync-report.json || true
 
                   # Cleanup
                   rm -rf $SYNC_DIR
