@@ -57,12 +57,11 @@ let
   entrypointScriptText = builtins.readFile ./entrypoint.sh;
 
   # Build a custom rootfs that includes openclaw + matrix deps
-  # Using mkDerivation instead of buildEnv to have full control over symlinks
+  # Using runCommand for full control over the file tree
   openclawRootfs = pkgs.runCommand "openclaw-rootfs" { } ''
-    # Start with toolchain packages (these go to standard paths)
-    # Copy bin directories
+    # Copy bin directories (ffmpeg-headless saves ~728MB closure vs full ffmpeg)
     mkdir -p $out/bin
-    for pkg in ${pkgs.curl} ${pkgs.jq} ${pkgs.gnused} ${pkgs.git} ${pkgs.python3} ${pkgs.uv} ${pkgs.ffmpeg} ${pkgs.github-cli} ${pkgs.gemini-cli} ${pkgs.nodejs_22} ${pkgs.procps} ${openclawGateway}; do
+    for pkg in ${pkgs.curl} ${pkgs.jq} ${pkgs.gnused} ${pkgs.git} ${pkgs.python3} ${pkgs.uv} ${pkgs.ffmpeg-headless} ${pkgs.github-cli} ${pkgs.gemini-cli} ${pkgs.nodejs_22} ${pkgs.procps} ${openclawGateway}; do
       if [ -d "$pkg/bin" ]; then
         cp -rsf "$pkg/bin"/* $out/bin/ 2>/dev/null || true
       fi
@@ -81,6 +80,22 @@ let
     if [ -d "${openclawGateway}/lib" ]; then
       cp -rL "${openclawGateway}/lib"/* $out/lib/ 2>/dev/null || true
     fi
+
+    # Remove unused heavy optional deps (~1GB savings)
+    # node-llama-cpp: optional local embeddings (we use remote via Gemini API)
+    # lancedb: unused vector DB (zero references in dist/)
+    # koffi: unused FFI library (zero references in dist/)
+    chmod -R u+w $out/lib/openclaw/node_modules/ || true
+    rm -rf $out/lib/openclaw/node_modules/.pnpm/@node-llama-cpp+*
+    rm -rf $out/lib/openclaw/node_modules/.pnpm/node-llama-cpp@*
+    rm -rf $out/lib/openclaw/node_modules/.pnpm/@lancedb+*
+    rm -rf $out/lib/openclaw/node_modules/.pnpm/lancedb@*
+    rm -rf $out/lib/openclaw/node_modules/.pnpm/koffi@*
+    rm -rf $out/lib/openclaw/node_modules/node-llama-cpp
+    rm -rf $out/lib/openclaw/node_modules/@node-llama-cpp
+    rm -rf $out/lib/openclaw/node_modules/@lancedb
+    rm -rf $out/lib/openclaw/node_modules/lancedb
+    rm -rf $out/lib/openclaw/node_modules/koffi
 
     # Copy etc directories (except ssl certs - handled separately)
     mkdir -p $out/etc
@@ -110,22 +125,19 @@ let
     mkdir -p $out/etc/openclaw
     cp ${./config-template.json5} $out/etc/openclaw/config-template.json5
 
-    # NOW: Fill the matrix extension's node_modules with our deps
-    # This is safe because $out/lib is real files now, not symlinks
+    # Fill the matrix extension's node_modules with our deps
     if [ -d "${matrixPluginDeps}/matrix-deps/node_modules" ]; then
-      # Make writable (files from nix store are read-only)
       chmod -R u+w $out/lib/openclaw/extensions/matrix/ || true
-      # Remove empty node_modules and replace with populated one
       rm -rf $out/lib/openclaw/extensions/matrix/node_modules
       cp -r ${matrixPluginDeps}/matrix-deps/node_modules $out/lib/openclaw/extensions/matrix/
     fi
   '';
 in
-dockerTools.buildImage {
+dockerTools.streamLayeredImage {
   name = "localhost/openclaw-nix";
   tag = "dev";
 
-  copyToRoot = [
+  contents = [
     openclawRootfs
     pkgs.coreutils
     pkgs.bash
