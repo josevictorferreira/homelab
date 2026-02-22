@@ -197,3 +197,13 @@
 **Lesson:** nix-openclaw bundles extensions at `/lib/openclaw/extensions/` but `node_modules` directories are EMPTY. Matrix plugin requires 5 npm packages (matrix-bot-sdk, matrix-sdk-crypto-nodejs, markdown-it, music-metadata, zod) - must pre-install in image.
 **Context:** Unlike WhatsApp which bundles deps in core (Baileys), Matrix uses external packages with native bindings. Runtime npm install would break `--network=none` operation.
 **Verify:** `ls /lib/openclaw/extensions/matrix/node_modules` - if empty, deps missing
+
+### Use mkDerivation Not buildEnv for Writable OCI Rootfs
+**Lesson:** When building OCI images that need runtime file modifications (like adding node_modules), use `mkDerivation` with `cp -rL` instead of `buildEnv`. `buildEnv` creates symlink trees to read-only nix store paths.
+**Context:** `buildEnv` is great for PATH construction but creates read-only symlinks. For writable rootfs layers, use `mkDerivation` + `cp -rL` + `chmod -R u+w`.
+**Verify:** `ls -la <path>` shows real files not symlinks to `/nix/store/`
+
+### Dereference Nix Store Paths with cp -rL
+**Lesson:** When copying from nix store derivations, use `cp -rL` (dereference) not `cp -rsf`. The `-s` flag creates symlinks, not actual copies, making files read-only.
+**Context:** `cp -rsf /nix/store/.../lib ./lib` creates symlinks pointing back to nix store. Use `cp -rL` to dereference and create writable copies, then `chmod -R u+w` to enable modification.
+**Verify:** `stat <file>` shows regular file, not symlink; can `touch <file>` without permission error
