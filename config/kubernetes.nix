@@ -48,6 +48,7 @@
       matrix = "10.10.10.138";
       rabbitmq = "10.10.10.139";
       openclaw = "10.10.10.140";
+      openclaw-nix = "10.10.10.141";
       nfs = "10.10.10.150";
       grafana = "10.10.10.190";
     };
@@ -74,5 +75,6 @@
     certificate = "cert-manager";
     applications = "apps";
     storage = "rook-ceph";
+    backup = "backup";
   };
 }

@@ -207,3 +207,20 @@
 **Lesson:** When copying from nix store derivations, use `cp -rL` (dereference) not `cp -rsf`. The `-s` flag creates symlinks, not actual copies, making files read-only.
 **Context:** `cp -rsf /nix/store/.../lib ./lib` creates symlinks pointing back to nix store. Use `cp -rL` to dereference and create writable copies, then `chmod -R u+w` to enable modification.
 **Verify:** `stat <file>` shows regular file, not symlink; can `touch <file>` without permission error
+
+## Release Submodule (app-template)
+
+### Release Submodule Requires LoadBalancer Service Entry
+**Lesson:** The release submodule unconditionally calls `kubenix.lib.serviceAnnotationFor` for every app. Even when using ClusterIP (via `values.service.main.type = "ClusterIP"`), the service name must exist in `homelab.kubernetes.loadBalancer.services` or Nix evaluation fails.
+**Context:** The annotation lookup happens eagerly during evaluation before values merge. The workaround: add an IP entry to the loadBalancer map even for ClusterIP-only services.
+**Verify:** Add entry in `config/kubernetes.nix` loadBalancer.services before running `make manifests`
+
+### Persistence Schema Requires Full Fields Even When Disabled
+**Lesson:** When disabling the release submodule's default persistence, don't pass minimal `{ enabled = false; }`. The bjw-s chart v4 validates `persistence.main` against a schema that requires fields like `type`, `storageClass` even when disabled.
+**Context:** Either omit the `persistence` argument entirely (uses default with `enabled = false` + all fields) or don't fight it and add extra persistence volumes via `values.persistence.*`.
+**Verify:** `nix build .#gen-manifests` fails with "oneOf" schema validation if persistence is malformed
+
+### Use advancedMounts to Scope Volumes to Specific Containers
+**Lesson:** The release submodule's default persistence uses `globalMounts` which mounts to ALL containers including sidecars. Use `advancedMounts` to restrict volumes to specific containers (e.g., only main container, not tailscale sidecar).
+**Context:** Tailscale sidecar shouldn't get /config, /state, /logs, or workspace mounts. Structure: `advancedMounts.<controller>.<container> = [{ name = "..."; path = "..."; }]`. Global mounts on tailscale-only volumes (dev-tun, tailscale-state) are fine.
+**Verify:** Check generated Deployment YAML - tailscale container should only have its own mounts, not main container's data volumes
