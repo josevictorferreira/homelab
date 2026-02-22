@@ -25,21 +25,70 @@ BLUE='\033[0;34m'
 CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
-# Get script directory
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+# Get script directory (resolve symlinks for nix store paths)
+SCRIPT_SOURCE="${BASH_SOURCE[0]}"
+if [[ -L "$SCRIPT_SOURCE" ]]; then
+    SCRIPT_SOURCE="$(readlink -f "$SCRIPT_SOURCE")"
+fi
+SCRIPT_DIR="$(cd "$(dirname "$SCRIPT_SOURCE")" && pwd)"
+
+# Detect REPO_ROOT - handle both direct execution and nix run
+if [[ "$SCRIPT_DIR" == /nix/store/* ]] || [[ "${SCRIPT_SOURCE:-}" == /nix/store/* ]]; then
+    # Running via nix - look for repo relative to CWD
+    if [[ -d "$PWD/modules/kubenix" ]]; then
+        REPO_ROOT="$PWD"
+    elif [[ -d "$PWD/../modules/kubenix" ]]; then
+        REPO_ROOT="$(cd "$PWD/.." && pwd)"
+    else
+        # Search up directory tree
+        REPO_ROOT="$PWD"
+        while [[ "$REPO_ROOT" != "/" ]]; do
+            if [[ -d "$REPO_ROOT/modules/kubenix" ]]; then
+                break
+            fi
+            REPO_ROOT="$(dirname "$REPO_ROOT")"
+        done
+        
+        if [[ "$REPO_ROOT" == "/" ]]; then
+            echo "Error: Cannot find homelab repo root (no modules/kubenix directory found)"
+            echo "Please run from within the homelab repository"
+            exit 1
+        fi
+    fi
+else
+    # Direct execution - script is in scripts/ directory
+    REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+fi
 KUBENIX_DIR="$REPO_ROOT/modules/kubenix"
 
-# Check for required tools
+# Debug: Print detected paths
+if [[ "${DEBUG:-}" == "1" ]]; then
+    echo "BASH_SOURCE[0]: ${BASH_SOURCE[0]}"
+    echo "SCRIPT_SOURCE: ${SCRIPT_SOURCE:-unset}"
+    echo "SCRIPT_DIR: $SCRIPT_DIR"
+    echo "REPO_ROOT: $REPO_ROOT"
+    echo "KUBENIX_DIR: $KUBENIX_DIR"
+    echo "PWD: $PWD"
+fi
+
+# Check for required tools (command-specific)
 check_dependencies() {
+    local cmd="${1:-}"
     local missing=()
     
-    command -v skopeo >/dev/null 2>&1 || missing+=("skopeo")
-    command -v jq >/dev/null 2>&1 || missing+=("jq")
-    command -v grep >/dev/null 2>&1 || missing+=("grep")
-    command -v awk >/dev/null 2>&1 || missing+=("awk")
-    command -v find >/dev/null 2>&1 || missing+=("find")
-    command -v sed >/dev/null 2>&1 || missing+=("sed")
+    # Base tools needed by all commands
+    command -v jq > /dev/null 2>&1 || missing+=("jq")
+    command -v grep > /dev/null 2>&1 || missing+=("grep")
+    command -v awk > /dev/null 2>&1 || missing+=("awk")
+    command -v find > /dev/null 2>&1 || missing+=("find")
+    command -v sed > /dev/null 2>&1 || missing+=("sed")
+    
+    # skopeo only needed for commands that query registries
+    case "$cmd" in
+        check|check-all|outdated)
+            command -v skopeo > /dev/null 2>&1 || missing+=("skopeo")
+            ;;
+    esac
     
     if [ ${#missing[@]} -gt 0 ]; then
         echo -e "${RED}Error: Missing required tools: ${missing[*]}${NC}"
@@ -119,9 +168,9 @@ extract_images() {
         
         # Pattern 1: image = { registry = "..."; repository = "..."; tag = "..."; }
         # Also matches: image.repository = "..."; image.tag = "...";
-        grep -n "repository\s*=" "$file" 2>/dev/null | while IFS=: read -r line_num line_content; do
+        grep -n "repository[[:space:]]*=" "$file" 2>/dev/null | while IFS=: read -r line_num line_content; do
             # Extract repository value
-            if [[ "$line_content" =~ repository\s*=\s*\"([^\"]+)\" ]]; then
+            if [[ "$line_content" =~ repository[[:space:]]*=[[:space:]]*\"([^\"]+)\" ]]; then
                 local repository="${BASH_REMATCH[1]}"
                 
                 # Try to find matching tag in nearby lines
@@ -134,12 +183,12 @@ extract_images() {
                 local registry=""
                 
                 # Extract tag
-                if [[ "$context" =~ tag\s*=\s*\"([^\"]+)\" ]]; then
+                if [[ "$context" =~ tag[[:space:]]*=[[:space:]]*\"([^\"]+)\" ]]; then
                     tag="${BASH_REMATCH[1]}"
                 fi
                 
                 # Extract registry if present
-                if [[ "$context" =~ registry\s*=\s*\"([^\"]+)\" ]]; then
+                if [[ "$context" =~ registry[[:space:]]*=[[:space:]]*\"([^\"]+)\" ]]; then
                     registry="${BASH_REMATCH[1]}"
                 fi
                 
@@ -166,8 +215,8 @@ extract_images() {
         done
         
         # Pattern 2: Simple image strings (e.g., image = "docker.io/library/busybox:1.37";)
-        grep -nE 'image\s*=\s*"[^"]+"' "$file" 2>/dev/null | while IFS=: read -r line_num line_content; do
-            if [[ "$line_content" =~ image\s*=\s*\"([^\"]+)\" ]]; then
+        grep -nE 'image[[:space:]]*=[[:space:]]*"[^"]+"' "$file" 2>/dev/null | while IFS=: read -r line_num line_content; do
+            if [[ "$line_content" =~ image[[:space:]]*=[[:space:]]*\"([^\"]+)\" ]]; then
                 local image_ref="${BASH_REMATCH[1]}"
                 
                 # Skip variable references and secrets
@@ -279,10 +328,41 @@ cmp_versions() {
     if [ "$ver_a" = "$ver_b" ]; then
         echo "equal"
     elif [ "$first" = "$ver_a" ]; then
-        echo "newer"
-    else
+        # ver_a comes first in sort, so it's older
         echo "older"
+    else
+        # ver_a comes after in sort, so it's newer
+        echo "newer"
     fi
+}
+
+# Filter tags to only include semantic versions (vN.N.N or N.N.N)
+# Excludes commit-based tags like 2026.2.21-89a63114c
+filter_semver_tags() {
+    local tags="$1"
+    
+    echo "$tags" | while IFS= read -r tag; do
+        [ -z "$tag" ] && continue
+        # Match vN.N.N or N.N.N patterns (at least major.minor)
+        if echo "$tag" | grep -qE '^(v?[0-9]+\.[0-9]+(\.[0-9]+)?)$'; then
+            echo "$tag"
+        fi
+    done
+}
+
+# Find the latest semantic version from a list of tags
+# Returns the highest version tag
+find_latest_semver() {
+    local tags="$1"
+    local current_tag="$2"
+    
+    # Filter to only semantic versions
+    local semver_tags=$(filter_semver_tags "$tags")
+    
+    [ -z "$semver_tags" ] && return
+    
+    # Sort versions and get the latest
+    echo "$semver_tags" | sort -V | tail -1
 }
 
 # Scan and display all images
@@ -410,44 +490,110 @@ check_all_images() {
     done
 }
 
-# Show outdated images only
+# Show outdated images with latest semantic version and digest
 show_outdated() {
     echo -e "${BLUE}Checking for outdated images...${NC}" >&2
     local images=$(extract_images "json")
+    local total=$(echo "$images" | wc -l)
     
-    local outdated_count=0
+    echo -e "Checking ${total} images..." >&2
     
-    echo "$images" | while read -r obj; do
+    local outdated_results=""
+    local idx=0
+    
+    while IFS= read -r obj; do
+        idx=$((idx + 1))
+        [ -z "$obj" ] && continue
+        
         local file=$(echo "$obj" | jq -r '.file')
         local image=$(echo "$obj" | jq -r '.image')
         local tag=$(echo "$obj" | jq -r '.tag')
+        
+        echo -e "  [${idx}/${total}] Checking ${YELLOW}${image}${NC}..." >&2
         
         local parsed=$(parse_image_ref "$image")
         local registry=$(echo "$parsed" | cut -d'|' -f1)
         local repository=$(echo "$parsed" | cut -d'|' -f2)
         local current_tag=$(echo "$parsed" | cut -d'|' -f3)
         
-        # Quick check - just get latest tags
-        local latest_tags=$(get_available_tags "$registry" "$repository" 5)
+        # Fetch tags from registry
+        local all_tags=$(get_available_tags "$registry" "$repository" 50)
         
-        local found_newer=false
-        while IFS= read -r t; do
-            [ -z "$t" ] && continue
-            local cmp=$(cmp_versions "$t" "$current_tag")
-            if [ "$cmp" = "newer" ]; then
-                found_newer=true
-                break
-            fi
-        done <<< "$latest_tags"
-        
-        if [ "$found_newer" = "true" ]; then
-            echo "$obj"
+        if [ -z "$all_tags" ]; then
+            echo -e "    ${RED}Failed to fetch tags from ${registry}${NC}" >&2
+            continue
         fi
-    done | if read -t 0; then
-        cat
-    else
+        
+        # Find latest semantic version
+        local latest_tag=$(find_latest_semver "$all_tags" "$current_tag")
+        
+        if [ -z "$latest_tag" ]; then
+            echo -e "    ${CYAN}No semantic version tags found${NC}" >&2
+            continue
+        fi
+        
+        # Check if latest is actually newer
+        local cmp=$(cmp_versions "$latest_tag" "$current_tag")
+        
+        if [ "$cmp" = "newer" ]; then
+            echo -e "    ${GREEN}Update available: ${current_tag} → ${latest_tag}${NC}" >&2
+            
+            # Get digest for latest version
+            local latest_digest=$(get_digest "$registry" "$repository" "$latest_tag")
+            
+            # Build result object
+            local result=$(jq -n \
+                --arg file "$file" \
+                --arg image "$image" \
+                --arg current_tag "$current_tag" \
+                --arg latest_tag "$latest_tag" \
+                --arg latest_digest "$latest_digest" \
+                --arg registry "$registry" \
+                --arg repository "$repository" \
+                '{file: $file, image: $image, current_tag: $current_tag, latest_tag: $latest_tag, latest_digest: $latest_digest, registry: $registry, repository: $repository}')
+            
+            if [ -z "$outdated_results" ]; then
+                outdated_results="$result"
+            else
+                outdated_results="${outdated_results}
+${result}"
+            fi
+        else
+            echo -e "    ${CYAN}Up to date (${current_tag})${NC}" >&2
+        fi
+    done <<< "$images"
+    
+    echo "" >&2
+    
+    if [ -z "$outdated_results" ]; then
         echo -e "${GREEN}All images are up to date!${NC}"
+        return 0
     fi
+    
+    local count=$(echo "$outdated_results" | wc -l)
+    echo -e "${YELLOW}Found $count outdated image(s):${NC}" >&2
+    echo "================================================================================" >&2
+    echo "" >&2
+    
+    # Show as formatted table
+    echo -e "${CYAN}FILE                                              CURRENT → LATEST @ DIGEST${NC}"
+    echo "--------------------------------------------------------------------------------"
+    echo "$outdated_results" | while read -r result; do
+        local file=$(echo "$result" | jq -r '.file')
+        local current_tag=$(echo "$result" | jq -r '.current_tag')
+        local latest_tag=$(echo "$result" | jq -r '.latest_tag')
+        local latest_digest=$(echo "$result" | jq -r '.latest_digest')
+        
+        local digest_short=""
+        if [ -n "$latest_digest" ] && [ "$latest_digest" != "null" ]; then
+            digest_short="@${latest_digest:0:19}..."
+        fi
+        
+        printf "%-50s %s → %s%s\n" "$file" "$current_tag" "$latest_tag" "$digest_short"
+    done
+    
+    echo "" >&2
+    echo -e "${YELLOW}To update an image, edit the file and change the tag/digest.${NC}" >&2
 }
 
 # Show help
@@ -486,11 +632,12 @@ EOF
 
 # Main
 main() {
-    check_dependencies
+    local cmd="${1:-help}"
+    
+    check_dependencies "$cmd"
     
     cd "$REPO_ROOT"
     
-    local cmd="${1:-help}"
     shift || true
     
     case "$cmd" in
