@@ -448,7 +448,7 @@ check_single_image() {
         if [ "$show_digest" = "true" ]; then
             local d=$(get_digest "$registry" "$repository" "$tag")
             if [ -n "$d" ]; then
-                digest_str=" @ ${d:0:16}..."
+                digest_str=" @$d"
             fi
         fi
         
@@ -498,8 +498,13 @@ show_outdated() {
     
     echo -e "Checking ${total} images..." >&2
     
-    local outdated_results=""
+    local outdated_count=0
     local idx=0
+    
+    # Print table header
+    echo "================================================================================"
+    echo -e "${CYAN}FILE                                              CURRENT → LATEST @ DIGEST${NC}"
+    echo "--------------------------------------------------------------------------------"
     
     while IFS= read -r obj; do
         idx=$((idx + 1))
@@ -509,7 +514,7 @@ show_outdated() {
         local image=$(echo "$obj" | jq -r '.image')
         local tag=$(echo "$obj" | jq -r '.tag')
         
-        echo -e "  [${idx}/${total}] Checking ${YELLOW}${image}${NC}..." >&2
+        echo -e "  [${idx}/${total}] Checking ${YELLOW}${image}${NC}" >&2
         
         local parsed=$(parse_image_ref "$image")
         local registry=$(echo "$parsed" | cut -d'|' -f1)
@@ -536,64 +541,31 @@ show_outdated() {
         local cmp=$(cmp_versions "$latest_tag" "$current_tag")
         
         if [ "$cmp" = "newer" ]; then
-            echo -e "    ${GREEN}Update available: ${current_tag} → ${latest_tag}${NC}" >&2
-            
             # Get digest for latest version
             local latest_digest=$(get_digest "$registry" "$repository" "$latest_tag")
             
-            # Build result object
-            local result=$(jq -n \
-                --arg file "$file" \
-                --arg image "$image" \
-                --arg current_tag "$current_tag" \
-                --arg latest_tag "$latest_tag" \
-                --arg latest_digest "$latest_digest" \
-                --arg registry "$registry" \
-                --arg repository "$repository" \
-                '{file: $file, image: $image, current_tag: $current_tag, latest_tag: $latest_tag, latest_digest: $latest_digest, registry: $registry, repository: $repository}')
-            
-            if [ -z "$outdated_results" ]; then
-                outdated_results="$result"
-            else
-                outdated_results="${outdated_results}
-${result}"
+            local digest_str=""
+            if [ -n "$latest_digest" ] && [ "$latest_digest" != "null" ]; then
+                digest_str="@$latest_digest"
             fi
-        else
-            echo -e "    ${CYAN}Up to date (${current_tag})${NC}" >&2
+            
+            # Print table row directly
+            printf "%-50s %s → %s%s\n" "$file" "$current_tag" "$latest_tag" "$digest_str"
+            
+            outdated_count=$((outdated_count + 1))
         fi
     done <<< "$images"
     
+    echo "================================================================================"
     echo "" >&2
     
-    if [ -z "$outdated_results" ]; then
+    if [ $outdated_count -eq 0 ]; then
         echo -e "${GREEN}All images are up to date!${NC}"
-        return 0
+    else
+        echo -e "${YELLOW}Found $outdated_count outdated image(s)${NC}" >&2
+        echo "" >&2
+        echo -e "${YELLOW}To update an image, edit the file and change the tag/digest.${NC}" >&2
     fi
-    
-    local count=$(echo "$outdated_results" | wc -l)
-    echo -e "${YELLOW}Found $count outdated image(s):${NC}" >&2
-    echo "================================================================================" >&2
-    echo "" >&2
-    
-    # Show as formatted table
-    echo -e "${CYAN}FILE                                              CURRENT → LATEST @ DIGEST${NC}"
-    echo "--------------------------------------------------------------------------------"
-    echo "$outdated_results" | while read -r result; do
-        local file=$(echo "$result" | jq -r '.file')
-        local current_tag=$(echo "$result" | jq -r '.current_tag')
-        local latest_tag=$(echo "$result" | jq -r '.latest_tag')
-        local latest_digest=$(echo "$result" | jq -r '.latest_digest')
-        
-        local digest_short=""
-        if [ -n "$latest_digest" ] && [ "$latest_digest" != "null" ]; then
-            digest_short="@${latest_digest:0:19}..."
-        fi
-        
-        printf "%-50s %s → %s%s\n" "$file" "$current_tag" "$latest_tag" "$digest_short"
-    done
-    
-    echo "" >&2
-    echo -e "${YELLOW}To update an image, edit the file and change the tag/digest.${NC}" >&2
 }
 
 # Show help

@@ -521,6 +521,65 @@ let
         ${./image-updater.sh} "''${@:-help}"
       '';
 
+  # ============================================================================
+  # OpenClaw Container Image
+  # ============================================================================
+
+  # OpenClaw image configuration
+  openclawImageName = "openclaw-nix";
+  openclawRegistry = "ghcr.io";
+
+  push-openclaw =
+    mkCommand "push-openclaw" "Build and push openclaw-nix image to GHCR"
+      [ pkgs.nix pkgs.podman pkgs.gh pkgs.coreutils ]
+      ''
+        set -e
+
+        IMAGE_NAME="${openclawImageName}"
+        REGISTRY="${openclawRegistry}"
+        GITHUB_USER="${githubUser}"
+        LOCAL_TAG="localhost/''${IMAGE_NAME}:dev"
+        FULL_TAG="''${REGISTRY}/''${GITHUB_USER}/''${IMAGE_NAME}:latest"
+
+        # Build
+        echo "[1/4] Building ''${IMAGE_NAME}..."
+        nix build .#''${IMAGE_NAME}-image --show-trace
+
+        # Load into podman
+        echo "[2/4] Loading image into podman..."
+        podman load < result
+        rm -f result
+
+        # Tag for registry
+        echo "[3/3] Tagging as ''${FULL_TAG}..."
+        podman tag "''${LOCAL_TAG}" "''${FULL_TAG}"
+
+        # Login
+        echo "[4/4] Logging in to ''${REGISTRY}..."
+        if [ -n "''${GITHUB_TOKEN:-}" ]; then
+          echo "$GITHUB_TOKEN" | podman login "''${REGISTRY}" -u "''${GITHUB_USER}" --password-stdin
+        elif command -v gh >/dev/null 2>&1; then
+          GH_TOKEN="$(gh auth token)"
+          if [ -n "$GH_TOKEN" ]; then
+            echo "$GH_TOKEN" | podman login "''${REGISTRY}" -u "''${GITHUB_USER}" --password-stdin
+          else
+            echo "GitHub CLI not authenticated. Run: gh auth login"
+            exit 1
+          fi
+        else
+          echo "Error: Neither gh CLI nor GITHUB_TOKEN available"
+          exit 1
+        fi
+
+        # Push
+        echo "Pushing to ''${FULL_TAG}..."
+        podman push "''${FULL_TAG}"
+
+        echo ""
+        echo "✓ Image pushed: ''${FULL_TAG}"
+        echo "  View at: https://''${REGISTRY}/''${GITHUB_USER}/''${IMAGE_NAME}"
+      '';
+
 in
 {
   inherit
@@ -546,5 +605,6 @@ in
     image-scan
     image-outdated
     image-updater
+    push-openclaw
     ;
 }
