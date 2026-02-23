@@ -376,10 +376,17 @@ in
           existingClaim = "cephfs-shared-storage-root";
           advancedMounts.main.main = [
             {
-              path = "/home/node/.openclaw/workspace";
+              path = "/home/node/.openclaw";
               subPath = "openclaw";
             }
           ];
+        };
+
+        # Persistence: full shared storage access
+        persistence.shared-storage = {
+          type = "persistentVolumeClaim";
+          existingClaim = "cephfs-shared-storage-root";
+          advancedMounts.main.main = [ { path = "/home/node/shared"; } ];
         };
 
         # Persistence: tailscale state (block storage)
