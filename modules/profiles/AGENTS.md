@@ -1,45 +1,27 @@
 # NIXOS PROFILES
 
-Role-based NixOS modules. Hosts in `config/nodes.nix` declare roles → profiles auto-enabled.
+Role-based NixOS modules. Hosts declare roles in `config/nodes.nix` → profiles auto-enabled.
 
-## ROLES → PROFILES
+## WHERE TO LOOK
 
 | Role | Profile | Purpose |
 |------|---------|---------|
-| `k8s-control-plane` | HA k3s server, etcd, HAProxy, Keepalived |
-| `k8s-worker` | k3s agent mode |
-| `k8s-server` | Common k3s settings (both CP and worker) |
-| `k8s-storage` | Ceph kernel modules, LVM |
-| `amd-gpu` | ROCm, AMDVLK, GPU drivers |
-| `system-admin` | SSH, users, base packages |
-| `nixos-server` | Common server settings |
-| `backup-server` | Backup services |
-
-## MODULE PATTERN
-
-```nix
-{ lib, config, hostConfig, homelab, ... }:
-
-let
-  cfg = config.profiles."my-profile";
-in
-{
-  options.profiles."my-profile" = {
-    enable = lib.mkEnableOption "My profile";
-    # Additional options...
-  };
-
-  config = lib.mkIf cfg.enable {
-    # Configuration when enabled
-  };
-}
-```
+| `nixos-server` | Base server config, networking, zram, journal limits | Foundation for all nodes |
+| `system-admin` | SSH, users, sops, vim/zsh/git | Admin access and tools |
+| `k8s-server` | k3s deps, kernel modules, firewall ports | Common k3s prerequisites |
+| `k8s-control-plane` | k3s server, HAProxy, Keepalived, etcd snapshots | Control plane with VIP |
+| `k8s-worker` | k3s agent, kubelet GC settings | Worker node |
+| `k8s-storage` | Ceph kernel modules, LVM, blacklists `nbd` | Storage node |
+| `amd-gpu` | ROCm, AMDVLK, GPU drivers | GPU workloads |
+| `tailscale` | VPN mesh, subnet router logic | Remote access |
+| `tailscale-router` | Marker role for subnet routing | Detected by `tailscale.nix` |
+| `backup-server` | MinIO, ZFS pool, NFS, Wake-on-LAN | Backup target |
 
 ## HOW ROLES WORK
 
 1. Host declares roles in `config/nodes.nix`:
    ```nix
-   lab-alpha-cp.roles = [ "k8s-control-plane" "k8s-storage" ... ];
+   lab-alpha-cp.roles = [ "k8s-control-plane" "k8s-storage" "tailscale-router" ];
    ```
 
 2. `hosts/default.nix` auto-imports and enables:
@@ -48,16 +30,20 @@ in
    profiles = listToAttrs (map (r: { name = r; value.enable = true; }) hostConfig.roles);
    ```
 
-## K8S CONTROL PLANE SPECIFICS
+## CONVENTIONS
 
-- First node in group = cluster init (`--cluster-init`)
-- Others join via VIP (10.10.10.250)
-- Bootstrap manifests only on init node
-- Cilium, Flux components deployed via k3s manifests
+- **Profile module pattern**: Use `options.profiles."<name">` with `lib.mkEnableOption`
+- **Conditional config**: Wrap in `lib.mkIf cfg.enable { }`
+- **Marker profiles**: `tailscale-router.nix` has empty config, detected by other profiles
+- **Role detection**: Use `builtins.elem "role-name" hostConfig.roles` for conditional logic
+- **Imports**: Reference services via `${homelab.paths.services}/<name>.nix`
 
-## IMPORTS
+## ANTI-PATTERNS
 
-Profiles can import from:
-- `${homelab.paths.services}/` - Custom services (haproxy, keepalived)
-- `${homelab.paths.common}/` - Shared settings
-- `${homelab.paths.programs}/` - Custom programs
+| Forbidden | Why |
+|-----------|-----|
+| Create role without `.nix` file | Eval fails, role must exist in `modules/profiles/` |
+| Use `with pkgs;` | Breaks static analysis, use explicit `pkgs.<name>` |
+| Hardcode secrets | Use `sops.secrets` with proper `sopsFile` paths |
+| Skip `lib.mkIf cfg.enable` | Config applies unconditionally |
+| Assume `hostConfig.roles` exists | Pass as argument or check `config` availability |
