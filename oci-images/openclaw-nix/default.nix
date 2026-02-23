@@ -135,6 +135,14 @@ let
       rm -rf $out/lib/openclaw/extensions/matrix/node_modules
       cp -r ${matrixPluginDeps}/matrix-deps/node_modules $out/lib/openclaw/extensions/matrix/
     fi
+
+    # Create symlinks from original nix store paths to our copied lib
+    # This ensures the gateway finds extensions at the paths it expects
+    GATEWAY_STORE_PATH=$(readlink -f ${openclawGateway} | sed 's|^/nix/store/||' | cut -d'/' -f1)
+    if [ -n "$GATEWAY_STORE_PATH" ]; then
+      mkdir -p "$out/nix/store/$GATEWAY_STORE_PATH"
+      ln -s $out/lib "$out/nix/store/$GATEWAY_STORE_PATH/lib"
+    fi
   '';
 in
 dockerTools.streamLayeredImage {
