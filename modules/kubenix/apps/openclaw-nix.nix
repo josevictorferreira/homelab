@@ -371,6 +371,58 @@ in
           ];
         };
 
+        # Init container: install matrix plugin dependencies
+        controllers.main.initContainers.install-matrix-deps = {
+          image = {
+            repository = "node";
+            tag = "22-slim";
+          };
+          securityContext = {
+            runAsUser = 0;
+            runAsGroup = 0;
+          };
+          command = [
+            "bash"
+            "-c"
+            ''
+              set -e
+              echo "Installing matrix plugin dependencies..."
+
+              # Find the matrix extension directory in nix store
+              EXT_DIR="/nix/store"
+              MATRIX_EXT=$(find $EXT_DIR -path "*/lib/openclaw/extensions/matrix" -type d 2>/dev/null | head -1)
+
+              if [ -z "$MATRIX_EXT" ]; then
+                echo "Matrix extension not found in nix store, skipping..."
+                exit 0
+              fi
+
+              echo "Found matrix extension at: $MATRIX_EXT"
+              cd "$MATRIX_EXT"
+
+              # Check if node_modules already exists
+              if [ -d "node_modules" ] && [ "$(ls -A node_modules 2>/dev/null)" ]; then
+                echo "node_modules already exists, skipping npm install"
+                exit 0
+              fi
+
+              # Strip workspace: protocol deps that npm can't handle
+              if [ -f "package.json" ]; then
+                node -e "
+                  const fs = require('fs');
+                  const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+                  delete pkg.devDependencies;
+                  fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2));
+                "
+                npm install --omit=dev --no-package-lock --legacy-peer-deps 2>&1 || echo "WARN: npm install failed, plugin may not work"
+                echo "Matrix plugin dependencies installed"
+              else
+                echo "No package.json found, skipping"
+              fi
+            ''
+          ];
+        };
+
         # Persistence: writable config scratch dir (main container only)
         persistence.scratch-config = {
           type = "emptyDir";
