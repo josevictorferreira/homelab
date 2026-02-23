@@ -1,8 +1,5 @@
-{
-  pkgs ? import <nixpkgs> { },
-  inputs ? { },
-  system ? "x86_64-linux",
-}:
+{ pkgs, lib, ... }:
+
 let
   dockerTools = pkgs.dockerTools;
 
@@ -11,46 +8,13 @@ let
     inputs.nix-openclaw.packages.${system}.openclaw-gateway
       or (throw "nix-openclaw input not available");
 
-  # Matrix plugin dependencies - FOD build using npm
-  # Dependencies from nix-openclaw matrix extension package.json:
-  # - @matrix-org/matrix-sdk-crypto-nodejs: ^0.4.0
-  # - @vector-im/matrix-bot-sdk: 0.8.0-element.3
-  # - markdown-it: 14.1.1
-  # - music-metadata: ^11.12.1
-  # - zod: ^4.3.6
-  matrixPluginDeps = pkgs.buildNpmPackage {
-    pname = "openclaw-matrix-plugin-deps";
-    version = "1.0.0";
+  # Import matrix plugin deps from separate file (includes scripts.build for npm)
+  matrixPluginDeps = (import ./matrix-deps.nix { inherit pkgs lib; }).matrixPluginDeps;
 
-    src = pkgs.writeTextDir "package.json" (
-      builtins.toJSON {
-        name = "openclaw-matrix-plugin";
-        version = "1.0.0";
-        dependencies = {
-          "@matrix-org/matrix-sdk-crypto-nodejs" = "0.4.0";
-          "@vector-im/matrix-bot-sdk" = "0.8.0-element.3";
-          "markdown-it" = "14.1.1";
-          "music-metadata" = "11.12.1";
-          "zod" = "4.3.6";
-        };
-      }
-    );
-
-    npmDepsHash = "sha256-UviJ9mGUxwezhcaUbRcQUlYsEmzxkP1I4Bh8WGz3OzM=";
-
-    # Copy vendored package-lock.json
-    postPatch = ''
-      cp ${./matrix-plugin-package-lock.json} package-lock.json
-    '';
-
-    # Don't run any build scripts, just install deps
-    dontNpmBuild = true;
-
-    # Install to a unique path to avoid merge conflicts
-    installPhase = ''
-      mkdir -p $out/matrix-deps
-      cp -r node_modules $out/matrix-deps/
-    '';
+  # Native binary for matrix-sdk-crypto-nodejs (linux x64)
+  matrixCryptoNative = pkgs.fetchurl {
+    url = "https://github.com/matrix-org/matrix-rust-sdk/releases/download/matrix-sdk-crypto-nodejs-v0.4.0/matrix-sdk-crypto.linux-x64-gnu.node";
+    sha256 = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="; # Placeholder, will update from error
   };
 
   # Entrypoint script source (just the text, we copy it in extraCommands)
@@ -134,6 +98,14 @@ let
       chmod -R u+w $out/lib/openclaw/extensions/matrix/ || true
       rm -rf $out/lib/openclaw/extensions/matrix/node_modules
       cp -r ${matrixPluginDeps}/matrix-deps/node_modules $out/lib/openclaw/extensions/matrix/
+    fi
+
+    # Copy native binary for matrix-sdk-crypto-nodejs
+    CRYPTO_PKG="$out/lib/openclaw/extensions/matrix/node_modules/@matrix-org/matrix-sdk-crypto-nodejs"
+    if [ -d "$CRYPTO_PKG" ]; then
+      chmod -R u+w "$CRYPTO_PKG" || true
+      cp ${matrixCryptoNative} "$CRYPTO_PKG/matrix-sdk-crypto.linux-x64-gnu.node"
+      echo "Copied matrix-sdk-crypto native binary"
     fi
 
     # Create symlinks from original nix store paths to our copied lib
