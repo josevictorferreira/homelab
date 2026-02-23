@@ -38,23 +38,23 @@ spec:
         - command:
             - bash
             - -c
-            - "set -e\necho \"Installing matrix plugin dependencies...\"\n\n# Find\
-              \ the matrix extension directory in nix store\nEXT_DIR=\"/nix/store\"\
-              \nMATRIX_EXT=$(find $EXT_DIR -path \"*/lib/openclaw/extensions/matrix\"\
-              \ -type d 2>/dev/null | head -1)\n\nif [ -n \"$MATRIX_EXT\" ]; then\n\
-              \  echo \"Found matrix extension at: $MATRIX_EXT\"\n  cd \"$MATRIX_EXT\"\
-              \n  \n  # Check if node_modules exists and has content\n  if [ ! -d\
-              \ \"node_modules\" ] || [ -z \"$(ls -A node_modules 2>/dev/null)\" ];\
-              \ then\n    echo \"Installing npm dependencies...\"\n    # Strip workspace:\
-              \ protocol deps that npm can't handle\n    node -e \"\n      const fs\
-              \ = require('fs');\n      const pkg = JSON.parse(fs.readFileSync('package.json',\
-              \ 'utf8'));\n      delete pkg.devDependencies;\n      fs.writeFileSync('package.json',\
+            - "set -e\necho \"Installing matrix plugin dependencies...\"\n\n# Matrix\
+              \ extension directory in the OCI image\nMATRIX_EXT=\"/lib/openclaw/extensions/matrix\"\
+              \n\nif [ -d \"$MATRIX_EXT\" ]; then\n  echo \"Found matrix extension\
+              \ at: $MATRIX_EXT\"\n  cd \"$MATRIX_EXT\"\n\n  # Check if node_modules\
+              \ exists and has content\n  if [ ! -d \"node_modules\" ] || [ -z \"\
+              $(ls -A node_modules 2>/dev/null)\" ]; then\n    echo \"Installing npm\
+              \ dependencies...\"\n    # Strip workspace: protocol deps that npm can't\
+              \ handle\n    node -e \"\n      const fs = require('fs');\n      const\
+              \ pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));\n     \
+              \ delete pkg.devDependencies;\n      fs.writeFileSync('package.json',\
               \ JSON.stringify(pkg, null, 2));\n    \"\n    npm install --omit=dev\
               \ --no-package-lock --legacy-peer-deps 2>&1 || echo \"WARN: npm install\
               \ failed\"\n    echo \"Matrix plugin dependencies installed\"\n  else\n\
               \    echo \"node_modules already exists, skipping\"\n  fi\nelse\n  echo\
-              \ \"Matrix extension not found in nix store\"\nfi\n\necho \"Starting\
-              \ openclaw gateway...\"\nexec openclaw-gateway\n"
+              \ \"Matrix extension not found at $MATRIX_EXT\"\nfi\n\necho \"Starting\
+              \ openclaw gateway...\"\n# Run the entrypoint script which handles config\
+              \ generation and starts the gateway\nexec /entrypoint.sh\n"
           env:
             - name: ELEVENLABS_API_KEY
               valueFrom:

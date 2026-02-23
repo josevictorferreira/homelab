@@ -324,14 +324,13 @@ in
             set -e
             echo "Installing matrix plugin dependencies..."
 
-            # Find the matrix extension directory in nix store
-            EXT_DIR="/nix/store"
-            MATRIX_EXT=$(find $EXT_DIR -path "*/lib/openclaw/extensions/matrix" -type d 2>/dev/null | head -1)
+            # Matrix extension directory in the OCI image
+            MATRIX_EXT="/lib/openclaw/extensions/matrix"
 
-            if [ -n "$MATRIX_EXT" ]; then
+            if [ -d "$MATRIX_EXT" ]; then
               echo "Found matrix extension at: $MATRIX_EXT"
               cd "$MATRIX_EXT"
-              
+
               # Check if node_modules exists and has content
               if [ ! -d "node_modules" ] || [ -z "$(ls -A node_modules 2>/dev/null)" ]; then
                 echo "Installing npm dependencies..."
@@ -348,11 +347,12 @@ in
                 echo "node_modules already exists, skipping"
               fi
             else
-              echo "Matrix extension not found in nix store"
+              echo "Matrix extension not found at $MATRIX_EXT"
             fi
 
             echo "Starting openclaw gateway..."
-            exec openclaw-gateway
+            # Run the entrypoint script which handles config generation and starts the gateway
+            exec /entrypoint.sh
           ''
         ];
 
