@@ -101,9 +101,11 @@ spec:
               name: logs
             - mountPath: /config
               name: scratch-config
+            - mountPath: /home/node/shared
+              name: shared-storage
             - mountPath: /state
               name: state
-            - mountPath: /home/node/.openclaw/workspace
+            - mountPath: /home/node/.openclaw
               name: workspace
               subPath: openclaw
         - env:
@@ -176,6 +178,9 @@ spec:
             claimName: openclaw-nix-logs
         - emptyDir: {}
           name: scratch-config
+        - name: shared-storage
+          persistentVolumeClaim:
+            claimName: cephfs-shared-storage-root
         - name: state
           persistentVolumeClaim:
             claimName: openclaw-nix-state
