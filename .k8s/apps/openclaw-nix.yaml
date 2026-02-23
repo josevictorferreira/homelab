@@ -84,6 +84,8 @@ spec:
                 secretKeyRef:
                   key: MINIMAX_API_KEY
                   name: openclaw-secrets
+            - name: NODE_PATH
+              value: /lib/openclaw/extensions/matrix/node_modules
             - name: OPENCLAW_CONFIG_PATH
               value: /config/openclaw.json
             - name: OPENCLAW_DATA_DIR
