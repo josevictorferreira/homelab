@@ -135,7 +135,7 @@
           };
           openclawNixImage = import ./oci-images/openclaw-nix {
             pkgs = sysPkgs;
-            inherit inputs system;
+            inherit lib inputs system;
           };
         in
         {
