@@ -346,6 +346,31 @@ in
           };
         };
 
+        # Init container: create symlink for .openclaw
+        controllers.main.initContainers.create-openclaw-symlink = {
+          image = {
+            repository = "busybox";
+            tag = "latest";
+          };
+          securityContext = {
+            runAsUser = 0;
+            runAsGroup = 0;
+          };
+          command = [
+            "sh"
+            "-c"
+            ''
+              mkdir -p /home/node
+              # Create .openclaw as a symlink to shared/openclaw
+              if [ ! -L /home/node/.openclaw ]; then
+                ln -sf /home/node/shared/openclaw /home/node/.openclaw
+              fi
+              # Ensure the target directory exists
+              mkdir -p /home/node/shared/openclaw
+            ''
+          ];
+        };
+
         # Persistence: writable config scratch dir (main container only)
         persistence.scratch-config = {
           type = "emptyDir";
@@ -370,19 +395,8 @@ in
           advancedMounts.main.main = [ { path = "/logs"; } ];
         };
 
-        # Persistence: workspace on CephFS shared storage
-        persistence.workspace = {
-          type = "persistentVolumeClaim";
-          existingClaim = "cephfs-shared-storage-root";
-          advancedMounts.main.main = [
-            {
-              path = "/home/node/.openclaw";
-              subPath = "openclaw";
-            }
-          ];
-        };
-
-        # Persistence: full shared storage access
+        # Persistence: full shared storage at /home/node/shared
+        # The .openclaw directory will be accessible via symlink
         persistence.shared-storage = {
           type = "persistentVolumeClaim";
           existingClaim = "cephfs-shared-storage-root";
