@@ -324,15 +324,16 @@ in
             set -e
             echo "Installing matrix plugin dependencies..."
 
-            # Matrix extension directory in the OCI image
-            MATRIX_EXT="/lib/openclaw/extensions/matrix"
+            # Find the actual nix store path where the gateway loads extensions from
+            # (resolves symlinks to get the real path)
+            MATRIX_EXT=$(readlink -f /lib/openclaw/extensions/matrix 2>/dev/null || echo "/lib/openclaw/extensions/matrix")
 
             if [ -d "$MATRIX_EXT" ]; then
               echo "Found matrix extension at: $MATRIX_EXT"
               cd "$MATRIX_EXT"
 
-              # Check if node_modules exists and has content
-              if [ ! -d "node_modules" ] || [ -z "$(ls -A node_modules 2>/dev/null)" ]; then
+              # Check if node_modules exists and has @vector-im/matrix-bot-sdk
+              if [ ! -d "node_modules/@vector-im" ]; then
                 echo "Installing npm dependencies..."
                 # Strip workspace: protocol deps that npm can't handle
                 node -e "
@@ -344,7 +345,7 @@ in
                 npm install --omit=dev --no-package-lock --legacy-peer-deps 2>&1 || echo "WARN: npm install failed"
                 echo "Matrix plugin dependencies installed"
               else
-                echo "node_modules already exists, skipping"
+                echo "node_modules already exists with deps, skipping"
               fi
             else
               echo "Matrix extension not found at $MATRIX_EXT"

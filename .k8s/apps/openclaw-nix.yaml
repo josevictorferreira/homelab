@@ -38,23 +38,24 @@ spec:
         - command:
             - bash
             - -c
-            - "set -e\necho \"Installing matrix plugin dependencies...\"\n\n# Matrix\
-              \ extension directory in the OCI image\nMATRIX_EXT=\"/lib/openclaw/extensions/matrix\"\
-              \n\nif [ -d \"$MATRIX_EXT\" ]; then\n  echo \"Found matrix extension\
+            - "set -e\necho \"Installing matrix plugin dependencies...\"\n\n# Find\
+              \ the actual nix store path where the gateway loads extensions from\n\
+              # (resolves symlinks to get the real path)\nMATRIX_EXT=$(readlink -f\
+              \ /lib/openclaw/extensions/matrix 2>/dev/null || echo \"/lib/openclaw/extensions/matrix\"\
+              )\n\nif [ -d \"$MATRIX_EXT\" ]; then\n  echo \"Found matrix extension\
               \ at: $MATRIX_EXT\"\n  cd \"$MATRIX_EXT\"\n\n  # Check if node_modules\
-              \ exists and has content\n  if [ ! -d \"node_modules\" ] || [ -z \"\
-              $(ls -A node_modules 2>/dev/null)\" ]; then\n    echo \"Installing npm\
-              \ dependencies...\"\n    # Strip workspace: protocol deps that npm can't\
-              \ handle\n    node -e \"\n      const fs = require('fs');\n      const\
-              \ pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));\n     \
-              \ delete pkg.devDependencies;\n      fs.writeFileSync('package.json',\
+              \ exists and has @vector-im/matrix-bot-sdk\n  if [ ! -d \"node_modules/@vector-im\"\
+              \ ]; then\n    echo \"Installing npm dependencies...\"\n    # Strip\
+              \ workspace: protocol deps that npm can't handle\n    node -e \"\n \
+              \     const fs = require('fs');\n      const pkg = JSON.parse(fs.readFileSync('package.json',\
+              \ 'utf8'));\n      delete pkg.devDependencies;\n      fs.writeFileSync('package.json',\
               \ JSON.stringify(pkg, null, 2));\n    \"\n    npm install --omit=dev\
               \ --no-package-lock --legacy-peer-deps 2>&1 || echo \"WARN: npm install\
               \ failed\"\n    echo \"Matrix plugin dependencies installed\"\n  else\n\
-              \    echo \"node_modules already exists, skipping\"\n  fi\nelse\n  echo\
-              \ \"Matrix extension not found at $MATRIX_EXT\"\nfi\n\necho \"Starting\
-              \ openclaw gateway...\"\n# Run the entrypoint script which handles config\
-              \ generation and starts the gateway\nexec /entrypoint.sh\n"
+              \    echo \"node_modules already exists with deps, skipping\"\n  fi\n\
+              else\n  echo \"Matrix extension not found at $MATRIX_EXT\"\nfi\n\necho\
+              \ \"Starting openclaw gateway...\"\n# Run the entrypoint script which\
+              \ handles config generation and starts the gateway\nexec /entrypoint.sh\n"
           env:
             - name: ELEVENLABS_API_KEY
               valueFrom:
