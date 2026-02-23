@@ -101,11 +101,3 @@ volumes = [{ name = "shared"; persistentVolumeClaim.claimName = "shared-storage"
 3. Add secrets to `secrets/k8s-secrets.enc.yaml` via `make secrets`
 4. Run `make manifests`
 5. Commit and push → Flux deploys
-
-## EXISTING APPS
-
-Infrastructure: postgresql, postgresql-18, rabbitmq, redis
-Services: n8n, immich, glance, blocky, searxng, uptime-kuma, ntfy
-Media: qbittorrent, prowlarr
-AI/ML: open-webui, ollama, mcpo, youtube-transcriber, libebooker
-Storage: sftpgo, linkwarden
