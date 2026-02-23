@@ -105,9 +105,6 @@ spec:
               name: shared-storage
             - mountPath: /state
               name: state
-            - mountPath: /home/node/.openclaw
-              name: workspace
-              subPath: openclaw
         - env:
             - name: TS_ACCEPT_DNS
               value: 'false'
@@ -162,6 +159,24 @@ spec:
       hostPID: false
       imagePullSecrets:
         - name: ghcr-registry-secret
+      initContainers:
+        - command:
+            - sh
+            - -c
+            - "mkdir -p /home/node\n# Create .openclaw as a symlink to shared/openclaw\n\
+              if [ ! -L /home/node/.openclaw ]; then\n  ln -sf /home/node/shared/openclaw\
+              \ /home/node/.openclaw\nfi\n# Ensure the target directory exists\nmkdir\
+              \ -p /home/node/shared/openclaw\n"
+          image: busybox:latest
+          name: create-openclaw-symlink
+          securityContext:
+            runAsGroup: 0
+            runAsUser: 0
+          volumeMounts:
+            - mountPath: /etc/openclaw/config-template.json
+              name: config
+              readOnly: true
+              subPath: config-template.json
       serviceAccountName: openclaw-nix
       volumes:
         - configMap:
@@ -187,9 +202,6 @@ spec:
         - name: tailscale-state
           persistentVolumeClaim:
             claimName: openclaw-nix-tailscale-state
-        - name: workspace
-          persistentVolumeClaim:
-            claimName: cephfs-shared-storage-root
 ---
 apiVersion: v1
 data:
