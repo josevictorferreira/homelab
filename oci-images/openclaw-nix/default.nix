@@ -1,4 +1,9 @@
-{ pkgs, lib, inputs, system }:
+{
+  pkgs,
+  lib,
+  inputs,
+  system,
+}:
 
 let
   dockerTools = pkgs.dockerTools;
@@ -14,40 +19,10 @@ let
   # Import main deps including prism-media
   prismMedia = (import ./main-deps.nix { inherit pkgs lib; }).prismMedia;
 
-  # strtok3 for file-type dependency
-  strtok3 = pkgs.fetchurl {
-
-  # readdirp for chokidar dependency
-  readdirp = pkgs.fetchurl {
-    url = "https://registry.npmjs.org/readdirp/-/readdirp-4.1.2.tgz";
-    sha256 = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
-  };
-    url = "https://registry.npmjs.org/strtok3/-/strtok3-10.2.2.tgz";
-
-  # readdirp for chokidar dependency
-  readdirp = pkgs.fetchurl {
-    url = "https://registry.npmjs.org/readdirp/-/readdirp-4.1.2.tgz";
-    sha256 = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
-  };
-    sha256 = "sha256-FHLqoEnMgsc5/ksku70hYR4E/wxIl0m3AmHOAVe0DPk=";
-
-  # readdirp for chokidar dependency
-  readdirp = pkgs.fetchurl {
-    url = "https://registry.npmjs.org/readdirp/-/readdirp-4.1.2.tgz";
-    sha256 = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
-  };
-  };
-
-  # readdirp for chokidar dependency
-  readdirp = pkgs.fetchurl {
-    url = "https://registry.npmjs.org/readdirp/-/readdirp-4.1.2.tgz";
-    sha256 = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
-  };
-
   # Native binary for matrix-sdk-crypto-nodejs (linux x64)
   matrixCryptoNative = pkgs.fetchurl {
     url = "https://github.com/matrix-org/matrix-rust-sdk-crypto-nodejs/releases/download/v0.4.0/matrix-sdk-crypto.linux-x64-gnu.node";
-    sha256 = "sha256-cHjU3ZhxKPea/RksT2IfZK3s435D8qh1bx0KnwNN5xg="; # Placeholder, will update from error
+    sha256 = "sha256-cHjU3ZhxKPea/RksT2IfZK3s435D8qh1bx0KnwNN5xg=";
   };
 
   # Entrypoint script source (just the text, we copy it in extraCommands)
@@ -69,34 +44,31 @@ let
     done
 
     # Copy lib directories
-    # For openclawGateway, use -rL (dereference) to create real copies, not symlinks
-    # This allows us to modify the matrix extension's node_modules
     mkdir -p $out/lib
     for pkg in ${pkgs.python3} ${pkgs.nodejs_22}; do
       if [ -d "$pkg/lib" ]; then
         cp -rsf "$pkg/lib"/* $out/lib/ 2>/dev/null || true
       fi
     done
-    # Copy openclawGateway lib with dereferenced symlinks (writable copies)
+    # Copy openclawGateway lib preserving pnpm symlink structure
+    # CRITICAL: use cp -a (not -rL) to preserve relative symlinks that pnpm
+    # uses for correct dependency version resolution (e.g. signal-exit@3 vs @4)
     if [ -d "${openclawGateway}/lib" ]; then
-      cp -rL "${openclawGateway}/lib"/* $out/lib/ 2>/dev/null || true
+      cp -a "${openclawGateway}/lib"/* $out/lib/ 2>/dev/null || true
     fi
 
     # Remove unused heavy optional deps (~1GB savings)
     # node-llama-cpp: optional local embeddings (we use remote via Gemini API)
     # lancedb: unused vector DB (zero references in dist/)
-    # koffi: unused FFI library (zero references in dist/)
     chmod -R u+w $out/lib/openclaw/node_modules/ || true
     rm -rf $out/lib/openclaw/node_modules/.pnpm/@node-llama-cpp+*
     rm -rf $out/lib/openclaw/node_modules/.pnpm/node-llama-cpp@*
     rm -rf $out/lib/openclaw/node_modules/.pnpm/@lancedb+*
     rm -rf $out/lib/openclaw/node_modules/.pnpm/lancedb@*
-    rm -rf $out/lib/openclaw/node_modules/.pnpm/koffi@*
     rm -rf $out/lib/openclaw/node_modules/node-llama-cpp
     rm -rf $out/lib/openclaw/node_modules/@node-llama-cpp
     rm -rf $out/lib/openclaw/node_modules/@lancedb
     rm -rf $out/lib/openclaw/node_modules/lancedb
-    rm -rf $out/lib/openclaw/node_modules/koffi
 
     cd $out/lib/openclaw
 
@@ -135,18 +107,24 @@ let
       cp -rL ${matrixPluginDeps}/matrix-deps/node_modules $out/lib/openclaw/extensions/matrix/
     fi
 
-    # Merge main deps (prism-media) into openclaw node_modules
-    # Extract prism-media from tarball
-    mkdir -p $out/lib/openclaw/node_modules/prism-media
-    tar -xzf "${prismMedia}" -C $out/lib/openclaw/node_modules/prism-media --strip-components=1
+    # With cp -a, pnpm's relative symlinks are preserved and resolve correctly.
+    # Only need to handle matrix extension node_modules (empty in source).
+    # Make extensions dir writable so we can replace matrix node_modules
+    chmod -R u+w $out/lib/openclaw/extensions/matrix/ 2>/dev/null || true
 
-    # Extract strtok3 for file-type
-    mkdir -p $out/lib/openclaw/node_modules/strtok3
-    tar -xzf "${strtok3}" -C $out/lib/openclaw/node_modules/strtok3 --strip-components=1 || echo "WARN: strtok3 not found"
-
-    # Extract readdirp for chokidar
-    mkdir -p $out/lib/openclaw/node_modules/readdirp
-    tar -xzf "${readdirp}" -C $out/lib/openclaw/node_modules/readdirp --strip-components=1 || echo "WARN: readdirp not found"
+    # Fix absolute symlinks that point to the original nix store gateway path
+    # cp -a preserves symlinks as-is; relative ones work but absolute ones break
+    GATEWAY_STORE=$(readlink -f ${openclawGateway})
+    find $out/lib/openclaw -type l 2>/dev/null | while read link; do
+      tgt=$(readlink "$link")
+      case "$tgt" in
+        "$GATEWAY_STORE"*)
+          newtgt=$(echo "$tgt" | sed "s|$GATEWAY_STORE/|$out/|")
+          ln -sfn "$newtgt" "$link" 2>/dev/null || true
+          ;;
+      esac
+    done
+    echo "Fixed absolute nix store symlinks"
 
     # Copy native binary for matrix-sdk-crypto-nodejs
     CRYPTO_PKG="$out/lib/openclaw/extensions/matrix/node_modules/@matrix-org/matrix-sdk-crypto-nodejs"
