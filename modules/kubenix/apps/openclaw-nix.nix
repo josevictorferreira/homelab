@@ -271,6 +271,7 @@ in
         controllers.main.containers.main.env.OPENCLAW_DATA_DIR = "/state/openclaw";
         controllers.main.containers.main.env.HOME = "/state/home";
         controllers.main.containers.main.env.TZ = "America/Sao_Paulo";
+        controllers.main.containers.main.env.NODE_PATH = "/lib/openclaw/extensions/matrix/node_modules";
 
         # Secret env refs
         controllers.main.containers.main.env.GEMINI_API_KEY = {
