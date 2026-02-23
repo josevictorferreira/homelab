@@ -11,6 +11,39 @@ let
   # Import matrix plugin deps from separate file (includes scripts.build for npm)
   matrixPluginDeps = (import ./matrix-deps.nix { inherit pkgs lib; }).matrixPluginDeps;
 
+  # Import main deps including prism-media
+  prismMedia = (import ./main-deps.nix { inherit pkgs lib; }).prismMedia;
+
+  # strtok3 for file-type dependency
+  strtok3 = pkgs.fetchurl {
+
+  # readdirp for chokidar dependency
+  readdirp = pkgs.fetchurl {
+    url = "https://registry.npmjs.org/readdirp/-/readdirp-4.1.2.tgz";
+    sha256 = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+  };
+    url = "https://registry.npmjs.org/strtok3/-/strtok3-10.2.2.tgz";
+
+  # readdirp for chokidar dependency
+  readdirp = pkgs.fetchurl {
+    url = "https://registry.npmjs.org/readdirp/-/readdirp-4.1.2.tgz";
+    sha256 = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+  };
+    sha256 = "sha256-FHLqoEnMgsc5/ksku70hYR4E/wxIl0m3AmHOAVe0DPk=";
+
+  # readdirp for chokidar dependency
+  readdirp = pkgs.fetchurl {
+    url = "https://registry.npmjs.org/readdirp/-/readdirp-4.1.2.tgz";
+    sha256 = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+  };
+  };
+
+  # readdirp for chokidar dependency
+  readdirp = pkgs.fetchurl {
+    url = "https://registry.npmjs.org/readdirp/-/readdirp-4.1.2.tgz";
+    sha256 = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+  };
+
   # Native binary for matrix-sdk-crypto-nodejs (linux x64)
   matrixCryptoNative = pkgs.fetchurl {
     url = "https://github.com/matrix-org/matrix-rust-sdk-crypto-nodejs/releases/download/v0.4.0/matrix-sdk-crypto.linux-x64-gnu.node";
@@ -65,6 +98,8 @@ let
     rm -rf $out/lib/openclaw/node_modules/lancedb
     rm -rf $out/lib/openclaw/node_modules/koffi
 
+    cd $out/lib/openclaw
+
     # Copy etc directories (except ssl certs - handled separately)
     mkdir -p $out/etc
     for pkg in ${pkgs.tzdata}; do
@@ -99,6 +134,19 @@ let
       rm -rf $out/lib/openclaw/extensions/matrix/node_modules
       cp -rL ${matrixPluginDeps}/matrix-deps/node_modules $out/lib/openclaw/extensions/matrix/
     fi
+
+    # Merge main deps (prism-media) into openclaw node_modules
+    # Extract prism-media from tarball
+    mkdir -p $out/lib/openclaw/node_modules/prism-media
+    tar -xzf "${prismMedia}" -C $out/lib/openclaw/node_modules/prism-media --strip-components=1
+
+    # Extract strtok3 for file-type
+    mkdir -p $out/lib/openclaw/node_modules/strtok3
+    tar -xzf "${strtok3}" -C $out/lib/openclaw/node_modules/strtok3 --strip-components=1 || echo "WARN: strtok3 not found"
+
+    # Extract readdirp for chokidar
+    mkdir -p $out/lib/openclaw/node_modules/readdirp
+    tar -xzf "${readdirp}" -C $out/lib/openclaw/node_modules/readdirp --strip-components=1 || echo "WARN: readdirp not found"
 
     # Copy native binary for matrix-sdk-crypto-nodejs
     CRYPTO_PKG="$out/lib/openclaw/extensions/matrix/node_modules/@matrix-org/matrix-sdk-crypto-nodejs"
