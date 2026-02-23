@@ -1,4 +1,4 @@
-{ pkgs, lib, ... }:
+{ pkgs, lib, inputs, system }:
 
 let
   dockerTools = pkgs.dockerTools;
@@ -13,8 +13,8 @@ let
 
   # Native binary for matrix-sdk-crypto-nodejs (linux x64)
   matrixCryptoNative = pkgs.fetchurl {
-    url = "https://github.com/matrix-org/matrix-rust-sdk/releases/download/matrix-sdk-crypto-nodejs-v0.4.0/matrix-sdk-crypto.linux-x64-gnu.node";
-    sha256 = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="; # Placeholder, will update from error
+    url = "https://github.com/matrix-org/matrix-rust-sdk-crypto-nodejs/releases/download/v0.4.0/matrix-sdk-crypto.linux-x64-gnu.node";
+    sha256 = "sha256-cHjU3ZhxKPea/RksT2IfZK3s435D8qh1bx0KnwNN5xg="; # Placeholder, will update from error
   };
 
   # Entrypoint script source (just the text, we copy it in extraCommands)
@@ -97,7 +97,7 @@ let
     if [ -d "${matrixPluginDeps}/matrix-deps/node_modules" ]; then
       chmod -R u+w $out/lib/openclaw/extensions/matrix/ || true
       rm -rf $out/lib/openclaw/extensions/matrix/node_modules
-      cp -r ${matrixPluginDeps}/matrix-deps/node_modules $out/lib/openclaw/extensions/matrix/
+      cp -rL ${matrixPluginDeps}/matrix-deps/node_modules $out/lib/openclaw/extensions/matrix/
     fi
 
     # Copy native binary for matrix-sdk-crypto-nodejs
