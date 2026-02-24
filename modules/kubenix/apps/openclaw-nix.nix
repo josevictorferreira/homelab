@@ -51,7 +51,7 @@ in
       };
       port = 18789;
       replicas = 1;
-      secretName = "openclaw-secrets";
+      secretName = "openclaw-config";
 
       # Config template mounted at /etc/openclaw/config-template.json
       # The image entrypoint copies it to /config/openclaw.json and substitutes env vars
@@ -276,43 +276,43 @@ in
         # Secret env refs
         controllers.main.containers.main.env.GEMINI_API_KEY = {
           valueFrom.secretKeyRef = {
-            name = "openclaw-secrets";
+            name = "openclaw-config";
             key = "GEMINI_API_KEY";
           };
         };
         controllers.main.containers.main.env.OPENROUTER_API_KEY = {
           valueFrom.secretKeyRef = {
-            name = "openclaw-secrets";
+            name = "openclaw-config";
             key = "OPENROUTER_API_KEY";
           };
         };
         controllers.main.containers.main.env.MINIMAX_API_KEY = {
           valueFrom.secretKeyRef = {
-            name = "openclaw-secrets";
+            name = "openclaw-config";
             key = "MINIMAX_API_KEY";
           };
         };
         controllers.main.containers.main.env.KIMI_API_KEY = {
           valueFrom.secretKeyRef = {
-            name = "openclaw-secrets";
+            name = "openclaw-config";
             key = "KIMI_API_KEY";
           };
         };
         controllers.main.containers.main.env.OPENCLAW_MATRIX_TOKEN = {
           valueFrom.secretKeyRef = {
-            name = "openclaw-secrets";
+            name = "openclaw-config";
             key = "OPENCLAW_MATRIX_TOKEN";
           };
         };
         controllers.main.containers.main.env.ELEVENLABS_API_KEY = {
           valueFrom.secretKeyRef = {
-            name = "openclaw-secrets";
+            name = "openclaw-config";
             key = "ELEVENLABS_API_KEY";
           };
         };
         controllers.main.containers.main.env.GITHUB_TOKEN = {
           valueFrom.secretKeyRef = {
-            name = "openclaw-secrets";
+            name = "openclaw-config";
             key = "GITHUB_TOKEN";
           };
         };
@@ -375,7 +375,7 @@ in
           env = {
             TS_AUTHKEY = {
               valueFrom.secretKeyRef = {
-                name = "openclaw-secrets";
+                name = "openclaw-config";
                 key = "TS_AUTHKEY";
               };
             };
