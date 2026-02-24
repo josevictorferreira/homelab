@@ -61,29 +61,29 @@ spec:
               valueFrom:
                 secretKeyRef:
                   key: ELEVENLABS_API_KEY
-                  name: openclaw-secrets
+                  name: openclaw-config
             - name: GEMINI_API_KEY
               valueFrom:
                 secretKeyRef:
                   key: GEMINI_API_KEY
-                  name: openclaw-secrets
+                  name: openclaw-config
             - name: GITHUB_TOKEN
               valueFrom:
                 secretKeyRef:
                   key: GITHUB_TOKEN
-                  name: openclaw-secrets
+                  name: openclaw-config
             - name: HOME
               value: /state/home
             - name: KIMI_API_KEY
               valueFrom:
                 secretKeyRef:
                   key: KIMI_API_KEY
-                  name: openclaw-secrets
+                  name: openclaw-config
             - name: MINIMAX_API_KEY
               valueFrom:
                 secretKeyRef:
                   key: MINIMAX_API_KEY
-                  name: openclaw-secrets
+                  name: openclaw-config
             - name: NODE_PATH
               value: /lib/openclaw/extensions/matrix/node_modules
             - name: OPENCLAW_CONFIG_PATH
@@ -94,17 +94,17 @@ spec:
               valueFrom:
                 secretKeyRef:
                   key: OPENCLAW_MATRIX_TOKEN
-                  name: openclaw-secrets
+                  name: openclaw-config
             - name: OPENROUTER_API_KEY
               valueFrom:
                 secretKeyRef:
                   key: OPENROUTER_API_KEY
-                  name: openclaw-secrets
+                  name: openclaw-config
             - name: TZ
               value: America/Sao_Paulo
           envFrom:
             - secretRef:
-                name: openclaw-secrets
+                name: openclaw-config
           image: ghcr.io/josevictorferreira/openclaw-nix:latest
           imagePullPolicy: Always
           name: main
@@ -135,7 +135,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   key: TS_AUTHKEY
-                  name: openclaw-secrets
+                  name: openclaw-config
             - name: TS_AUTH_ONCE
               value: 'true'
             - name: TS_HOSTNAME

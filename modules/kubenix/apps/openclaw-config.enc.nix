@@ -4,7 +4,7 @@ let
   namespace = homelab.kubernetes.namespaces.applications;
 in
 {
-  kubernetes.resources.secrets.openclaw-secrets = {
+  kubernetes.resources.secrets.openclaw-config = {
     metadata.namespace = namespace;
     stringData = {
       NODE_ENV = "production";
