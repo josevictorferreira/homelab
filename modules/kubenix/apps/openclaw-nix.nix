@@ -416,7 +416,7 @@ in
         # Persistence: writable config scratch dir (main container only)
         persistence.scratch-config = {
           type = "emptyDir";
-          advancedMounts.main.main = [ { path = "/config"; } ];
+          advancedMounts.main.main = [{ path = "/config"; }];
         };
 
         # Persistence: state (block storage, main container only)
@@ -425,7 +425,7 @@ in
           storageClass = "rook-ceph-block";
           size = "10Gi";
           accessMode = "ReadWriteOnce";
-          advancedMounts.main.main = [ { path = "/state"; } ];
+          advancedMounts.main.main = [{ path = "/state"; }];
         };
 
         # Persistence: logs (block storage, main container only)
@@ -434,7 +434,7 @@ in
           storageClass = "rook-ceph-block";
           size = "1Gi";
           accessMode = "ReadWriteOnce";
-          advancedMounts.main.main = [ { path = "/logs"; } ];
+          advancedMounts.main.main = [{ path = "/logs"; }];
         };
 
         # Persistence: full shared storage at /home/node/shared
@@ -442,7 +442,10 @@ in
         persistence.shared-storage = {
           type = "persistentVolumeClaim";
           existingClaim = "cephfs-shared-storage-root";
-          advancedMounts.main.main = [ { path = "/home/node/shared"; } ];
+          advancedMounts.main = {
+            create-openclaw-symlink = [{ path = "/home/node/shared"; }];
+            main = [{ path = "/home/node/shared"; }];
+          };
         };
 
         # Persistence: tailscale state (block storage)
@@ -451,14 +454,14 @@ in
           storageClass = "rook-ceph-block";
           size = "1Gi";
           accessMode = "ReadWriteOnce";
-          advancedMounts.main.tailscale = [ { path = "/var/lib/tailscale"; } ];
+          advancedMounts.main.tailscale = [{ path = "/var/lib/tailscale"; }];
         };
 
         # Persistence: /dev/net/tun for tailscale
         persistence.dev-tun = {
           type = "hostPath";
           hostPath = "/dev/net/tun";
-          advancedMounts.main.tailscale = [ { path = "/dev/net/tun"; } ];
+          advancedMounts.main.tailscale = [{ path = "/dev/net/tun"; }];
         };
       };
     };

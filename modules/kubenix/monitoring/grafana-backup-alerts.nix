@@ -6,14 +6,14 @@ let
 
   # Alert rule helper — Grafana Unified Alerting provisioning format
   mkPromRule =
-    {
-      uid,
-      title,
-      expr,
-      forDuration ? "5m",
-      severity ? "critical",
-      summary,
-      description,
+    { uid
+    , title
+    , expr
+    , forDuration ? "5m"
+    , severity ? "critical"
+    , summary
+    , description
+    ,
     }:
     {
       inherit uid title;
