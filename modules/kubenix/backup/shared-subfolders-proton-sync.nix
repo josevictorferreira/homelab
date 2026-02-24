@@ -106,7 +106,7 @@ let
     echo "=== Proton Drive Backup completed successfully ==="
     echo "Destination: proton:Backups/''${PROTON_DEST_PATH}/current/"
     echo "Manifest: proton:Backups/''${PROTON_DEST_PATH}/manifests/$MANIFEST_FILE"
-    ''    ;
+    ''     ;
 in
 {
   kubernetes.resources.cronJobs."shared-subfolders-proton-sync" = {
@@ -229,6 +229,7 @@ in
     };
   };
 }
+
 
 
 

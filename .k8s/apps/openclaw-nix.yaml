@@ -200,6 +200,8 @@ spec:
               name: config
               readOnly: true
               subPath: config-template.json
+            - mountPath: /home/node/shared
+              name: shared-storage
       serviceAccountName: openclaw-nix
       volumes:
         - configMap:
