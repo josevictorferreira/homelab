@@ -10,13 +10,12 @@
   };
 
   outputs =
-    {
-      self,
-      nixpkgs,
-      sops-nix,
-      deploy-rs,
-      kubenix,
-      ...
+    { self
+    , nixpkgs
+    , sops-nix
+    , deploy-rs
+    , kubenix
+    , ...
     }@inputs:
     let
       currentSystem = builtins.currentSystem or "x86_64-linux";
@@ -82,26 +81,28 @@
           };
 
       deploy = {
-        nodes = lib.mapAttrs (
-          hostName: hostCfg:
-          let
-            isRemoteNeeded = hostCfg.system != currentSystem;
-            # sshUser = homelab.users.admin.username;
-            sshUser = "root";
-          in
-          {
-            hostname = hostCfg.ipAddress;
-            sshUser = sshUser;
-            fastConnection = true;
-            remoteBuild = isRemoteNeeded;
+        nodes = lib.mapAttrs
+          (
+            hostName: hostCfg:
+              let
+                isRemoteNeeded = hostCfg.system != currentSystem;
+                # sshUser = homelab.users.admin.username;
+                sshUser = "root";
+              in
+              {
+                hostname = hostCfg.ipAddress;
+                sshUser = sshUser;
+                fastConnection = true;
+                remoteBuild = isRemoteNeeded;
 
-            profiles.system = {
-              user = "root";
-              path = deploy-rs.lib.${hostCfg.system}.activate.nixos self.nixosConfigurations.${hostName};
-              autoRollback = true;
-            };
-          }
-        ) homelab.nodes.hosts;
+                profiles.system = {
+                  user = "root";
+                  path = deploy-rs.lib.${hostCfg.system}.activate.nixos self.nixosConfigurations.${hostName};
+                  autoRollback = true;
+                };
+              }
+          )
+          homelab.nodes.hosts;
       };
 
       nodesList = builtins.concatStringsSep "\n" (builtins.attrNames homelab.nodes.hosts);
@@ -109,16 +110,20 @@
       nodeGroupsList = builtins.concatStringsSep "\n" homelab.nodes.groups;
 
       deployGroups = (
-        builtins.mapAttrs (
-          _: values: (builtins.concatStringsSep " " (builtins.map (v: "--targets='.#${v}'") values.names))
-        ) homelab.nodes.group
+        builtins.mapAttrs
+          (
+            _: values: (builtins.concatStringsSep " " (builtins.map (v: "--targets='.#${v}'") values.names))
+          )
+          homelab.nodes.group
       );
 
       checks = lib.optionalAttrs (lib.hasAttr currentSystem deploy-rs.lib) {
         ${currentSystem} = deploy-rs.lib.${currentSystem}.deployChecks {
-          nodes = lib.filterAttrs (
-            hostName: hostCfg: homelab.nodes.hosts.${hostName}.system == currentSystem
-          ) self.deploy.nodes;
+          nodes = lib.filterAttrs
+            (
+              hostName: hostCfg: homelab.nodes.hosts.${hostName}.system == currentSystem
+            )
+            self.deploy.nodes;
         };
       };
 
@@ -133,14 +138,27 @@
             inherit lib;
             deploy-rs-pkg = deploy-rs.packages.${system}.default;
           };
-          openclawNixImage = import ./oci-images/openclaw-nix {
-            pkgs = sysPkgs;
-            inherit lib inputs system;
-          };
+          # Build openclaw-nix image with specified version
+          # Usage: nix build .#openclaw-nix-image --override-input openclaw-version "2026.2.23"
+          # Or with version parameter: nix build .#packages.x86_64-linux.openclaw-nix-image.override { version = "2026.2.23"; }
+          openclawNixImage =
+            { version ? "2026.2.23"
+            ,
+            }:
+            import ./oci-images/openclaw-nix {
+              pkgs = sysPkgs;
+              inherit
+                lib
+                inputs
+                system
+                version
+                ;
+            };
         in
         {
           gen-manifests = kubenixModule.mkRenderer system sysPkgs;
-          openclaw-nix-image = openclawNixImage;
+          # Default version - change version param to upgrade
+          openclaw-nix-image = openclawNixImage { };
           inherit (commands)
             lgroups
             check
