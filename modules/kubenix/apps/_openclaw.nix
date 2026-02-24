@@ -107,7 +107,7 @@ in
         storageClass = "rook-ceph-block";
         size = "10Gi";
         accessMode = "ReadWriteOnce";
-        globalMounts = [ { path = "/home/node"; } ];
+        globalMounts = [{ path = "/home/node"; }];
       };
       config = {
         filename = "openclaw.json";
@@ -381,17 +381,17 @@ in
           storageClass = "rook-ceph-block";
           size = "1Gi";
           accessMode = "ReadWriteOnce";
-          advancedMounts.main.tailscale = [ { path = "/var/lib/tailscale"; } ];
+          advancedMounts.main.tailscale = [{ path = "/var/lib/tailscale"; }];
         };
         persistence.shared-storage = {
           type = "persistentVolumeClaim";
           existingClaim = "cephfs-shared-storage-root";
-          advancedMounts.main.main = [ { path = "/home/node/shared"; } ];
+          advancedMounts.main.main = [{ path = "/home/node/shared"; }];
         };
         persistence.dev-tun = {
           type = "hostPath";
           hostPath = "/dev/net/tun";
-          advancedMounts.main.tailscale = [ { path = "/dev/net/tun"; } ];
+          advancedMounts.main.tailscale = [{ path = "/dev/net/tun"; }];
         };
         controllers.main.initContainers.copy-config = {
           image = {

@@ -1,17 +1,42 @@
-{
-  pkgs,
-  lib,
-  inputs,
-  system,
+{ pkgs
+, lib
+, inputs
+, system
+, # Version to use - change this to upgrade OpenClaw
+  # Format: "YYYY.M.D" (e.g., "2026.2.23")
+  # Available versions: https://github.com/openclaw/openclaw/tags
+  version ? "2026.2.23"
+,
 }:
 
 let
   dockerTools = pkgs.dockerTools;
 
-  # Get openclaw-gateway from nix-openclaw flake input
+  # Source info for the specified OpenClaw version
+  # To update:
+  #   1. Change 'version' above to the desired version
+  #   2. Set both hashes to empty string: ""
+  #   3. Run: nix build .#openclaw-nix-image
+  #   4. Copy the correct hashes from the error message
+  #   5. Update the hashes below and rebuild
+  sourceInfo = {
+    owner = "openclaw";
+    repo = "openclaw";
+    rev = "v${version}";
+    hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+    pnpmDepsHash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+  };
+
+  # Build openclaw-gateway with the specified version
+  # We use nix-openclaw's nixpkgs (nixos-unstable) which has fetchPnpmDeps
+  openclawPkgs = inputs.nix-openclaw.inputs.nixpkgs.legacyPackages.${system};
+
   openclawGateway =
-    inputs.nix-openclaw.packages.${system}.openclaw-gateway
-      or (throw "nix-openclaw input not available");
+    openclawPkgs.callPackage (inputs.nix-openclaw + "/nix/packages/openclaw-gateway.nix")
+      {
+        inherit sourceInfo;
+        pnpmDepsHash = sourceInfo.pnpmDepsHash;
+      };
 
   # Import matrix plugin deps from separate file (includes scripts.build for npm)
   matrixPluginDeps = (import ./matrix-deps.nix { inherit pkgs lib; }).matrixPluginDeps;
@@ -145,7 +170,7 @@ let
 in
 dockerTools.streamLayeredImage {
   name = "localhost/openclaw-nix";
-  tag = "dev";
+  tag = "v${version}";
 
   contents = [
     openclawRootfs
