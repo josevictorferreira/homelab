@@ -114,9 +114,12 @@ in
 
                       # Install required libraries and socat for proxy
                       apt-get update
-                      apt-get install -y libfido2-1 socat libglx0 libgl1 libglib2.0-0
+                      apt-get install -y libfido2-1 socat libglx0 libgl1 libglib2.0-0 libopengl0 libegl1 libgssapi-krb5-2
 
                       echo "Starting ProtonMail Bridge..."
+
+                      # Set QT to use offscreen platform for headless GUI
+                      export QT_QPA_PLATFORM=offscreen
 
                       # Start bridge in background
                       /protonmail/proton-bridge --noninteractive &
