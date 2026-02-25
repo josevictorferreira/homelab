@@ -159,9 +159,6 @@ in
               dangerouslyAllowHostHeaderOriginFallback = true;
             };
           };
-          cron = {
-            storePath = "/home/node/.openclaw/cron/jobs.json";
-          };
           logging = {
             level = "debug";
           };
@@ -275,6 +272,7 @@ in
         # Environment overrides
         controllers.main.containers.main.env.OPENCLAW_CONFIG_PATH = "/config/openclaw.json";
         controllers.main.containers.main.env.OPENCLAW_DATA_DIR = "/home/node/.openclaw";
+        controllers.main.containers.main.env.OPENCLAW_STATE_DIR = "/home/node/.openclaw";
         controllers.main.containers.main.env.HOME = "/state/home";
         controllers.main.containers.main.env.TZ = "America/Sao_Paulo";
         controllers.main.containers.main.env.NODE_PATH = "/lib/openclaw/extensions/matrix/node_modules";
