@@ -10,7 +10,7 @@
   kubenix.project = homelab.name;
 
   kubernetes = {
-    version = homelab.kubernetes.version;
+    inherit (homelab.kubernetes) version;
   };
 }
 

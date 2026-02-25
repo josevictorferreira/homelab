@@ -14,7 +14,7 @@ in
       kind = "Service";
       metadata = {
         name = "minio-external";
-        namespace = namespace;
+        inherit namespace;
         labels = {
           app = "minio-external";
         };
@@ -39,7 +39,7 @@ in
       kind = "Endpoints";
       metadata = {
         name = "minio-external";
-        namespace = namespace;
+        inherit namespace;
         labels = {
           app = "minio-external";
         };
@@ -66,7 +66,7 @@ in
       kind = "ServiceMonitor";
       metadata = {
         name = "minio-cluster-metrics";
-        namespace = namespace;
+        inherit namespace;
         labels = {
           app = "minio-external";
         };
@@ -93,7 +93,7 @@ in
       kind = "ServiceMonitor";
       metadata = {
         name = "minio-node-metrics";
-        namespace = namespace;
+        inherit namespace;
         labels = {
           app = "minio-external";
         };

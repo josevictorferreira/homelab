@@ -20,7 +20,7 @@ in
       };
       includeCRDs = true;
       noHooks = true;
-      namespace = namespace;
+      inherit namespace;
       values = {
         image = {
           registry = "ghcr.io";
@@ -32,7 +32,7 @@ in
           replicas = 1;
 
           labels = {
-            app = app;
+            inherit app;
             release = app;
           };
           domain = kubenix.lib.domainFor app;
@@ -40,7 +40,7 @@ in
           data = {
             storageType = "s3";
             s3 = {
-              bucketName = bucketName;
+              inherit bucketName;
               endpoint = "http://rook-ceph-rgw-ceph-objectstore.${homelab.kubernetes.namespaces.storage}.svc.cluster.local";
               region = "us-east-1";
               existingSecret = "linkwarden-s3";
@@ -75,7 +75,7 @@ in
     resources = {
       services.linkwarden = {
         metadata = {
-          namespace = namespace;
+          inherit namespace;
           annotations = kubenix.lib.serviceAnnotationFor app;
         };
       };
@@ -173,10 +173,10 @@ in
 
       objectbucketclaim."linkwarden-s3" = {
         metadata = {
-          namespace = namespace;
+          inherit namespace;
         };
         spec = {
-          bucketName = bucketName;
+          inherit bucketName;
           storageClassName = "rook-ceph-objectstore";
         };
       };

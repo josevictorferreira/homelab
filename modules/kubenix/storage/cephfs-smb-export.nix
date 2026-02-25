@@ -10,14 +10,23 @@ in
     deployments.${appName} = {
       metadata = {
         name = appName;
-        namespace = namespace;
-        labels.app = appName;
+        labels = {
+          app = appName;
+        };
       };
       spec = {
         replicas = 1;
-        selector.matchLabels.app = appName;
+        selector = {
+          matchLabels = {
+            app = appName;
+          };
+        };
         template = {
-          metadata.labels.app = appName;
+          metadata = {
+            labels = {
+              app = appName;
+            };
+          };
           spec = {
             containers = [
               {
@@ -49,12 +58,15 @@ in
     services.${appName} = {
       metadata = {
         name = appName;
-        namespace = namespace;
-        labels.app = appName;
+        labels = {
+          app = appName;
+        };
       };
       spec = {
         type = "LoadBalancer";
-        selector.app = appName;
+        selector = {
+          app = appName;
+        };
         ports = [
           { name = "smb"; port = 445; targetPort = 445; protocol = "TCP"; }
         ];

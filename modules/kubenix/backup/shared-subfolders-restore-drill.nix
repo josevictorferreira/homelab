@@ -1,8 +1,4 @@
-{ kubenix
-, homelab
-, lib
-, ...
-}:
+{ homelab, ... }:
 
 let
   namespace = homelab.kubernetes.namespaces.backup;
@@ -43,7 +39,7 @@ let
     SMOKE_OK=true
     TOTAL_FILES=0
 
-    for folder in ${builtins.toString expectedFolders}; do
+    for folder in ${toString expectedFolders}; do
       echo "Checking folder: $folder"
 
       # Count files in this folder
@@ -101,7 +97,7 @@ in
   kubernetes.resources.cronJobs."shared-subfolders-restore-drill" = {
     metadata = {
       name = "shared-subfolders-restore-drill";
-      namespace = namespace;
+      inherit namespace;
     };
     spec = {
       schedule = "0 4 * * 0";

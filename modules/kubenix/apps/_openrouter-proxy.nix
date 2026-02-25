@@ -1,4 +1,4 @@
-{ ... }:
+_:
 
 let
   app = "openrouter-proxy";

@@ -9,7 +9,7 @@ in
       secrets."gluetun-vpn-credentials" = {
         metadata = {
           name = "gluetun-vpn-credentials";
-          namespace = namespace;
+          inherit namespace;
         };
         data = {
           "VPN_SERVICE_PROVIDER" = kubenix.lib.secretsFor "vpn_service_provider";

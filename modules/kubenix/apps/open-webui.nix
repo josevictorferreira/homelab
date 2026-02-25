@@ -19,7 +19,7 @@ in
       };
       includeCRDs = true;
       noHooks = true;
-      namespace = namespace;
+      inherit namespace;
       values = {
         image = {
           repository = "ghcr.io/open-webui/open-webui";
@@ -77,10 +77,10 @@ in
     resources = {
       objectbucketclaim."open-webui-s3" = {
         metadata = {
-          namespace = namespace;
+          inherit namespace;
         };
         spec = {
-          bucketName = bucketName;
+          inherit bucketName;
           storageClassName = "rook-ceph-objectstore";
         };
       };

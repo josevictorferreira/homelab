@@ -8,7 +8,7 @@ let
     type = "postgres";
     access = "proxy";
     url = "${kubenix.lib.serviceHostFor "postgresql-18-hl" "apps"}:5432";
-    database = database;
+    inherit database;
     user = "postgres";
     isDefault = false;
     editable = false;

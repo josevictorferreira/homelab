@@ -22,11 +22,11 @@ in
           volumeHandle = pvName;
           nodeStageSecretRef = {
             name = "cephfs-user-secret";
-            namespace = namespace;
+            inherit namespace;
           };
           volumeAttributes = {
             clusterID = "rook-ceph";
-            fsName = fsName;
+            inherit fsName;
             staticVolume = "true";
             rootPath = exportPath;
           };
@@ -37,7 +37,7 @@ in
     persistentVolumeClaims.${pvcName} = {
       metadata = {
         name = pvcName;
-        namespace = namespace;
+        inherit namespace;
       };
       spec = {
         accessModes = [ "ReadWriteMany" ];

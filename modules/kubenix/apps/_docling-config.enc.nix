@@ -9,7 +9,7 @@ in
     resources = {
       secrets."docling-config" = {
         metadata = {
-          namespace = namespace;
+          inherit namespace;
         };
         type = "Opaque";
         stringData = {

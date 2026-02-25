@@ -8,7 +8,7 @@ in
     resources = {
       secrets."keycloak-env" = {
         metadata = {
-          namespace = namespace;
+          inherit namespace;
         };
         stringData = {
           "db-username" = "postgres";

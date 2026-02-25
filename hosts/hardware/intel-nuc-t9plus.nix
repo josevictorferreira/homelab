@@ -6,39 +6,37 @@
       (modulesPath + "/installer/scan/not-detected.nix")
     ];
 
-  boot.supportedFilesystems = [ "zfs" ];
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
-  boot.initrd.availableKernelModules = [ "xhci_pci" "nvme" "usb_storage" "usbhid" "sd_mod" ];
-  boot.initrd.kernelModules = [ ];
-  boot.kernelModules = [ "kvm-intel" ];
-  boot.extraModulePackages = [ ];
-
-  fileSystems."/" =
-    {
+  boot = {
+    supportedFilesystems = [ "zfs" ];
+    loader.systemd-boot.enable = true;
+    loader.efi.canTouchEfiVariables = true;
+    initrd.availableKernelModules = [ "xhci_pci" "nvme" "usb_storage" "usbhid" "sd_mod" ];
+    initrd.kernelModules = [ ];
+    kernelModules = [ "kvm-intel" ];
+    extraModulePackages = [ ];
+  };
+  fileSystems = {
+    "/" = {
       device = "rpool/root";
       fsType = "zfs";
     };
 
-  fileSystems."/nix" =
-    {
+    "/nix" = {
       device = "rpool/nix";
       fsType = "zfs";
     };
 
-  fileSystems."/var/log" =
-    {
+    "/var/log" = {
       device = "rpool/log";
       fsType = "zfs";
     };
 
-  fileSystems."/boot" =
-    {
+    "/boot" = {
       device = "/dev/disk/by-partlabel/EFI";
       fsType = "vfat";
       options = [ "fmask=0022" "dmask=0022" ];
     };
-
+  };
   swapDevices = [ ];
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";

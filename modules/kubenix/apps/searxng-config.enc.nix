@@ -59,7 +59,7 @@ in
       configMaps."searxng-config" = {
         metadata = {
           name = "searxng-config";
-          namespace = namespace;
+          inherit namespace;
         };
         data = {
           "settings.yml" = kubenix.lib.toYamlStr settings;
@@ -70,7 +70,7 @@ in
       secrets."searxng-secret" = {
         metadata = {
           name = "searxng-secret";
-          namespace = namespace;
+          inherit namespace;
         };
         stringData = {
           "SEARXNG_HOSTNAME" = domain;

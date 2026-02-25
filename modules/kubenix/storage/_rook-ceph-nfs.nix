@@ -71,7 +71,7 @@ let
   exportConf = {
     export_id = 10;
     path = "__SUBVOL_PATH__";
-    pseudo = pseudo;
+    inherit pseudo;
     security_label = false;
     access_type = "RW";
     squash = "all_squash";
@@ -94,7 +94,7 @@ in
   kubernetes.resources = {
     cephnfs.${nfsName} = {
       metadata = {
-        namespace = namespace;
+        inherit namespace;
       };
       spec = {
         server = {
@@ -116,7 +116,7 @@ in
     services.${nfsName} = {
       metadata = {
         annotations = kubenix.lib.serviceAnnotationFor "nfs";
-        namespace = namespace;
+        inherit namespace;
       };
       spec = {
         type = "LoadBalancer";
@@ -135,7 +135,7 @@ in
     jobs."${nfsName}-ceph-export-task" = {
       metadata = {
         name = "${nfsName}-ceph-export-task";
-        namespace = namespace;
+        inherit namespace;
       };
       spec = {
         backoffLimit = 3;
@@ -260,7 +260,7 @@ in
 
 
     roles."${nfsName}-ganesha-conf-patch-role" = {
-      metadata = { name = "${nfsName}-ganesha-conf-patch-role"; namespace = namespace; };
+      metadata = { name = "${nfsName}-ganesha-conf-patch-role"; inherit namespace; };
       rules = [
         {
           apiGroups = [ "" ];
@@ -276,13 +276,13 @@ in
     };
 
     roleBindings."${nfsName}-ganesha-conf-patch-rb" = {
-      metadata = { name = "${nfsName}-ganesha-conf-patch-rb"; namespace = namespace; };
+      metadata = { name = "${nfsName}-ganesha-conf-patch-rb"; inherit namespace; };
       roleRef = { apiGroup = "rbac.authorization.k8s.io"; kind = "Role"; name = "${nfsName}-ganesha-conf-patch-role"; };
-      subjects = [{ kind = "ServiceAccount"; name = "rook-ceph-default"; namespace = namespace; }];
+      subjects = [{ kind = "ServiceAccount"; name = "rook-ceph-default"; inherit namespace; }];
     };
 
     jobs."${nfsName}-ganesha-conf-patch" = {
-      metadata = { name = "${nfsName}-ganesha-conf-patch"; namespace = namespace; };
+      metadata = { name = "${nfsName}-ganesha-conf-patch"; inherit namespace; };
       spec = {
         backoffLimit = 2;
         ttlSecondsAfterFinished = 3600;

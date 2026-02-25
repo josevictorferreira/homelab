@@ -3,92 +3,13 @@
 let
   namespace = homelab.kubernetes.namespaces.applications;
 
-  # User provisioning script for declarative Matrix user creation
-  userProvisioningScript = ''
-    #!/bin/sh
-    set -e
-
-    SYNAPSE_URL="http://synapse-matrix-synapse.${namespace}.svc.cluster.local:8008"
-    SHARED_SECRET="$REGISTRATION_SHARED_SECRET"
-
-    echo "Checking if user provisioning has already completed..."
-    # Check if all users already exist - if so, exit early
-    admin_exists=$(curl -s -o /dev/null -w "%{http_code}" "$SYNAPSE_URL/_matrix/client/v3/register/available?username=admin" || echo "000")
-    jose_exists=$(curl -s -o /dev/null -w "%{http_code}" "$SYNAPSE_URL/_matrix/client/v3/register/available?username=jose" || echo "000")
-    zeh_exists=$(curl -s -o /dev/null -w "%{http_code}" "$SYNAPSE_URL/_matrix/client/v3/register/available?username=zeh" || echo "000")
-
-    if [ "$admin_exists" = "400" ] && [ "$jose_exists" = "400" ] && [ "$zeh_exists" = "400" ]; then
-      echo "All users already exist. Provisioning already completed, skipping..."
-      exit 0
-    fi
-
-    echo "Waiting for Synapse to be ready..."
-    until curl -sf "$SYNAPSE_URL/_matrix/client/versions" > /dev/null 2>&1; do
-      echo "Synapse not ready, waiting..."
-      sleep 5
-    done
-    echo "Synapse is ready!"
-
-    generate_mac() {
-      local nonce="$1" user="$2" password="$3" admin="$4"
-      if [ "$admin" = "true" ]; then admin_str="admin"; else admin_str="notadmin"; fi
-      printf "%s\0%s\0%s\0%s" "$nonce" "$user" "$password" "$admin_str" | \
-        openssl dgst -sha1 -hmac "$SHARED_SECRET" | awk '{print $2}'
-    }
-
-    register_user() {
-      local username="$1" password="$2" displayname="$3" admin="$4"
-      echo "Processing user: $username"
-
-      status=$(curl -s -o /dev/null -w "%{http_code}" "$SYNAPSE_URL/_matrix/client/v3/register/available?username=$username")
-      if [ "$status" = "400" ]; then
-        echo "User $username already exists, skipping..."
-        return 0
-      fi
-
-      nonce=$(curl -sf "$SYNAPSE_URL/_synapse/admin/v1/register" | jq -r '.nonce')
-      if [ -z "$nonce" ] || [ "$nonce" = "null" ]; then
-        echo "Failed to get nonce for $username"
-        return 1
-      fi
-
-      mac=$(generate_mac "$nonce" "$username" "$password" "$admin")
-
-      response=$(curl -sf -X POST "$SYNAPSE_URL/_synapse/admin/v1/register" \
-        -H "Content-Type: application/json" \
-        -d "{
-          \"nonce\": \"$nonce\",
-          \"username\": \"$username\",
-          \"password\": \"$password\",
-          \"displayname\": \"$displayname\",
-          \"admin\": $admin,
-          \"mac\": \"$mac\"
-        }" 2>&1) || true
-
-      if echo "$response" | grep -q "user_id"; then
-        echo "Successfully created user: $username"
-      elif echo "$response" | grep -q "User ID already taken"; then
-        echo "User $username already exists"
-      else
-        echo "Failed to create user $username: $response"
-      fi
-    }
-
-    echo "Starting user provisioning..."
-    register_user "admin" "$ADMIN_PASSWORD" "Admin" true
-    register_user "jose" "$JOSE_PASSWORD" "Jose Victor" false
-    register_user "zeh" "$ZEH_PASSWORD" "Zeh" true
-    echo "User provisioning complete!"
-  '';
 in
 {
   kubernetes = {
     resources = {
       secrets = {
         "synapse-env" = {
-          metadata = {
-            namespace = namespace;
-          };
+          metadata = { inherit namespace; };
           stringData = {
             "postgres-password" = kubenix.lib.secretsFor "postgresql_admin_password";
             "macaroon-secret-key" = kubenix.lib.secretsFor "synapse_macaroon_secret_key";
@@ -98,17 +19,13 @@ in
         };
 
         "synapse-signing-key" = {
-          metadata = {
-            namespace = namespace;
-          };
+          metadata = { inherit namespace; };
           stringData = {
             "matrix.josevictor.me.key" = kubenix.lib.secretsFor "synapse_signing_key";
           };
         };
         "mautrix-whatsapp-registration" = {
-          metadata = {
-            namespace = namespace;
-          };
+          metadata = { inherit namespace; };
           stringData = {
             "registration.yaml" = kubenix.lib.toYamlStr {
               id = "whatsapp";
@@ -136,9 +53,7 @@ in
 
         # mautrix-whatsapp v0.11+/v26+ megabridge config format
         "mautrix-whatsapp-config" = {
-          metadata = {
-            namespace = namespace;
-          };
+          metadata = { inherit namespace; };
           stringData = {
             "config.yaml" = kubenix.lib.toYamlStr {
               # WhatsApp network-specific settings
@@ -244,9 +159,7 @@ in
         };
 
         "mautrix-discord-registration" = {
-          metadata = {
-            namespace = namespace;
-          };
+          metadata = { inherit namespace; };
           stringData = {
             "registration.yaml" = kubenix.lib.toYamlStr {
               id = "discord";
@@ -273,9 +186,7 @@ in
         };
 
         "mautrix-discord-config" = {
-          metadata = {
-            namespace = namespace;
-          };
+          metadata = { inherit namespace; };
           stringData = {
             "config.yaml" = kubenix.lib.toYamlStr {
               homeserver = {
@@ -332,9 +243,7 @@ in
         };
 
         "mautrix-slack-registration" = {
-          metadata = {
-            namespace = namespace;
-          };
+          metadata = { inherit namespace; };
           stringData = {
             "registration.yaml" = kubenix.lib.toYamlStr {
               id = "slack";
@@ -361,9 +270,7 @@ in
         };
 
         "mautrix-slack-config" = {
-          metadata = {
-            namespace = namespace;
-          };
+          metadata = { inherit namespace; };
           stringData = {
             "config.yaml" = kubenix.lib.toYamlStr {
               homeserver = {

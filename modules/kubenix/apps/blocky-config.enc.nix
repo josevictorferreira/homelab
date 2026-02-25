@@ -9,8 +9,8 @@ let
 
   dnsHosts = lib.mapAttrsToList
     (
-      serviceName: ipAddress:
-        "${kubenix.lib.domainFor serviceName} = ${homelab.kubernetes.loadBalancer.address}"
+      serviceName: _ipAddress:
+      "${kubenix.lib.domainFor serviceName} = ${homelab.kubernetes.loadBalancer.address}"
     )
     homelab.kubernetes.loadBalancer.services;
 
@@ -99,7 +99,7 @@ in
     resources = {
       configMaps."blocky" = {
         metadata = {
-          namespace = namespace;
+          inherit namespace;
         };
         data."config.yml" = blockyConfigYaml;
       };

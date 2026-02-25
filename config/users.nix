@@ -1,6 +1,7 @@
-{ ... }:
+_:
 
 {
+
   admin = {
     name = "Jose Victor Ferreira";
     username = "josevictor";

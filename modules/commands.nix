@@ -55,12 +55,28 @@ let
     fi
   '';
 
-  lint = mkCommand "lint" "Check nix formatting" [ pkgs.nix ] ''
+  lint = mkCommand "lint" "Lint nix files (formatting + deadnix + statix)" [ pkgs.nix ] ''
     echo "Running nix formatter check..."
     if nix fmt -- --check .; then
       echo "All files are properly formatted."
     else
       echo "Some files need formatting. Run 'make format' to fix."
+      exit 1
+    fi
+
+    echo "Running deadnix check..."
+    if nix run nixpkgs#deadnix . --fail; then
+      echo "No deadnix issues found."
+    else
+      echo "Deadnix found unused variables. Fix them manually."
+      exit 1
+    fi
+
+    echo "Running statix check..."
+    if nix run nixpkgs#statix check .; then
+      echo "No statix issues found."
+    else
+      echo "Statix found style issues. Fix them manually."
       exit 1
     fi
   '';

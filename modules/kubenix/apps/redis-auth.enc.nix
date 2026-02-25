@@ -9,7 +9,7 @@ in
       secrets."redis-auth" = {
         type = "Opaque";
         metadata = {
-          namespace = namespace;
+          inherit namespace;
         };
         stringData = {
           "redis-password" = kubenix.lib.secretsFor "redis_password";

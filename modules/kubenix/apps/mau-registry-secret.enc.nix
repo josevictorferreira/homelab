@@ -7,7 +7,7 @@ in
     resources = {
       secrets."mau-registry-secret" = {
         metadata = {
-          namespace = namespace;
+          inherit namespace;
         };
         type = "kubernetes.io/dockerconfigjson";
         data = {

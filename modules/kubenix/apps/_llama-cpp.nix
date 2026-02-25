@@ -1,4 +1,4 @@
-{ homelab, kubenix, ... }:
+{ homelab, ... }:
 
 let
   namespace = homelab.kubernetes.namespaces.applications;
@@ -8,7 +8,7 @@ in
   submodules.instances.${app} = {
     submodule = "release";
     args = {
-      namespace = namespace;
+      inherit namespace;
       image = {
         repository = "ghcr.io/ggml-org/llama.cpp";
         tag = "server-vulkan@sha256:429a5c2109a15b33026d5dcc2333b6cb89a58a3566c7b6ad84891c95e4a4416b";

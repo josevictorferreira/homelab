@@ -23,7 +23,7 @@ in
           };
           volumeAttributes = {
             clusterID = "rook-ceph";
-            fsName = fsName;
+            inherit fsName;
             staticVolume = "true";
             rootPath = "/volumes/nfs-exports/homelab-nfs/5a434804-52fc-4e58-b09f-592a37a16a97";
           };
@@ -34,7 +34,7 @@ in
     persistentVolumeClaims."cephfs-shared-storage-root" = {
       metadata = {
         name = "cephfs-shared-storage-root";
-        namespace = namespace;
+        inherit namespace;
       };
       spec = {
         accessModes = [ "ReadWriteMany" ];

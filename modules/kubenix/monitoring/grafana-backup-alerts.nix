@@ -28,7 +28,7 @@ let
             from = 600;
             to = 0;
           };
-          datasourceUid = datasourceUid;
+          inherit datasourceUid;
           model = {
             inherit expr;
             intervalMs = 1000;

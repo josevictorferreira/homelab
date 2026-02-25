@@ -3,7 +3,6 @@
 , pkgs
 , ...
 }:
-
 let
   cfg = config.profiles."amd-gpu";
 in
@@ -16,26 +15,29 @@ in
     boot.kernelParams = [ "amdgpu.sg_display=0" ];
 
     systemd.tmpfiles.rules = [ "L+    /opt/rocm   -    -    -     -    ${pkgs.rocmPackages.clr}" ];
-    hardware.cpu.amd.updateMicrocode = true;
+
+    hardware = {
+      cpu.amd.updateMicrocode = true;
+
+      graphics = {
+        enable = true;
+        extraPackages = [
+          pkgs.clinfo
+          pkgs.rocmPackages.rocminfo
+          pkgs.rocmPackages.rocm-device-libs
+          pkgs.rocmPackages.rocm-runtime
+        ];
+        enable32Bit = true;
+      };
+
+      amdgpu.amdvlk = {
+        enable = true;
+        support32Bit.enable = true;
+      };
+    };
 
     nixpkgs.config.allowUnfree = true;
     nixpkgs.config.rocmSupport = "rocm";
-
-    hardware.graphics = {
-      enable = true;
-      extraPackages = [
-        pkgs.clinfo
-        pkgs.rocmPackages.rocminfo
-        pkgs.rocmPackages.rocm-device-libs
-        pkgs.rocmPackages.rocm-runtime
-      ];
-      enable32Bit = true;
-    };
-
-    hardware.amdgpu.amdvlk = {
-      enable = true;
-      support32Bit.enable = true;
-    };
 
     virtualisation.containerd.enable = true;
 

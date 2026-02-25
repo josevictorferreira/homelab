@@ -19,10 +19,10 @@ in
       };
       includeCRDs = true;
       noHooks = true;
-      namespace = namespace;
+      inherit namespace;
 
       values = {
-        image = image;
+        inherit image;
 
         architecture = "standalone";
 

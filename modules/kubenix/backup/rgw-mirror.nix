@@ -69,7 +69,7 @@ in
   kubernetes.resources.cronJobs."rgw-mirror" = {
     metadata = {
       name = "rgw-mirror";
-      namespace = namespace;
+      inherit namespace;
     };
     spec = {
       schedule = "0 4 * * *";

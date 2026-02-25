@@ -5,20 +5,21 @@
     ./hardware-configuration.nix
   ];
 
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
-  boot.supportedFilesystems = [ "zfs" ];
-  boot.kernel.sysctl."vm.swappiness" = 180;
+  boot = {
+    loader.systemd-boot.enable = true;
+    loader.efi.canTouchEfiVariables = true;
+    supportedFilesystems = [ "zfs" ];
+    kernel.sysctl."vm.swappiness" = 180;
+  };
 
   time.timeZone = "America/Sao_Paulo";
   i18n.defaultLocale = "en_US.UTF-8";
-  services.xserver.xkb.layout = "us";
 
-  networking.firewall.enable = false;
-  networking.hostName = "lab-alpha-cp";
-  networking.hostId = builtins.substring 0 8 (builtins.hashString "sha1" "lab-alpha-cp");
-
-  networking.useDHCP = false;
+  services = {
+    xserver.xkb.layout = "us";
+    openssh.enable = true;
+    earlyoom.enable = true;
+  };
 
   users.users.josevictor = {
     isNormalUser = true;
@@ -31,17 +32,24 @@
     ];
   };
 
-  networking.interfaces.enp1s0 = {
-    mtu = 1500;
-    ipv4.addresses = [{
-      address = "10.10.10.200";
-      prefixLength = 24;
-    }];
-  };
+  networking = {
+    firewall.enable = false;
+    hostName = "lab-alpha-cp";
+    hostId = builtins.substring 0 8 (builtins.hashString "sha1" "lab-alpha-cp");
+    useDHCP = false;
 
-  networking.defaultGateway = {
-    address = "10.10.10.1";
-    interface = "enp1s0";
+    interfaces.enp1s0 = {
+      mtu = 1500;
+      ipv4.addresses = [{
+        address = "10.10.10.200";
+        prefixLength = 24;
+      }];
+    };
+
+    defaultGateway = {
+      address = "10.10.10.1";
+      interface = "enp1s0";
+    };
   };
 
   security.sudo = {
@@ -66,9 +74,6 @@
   };
 
   system.copySystemConfiguration = true;
-
-  services.openssh.enable = true;
-  services.earlyoom.enable = true;
 
   programs.gnupg.agent = {
     enable = true;
@@ -97,6 +102,8 @@
 
   system.stateVersion = "25.05";
 
-  nix.settings.trusted-users = [ "root" "@wheel" ];
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  nix.settings = {
+    trusted-users = [ "root" "@wheel" ];
+    experimental-features = [ "nix-command" "flakes" ];
+  };
 }

@@ -7,7 +7,7 @@ in
     resources = {
       secrets."valoris-config" = {
         metadata = {
-          namespace = namespace;
+          inherit namespace;
         };
         stringData = {
           "RAILS_LOG_TO_STDOUT" = "true";

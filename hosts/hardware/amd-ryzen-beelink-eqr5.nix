@@ -8,43 +8,51 @@
     (modulesPath + "/installer/scan/not-detected.nix")
   ];
 
-  boot.supportedFilesystems = [ "zfs" ];
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
-  boot.initrd.availableKernelModules = [
-    "nvme"
-    "xhci_pci"
-    "usb_storage"
-    "usbhid"
-    "sd_mod"
-  ];
-  boot.initrd.kernelModules = [ "amdgpu" ];
-  boot.kernelModules = [ "kvm-amd" ];
-  boot.extraModulePackages = [ ];
-
-  fileSystems."/" = {
-    device = "rpool/root";
-    fsType = "zfs";
+  boot = {
+    supportedFilesystems = [ "zfs" ];
+    loader = {
+      systemd-boot.enable = true;
+      efi.canTouchEfiVariables = true;
+    };
+    initrd = {
+      availableKernelModules = [
+        "nvme"
+        "xhci_pci"
+        "usb_storage"
+        "usbhid"
+        "sd_mod"
+      ];
+      kernelModules = [ "amdgpu" ];
+    };
+    kernelModules = [ "kvm-amd" ];
+    extraModulePackages = [ ];
   };
 
-  fileSystems."/nix" = {
-    device = "rpool/nix";
-    fsType = "zfs";
-  };
+  fileSystems = {
+    "/" = {
+      device = "rpool/root";
+      fsType = "zfs";
+    };
 
-  fileSystems."/var/log" = {
-    device = "rpool/log";
-    fsType = "zfs";
-  };
+    "/nix" = {
+      device = "rpool/nix";
+      fsType = "zfs";
+    };
 
-  fileSystems."/boot" = {
-    # device = "/dev/disk/by-uuid/C6FA-428C";
-    device = "/dev/disk/by-partlabel/EFI";
-    fsType = "vfat";
-    options = [
-      "fmask=0022"
-      "dmask=0022"
-    ];
+    "/var/log" = {
+      device = "rpool/log";
+      fsType = "zfs";
+    };
+
+    "/boot" = {
+      # device = "/dev/disk/by-uuid/C6FA-428C";
+      device = "/dev/disk/by-partlabel/EFI";
+      fsType = "vfat";
+      options = [
+        "fmask=0022"
+        "dmask=0022"
+      ];
+    };
   };
 
   services.btrfs.autoScrub = {

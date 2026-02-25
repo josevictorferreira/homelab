@@ -9,7 +9,7 @@ in
     resources = {
       secrets."cephfs-user-secret" = {
         metadata = {
-          namespace = namespace;
+          inherit namespace;
         };
         data = {
           "userID" = kubenix.lib.secretsFor "cephfs_user_id";
@@ -20,7 +20,7 @@ in
       configMaps."${appName}-config" = {
         metadata = {
           name = "${appName}-config";
-          namespace = namespace;
+          inherit namespace;
         };
         data."config.yml" = ''
           auth:
