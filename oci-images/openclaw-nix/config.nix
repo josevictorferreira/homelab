@@ -14,7 +14,7 @@
       }
     ];
     defaults = {
-      workspace = "/state/workspace";
+      workspace = "/home/node/.openclaw/workspace";
       model.primary = "kimi-coding/k2p5";
       userTimezone = "America/Sao_Paulo";
       timeoutSeconds = 600;
