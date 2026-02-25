@@ -5,39 +5,41 @@ let
 in
 {
   # RBAC: full cluster access for OpenClaw-Nix pod
-  kubernetes.resources.serviceAccounts.openclaw-nix = {
-    metadata.namespace = namespace;
-  };
-
-  kubernetes.resources.clusterRoles.openclaw-nix-cluster-admin = {
-    metadata = { };
-    rules = [
-      {
-        apiGroups = [ "*" ];
-        resources = [ "*" ];
-        verbs = [ "*" ];
-      }
-      {
-        nonResourceURLs = [ "*" ];
-        verbs = [ "*" ];
-      }
-    ];
-  };
-
-  kubernetes.resources.clusterRoleBindings.openclaw-nix-cluster-admin = {
-    metadata = { };
-    roleRef = {
-      apiGroup = "rbac.authorization.k8s.io";
-      kind = "ClusterRole";
-      name = "openclaw-nix-cluster-admin";
+  kubernetes.resources = {
+    serviceAccounts.openclaw-nix = {
+      metadata.namespace = namespace;
     };
-    subjects = [
-      {
-        kind = "ServiceAccount";
-        name = "openclaw-nix";
-        inherit namespace;
-      }
-    ];
+
+    clusterRoles.openclaw-nix-cluster-admin = {
+      metadata = { };
+      rules = [
+        {
+          apiGroups = [ "*" ];
+          resources = [ "*" ];
+          verbs = [ "*" ];
+        }
+        {
+          nonResourceURLs = [ "*" ];
+          verbs = [ "*" ];
+        }
+      ];
+    };
+
+    clusterRoleBindings.openclaw-nix-cluster-admin = {
+      metadata = { };
+      roleRef = {
+        apiGroup = "rbac.authorization.k8s.io";
+        kind = "ClusterRole";
+        name = "openclaw-nix-cluster-admin";
+      };
+      subjects = [
+        {
+          kind = "ServiceAccount";
+          name = "openclaw-nix";
+          inherit namespace;
+        }
+      ];
+    };
   };
 
   submodules.instances.openclaw-nix = {
@@ -236,211 +238,220 @@ in
         # Override service type to ClusterIP (release default is LoadBalancer)
         service.main.type = "ClusterIP";
 
-        # Security context: run as root for full access
-        controllers.main.containers.main.securityContext = {
-          runAsUser = 0;
-          runAsGroup = 0;
-        };
-
-        # Service account for cluster-admin RBAC
-        controllers.main.serviceAccount.name = "openclaw-nix";
         defaultPodOptions.automountServiceAccountToken = true;
         defaultPodOptions.imagePullSecrets = [
           { name = "ghcr-registry-secret"; }
         ];
 
-        # DNS config: cluster DNS + Tailscale MagicDNS
-        controllers.main.pod.dnsPolicy = "None";
-        controllers.main.pod.dnsConfig = {
-          nameservers = [
-            "10.43.0.10"
-            "100.100.100.100"
-          ];
-          searches = [
-            "apps.svc.cluster.local"
-            "svc.cluster.local"
-            "cluster.local"
-          ];
-          options = [
-            {
-              name = "ndots";
-              value = "5";
-            }
-          ];
-        };
+        # Security context: run as root for full access
+        controllers.main = {
+          containers.main = {
+            securityContext = {
+              runAsUser = 0;
+              runAsGroup = 0;
+            };
 
-        # Environment overrides
-        controllers.main.containers.main.env.OPENCLAW_CONFIG_PATH = "/config/openclaw.json";
-        controllers.main.containers.main.env.OPENCLAW_DATA_DIR = "/home/node/.openclaw";
-        controllers.main.containers.main.env.OPENCLAW_STATE_DIR = "/home/node/.openclaw";
-        controllers.main.containers.main.env.HOME = "/state/home";
-        controllers.main.containers.main.env.TZ = "America/Sao_Paulo";
-        controllers.main.containers.main.env.NODE_PATH = "/lib/openclaw/extensions/matrix/node_modules";
+            env = {
+              OPENCLAW_CONFIG_PATH = "/config/openclaw.json";
+              OPENCLAW_DATA_DIR = "/home/node/.openclaw";
+              OPENCLAW_STATE_DIR = "/home/node/.openclaw";
+              HOME = "/state/home";
+              TZ = "America/Sao_Paulo";
+              NODE_PATH = "/lib/openclaw/extensions/matrix/node_modules";
 
-        # Secret env refs
-        controllers.main.containers.main.env.GEMINI_API_KEY = {
-          valueFrom.secretKeyRef = {
-            name = "openclaw-config";
-            key = "GEMINI_API_KEY";
-          };
-        };
-        controllers.main.containers.main.env.OPENROUTER_API_KEY = {
-          valueFrom.secretKeyRef = {
-            name = "openclaw-config";
-            key = "OPENROUTER_API_KEY";
-          };
-        };
-        controllers.main.containers.main.env.MINIMAX_API_KEY = {
-          valueFrom.secretKeyRef = {
-            name = "openclaw-config";
-            key = "MINIMAX_API_KEY";
-          };
-        };
-        controllers.main.containers.main.env.KIMI_API_KEY = {
-          valueFrom.secretKeyRef = {
-            name = "openclaw-config";
-            key = "KIMI_API_KEY";
-          };
-        };
-        controllers.main.containers.main.env.OPENCLAW_MATRIX_TOKEN = {
-          valueFrom.secretKeyRef = {
-            name = "openclaw-config";
-            key = "OPENCLAW_MATRIX_TOKEN";
-          };
-        };
-        controllers.main.containers.main.env.ELEVENLABS_API_KEY = {
-          valueFrom.secretKeyRef = {
-            name = "openclaw-config";
-            key = "ELEVENLABS_API_KEY";
-          };
-        };
-        controllers.main.containers.main.env.GITHUB_TOKEN = {
-          valueFrom.secretKeyRef = {
-            name = "openclaw-config";
-            key = "GITHUB_TOKEN";
-          };
-        };
-
-        # Command: install matrix deps then start gateway
-        controllers.main.containers.main.command = [
-          "bash"
-          "-c"
-          ''
-            set -e
-            echo "Installing matrix plugin dependencies..."
-
-            # Find the actual nix store path where the gateway loads extensions from
-            # (resolves symlinks to get the real path)
-            MATRIX_EXT=$(readlink -f /lib/openclaw/extensions/matrix 2>/dev/null || echo "/lib/openclaw/extensions/matrix")
-
-            if [ -d "$MATRIX_EXT" ]; then
-              echo "Found matrix extension at: $MATRIX_EXT"
-              cd "$MATRIX_EXT"
-
-              # Check if node_modules exists and has @vector-im/matrix-bot-sdk
-              if [ ! -d "node_modules/@vector-im" ]; then
-                echo "Installing npm dependencies..."
-                # Strip workspace: protocol deps that npm can't handle
-                node -e "
-                  const fs = require('fs');
-                  const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
-                  delete pkg.devDependencies;
-                  fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2));
-                "
-                npm install --omit=dev --no-package-lock --legacy-peer-deps 2>&1 || echo "WARN: npm install failed"
-                echo "Matrix plugin dependencies installed"
-              else
-                echo "node_modules already exists with deps, skipping"
-              fi
-            else
-              echo "Matrix extension not found at $MATRIX_EXT"
-            fi
-
-            echo "Starting openclaw gateway..."
-            # Run the entrypoint script which handles config generation and starts the gateway
-            exec /entrypoint.sh
-          ''
-        ];
-
-        # Tailscale sidecar
-        controllers.main.containers.tailscale = {
-          image = {
-            repository = "tailscale/tailscale";
-            tag = "latest";
-          };
-          securityContext = {
-            runAsUser = 0;
-            runAsGroup = 0;
-            capabilities.add = [
-              "NET_ADMIN"
-              "NET_RAW"
-            ];
-          };
-          env = {
-            TS_AUTHKEY = {
-              valueFrom.secretKeyRef = {
-                name = "openclaw-config";
-                key = "TS_AUTHKEY";
+              # Secret env refs
+              GEMINI_API_KEY = {
+                valueFrom.secretKeyRef = {
+                  name = "openclaw-config";
+                  key = "GEMINI_API_KEY";
+                };
+              };
+              OPENROUTER_API_KEY = {
+                valueFrom.secretKeyRef = {
+                  name = "openclaw-config";
+                  key = "OPENROUTER_API_KEY";
+                };
+              };
+              MINIMAX_API_KEY = {
+                valueFrom.secretKeyRef = {
+                  name = "openclaw-config";
+                  key = "MINIMAX_API_KEY";
+                };
+              };
+              KIMI_API_KEY = {
+                valueFrom.secretKeyRef = {
+                  name = "openclaw-config";
+                  key = "KIMI_API_KEY";
+                };
+              };
+              OPENCLAW_MATRIX_TOKEN = {
+                valueFrom.secretKeyRef = {
+                  name = "openclaw-config";
+                  key = "OPENCLAW_MATRIX_TOKEN";
+                };
+              };
+              ELEVENLABS_API_KEY = {
+                valueFrom.secretKeyRef = {
+                  name = "openclaw-config";
+                  key = "ELEVENLABS_API_KEY";
+                };
+              };
+              GITHUB_TOKEN = {
+                valueFrom.secretKeyRef = {
+                  name = "openclaw-config";
+                  key = "GITHUB_TOKEN";
+                };
               };
             };
-            TS_HOSTNAME = "openclaw-nix";
-            TS_USERSPACE = "false";
-            TS_STATE_DIR = "/var/lib/tailscale";
-            TS_ACCEPT_DNS = "false";
-            TS_AUTH_ONCE = "true";
-            TS_KUBE_SECRET = "";
+
+            # Command: install matrix deps then start gateway
+            command = [
+              "bash"
+              "-c"
+              ''
+                set -e
+                echo "Installing matrix plugin dependencies..."
+
+                # Find the actual nix store path where the gateway loads extensions from
+                # (resolves symlinks to get the real path)
+                MATRIX_EXT=$(readlink -f /lib/openclaw/extensions/matrix 2>/dev/null || echo "/lib/openclaw/extensions/matrix")
+
+                if [ -d "$MATRIX_EXT" ]; then
+                  echo "Found matrix extension at: $MATRIX_EXT"
+                  cd "$MATRIX_EXT"
+
+                  # Check if node_modules exists and has @vector-im/matrix-bot-sdk
+                  if [ ! -d "node_modules/@vector-im" ]; then
+                    echo "Installing npm dependencies..."
+                    # Strip workspace: protocol deps that npm can't handle
+                    node -e "
+                      const fs = require('fs');
+                      const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+                      delete pkg.devDependencies;
+                      fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2));
+                    "
+                    npm install --omit=dev --no-package-lock --legacy-peer-deps 2>&1 || echo "WARN: npm install failed"
+                    echo "Matrix plugin dependencies installed"
+                  else
+                    echo "node_modules already exists with deps, skipping"
+                  fi
+                else
+                  echo "Matrix extension not found at $MATRIX_EXT"
+                fi
+
+                echo "Starting openclaw gateway..."
+                # Run the entrypoint script which handles config generation and starts the gateway
+                exec /entrypoint.sh
+              ''
+            ];
+          };
+
+          # Tailscale sidecar
+          containers.tailscale = {
+            image = {
+              repository = "tailscale/tailscale";
+              tag = "latest";
+            };
+            securityContext = {
+              runAsUser = 0;
+              runAsGroup = 0;
+              capabilities.add = [
+                "NET_ADMIN"
+                "NET_RAW"
+              ];
+            };
+            env = {
+              TS_AUTHKEY = {
+                valueFrom.secretKeyRef = {
+                  name = "openclaw-config";
+                  key = "TS_AUTHKEY";
+                };
+              };
+              TS_HOSTNAME = "openclaw-nix";
+              TS_USERSPACE = "false";
+              TS_STATE_DIR = "/var/lib/tailscale";
+              TS_ACCEPT_DNS = "false";
+              TS_AUTH_ONCE = "true";
+              TS_KUBE_SECRET = "";
+            };
+          };
+
+          # Service account for cluster-admin RBAC
+          serviceAccount.name = "openclaw-nix";
+
+          # DNS config: cluster DNS + Tailscale MagicDNS
+          pod = {
+            dnsPolicy = "None";
+            dnsConfig = {
+              nameservers = [
+                "10.43.0.10"
+                "100.100.100.100"
+              ];
+              searches = [
+                "apps.svc.cluster.local"
+                "svc.cluster.local"
+                "cluster.local"
+              ];
+              options = [
+                {
+                  name = "ndots";
+                  value = "5";
+                }
+              ];
+            };
           };
         };
 
-        # Persistence: writable config scratch dir (main container only)
-        persistence.scratch-config = {
-          type = "emptyDir";
-          advancedMounts.main.main = [{ path = "/config"; }];
-        };
+        persistence = {
+          scratch-config = {
+            type = "emptyDir";
+            advancedMounts.main.main = [{ path = "/config"; }];
+          };
 
-        # Persistence: state (block storage, main container only)
-        persistence.state = {
-          type = "persistentVolumeClaim";
-          storageClass = "rook-ceph-block";
-          size = "10Gi";
-          accessMode = "ReadWriteOnce";
-          advancedMounts.main.main = [{ path = "/state"; }];
-        };
+          # Persistence: state (block storage, main container only)
+          state = {
+            type = "persistentVolumeClaim";
+            storageClass = "rook-ceph-block";
+            size = "10Gi";
+            accessMode = "ReadWriteOnce";
+            advancedMounts.main.main = [{ path = "/state"; }];
+          };
 
-        # Persistence: logs (block storage, main container only)
-        persistence.logs = {
-          type = "persistentVolumeClaim";
-          storageClass = "rook-ceph-block";
-          size = "1Gi";
-          accessMode = "ReadWriteOnce";
-          advancedMounts.main.main = [{ path = "/logs"; }];
-        };
+          # Persistence: logs (block storage, main container only)
+          logs = {
+            type = "persistentVolumeClaim";
+            storageClass = "rook-ceph-block";
+            size = "1Gi";
+            accessMode = "ReadWriteOnce";
+            advancedMounts.main.main = [{ path = "/logs"; }];
+          };
 
-        # Persistence: CephFS shared storage — single PVC, two mounts
-        # Full shared at /home/node/shared, openclaw subdir at ~/.openclaw
-        persistence.shared-storage = {
-          type = "persistentVolumeClaim";
-          existingClaim = "cephfs-shared-storage-root";
-          advancedMounts.main.main = [
-            { path = "/home/node/shared"; }
-            { path = "/home/node/.openclaw"; subPath = "openclaw"; }
-          ];
-        };
+          # Persistence: CephFS shared storage — single PVC, two mounts
+          # Full shared at /home/node/shared, openclaw subdir at ~/.openclaw
+          shared-storage = {
+            type = "persistentVolumeClaim";
+            existingClaim = "cephfs-shared-storage-root";
+            advancedMounts.main.main = [
+              { path = "/home/node/shared"; }
+              { path = "/home/node/.openclaw"; subPath = "openclaw"; }
+            ];
+          };
 
-        # Persistence: tailscale state (block storage)
-        persistence.tailscale-state = {
-          type = "persistentVolumeClaim";
-          storageClass = "rook-ceph-block";
-          size = "1Gi";
-          accessMode = "ReadWriteOnce";
-          advancedMounts.main.tailscale = [{ path = "/var/lib/tailscale"; }];
-        };
+          # Persistence: tailscale state (block storage)
+          tailscale-state = {
+            type = "persistentVolumeClaim";
+            storageClass = "rook-ceph-block";
+            size = "1Gi";
+            accessMode = "ReadWriteOnce";
+            advancedMounts.main.tailscale = [{ path = "/var/lib/tailscale"; }];
+          };
 
-        # Persistence: /dev/net/tun for tailscale
-        persistence.dev-tun = {
-          type = "hostPath";
-          hostPath = "/dev/net/tun";
-          advancedMounts.main.tailscale = [{ path = "/dev/net/tun"; }];
+          # Persistence: /dev/net/tun for tailscale
+          dev-tun = {
+            type = "hostPath";
+            hostPath = "/dev/net/tun";
+            advancedMounts.main.tailscale = [{ path = "/dev/net/tun"; }];
+          };
         };
       };
     };

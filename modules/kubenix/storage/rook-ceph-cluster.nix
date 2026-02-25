@@ -6,11 +6,11 @@
 
 let
   namespace = homelab.kubernetes.namespaces.storage;
-  domain = homelab.domain;
+  inherit (homelab) domain;
   storageNodes = homelab.nodes.group."k8s-storage".configs;
   storageNodesList = lib.mapAttrsToList
     (name: attrs: {
-      name = name;
+      inherit name;
       devices = builtins.map
         (device: {
           name = device;
@@ -30,7 +30,7 @@ in
         version = "1.19.0";
         sha256 = "sha256-GOYYxPe7XWycR8L0pABH8i693nJWzo+9nhFx1UcU9Q8=";
       };
-      namespace = namespace;
+      inherit namespace;
       includeCRDs = true;
       noHooks = false;
       values = {

@@ -41,21 +41,23 @@ in
 
     users = {
       enable = true;
-      username = usersConfig.admin.username;
-      keys = usersConfig.admin.keys;
+      inherit (usersConfig.admin) username;
+      inherit (usersConfig.admin) keys;
     };
 
     sops = {
       enable = true;
-      username = usersConfig.admin.username;
+      inherit (usersConfig.admin) username;
     };
 
-    programs.vimCustom.enable = true;
-    programs.zshCustom.enable = true;
-    programs.gitCustom = {
-      enable = true;
-      name = usersConfig.admin.name;
-      email = usersConfig.admin.email;
+    programs = {
+      vimCustom.enable = true;
+      zshCustom.enable = true;
+      gitCustom = {
+        enable = true;
+        inherit (usersConfig.admin) name;
+        inherit (usersConfig.admin) email;
+      };
     };
 
     services.ssh.enable = true;

@@ -278,103 +278,213 @@ in
       };
       values = {
         ingress.main.enabled = false;
-        controllers.main.containers.main.securityContext = {
-          runAsUser = 0;
-          runAsGroup = 0;
-        };
-        controllers.main.serviceAccount.name = "openclaw";
-        defaultPodOptions.automountServiceAccountToken = true;
-        controllers.main.pod.dnsPolicy = "None";
-        controllers.main.pod.dnsConfig = {
-          nameservers = [
-            "10.43.0.10"
-            "100.100.100.100"
-          ];
-          searches = [
-            "apps.svc.cluster.local"
-            "svc.cluster.local"
-            "cluster.local"
-          ];
-          options = [
-            {
-              name = "ndots";
-              value = "5";
-            }
-          ];
-        };
-        controllers.main.containers.main.env.XDG_CONFIG_HOME = "/home/node/.config";
-        controllers.main.containers.main.env.HOME = "/home/node";
-        controllers.main.containers.main.env.TZ = "America/Sao_Paulo";
-        controllers.main.containers.main.env.PATH =
-          "/home/node/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin";
-        controllers.main.containers.main.env.GEMINI_API_KEY = {
-          valueFrom.secretKeyRef = {
-            name = "openclaw-secrets";
-            key = "GEMINI_API_KEY";
+        controllers.main = {
+          serviceAccount.name = "openclaw";
+          pod = {
+            dnsPolicy = "None";
+            dnsConfig = {
+              nameservers = [
+                "10.43.0.10"
+                "100.100.100.100"
+              ];
+              searches = [
+                "apps.svc.cluster.local"
+                "svc.cluster.local"
+                "cluster.local"
+              ];
+              options = [
+                {
+                  name = "ndots";
+                  value = "5";
+                }
+              ];
+            };
           };
-        };
-        controllers.main.containers.main.env.OPENROUTER_API_KEY = {
-          valueFrom.secretKeyRef = {
-            name = "openclaw-secrets";
-            key = "OPENROUTER_API_KEY";
-          };
-        };
-        controllers.main.containers.main.env.MINIMAX_API_KEY = {
-          valueFrom.secretKeyRef = {
-            name = "openclaw-secrets";
-            key = "MINIMAX_API_KEY";
-          };
-        };
-        controllers.main.containers.main.env.KIMI_API_KEY = {
-          valueFrom.secretKeyRef = {
-            name = "openclaw-secrets";
-            key = "KIMI_API_KEY";
-          };
-        };
-        controllers.main.containers.main.env.OPENCLAW_MATRIX_TOKEN = {
-          valueFrom.secretKeyRef = {
-            name = "openclaw-secrets";
-            key = "OPENCLAW_MATRIX_TOKEN";
-          };
-        };
-        controllers.main.containers.main.env.ELEVENLABS_API_KEY = {
-          valueFrom.secretKeyRef = {
-            name = "openclaw-secrets";
-            key = "ELEVENLABS_API_KEY";
-          };
-        };
-        controllers.main.containers.main.env.GITHUB_TOKEN = {
-          valueFrom.secretKeyRef = {
-            name = "openclaw-secrets";
-            key = "GITHUB_TOKEN";
-          };
-        };
-        controllers.main.containers.tailscale = {
-          image = {
-            repository = "tailscale/tailscale";
-            tag = "latest";
-          };
-          securityContext = {
-            runAsUser = 0;
-            runAsGroup = 0;
-            capabilities.add = [
-              "NET_ADMIN"
-              "NET_RAW"
-            ];
-          };
-          env = {
-            TS_AUTHKEY = {
-              valueFrom.secretKeyRef = {
-                name = "openclaw-secrets";
-                key = "TS_AUTHKEY";
+          containers.main = {
+            securityContext = {
+              runAsUser = 0;
+              runAsGroup = 0;
+            };
+            env = {
+              XDG_CONFIG_HOME = "/home/node/.config";
+              HOME = "/home/node";
+              TZ = "America/Sao_Paulo";
+              PATH =
+                "/home/node/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin";
+              GEMINI_API_KEY = {
+                valueFrom.secretKeyRef = {
+                  name = "openclaw-secrets";
+                  key = "GEMINI_API_KEY";
+                };
+              };
+              OPENROUTER_API_KEY = {
+                valueFrom.secretKeyRef = {
+                  name = "openclaw-secrets";
+                  key = "OPENROUTER_API_KEY";
+                };
+              };
+              MINIMAX_API_KEY = {
+                valueFrom.secretKeyRef = {
+                  name = "openclaw-secrets";
+                  key = "MINIMAX_API_KEY";
+                };
+              };
+              KIMI_API_KEY = {
+                valueFrom.secretKeyRef = {
+                  name = "openclaw-secrets";
+                  key = "KIMI_API_KEY";
+                };
+              };
+              OPENCLAW_MATRIX_TOKEN = {
+                valueFrom.secretKeyRef = {
+                  name = "openclaw-secrets";
+                  key = "OPENCLAW_MATRIX_TOKEN";
+                };
+              };
+              ELEVENLABS_API_KEY = {
+                valueFrom.secretKeyRef = {
+                  name = "openclaw-secrets";
+                  key = "ELEVENLABS_API_KEY";
+                };
+              };
+              GITHUB_TOKEN = {
+                valueFrom.secretKeyRef = {
+                  name = "openclaw-secrets";
+                  key = "GITHUB_TOKEN";
+                };
               };
             };
-            TS_HOSTNAME = "openclaw";
-            TS_USERSPACE = "false";
-            TS_STATE_DIR = "/var/lib/tailscale";
-            TS_ACCEPT_DNS = "false";
-            TS_AUTH_ONCE = "true";
-            TS_KUBE_SECRET = "";
+          };
+          containers.tailscale = {
+            image = {
+              repository = "tailscale/tailscale";
+              tag = "latest";
+            };
+            securityContext = {
+              runAsUser = 0;
+              runAsGroup = 0;
+              capabilities.add = [
+                "NET_ADMIN"
+                "NET_RAW"
+              ];
+            };
+            env = {
+              TS_AUTHKEY = {
+                valueFrom.secretKeyRef = {
+                  name = "openclaw-secrets";
+                  key = "TS_AUTHKEY";
+                };
+              };
+              TS_HOSTNAME = "openclaw";
+              TS_USERSPACE = "false";
+              TS_STATE_DIR = "/var/lib/tailscale";
+              TS_ACCEPT_DNS = "false";
+              TS_AUTH_ONCE = "true";
+              TS_KUBE_SECRET = "";
+            };
+          };
+          initContainers.preset-config = {
+            image = {
+              repository = "busybox";
+              tag = "latest";
+            };
+            securityContext = {
+              runAsUser = 0;
+              runAsGroup = 0;
+            };
+            command = [
+              "sh"
+              "-c"
+              "mkdir -p /home/node/.openclaw && cp /config/openclaw.json /home/node/.openclaw/openclaw.json && rm -rf /home/node/.openclaw/extensions /home/node/.config/openclaw/extensions"
+            ];
+          };
+          initContainers.install-tools = {
+            image = {
+              repository = "node";
+              tag = "22-slim";
+            };
+            securityContext = {
+              runAsUser = 0;
+              runAsGroup = 0;
+            };
+            command = [
+              "bash"
+              "-c"
+              ''
+                set -e
+                mkdir -p /home/node/.local/bin
+                chown -R 1000:1000 /home/node/.local
+
+                # Install curl, jq, git, python3-pip and other deps
+                apt-get update && apt-get install -y curl xz-utils jq git python3-pip
+
+                # Install requests library for Python in user directory
+                if [ ! -d /home/node/.local/lib/python3.*/site-packages/requests ]; then
+                  echo "Installing requests library..."
+                  pip3 install --user --no-cache-dir --break-system-packages requests
+                  echo "requests installed successfully"
+                else
+                  echo "requests already exists, skipping..."
+                fi
+
+                # Install ffmpeg
+                if [ ! -f /home/node/.local/bin/ffmpeg ]; then
+                  echo "Installing ffmpeg..."
+                  # Download from John Van Sickle (reliable static builds)
+                  curl -fsSL -o /tmp/ffmpeg.tar.xz "https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz"
+                  tar -xf /tmp/ffmpeg.tar.xz -C /tmp/
+                  # Find the ffmpeg binary in the extracted folder (it's usually in a subdirectory)
+                  find /tmp -name "ffmpeg" -type f -executable | head -1 | xargs -I {} cp {} /home/node/.local/bin/ffmpeg
+                  chmod +x /home/node/.local/bin/ffmpeg
+                  rm -rf /tmp/ffmpeg.tar.xz /tmp/ffmpeg*
+                  echo "ffmpeg installed successfully"
+                else
+                  echo "ffmpeg already exists, skipping..."
+                fi
+
+                # Install uv
+                if [ ! -f /home/node/.local/bin/uv ]; then
+                  echo "Installing uv..."
+                  curl -fsSL https://astral.sh/uv/install.sh | UV_INSTALL_DIR=/home/node/.local/bin sh
+                  echo "uv installed successfully"
+                else
+                  echo "uv already exists, skipping..."
+                fi
+
+                # Install Gemini CLI
+                if [ ! -f /home/node/.local/bin/gemini ]; then
+                  echo "Installing Gemini CLI..."
+                  # Install locally - npm creates lib/ inside prefix
+                  mkdir -p /home/node/.local/lib/node_modules
+                  npm install @google/gemini-cli --prefix /home/node/.local
+                  # Create symlink to the binary (npm puts it in prefix/lib/node_modules/.bin/)
+                  ln -sf /home/node/.local/lib/node_modules/.bin/gemini /home/node/.local/bin/gemini
+                  echo "Gemini CLI installed successfully"
+                else
+                  echo "Gemini CLI already exists, skipping..."
+                fi
+
+                # Install GitHub CLI (gh)
+                if [ ! -f /home/node/.local/bin/gh ]; then
+                  echo "Installing GitHub CLI..."
+                  # Download latest gh CLI release for Linux amd64
+                  curl -fsSL -o /tmp/gh.tar.gz "https://github.com/cli/cli/releases/latest/download/gh_$(curl -s https://api.github.com/repos/cli/cli/releases/latest | jq -r '.tag_name' | sed 's/v//')_linux_amd64.tar.gz"
+                  tar -xzf /tmp/gh.tar.gz -C /tmp/
+                  # Find and copy the gh binary
+                  find /tmp -name "gh" -type f -executable | head -1 | xargs -I {} cp {} /home/node/.local/bin/gh
+                  chmod +x /home/node/.local/bin/gh
+                  rm -rf /tmp/gh.tar.gz /tmp/gh_*
+                  echo "GitHub CLI installed successfully"
+                else
+                  echo "GitHub CLI already exists, skipping..."
+                fi
+
+                # Set ownership
+                chown -R 1000:1000 /home/node/.local
+                ls -la /home/node/.local/bin/
+                echo "All tools installed successfully!"
+              ''
+            ];
           };
         };
         persistence = {
@@ -395,109 +505,6 @@ in
             hostPath = "/dev/net/tun";
             advancedMounts.main.tailscale = [{ path = "/dev/net/tun"; }];
           };
-        };
-        controllers.main.initContainers.preset-config = {
-          image = {
-            repository = "busybox";
-            tag = "latest";
-          };
-          securityContext = {
-            runAsUser = 0;
-            runAsGroup = 0;
-          };
-          command = [
-            "sh"
-            "-c"
-            "mkdir -p /home/node/.openclaw && cp /config/openclaw.json /home/node/.openclaw/openclaw.json && rm -rf /home/node/.openclaw/extensions /home/node/.config/openclaw/extensions"
-          ];
-        };
-        controllers.main.initContainers.install-tools = {
-          image = {
-            repository = "node";
-            tag = "22-slim";
-          };
-          securityContext = {
-            runAsUser = 0;
-            runAsGroup = 0;
-          };
-          command = [
-            "bash"
-            "-c"
-            ''
-              set -e
-              mkdir -p /home/node/.local/bin
-              chown -R 1000:1000 /home/node/.local
-
-              # Install curl, jq, git, python3-pip and other deps
-              apt-get update && apt-get install -y curl xz-utils jq git python3-pip
-
-              # Install requests library for Python in user directory
-              if [ ! -d /home/node/.local/lib/python3.*/site-packages/requests ]; then
-                echo "Installing requests library..."
-                pip3 install --user --no-cache-dir --break-system-packages requests
-                echo "requests installed successfully"
-              else
-                echo "requests already exists, skipping..."
-              fi
-
-              # Install ffmpeg
-              if [ ! -f /home/node/.local/bin/ffmpeg ]; then
-                echo "Installing ffmpeg..."
-                # Download from John Van Sickle (reliable static builds)
-                curl -fsSL -o /tmp/ffmpeg.tar.xz "https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz"
-                tar -xf /tmp/ffmpeg.tar.xz -C /tmp/
-                # Find the ffmpeg binary in the extracted folder (it's usually in a subdirectory)
-                find /tmp -name "ffmpeg" -type f -executable | head -1 | xargs -I {} cp {} /home/node/.local/bin/ffmpeg
-                chmod +x /home/node/.local/bin/ffmpeg
-                rm -rf /tmp/ffmpeg.tar.xz /tmp/ffmpeg*
-                echo "ffmpeg installed successfully"
-              else
-                echo "ffmpeg already exists, skipping..."
-              fi
-
-              # Install uv
-              if [ ! -f /home/node/.local/bin/uv ]; then
-                echo "Installing uv..."
-                curl -fsSL https://astral.sh/uv/install.sh | UV_INSTALL_DIR=/home/node/.local/bin sh
-                echo "uv installed successfully"
-              else
-                echo "uv already exists, skipping..."
-              fi
-
-              # Install Gemini CLI
-              if [ ! -f /home/node/.local/bin/gemini ]; then
-                echo "Installing Gemini CLI..."
-                # Install locally - npm creates lib/ inside prefix
-                mkdir -p /home/node/.local/lib/node_modules
-                npm install @google/gemini-cli --prefix /home/node/.local
-                # Create symlink to the binary (npm puts it in prefix/lib/node_modules/.bin/)
-                ln -sf /home/node/.local/lib/node_modules/.bin/gemini /home/node/.local/bin/gemini
-                echo "Gemini CLI installed successfully"
-              else
-                echo "Gemini CLI already exists, skipping..."
-              fi
-
-              # Install GitHub CLI (gh)
-              if [ ! -f /home/node/.local/bin/gh ]; then
-                echo "Installing GitHub CLI..."
-                # Download latest gh CLI release for Linux amd64
-                curl -fsSL -o /tmp/gh.tar.gz "https://github.com/cli/cli/releases/latest/download/gh_$(curl -s https://api.github.com/repos/cli/cli/releases/latest | jq -r '.tag_name' | sed 's/v//')_linux_amd64.tar.gz"
-                tar -xzf /tmp/gh.tar.gz -C /tmp/
-                # Find and copy the gh binary
-                find /tmp -name "gh" -type f -executable | head -1 | xargs -I {} cp {} /home/node/.local/bin/gh
-                chmod +x /home/node/.local/bin/gh
-                rm -rf /tmp/gh.tar.gz /tmp/gh_*
-                echo "GitHub CLI installed successfully"
-              else
-                echo "GitHub CLI already exists, skipping..."
-              fi
-
-              # Set ownership
-              chown -R 1000:1000 /home/node/.local
-              ls -la /home/node/.local/bin/
-              echo "All tools installed successfully!"
-            ''
-          ];
         };
       };
     };

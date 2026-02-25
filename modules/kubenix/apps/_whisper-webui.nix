@@ -8,7 +8,7 @@ in
   submodules.instances.${app} = {
     submodule = "release";
     args = {
-      namespace = namespace;
+      inherit namespace;
       image = {
         repository = "ghcr.io/jhj0517/whisper-webui-backend";
         tag = "v1.0.7@sha256:4b4ebc76d5efe57247e1136bb857ed0f374a6b471e0d4d25ea42c3874e374160";

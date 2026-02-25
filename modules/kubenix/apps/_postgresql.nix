@@ -99,6 +99,7 @@ in
             };
           };
       };
+      };
     };
 
     resources.configMaps."postgresql-bootstrap" = {
@@ -149,5 +150,5 @@ in
       };
     };
 
-  }
-};
+  };
+}
