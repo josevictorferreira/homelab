@@ -8,7 +8,7 @@ in
     resources = {
       secrets."s3-credentials" = {
         metadata = {
-          namespace = namespace;
+          inherit namespace;
         };
         stringData = {
           "AWS_ACCESS_KEY_ID" = kubenix.lib.secretsFor "ceph_objectstore_access_key_id";

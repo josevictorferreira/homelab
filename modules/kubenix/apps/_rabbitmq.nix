@@ -20,10 +20,10 @@ in
       };
       includeCRDs = true;
       noHooks = true;
-      namespace = namespace;
+      inherit namespace;
 
       values = {
-        image = image;
+        inherit image;
 
         global.security.allowInsecureImages = true;
 
@@ -116,7 +116,7 @@ in
         metrics = {
           enabled = true;
           serviceMonitor = {
-            namespace = namespace;
+            inherit namespace;
             default.enabled = true;
           };
         };

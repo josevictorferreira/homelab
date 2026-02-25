@@ -36,7 +36,7 @@ in
       };
       includeCRDs = true;
       noHooks = true;
-      namespace = namespace;
+      inherit namespace;
       values = {
         image = qbtImage;
         qbitportforwardImage = {
@@ -197,9 +197,11 @@ in
               primary = true;
               enabeld = true;
               imageSelector = "qbitportforwardImage";
-              probes.liveness.enabled = false;
-              probes.readiness.enabled = false;
-              probes.startup.enabled = false;
+              probes = {
+                liveness.enabled = false;
+                readiness.enabled = false;
+                startup.enabled = false;
+              };
               env = {
                 QBT_ADDR = "http://localhost:8080";
                 GTN_ADDR = "http://localhost:8000";

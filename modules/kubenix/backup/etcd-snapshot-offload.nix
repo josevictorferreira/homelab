@@ -50,7 +50,7 @@ in
 {
   kubernetes.resources.cronJobs."etcd-snapshot-offload" = {
     metadata = {
-      namespace = namespace;
+      inherit namespace;
       labels."app.kubernetes.io/name" = "etcd-snapshot-offload";
     };
     spec = {

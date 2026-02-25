@@ -5,31 +5,30 @@
     (modulesPath + "/installer/cd-dvd/installation-cd-minimal.nix")
   ];
 
-  networking.hostName = "homelab-recovery";
-  time.timeZone = "America/Sao_Paulo";
-
-  networking.networkmanager.enable = false;
-
-  networking.useDHCP = false;
-  networking.interfaces.enp1s0 = {
-    mtu = 1500;
-    ipv4.addresses = [
-      {
-        address = "10.10.10.240";
-        prefixLength = 24;
-      }
-    ];
+  networking = {
+    hostName = "homelab-recovery";
+    networkmanager.enable = false;
     useDHCP = false;
+    interfaces.enp1s0 = {
+      mtu = 1500;
+      ipv4.addresses = [
+        {
+          address = "10.10.10.240";
+          prefixLength = 24;
+        }
+      ];
+      useDHCP = false;
+    };
+    defaultGateway = {
+      address = "10.10.10.1";
+      interface = "enp1s0";
+    };
+    nameservers = [
+      "1.1.1.1"
+      "8.8.8.8"
+    ];
+    firewall.enable = false;
   };
-  networking.defaultGateway = {
-    address = "10.10.10.1";
-    interface = "enp1s0";
-  };
-  networking.nameservers = [
-    "1.1.1.1"
-    "8.8.8.8"
-  ];
-  networking.firewall.enable = false;
 
   services.openssh = {
     enable = true;
