@@ -44,10 +44,20 @@ let
     nix eval --raw .#nodeGroupsList --read-only --quiet | tr ' ' '\n'
   '';
 
-  check = mkCommand "check" "Check if the flake is valid" [ pkgs.nix pkgs.git ] ''
+  check = mkCommand "check" "Check if the flake is valid (includes lint)" [ pkgs.nix pkgs.git ] ''
     git config core.hooksPath .githooks 2>/dev/null || true
+
+    # Run lint first
+    echo "=== Running lint checks ==="
+    if ! nix run .#lint --quiet 2>/dev/null; then
+      echo "Lint failed. Fix issues before running check."
+      exit 1
+    fi
+    echo ""
+
     # NOTE: `--all-systems` will fail without remote builders for other systems.
     # Opt-in via ALL_SYSTEMS=1.
+    echo "=== Running nix flake check ==="
     if [ "''${ALL_SYSTEMS:-}" = "1" ]; then
       nix flake check --show-trace --all-systems --impure
     else
@@ -56,28 +66,48 @@ let
   '';
 
   lint = mkCommand "lint" "Lint nix files (formatting + deadnix + statix)" [ pkgs.nix ] ''
-    echo "Running nix formatter check..."
+    ERRORS=0
+
+    echo "=== [1/4] Checking nix formatting (nixpkgs-fmt) ==="
     if nix fmt -- --check .; then
       echo "All files are properly formatted."
     else
       echo "Some files need formatting. Run 'make format' to fix."
-      exit 1
+      ERRORS=$((ERRORS + 1))
     fi
+    echo ""
 
-    echo "Running deadnix check..."
+    echo "=== [2/4] Running deadnix (unused code detection) ==="
     if nix run nixpkgs#deadnix . --fail; then
       echo "No deadnix issues found."
     else
       echo "Deadnix found unused variables. Fix them manually."
-      exit 1
+      ERRORS=$((ERRORS + 1))
     fi
+    echo ""
 
-    echo "Running statix check..."
+    echo "=== [3/4] Running statix (style linting) ==="
     if nix run nixpkgs#statix check .; then
       echo "No statix issues found."
     else
       echo "Statix found style issues. Fix them manually."
+      ERRORS=$((ERRORS + 1))
+    fi
+    echo ""
+
+    echo "=== [4/4] Checking with nixd (optional) ==="
+    if command -v nixd >/dev/null 2>&1; then
+      echo "nixd is available (language server running externally)."
+    else
+      echo "nixd not found (optional - install for IDE diagnostics)."
+    fi
+    echo ""
+
+    if [ "$ERRORS" -gt 0 ]; then
+      echo "Lint found issues ($ERRORS check(s) failed)."
       exit 1
+    else
+      echo "All lint checks passed!"
     fi
   '';
 

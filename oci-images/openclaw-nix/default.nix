@@ -1,9 +1,9 @@
-{
-  pkgs,
-  lib,
-  inputs,
-  system,
-  version ? "2026.2.23",
+{ pkgs
+, lib
+, inputs
+, system
+, version ? "2026.2.23"
+,
 }:
 
 let
@@ -80,7 +80,6 @@ let
       });
 
   inherit (import ./matrix-deps.nix { inherit pkgs lib; }) matrixPluginDeps;
-  inherit (import ./main-deps.nix { inherit pkgs lib; }) prismMedia;
   matrixCryptoNative = pkgs.fetchurl {
     url = "https://github.com/matrix-org/matrix-rust-sdk-crypto-nodejs/releases/download/v0.4.0/matrix-sdk-crypto.linux-x64-gnu.node";
     sha256 = "sha256-cHjU3ZhxKPea/RksT2IfZK3s435D8qh1bx0KnwNN5xg=";
@@ -91,7 +90,7 @@ let
 
   openclawRootfs = pkgs.runCommand "openclaw-rootfs" { } ''
     mkdir -p $out/bin
-    for pkg in ${pkgs.curl} ${pkgs.jq} ${pkgs.gnused} ${pkgs.git} ${pkgs.python3} ${pkgs.uv} ${pkgs.ffmpeg-headless} ${pkgs.github-cli} ${pkgs.gemini-cli} ${pkgs.nodejs_22} ${pkgs.procps} ${openclawGateway}; do
+    for pkg in ${pkgs.curl} ${pkgs.jq} ${pkgs.gnused} ${pkgs.git} ${pkgs.python3} ${pkgs.uv} ${pkgs.ffmpeg-headless} ${pkgs.github-cli} ${pkgs.gemini-cli} ${pkgs.nodejs_22} ${pkgs.procps} ${openclawGateway} ${pkgs.gnugrep} ${pkgs.gawk} ${pkgs.findutils} ${pkgs.which} ${pkgs.tree} ${pkgs.ripgrep} ${pkgs.file} ${pkgs.wget} ${pkgs.diffutils} ${pkgs.gnutar} ${pkgs.gzip} ${pkgs.less} ${pkgs.openssh} ${pkgs.rsync}; do
       if [ -d "$pkg/bin" ]; then cp -rsf "$pkg/bin"/* $out/bin/ 2>/dev/null || true; fi
     done
     mkdir -p $out/lib
