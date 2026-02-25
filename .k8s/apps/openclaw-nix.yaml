@@ -122,6 +122,9 @@ spec:
               subPath: config-template.json
             - mountPath: /logs
               name: logs
+            - mountPath: /home/node/.openclaw
+              name: openclaw-data
+              subPath: openclaw
             - mountPath: /config
               name: scratch-config
             - mountPath: /home/node/shared
@@ -182,26 +185,6 @@ spec:
       hostPID: false
       imagePullSecrets:
         - name: ghcr-registry-secret
-      initContainers:
-        - command:
-            - sh
-            - -c
-            - "mkdir -p /home/node\n# Create .openclaw as a symlink to shared/openclaw\n\
-              if [ ! -L /home/node/.openclaw ]; then\n  ln -sf /home/node/shared/openclaw\
-              \ /home/node/.openclaw\nfi\n# Ensure the target directory exists\nmkdir\
-              \ -p /home/node/shared/openclaw\n"
-          image: busybox:latest
-          name: create-openclaw-symlink
-          securityContext:
-            runAsGroup: 0
-            runAsUser: 0
-          volumeMounts:
-            - mountPath: /etc/openclaw/config-template.json
-              name: config
-              readOnly: true
-              subPath: config-template.json
-            - mountPath: /home/node/shared
-              name: shared-storage
       serviceAccountName: openclaw-nix
       volumes:
         - configMap:
@@ -216,6 +199,9 @@ spec:
         - name: logs
           persistentVolumeClaim:
             claimName: openclaw-nix-logs
+        - name: openclaw-data
+          persistentVolumeClaim:
+            claimName: cephfs-shared-storage-root
         - emptyDir: {}
           name: scratch-config
         - name: shared-storage
