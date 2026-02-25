@@ -232,12 +232,22 @@
 **Context:** OpenClaw v2026.2.22+ needs rolldown for `canvas:a2ui:bundle`. `pnpm dlx rolldown` fails in sandbox. `bundle-a2ui.sh` checks `command -v rolldown` first — providing the binary in PATH avoids network entirely. Pattern: `fetchurl` 4 tarballs → assemble `node_modules` tree → `makeWrapper` for CLI.
 **Verify:** `nix build .#openclaw-nix-image` succeeds; check logs for `canvas:a2ui:bundle` completing without `pnpm dlx`
 
-### Verify Image Push with podman Directly
-**Lesson:** After `make push-openclaw`, verify the pushed image version with `podman run --rm --entrypoint "" <image> node -e "console.log(require('/lib/openclaw/package.json').version)"`. If version mismatch, push manually: `podman tag localhost/<image>:<tag> ghcr.io/.../<image>:latest && podman push ghcr.io/.../<image>:latest`.
-**Context:** The stream-based `make push-openclaw` can silently push a stale cached image. Manual `podman tag` + `podman push` is more reliable for verification.
-**Verify:** `kubectl exec -n apps <pod> -c main -- node -e "console.log(require('/lib/openclaw/package.json').version)"` shows expected version after deploy
+### Verify Image Push — `make push-openclaw` Has Tag Mismatch
+**Lesson:** `make push-openclaw` tags `localhost/openclaw-nix:dev` but the stream creates `:v{version}`. This silently pushes a STALE `:dev` image. Always push manually: `podman tag localhost/openclaw-nix:v{VERSION} ghcr.io/.../openclaw-nix:latest && podman push ghcr.io/.../openclaw-nix:latest`.
+**Context:** The tag mismatch in `modules/commands.nix` (`LOCAL_TAG = ...dev`) means `podman tag` targets a non-existent or old image. All verification passes locally but the cluster pulls the wrong image.
+**Verify:** After push: `podman images | grep openclaw` — confirm GHCR tag's IMAGE ID matches the `:v{VERSION}` tag, not `:dev`
 
 ### Use Named let Bindings Not srcs for Multi-Tarball Derivations
 **Lesson:** In `mkDerivation`, don't use `srcs = [...]` + `builtins.elemAt srcs N` in build scripts. Instead, define each `fetchurl` as a named `let` binding and reference it directly in shell via `${tgzName}` interpolation.
 **Context:** `builtins.elemAt` is a Nix-level function, not available in bash. `srcs` is auto-unpacked. Named bindings give you stable references: `tar xzf ${rolldownTgz} -C $out/...`.
 **Verify:** `nix eval` the derivation successfully; no `undefined variable` errors
+
+### streamLayeredImage: Use extraCommands to Merge /bin/ Across Contents
+**Lesson:** `streamLayeredImage` `contents` entries that both provide `/bin/` don't merge — Docker overlay layers mean last writer wins. Use `pkgs.buildEnv` for all CLI tools + `extraCommands` to symlink `${buildEnv}/bin/*` into `./bin/`. The `buildEnv` must be in `contents` so its closure is included.
+**Context:** Spent 60+ min debugging "missing tools" that were in the image's nix store but not in `/bin/`. The customization layer (from `extraCommands`) sits on top and reliably provides symlinks.
+**Verify:** `tar tf /nix/store/*-customisation-layer/layer.tar | grep './bin/grep'` shows symlink in top layer
+
+### Don't Remove App Binaries When Refactoring Image /bin/
+**Lesson:** When refactoring OCI image `/bin/` construction (e.g., moving tools to `buildEnv`), ensure the main app binary (`openclaw`) is still explicitly added to rootfs `/bin/` via symlink or copy.
+**Context:** Moving all packages to `buildEnv` and removing the rootfs bin loop also removed the `openclaw` binary, causing `exec: openclaw: not found` crash.
+**Verify:** `podman run --rm --entrypoint '' <image> which openclaw` returns a path before pushing
