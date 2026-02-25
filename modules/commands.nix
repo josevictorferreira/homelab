@@ -78,7 +78,7 @@ let
     echo ""
 
     echo "=== [2/4] Running deadnix (unused code detection) ==="
-    if nix run nixpkgs#deadnix . --fail; then
+    if nix run nixpkgs#deadnix -- . --fail; then
       echo "No deadnix issues found."
     else
       echo "Deadnix found unused variables. Fix them manually."

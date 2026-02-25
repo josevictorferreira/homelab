@@ -98,7 +98,7 @@ in
               ephemeral-storage = "50Mi";
             };
           };
-      };
+        };
       };
     };
 
