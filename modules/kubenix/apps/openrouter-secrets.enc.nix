@@ -8,7 +8,7 @@ in
     resources = {
       secrets."openrouter-secrets" = {
         metadata = {
-          namespace = namespace;
+          inherit namespace;
         };
         stringData = {
           "OPENROUTER_MODEL" = "qwen/qwen3-next-80b-a3b-instruct";

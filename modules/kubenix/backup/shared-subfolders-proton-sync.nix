@@ -114,123 +114,125 @@ let
     '';
 in
 {
-  kubernetes.resources.cronJobs."shared-subfolders-proton-sync" = {
-    metadata = {
-      name = "shared-subfolders-proton-sync";
-      namespace = namespace;
-    };
-    spec = {
-      schedule = "0 3 * * *"; # 3 AM daily (after minio backup at 1 AM)
-      timeZone = "America/Sao_Paulo";
-      concurrencyPolicy = "Forbid";
-      successfulJobsHistoryLimit = 3;
-      failedJobsHistoryLimit = 3;
-      jobTemplate.spec = {
-        backoffLimit = 2;
-        activeDeadlineSeconds = 3600; # 1 hour timeout
-        template.spec = {
-          restartPolicy = "OnFailure";
-          imagePullSecrets = [ { name = "ghcr-registry-secret"; } ];
-          containers = [
-            {
-              name = "proton-sync";
-              inherit image;
-              command = [
-                "bash"
-                "-c"
-              ];
-              args = [ backupScript ];
-              env = [
-                {
-                  name = "PROTON_DEST_PATH";
-                  value = protonDestPath;
-                }
-                {
-                  name = "PROTON_USERNAME";
-                  valueFrom.secretKeyRef = {
-                    name = "shared-subfolders-proton-sync-config";
-                    key = "PROTON_USERNAME";
+  kubernetes.resources = {
+    cronJobs."shared-subfolders-proton-sync" = {
+      metadata = {
+        name = "shared-subfolders-proton-sync";
+        inherit namespace;
+      };
+      spec = {
+        schedule = "0 3 * * *"; # 3 AM daily (after minio backup at 1 AM)
+        timeZone = "America/Sao_Paulo";
+        concurrencyPolicy = "Forbid";
+        successfulJobsHistoryLimit = 3;
+        failedJobsHistoryLimit = 3;
+        jobTemplate.spec = {
+          backoffLimit = 2;
+          activeDeadlineSeconds = 3600; # 1 hour timeout
+          template.spec = {
+            restartPolicy = "OnFailure";
+            imagePullSecrets = [ { name = "ghcr-registry-secret"; } ];
+            containers = [
+              {
+                name = "proton-sync";
+                inherit image;
+                command = [
+                  "bash"
+                  "-c"
+                ];
+                args = [ backupScript ];
+                env = [
+                  {
+                    name = "PROTON_DEST_PATH";
+                    value = protonDestPath;
+                  }
+                  {
+                    name = "PROTON_USERNAME";
+                    valueFrom.secretKeyRef = {
+                      name = "shared-subfolders-proton-sync-config";
+                      key = "PROTON_USERNAME";
+                    };
+                  }
+                  {
+                    name = "PROTON_PASSWORD";
+                    valueFrom.secretKeyRef = {
+                      name = "shared-subfolders-proton-sync-config";
+                      key = "PROTON_PASSWORD";
+                    };
+                  }
+                ];
+                resources = {
+                  requests = {
+                    cpu = "100m";
+                    memory = "256Mi";
+                    ephemeral-storage = "1Gi";
                   };
-                }
-                {
-                  name = "PROTON_PASSWORD";
-                  valueFrom.secretKeyRef = {
-                    name = "shared-subfolders-proton-sync-config";
-                    key = "PROTON_PASSWORD";
+                  limits = {
+                    cpu = "1000m";
+                    memory = "1Gi";
+                    ephemeral-storage = "5Gi";
                   };
-                }
-              ];
-              resources = {
-                requests = {
-                  cpu = "100m";
-                  memory = "256Mi";
-                  ephemeral-storage = "1Gi";
                 };
-                limits = {
-                  cpu = "1000m";
-                  memory = "1Gi";
-                  ephemeral-storage = "5Gi";
-                };
-              };
-              volumeMounts = [
-                {
-                  name = "shared-storage";
-                  mountPath = "/shared";
-                  readOnly = true;
-                }
-                {
-                  name = "proton-config";
-                  mountPath = "/root/.config/rclone";
-                }
-                {
-                  name = "proton-cache";
-                  mountPath = "/root/.cache/rclone";
-                }
-              ];
-            }
-          ];
-          volumes = [
-            {
-              name = "shared-storage";
-              persistentVolumeClaim.claimName = "cephfs-shared-storage-root";
-            }
-            {
-              name = "proton-config";
-              persistentVolumeClaim.claimName = "shared-subfolders-proton-sync-config";
-            }
-            {
-              name = "proton-cache";
-              persistentVolumeClaim.claimName = "shared-subfolders-proton-sync-state";
-            }
-          ];
+                volumeMounts = [
+                  {
+                    name = "shared-storage";
+                    mountPath = "/shared";
+                    readOnly = true;
+                  }
+                  {
+                    name = "proton-config";
+                    mountPath = "/root/.config/rclone";
+                  }
+                  {
+                    name = "proton-cache";
+                    mountPath = "/root/.cache/rclone";
+                  }
+                ];
+              }
+            ];
+            volumes = [
+              {
+                name = "shared-storage";
+                persistentVolumeClaim.claimName = "cephfs-shared-storage-root";
+              }
+              {
+                name = "proton-config";
+                persistentVolumeClaim.claimName = "shared-subfolders-proton-sync-config";
+              }
+              {
+                name = "proton-cache";
+                persistentVolumeClaim.claimName = "shared-subfolders-proton-sync-state";
+              }
+            ];
+          };
         };
       };
     };
-  };
 
-  # PVC for Proton Drive config (persistent auth credentials)
-  kubernetes.resources.persistentVolumeClaims."shared-subfolders-proton-sync-config" = {
-    metadata = {
-      name = "shared-subfolders-proton-sync-config";
-      namespace = namespace;
+    # PVC for Proton Drive config (persistent auth credentials)
+    persistentVolumeClaims."shared-subfolders-proton-sync-config" = {
+      metadata = {
+        name = "shared-subfolders-proton-sync-config";
+        inherit namespace;
+      };
+      spec = {
+        accessModes = [ "ReadWriteOnce" ];
+        resources.requests.storage = "1Gi";
+        storageClassName = "rook-ceph-block";
+      };
     };
-    spec = {
-      accessModes = [ "ReadWriteOnce" ];
-      resources.requests.storage = "1Gi";
-      storageClassName = "rook-ceph-block";
-    };
-  };
 
-  # PVC for Proton Drive state (cache, logs)
-  kubernetes.resources.persistentVolumeClaims."shared-subfolders-proton-sync-state" = {
-    metadata = {
-      name = "shared-subfolders-proton-sync-state";
-      namespace = namespace;
-    };
-    spec = {
-      accessModes = [ "ReadWriteOnce" ];
-      resources.requests.storage = "5Gi";
-      storageClassName = "rook-ceph-block" ;
+    # PVC for Proton Drive state (cache, logs)
+    persistentVolumeClaims."shared-subfolders-proton-sync-state" = {
+      metadata = {
+        name = "shared-subfolders-proton-sync-state";
+        inherit namespace;
+      };
+      spec = {
+        accessModes = [ "ReadWriteOnce" ];
+        resources.requests.storage = "5Gi";
+        storageClassName = "rook-ceph-block";
+      };
     };
   };
 }

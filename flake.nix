@@ -20,7 +20,7 @@
     let
       currentSystem = builtins.currentSystem or "x86_64-linux";
 
-      lib = nixpkgs.lib;
+      inherit (nixpkgs) lib;
 
       pkgs = import nixpkgs { system = currentSystem; };
 
@@ -34,7 +34,7 @@
         };
       };
 
-      homelab = homelabEval.config.homelab;
+      inherit (homelabEval.config) homelab;
 
       kubenixModule = import ./modules/kubenix {
         inherit
@@ -48,7 +48,7 @@
       mkHost =
         hostName:
         lib.nixosSystem {
-          system = homelab.nodes.hosts.${hostName}.system;
+          inherit (homelab.nodes.hosts.${hostName}) system;
           specialArgs = {
             hostConfig = homelab.nodes.hosts.${hostName};
             inherit
@@ -109,13 +109,11 @@
 
       nodeGroupsList = builtins.concatStringsSep "\n" homelab.nodes.groups;
 
-      deployGroups = (
-        builtins.mapAttrs
+      deployGroups = builtins.mapAttrs
           (
             _: values: (builtins.concatStringsSep " " (builtins.map (v: "--targets='.#${v}'") values.names))
           )
-          homelab.nodes.group
-      );
+          homelab.nodes.group;
 
       checks = lib.optionalAttrs (lib.hasAttr currentSystem deploy-rs.lib) {
         ${currentSystem} = deploy-rs.lib.${currentSystem}.deployChecks {

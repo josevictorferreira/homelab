@@ -7,7 +7,7 @@
 }:
 
 let
-  dockerTools = pkgs.dockerTools;
+  inherit (pkgs) dockerTools;
 
   # Source info — change version param to upgrade
   sourceInfo = {
@@ -73,14 +73,14 @@ let
   openclawGateway =
     (openclawPkgs.openclaw-gateway.override {
       inherit sourceInfo;
-      pnpmDepsHash = sourceInfo.pnpmDepsHash;
+      inherit (sourceInfo) pnpmDepsHash;
     }).overrideAttrs
       (old: {
         nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ rolldown ];
       });
 
-  matrixPluginDeps = (import ./matrix-deps.nix { inherit pkgs lib; }).matrixPluginDeps;
-  prismMedia = (import ./main-deps.nix { inherit pkgs lib; }).prismMedia;
+  inherit (import ./matrix-deps.nix { inherit pkgs lib; }) matrixPluginDeps;
+  inherit (import ./main-deps.nix { inherit pkgs lib; }) prismMedia;
   matrixCryptoNative = pkgs.fetchurl {
     url = "https://github.com/matrix-org/matrix-rust-sdk-crypto-nodejs/releases/download/v0.4.0/matrix-sdk-crypto.linux-x64-gnu.node";
     sha256 = "sha256-cHjU3ZhxKPea/RksT2IfZK3s435D8qh1bx0KnwNN5xg=";

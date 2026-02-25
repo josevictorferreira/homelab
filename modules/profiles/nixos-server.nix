@@ -18,36 +18,38 @@ in
   config = lib.mkIf cfg.enable {
     nixDefaults.enable = true;
     locale = {
-      timeZone = homelab.timeZone;
+      inherit (homelab) timeZone;
       enable = true;
     };
-    networking.firewall.enable = false;
+    networking = {
+      firewall.enable = false;
+      inherit hostName;
+      inherit (homelab) domain;
+      fqdn = "${hostName}.${homelab.domain}";
+      hostId = lib.mkDefault
+        (builtins.substring 0 8 (builtins.hashString "sha1" hostName));
 
-    networking.hostName = hostName;
-    networking.domain = homelab.domain;
-    networking.fqdn = "${hostName}.${homelab.domain}";
-    networking.hostId = lib.mkDefault
-      (builtins.substring 0 8 (builtins.hashString "sha1" hostName));
-
-    networking.staticIP = {
-      enable = true;
-      interface = homelab.nodes.hosts.${hostName}.interface;
-      address = homelab.nodes.hosts.${hostName}.ipAddress;
-      prefixLength = 24;
-      gateway = homelab.gateway;
-      nameservers = [ homelab.kubernetes.loadBalancer.services.blocky ] ++ homelab.dnsServers;
+      staticIP = {
+        enable = true;
+        inherit (homelab.nodes.hosts.${hostName}) interface;
+        address = homelab.nodes.hosts.${hostName}.ipAddress;
+        prefixLength = 24;
+        inherit (homelab) gateway;
+        nameservers = [ homelab.kubernetes.loadBalancer.services.blocky ] ++ homelab.dnsServers;
+      };
     };
 
-    services.earlyoom.enable = true;
+    services = {
+      earlyoom.enable = true;
 
-    services.journald.extraConfig = ''
-      SystemMaxUse=100M
-      SystemMaxFileSize=50M
-      MaxRetentionSec=7day
-    '';
+      journald.extraConfig = ''
+        SystemMaxUse=100M
+        SystemMaxFileSize=50M
+        MaxRetentionSec=7day
+      '';
 
-    boot.supportedFilesystems = [ "nfs" ];
-    services.rpcbind.enable = true;
+      rpcbind.enable = true;
+    };
 
     zramSwap = {
       enable = true;

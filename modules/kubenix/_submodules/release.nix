@@ -142,7 +142,7 @@ in
                   persistence.main = cfg.persistence;
                   controllers.main.replicas = cfg.replicas;
                   controllers.main.containers.main = {
-                    image = cfg.image;
+                    inherit (cfg) image;
                     ports = [
                       {
                         name = "http";
@@ -155,10 +155,10 @@ in
                     envFrom = [{ secretRef.name = cfg.secretName; }];
                   }
                   // optionalAttrs (cfg.resources != null) {
-                    resources = cfg.resources;
+                    inherit (cfg) resources;
                   }
                   // optionalAttrs (cfg.command != null) {
-                    command = cfg.command;
+                    inherit (cfg) command;
                   };
                   service.main = {
                     type = "LoadBalancer";
@@ -166,7 +166,7 @@ in
                     ports = {
                       http = {
                         enabled = true;
-                        port = cfg.port;
+                        inherit (cfg) port;
                       };
                     };
                   };

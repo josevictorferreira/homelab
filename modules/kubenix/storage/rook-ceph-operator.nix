@@ -32,11 +32,13 @@ in
       noHooks = false;
       values = {
         crds.enabled = true;
-        csi.cephFSAttachRequired = true;
-        csi.csiRBDPluginVolume = [ libModulesVolume hostNixVolume ];
-        csi.csiRBDPluginVolumeMount = [ hostNixMount ];
-        csi.csiCephFSPluginVolume = [ libModulesVolume hostNixVolume ];
-        csi.csiCephFSPluginVolumeMount = [ hostNixMount ];
+        csi = {
+          cephFSAttachRequired = true;
+          csiRBDPluginVolume = [ libModulesVolume hostNixVolume ];
+          csiRBDPluginVolumeMount = [ hostNixMount ];
+          csiCephFSPluginVolume = [ libModulesVolume hostNixVolume ];
+          csiCephFSPluginVolumeMount = [ hostNixMount ];
+        };
       };
     };
   };

@@ -1,4 +1,10 @@
-{ lib, config, pkgs, homelab, ... }:
+{
+  lib,
+  config,
+  pkgs,
+  homelab,
+  ...
+}:
 
 let
   cfg = config.profiles."k8s-server";
@@ -75,30 +81,35 @@ in
       "fs.inotify.max_user_watches" = 524288;
     };
 
-    networking.enableIPv6 = true;
-    networking.nat = {
-      enable = true;
+    networking = {
       enableIPv6 = true;
+      nat = {
+        enable = true;
+        enableIPv6 = true;
+      };
+      firewall = {
+        trustedInterfaces = [
+          "cilium_host"
+          "cilium_net"
+        ];
+        allowedTCPPorts = [
+          443
+          2379
+          2380
+          4240
+          6443
+          6444
+          8472
+          10250
+          2049 # # NFS
+        ];
+        allowedUDPPorts = [
+          2049 # # NFS
+          8472
+          51820
+          51821
+        ];
+      };
     };
-
-    networking.firewall.trustedInterfaces = [ "cilium_host" "cilium_net" ];
-
-    networking.firewall.allowedTCPPorts = [
-      443
-      2379
-      2380
-      4240
-      6443
-      6444
-      8472
-      10250
-      2049 ## NFS
-    ];
-    networking.firewall.allowedUDPPorts = [
-      2049 ## NFS
-      8472
-      51820
-      51821
-    ];
   };
 }

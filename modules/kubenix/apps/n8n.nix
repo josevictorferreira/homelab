@@ -111,7 +111,7 @@ in
         inherit namespace;
       };
       spec = {
-        bucketName = bucketName;
+        inherit bucketName;
         storageClassName = "rook-ceph-objectstore";
       };
     };

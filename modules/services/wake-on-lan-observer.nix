@@ -33,7 +33,7 @@ in
   options.services.wakeOnLanObserver = {
     enable = lib.mkEnableOption "Enable Wake-on-LAN observer service";
     machines = lib.mkOption {
-      type = lib.types.listOf (lib.types.attrs);
+      type = lib.types.listOf lib.types.attrs;
       default = [ ];
       description = "List of machines to monitor for Wake-on-LAN. Each machine should have a name, IP address, and MAC address.";
     };

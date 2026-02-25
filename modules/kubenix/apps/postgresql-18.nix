@@ -36,9 +36,9 @@ in
       };
       includeCRDs = true;
       noHooks = true;
-      namespace = namespace;
+      inherit namespace;
       values = {
-        image = image;
+        inherit image;
 
         postgresqlSharedPreloadLibraries = "vchord.so";
 
@@ -54,56 +54,57 @@ in
           };
         };
 
-        primary.persistence = {
-          enabled = true;
-          storageClass = "rook-ceph-block";
-          reclaimPolicy = "Retain";
-          accessModes = [ "ReadWriteOnce" ];
-        };
-        primary.service = kubenix.lib.plainServiceFor "postgresql-18";
-        primary.initdb.args = "--data-checksums";
-        primary.extendedConfiguration = ''
-          shared_preload_libraries = 'vchord.so'
-          search_path = '"$user", public, vectors'
-          logging_collector = on
-          max_wal_size = 2GB
-          min_wal_size = '512MB'
-          shared_buffers = 512MB
-          wal_buffers = '32MB'
-          wal_compression = on
-          wal_keep_size = '512MB'
-          checkpoint_timeout = '30min'
-          checkpoint_completion_target = 0.9
-          effective_cache_size = '10GB'
-          work_mem = '64MB'
-          maintenance_work_mem = '2GB'
-          synchronous_commit = off
-          autovacuum_max_workers = 5
-          autovacuum_naptime = '10s'
-          autovacuum_vacuum_cost_delay = '10ms'
-          autovacuum_vacuum_cost_limit = 2000
-          log_min_duration_statement = 2000
-          log_checkpoints = on
-        '';
-        primary.resources = {
-          limits = {
-            cpu = "150m";
-            memory = "1Gi";
-            ephemeral-storage = "1Gi";
+        primary = {
+          persistence = {
+            enabled = true;
+            storageClass = "rook-ceph-block";
+            reclaimPolicy = "Retain";
+            accessModes = [ "ReadWriteOnce" ];
           };
-          requests = {
-            cpu = "50m";
-            memory = "128Mi";
-            ephemeral-storage = "50Mi";
+          service = kubenix.lib.plainServiceFor "postgresql-18";
+          initdb.args = "--data-checksums";
+          extendedConfiguration = ''
+            shared_preload_libraries = 'vchord.so'
+            search_path = '"$user", public, vectors'
+            logging_collector = on
+            max_wal_size = 2GB
+            min_wal_size = '512MB'
+            shared_buffers = 512MB
+            wal_buffers = '32MB'
+            wal_compression = on
+            wal_keep_size = '512MB'
+            checkpoint_timeout = '30min'
+            checkpoint_completion_target = 0.9
+            effective_cache_size = '10GB'
+            work_mem = '64MB'
+            maintenance_work_mem = '2GB'
+            synchronous_commit = off
+            autovacuum_max_workers = 5
+            autovacuum_naptime = '10s'
+            autovacuum_vacuum_cost_delay = '10ms'
+            autovacuum_vacuum_cost_limit = 2000
+            log_min_duration_statement = 2000
+            log_checkpoints = on
+          '';
+          resources = {
+            limits = {
+              cpu = "150m";
+              memory = "1Gi";
+              ephemeral-storage = "1Gi";
+            };
+            requests = {
+              cpu = "50m";
+              memory = "128Mi";
+              ephemeral-storage = "50Mi";
+            };
           };
         };
       };
     };
-
     resources.configMaps."postgresql-18-bootstrap" = {
       metadata = {
         name = "postgresql-18-bootstrap";
-        namespace = namespace;
+        inherit namespace;
       };
       data = {
         databases = createDbCommands;
@@ -113,7 +114,7 @@ in
     resources.jobs."${jobName}" = {
       metadata = {
         name = jobName;
-        namespace = namespace;
+        inherit namespace;
       };
       spec.template = {
         metadata.annotations."checksum/config" = configChecksum;
