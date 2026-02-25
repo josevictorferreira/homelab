@@ -11,7 +11,7 @@ in
         metadata = { inherit namespace; };
       };
       clusterRoles."openclaw-cluster-admin" = {
-        
+
         rules = [
           {
             apiGroups = [ "*" ];
@@ -25,7 +25,7 @@ in
         ];
       };
       clusterRoleBindings."openclaw-cluster-admin" = {
-        
+
         roleRef = {
           apiGroup = "rbac.authorization.k8s.io";
           kind = "ClusterRole";

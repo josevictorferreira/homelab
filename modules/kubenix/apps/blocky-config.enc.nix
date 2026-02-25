@@ -10,7 +10,7 @@ let
   dnsHosts = lib.mapAttrsToList
     (
       serviceName: _ipAddress:
-      "${kubenix.lib.domainFor serviceName} = ${homelab.kubernetes.loadBalancer.address}"
+        "${kubenix.lib.domainFor serviceName} = ${homelab.kubernetes.loadBalancer.address}"
     )
     homelab.kubernetes.loadBalancer.services;
 
