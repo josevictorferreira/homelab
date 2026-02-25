@@ -89,7 +89,7 @@ spec:
             - name: OPENCLAW_CONFIG_PATH
               value: /config/openclaw.json
             - name: OPENCLAW_DATA_DIR
-              value: /state/openclaw
+              value: /home/node/.openclaw
             - name: OPENCLAW_MATRIX_TOKEN
               valueFrom:
                 secretKeyRef:
