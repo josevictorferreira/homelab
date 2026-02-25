@@ -14,7 +14,7 @@ in
           sha256 = "sha256-q56T7iEqKm60iEhgeuLVhEKhaDpR8DebjW8+/gphN5Q=";
         };
       includeCRDs = true;
-      namespace = namespace;
+      inherit namespace;
       noHooks = true;
       values = {
         namespaceOverride = namespace;
@@ -22,10 +22,12 @@ in
         kubeProxy.enabled = false;
         grafana = {
           enabled = true;
-          sidecar.dashboards.enabled = true;
-          sidecar.datasources.enabled = true;
-          sidecar.alerts.enabled = true;
-          namespace = namespace;
+          sidecar = {
+            dashboards.enabled = true;
+            datasources.enabled = true;
+            alerts.enabled = true;
+          };
+          inherit namespace;
           persistence = {
             enabled = true;
             type = "pvc";
@@ -68,25 +70,11 @@ in
       };
     };
     resources = {
-      services."kube-prometheus-stack-coredns" = {
-        metadata = {
-          namespace = lib.mkForce "kube-system";
-        };
-      };
-      services."kube-prometheus-stack-kube-etcd" = {
-        metadata = {
-          namespace = lib.mkForce "kube-system";
-        };
-      };
-      services."kube-prometheus-stack-kube-scheduler" = {
-        metadata = {
-          namespace = lib.mkForce "kube-system";
-        };
-      };
-      services."kube-prometheus-stack-kube-controller-manager" = {
-        metadata = {
-          namespace = lib.mkForce "kube-system";
-        };
+      services = {
+        "kube-prometheus-stack-coredns" = { metadata.namespace = lib.mkForce "kube-system"; };
+        "kube-prometheus-stack-kube-etcd" = { metadata.namespace = lib.mkForce "kube-system"; };
+        "kube-prometheus-stack-kube-scheduler" = { metadata.namespace = lib.mkForce "kube-system"; };
+        "kube-prometheus-stack-kube-controller-manager" = { metadata.namespace = lib.mkForce "kube-system"; };
       };
     };
   };

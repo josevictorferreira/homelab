@@ -17,7 +17,7 @@ in
       };
       includeCRDs = true;
       noHooks = true;
-      namespace = namespace;
+      inherit namespace;
 
       values = {
         controllers.main.containers.main = {
@@ -48,9 +48,11 @@ in
           enabled = true;
 
           controllers.main.containers.main = {
-            image.repository = "ghcr.io/immich-app/immich-machine-learning";
-            image.tag = "v2.5.2@sha256:531d2bccbe20d0412496e36455715a18d692911eca5e2ee37d32e1e4f50e14bb";
-            image.pullPolicy = "IfNotPresent";
+            image = {
+              repository = "ghcr.io/immich-app/immich-machine-learning";
+              tag = "v2.5.2@sha256:531d2bccbe20d0412496e36455715a18d692911eca5e2ee37d32e1e4f50e14bb";
+              pullPolicy = "IfNotPresent";
+            };
           };
 
           env.TRANSFORMERS_CACHE = "/cache";
@@ -67,9 +69,11 @@ in
         server = {
           enabled = true;
           controllers.main.containers.main = {
-            image.repository = "ghcr.io/immich-app/immich-server";
-            image.tag = "v2.5.2@sha256:8ac5a6d471fbb6fcfec6bc34854dd5a947c1795547f0d9345d9bf1803d1209e3";
-            image.pullPolicy = "IfNotPresent";
+            image = {
+              repository = "ghcr.io/immich-app/immich-server";
+              tag = "v2.5.2@sha256:8ac5a6d471fbb6fcfec6bc34854dd5a947c1795547f0d9345d9bf1803d1209e3";
+              pullPolicy = "IfNotPresent";
+            };
           };
 
           service.main = {

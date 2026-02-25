@@ -9,7 +9,7 @@ in
       secrets."ntfy-secrets" = {
         type = "Opaque";
         metadata = {
-          namespace = namespace;
+          inherit namespace;
         };
         stringData = {
           "publicKey" = kubenix.lib.secretsFor "vapid_public_key";

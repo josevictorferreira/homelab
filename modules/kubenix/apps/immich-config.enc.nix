@@ -8,7 +8,7 @@ in
     resources = {
       secrets."immich-secret" = {
         metadata = {
-          namespace = namespace;
+          inherit namespace;
         };
         stringData = {
           REDIS_URL = "ioredis://${kubenix.lib.secretsFor "redis_config_b64"}";

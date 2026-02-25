@@ -8,7 +8,7 @@ in
     resources = {
       secrets."alarm-server-config" = {
         metadata = {
-          namespace = namespace;
+          inherit namespace;
         };
         type = "Opaque";
         stringData = {

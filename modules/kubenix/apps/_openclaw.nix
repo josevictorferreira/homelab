@@ -5,45 +5,46 @@ let
 in
 {
   # RBAC: full cluster access for OpenClaw pod
-  kubernetes.resources.serviceAccounts.openclaw = {
-    metadata.namespace = namespace;
-  };
-
-  kubernetes.resources.clusterRoles.openclaw-cluster-admin = {
-    metadata = { };
-    rules = [
-      {
-        apiGroups = [ "*" ];
-        resources = [ "*" ];
-        verbs = [ "*" ];
-      }
-      {
-        nonResourceURLs = [ "*" ];
-        verbs = [ "*" ];
-      }
-    ];
-  };
-
-  kubernetes.resources.clusterRoleBindings.openclaw-cluster-admin = {
-    metadata = { };
-    roleRef = {
-      apiGroup = "rbac.authorization.k8s.io";
-      kind = "ClusterRole";
-      name = "openclaw-cluster-admin";
+  kubernetes = {
+    resources = {
+      serviceAccounts.openclaw = {
+        metadata = { inherit namespace; };
+      };
+      clusterRoles."openclaw-cluster-admin" = {
+        
+        rules = [
+          {
+            apiGroups = [ "*" ];
+            resources = [ "*" ];
+            verbs = [ "*" ];
+          }
+          {
+            nonResourceURLs = [ "*" ];
+            verbs = [ "*" ];
+          }
+        ];
+      };
+      clusterRoleBindings."openclaw-cluster-admin" = {
+        
+        roleRef = {
+          apiGroup = "rbac.authorization.k8s.io";
+          kind = "ClusterRole";
+          name = "openclaw-cluster-admin";
+        };
+        subjects = [
+          {
+            kind = "ServiceAccount";
+            name = "openclaw";
+            inherit namespace;
+          }
+        ];
+      };
     };
-    subjects = [
-      {
-        kind = "ServiceAccount";
-        name = "openclaw";
-        inherit namespace;
-      }
-    ];
   };
-
   submodules.instances.openclaw = {
     submodule = "release";
     args = {
-      namespace = namespace;
+      inherit namespace;
       image = {
         repository = "ghcr.io/openclaw/openclaw";
         tag = "2026.2.19@sha256:5352d3ababbc12237fda60fe00a25237441eb7bb5e3d3062a6b0b5fbd938734d";
@@ -107,7 +108,7 @@ in
         storageClass = "rook-ceph-block";
         size = "10Gi";
         accessMode = "ReadWriteOnce";
-        globalMounts = [{ path = "/home/node"; }];
+        advancedMounts.main.main = [{ path = "/home/node"; }];
       };
       config = {
         filename = "openclaw.json";
@@ -376,24 +377,26 @@ in
             TS_KUBE_SECRET = "";
           };
         };
-        persistence.tailscale-state = {
-          type = "persistentVolumeClaim";
-          storageClass = "rook-ceph-block";
-          size = "1Gi";
-          accessMode = "ReadWriteOnce";
-          advancedMounts.main.tailscale = [{ path = "/var/lib/tailscale"; }];
+        persistence = {
+          tailscale-state = {
+            type = "persistentVolumeClaim";
+            storageClass = "rook-ceph-block";
+            size = "1Gi";
+            accessMode = "ReadWriteOnce";
+            advancedMounts.main.tailscale = [{ path = "/var/lib/tailscale"; }];
+          };
+          shared-storage = {
+            type = "persistentVolumeClaim";
+            existingClaim = "cephfs-shared-storage-root";
+            advancedMounts.main.main = [{ path = "/home/node/shared"; }];
+          };
+          dev-tun = {
+            type = "hostPath";
+            hostPath = "/dev/net/tun";
+            advancedMounts.main.tailscale = [{ path = "/dev/net/tun"; }];
+          };
         };
-        persistence.shared-storage = {
-          type = "persistentVolumeClaim";
-          existingClaim = "cephfs-shared-storage-root";
-          advancedMounts.main.main = [{ path = "/home/node/shared"; }];
-        };
-        persistence.dev-tun = {
-          type = "hostPath";
-          hostPath = "/dev/net/tun";
-          advancedMounts.main.tailscale = [{ path = "/dev/net/tun"; }];
-        };
-        controllers.main.initContainers.copy-config = {
+        controllers.main.initContainers.preset-config = {
           image = {
             repository = "busybox";
             tag = "latest";

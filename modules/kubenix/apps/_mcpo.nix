@@ -8,7 +8,7 @@ in
   submodules.instances.${app} = {
     submodule = "release";
     args = {
-      namespace = namespace;
+      inherit namespace;
       image = {
         repository = "ghcr.io/josevictorferreira/mcpo";
         tag = "latest@sha256:87bf1da9ed289777a08e4e5816cc9f8a9df5cee259842ac5ff3a223f0256ecc2";

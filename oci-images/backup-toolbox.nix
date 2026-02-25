@@ -2,7 +2,7 @@
 ,
 }:
 let
-  dockerTools = pkgs.dockerTools;
+  inherit (pkgs) dockerTools;
   postgresql = pkgs.postgresql_18;
 in
 dockerTools.buildImage {

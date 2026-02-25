@@ -2,6 +2,21 @@
 
 let
   namespace = homelab.kubernetes.namespaces.storage;
+  libModulesVolume = {
+    name = "lib-modules";
+    hostPath.path = "/run/booted-system/kernel-modules/lib/modules/";
+  };
+
+  hostNixVolume = {
+    name = "host-nix";
+    hostPath.path = "/nix";
+  };
+
+  hostNixMount = {
+    name = "host-nix";
+    mountPath = "/nix";
+    readOnly = true;
+  };
 in
 {
   kubernetes = {
@@ -12,54 +27,16 @@ in
         version = "1.19.0";
         sha256 = "sha256-zx3yX4JxoYGKXlDJfTXeRQOM7HgB1BFiWLrgspqCLuk=";
       };
-      namespace = namespace;
+      inherit namespace;
       includeCRDs = true;
       noHooks = false;
       values = {
         crds.enabled = true;
         csi.cephFSAttachRequired = true;
-        csi.csiRBDPluginVolume = [
-          {
-            name = "lib-modules";
-            hostPath = {
-              path = "/run/booted-system/kernel-modules/lib/modules/";
-            };
-          }
-          {
-            name = "host-nix";
-            hostPath = {
-              path = "/nix";
-            };
-          }
-        ];
-        csi.csiRBDPluginVolumeMount = [
-          {
-            name = "host-nix";
-            mountPath = "/nix";
-            readOnly = true;
-          }
-        ];
-        csi.csiCephFSPluginVolume = [
-          {
-            name = "lib-modules";
-            hostPath = {
-              path = "/run/booted-system/kernel-modules/lib/modules/";
-            };
-          }
-          {
-            name = "host-nix";
-            hostPath = {
-              path = "/nix";
-            };
-          }
-        ];
-        csi.csiCephFSPluginVolumeMount = [
-          {
-            name = "host-nix";
-            mountPath = "/nix";
-            readOnly = true;
-          }
-        ];
+        csi.csiRBDPluginVolume = [ libModulesVolume hostNixVolume ];
+        csi.csiRBDPluginVolumeMount = [ hostNixMount ];
+        csi.csiCephFSPluginVolume = [ libModulesVolume hostNixVolume ];
+        csi.csiCephFSPluginVolumeMount = [ hostNixMount ];
       };
     };
   };

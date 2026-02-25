@@ -39,7 +39,7 @@ in
         /run/current-system/sw/bin/k3s-killall.sh
         systemctl disable k3s
         KUBELET_PATH=$(mount | grep kubelet | cut -d' ' -f3);
-        /$/{KUBELET_PATH:+umount /$KUBELET_PATH/}
+        if [ -n "$KUBELET_PATH" ]; then umount "$KUBELET_PATH"; fi
         sleep 2
         rm -rf /etc/rancher/{k3s,node}
         rm -rf /var/lib/{rancher/k3s,kubelet,longhorn,etcd,cni}

@@ -1,7 +1,4 @@
-{ kubenix
-, homelab
-, ...
-}:
+{ homelab, ... }:
 
 let
   name = "flaresolverr";

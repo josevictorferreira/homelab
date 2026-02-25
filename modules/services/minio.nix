@@ -22,7 +22,7 @@ in
     services.minio = {
       enable = true;
       dataDir = [ cfg.dataDir ];
-      rootCredentialsFile = cfg.rootCredentialsFile;
+      inherit (cfg) rootCredentialsFile;
       listenAddress = "0.0.0.0:9000";
       consoleAddress = "0.0.0.0:9001";
       region = "sa-east-1";

@@ -1,4 +1,4 @@
-{ homelab, kubenix, ... }:
+{ homelab, ... }:
 
 let
   namespace = homelab.kubernetes.namespaces.applications;
@@ -11,7 +11,7 @@ in
   submodules.instances.${app} = {
     submodule = "release";
     args = {
-      namespace = namespace;
+      inherit namespace;
       image = {
         repository = "ghcr.io/autobrr/qui";
         tag = "v1.13.1@sha256:05b9badae10d21f54722464e8b51abc9487ba93f9bb2fff649fbc09944d0d111";

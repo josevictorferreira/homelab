@@ -1,8 +1,4 @@
-{ kubenix
-, homelab
-, lib
-, ...
-}:
+{ homelab, ... }:
 let
   namespace = homelab.kubernetes.namespaces.backup;
   toolboxImage = "ghcr.io/josevictorferreira/backup-toolbox@sha256:08bda3ee3383b093cc0ed74d42ed9b167ecb92dd7c01e090a542d0a75dec8abb";
@@ -126,7 +122,7 @@ in
   kubernetes.resources.cronJobs."postgres-restore-drill" = {
     metadata = {
       name = "postgres-restore-drill";
-      namespace = namespace;
+      inherit namespace;
     };
     spec = {
       schedule = "0 3 * * 0";

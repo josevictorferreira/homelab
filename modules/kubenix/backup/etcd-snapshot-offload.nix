@@ -1,4 +1,4 @@
-{ kubenix, homelab, ... }:
+{ homelab, ... }:
 let
   namespace = homelab.kubernetes.namespaces.backup;
 

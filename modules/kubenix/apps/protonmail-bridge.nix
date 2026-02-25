@@ -1,4 +1,4 @@
-{ kubenix, homelab, ... }:
+{ homelab, ... }:
 
 let
   app = "protonmail-bridge";

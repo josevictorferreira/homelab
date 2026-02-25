@@ -224,3 +224,20 @@
 **Lesson:** The release submodule's default persistence uses `globalMounts` which mounts to ALL containers including sidecars. Use `advancedMounts` to restrict volumes to specific containers (e.g., only main container, not tailscale sidecar).
 **Context:** Tailscale sidecar shouldn't get /config, /state, /logs, or workspace mounts. Structure: `advancedMounts.<controller>.<container> = [{ name = "..."; path = "..."; }]`. Global mounts on tailscale-only volumes (dev-tun, tailscale-state) are fine.
 **Verify:** Check generated Deployment YAML - tailscale container should only have its own mounts, not main container's data volumes
+
+## OpenClaw Version Upgrade
+
+### Provide Missing Build Tools via npm Tarball Derivations
+**Lesson:** When a Nix build needs a tool that uses `pnpm dlx` (network-dependent), check if the build script has a `command -v <tool>` fallback. If yes, create a Nix derivation from pre-built npm tarballs (main + native binding + deps) and add it to `nativeBuildInputs`. Fetch tarball URLs/hashes from `registry.npmjs.org/<pkg>/<version>`.
+**Context:** OpenClaw v2026.2.22+ needs rolldown for `canvas:a2ui:bundle`. `pnpm dlx rolldown` fails in sandbox. `bundle-a2ui.sh` checks `command -v rolldown` first — providing the binary in PATH avoids network entirely. Pattern: `fetchurl` 4 tarballs → assemble `node_modules` tree → `makeWrapper` for CLI.
+**Verify:** `nix build .#openclaw-nix-image` succeeds; check logs for `canvas:a2ui:bundle` completing without `pnpm dlx`
+
+### Verify Image Push with podman Directly
+**Lesson:** After `make push-openclaw`, verify the pushed image version with `podman run --rm --entrypoint "" <image> node -e "console.log(require('/lib/openclaw/package.json').version)"`. If version mismatch, push manually: `podman tag localhost/<image>:<tag> ghcr.io/.../<image>:latest && podman push ghcr.io/.../<image>:latest`.
+**Context:** The stream-based `make push-openclaw` can silently push a stale cached image. Manual `podman tag` + `podman push` is more reliable for verification.
+**Verify:** `kubectl exec -n apps <pod> -c main -- node -e "console.log(require('/lib/openclaw/package.json').version)"` shows expected version after deploy
+
+### Use Named let Bindings Not srcs for Multi-Tarball Derivations
+**Lesson:** In `mkDerivation`, don't use `srcs = [...]` + `builtins.elemAt srcs N` in build scripts. Instead, define each `fetchurl` as a named `let` binding and reference it directly in shell via `${tgzName}` interpolation.
+**Context:** `builtins.elemAt` is a Nix-level function, not available in bash. `srcs` is auto-unpacked. Named bindings give you stable references: `tar xzf ${rolldownTgz} -C $out/...`.
+**Verify:** `nix eval` the derivation successfully; no `undefined variable` errors

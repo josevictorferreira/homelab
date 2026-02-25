@@ -11,7 +11,7 @@ in
     valoris = {
       submodule = "release";
       args = {
-        namespace = namespace;
+        inherit namespace;
         image = {
           repository = "ghcr.io/josevictorferreira/valoris-frontend";
           tag = imageTag;
@@ -47,7 +47,7 @@ in
     valoris-backend = {
       submodule = "release";
       args = {
-        namespace = namespace;
+        inherit namespace;
         image = {
           repository = "ghcr.io/josevictorferreira/valoris-backend";
           tag = imageTag;
@@ -86,7 +86,7 @@ in
     valoris-worker = {
       submodule = "release";
       args = {
-        namespace = namespace;
+        inherit namespace;
         image = {
           repository = "ghcr.io/josevictorferreira/valoris-backend";
           tag = imageTag;
@@ -121,10 +121,10 @@ in
     resources = {
       objectbucketclaim."valoris-s3" = {
         metadata = {
-          namespace = namespace;
+          inherit namespace;
         };
         spec = {
-          bucketName = bucketName;
+          inherit bucketName;
           storageClassName = "rook-ceph-objectstore";
         };
       };

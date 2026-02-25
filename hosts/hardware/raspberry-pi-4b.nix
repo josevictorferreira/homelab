@@ -6,9 +6,11 @@
       (modulesPath + "/installer/scan/not-detected.nix")
     ];
 
-  boot.supportedFilesystems = [ "zfs" ];
-  boot.loader.grub.enable = false;
-  boot.loader.generic-extlinux-compatible.enable = true;
+  boot = {
+    supportedFilesystems = [ "zfs" ];
+    loader.grub.enable = false;
+    loader.generic-extlinux-compatible.enable = true;
+  };
 
   boot.initrd.availableKernelModules = [ "xhci_pci" "usbhid" "usb_storage" ];
   boot.kernelModules = [ "usb_storage" ];

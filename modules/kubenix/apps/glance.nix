@@ -1,4 +1,4 @@
-{ ... }:
+_:
 
 {
   submodules.instances.glance = {

@@ -16,7 +16,7 @@ in
       };
       includeCRDs = true;
       noHooks = false;
-      namespace = namespace;
+      inherit namespace;
 
       values = {
         image = {
@@ -36,41 +36,41 @@ in
           "IMGPROXY_ALLOW_ORIGIN" = "https://${kubenix.lib.domainFor "valoris"}";
         };
 
-        resources.addSecrets = [
-          "imgproxy-config"
-          "valoris-s3"
-        ];
-
-        resources.service = kubenix.lib.plainServiceFor app;
-
-        resources.ingress = {
-          enabled = true;
-          className = "cilium";
-          pathType = "Prefix";
-          annotations = {
-            "cert-manager.io/cluster-issuer" = "cloudflare-issuer";
+        resources = {
+          addSecrets = [
+            "imgproxy-config"
+            "valoris-s3"
+          ];
+          service = kubenix.lib.plainServiceFor app;
+          ingress = {
+            enabled = true;
+            className = "cilium";
+            pathType = "Prefix";
+            annotations = {
+              "cert-manager.io/cluster-issuer" = "cloudflare-issuer";
+            };
+            hosts = [
+              (kubenix.lib.domainFor app)
+            ];
+            tls = [
+              {
+                hosts = [
+                  (kubenix.lib.domainFor app)
+                ];
+                secretName = "wildcard-tls";
+              }
+            ];
           };
-          hosts = [
-            (kubenix.lib.domainFor app)
-          ];
-          tls = [
-            {
-              hosts = [
-                (kubenix.lib.domainFor app)
-              ];
-              secretName = "wildcard-tls";
-            }
-          ];
         };
       };
     };
 
     resources.objectbucketclaim."imgproxy-s3" = {
       metadata = {
-        namespace = namespace;
+        inherit namespace;
       };
       spec = {
-        bucketName = bucketName;
+        inherit bucketName;
         storageClassName = "rook-ceph-objectstore";
       };
     };

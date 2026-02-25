@@ -1,4 +1,4 @@
-{ kubenix, homelab, pkgs, ... }:
+{ kubenix, homelab, ... }:
 let
   name = "shared-subfolders-proton-sync";
   namespace = homelab.kubernetes.namespaces.backup;

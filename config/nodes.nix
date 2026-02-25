@@ -2,7 +2,7 @@
 
 let
   filterByRoles =
-    hosts: role: (lib.attrsets.filterAttrs (name: value: builtins.elem role value.roles) hosts);
+    hosts: role: (lib.attrsets.filterAttrs (_: value: builtins.elem role value.roles) hosts);
 in
 rec {
   hosts = {

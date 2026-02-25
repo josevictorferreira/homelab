@@ -8,7 +8,7 @@ in
   submodules.instances.${app} = {
     submodule = "release";
     args = {
-      namespace = namespace;
+      inherit namespace;
       image = {
         repository = "docker.io/binwiederhier/ntfy";
         tag = "v2.16.0@sha256:115357a63dd35e3d08ad03c93ade7d7eef63761726572b809da13f2999f1958f";
