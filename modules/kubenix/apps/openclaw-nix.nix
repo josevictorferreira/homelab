@@ -159,6 +159,9 @@ in
               dangerouslyAllowHostHeaderOriginFallback = true;
             };
           };
+          cron = {
+            storePath = "/home/node/.openclaw/cron/jobs.json";
+          };
           logging = {
             level = "debug";
           };
