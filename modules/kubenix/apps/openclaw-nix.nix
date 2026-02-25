@@ -415,19 +415,15 @@ in
           advancedMounts.main.main = [{ path = "/logs"; }];
         };
 
-        # Persistence: full shared storage at /home/node/shared
+        # Persistence: CephFS shared storage — single PVC, two mounts
+        # Full shared at /home/node/shared, openclaw subdir at ~/.openclaw
         persistence.shared-storage = {
           type = "persistentVolumeClaim";
           existingClaim = "cephfs-shared-storage-root";
-          advancedMounts.main.main = [{ path = "/home/node/shared"; }];
-        };
-
-        # Persistence: CephFS openclaw subdir mounted directly at ~/.openclaw
-        # This prevents openclaw from overwriting a symlink on startup
-        persistence.openclaw-data = {
-          type = "persistentVolumeClaim";
-          existingClaim = "cephfs-shared-storage-root";
-          advancedMounts.main.main = [{ path = "/home/node/.openclaw"; subPath = "openclaw"; }];
+          advancedMounts.main.main = [
+            { path = "/home/node/shared"; }
+            { path = "/home/node/.openclaw"; subPath = "openclaw"; }
+          ];
         };
 
         # Persistence: tailscale state (block storage)
