@@ -114,7 +114,7 @@ in
 
                       # Install required libraries and socat for proxy
                       apt-get update
-                      apt-get install -y libfido2-1 socat
+                      apt-get install -y libfido2-1 socat libglx0 libgl1 libglib2.0-0
 
                       echo "Starting ProtonMail Bridge..."
 
