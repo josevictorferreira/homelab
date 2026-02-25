@@ -2,7 +2,7 @@
 , lib
 , inputs
 , system
-, version ? "2026.2.23"
+, version ? "2026.2.24"
 ,
 }:
 
@@ -14,8 +14,8 @@ let
     owner = "openclaw";
     repo = "openclaw";
     rev = "v${version}";
-    hash = "sha256-TCBuoAHquGImmyiCRfJZ1flGAddQ3Uds0I3njTaif0w=";
-    pnpmDepsHash = "sha256-x4uB91wUStN6ljiV1Jqx0qWK3RwAwd+5msbrlSb/sSE=";
+    hash = "sha256-VpGi4euHx5bQoZ7DqWeYT92fPw7sHbdreas+SBzlURw=";
+    pnpmDepsHash = "sha256-G+wDPYzn3Ce71XmqDtbBYTsOX9f/JjEaDnknxXLIDPw=";
   };
 
   # Rolldown 1.0.0-rc.3 — pre-built from npm registry
@@ -98,7 +98,7 @@ let
       pkgs.jq
       pkgs.gnused
       pkgs.git
-      pkgs.python3
+      (pkgs.python3.withPackages (ps: [ ps.pip ps.requests ]))
       pkgs.uv
       pkgs.ffmpeg-headless
       pkgs.github-cli
