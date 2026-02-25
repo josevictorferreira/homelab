@@ -46,7 +46,7 @@ in
   kubernetes.resources.cronJobs."postgres-backup" = {
     metadata = {
       name = "postgres-backup";
-      namespace = namespace;
+      inherit namespace;
     };
     spec = {
       schedule = "30 2 * * *";

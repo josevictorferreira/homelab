@@ -17,7 +17,7 @@ in
       };
       includeCRDs = true;
       noHooks = false;
-      namespace = namespace;
+      inherit namespace;
 
       values = {
         image = {
@@ -108,7 +108,7 @@ in
 
     resources.objectbucketclaim."n8n-s3" = {
       metadata = {
-        namespace = namespace;
+        inherit namespace;
       };
       spec = {
         bucketName = bucketName;

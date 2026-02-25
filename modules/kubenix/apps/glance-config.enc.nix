@@ -414,7 +414,7 @@ in
     resources = {
       configMaps."glance" = {
         metadata = {
-          namespace = namespace;
+          inherit namespace;
         };
         data."glance.yml" = kubenix.lib.toYamlStr glanceConfig;
       };

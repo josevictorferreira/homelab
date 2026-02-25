@@ -13,7 +13,7 @@ in
       version = "11.3.2";
       sha256 = "0qycxy93p8d3m2fq6f10zyaqlnkvh31dka6ag9z0nwncdz33v3mk";
     };
-    namespace = namespace;
+    inherit namespace;
     values = {
       configuration = {
         backupStorageLocation = [ ];
@@ -61,7 +61,7 @@ in
       kind = "BackupStorageLocation";
       metadata = {
         name = "default";
-        namespace = namespace;
+        inherit namespace;
       };
       spec = {
         provider = "aws";
@@ -84,7 +84,7 @@ in
       kind = "Schedule";
       metadata = {
         name = "daily-backup";
-        namespace = namespace;
+        inherit namespace;
       };
       spec = {
         schedule = "0 3 * * *";

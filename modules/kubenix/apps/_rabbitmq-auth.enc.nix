@@ -8,7 +8,7 @@ in
     resources = {
       secrets."rabbitmq-auth" = {
         metadata = {
-          namespace = namespace;
+          inherit namespace;
         };
         stringData = {
           "rabbitmq-password" = kubenix.lib.secretsFor "rabbitmq_password";

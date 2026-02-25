@@ -7,9 +7,7 @@ in
   kubernetes = {
     resources = {
       secrets."open-webui-secrets" = {
-        metadata = {
-          namespace = namespace;
-        };
+        metadata = { inherit namespace; };
         stringData = {
           "ENV" = "prod";
           "ENABLE_SIGNUP" = "True";

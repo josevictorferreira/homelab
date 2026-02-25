@@ -7,7 +7,7 @@ in
   submodules.instances.libebooker = {
     submodule = "release";
     args = {
-      namespace = namespace;
+      inherit namespace;
       image = {
         repository = "ghcr.io/josevictorferreira/libebooker";
         tag = "latest";

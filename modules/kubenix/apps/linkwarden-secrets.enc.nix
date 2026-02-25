@@ -8,7 +8,7 @@ in
     resources = {
       secrets."linkwarden-secrets" = {
         metadata = {
-          namespace = namespace;
+          inherit namespace;
         };
         stringData = {
           "NEXTAUTH_SECRET" = kubenix.lib.secretsFor "linkwarden_auth_secret";
@@ -17,7 +17,7 @@ in
 
       secrets."linkwarden-db" = {
         metadata = {
-          namespace = namespace;
+          inherit namespace;
         };
         stringData = {
           "uri" =

@@ -5,7 +5,7 @@
 ,
 }:
 let
-  dockerTools = pkgs.dockerTools;
+  inherit (pkgs) dockerTools buildEnv writeTextFile;
   mcpoConfig = {
     mcpServers = {
       memory = {
@@ -35,7 +35,7 @@ let
     };
   };
   configJson = builtins.toJSON mcpoConfig;
-  configFile = pkgs.writeTextFile {
+  configFile = writeTextFile {
     name = "mcpo-config.json";
     text = configJson;
     destination = "/etc/mcpo/config.json";
@@ -44,7 +44,7 @@ in
 dockerTools.buildImage {
   name = "mcpo";
   tag = "latest";
-  copyToRoot = pkgs.buildEnv {
+  copyToRoot = buildEnv {
     name = "rootfs";
     paths = [
       pkgs.uv

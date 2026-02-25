@@ -91,7 +91,7 @@
               in
               {
                 hostname = hostCfg.ipAddress;
-                sshUser = sshUser;
+                inherit sshUser;
                 fastConnection = true;
                 remoteBuild = isRemoteNeeded;
 
@@ -138,27 +138,14 @@
             inherit lib;
             deploy-rs-pkg = deploy-rs.packages.${system}.default;
           };
-          # Build openclaw-nix image with specified version
-          # Usage: nix build .#openclaw-nix-image --override-input openclaw-version "2026.2.23"
-          # Or with version parameter: nix build .#packages.x86_64-linux.openclaw-nix-image.override { version = "2026.2.23"; }
-          openclawNixImage =
-            { version ? "2026.2.23"
-            ,
-            }:
-            import ./oci-images/openclaw-nix {
-              pkgs = sysPkgs;
-              inherit
-                lib
-                inputs
-                system
-                version
-                ;
-            };
+          openclawNixImage = import ./oci-images/openclaw-nix {
+            pkgs = sysPkgs;
+            inherit lib inputs system;
+          };
         in
         {
           gen-manifests = kubenixModule.mkRenderer system sysPkgs;
-          # Default version - change version param to upgrade
-          openclaw-nix-image = openclawNixImage { };
+          openclaw-nix-image = openclawNixImage;
           inherit (commands)
             lgroups
             check

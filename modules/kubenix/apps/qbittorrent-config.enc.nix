@@ -169,7 +169,7 @@ in
       configMaps."qbittorrent-config" = {
         metadata = {
           name = "qbittorrent-config";
-          namespace = namespace;
+          inherit namespace;
         };
         data = {
           "qBittorrent.conf" = qbtConf;

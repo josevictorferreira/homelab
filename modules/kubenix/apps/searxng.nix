@@ -15,7 +15,7 @@ in
       };
       includeCRDs = true;
       noHooks = true;
-      namespace = namespace;
+      inherit namespace;
 
       values = {
         replicaCount = 1;
@@ -63,7 +63,7 @@ in
         metadata.namespace = namespace;
         spec.template.spec.containers.${app} = {
           envFrom = [
-            { secretRef.name = "searxng-secret"; }
+            { secretRef = { name = "searxng-secret"; }; }
           ];
         };
       };

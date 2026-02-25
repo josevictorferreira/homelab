@@ -1,7 +1,7 @@
 { kubenix, homelab, ... }:
 
 let
-  namespace = homelab.kubernetes.namespaces.certificate;
+  inherit (homelab.kubernetes.namespaces) certificate;
 in
 {
   kubernetes = {
@@ -9,7 +9,7 @@ in
       secrets."cloudflare-api-token" = {
         type = "Opaque";
         metadata = {
-          namespace = namespace;
+          namespace = certificate;
         };
         data = {
           "cloudflare-api-token" = kubenix.lib.secretsFor "cloudflare_api_token";

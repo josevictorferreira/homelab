@@ -16,7 +16,7 @@ let
 
       here = map
         (e: {
-          path = builtins.toPath "${dir}/${e.name}";
+          path = builtins.toString "${dir}/${e.name}";
           rel = if rel == "" then e.name else "${rel}/${e.name}";
         })
         files;
@@ -24,7 +24,7 @@ let
       below = lib.concatMap
         (e:
           discover
-            (builtins.toPath "${dir}/${e.name}")
+            (builtins.toString "${dir}/${e.name}")
             (if rel == "" then e.name else "${rel}/${e.name}")
         )
         dirs;

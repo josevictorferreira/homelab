@@ -34,19 +34,20 @@
   };
 
   config = lib.mkIf config.networking.staticIP.enable {
-    networking.interfaces.${config.networking.staticIP.interface} = {
-      mtu = 1500;
-      ipv4.addresses = [{
-        address = config.networking.staticIP.address;
-        prefixLength = config.networking.staticIP.prefixLength;
-      }];
+    networking = {
+      interfaces.${config.networking.staticIP.interface} = {
+        mtu = 1500;
+        ipv4.addresses = [{
+          inherit (config.networking.staticIP) address prefixLength;
+        }];
+        useDHCP = false;
+      };
+      defaultGateway = {
+        address = config.networking.staticIP.gateway;
+        inherit (config.networking.staticIP) interface;
+      };
       useDHCP = false;
+      inherit (config.networking.staticIP) nameservers;
     };
-    networking.defaultGateway = {
-      address = config.networking.staticIP.gateway;
-      interface = config.networking.staticIP.interface;
-    };
-    networking.useDHCP = false;
-    networking.nameservers = config.networking.staticIP.nameservers;
   };
 }

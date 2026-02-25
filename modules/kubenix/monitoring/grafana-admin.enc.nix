@@ -32,7 +32,7 @@ in
       secrets."grafana-admin" = {
         type = "Opaque";
         metadata = {
-          namespace = namespace;
+          inherit namespace;
         };
         data = {
           "ADMIN_USER" = kubenix.lib.secretsFor "grafana_admin_username";
@@ -42,7 +42,7 @@ in
 
       configMaps."grafana-alerting-contactpoints" = {
         metadata = {
-          namespace = namespace;
+          inherit namespace;
           labels = {
             grafana_alert = "1";
           };

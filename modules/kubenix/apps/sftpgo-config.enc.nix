@@ -8,7 +8,7 @@ in
     resources = {
       secrets."sftpgo-config" = {
         metadata = {
-          namespace = namespace;
+          inherit namespace;
         };
         stringData = {
           "SFTPGO_ADMIN_USERNAME" = "admin";

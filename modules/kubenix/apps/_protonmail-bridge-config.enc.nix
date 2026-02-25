@@ -1,4 +1,4 @@
-{ kubenix, homelab, ... }:
+_:
 
 {
   # ProtonMail Bridge uses interactive CLI authentication

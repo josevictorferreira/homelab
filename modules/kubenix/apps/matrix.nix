@@ -22,7 +22,7 @@ in
       };
       includeCRDs = true;
       noHooks = false;
-      namespace = namespace;
+      inherit namespace;
 
       values = {
         image = {

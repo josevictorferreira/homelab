@@ -1,7 +1,7 @@
 { lib, hostName, hostConfig, homelab, ... }:
 
 let
-  isMaster = hostName == builtins.head (homelab.nodes.group."k8s-control-plane".names);
+  isMaster = hostName == builtins.head homelab.nodes.group."k8s-control-plane".names;
 in
 {
   services.keepalived = {
@@ -9,7 +9,7 @@ in
     openFirewall = true;
 
     vrrpInstances."k8s-api" = {
-      interface = hostConfig.interface;
+      inherit (hostConfig) interface;
       virtualRouterId = 51;
       state = lib.mkDefault (if isMaster then "MASTER" else "BACKUP");
       priority = lib.mkDefault (if isMaster then 150 else 100);

@@ -21,11 +21,11 @@ in
             volumeHandle = "cephfs-shared-storage-root";
             nodeStageSecretRef = {
               name = "cephfs-user-secret";
-              namespace = namespace;
+              inherit namespace;
             };
             volumeAttributes = {
               clusterID = "rook-ceph";
-              fsName = fsName;
+              inherit fsName;
               staticVolume = "true";
               rootPath = "/volumes/nfs-exports/homelab-nfs/5a434804-52fc-4e58-b09f-592a37a16a97";
             };
@@ -45,11 +45,11 @@ in
             volumeHandle = "cephfs-shared-storage-downloads";
             nodeStageSecretRef = {
               name = "cephfs-user-secret";
-              namespace = namespace;
+              inherit namespace;
             };
             volumeAttributes = {
               clusterID = "rook-ceph";
-              fsName = fsName;
+              inherit fsName;
               staticVolume = "true";
               rootPath = "/volumes/nfs-exports/homelab-nfs/5a434804-52fc-4e58-b09f-592a37a16a97/downloads";
             };
@@ -64,7 +64,7 @@ in
       "cephfs-shared-storage-root" = {
         metadata = {
           name = "cephfs-shared-storage-root";
-          namespace = namespace;
+          inherit namespace;
         };
         spec = {
           accessModes = [ "ReadWriteMany" ];
@@ -78,7 +78,7 @@ in
       "cephfs-shared-storage-downloads" = {
         metadata = {
           name = "cephfs-shared-storage-downloads";
-          namespace = namespace;
+          inherit namespace;
         };
         spec = {
           accessModes = [ "ReadWriteMany" ];

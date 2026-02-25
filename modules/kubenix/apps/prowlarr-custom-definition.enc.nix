@@ -9,7 +9,7 @@ in
       secrets."prowlarr-custom-definitions" = {
         type = "Opaque";
         metadata = {
-          namespace = namespace;
+          inherit namespace;
         };
         data = {
           "custom-indexer" = kubenix.lib.secretsFor "prowlarr_custom_indexer";

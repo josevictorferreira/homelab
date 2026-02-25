@@ -43,7 +43,7 @@ in
   submodules.instances.openclaw-nix = {
     submodule = "release";
     args = {
-      namespace = namespace;
+      inherit namespace;
       image = {
         repository = "ghcr.io/josevictorferreira/openclaw-nix";
         tag = "latest";
@@ -155,6 +155,9 @@ in
             mode = "local";
             port = 18789;
             bind = "lan";
+            controlUi = {
+              dangerouslyAllowHostHeaderOriginFallback = true;
+            };
           };
           logging = {
             level = "debug";

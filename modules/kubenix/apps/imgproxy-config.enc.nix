@@ -9,7 +9,7 @@ in
       secrets."imgproxy-config" = {
         metadata = {
           name = "imgproxy-config";
-          namespace = namespace;
+          inherit namespace;
         };
         data = {
           "IMGPROXY_KEY" = kubenix.lib.secretsFor "imgproxy_key";

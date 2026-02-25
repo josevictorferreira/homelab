@@ -8,7 +8,7 @@ in
     resources = {
       secrets."n8n-env" = {
         metadata = {
-          namespace = namespace;
+          inherit namespace;
         };
         stringData = {
           "N8N_ENCRYPTION_KEY" = kubenix.lib.secretsFor "n8n_encryption_key";

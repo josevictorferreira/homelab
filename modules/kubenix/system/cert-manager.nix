@@ -9,7 +9,7 @@ let
       value = {
         metadata = {
           name = "wildcard-certificate";
-          namespace = namespace;
+          inherit namespace;
           annotations = {
             "cert-manager.io/issue-temporary-certificate" = "true";
           };
@@ -41,7 +41,7 @@ in
         };
       includeCRDs = true;
       noHooks = true;
-      namespace = namespace;
+      inherit namespace;
       values = {
         global.leaderElection.namespace = "cert-manager";
         crds.enabled = true;
@@ -53,7 +53,7 @@ in
       clusterissuer."cloudflare-issuer" = {
         metadata = {
           name = "cloudflare-issuer";
-          namespace = namespace;
+          inherit namespace;
         };
         spec = {
           acme = {

@@ -5,9 +5,9 @@ let
   repoPathEnv = builtins.getEnv repoPathVariableName;
   repoPathFromFile = ./..;
   repoRoot = if repoPathEnv != "" then repoPathEnv else repoPathFromFile;
-  users = (import ./users.nix { inherit lib; });
-  nodes = (import ./nodes.nix { inherit lib; });
-  kubernetes = (import ./kubernetes.nix { inherit lib; });
+  users = import ./users.nix { inherit lib; };
+  nodes = import ./nodes.nix { inherit lib; };
+  kubernetes = import ./kubernetes.nix;
 in
 {
   config.homelab = {
