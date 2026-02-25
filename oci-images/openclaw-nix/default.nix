@@ -88,16 +88,48 @@ let
   openclawConfig = import ./config.nix;
   openclawConfigJson = pkgs.writeText "openclaw-config.json" (builtins.toJSON openclawConfig);
 
+  # Merged CLI tools environment — single /bin/ with all tools accessible
+  cliTools = pkgs.buildEnv {
+    name = "openclaw-cli-tools";
+    paths = [
+      pkgs.coreutils
+      pkgs.bash
+      pkgs.curl
+      pkgs.jq
+      pkgs.gnused
+      pkgs.git
+      pkgs.python3
+      pkgs.uv
+      pkgs.ffmpeg-headless
+      pkgs.github-cli
+      pkgs.gemini-cli
+      pkgs.nodejs_22
+      pkgs.procps
+      pkgs.gnugrep
+      pkgs.gawk
+      pkgs.findutils
+      pkgs.which
+      pkgs.tree
+      pkgs.ripgrep
+      pkgs.file
+      pkgs.wget
+      pkgs.diffutils
+      pkgs.gnutar
+      pkgs.gzip
+      pkgs.less
+      pkgs.openssh
+      pkgs.rsync
+    ];
+    pathsToLink = [ "/bin" "/lib" "/share" ];
+  };
+
   openclawRootfs = pkgs.runCommand "openclaw-rootfs" { } ''
-    mkdir -p $out/bin
-    for pkg in ${pkgs.curl} ${pkgs.jq} ${pkgs.gnused} ${pkgs.git} ${pkgs.python3} ${pkgs.uv} ${pkgs.ffmpeg-headless} ${pkgs.github-cli} ${pkgs.gemini-cli} ${pkgs.nodejs_22} ${pkgs.procps} ${openclawGateway} ${pkgs.gnugrep} ${pkgs.gawk} ${pkgs.findutils} ${pkgs.which} ${pkgs.tree} ${pkgs.ripgrep} ${pkgs.file} ${pkgs.wget} ${pkgs.diffutils} ${pkgs.gnutar} ${pkgs.gzip} ${pkgs.less} ${pkgs.openssh} ${pkgs.rsync}; do
-      if [ -d "$pkg/bin" ]; then cp -rsf "$pkg/bin"/* $out/bin/ 2>/dev/null || true; fi
-    done
-    mkdir -p $out/lib
-    for pkg in ${pkgs.python3} ${pkgs.nodejs_22}; do
-      if [ -d "$pkg/lib" ]; then cp -rsf "$pkg/lib"/* $out/lib/ 2>/dev/null || true; fi
-    done
+    mkdir -p $out/lib $out/bin
+    # Copy openclaw gateway lib (the main app)
     if [ -d "${openclawGateway}/lib" ]; then cp -a "${openclawGateway}/lib"/* $out/lib/ 2>/dev/null || true; fi
+    # Symlink the openclaw binary
+    if [ -f "${openclawGateway}/bin/openclaw" ]; then ln -s "${openclawGateway}/bin/openclaw" $out/bin/openclaw; fi
+    # Copy python lib for requests etc.
     chmod -R u+w $out/lib/openclaw/node_modules/ || true
     rm -rf $out/lib/openclaw/node_modules/.pnpm/@node-llama-cpp+* $out/lib/openclaw/node_modules/.pnpm/node-llama-cpp@*
     rm -rf $out/lib/openclaw/node_modules/.pnpm/@lancedb+* $out/lib/openclaw/node_modules/.pnpm/lancedb@*
@@ -137,12 +169,20 @@ dockerTools.streamLayeredImage {
   tag = "v${version}";
   contents = [
     openclawRootfs
-    pkgs.coreutils
-    pkgs.bash
+    cliTools
   ];
   extraCommands = ''
     mkdir -p ./config ./state ./logs ./tmp ./var/tmp
     chmod 1777 ./tmp ./var/tmp
+
+    # Symlink all CLI tools into /bin/ (buildEnv bins get lost in layer merging)
+    for bin in ${cliTools}/bin/*; do
+      name=$(basename "$bin")
+      if [ ! -e "./bin/$name" ]; then
+        ln -s "$bin" "./bin/$name"
+      fi
+    done
+
     cat > ./entrypoint.sh << 'EOF'
     ${entrypointScriptText}
     EOF

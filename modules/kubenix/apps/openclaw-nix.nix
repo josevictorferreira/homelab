@@ -157,6 +157,9 @@ in
             mode = "local";
             port = 18789;
             bind = "lan";
+            controlUi = {
+              dangerouslyAllowHostHeaderOriginFallback = true;
+            };
           };
           logging = {
             level = "debug";

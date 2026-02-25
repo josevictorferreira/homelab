@@ -110,16 +110,16 @@
       nodeGroupsList = builtins.concatStringsSep "\n" homelab.nodes.groups;
 
       deployGroups = builtins.mapAttrs
-          (
-            _: values: (builtins.concatStringsSep " " (builtins.map (v: "--targets='.#${v}'") values.names))
-          )
-          homelab.nodes.group;
+        (
+          _: values: (builtins.concatStringsSep " " (builtins.map (v: "--targets='.#${v}'") values.names))
+        )
+        homelab.nodes.group;
 
       checks = lib.optionalAttrs (lib.hasAttr currentSystem deploy-rs.lib) {
         ${currentSystem} = deploy-rs.lib.${currentSystem}.deployChecks {
           nodes = lib.filterAttrs
             (
-              hostName: hostCfg: homelab.nodes.hosts.${hostName}.system == currentSystem
+              hostName: _: homelab.nodes.hosts.${hostName}.system == currentSystem
             )
             self.deploy.nodes;
         };
