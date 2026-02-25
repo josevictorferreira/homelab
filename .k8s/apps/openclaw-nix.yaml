@@ -122,13 +122,13 @@ spec:
               subPath: config-template.json
             - mountPath: /logs
               name: logs
-            - mountPath: /home/node/.openclaw
-              name: openclaw-data
-              subPath: openclaw
             - mountPath: /config
               name: scratch-config
             - mountPath: /home/node/shared
               name: shared-storage
+            - mountPath: /home/node/.openclaw
+              name: shared-storage
+              subPath: openclaw
             - mountPath: /state
               name: state
         - env:
@@ -199,9 +199,6 @@ spec:
         - name: logs
           persistentVolumeClaim:
             claimName: openclaw-nix-logs
-        - name: openclaw-data
-          persistentVolumeClaim:
-            claimName: cephfs-shared-storage-root
         - emptyDir: {}
           name: scratch-config
         - name: shared-storage
