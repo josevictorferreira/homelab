@@ -53,6 +53,7 @@ metadata:
   labels:
     app: cephfs-smb-export
   name: cephfs-smb-export
+  namespace: rook-ceph
 spec:
   ports:
     - name: smb

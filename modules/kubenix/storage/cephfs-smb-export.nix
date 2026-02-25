@@ -58,6 +58,7 @@ in
     services.${appName} = {
       metadata = {
         name = appName;
+        inherit namespace;
         labels = {
           app = appName;
         };
