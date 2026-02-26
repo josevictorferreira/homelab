@@ -119,35 +119,45 @@ in
                       # Update library cache
                       ldconfig
 
-                      echo "Starting ProtonMail Bridge..."
-
-
                       export QT_QPA_PLATFORM=offscreen
 
-                      # Set QT to use offscreen platform for headless GUI
-                      export QT_QPA_PLATFORM=offscreen
+                      start_bridge() {
+                        echo "Starting ProtonMail Bridge..."
+                        /protonmail/proton-bridge --noninteractive &
+                        BRIDGE_PID=$!
+                        sleep 5
+                        echo "Bridge started on PID $BRIDGE_PID"
+                      }
 
-                      # Start bridge in background
-                      /protonmail/proton-bridge --noninteractive &
-                      BRIDGE_PID=$!
+                      start_socat() {
+                        # Kill old socat instances if any
+                        pkill -f "socat TCP-LISTEN" 2>/dev/null || true
+                        sleep 1
 
-                      # Wait for bridge to start listening
-                      sleep 5
+                        echo "Setting up port forwarding..."
+                        socat TCP-LISTEN:143,fork,reuseaddr TCP:127.0.0.1:1143 &
+                        socat TCP-LISTEN:25,fork,reuseaddr TCP:127.0.0.1:1025 &
+                        echo "Port forwarding active: 143->1143, 25->1025"
+                      }
 
-                      echo "Bridge started on PID $BRIDGE_PID"
-                      echo "Setting up port forwarding..."
+                      start_bridge
+                      start_socat
 
-                      # Forward external 0.0.0.0:143 -> 127.0.0.1:1143
-                      socat TCP-LISTEN:143,fork,reuseaddr TCP:127.0.0.1:1143 &
-
-                      # Forward external 0.0.0.0:25 -> 127.0.0.1:1025
-                      socat TCP-LISTEN:25,fork,reuseaddr TCP:127.0.0.1:1025 &
-
-                      echo "Port forwarding active: 143->1143, 25->1025"
                       echo "Bridge is ready for connections"
+                      echo "---"
+                      echo "To reauthenticate: kubectl exec -it -n applications protonmail-bridge-0 -- sh -c 'pkill -f proton-bridge; sleep 2; /protonmail/proton-bridge --cli'"
+                      echo "---"
 
-                      # Wait for bridge process
-                      wait $BRIDGE_PID
+                      # Keep container alive even if bridge dies (for reauth)
+                      while true; do
+                        wait $BRIDGE_PID 2>/dev/null || true
+                        echo "Bridge process exited. Container staying alive for CLI access."
+                        echo "Run: /protonmail/proton-bridge --cli"
+                        echo "After reauth, the pod will need to be restarted."
+                        # Sleep forever - container stays up for exec access
+                        sleep infinity &
+                        wait $!
+                      done
                     ''
                   ];
                   ports = [
