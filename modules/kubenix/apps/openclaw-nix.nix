@@ -232,8 +232,34 @@ in
 
       # Main persistence: use default (disabled) — custom volumes via values
       values = {
-        # Disable ingress (internal service only)
-        ingress.main.enabled = false;
+        # Enable ingress for external access
+        ingress.main = {
+          enabled = true;
+          className = "cilium";
+          annotations = {
+            "cert-manager.io/cluster-issuer" = "cloudflare-issuer";
+          };
+          hosts = [
+            {
+              host = "openclaw.${homelab.domain}";
+              paths = [
+                {
+                  path = "/";
+                  service.name = "openclaw-nix";
+                  service.port = 18789;
+                }
+              ];
+            }
+          ];
+          tls = [
+            {
+              hosts = [
+                "openclaw.${homelab.domain}"
+              ];
+              secretName = "wildcard-tls";
+            }
+          ];
+        };
 
         # Override service type to ClusterIP (release default is LoadBalancer)
         service.main.type = "ClusterIP";
