@@ -114,7 +114,7 @@ in
 
                       # Install required libraries and socat for proxy
                       apt-get update
-                      apt-get install -y libfido2-1 socat libglx0 libgl1 libglib2.0-0 libopengl0 libegl1 libgssapi-krb5-2 libxkbcommon0 libxkbcommon-x11-0 libfontconfig1 libfreetype6 libdbus-1-3
+                      apt-get install -y libfido2-1 socat procps libglx0 libgl1 libglib2.0-0 libopengl0 libegl1 libgssapi-krb5-2 libxkbcommon0 libxkbcommon-x11-0 libfontconfig1 libfreetype6 libdbus-1-3
 
                       # Update library cache
                       ldconfig
