@@ -121,7 +121,15 @@ in
 
                       export QT_QPA_PLATFORM=offscreen
 
+                      LOCK_FILE="/root/.cache/protonmail/bridge-v3/bridge-v3.lock"
+
+                      cleanup_lock() {
+                        rm -f "$LOCK_FILE"
+                        echo "Lock file cleaned up"
+                      }
+
                       start_bridge() {
+                        cleanup_lock
                         echo "Starting ProtonMail Bridge..."
                         /protonmail/proton-bridge --noninteractive &
                         BRIDGE_PID=$!
@@ -130,10 +138,8 @@ in
                       }
 
                       start_socat() {
-                        # Kill old socat instances if any
                         pkill -f "socat TCP-LISTEN" 2>/dev/null || true
                         sleep 1
-
                         echo "Setting up port forwarding..."
                         socat TCP-LISTEN:143,fork,reuseaddr TCP:127.0.0.1:1143 &
                         socat TCP-LISTEN:25,fork,reuseaddr TCP:127.0.0.1:1025 &
@@ -143,18 +149,20 @@ in
                       start_bridge
                       start_socat
 
-                      echo "Bridge is ready for connections"
+                      echo "Bridge is ready"
                       echo "---"
-                      echo "To reauthenticate: kubectl exec -it -n applications protonmail-bridge-0 -- sh -c 'pkill -f proton-bridge; sleep 2; /protonmail/proton-bridge --cli'"
+                      echo "To reauthenticate:"
+                      echo "  1. kubectl exec -n apps protonmail-bridge-0 -- pkill -f proton-bridge"
+                      echo "  2. kubectl exec -it -n apps protonmail-bridge-0 -- /protonmail/proton-bridge --cli"
                       echo "---"
 
                       # Keep container alive even if bridge dies (for reauth)
                       while true; do
                         wait $BRIDGE_PID 2>/dev/null || true
+                        cleanup_lock
                         echo "Bridge process exited. Container staying alive for CLI access."
                         echo "Run: /protonmail/proton-bridge --cli"
-                        echo "After reauth, the pod will need to be restarted."
-                        # Sleep forever - container stays up for exec access
+                        echo "After reauth, restart the pod."
                         sleep infinity &
                         wait $!
                       done
