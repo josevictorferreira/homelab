@@ -251,3 +251,14 @@
 **Lesson:** When refactoring OCI image `/bin/` construction (e.g., moving tools to `buildEnv`), ensure the main app binary (`openclaw`) is still explicitly added to rootfs `/bin/` via symlink or copy.
 **Context:** Moving all packages to `buildEnv` and removing the rootfs bin loop also removed the `openclaw` binary, causing `exec: openclaw: not found` crash.
 **Verify:** `podman run --rm --entrypoint '' <image> which openclaw` returns a path before pushing
+
+### OpenClaw Config: `dangerouslyAllowHostHeaderOriginFallback` Required for Non-Loopback
+**Lesson:** The `gateway.controlUi.dangerouslyAllowHostHeaderOriginFallback` config is REQUIRED when binding gateway to non-loopback addresses (e.g., `bind: "lan"`), despite being flagged as an "unknown config key" by the doctor.
+**Context:** OpenClaw v2026.2.25+ enforces origin validation for Control UI. The doctor warns about the key being unrecognized, but the gateway fails to start without it on non-loopback binds. Do NOT remove this config.
+**Verify:** Gateway starts without `Error: non-loopback Control UI requires gateway.controlUi.allowedOrigins` error.
+
+
+### Use Explicit Version Tags Instead of `latest` for K8s Images
+**Lesson:** Use specific version tags (e.g., `2026.2.25`) instead of `latest` for container images deployed to Kubernetes. Node-level image caching causes `latest` to stay stale even with `imagePullPolicy: Always`.
+**Context:** Kubernetes nodes cache images tagged as `latest`. A rollout restart doesn't force a fresh pull if the node thinks it already has `latest`. Using explicit tags ensures the correct version is deployed.
+**Verify:** `kubectl get pod <pod> -o yaml | grep imageID` shows the expected digest for the version tag.
