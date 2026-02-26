@@ -332,6 +332,40 @@ spec:
     app.kubernetes.io/name: openclaw-nix
   type: ClusterIP
 ---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: cloudflare-issuer
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: openclaw-nix
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: openclaw-nix
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: openclaw-nix
+  namespace: apps
+spec:
+  ingressClassName: cilium
+  rules:
+    - host: openclaw.josevictor.me
+      http:
+        paths:
+          - backend:
+              service:
+                name: openclaw-nix
+                port:
+                  number: 18789
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - openclaw.josevictor.me
+      secretName: wildcard-tls
+---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
