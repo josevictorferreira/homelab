@@ -48,7 +48,7 @@ in
       inherit namespace;
       image = {
         repository = "ghcr.io/josevictorferreira/openclaw-nix";
-        tag = "2026.2.25";
+        tag = "2026.2.26";
         pullPolicy = "Always";
       };
       port = 18789;
@@ -129,6 +129,40 @@ in
                   model = "perplexity/sonar-pro";
                   apiKey = "\${OPENROUTER_API_KEY}";
                 };
+              };
+            };
+            media = {
+              concurrency = 2;
+              audio = {
+                enabled = true;
+                maxBytes = 20971520;
+                scope = {
+                  default = "deny";
+                  rules = [
+                    {
+                      action = "allow";
+                      match = {
+                        chatType = "direct";
+                      };
+                    }
+                  ];
+                };
+                models = [
+                  {
+                    provider = "elevenlabs";
+                    model = "scribe_v2";
+                  }
+                ];
+              };
+              video = {
+                enabled = true;
+                maxBytes = 52428800;
+                models = [
+                  {
+                    provider = "github-copilot";
+                    model = "gemini-3-flash-preview";
+                  }
+                ];
               };
             };
           };
