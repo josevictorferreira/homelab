@@ -21,7 +21,22 @@
       memorySearch = {
         provider = "gemini";
         model = "gemini-embedding-001";
-      };
+        store = {
+          vector = {
+            enabled = true;
+            extensionPath = "/lib/sqlite-vec/vec0";
+          };
+        };
+        query = {
+          hybrid = {
+            enabled = true;
+            vectorWeight = 0.7;
+            textWeight = 0.3;
+          };
+        };
+        cache = {
+          enabled = true;
+        };
     };
   };
 
@@ -89,6 +104,7 @@
   plugins.allow = [
     "matrix"
     "whatsapp"
+    "memory-core"
   ];
 
   gateway = {
