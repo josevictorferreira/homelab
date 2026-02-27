@@ -85,7 +85,7 @@ in
               };
               subagents = {
                 model = "minimax/MiniMax-M2.5";
-                maxConcurrent = 1;
+                maxConcurrent = 4;
                 runTimeoutSeconds = 900;
                 archiveAfterMinutes = 60;
               };
