@@ -85,9 +85,6 @@ let
     sha256 = "sha256-cHjU3ZhxKPea/RksT2IfZK3s435D8qh1bx0KnwNN5xg=";
   };
   entrypointScriptText = builtins.readFile ./entrypoint.sh;
-  openclawConfig = import ./config.nix;
-  openclawConfigJson = pkgs.writeText "openclaw-config.json" (builtins.toJSON openclawConfig);
-
   # Merged CLI tools environment — single /bin/ with all tools accessible
   cliTools = pkgs.buildEnv {
     name = "openclaw-cli-tools";
@@ -119,10 +116,10 @@ let
       pkgs.less
       pkgs.openssh
       pkgs.rsync
+      pkgs.kubectl
     ];
     pathsToLink = [ "/bin" "/lib" "/share" ];
   };
-
   openclawRootfs = pkgs.runCommand "openclaw-rootfs" { } ''
     mkdir -p $out/lib $out/bin
     # Copy openclaw gateway lib (the main app)
@@ -145,8 +142,8 @@ let
     mkdir -p $out/etc/ssl/certs
     cp -rsf ${pkgs.cacert}/etc/ssl/certs/* $out/etc/ssl/certs/ 2>/dev/null || true
     if [ -d "${pkgs.python3Packages.requests}/lib" ]; then cp -rsf ${pkgs.python3Packages.requests}/lib/* $out/lib/ 2>/dev/null || true; fi
+    # Config is mounted externally via volume, no baked-in config needed
     mkdir -p $out/etc/openclaw
-    cp ${openclawConfigJson} $out/etc/openclaw/config-template.json
     if [ -d "${matrixPluginDeps}/matrix-deps/node_modules" ]; then
       chmod -R u+w $out/lib/openclaw/extensions/matrix/ || true
       rm -rf $out/lib/openclaw/extensions/matrix/node_modules
