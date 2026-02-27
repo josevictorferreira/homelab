@@ -83,6 +83,12 @@ in
                 provider = "gemini";
                 model = "gemini-embedding-001";
               };
+              subagents = {
+                model = "minimax/MiniMax-M2.5";
+                maxConcurrent = 1;
+                runTimeoutSeconds = 900;
+                archiveAfterMinutes = 60;
+              };
             };
           };
           session = {
@@ -224,6 +230,42 @@ in
                   }
                 ];
               };
+              zai-coding-plan = {
+                baseUrl = "https://api.z.ai/api/anthropic";
+                apiKey = "\${Z_AI_API_KEY}";
+                api = "anthropic-messages";
+                models = [
+                  {
+                    id = "glm-5";
+                    name = "GLM-5";
+                    reasoning = true;
+                    input = [ "text" ];
+                    contextWindow = 120000;
+                    maxTokens = 8192;
+                  }
+                ];
+              };
+              minimax = {
+                baseUrl = "https://api.minimaxi.com/anthropic";
+                apiKey = "\${MINIMAX_API_KEY}";
+                api = "anthropic-messages";
+                models = [
+                  {
+                    id = "MiniMax-M2.5";
+                    name = "MiniMax M2.5";
+                    reasoning = true;
+                    input = [ "text" ];
+                    cost = {
+                      input = 15;
+                      output = 60;
+                      cacheRead = 2;
+                      cacheWrite = 10;
+                    };
+                    contextWindow = 200000;
+                    maxTokens = 8192;
+                  }
+                ];
+              };
             };
           };
         };
@@ -295,6 +337,18 @@ in
                 valueFrom.secretKeyRef = {
                   name = "openclaw-config";
                   key = "OPENROUTER_API_KEY";
+                };
+              };
+              Z_AI_API_KEY = {
+                valueFrom.secretKeyRef = {
+                  name = "openclaw-config";
+                  key = "Z_AI_API_KEY";
+                };
+              };
+              COPILOT_GITHUB_TOKEN = {
+                valueFrom.secretKeyRef = {
+                  name = "openclaw-config";
+                  key = "COPILOT_GITHUB_TOKEN";
                 };
               };
               MINIMAX_API_KEY = {
