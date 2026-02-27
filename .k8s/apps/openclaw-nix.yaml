@@ -27,7 +27,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/configMaps: c0195100b224d3970a36a466bc7c89767a67f985df1842bb299f96837fc932cd
+        checksum/configMaps: 030188319366c2012c3e8acfb56f7f8f217bbae404da86b61c8a1d44f63843a5
       labels:
         app.kubernetes.io/controller: main
         app.kubernetes.io/instance: openclaw-nix
@@ -117,7 +117,7 @@ spec:
           envFrom:
             - secretRef:
                 name: openclaw-config
-          image: ghcr.io/josevictorferreira/openclaw-nix:2026.2.25
+          image: ghcr.io/josevictorferreira/openclaw-nix:2026.2.26
           imagePullPolicy: Always
           name: main
           ports:
@@ -228,7 +228,7 @@ data:
   config-template.json: '{"agents":{"defaults":{"memorySearch":{"model":"gemini-embedding-001","provider":"gemini"},"model":{"primary":"kimi-coding/k2p5"},"subagents":{"archiveAfterMinutes":60,"maxConcurrent":4,"model":"minimax/MiniMax-M2.5","runTimeoutSeconds":900},"timeoutSeconds":600,"userTimezone":"America/Sao_Paulo","workspace":"/home/node/.openclaw/workspace"},"list":[{"id":"main","identity":{"emoji":"🐕","name":"Mel","theme":"minha
     fiel assistente"}}]},"channels":{"matrix":{"accessToken":"${OPENCLAW_MATRIX_TOKEN}","autoJoin":"allowlist","autoJoinAllowList":["@jose:josevictor.me","@admin:josevictor.me","@zeh:josevictor.me"],"dm":{"allowFrom":["@jose:josevictor.me","@admin:josevictor.me","@zeh:josevictor.me"],"policy":"allowlist"},"enabled":true,"encryption":false,"groupPolicy":"disabled","homeserver":"http://synapse-matrix-synapse:8008","mediaMaxMb":150,"userId":"@openclaw:josevictor.me"},"whatsapp":{"ackReaction":{"direct":true,"emoji":"👀","group":"mentions"},"allowFrom":["${WHATSAPP_NUMBER}"],"dmPolicy":"allowlist","groupAllowFrom":["${WHATSAPP_NUMBER}"],"groupPolicy":"allowlist"}},"env":{"ELEVENLABS_API_KEY":"${ELEVENLABS_API_KEY}","MOONSHOT_API_KEY":"${MOONSHOT_API_KEY}","OPENROUTER_API_KEY":"${OPENCLAW_MATRIX_TOKEN}"},"gateway":{"bind":"lan","controlUi":{"dangerouslyAllowHostHeaderOriginFallback":true},"mode":"local","port":18789},"logging":{"level":"debug"},"messages":{"tts":{"auto":"inbound","elevenlabs":{"apiKey":"${ELEVENLABS_API_KEY}","modelId":"eleven_v3","seed":91,"voiceId":"GOkMqfyKMLVUcYfO2WbB","voiceSettings":{"similarityBoost":0.75,"speed":1.0,"stability":0.5,"style":0.0,"useSpeakerBoost":true}},"provider":"elevenlabs","summaryModel":"kimi-coding/k2p5"}},"models":{"mode":"merge","providers":{"kimi-coding":{"api":"anthropic-messages","apiKey":"${MOONSHOT_API_KEY}","baseUrl":"https://api.kimi.com/coding","models":[{"contextWindow":256000,"id":"k2p5","input":["text"],"maxTokens":8192,"name":"Kimi
     K2.5","reasoning":false}]},"minimax":{"api":"anthropic-messages","apiKey":"${MINIMAX_API_KEY}","baseUrl":"https://api.minimaxi.com/anthropic","models":[{"contextWindow":200000,"cost":{"cacheRead":2,"cacheWrite":10,"input":15,"output":60},"id":"MiniMax-M2.5","input":["text"],"maxTokens":8192,"name":"MiniMax
-    M2.5","reasoning":true}]},"zai-coding-plan":{"api":"anthropic-messages","apiKey":"${Z_AI_API_KEY}","baseUrl":"https://api.z.ai/api/anthropic","models":[{"contextWindow":120000,"id":"glm-5","input":["text"],"maxTokens":8192,"name":"GLM-5","reasoning":true}]}}},"plugins":{"allow":["matrix","whatsapp"]},"session":{"idleMinutes":60,"reset":{"atHour":4,"mode":"daily"},"scope":"per-sender"},"tools":{"allow":["exec","read","write","edit","process","web_search","web_fetch","canvas","nodes","message","gateway","browser","sessions_list","sessions_history","sessions_send","sessions_spawn","session_status","agents_list"],"deny":[],"web":{"search":{"perplexity":{"apiKey":"${OPENROUTER_API_KEY}","baseUrl":"https://openrouter.ai/api/v1","model":"perplexity/sonar-pro"},"provider":"perplexity"}}}}'
+    M2.5","reasoning":true}]},"zai-coding-plan":{"api":"anthropic-messages","apiKey":"${Z_AI_API_KEY}","baseUrl":"https://api.z.ai/api/anthropic","models":[{"contextWindow":120000,"id":"glm-5","input":["text"],"maxTokens":8192,"name":"GLM-5","reasoning":true}]}}},"plugins":{"allow":["matrix","whatsapp"]},"session":{"idleMinutes":60,"reset":{"atHour":4,"mode":"daily"},"scope":"per-sender"},"tools":{"allow":["exec","read","write","edit","process","web_search","web_fetch","canvas","nodes","message","gateway","browser","sessions_list","sessions_history","sessions_send","sessions_spawn","session_status","agents_list"],"deny":[],"media":{"audio":{"enabled":true,"maxBytes":20971520,"models":[{"model":"scribe_v2","provider":"elevenlabs"}],"scope":{"default":"deny","rules":[{"action":"allow","match":{"chatType":"direct"}}]}},"concurrency":2,"video":{"enabled":true,"maxBytes":52428800,"models":[{"model":"gemini-3-flash-preview","provider":"github-copilot"}]}},"web":{"search":{"perplexity":{"apiKey":"${OPENROUTER_API_KEY}","baseUrl":"https://openrouter.ai/api/v1","model":"perplexity/sonar-pro"},"provider":"perplexity"}}}}'
 kind: ConfigMap
 metadata:
   annotations:
