@@ -1,9 +1,9 @@
-{ pkgs
-, lib
-, inputs
-, system
-, version ? "2026.2.25"
-,
+{
+  pkgs,
+  lib,
+  inputs,
+  system,
+  version ? "2026.2.26",
 }:
 
 let
@@ -95,7 +95,10 @@ let
       pkgs.jq
       pkgs.gnused
       pkgs.git
-      (pkgs.python3.withPackages (ps: [ ps.pip ps.requests ]))
+      (pkgs.python3.withPackages (ps: [
+        ps.pip
+        ps.requests
+      ]))
       pkgs.uv
       pkgs.ffmpeg-headless
       pkgs.github-cli
@@ -118,7 +121,11 @@ let
       pkgs.rsync
       pkgs.kubectl
     ];
-    pathsToLink = [ "/bin" "/lib" "/share" ];
+    pathsToLink = [
+      "/bin"
+      "/lib"
+      "/share"
+    ];
   };
   openclawRootfs = pkgs.runCommand "openclaw-rootfs" { } ''
     mkdir -p $out/lib $out/bin
