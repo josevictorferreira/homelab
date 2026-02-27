@@ -555,6 +555,7 @@ let
 
   # OpenClaw image configuration
   openclawImageName = "openclaw-nix";
+  openclawVersion = "2026.2.26";
   openclawRegistry = "ghcr.io";
 
   push-openclaw =
@@ -566,8 +567,9 @@ let
         IMAGE_NAME="${openclawImageName}"
         REGISTRY="${openclawRegistry}"
         GITHUB_USER="${githubUser}"
-        LOCAL_TAG="localhost/''${IMAGE_NAME}:dev"
+        LOCAL_TAG="localhost/''${IMAGE_NAME}:v${openclawVersion}"
         FULL_TAG="''${REGISTRY}/''${GITHUB_USER}/''${IMAGE_NAME}:latest"
+        VERSION_TAG="''${REGISTRY}/''${GITHUB_USER}/''${IMAGE_NAME}:v${openclawVersion}"
 
         # Build
         echo "[1/4] Building ''${IMAGE_NAME}..."
@@ -578,9 +580,10 @@ let
         ./result | podman load
         rm -f result
 
-        # Tag for registry
-        echo "[3/3] Tagging as ''${FULL_TAG}..."
+        # Tag for registry (both latest and version)
+        echo "[3/4] Tagging as ''${FULL_TAG} and ''${VERSION_TAG}..."
         podman tag "''${LOCAL_TAG}" "''${FULL_TAG}"
+        podman tag "''${LOCAL_TAG}" "''${VERSION_TAG}"
 
         # Login
         echo "[4/4] Logging in to ''${REGISTRY}..."
@@ -599,13 +602,17 @@ let
           exit 1
         fi
 
-        # Push
-        echo "Pushing to ''${FULL_TAG}..."
+        # Push both tags
+        echo "[5/5] Pushing images..."
         podman push "''${FULL_TAG}"
+        podman push "''${VERSION_TAG}"
 
         echo ""
-        echo "✓ Image pushed: ''${FULL_TAG}"
+        echo "✓ Images pushed:"
+        echo "  - ''${FULL_TAG}"
+        echo "  - ''${VERSION_TAG}"
         echo "  View at: https://''${REGISTRY}/''${GITHUB_USER}/''${IMAGE_NAME}"
+
       '';
 
   ghcr-size =
