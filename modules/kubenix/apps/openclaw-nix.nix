@@ -80,8 +80,8 @@ in
               userTimezone = "America/Sao_Paulo";
               timeoutSeconds = 600;
               memorySearch = {
-                provider = "openrouter";
-                model = "qwen/qwen3-embedding-8b";
+                provider = "gemini";
+                model = "gemini-embedding-001";
               };
               subagents = {
                 model = "minimax/MiniMax-M2.5";
