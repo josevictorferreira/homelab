@@ -105,7 +105,6 @@ in
               "canvas"
               "nodes"
               "message"
-              "cron"
               "gateway"
               "browser"
               "sessions_list"
@@ -129,13 +128,13 @@ in
           };
           messages = {
             tts = {
-              auto = "always";
+              auto = "inbound";
               provider = "elevenlabs";
-              summaryModel = "google/gemini-2.0-flash";
+              summaryModel = "kimi-coding/k2p5";
               elevenlabs = {
                 apiKey = "\${ELEVENLABS_API_KEY}";
                 voiceId = "GOkMqfyKMLVUcYfO2WbB";
-                modelId = "eleven_multilingual_v2";
+                modelId = "eleven_v3";
                 seed = 91;
                 voiceSettings = {
                   stability = 0.5;
@@ -431,7 +430,7 @@ in
         persistence = {
           scratch-config = {
             type = "emptyDir";
-            advancedMounts.main.main = [{ path = "/config"; }];
+            advancedMounts.main.main = [ { path = "/config"; } ];
           };
 
           # Persistence: state (block storage, main container only)
@@ -440,7 +439,7 @@ in
             storageClass = "rook-ceph-block";
             size = "10Gi";
             accessMode = "ReadWriteOnce";
-            advancedMounts.main.main = [{ path = "/state"; }];
+            advancedMounts.main.main = [ { path = "/state"; } ];
           };
 
           # Persistence: logs (block storage, main container only)
@@ -449,7 +448,7 @@ in
             storageClass = "rook-ceph-block";
             size = "1Gi";
             accessMode = "ReadWriteOnce";
-            advancedMounts.main.main = [{ path = "/logs"; }];
+            advancedMounts.main.main = [ { path = "/logs"; } ];
           };
 
           # Persistence: CephFS shared storage — single PVC, two mounts
@@ -459,7 +458,10 @@ in
             existingClaim = "cephfs-shared-storage-root";
             advancedMounts.main.main = [
               { path = "/home/node/shared"; }
-              { path = "/home/node/.openclaw"; subPath = "openclaw"; }
+              {
+                path = "/home/node/.openclaw";
+                subPath = "openclaw";
+              }
             ];
           };
 
@@ -469,14 +471,14 @@ in
             storageClass = "rook-ceph-block";
             size = "1Gi";
             accessMode = "ReadWriteOnce";
-            advancedMounts.main.tailscale = [{ path = "/var/lib/tailscale"; }];
+            advancedMounts.main.tailscale = [ { path = "/var/lib/tailscale"; } ];
           };
 
           # Persistence: /dev/net/tun for tailscale
           dev-tun = {
             type = "hostPath";
             hostPath = "/dev/net/tun";
-            advancedMounts.main.tailscale = [{ path = "/dev/net/tun"; }];
+            advancedMounts.main.tailscale = [ { path = "/dev/net/tun"; } ];
           };
         };
       };
