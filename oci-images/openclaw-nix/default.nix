@@ -37,11 +37,6 @@ let
     sha256 = "05njq25fg7qx1pmww7mqq5rwhj9f0kk6129ifydij1q2759b3pkj";
   };
 
-  # sqlite-vec v0.1.6 — loadable extension for vector search (memory-core plugin)
-  sqliteVecLoadable = pkgs.fetchurl {
-    url = "https://github.com/asg017/sqlite-vec/releases/download/v0.1.6/sqlite-vec-0.1.6-loadable-linux-x86_64.tar.gz";
-    sha256 = "0zw6myf4cl0qnp2spmy9rq5rr1lrl70dr81sbd9b739zkzr0v3j3";
-  };
 
   rolldown = pkgs.stdenv.mkDerivation {
     pname = "rolldown";
@@ -126,7 +121,6 @@ let
       pkgs.openssh
       pkgs.rsync
       pkgs.kubectl
-      pkgs.sqlite
     ];
     pathsToLink = [
       "/bin"
@@ -173,10 +167,6 @@ let
     if [ -d "$CRYPTO_PKG" ]; then chmod -R u+w "$CRYPTO_PKG" || true; cp ${matrixCryptoNative} "$CRYPTO_PKG/matrix-sdk-crypto.linux-x64-gnu.node"; fi
     GATEWAY_STORE_PATH=$(readlink -f ${openclawGateway} | sed 's|^/nix/store/||' | cut -d'/' -f1)
     if [ -n "$GATEWAY_STORE_PATH" ]; then mkdir -p "$out/nix/store/$GATEWAY_STORE_PATH"; ln -s $out/lib "$out/nix/store/$GATEWAY_STORE_PATH/lib"; fi
-    # sqlite-vec loadable extension for memory-core plugin
-    mkdir -p $out/lib/sqlite-vec
-    tar xzf ${sqliteVecLoadable} -C $out/lib/sqlite-vec --strip-components=0
-    chmod 755 $out/lib/sqlite-vec/vec0.so 2>/dev/null || true
   '';
 in
 dockerTools.streamLayeredImage {

@@ -48,7 +48,7 @@ in
       inherit namespace;
       image = {
         repository = "ghcr.io/josevictorferreira/openclaw-nix";
-        tag = "v2026.2.26";
+        tag = "2026.2.25";
         pullPolicy = "Always";
       };
       port = 18789;
@@ -79,9 +79,22 @@ in
               };
               userTimezone = "America/Sao_Paulo";
               timeoutSeconds = 600;
+              contextPruning = {
+                mode = "cache-ttl";
+                ttl = "30m";
+              };
               memorySearch = {
                 provider = "gemini";
                 model = "gemini-embedding-001";
+                remote = {
+                  batch = {
+                    enabled = true;
+                    concurrency = 2;
+                  };
+                };
+                sync = {
+                  watch = true;
+                };
                 store = {
                   vector = {
                     enabled = true;
@@ -98,6 +111,13 @@ in
                 cache = {
                   enabled = true;
                 };
+                experimental = {
+                  sessionMemory = true;
+                };
+                sources = [
+                  "memory"
+                  "sessions"
+                ];
               };
               subagents = {
                 model = "minimax/MiniMax-M2.5";
@@ -203,6 +223,7 @@ in
             };
           };
           plugins = {
+            slots.memory = "memory-core";
             allow = [
               "matrix"
               "whatsapp"
