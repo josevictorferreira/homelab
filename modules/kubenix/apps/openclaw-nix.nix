@@ -79,6 +79,10 @@ in
               };
               userTimezone = "America/Sao_Paulo";
               timeoutSeconds = 600;
+              imageModel = {
+                primary = "github-copilot/gemini-3-flash-preview";
+                fallbacks = [ "kimi-coding/k2p5" ];
+              };
               contextPruning = {
                 mode = "cache-ttl";
                 ttl = "30m";
@@ -86,38 +90,6 @@ in
               memorySearch = {
                 provider = "gemini";
                 model = "gemini-embedding-001";
-                remote = {
-                  batch = {
-                    enabled = true;
-                    concurrency = 2;
-                  };
-                };
-                sync = {
-                  watch = true;
-                };
-                store = {
-                  vector = {
-                    enabled = true;
-                    extensionPath = "/lib/sqlite-vec/vec0";
-                  };
-                };
-                query = {
-                  hybrid = {
-                    enabled = true;
-                    vectorWeight = 0.7;
-                    textWeight = 0.3;
-                  };
-                };
-                cache = {
-                  enabled = true;
-                };
-                experimental = {
-                  sessionMemory = true;
-                };
-                sources = [
-                  "memory"
-                  "sessions"
-                ];
               };
               subagents = {
                 model = "minimax/MiniMax-M2.5";
@@ -223,11 +195,9 @@ in
             };
           };
           plugins = {
-            slots.memory = "memory-core";
             allow = [
               "matrix"
               "whatsapp"
-              "memory-core"
             ];
           };
           gateway = {
