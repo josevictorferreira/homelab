@@ -75,8 +75,9 @@ in
             defaults = {
               workspace = "/home/node/.openclaw/workspace";
               model = {
-                primary = "kimi-coding/k2p5";
+                primary = "github-copilot/claude-opus-4.6";
                 fallbacks = [
+                  "kimi-coding/k2p5"
                   "zai-coding-plan/glm-5"
                   "minimax/MiniMax-M2.5"
                 ];
