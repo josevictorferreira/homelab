@@ -103,7 +103,6 @@ let
       pkgs.uv
       pkgs.ffmpeg-headless
       pkgs.github-cli
-      pkgs.gemini-cli
       pkgs.nodejs_22
       pkgs.procps
       pkgs.gnugrep
@@ -136,10 +135,25 @@ let
     if [ -f "${openclawGateway}/bin/openclaw" ]; then ln -s "${openclawGateway}/bin/openclaw" $out/bin/openclaw; fi
     # Copy python lib for requests etc.
     chmod -R u+w $out/lib/openclaw/node_modules/ || true
+    # Strip ML/vector libs (not used)
     rm -rf $out/lib/openclaw/node_modules/.pnpm/@node-llama-cpp+* $out/lib/openclaw/node_modules/.pnpm/node-llama-cpp@*
     rm -rf $out/lib/openclaw/node_modules/.pnpm/@lancedb+* $out/lib/openclaw/node_modules/.pnpm/lancedb@*
     rm -rf $out/lib/openclaw/node_modules/node-llama-cpp $out/lib/openclaw/node_modules/@node-llama-cpp
     rm -rf $out/lib/openclaw/node_modules/@lancedb $out/lib/openclaw/node_modules/lancedb
+    # Strip cross-platform native bindings (we only need linux-x64-gnu)
+    find $out/lib/openclaw/node_modules/.pnpm/ -maxdepth 1 -type d \( \
+      -name '*-musl-*' -o -name '*musl@*' -o -name '*linuxmusl*' \
+      -o -name '*-darwin-*' -o -name '*darwin@*' \
+      -o -name '*-win32-*' -o -name '*win32@*' \
+      -o -name '*-arm64-*' -o -name '*arm64@*' \
+      -o -name '*-armv7l-*' -o -name '*armv7l@*' \
+      -o -name '*-freebsd-*' -o -name '*freebsd@*' \
+      -o -name '*-android-*' -o -name '*android@*' \
+    \) -exec rm -rf {} + 2>/dev/null || true
+    # Strip runtime-unnecessary packages
+    rm -rf $out/lib/openclaw/node_modules/.pnpm/typescript@*
+    rm -rf $out/lib/openclaw/node_modules/.pnpm/@larksuiteoapi+*
+    rm -rf $out/lib/openclaw/node_modules/.pnpm/@line+*
     cd $out/lib/openclaw
     mkdir -p $out/etc
     for pkg in ${pkgs.tzdata}; do
