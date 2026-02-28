@@ -159,49 +159,28 @@ in
                 };
               };
             };
-            # media = {
-            #   concurrency = 2;
-            #   audio = {
-            #     enabled = true;
-            #     maxBytes = 20971520;
-            #     scope = {
-            #       default = "deny";
-            #       rules = [
-            #         {
-            #           action = "allow";
-            #           match = {
-            #             chatType = "direct";
-            #           };
-            #         }
-            #       ];
-            #     };
-            #     models = [
-            #       {
-            #         provider = "elevenlabs";
-            #         model = "scribe_v2";
-            #         type = "provider";
-            #         capabilities = [ "audio" ];
-            #         providerOptions = {
-            #           elevenlabs = {
-            #             apiKey = "\${ELEVENLABS_API_KEY}";
-            #             language = "por";
-            #             tagAudioEvents = true;
-            #           };
-            #         };
-            #       }
-            #     ];
-            #   };
-            #   video = {
-            #     enabled = true;
-            #     maxBytes = 52428800;
-            #     models = [
-            #       {
-            #         provider = "github-copilot";
-            #         model = "gemini-3-flash-preview";
-            #       }
-            #     ];
-            #   };
-            # };
+            media = {
+              concurrency = 2;
+              audio = {
+                enabled = true;
+                models = [
+                  {
+                    provider = "elevenlabs";
+                    model = "scribe_v2";
+                  }
+                ];
+              };
+              video = {
+                enabled = true;
+                maxBytes = 52428800;
+                models = [
+                  {
+                    provider = "github-copilot";
+                    model = "gemini-3-flash-preview";
+                  }
+                ];
+              };
+            };
           };
           talk = {
             voiceId = "GOkMqfyKMLVUcYfO2WbB";
