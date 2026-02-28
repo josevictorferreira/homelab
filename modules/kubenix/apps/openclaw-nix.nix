@@ -167,8 +167,17 @@ in
                 enabled = true;
                 models = [
                   {
-                    provider = "elevenlabs";
-                    model = "scribe_v2";
+                    type = "cli";
+                    command = "sh";
+                    args = [
+                      "-c"
+                      "curl -s -X POST 'https://api.elevenlabs.io/v1/speech-to-text' \
+                        -H 'xi-api-key: $ELEVENLABS_API_KEY' \
+                        -F 'model_id=scribe_v2' \
+                        -F 'file=@$AUDIO_PATH' \
+                        -F 'tag_audio_events=true' \
+                        -F 'language_code=por' | jq -r '.text'"
+                    ];
                   }
                 ];
               };
@@ -270,6 +279,7 @@ in
             };
           };
           env = {
+            COPILOT_GITHUB_TOKEN = "\${COPILOT_GITHUB_TOKEN}";
             MOONSHOT_API_KEY = "\${MOONSHOT_API_KEY}";
             ELEVENLABS_API_KEY = "\${ELEVENLABS_API_KEY}";
             OPENROUTER_API_KEY = "\${OPENCLAW_MATRIX_TOKEN}";
