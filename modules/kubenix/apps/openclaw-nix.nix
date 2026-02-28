@@ -48,7 +48,7 @@ in
       inherit namespace;
       image = {
         repository = "ghcr.io/josevictorferreira/openclaw-nix";
-        tag = "v2026.2.26";
+        tag = "2026.2.25";
         pullPolicy = "Always";
       };
       port = 18789;
@@ -94,6 +94,13 @@ in
               memorySearch = {
                 provider = "gemini";
                 model = "gemini-embedding-001";
+                experimental = {
+                  sessionMemory = true;
+                };
+                sources = [
+                  "memory"
+                  "sessions"
+                ];
               };
               compaction = {
                 reserveTokensFloor = 20000;
@@ -186,6 +193,13 @@ in
                 ];
               };
             };
+          };
+          talk = {
+            voiceId = "GOkMqfyKMLVUcYfO2WbB";
+            modelId = "eleven_v3";
+            outputFormat = "mp3_44100_128";
+            apiKey = "\${ELEVENLABS_API_KEY}";
+            interruptOnSpeech = true;
           };
           messages = {
             tts = {
