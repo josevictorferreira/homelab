@@ -27,7 +27,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/configMaps: 9a9f3cb953e7901a1a70d4fb42d29e57e3a9919ba0e56aea9ab430a1290b3baf
+        checksum/configMaps: 5ba5911b5945af09eac17e240253986f8ada795716f33a4ed81ce5a532a8a982
       labels:
         app.kubernetes.io/controller: main
         app.kubernetes.io/instance: openclaw-nix
@@ -236,11 +236,9 @@ data:
     fiel assistente"}}]},"channels":{"matrix":{"accessToken":"${OPENCLAW_MATRIX_TOKEN}","autoJoin":"allowlist","autoJoinAllowList":["@jose:josevictor.me","@admin:josevictor.me","@zeh:josevictor.me"],"dm":{"allowFrom":["@jose:josevictor.me","@admin:josevictor.me","@zeh:josevictor.me"],"policy":"allowlist"},"enabled":true,"encryption":false,"groupPolicy":"disabled","homeserver":"http://synapse-matrix-synapse:8008","mediaMaxMb":150,"userId":"@openclaw:josevictor.me"},"whatsapp":{"ackReaction":{"direct":true,"emoji":"👀","group":"mentions"},"allowFrom":["${WHATSAPP_NUMBER}"],"dmPolicy":"allowlist","enabled":true,"groupAllowFrom":["${WHATSAPP_NUMBER}"],"groupPolicy":"allowlist"}},"env":{"COPILOT_GITHUB_TOKEN":"${COPILOT_GITHUB_TOKEN}","ELEVENLABS_API_KEY":"${ELEVENLABS_API_KEY}","MOONSHOT_API_KEY":"${MOONSHOT_API_KEY}","OPENROUTER_API_KEY":"${OPENCLAW_MATRIX_TOKEN}"},"gateway":{"bind":"lan","controlUi":{"dangerouslyAllowHostHeaderOriginFallback":true},"mode":"local","port":18789},"logging":{"level":"debug"},"messages":{"tts":{"auto":"inbound","elevenlabs":{"apiKey":"${ELEVENLABS_API_KEY}","modelId":"eleven_v3","seed":91,"voiceId":"GOkMqfyKMLVUcYfO2WbB","voiceSettings":{"similarityBoost":0.75,"speed":1.0,"stability":0.5,"style":0.0,"useSpeakerBoost":true}},"provider":"elevenlabs","summaryModel":"kimi-coding/k2p5"}},"models":{"mode":"merge","providers":{"kimi-coding":{"api":"anthropic-messages","apiKey":"${MOONSHOT_API_KEY}","baseUrl":"https://api.kimi.com/coding","models":[{"contextWindow":256000,"id":"k2p5","input":["text"],"maxTokens":8192,"name":"Kimi
     K2.5","reasoning":false}]},"minimax":{"api":"anthropic-messages","apiKey":"${MINIMAX_API_KEY}","baseUrl":"https://api.minimaxi.com/anthropic","models":[{"contextWindow":200000,"cost":{"cacheRead":2,"cacheWrite":10,"input":15,"output":60},"id":"MiniMax-M2.5","input":["text"],"maxTokens":8192,"name":"MiniMax
     M2.5","reasoning":true}]},"zai-coding-plan":{"api":"anthropic-messages","apiKey":"${Z_AI_API_KEY}","baseUrl":"https://api.z.ai/api/anthropic","models":[{"contextWindow":120000,"id":"glm-5","input":["text"],"maxTokens":8192,"name":"GLM-5","reasoning":true}]}}},"plugins":{"allow":["matrix","whatsapp","memory-core"],"slots":{"memory":"memory-core"}},"session":{"idleMinutes":60,"reset":{"atHour":4,"mode":"daily"},"scope":"per-sender"},"talk":{"apiKey":"${ELEVENLABS_API_KEY}","interruptOnSpeech":true,"modelId":"eleven_v3","outputFormat":"mp3_44100_128","voiceId":"GOkMqfyKMLVUcYfO2WbB"},"tools":{"allow":["exec","read","write","edit","process","web_search","web_fetch","canvas","nodes","image","message","gateway","browser","cron","browser","sessions_list","sessions_history","sessions_send","sessions_spawn","session_status","agents_list"],"deny":[],"media":{"audio":{"enabled":true,"models":[{"args":["-c","curl
-    -s -X POST ''https://api.elevenlabs.io/v1/speech-to-text'' \n                        -H
-    ''xi-api-key: $ELEVENLABS_API_KEY'' \n                        -F ''model_id=scribe_v2''
-    \n                        -F ''file=@$AUDIO_PATH'' \n                        -F
-    ''tag_audio_events=true'' \n                        -F ''language_code=por'' |
-    jq -r ''.text''"],"command":"sh","type":"cli"}]},"concurrency":2,"video":{"enabled":true,"maxBytes":52428800,"models":[{"model":"gemini-3-flash-preview","provider":"github-copilot"}]}},"web":{"search":{"perplexity":{"apiKey":"${OPENROUTER_API_KEY}","baseUrl":"https://openrouter.ai/api/v1","model":"perplexity/sonar-pro"},"provider":"perplexity"}}}}'
+    -s -X POST ''https://api.elevenlabs.io/v1/speech-to-text'' \\\n  -H \"xi-api-key:
+    $ELEVENLABS_API_KEY\" \\\n  -F ''model_id=scribe_v2'' \\\n  -F \"file=@$AUDIO_PATH\"
+    \\\n  -F ''tag_audio_events=true'' \\\n  -F ''language_code=por'' | jq -r ''.text''\n"],"command":"sh","type":"cli"}]},"concurrency":2,"video":{"enabled":true,"maxBytes":52428800,"models":[{"model":"gemini-3-flash-preview","provider":"github-copilot"}]}},"web":{"search":{"perplexity":{"apiKey":"${OPENROUTER_API_KEY}","baseUrl":"https://openrouter.ai/api/v1","model":"perplexity/sonar-pro"},"provider":"perplexity"}}}}'
 kind: ConfigMap
 metadata:
   annotations:
