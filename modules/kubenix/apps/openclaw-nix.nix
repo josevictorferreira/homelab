@@ -112,7 +112,7 @@ in
                 };
               };
               subagents = {
-                model = "minimax/MiniMax-M2.5";
+                model = "zai-coding-plan/glm-5";
                 maxConcurrent = 4;
                 runTimeoutSeconds = 900;
                 archiveAfterMinutes = 60;
@@ -140,6 +140,7 @@ in
               "nodes"
               "message"
               "gateway"
+              "cron"
               "browser"
               "sessions_list"
               "sessions_history"
