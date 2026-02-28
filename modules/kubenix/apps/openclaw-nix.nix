@@ -48,7 +48,7 @@ in
       inherit namespace;
       image = {
         repository = "ghcr.io/josevictorferreira/openclaw-nix";
-        tag = "2026.2.25";
+        tag = "v2026.2.26";
         pullPolicy = "Always";
       };
       port = 18789;
@@ -76,6 +76,10 @@ in
               workspace = "/home/node/.openclaw/workspace";
               model = {
                 primary = "kimi-coding/k2p5";
+                fallbacks = [
+                  "zai-coding-plan/glm-5"
+                  "minimax/MiniMax-M2.5"
+                ];
               };
               userTimezone = "America/Sao_Paulo";
               timeoutSeconds = 600;
@@ -90,6 +94,15 @@ in
               memorySearch = {
                 provider = "gemini";
                 model = "gemini-embedding-001";
+              };
+              compaction = {
+                reserveTokensFloor = 20000;
+                memoryFlush = {
+                  enabled = true;
+                  softThresholdTokens = 4000;
+                  systemPrompt = "Session nearing compaction. Store durable memories now.";
+                  prompt = "Write any lasting notes to memory/YYYY-MM-DD.md; reply with NO_REPLY if nothing to store.";
+                };
               };
               subagents = {
                 model = "minimax/MiniMax-M2.5";
@@ -198,7 +211,9 @@ in
             allow = [
               "matrix"
               "whatsapp"
+              "memory-core"
             ];
+            slots.memory = "memory-core";
           };
           gateway = {
             mode = "local";

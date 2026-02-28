@@ -86,10 +86,14 @@
     };
   };
 
-  plugins.allow = [
-    "matrix"
-    "whatsapp"
-  ];
+  plugins = {
+    allow = [
+      "matrix"
+      "whatsapp"
+      "memory-core"
+    ];
+    slots.memory = "memory-core";
+  };
 
   gateway = {
     mode = "local";
