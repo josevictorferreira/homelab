@@ -179,6 +179,15 @@ in
                   {
                     provider = "elevenlabs";
                     model = "scribe_v2";
+                    type = "provider";
+                    capabilities = [ "audio" ];
+                    providerOptions = {
+                      elevenlabs = {
+                        apiKey = "\${ELEVENLABS_API_KEY}";
+                        language = "pt";
+                        tagAudioEvents = true;
+                      };
+                    };
                   }
                 ];
               };
