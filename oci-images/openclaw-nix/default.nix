@@ -153,7 +153,6 @@ let
     # Strip runtime-unnecessary packages
     rm -rf $out/lib/openclaw/node_modules/.pnpm/typescript@*
     rm -rf $out/lib/openclaw/node_modules/.pnpm/@larksuiteoapi+*
-    rm -rf $out/lib/openclaw/node_modules/.pnpm/@line+*
     cd $out/lib/openclaw
     mkdir -p $out/etc
     for pkg in ${pkgs.tzdata}; do
