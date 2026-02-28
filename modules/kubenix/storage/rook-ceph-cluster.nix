@@ -87,7 +87,7 @@ in
               requests.memory = "64Mi";
             };
             osd = {
-              limits.memory = "4Gi";
+              limits.memory = "6Gi";
               requests.cpu = "50m";
               requests.memory = "64Mi";
             };
