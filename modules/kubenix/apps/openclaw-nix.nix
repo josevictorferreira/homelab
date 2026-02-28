@@ -55,8 +55,6 @@ in
       replicas = 1;
       secretName = "openclaw-config";
 
-      # Config template mounted at /etc/openclaw/config-template.json
-      # The image entrypoint copies it to /config/openclaw.json and substitutes env vars
       config = {
         filename = "config-template.json";
         mountPath = "/etc/openclaw";
@@ -139,8 +137,10 @@ in
               "web_fetch"
               "canvas"
               "nodes"
+              "image"
               "message"
               "gateway"
+              "browser"
               "cron"
               "browser"
               "sessions_list"
@@ -405,6 +405,12 @@ in
                 valueFrom.secretKeyRef = {
                   name = "openclaw-config";
                   key = "Z_AI_API_KEY";
+                };
+              };
+              COPILOTGITHUBTOKEN = {
+                valueFrom.secretKeyRef = {
+                  name = "openclaw-config";
+                  key = "COPILOTGITHUBTOKEN";
                 };
               };
               COPILOT_GITHUB_TOKEN = {
