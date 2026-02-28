@@ -95,7 +95,7 @@ let
       pkgs.curl
       pkgs.jq
       pkgs.gnused
-      pkgs.git
+      pkgs.gitMinimal
       (pkgs.python3.withPackages (ps: [
         ps.pip
         ps.requests
@@ -103,7 +103,7 @@ let
       pkgs.uv
       pkgs.ffmpeg-headless
       pkgs.github-cli
-      pkgs.nodejs_22
+      openclawPkgs.nodejs_22
       pkgs.procps
       pkgs.gnugrep
       pkgs.gawk
