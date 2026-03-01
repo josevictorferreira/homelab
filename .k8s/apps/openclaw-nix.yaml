@@ -131,6 +131,11 @@ spec:
               value: /home/node/.local/lib/python
             - name: PYTHONPATH
               value: /home/node/.local/lib/python
+            - name: SEARXNG_URL
+              valueFrom:
+                secretKeyRef:
+                  key: SEARXNG_URL
+                  name: openclaw-config
             - name: TZ
               value: America/Sao_Paulo
             - name: Z_AI_API_KEY
