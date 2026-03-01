@@ -386,11 +386,15 @@ in
             };
 
             env = {
-              OPENCLAW_CONFIG_PATH = "/config/openclaw.json";
+              OPENCLAW_CONFIG_PATH = "/home/node/.openclaw/openclaw.json";
               OPENCLAW_DATA_DIR = "/home/node/.openclaw";
               OPENCLAW_STATE_DIR = "/home/node/.openclaw";
-              HOME = "/state/home";
+              HOME = "/home/node";
               TZ = "America/Sao_Paulo";
+              NPM_CONFIG_PREFIX = "/home/node/.npm-global";
+              PIP_TARGET = "/home/node/.local/lib/python";
+              PYTHONPATH = "/home/node/.local/lib/python";
+              PATH = "/home/node/.local/bin:/home/node/.npm-global/bin:/bin:/usr/bin";
               NODE_PATH = "/lib/openclaw/extensions/matrix/node_modules";
 
               # Secret env refs
@@ -462,20 +466,43 @@ in
               "-c"
               ''
                 set -e
+
+                # Ensure persistent directories exist for npm/pip packages
+                mkdir -p /home/node/.npm-global/bin
+                mkdir -p /home/node/.local/lib/python
+                mkdir -p /home/node/.local/bin
+                mkdir -p /home/node/.config
+                mkdir -p /home/node/.openclaw
+
+                # Seed config from ConfigMap template if CephFS file doesn't exist yet
+                CONFIG_FILE="/home/node/.openclaw/openclaw.json"
+                if [ ! -f "$CONFIG_FILE" ]; then
+                  echo "First run: seeding config from template..."
+                  cp /etc/openclaw/config-template.json "$CONFIG_FILE"
+                  # Substitute secret env vars into the seeded config
+                  for var in OPENCLAW_MATRIX_TOKEN ELEVENLABS_API_KEY MOONSHOT_API_KEY OPENROUTER_API_KEY KIMI_API_KEY MINIMAX_API_KEY WHATSAPP_NUMBER WHATSAPP_BOT_NUMBER GEMINI_API_KEY GITHUB_TOKEN TS_AUTHKEY; do
+                    val=$(printenv "$var" 2>/dev/null || true)
+                    if [ -n "$val" ]; then
+                      pattern=$(printf '\x24{%s}' "$var")
+                      sed -i "s|$pattern|$val|g" "$CONFIG_FILE"
+                    fi
+                  done
+                  echo "Config seeded at $CONFIG_FILE"
+                else
+                  echo "Using existing config at $CONFIG_FILE"
+                fi
+
                 echo "Installing matrix plugin dependencies..."
 
                 # Find the actual nix store path where the gateway loads extensions from
-                # (resolves symlinks to get the real path)
                 MATRIX_EXT=$(readlink -f /lib/openclaw/extensions/matrix 2>/dev/null || echo "/lib/openclaw/extensions/matrix")
 
                 if [ -d "$MATRIX_EXT" ]; then
                   echo "Found matrix extension at: $MATRIX_EXT"
                   cd "$MATRIX_EXT"
 
-                  # Check if node_modules exists and has @vector-im/matrix-bot-sdk
                   if [ ! -d "node_modules/@vector-im" ]; then
                     echo "Installing npm dependencies..."
-                    # Strip workspace: protocol deps that npm can't handle
                     node -e "
                       const fs = require('fs');
                       const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
@@ -492,8 +519,7 @@ in
                 fi
 
                 echo "Starting openclaw gateway..."
-                # Run the entrypoint script which handles config generation and starts the gateway
-                exec /entrypoint.sh
+                exec openclaw gateway --port 18789
               ''
             ];
           };
@@ -555,44 +581,28 @@ in
         };
 
         persistence = {
-          scratch-config = {
-            type = "emptyDir";
-            advancedMounts.main.main = [ { path = "/config"; } ];
-          };
 
-          # Persistence: state (block storage, main container only)
-          state = {
-            type = "persistentVolumeClaim";
-            storageClass = "rook-ceph-block";
-            size = "10Gi";
-            accessMode = "ReadWriteOnce";
-            advancedMounts.main.main = [ { path = "/state"; } ];
-          };
-
-          # Persistence: logs (block storage, main container only)
-          logs = {
-            type = "persistentVolumeClaim";
-            storageClass = "rook-ceph-block";
-            size = "1Gi";
-            accessMode = "ReadWriteOnce";
-            advancedMounts.main.main = [ { path = "/logs"; } ];
-          };
-
-          # Persistence: CephFS shared storage — single PVC, two mounts
-          # Full shared at /home/node/shared, openclaw subdir at ~/.openclaw
+          # CephFS shared storage — single PVC, multiple subPath mounts
+          # /home/node = openclaw-home subPath (HOME dir, persistent npm/pip, .config)
+          # /home/node/.openclaw = openclaw subPath (workspace, memory, runtime state)
+          # /home/node/shared = full CephFS root (cross-app access)
           shared-storage = {
             type = "persistentVolumeClaim";
             existingClaim = "cephfs-shared-storage-root";
             advancedMounts.main.main = [
-              { path = "/home/node/shared"; }
+              {
+                path = "/home/node";
+                subPath = "openclaw-home";
+              }
               {
                 path = "/home/node/.openclaw";
                 subPath = "openclaw";
               }
+              { path = "/home/node/shared"; }
             ];
           };
 
-          # Persistence: tailscale state (block storage)
+          # Tailscale sidecar persistence (block storage)
           tailscale-state = {
             type = "persistentVolumeClaim";
             storageClass = "rook-ceph-block";
@@ -601,7 +611,6 @@ in
             advancedMounts.main.tailscale = [ { path = "/var/lib/tailscale"; } ];
           };
 
-          # Persistence: /dev/net/tun for tailscale
           dev-tun = {
             type = "hostPath";
             hostPath = "/dev/net/tun";
