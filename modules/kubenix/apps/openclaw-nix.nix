@@ -171,7 +171,7 @@ in
                     command = "sh";
                     args = [
                       "-c"
-                      "curl -s -X POST https://api.elevenlabs.io/v1/speech-to-text -H \"xi-api-key: $ELEVENLABS_API_KEY\" -F model_id=scribe_v2 -F \"file=@{{`{{MediaPath}}`}}\" -F tag_audio_events=true -F language_code=por | jq -r .text"
+                      "curl -s -X POST https://api.elevenlabs.io/v1/speech-to-text -H \"xi-api-key: \${ELEVENLABS_API_KEY}\" -F model_id=scribe_v2 -F \"file=@{{`{{MediaPath}}`}}\" -F tag_audio_events=true -F language_code=por | jq -r .text"
                     ];
                   }
                 ];
