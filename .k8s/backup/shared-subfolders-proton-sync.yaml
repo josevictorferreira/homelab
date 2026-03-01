@@ -17,81 +17,66 @@ spec:
         spec:
           containers:
             - args:
-                - "          set -euo pipefail\n\n          DATE=\"$(date +%Y-%m-%d)\"\
-                  \n          TIMESTAMP=\"$(date +%Y%m%d_%H%M%S)\"\n          MANIFEST_FILE=\"\
-                  manifest-$DATE.json\"\n\n          SOURCE_ROOT=\\\"/shared\\\"\n\
-                  \n          echo \\\"=== Starting Proton Drive shared subfolders\
-                  \ backup (rclone sync) ===\\\"\n          echo \\\"Date: $DATE\\\
-                  \"\n          echo \\\"Timestamp: $TIMESTAMP\\\"\n          echo\
-                  \ \\\"Folders to backup: notetaking images backups\\\"\n       \
-                  \   echo \\\"Destination: proton:Backups/${PROTON_DEST_PATH}/current/\\\
-                  \"\n\n          # Ensure rclone config directory exists\n      \
-                  \    mkdir -p \\\"$HOME/.config/rclone\\\"\n\n          # Check\
-                  \ if proton configuration exists, if not create it\n          if\
-                  \ ! grep -q \\\"\\[proton\\]\\\" \\\"$HOME/.config/rclone/rclone.conf\\\
-                  \" 2>/dev/null; then\n            echo \\\"Setting up initial Proton\
-                  \ Drive rclone config...\\\"\n            OBSCURED_PASS=\"$(rclone\
-                  \ obscure \"$PROTON_PASSWORD\")\"\n            cat >> \\\"$HOME/.config/rclone/rclone.conf\\\
-                  \" <<RCLONE_EOF\n  [proton]\n  type = protondrive\n  username =\
-                  \ $PROTON_USERNAME\n  password = $OBSCURED_PASS\n  RCLONE_EOF\n\
-                  \          fi\n\n          # Generate manifest of files\n      \
-                  \    echo \\\"Generating manifest...\\\"\n          WORKDIR=\\\"\
-                  /tmp/proton-backup-$TIMESTAMP\\\"\n          mkdir -p \\\"$WORKDIR\\\
-                  \"\n          cd \\\"$WORKDIR\\\"\n\n          echo \\\"{\\\" >\
-                  \ \\\"$MANIFEST_FILE\\\"\n          echo \"  \\\"backup_date\\\"\
-                  : \\\"$DATE\\\",\" >> \"$MANIFEST_FILE\"\n          echo \"  \\\"\
-                  timestamp\\\": \\\"$TIMESTAMP\\\",\" >> \"$MANIFEST_FILE\"\n   \
-                  \       echo \"  \\\"source_root\\\": \\\"/shared\\\",\" >> \"$MANIFEST_FILE\"\
-                  \n          echo \"  \\\"method\\\": \\\"rclone-sync-proton\\\"\
-                  ,\" >> \"$MANIFEST_FILE\"\n          echo \"  \\\"destination\\\"\
-                  : \\\"proton:Backups/${PROTON_DEST_PATH}/current/\\\", \\\" >> \\\
-                  \"$MANIFEST_FILE\\\"\"\n          echo \"  \\\"folders\\\": [ \\\
-                  \"notetaking\\\", \\\"images\\\", \\\"backups\\\" ],\" >> \\\"$MANIFEST_FILE\\\
-                  \"\n          echo \\\"  \\\\\"\n  folders\\\\\": [\\\\\"\n  notetaking\\\
-                  \\\", \\\\\"\n  images\\\\\", \\\\\"\n  backups\\\\\"],\\\" >> \\\
-                  \"$MANIFEST_FILE\\\"\n          echo \\\"  \\\\\"\n  files\\\\\"\
-                  : [\\\" >> \\\"$MANIFEST_FILE\\\"\n\n          FIRST=true\n    \
-                  \      for folder in notetaking images backups; do\n           \
-                  \ if [ -d \"$SOURCE_ROOT/$folder\" ]; then\n              while\
-                  \ IFS= read -r -d $'\\0' file; do\n                SIZE=\"$(stat\
-                  \ -c%s \"$file\" 2>/dev/null || echo 0)\"\n                MTIME=\"\
-                  $(stat -c%Y \"$file\" 2>/dev/null || echo 0)\"\n               \
-                  \ RELPATH=$(echo \"$file\" | sed \"s|^$SOURCE_ROOT/||\")\n     \
-                  \           if [ \"$FIRST\" = true ]; then\n                  FIRST=false\n\
-                  \                else\n                  echo \\\",\\\" >> \\\"\
-                  $MANIFEST_FILE\\\"\n                fi\n                echo -n\
-                  \ '        {\"path\": \"'\"$RELPATH\"'\", \"size\": $SIZE, \"mtime\"\
-                  : $MTIME}' >> \"$MANIFEST_FILE\"\n              done < <(find \"\
-                  $SOURCE_ROOT/$folder\" -type f ! -name \".DS_Store\" ! -name \"\
-                  Thumbs.db\" -print0 2>/dev/null)\n            fi\n          done\n\
-                  \n          echo \\\"\\\" >> \\\"$MANIFEST_FILE\\\"\n          echo\
-                  \ \\\"      ],\\\" >> \\\"$MANIFEST_FILE\\\"\n          echo ' \
-                  \     \"exclusions\": [\".DS_Store\", \"Thumbs.db\"]' >> \"$MANIFEST_FILE\"\
-                  \n          echo \\\"    }\\\" >> \\\"$MANIFEST_FILE\\\"\n\n   \
-                  \       # Ensure destination exists\n          echo \\\"Ensuring\
-                  \ remote directory exists...\\\"\n          rclone mkdir \\\"proton:Backups/${PROTON_DEST_PATH}\\\
-                  \" || true\n\n  # Sync each folder individually with filters\n \
-                  \ echo \\\"Starting rclone sync to Proton Drive...\\\"\n  for\n\
-                  \  folder in notetaking images backups;\n          echo \\\"Syncing\
-                  \ folder: \\$folder\\\"\n          rclone sync \\\"$SOURCE_ROOT/$folder\\\
-                  \" \\\"proton:Backups/${PROTON_DEST_PATH}/current/\\$folder/\\\"\
-                  \ --exclude \\\".DS_Store\\\" --exclude \\\"Thumbs.db\\\" --fast-list\
-                  \ --transfers 4 --checksum --stats-one-line --stats 30s --log-level\
-                  \ INFO\n  echo \\\"Syncing folder: \\$folder\\\"\n          echo\
-                  \ \\\"Warning: folder \\$folder not found, skipping\\\"\n  --exclude\
-                  \ \\\".DS_Store\\\" \\\n  --exclude \\\"Thumbs.db\\\" \\\n  --fast-list\
-                  \ \\\n  --transfers 4 \\\n  --checksum \\\n          rclone copy\
-                  \ \\\"$MANIFEST_FILE\\\" \\\"proton:Backups/${PROTON_DEST_PATH}/manifests/\\\
-                  \"\n  --stats 30s \\\n  --log-level INFO\n  else\n  echo \\\"Warning:\
-                  \ folder \\$folder not found, skipping\\\"\n  fi\n          echo\
-                  \ \\\"Destination: proton:Backups/${PROTON_DEST_PATH}/current/\\\
-                  \"\n          echo \\\"Manifest: proton:Backups/${PROTON_DEST_PATH}/manifests/$MANIFEST_FILE\\\
-                  \"\necho \\\"Uploading manifest...\\\"\n  rclone copy \\\"$MANIFEST_FILE\\\
-                  \" \\\"proton:Backups/${PROTON_DEST_PATH}/manifests/\\\"\n\n  #\
-                  \ Clean up\n  rm -rf \\\"$WORKDIR\\\"\n\n  echo \\\"=== Proton Drive\
-                  \ Backup completed successfully ===\\\"\n  echo \\\"Destination:\
-                  \ proton:Backups/${PROTON_DEST_PATH}/current/\\\"\n  echo \\\"Manifest:\
-                  \ proton:Backups/${PROTON_DEST_PATH}/manifests/$MANIFEST_FILE\\\"\
+                - "    set -euo pipefail\n\n    DATE=\"$(date +%Y-%m-%d)\"\n    TIMESTAMP=\"\
+                  $(date +%Y%m%d_%H%M%S)\"\n    MANIFEST_FILE=\"manifest-$DATE.json\"\
+                  \n\n    SOURCE_ROOT=\"/shared\"\n\n    echo \"=== Starting Proton\
+                  \ Drive shared subfolders backup (rclone sync) ===\"\n    echo \"\
+                  Date: $DATE\"\n    echo \"Timestamp: $TIMESTAMP\"\n    echo \"Folders\
+                  \ to backup: notetaking images backups openclaw\"\n    echo \"Destination:\
+                  \ proton:Backups/homelab/shared-archives/current/\"\n\n    # Ensure\
+                  \ rclone config directory exists\n    mkdir -p \"$HOME/.config/rclone\"\
+                  \n\n    # Check if proton configuration exists, if not create it\n\
+                  \    if ! grep -q \"\\[proton\\]\" \"$HOME/.config/rclone/rclone.conf\"\
+                  \ 2>/dev/null; then\n      echo \"Setting up initial Proton Drive\
+                  \ rclone config...\"\n      OBSCURED_PASS=\"$(rclone obscure \"\
+                  $PROTON_PASSWORD\")\"\n      cat >> \"$HOME/.config/rclone/rclone.conf\"\
+                  \ <<RCLONE_EOF\n[proton]\ntype = protondrive\nusername = $PROTON_USERNAME\n\
+                  password = $OBSCURED_PASS\nRCLONE_EOF\n    fi\n\n    # Generate\
+                  \ manifest of files\n    echo \"Generating manifest...\"\n    WORKDIR=\"\
+                  /tmp/proton-backup-$TIMESTAMP\"\n    mkdir -p \"$WORKDIR\"\n   \
+                  \ cd \"$WORKDIR\"\n\n    echo \"{\" > \"$MANIFEST_FILE\"\n    echo\
+                  \ \"  \\\"backup_date\\\": \\\"$DATE\\\",\" >> \"$MANIFEST_FILE\"\
+                  \n    echo \"  \\\"timestamp\\\": \\\"$TIMESTAMP\\\",\" >> \"$MANIFEST_FILE\"\
+                  \n    echo \"  \\\"source_root\\\": \\\"/shared\\\",\" >> \"$MANIFEST_FILE\"\
+                  \n    echo \"  \\\"method\\\": \\\"rclone-sync-proton\\\",\" >>\
+                  \ \"$MANIFEST_FILE\"\n    echo \"  \\\"destination\\\": \\\"proton:Backups/homelab/shared-archives/current/\\\
+                  \",\" >> \"$MANIFEST_FILE\"\n    echo \"  \\\"folders\\\": [\\\"\
+                  notetaking\\\", \\\"images\\\", \\\"backups\\\", \\\"openclaw\\\"\
+                  ],\" >> \"$MANIFEST_FILE\"\n    echo \"  \\\"files\\\": [\" >> \"\
+                  $MANIFEST_FILE\"\n\n    FIRST=true\n    for folder in notetaking\
+                  \ images backups openclaw; do\n      if [ -d \"$SOURCE_ROOT/$folder\"\
+                  \ ]; then\n        while IFS= read -r -d $'\\0' file; do\n     \
+                  \     SIZE=\"$(stat -c%s \"$file\" 2>/dev/null || echo 0)\"\n  \
+                  \        MTIME=\"$(stat -c%Y \"$file\" 2>/dev/null || echo 0)\"\n\
+                  \          RELPATH=$(echo \"$file\" | sed \"s|^$SOURCE_ROOT/||\"\
+                  )\n          if [ \"$FIRST\" = true ]; then\n            FIRST=false\n\
+                  \          else\n            echo \",\" >> \"$MANIFEST_FILE\"\n\
+                  \          fi\n          echo -n \"        {\\\"path\\\": \\\"$RELPATH\\\
+                  \", \\\"size\\\": $SIZE, \\\"mtime\\\": $MTIME}\" >> \"$MANIFEST_FILE\"\
+                  \n        done < <(find \"$SOURCE_ROOT/$folder\" -type f ! -name\
+                  \ \".DS_Store\" ! -name \"Thumbs.db\" -print0 2>/dev/null)\n   \
+                  \   fi\n    done\n\n    echo \"\" >> \"$MANIFEST_FILE\"\n    echo\
+                  \ \"      ],\" >> \"$MANIFEST_FILE\"\n    echo \"      \\\"exclusions\\\
+                  \": [\\\".DS_Store\\\", \\\"Thumbs.db\\\"]\" >> \"$MANIFEST_FILE\"\
+                  \n    echo \"    }\" >> \"$MANIFEST_FILE\"\n\n    # Ensure destination\
+                  \ exists\n    echo \"Ensuring remote directory exists...\"\n   \
+                  \ rclone mkdir \"proton:Backups/homelab/shared-archives\" || true\n\
+                  \n    # Sync each folder individually with filters\n    echo \"\
+                  Starting rclone sync to Proton Drive...\"\n    for folder in notetaking\
+                  \ images backups openclaw; do\n      if [ -d \"$SOURCE_ROOT/$folder\"\
+                  \ ]; then\n        echo \"Syncing folder: $folder\"\n        rclone\
+                  \ sync \"$SOURCE_ROOT/$folder\" \"proton:Backups/homelab/shared-archives/current/$folder/\"\
+                  \ \\\n          --exclude \".DS_Store\" \\\n          --exclude\
+                  \ \"Thumbs.db\" \\\n          --fast-list \\\n          --transfers\
+                  \ 4 \\\n          --checksum \\\n          --stats-one-line \\\n\
+                  \          --stats 30s \\\n          --log-level INFO\n      else\n\
+                  \        echo \"Warning: folder $folder not found, skipping\"\n\
+                  \      fi\n    done\n\n    # Upload manifest\n    echo \"Uploading\
+                  \ manifest...\"\n    rclone copy \"$MANIFEST_FILE\" \"proton:Backups/homelab/shared-archives/manifests/\"\
+                  \n\n    # Clean up\n    rm -rf \"$WORKDIR\"\n\n    echo \"=== Proton\
+                  \ Drive Backup completed successfully ===\"\n    echo \"Destination:\
+                  \ proton:Backups/homelab/shared-archives/current/\"\n    echo \"\
+                  Manifest: proton:Backups/homelab/shared-archives/manifests/$MANIFEST_FILE\"\
                   \n"
               command:
                 - bash
