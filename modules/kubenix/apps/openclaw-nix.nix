@@ -458,6 +458,12 @@ in
                   key = "GITHUB_TOKEN";
                 };
               };
+              SEARXNG_URL = {
+                valueFrom.secretKeyRef = {
+                  name = "openclaw-config";
+                  key = "SEARXNG_URL";
+                };
+              };
             };
 
             # Command: install matrix deps then start gateway
