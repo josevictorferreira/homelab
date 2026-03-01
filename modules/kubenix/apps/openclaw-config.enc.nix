@@ -22,6 +22,7 @@ in
       OPENCLAW_MATRIX_TOKEN = kubenix.lib.secretsFor "openclaw_matrix_token";
       ELEVENLABS_API_KEY = kubenix.lib.secretsFor "elevenlabs_api_key";
       GITHUB_TOKEN = kubenix.lib.secretsFor "github_token";
+      SEARXNG_URL = kubenix.lib.secretsFor "searxng_url";
       WHATSAPP_NUMBER = kubenix.lib.secretsFor "whatsapp_number";
       WHATSAPP_BOT_NUMBER = kubenix.lib.secretsFor "whatsapp_bot_number";
     };
