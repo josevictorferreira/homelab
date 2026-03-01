@@ -27,15 +27,16 @@ spec:
                   \ = $MINIO_ENDPOINT\nregion = sa-east-1\nforce_path_style = true\n\
                   EOF\n\necho \"Verifying backup exists in MinIO...\"\n\n# Check that\
                   \ the current/ folder structure exists\nSMOKE_OK=true\nTOTAL_FILES=0\n\
-                  \nfor folder in notetaking images backups; do\n  echo \"Checking\
-                  \ folder: $folder\"\n\n  # Count files in this folder\n  COUNT=$(rclone\
-                  \ lsl \"minio:homelab-backup-shared/current/$folder/\" 2>/dev/null\
-                  \ | wc -l || echo \"0\")\n\n  if [ \"$COUNT\" -gt 0 ]; then\n  \
-                  \  echo \"OK: folder $folder exists with $COUNT items\"\n    TOTAL_FILES=$((TOTAL_FILES\
-                  \ + COUNT))\n  else\n    echo \"FAIL: folder $folder is empty or\
-                  \ missing\"\n    SMOKE_OK=false\n  fi\ndone\n\necho \"Total files\
-                  \ in backup: $TOTAL_FILES\"\n\n# Verify latest manifest exists\n\
-                  echo \"Checking manifest...\"\nLATEST_MANIFEST=$(rclone lsl \"minio:homelab-backup-shared/manifests/\"\
+                  \nfor folder in notetaking images backups openclaw; do\n  echo \"\
+                  Checking folder: $folder\"\n\n  # Count files in this folder\n \
+                  \ COUNT=$(rclone lsl \"minio:homelab-backup-shared/current/$folder/\"\
+                  \ 2>/dev/null | wc -l || echo \"0\")\n\n  if [ \"$COUNT\" -gt 0\
+                  \ ]; then\n    echo \"OK: folder $folder exists with $COUNT items\"\
+                  \n    TOTAL_FILES=$((TOTAL_FILES + COUNT))\n  else\n    echo \"\
+                  FAIL: folder $folder is empty or missing\"\n    SMOKE_OK=false\n\
+                  \  fi\ndone\n\necho \"Total files in backup: $TOTAL_FILES\"\n\n\
+                  # Verify latest manifest exists\necho \"Checking manifest...\"\n\
+                  LATEST_MANIFEST=$(rclone lsl \"minio:homelab-backup-shared/manifests/\"\
                   \ 2>/dev/null | sort -k2 | tail -1 || true)\n\nif [ -n \"$LATEST_MANIFEST\"\
                   \ ]; then\n  echo \"OK: Found manifest - $LATEST_MANIFEST\"\nelse\n\
                   \  echo \"WARN: No manifest found (backup may not have completed)\"\
