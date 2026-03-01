@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/controller: main
@@ -27,7 +27,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/configMaps: 0a6b75fec5f9ab9f9084fb85c8c8d52e58ddcbc0af95cd3fe960e0f4a2211b65
+        checksum/configMaps: b3e55fc110e89b21857a7eee850079ae6d351f77de873bb22bdf8cff58d3ea14
       labels:
         app.kubernetes.io/controller: main
         app.kubernetes.io/instance: openclaw-nix
@@ -150,22 +150,22 @@ spec:
               name: state
         - env:
             - name: TS_ACCEPT_DNS
-              value: 'false'
+              value: "false"
             - name: TS_AUTHKEY
               valueFrom:
                 secretKeyRef:
                   key: TS_AUTHKEY
                   name: openclaw-config
             - name: TS_AUTH_ONCE
-              value: 'true'
+              value: "true"
             - name: TS_HOSTNAME
               value: openclaw-nix
             - name: TS_KUBE_SECRET
-              value: ''
+              value: ""
             - name: TS_STATE_DIR
               value: /var/lib/tailscale
             - name: TS_USERSPACE
-              value: 'false'
+              value: "false"
           image: tailscale/tailscale:latest
           name: tailscale
           securityContext:
@@ -190,7 +190,7 @@ spec:
           - 100.100.100.100
         options:
           - name: ndots
-            value: '5'
+            value: "5"
         searches:
           - apps.svc.cluster.local
           - svc.cluster.local
@@ -230,19 +230,20 @@ spec:
 ---
 apiVersion: v1
 data:
-  config-template.json: '{"agents":{"defaults":{"compaction":{"memoryFlush":{"enabled":true,"prompt":"Write
+  config-template.json:
+    '{"agents":{"defaults":{"compaction":{"memoryFlush":{"enabled":true,"prompt":"Write
     any lasting notes to memory/YYYY-MM-DD.md; reply with NO_REPLY if nothing to store.","softThresholdTokens":4000,"systemPrompt":"Session
     nearing compaction. Store durable memories now."},"reserveTokensFloor":20000},"contextPruning":{"mode":"cache-ttl","ttl":"30m"},"imageModel":{"fallbacks":["kimi-coding/k2p5"],"primary":"github-copilot/gemini-3-flash-preview"},"memorySearch":{"experimental":{"sessionMemory":true},"model":"gemini-embedding-001","provider":"gemini","sources":["memory","sessions"]},"model":{"fallbacks":["kimi-coding/k2p5","zai-coding-plan/glm-5","minimax/MiniMax-M2.5"],"primary":"github-copilot/claude-opus-4.6"},"subagents":{"archiveAfterMinutes":60,"maxConcurrent":4,"model":"zai-coding-plan/glm-5","runTimeoutSeconds":900},"timeoutSeconds":600,"userTimezone":"America/Sao_Paulo","workspace":"/home/node/.openclaw/workspace"},"list":[{"id":"main","identity":{"emoji":"🐕","name":"Mel","theme":"minha
     fiel assistente"}}]},"channels":{"matrix":{"accessToken":"${OPENCLAW_MATRIX_TOKEN}","autoJoin":"allowlist","autoJoinAllowList":["@jose:josevictor.me","@admin:josevictor.me","@zeh:josevictor.me"],"dm":{"allowFrom":["@jose:josevictor.me","@admin:josevictor.me","@zeh:josevictor.me"],"policy":"allowlist"},"enabled":true,"encryption":false,"groupPolicy":"disabled","homeserver":"http://synapse-matrix-synapse:8008","mediaMaxMb":150,"userId":"@openclaw:josevictor.me"},"whatsapp":{"ackReaction":{"direct":true,"emoji":"👀","group":"mentions"},"allowFrom":["${WHATSAPP_NUMBER}"],"dmPolicy":"allowlist","enabled":true,"groupAllowFrom":["${WHATSAPP_NUMBER}"],"groupPolicy":"allowlist"}},"env":{"COPILOT_GITHUB_TOKEN":"${COPILOT_GITHUB_TOKEN}","ELEVENLABS_API_KEY":"${ELEVENLABS_API_KEY}","MOONSHOT_API_KEY":"${MOONSHOT_API_KEY}","OPENROUTER_API_KEY":"${OPENCLAW_MATRIX_TOKEN}"},"gateway":{"bind":"lan","controlUi":{"dangerouslyAllowHostHeaderOriginFallback":true},"mode":"local","port":18789},"logging":{"level":"debug"},"messages":{"tts":{"auto":"inbound","elevenlabs":{"apiKey":"${ELEVENLABS_API_KEY}","modelId":"eleven_v3","seed":91,"voiceId":"GOkMqfyKMLVUcYfO2WbB","voiceSettings":{"similarityBoost":0.75,"speed":1.0,"stability":0.5,"style":0.0,"useSpeakerBoost":true}},"provider":"elevenlabs","summaryModel":"kimi-coding/k2p5"}},"models":{"mode":"merge","providers":{"kimi-coding":{"api":"anthropic-messages","apiKey":"${MOONSHOT_API_KEY}","baseUrl":"https://api.kimi.com/coding","models":[{"contextWindow":256000,"id":"k2p5","input":["text"],"maxTokens":8192,"name":"Kimi
     K2.5","reasoning":false}]},"minimax":{"api":"anthropic-messages","apiKey":"${MINIMAX_API_KEY}","baseUrl":"https://api.minimaxi.com/anthropic","models":[{"contextWindow":200000,"cost":{"cacheRead":2,"cacheWrite":10,"input":15,"output":60},"id":"MiniMax-M2.5","input":["text"],"maxTokens":8192,"name":"MiniMax
     M2.5","reasoning":true}]},"zai-coding-plan":{"api":"anthropic-messages","apiKey":"${Z_AI_API_KEY}","baseUrl":"https://api.z.ai/api/anthropic","models":[{"contextWindow":120000,"id":"glm-5","input":["text"],"maxTokens":8192,"name":"GLM-5","reasoning":true}]}}},"plugins":{"allow":["matrix","whatsapp","memory-core"],"slots":{"memory":"memory-core"}},"session":{"idleMinutes":60,"reset":{"atHour":4,"mode":"daily"},"scope":"per-sender"},"talk":{"apiKey":"${ELEVENLABS_API_KEY}","interruptOnSpeech":true,"modelId":"eleven_v3","outputFormat":"mp3_44100_128","voiceId":"GOkMqfyKMLVUcYfO2WbB"},"tools":{"allow":["exec","read","write","edit","process","web_search","web_fetch","canvas","nodes","image","message","gateway","browser","cron","browser","sessions_list","sessions_history","sessions_send","sessions_spawn","session_status","agents_list"],"deny":[],"media":{"audio":{"enabled":true,"models":[{"args":["-c","curl
     -s -X POST https://api.elevenlabs.io/v1/speech-to-text -H \"xi-api-key: $ELEVENLABS_API_KEY\"
-    -F model_id=scribe_v2 -F \"file=@$AUDIO_PATH\" -F tag_audio_events=true -F language_code=por
+    -F model_id=scribe_v2 -F \"file=@{{MediaPath}}\" -F tag_audio_events=true -F language_code=por
     | jq -r .text"],"command":"sh","type":"cli"}]},"concurrency":2,"video":{"enabled":true,"maxBytes":52428800,"models":[{"model":"gemini-3-flash-preview","provider":"github-copilot"}]}},"web":{"search":{"perplexity":{"apiKey":"${OPENROUTER_API_KEY}","baseUrl":"https://openrouter.ai/api/v1","model":"perplexity/sonar-pro"},"provider":"perplexity"}}}}'
 kind: ConfigMap
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/instance: openclaw-nix
@@ -258,7 +259,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/instance: openclaw-nix
@@ -281,7 +282,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/instance: openclaw-nix
@@ -304,7 +305,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/instance: openclaw-nix
@@ -327,7 +328,7 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
     lbipam.cilium.io/ips: 10.10.10.141
     lbipam.cilium.io/sharing-key: openclaw-nix
@@ -358,7 +359,7 @@ kind: Ingress
 metadata:
   annotations:
     cert-manager.io/cluster-issuer: cloudflare-issuer
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/instance: openclaw-nix
@@ -391,7 +392,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   name: openclaw-nix
   namespace: apps
@@ -400,26 +401,26 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   name: openclaw-nix-cluster-admin
 rules:
   - apiGroups:
-      - '*'
+      - "*"
     resources:
-      - '*'
+      - "*"
     verbs:
-      - '*'
+      - "*"
   - nonResourceURLs:
-      - '*'
+      - "*"
     verbs:
-      - '*'
+      - "*"
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   name: openclaw-nix-cluster-admin
 roleRef:
