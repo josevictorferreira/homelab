@@ -38,24 +38,35 @@ spec:
         - command:
             - bash
             - -c
-            - "set -e\necho \"Installing matrix plugin dependencies...\"\n\n# Find\
-              \ the actual nix store path where the gateway loads extensions from\n\
-              # (resolves symlinks to get the real path)\nMATRIX_EXT=$(readlink -f\
+            - "set -e\n\n# Ensure persistent directories exist for npm/pip packages\n\
+              mkdir -p /home/node/.npm-global/bin\nmkdir -p /home/node/.local/lib/python\n\
+              mkdir -p /home/node/.local/bin\nmkdir -p /home/node/.config\nmkdir -p\
+              \ /home/node/.openclaw\n\n# Seed config from ConfigMap template if CephFS\
+              \ file doesn't exist yet\nCONFIG_FILE=\"/home/node/.openclaw/openclaw.json\"\
+              \nif [ ! -f \"$CONFIG_FILE\" ]; then\n  echo \"First run: seeding config\
+              \ from template...\"\n  cp /etc/openclaw/config-template.json \"$CONFIG_FILE\"\
+              \n  # Substitute secret env vars into the seeded config\n  for var in\
+              \ OPENCLAW_MATRIX_TOKEN ELEVENLABS_API_KEY MOONSHOT_API_KEY OPENROUTER_API_KEY\
+              \ KIMI_API_KEY MINIMAX_API_KEY WHATSAPP_NUMBER WHATSAPP_BOT_NUMBER GEMINI_API_KEY\
+              \ GITHUB_TOKEN TS_AUTHKEY; do\n    val=$(printenv \"$var\" 2>/dev/null\
+              \ || true)\n    if [ -n \"$val\" ]; then\n      pattern=$(printf '\\\
+              x24{%s}' \"$var\")\n      sed -i \"s|$pattern|$val|g\" \"$CONFIG_FILE\"\
+              \n    fi\n  done\n  echo \"Config seeded at $CONFIG_FILE\"\nelse\n \
+              \ echo \"Using existing config at $CONFIG_FILE\"\nfi\n\necho \"Installing\
+              \ matrix plugin dependencies...\"\n\n# Find the actual nix store path\
+              \ where the gateway loads extensions from\nMATRIX_EXT=$(readlink -f\
               \ /lib/openclaw/extensions/matrix 2>/dev/null || echo \"/lib/openclaw/extensions/matrix\"\
               )\n\nif [ -d \"$MATRIX_EXT\" ]; then\n  echo \"Found matrix extension\
-              \ at: $MATRIX_EXT\"\n  cd \"$MATRIX_EXT\"\n\n  # Check if node_modules\
-              \ exists and has @vector-im/matrix-bot-sdk\n  if [ ! -d \"node_modules/@vector-im\"\
-              \ ]; then\n    echo \"Installing npm dependencies...\"\n    # Strip\
-              \ workspace: protocol deps that npm can't handle\n    node -e \"\n \
-              \     const fs = require('fs');\n      const pkg = JSON.parse(fs.readFileSync('package.json',\
+              \ at: $MATRIX_EXT\"\n  cd \"$MATRIX_EXT\"\n\n  if [ ! -d \"node_modules/@vector-im\"\
+              \ ]; then\n    echo \"Installing npm dependencies...\"\n    node -e\
+              \ \"\n      const fs = require('fs');\n      const pkg = JSON.parse(fs.readFileSync('package.json',\
               \ 'utf8'));\n      delete pkg.devDependencies;\n      fs.writeFileSync('package.json',\
               \ JSON.stringify(pkg, null, 2));\n    \"\n    npm install --omit=dev\
               \ --no-package-lock --legacy-peer-deps 2>&1 || echo \"WARN: npm install\
               \ failed\"\n    echo \"Matrix plugin dependencies installed\"\n  else\n\
               \    echo \"node_modules already exists with deps, skipping\"\n  fi\n\
               else\n  echo \"Matrix extension not found at $MATRIX_EXT\"\nfi\n\necho\
-              \ \"Starting openclaw gateway...\"\n# Run the entrypoint script which\
-              \ handles config generation and starts the gateway\nexec /entrypoint.sh\n"
+              \ \"Starting openclaw gateway...\"\nexec openclaw gateway --port 18789\n"
           env:
             - name: COPILOTGITHUBTOKEN
               valueFrom:
@@ -83,7 +94,7 @@ spec:
                   key: GITHUB_TOKEN
                   name: openclaw-config
             - name: HOME
-              value: /state/home
+              value: /home/node
             - name: KIMI_API_KEY
               valueFrom:
                 secretKeyRef:
@@ -96,8 +107,10 @@ spec:
                   name: openclaw-config
             - name: NODE_PATH
               value: /lib/openclaw/extensions/matrix/node_modules
+            - name: NPM_CONFIG_PREFIX
+              value: /home/node/.npm-global
             - name: OPENCLAW_CONFIG_PATH
-              value: /config/openclaw.json
+              value: /home/node/.openclaw/openclaw.json
             - name: OPENCLAW_DATA_DIR
               value: /home/node/.openclaw
             - name: OPENCLAW_MATRIX_TOKEN
@@ -112,6 +125,12 @@ spec:
                 secretKeyRef:
                   key: OPENROUTER_API_KEY
                   name: openclaw-config
+            - name: PATH
+              value: /home/node/.local/bin:/home/node/.npm-global/bin:/bin:/usr/bin
+            - name: PIP_TARGET
+              value: /home/node/.local/lib/python
+            - name: PYTHONPATH
+              value: /home/node/.local/lib/python
             - name: TZ
               value: America/Sao_Paulo
             - name: Z_AI_API_KEY
@@ -137,17 +156,14 @@ spec:
               name: config
               readOnly: true
               subPath: config-template.json
-            - mountPath: /logs
-              name: logs
-            - mountPath: /config
-              name: scratch-config
-            - mountPath: /home/node/shared
+            - mountPath: /home/node
               name: shared-storage
+              subPath: openclaw-home
             - mountPath: /home/node/.openclaw
               name: shared-storage
               subPath: openclaw
-            - mountPath: /state
-              name: state
+            - mountPath: /home/node/shared
+              name: shared-storage
         - env:
             - name: TS_ACCEPT_DNS
               value: 'false'
@@ -213,20 +229,12 @@ spec:
         - hostPath:
             path: /dev/net/tun
           name: dev-tun
-        - name: logs
-          persistentVolumeClaim:
-            claimName: openclaw-nix-logs
-        - emptyDir: {}
-          name: scratch-config
         - name: shared-storage
           persistentVolumeClaim:
             claimName: cephfs-shared-storage-root
-        - name: state
-          persistentVolumeClaim:
-            claimName: openclaw-nix-state
         - name: tailscale-state
           persistentVolumeClaim:
-            claimName: openclaw-nix-tailscale-state
+            claimName: openclaw-nix
 ---
 apiVersion: v1
 data:
@@ -267,53 +275,7 @@ metadata:
     helm.sh/chart: app-template-4.2.0
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
-  name: openclaw-nix-logs
-  namespace: apps
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 1Gi
-  storageClassName: rook-ceph-block
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  annotations:
-    kubenix/k8s-version: '1.32'
-    kubenix/project-name: ze-homelab
-  labels:
-    app.kubernetes.io/instance: openclaw-nix
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: openclaw-nix
-    helm.sh/chart: app-template-4.2.0
-    kubenix/module-name: release
-    kubenix/module-version: 1.0.0
-  name: openclaw-nix-state
-  namespace: apps
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 10Gi
-  storageClassName: rook-ceph-block
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  annotations:
-    kubenix/k8s-version: '1.32'
-    kubenix/project-name: ze-homelab
-  labels:
-    app.kubernetes.io/instance: openclaw-nix
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: openclaw-nix
-    helm.sh/chart: app-template-4.2.0
-    kubenix/module-name: release
-    kubenix/module-version: 1.0.0
-  name: openclaw-nix-tailscale-state
+  name: openclaw-nix
   namespace: apps
 spec:
   accessModes:
