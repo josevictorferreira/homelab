@@ -10,6 +10,7 @@ let
     "notetaking"
     "images"
     "backups"
+    "openclaw"
   ];
 
   restoreScript = ''
