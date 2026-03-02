@@ -3,7 +3,7 @@
   lib,
   inputs,
   system,
-  version ? "2026.2.26",
+  version ? "2026.3.1",
 }:
 
 let
@@ -14,8 +14,8 @@ let
     owner = "openclaw";
     repo = "openclaw";
     rev = "v${version}";
-    hash = "sha256-2PYEeERGmdrmP8bwJlj3fyyqtx9hNDnjT4nvVN0awUc=";
-    pnpmDepsHash = "sha256-BjJze+4IGmQLttN1z8/kEPii8qvKjLFN56AArvipluo=";
+    hash = "sha256-5GscUtSgHwQ8kTN1WkTDprPHr4pZ7xTDwGBPKCyuojg=";
+    pnpmDepsHash = "sha256-vSxbDWuetQL7WrnsHxnW7b8hzrDoIT2ER0DJg7fH/rU=";
   };
 
   # Rolldown 1.0.0-rc.3 — pre-built from npm registry
@@ -36,7 +36,6 @@ let
     url = "https://registry.npmjs.org/@rolldown/pluginutils/-/pluginutils-1.0.0-rc.3.tgz";
     sha256 = "05njq25fg7qx1pmww7mqq5rwhj9f0kk6129ifydij1q2759b3pkj";
   };
-
 
   rolldown = pkgs.stdenv.mkDerivation {
     pname = "rolldown";
