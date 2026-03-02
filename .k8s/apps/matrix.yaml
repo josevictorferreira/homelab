@@ -25,8 +25,8 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: 618844adc5b3f88ba7f8aeabf0cd12715167626f7fcf0a1659ef83d8d02e220d
-        checksum/secrets: 48465119658983f952612fe1a7afed048a06ff7e5504fffc600caa8e9596a966
+        checksum/config: 1d15c584d7fd4e585cca277d188c65b5480352e83f7f1292a3dc0f68487110ee
+        checksum/secrets: b8339aa38ca9a41ab73883518b8042994453f0f539a58641bbfdd5ebd53fb5ac
       labels:
         app.kubernetes.io/component: synapse
         app.kubernetes.io/instance: synapse
@@ -41,9 +41,12 @@ spec:
               \ \"${REDIS_PASSWORD:-}\" | sed 's/\\//\\\\\\//g' | sed 's/\\&/\\\\\\\
               &/g') && \\\ncat /synapse/secrets/*.yaml | \\\n  sed -e \"s/@@POSTGRES_PASSWORD@@/${POSTGRES_PASSWORD:-}/\"\
               \ \\\n      -e \"s/@@REDIS_PASSWORD@@/${REDIS_PASSWORD:-}/\" \\\n  \
-              \       > /synapse/config/conf.d/secrets.yaml\n\nexec python -B -m synapse.app.homeserver\
-              \ \\\n            -c /synapse/config/homeserver.yaml \\\n          \
-              \  -c /synapse/config/conf.d/\n"
+              \       > /synapse/config/conf.d/secrets.yaml\n\n\nmkdir -p /modules\n\
+              echo '[default]' > /modules/aws-config\necho 's3 =' >> /modules/aws-config\n\
+              echo '  addressing_style = path' >> /modules/aws-config\npip install\
+              \ --no-cache-dir --target /modules synapse-s3-storage-provider\n\nexec\
+              \ python -B -m synapse.app.homeserver \\\n            -c /synapse/config/homeserver.yaml\
+              \ \\\n            -c /synapse/config/conf.d/\n"
           env:
             - name: POSTGRES_PASSWORD
               valueFrom:
@@ -55,6 +58,22 @@ spec:
                 secretKeyRef:
                   key: redis-password
                   name: redis-auth
+            - name: PYTHONPATH
+              value: /modules
+            - name: AWS_CONFIG_FILE
+              value: /modules/aws-config
+            - name: AWS_EC2_METADATA_DISABLED
+              value: 'true'
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  key: AWS_ACCESS_KEY_ID
+                  name: matrix-synapse-media
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: AWS_SECRET_ACCESS_KEY
+                  name: matrix-synapse-media
           image: ghcr.io/element-hq/synapse:v1.146.0
           imagePullPolicy: IfNotPresent
           livenessProbe:
@@ -96,6 +115,8 @@ spec:
               name: media
             - mountPath: /tmp
               name: tmpdir
+            - mountPath: /modules
+              name: synapse-python-modules
             - mountPath: /synapse/config/conf.d/mautrix-whatsapp-registration.yaml
               name: mautrix-whatsapp-registration
               readOnly: true
@@ -130,6 +151,8 @@ spec:
         - name: media
           persistentVolumeClaim:
             claimName: synapse-matrix-synapse
+        - emptyDir: {}
+          name: synapse-python-modules
         - name: mautrix-whatsapp-registration
           secret:
             items:
@@ -252,7 +275,11 @@ data:
     \ trusted servers to download signing keys from.\ntrusted_key_servers:\n  - server_name:\
     \ matrix.org\n\n## Workers ##\n\n## Extra config ##\n\napp_service_config_files:\n\
     - /synapse/config/conf.d/mautrix-whatsapp-registration.yaml\n- /synapse/config/conf.d/mautrix-discord-registration.yaml\n\
-    - /synapse/config/conf.d/mautrix-slack-registration.yaml\nrc_admin_redaction:\n\
+    - /synapse/config/conf.d/mautrix-slack-registration.yaml\nmedia_storage_providers:\n\
+    - config:\n    bucket: matrix-synapse-media\n    endpoint_url: http://rook-ceph-rgw-ceph-objectstore.rook-ceph.svc.cluster.local\n\
+    \    prefix: synapse/\n    region_name: us-east-1\n    request_checksum_calculation:\
+    \ when_required\n    response_checksum_validation: when_required\n  module: s3_storage_provider.S3StorageProviderBackend\n\
+    \  store_local: true\n  store_remote: true\n  store_synchronous: false\nrc_admin_redaction:\n\
     \  burst_count: 200\n  per_second: 100\nrc_invites:\n  per_issuer:\n    burst_count:\
     \ 100\n    per_second: 50\n  per_room:\n    burst_count: 100\n    per_second:\
     \ 50\n  per_user:\n    burst_count: 100\n    per_second: 50\nrc_joins:\n  local:\n\
@@ -372,7 +399,7 @@ metadata:
   name: synapse-matrix-synapse
   namespace: apps
 stringData:
-  config.yaml: "## Registration ##\n\nregistration_shared_secret: \"lFTnTRINM0D9KY3c9IMPwCJU\"\
+  config.yaml: "## Registration ##\n\nregistration_shared_secret: \"PlqegpBvT0ZI9FkI1LCeZvl6\"\
     \n\n## API Configuration ##\n\n## Database configuration ##\n\ndatabase:\n  name:\
     \ \"psycopg2\"\n  args:\n    user: \"postgres\"\n    password: \"@@POSTGRES_PASSWORD@@\"\
     \n    database: \"synapse\"\n    host: \"postgresql-18-hl\"\n    port: 5432\n\
@@ -509,6 +536,18 @@ spec:
     - hosts:
         - matrix.josevictor.me
       secretName: wildcard-tls
+---
+apiVersion: objectbucket.io/v1alpha1
+kind: ObjectBucketClaim
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: matrix-synapse-media
+  namespace: apps
+spec:
+  bucketName: matrix-synapse-media
+  storageClassName: rook-ceph-objectstore
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
