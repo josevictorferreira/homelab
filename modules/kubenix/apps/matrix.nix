@@ -51,7 +51,8 @@ in
             "echo '[default]' > /modules/aws-config"
             "echo 's3 =' >> /modules/aws-config"
             "echo '  addressing_style = path' >> /modules/aws-config"
-            "pip install --no-cache-dir --target /modules synapse-s3-storage-provider"
+            "pip install --no-cache-dir --target /modules boto3 psycopg2-binary"
+            "pip install --no-cache-dir --target /modules --no-deps synapse-s3-storage-provider"
           ];
 
           extraVolumes = [
