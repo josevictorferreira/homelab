@@ -26,7 +26,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 1d15c584d7fd4e585cca277d188c65b5480352e83f7f1292a3dc0f68487110ee
-        checksum/secrets: b8339aa38ca9a41ab73883518b8042994453f0f539a58641bbfdd5ebd53fb5ac
+        checksum/secrets: 1e4ee6d1471bcb545e840a75309bfca9937af232bc8a819d3b770fea4422c339
       labels:
         app.kubernetes.io/component: synapse
         app.kubernetes.io/instance: synapse
@@ -44,8 +44,9 @@ spec:
               \       > /synapse/config/conf.d/secrets.yaml\n\n\nmkdir -p /modules\n\
               echo '[default]' > /modules/aws-config\necho 's3 =' >> /modules/aws-config\n\
               echo '  addressing_style = path' >> /modules/aws-config\npip install\
-              \ --no-cache-dir --target /modules synapse-s3-storage-provider\n\nexec\
-              \ python -B -m synapse.app.homeserver \\\n            -c /synapse/config/homeserver.yaml\
+              \ --no-cache-dir --target /modules boto3 psycopg2-binary\npip install\
+              \ --no-cache-dir --target /modules --no-deps synapse-s3-storage-provider\n\
+              \nexec python -B -m synapse.app.homeserver \\\n            -c /synapse/config/homeserver.yaml\
               \ \\\n            -c /synapse/config/conf.d/\n"
           env:
             - name: POSTGRES_PASSWORD
@@ -399,7 +400,7 @@ metadata:
   name: synapse-matrix-synapse
   namespace: apps
 stringData:
-  config.yaml: "## Registration ##\n\nregistration_shared_secret: \"PlqegpBvT0ZI9FkI1LCeZvl6\"\
+  config.yaml: "## Registration ##\n\nregistration_shared_secret: \"EZEratM0ZKcVC6bezwvXElBL\"\
     \n\n## API Configuration ##\n\n## Database configuration ##\n\ndatabase:\n  name:\
     \ \"psycopg2\"\n  args:\n    user: \"postgres\"\n    password: \"@@POSTGRES_PASSWORD@@\"\
     \n    database: \"synapse\"\n    host: \"postgresql-18-hl\"\n    port: 5432\n\
