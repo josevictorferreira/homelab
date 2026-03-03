@@ -16,7 +16,6 @@ in
       OPENROUTER_API_KEY = kubenix.lib.secretsFor "openrouter_api_key_openclaw";
       Z_AI_API_KEY = kubenix.lib.secretsFor "z_ai_api_key";
       COPILOT_GITHUB_TOKEN = kubenix.lib.secretsFor "copilot_github_token";
-      COPILOTGITHUBTOKEN = kubenix.lib.secretsFor "copilot_github_token";
       MINIMAX_API_KEY = kubenix.lib.secretsFor "minimax_api_key";
       KIMI_API_KEY = kubenix.lib.secretsFor "moonshot_api_key";
       OPENCLAW_MATRIX_TOKEN = kubenix.lib.secretsFor "openclaw_matrix_token";
@@ -25,6 +24,7 @@ in
       SEARXNG_URL = kubenix.lib.secretsFor "searxng_url";
       WHATSAPP_NUMBER = kubenix.lib.secretsFor "whatsapp_number";
       WHATSAPP_BOT_NUMBER = kubenix.lib.secretsFor "whatsapp_bot_number";
+      BAILIAN_CODING_PLAN_API_KEY = kubenix.lib.secretsFor "bailian_coding_plan_api_key";
     };
   };
 }

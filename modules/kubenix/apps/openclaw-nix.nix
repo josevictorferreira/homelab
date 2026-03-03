@@ -278,6 +278,7 @@ in
             MOONSHOT_API_KEY = "\${MOONSHOT_API_KEY}";
             ELEVENLABS_API_KEY = "\${ELEVENLABS_API_KEY}";
             OPENROUTER_API_KEY = "\${OPENCLAW_MATRIX_TOKEN}";
+            BAILIAN_CODING_PLAN_API_KEY = "\${BAILIAN_CODING_PLAN_API_KEY}";
           };
           models = {
             mode = "merge";
@@ -416,12 +417,6 @@ in
                   key = "Z_AI_API_KEY";
                 };
               };
-              COPILOTGITHUBTOKEN = {
-                valueFrom.secretKeyRef = {
-                  name = "openclaw-config";
-                  key = "COPILOTGITHUBTOKEN";
-                };
-              };
               COPILOT_GITHUB_TOKEN = {
                 valueFrom.secretKeyRef = {
                   name = "openclaw-config";
@@ -462,6 +457,12 @@ in
                 valueFrom.secretKeyRef = {
                   name = "openclaw-config";
                   key = "SEARXNG_URL";
+                };
+              };
+              BAILIAN_CODING_PLAN_API_KEY = {
+                valueFrom.secretKeyRef = {
+                  name = "openclaw-config";
+                  key = "BAILIAN_CODING_PLAN_API_KEY";
                 };
               };
             };
