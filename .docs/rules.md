@@ -280,7 +280,24 @@
 **Context:** The migration script is defined as an entry point and isn't copied when using --no-deps. Must be available at `/modules/s3_media_upload` or downloaded separately.
 **Verify:** `kubectl exec -n apps deploy/synapse-matrix-synapse -c synapse -- python /modules/s3_media_upload --help`
 
-### s3_media_upload Requires Database Connection
-**Lesson:** The `s3_media_upload` script requires direct database access (via `homeserver.yaml` or `--database-config`) to update the media_storage_provider tracking table. Filesystem-only access is insufficient.
-**Context:** The script updates a database table to track which files have been uploaded to S3. Without DB access, it reports "0 files" even when media exists.
-**Verify:** Run with `--database-config` pointing to valid Synapse DB credentials, or ensure `homeserver.yaml` is readable.
+### s3_media_upload Only Migrates DB-Tracked Files — Use Direct S3 Sync for Pre-Existing Media
+**Lesson:** `s3_media_upload` only uploads files tracked in the Synapse database. For media predating the S3 provider (existing on PVC), use direct `aws s3 sync` instead.
+**Context:** The script queries the DB for media to upload — if files exist on disk but aren't in the DB's media tracking tables, they're skipped. Direct S3 sync bypasses this: `aws s3 sync /synapse/data/media/local_content s3://bucket/local_content/ --endpoint-url=...`
+**Verify:** After `s3_media_upload update`, check cache.db row count — if 0 but files exist on disk, use direct sync instead.
+
+### Helm Test Pods Are Ephemeral — Ignore Failures for Running Apps
+**Lesson:** Pods with `helm.sh/hook: test-success` are one-time validation jobs, not ongoing health checks. Failed test pods don't indicate app problems.
+**Context:** The `synapse-matrix-synapse-test-connection` pod failed due to busybox wget issues, but Synapse itself was healthy. Delete stale test pods: `kubectl delete pod <name>-test-connection -n <ns>`
+**Verify:** Check app deployment status separately from test pod status.
+
+## Kubernetes Operations
+
+### Always Verify kubectl Context Before Cluster Operations
+**Lesson:** Run `kubectl config current-context` before any cluster operations. Multi-cluster environments (EKS + k3s) make it easy to operate on the wrong cluster.
+**Context:** Ran commands against AWS EKS instead of homelab k3s for significant time. The contexts look similar in output but target completely different infrastructure.
+**Verify:** `kubectl config current-context` matches expected cluster name before proceeding.
+
+### RWO PVCs + GitOps Auto-Scale = Conflict — Suspend Flux for Manual Ops
+**Lesson:** When manually mounting a ReadWriteOnce PVC (e.g., for migration jobs), GitOps controllers will auto-scale deployments back up, causing PVC mount conflicts.
+**Context:** Scaled down Synapse to free PVC for migration, but Flux auto-scaled it back up. Either suspend the Flux Kustomization (`flux suspend kustomization <name>`) or accept the race condition and retry.
+**Verify:** After scaling down: `flux suspend kustomization apps -n flux-system` before starting manual PVC operations.
