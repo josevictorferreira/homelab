@@ -1,0 +1,110 @@
+# Task 4: Configure Synapse media_storage_providers for S3/RGW
+
+## Verification Evidence
+
+### 1. media_storage_providers Config (ConfigMap)
+
+Location: `.k8s/apps/matrix.yaml` (ConfigMap `synapse-matrix-synapse`)
+
+```yaml
+media_storage_providers:
+- config:
+    bucket: matrix-synapse-media
+    endpoint_url: http://rook-ceph-rgw-ceph-objectstore.rook-ceph.svc.cluster.local
+    prefix: synapse/
+    region_name: us-east-1
+    request_checksum_calculation: when_required
+    response_checksum_validation: when_required
+  module: s3_storage_provider.S3StorageProviderBackend
+  store_local: true
+  store_remote: true
+  store_synchronous: false
+```
+
+Verification command:
+```bash
+cat .k8s/apps/matrix.yaml | grep -A30 "media_storage_providers"
+```
+
+### 2. AWS Credentials (Deployment)
+
+Location: `.k8s/apps/matrix.yaml` (Deployment `synapse-matrix-synapse`)
+
+```yaml
+env:
+  - name: POSTGRES_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        key: postgres-password
+        name: synapse-env
+  - name: REDIS_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        key: redis-password
+        name: redis-auth
+  - name: PYTHONPATH
+    value: /modules
+  - name: AWS_CONFIG_FILE
+    value: /modules/aws-config
+  - name: AWS_EC2_METADATA_DISABLED
+    value: 'true'
+  - name: AWS_ACCESS_KEY_ID
+    valueFrom:
+      secretKeyRef:
+        key: AWS_ACCESS_KEY_ID
+        name: matrix-synapse-media
+  - name: AWS_SECRET_ACCESS_KEY
+    valueFrom:
+      secretKeyRef:
+        key: AWS_SECRET_ACCESS_KEY
+        name: matrix-synapse-media
+```
+
+Verification command:
+```bash
+cat .k8s/apps/matrix.yaml | grep -A80 "kind: Deployment" | grep -A60 "env:"
+```
+
+### 3. Source Configuration
+
+File: `modules/kubenix/apps/matrix.nix`
+
+Changes made:
+1. Added `media_storage_providers` list to `extraConfig` with:
+   - `module`: "s3_storage_provider.S3StorageProviderBackend"
+   - `store_local`: true
+   - `store_remote`: true
+   - `store_synchronous`: false
+   - `config.bucket`: bucketName ("matrix-synapse-media")
+   - `config.endpoint_url`: kubenix.lib.objectStoreEndpoint
+   - `config.region_name`: "us-east-1"
+   - `config.prefix`: "synapse/"
+   - `config.request_checksum_calculation`: "when_required"
+   - `config.response_checksum_validation`: "when_required"
+
+2. Added AWS credential env vars to `synapse.extraEnv`:
+   - `AWS_ACCESS_KEY_ID` from secret `matrix-synapse-media`
+   - `AWS_SECRET_ACCESS_KEY` from secret `matrix-synapse-media`
+
+### 4. Build Verification
+
+```bash
+$ make manifests
+# Completed successfully - all manifests generated and encrypted
+```
+
+### 5. Files Modified
+
+- `modules/kubenix/apps/matrix.nix` - Added S3 storage provider configuration
+- `.k8s/apps/matrix.yaml` - Generated manifest with S3 config
+- `.k8s/apps/matrix-config.enc.yaml` - Generated encrypted config
+
+## Summary
+
+Synapse is now configured to:
+- Store local uploads to S3 (RGW)
+- Store remote media (avatars, etc.) to S3 (RGW)
+- Use async writes (store_synchronous: false)
+- Authenticate with OBC-generated credentials via env vars
+- Use path-style addressing (RGW-compatible)
+- Disable checksum calculation/validation (RGW-compatible)

@@ -1,0 +1,11 @@
+Chart: ananace/matrix-synapse v3.12.19 ns=apps
+
+synapse.extraCommands: yes (array of shell cmds before start)
+
+synapse.extraEnv: yes (extra env vars)
+
+synapse.extraVolumes: yes
+
+synapse.extraVolumeMounts: yes (already used for bridges)
+
+Pod: synapse-matrix-synapse-74474486cf-nm8kn (dynamic hash)

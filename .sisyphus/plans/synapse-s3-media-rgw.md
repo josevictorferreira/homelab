@@ -1,19 +1,23 @@
 # Synapse media -> Ceph RGW (S3) bucket (OBC creds) via synapse-s3-storage-provider
 
 ## TL;DR
-> Switch Synapse media backend to Ceph RGW S3 bucket using `matrix-org/synapse-s3-storage-provider` installed via initContainer + PYTHONPATH.
+> Switch Synapse media backend to Ceph RGW S3 bucket using `matrix-org/synapse-s3-storage-provider` installed at container start via `synapse.extraCommands` (pip install into mounted `/modules`) + `PYTHONPATH`.
 
 **Deliverables**
 - OBC bucket: `matrix-synapse-media`
 - Synapse Helm values updated:
-  - initContainer pip-installs provider into shared volume
-  - Synapse env loads OBC creds + sets `PYTHONPATH`
-  - `media_storage_providers` configured (store local+remote, prefix enabled)
+  - Synapse runs runtime pip-install into `/modules` (no initContainer)
+  - Synapse env loads OBC creds + sets `PYTHONPATH=/modules`
+  - `media_storage_providers` configured (store local+remote, prefix enabled, async writes)
 - Migration runbook (agent-executable): upload existing media to S3; verify; then delete local
+
+**Fallback**
+- If RGW/S3 down: serve existing + accept new (read/write local; async S3 uploads retry)
+- Weekly manual sync/prune: keep ~30d local cache; strict age-based delete only after confirmed in S3
 
 **Effort**: Medium
 **Parallelism**: YES (3-4 waves)
-**Critical path**: chart-capability check -> OBC bucket -> Synapse config+initContainer -> deploy -> migrate -> cleanup
+**Critical path**: chart-capability check -> OBC bucket -> Synapse config+extraCommands -> deploy -> migrate -> cleanup
 
 ---
 
@@ -29,9 +33,13 @@ Use a Ceph-backed “object store bucket” as main asset/media storage for Matr
 - Creds: **OBC-generated Secret** (no SOPS static keys)
 - Store: **local + remote media**
 - Prefix: **YES** (e.g. `synapse/`)
-- Module install: **initContainer pip install** + shared volume + `PYTHONPATH`
+- Module install: **runtime pip install** via chart `synapse.extraCommands` + `/modules` volume + `PYTHONPATH`
 - Bucket name: **matrix-synapse-media**
 - Post-migration: **delete local after verify**
+- Fallback behavior when RGW/S3 down: **serve existing + accept new** (local-first; async S3)
+- `store_synchronous`: **false** (async)
+- Local retention: strict **30d**, manual runbook only, run **weekly**
+- region_name: **us-east-1**
 - Include: **deploy + verify** (Flux reconcile + runtime checks)
 
 ### Repo references (patterns to follow)
@@ -85,15 +93,15 @@ Make Ceph RGW S3 bucket the source of truth for Synapse media (uploads + remote 
 ### Parallel waves (target 5-8 tasks/wave)
 
 Wave 1 (discovery / de-risk)
-- chart capability + correct value keys for initContainer/env/volumes
+- chart capability + correct value keys for extraCommands/env/volumes/extraConfig
 - confirm media store path + python env details in running pod
-- confirm OBC secret key names and RGW endpoint behavior (path-style + checksum fallback)
+- confirm OBC secret key names and RGW endpoint behavior (checksum compatibility)
 
 Wave 2 (infra)
 - add OBC resource for bucket
 
 Wave 3 (synapse changes)
-- add initContainer + shared volume + PYTHONPATH
+- add runtime pip install (extraCommands) + shared volume + PYTHONPATH
 - wire env from OBC secret
 - configure `media_storage_providers`
 
@@ -109,13 +117,13 @@ Wave 4 (deploy + migrate)
 
   **What to do**:
   - Confirm the ananace/matrix-synapse chart value keys for:
-    - initContainers
+    - `synapse.extraCommands`
     - extra env / envFrom
     - extraVolumes / mounts
     - extraConfig injection for `homeserver.yaml`
   - Confirm current Synapse media store path inside the container (the directory that holds `local_content` etc.)
   - Confirm OBC secret key names (expect `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`) in the apps namespace.
-  - Decide whether provider needs checksum compatibility config for RGW (`request_checksum_calculation` / `response_checksum_validation`). Default: leave as provider default unless failures.
+  - Plan RGW checksum compatibility settings (provider supports `request_checksum_calculation` / `response_checksum_validation`). Default: set to `when_required`.
 
   **Must NOT do**:
   - Don’t change Synapse federation/registration behavior.
@@ -136,7 +144,7 @@ Wave 4 (deploy + migrate)
   - Provider README: https://github.com/matrix-org/synapse-s3-storage-provider (config keys + migration script).
 
   **Acceptance criteria**:
-  - [ ] Plan updated with exact chart keys to use for initContainer/env/volumes.
+  - [ ] Plan updated with exact chart keys to use for extraCommands/env/volumes.
   - [ ] Media store path recorded (absolute path).
 
   **QA scenarios**:
@@ -196,12 +204,12 @@ Wave 4 (deploy + migrate)
     Evidence: .sisyphus/evidence/task-2-obc-bound.txt
   ```
 
-- [ ] 3. Add shared python module volume + initContainer pip install
+- [ ] 3. Add shared python module volume + runtime pip install (extraCommands)
 
   **What to do**:
   - Add an `emptyDir` volume (e.g., `synapse-python-modules`).
-  - InitContainer runs `pip install --no-cache-dir --target /modules synapse-s3-storage-provider` (and deps if needed) into that volume.
-  - Create an AWS config file to force S3 path-style (RGW-friendly):
+  - Synapse container start (`synapse.extraCommands`) runs `pip install --no-cache-dir --target /modules synapse-s3-storage-provider` into that volume.
+  - Create an AWS config file to force S3 path-style (RGW-friendly) during startup:
     - Write `/modules/aws-config` with:
       - `[default]`
       - `s3 =`
@@ -229,7 +237,7 @@ Wave 4 (deploy + migrate)
   - Existing initContainer patterns: `modules/kubenix/apps/protonmail-bridge.nix`, `mautrix-*.nix`.
 
   **Acceptance criteria**:
-  - [ ] Generated Deployment includes initContainer, volume, mount, and PYTHONPATH env.
+  - [ ] Generated Deployment includes extraCommands, volume, mount, and PYTHONPATH env.
   - [ ] After deploy: `python -c 'import s3_storage_provider'` succeeds inside Synapse container.
 
   **QA scenarios**:
@@ -247,15 +255,15 @@ Wave 4 (deploy + migrate)
   **What to do**:
   - Update Synapse config in Helm values to include:
     - `media_storage_providers` with module `s3_storage_provider.S3StorageProviderBackend`
-    - `store_local: true`, `store_remote: true`, `store_synchronous: true`
+    - `store_local: true`, `store_remote: true`, `store_synchronous: false`
     - `config.bucket: matrix-synapse-media`
     - `config.endpoint_url: ${kubenix.lib.objectStoreEndpoint}`
     - `config.region_name: us-east-1`
     - `config.prefix: synapse/`
-    - `config.access_key_id` and `secret_access_key` via env or config injection (prefer env-based boto3 resolution if chart supports envFrom)
-  - If RGW checksum errors observed, set:
-    - `request_checksum_calculation: when_supported`
-    - `response_checksum_validation: when_supported`
+  - Creds: prefer **env-based boto3 resolution** (inject `AWS_ACCESS_KEY_ID`/`AWS_SECRET_ACCESS_KEY` from OBC Secret into container env).
+  - Set checksum compatibility explicitly:
+    - `request_checksum_calculation: when_required`
+    - `response_checksum_validation: when_required`
 
   **Recommended Agent Profile**:
   - **Category**: general
@@ -354,6 +362,35 @@ Wave 4 (deploy + migrate)
       4. Fetch a known old media URL; expect HTTP 200.
     Expected: old media served; local files removed.
     Evidence: .sisyphus/evidence/task-6-migration.txt
+  ```
+
+- [ ] 6b. Fallback + local retention runbook (manual weekly)
+
+  **What to do**:
+  - Document RGW/S3 outage behavior target: **serve existing + accept new**
+    - Reads: local-first; if missing locally, S3 may 5xx while down; do NOT break existing local cache serving.
+    - Writes: accept uploads to local; async S3 upload resumes when RGW returns.
+    - Monitoring: document log grep patterns and “backlog growing” indicators.
+  - Document weekly operator procedure to keep strict ~30d local cache:
+    - Run `s3_media_upload update ...` then `upload ...` (idempotent)
+    - Verify upload health (exit code + expected log lines)
+    - Prune local files older than 30d **only after** confirming objects exist in S3.
+  - Note accepted risks:
+    - Runtime `pip install` depends on PyPI each restart (emptyDir; no cache).
+
+  **Acceptance criteria**:
+  - [ ] Plan contains a copy/paste “Outage runbook” section with do/don’t + exact commands.
+  - [ ] Plan contains a copy/paste “Weekly sync+prune” section with exact commands + expected outputs.
+
+  **QA scenarios**:
+  ```
+  Scenario: Runbook is executable
+    Tool: Bash
+    Steps:
+      1. Extract the exact commands from this plan into a scratch file.
+      2. Sanity-check placeholders are defined: <apps-ns>, <pod>, <media_path>, <bucket>, <endpoint>.
+    Expected: commands are concrete (no TODO placeholders), ready for execution.
+    Evidence: .sisyphus/evidence/task-6b-runbook.txt
   ```
 
 ---

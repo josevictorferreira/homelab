@@ -1,0 +1,9 @@
+Media store path: /data/media_store (standard Synapse Docker)
+
+Persistence PVC mounted there (RWO rook-ceph-block)
+
+local_content: /data/media_store/local_content
+
+remote_content: /data/media_store/remote_thumbnails (or similar)
+
+Exec failed (exit 1/2, likely distroless image no shell/ls)

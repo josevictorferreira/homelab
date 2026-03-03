@@ -262,3 +262,25 @@
 **Lesson:** Use specific version tags (e.g., `2026.2.25`) instead of `latest` for container images deployed to Kubernetes. Node-level image caching causes `latest` to stay stale even with `imagePullPolicy: Always`.
 **Context:** Kubernetes nodes cache images tagged as `latest`. A rollout restart doesn't force a fresh pull if the node thinks it already has `latest`. Using explicit tags ensures the correct version is deployed.
 **Verify:** `kubectl get pod <pod> -o yaml | grep imageID` shows the expected digest for the version tag.
+
+## Synapse S3 Media Storage
+
+### Synapse Media Path is /synapse/data/media
+**Lesson:** Synapse stores media at `/synapse/data/media` NOT `/data/media_store`. Check the actual mount before planning migrations.
+**Context:** The matrix-synapse chart uses /synapse/data as the data directory, not /data. Migration scripts will fail if given wrong path.
+**Verify:** `kubectl exec -n apps deploy/synapse-matrix-synapse -c synapse -- ls -la /synapse/data/media/`
+
+### Runtime Pip Install Requires psycopg2-binary
+**Lesson:** When installing synapse-s3-storage-provider at runtime, install `psycopg2-binary` separately before the provider package to avoid compilation errors.
+**Context:** The container lacks build tools for psycopg2. Use `pip install boto3 psycopg2-binary` then `pip install --no-deps synapse-s3-storage-provider`.
+**Verify:** Check pod logs for "Failed to build psycopg2" - should not appear.
+
+### s3_media_upload Script Not Installed with --no-deps
+**Lesson:** Using `--no-deps` when installing synapse-s3-storage-provider skips the `s3_media_upload` console script. Download it manually from GitHub or install without --no-deps into a separate directory.
+**Context:** The migration script is defined as an entry point and isn't copied when using --no-deps. Must be available at `/modules/s3_media_upload` or downloaded separately.
+**Verify:** `kubectl exec -n apps deploy/synapse-matrix-synapse -c synapse -- python /modules/s3_media_upload --help`
+
+### s3_media_upload Requires Database Connection
+**Lesson:** The `s3_media_upload` script requires direct database access (via `homeserver.yaml` or `--database-config`) to update the media_storage_provider tracking table. Filesystem-only access is insufficient.
+**Context:** The script updates a database table to track which files have been uploaded to S3. Without DB access, it reports "0 files" even when media exists.
+**Verify:** Run with `--database-config` pointing to valid Synapse DB credentials, or ensure `homeserver.yaml` is readable.
