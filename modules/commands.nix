@@ -555,7 +555,7 @@ let
 
   # OpenClaw image configuration
   openclawImageName = "openclaw-nix";
-  openclawVersion = "2026.3.1";
+  openclawVersion = "2026.3.2";
   openclawRegistry = "ghcr.io";
 
   push-openclaw =
