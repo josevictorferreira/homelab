@@ -170,12 +170,17 @@ let
       cp -rL ${matrixPluginDeps}/matrix-deps/node_modules $out/lib/openclaw/extensions/matrix/
     fi
     chmod -R u+w $out/lib/openclaw/extensions/matrix/ 2>/dev/null || true
-    # Shim missing plugin-sdk subpath exports (upstream build regression #33001)
-    # Rolldown bundles keyed-async-queue into index.js but doesn't emit the separate file
-    if [ -f "$out/lib/openclaw/dist/plugin-sdk/index.js" ] && [ ! -f "$out/lib/openclaw/dist/plugin-sdk/keyed-async-queue.js" ]; then
-      chmod u+w "$out/lib/openclaw/dist/plugin-sdk/"
-      echo 'export * from "./index.js";' > "$out/lib/openclaw/dist/plugin-sdk/keyed-async-queue.js"
+    # Fix upstream build regression #33001: Rolldown bundles keyed-async-queue into index.js
+    # but OpenClaw's runtime TypeScript loader lacks the alias for this subpath.
+    # Patch the import to use the main plugin-sdk export which includes KeyedAsyncQueue.
+    SEND_QUEUE="$out/lib/openclaw/extensions/matrix/src/matrix/send-queue.ts"
+    if [ -f "$SEND_QUEUE" ]; then
+      chmod u+w "$SEND_QUEUE"
+      sed -i 's|openclaw/plugin-sdk/keyed-async-queue|openclaw/plugin-sdk|g' "$SEND_QUEUE"
     fi
+    # Add openclaw self-symlink so extensions can resolve "openclaw/*" imports
+    mkdir -p "$out/lib/openclaw/node_modules"
+    ln -sf ../ "$out/lib/openclaw/node_modules/openclaw"
     GATEWAY_STORE=$(readlink -f ${openclawGateway})
     find $out/lib/openclaw -type l 2>/dev/null | while read link; do
       tgt=$(readlink "$link")
