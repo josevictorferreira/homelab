@@ -85,6 +85,18 @@ let
     url = "https://github.com/matrix-org/matrix-rust-sdk-crypto-nodejs/releases/download/v0.4.0/matrix-sdk-crypto.linux-x64-gnu.node";
     sha256 = "sha256-cHjU3ZhxKPea/RksT2IfZK3s435D8qh1bx0KnwNN5xg=";
   };
+
+  fontsConf = pkgs.makeFontsConf {
+    fontDirectories = [
+      pkgs.dejavu_fonts
+      pkgs.noto-fonts
+      pkgs.noto-fonts-color-emoji
+      pkgs.noto-fonts-cjk-sans
+    ];
+  };
+
+  imageTag = "v${version}-v2";
+
   entrypointScriptText = builtins.readFile ./entrypoint.sh;
   # Merged CLI tools environment — single /bin/ with all tools accessible
   cliTools = pkgs.buildEnv {
@@ -120,6 +132,12 @@ let
       pkgs.openssh
       pkgs.rsync
       pkgs.kubectl
+      pkgs.chromium
+      pkgs.fontconfig
+      pkgs.dejavu_fonts
+      pkgs.noto-fonts
+      pkgs.noto-fonts-color-emoji
+      pkgs.noto-fonts-cjk-sans
     ];
     pathsToLink = [
       "/bin"
@@ -195,14 +213,17 @@ let
 in
 dockerTools.streamLayeredImage {
   name = "localhost/openclaw-nix";
-  tag = "v${version}";
+  tag = imageTag;
   contents = [
     openclawRootfs
     cliTools
   ];
   extraCommands = ''
-    mkdir -p ./config ./state ./logs ./tmp ./var/tmp
+    mkdir -p ./bin ./config ./state ./logs ./tmp ./var/tmp
     chmod 1777 ./tmp ./var/tmp
+
+    mkdir -p ./etc/fonts
+    cp ${fontsConf} ./etc/fonts/fonts.conf
 
     # Symlink all CLI tools into /bin/ (buildEnv bins get lost in layer merging)
     for bin in ${cliTools}/bin/*; do
@@ -229,6 +250,7 @@ dockerTools.streamLayeredImage {
     Env = [
       "OPENCLAW_STATE_DIR=/state/openclaw"
       "OPENCLAW_CONFIG_PATH=/config/openclaw.json"
+      "FONTCONFIG_FILE=/etc/fonts/fonts.conf"
       "HOME=/state/home"
       "PATH=/state/bin:/state/npm/bin:/bin:/usr/bin"
       "NPM_CONFIG_PREFIX=/state/npm"

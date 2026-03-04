@@ -72,6 +72,8 @@ in
             enabled = true;
             evaluateEnabled = true;
             headless = true;
+            executablePath = "/bin/chromium";
+            noSandbox = true;
           };
           models = {
             mode = "merge";
@@ -317,7 +319,7 @@ in
               };
               sandbox = {
                 browser = {
-                  enabled = true;
+                  enabled = false;
                   headless = true;
                 };
               };
