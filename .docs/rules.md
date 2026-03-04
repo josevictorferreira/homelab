@@ -301,3 +301,20 @@
 **Lesson:** When manually mounting a ReadWriteOnce PVC (e.g., for migration jobs), GitOps controllers will auto-scale deployments back up, causing PVC mount conflicts.
 **Context:** Scaled down Synapse to free PVC for migration, but Flux auto-scaled it back up. Either suspend the Flux Kustomization (`flux suspend kustomization <name>`) or accept the race condition and retry.
 **Verify:** After scaling down: `flux suspend kustomization apps -n flux-system` before starting manual PVC operations.
+
+## Podman OCI Image Management
+
+### Podman Push Silently Pushes Stale Image Due to GHCR Tag Collision
+**Lesson:** After `podman tag localhost/image:tag ghcr.io/.../image:tag`, a subsequent `podman pull ghcr.io/...` (e.g., to verify) overwrites the local GHCR tag with the REMOTE stale version. Always: (1) `podman rmi ghcr.io/...` to clear cached tag, (2) `podman tag localhost/...` to retag from local, (3) verify image ID with `podman images`, (4) push with `--format oci`.
+**Context:** Pushed openclaw-nix image that appeared correct but cluster pulled a stale version because podman's local GHCR tag pointed to the remote's old manifest, not the locally built image.
+**Verify:** `podman images | grep <ghcr-tag>` — IMAGE ID must match `localhost/` build before pushing.
+
+### Trace Full imageTag Computation Before Changing Version Strings
+**Lesson:** When bumping container image versions, trace the full tag computation chain (`version` → `imageTag` → pushed tag → K8s manifest tag). Changing version in one place without understanding the formula can produce unexpected tags like `v2026.3.2-v2-v2` (double suffix).
+**Context:** Changed `version = "2026.3.2-v2"` but `imageTag = "v${version}-v2"` produced `v2026.3.2-v2-v2`. Must `grep -n 'imageTag\|version\|Tag'` across all files to trace the full chain.
+**Verify:** `grep -rn 'imageTag\|openclawVersion\|image.tag' oci-images/ modules/` — ensure no double-suffix in computed tag.
+
+### Force Delete Pods Stuck Terminating During Large Image Pulls
+**Lesson:** When a rollout restart kills a pod mid-pull of a large image (6GB+), the pod gets stuck in `Terminating` state and no new pod is created (all ReplicaSets show DESIRED=0). Fix: `kubectl delete pod <name> -n <ns> --force --grace-period=0`, then a new pod is automatically created.
+**Context:** Rollout restart of openclaw-nix (6GB image) caused pod stuck Terminating for 10+ minutes. All 5 ReplicaSets showed DESIRED=0, CURRENT=0. Force-deleting the stuck pod allowed the new ReplicaSet to create a fresh pod.
+**Verify:** After force delete: `kubectl get pods -n <ns> -l app.kubernetes.io/name=<app>` shows new pod in ContainerCreating/Running state.
