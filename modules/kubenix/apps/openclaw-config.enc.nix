@@ -19,6 +19,9 @@ in
       MINIMAX_API_KEY = kubenix.lib.secretsFor "minimax_api_key";
       KIMI_API_KEY = kubenix.lib.secretsFor "moonshot_api_key";
       OPENCLAW_MATRIX_TOKEN = kubenix.lib.secretsFor "openclaw_matrix_token";
+      MEL_MATRIX_TOKEN = kubenix.lib.secretsFor "mel_matrix_token";
+      KIRA_MATRIX_TOKEN = kubenix.lib.secretsFor "kira_matrix_token";
+      LUNA_MATRIX_TOKEN = kubenix.lib.secretsFor "luna_matrix_token";
       ELEVENLABS_API_KEY = kubenix.lib.secretsFor "elevenlabs_api_key";
       GITHUB_TOKEN = kubenix.lib.secretsFor "github_token";
       SEARXNG_URL = kubenix.lib.secretsFor "searxng_url";
