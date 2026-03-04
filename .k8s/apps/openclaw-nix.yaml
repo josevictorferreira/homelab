@@ -26,8 +26,6 @@ spec:
     type: Recreate
   template:
     metadata:
-      annotations:
-        checksum/configMaps: e6683c35460c810f0c177101f73e9cae5a5039f131fe414bcaabc5018d419669
       labels:
         app.kubernetes.io/controller: main
         app.kubernetes.io/instance: openclaw-nix
@@ -45,21 +43,15 @@ spec:
               \ file doesn't exist yet\nCONFIG_FILE=\"/home/node/.openclaw/openclaw.json\"\
               \nif [ ! -f \"$CONFIG_FILE\" ]; then\n  echo \"First run: seeding config\
               \ from template...\"\n  cp /etc/openclaw/config-template.json \"$CONFIG_FILE\"\
-              \n  # Substitute secret env vars into the seeded config\n  for var in\
-              \ OPENCLAW_MATRIX_TOKEN ELEVENLABS_API_KEY MOONSHOT_API_KEY OPENROUTER_API_KEY\
-              \ KIMI_API_KEY MINIMAX_API_KEY WHATSAPP_NUMBER WHATSAPP_BOT_NUMBER GEMINI_API_KEY\
-              \ GITHUB_TOKEN TS_AUTHKEY; do\n    val=$(printenv \"$var\" 2>/dev/null\
-              \ || true)\n    if [ -n \"$val\" ]; then\n      pattern=$(printf '\\\
-              x24{%s}' \"$var\")\n      sed -i \"s|$pattern|$val|g\" \"$CONFIG_FILE\"\
-              \n    fi\n  done\n  echo \"Config seeded at $CONFIG_FILE\"\nelse\n \
-              \ echo \"Using existing config at $CONFIG_FILE\"\nfi\n\necho \"Installing\
-              \ matrix plugin dependencies...\"\n\n# Find the actual nix store path\
-              \ where the gateway loads extensions from\nMATRIX_EXT=$(readlink -f\
-              \ /lib/openclaw/extensions/matrix 2>/dev/null || echo \"/lib/openclaw/extensions/matrix\"\
-              )\n\nif [ -d \"$MATRIX_EXT\" ]; then\n  echo \"Found matrix extension\
-              \ at: $MATRIX_EXT\"\n  cd \"$MATRIX_EXT\"\n\n  if [ ! -d \"node_modules/@vector-im\"\
-              \ ]; then\n    echo \"Installing npm dependencies...\"\n    node -e\
-              \ \"\n      const fs = require('fs');\n      const pkg = JSON.parse(fs.readFileSync('package.json',\
+              \n\n  echo \"Config seeded at $CONFIG_FILE\"\nelse\n  echo \"Using existing\
+              \ config at $CONFIG_FILE\"\nfi\n\necho \"Installing matrix plugin dependencies...\"\
+              \n\n# Find the actual nix store path where the gateway loads extensions\
+              \ from\nMATRIX_EXT=$(readlink -f /lib/openclaw/extensions/matrix 2>/dev/null\
+              \ || echo \"/lib/openclaw/extensions/matrix\")\n\nif [ -d \"$MATRIX_EXT\"\
+              \ ]; then\n  echo \"Found matrix extension at: $MATRIX_EXT\"\n  cd \"\
+              $MATRIX_EXT\"\n\n  if [ ! -d \"node_modules/@vector-im\" ]; then\n \
+              \   echo \"Installing npm dependencies...\"\n    node -e \"\n      const\
+              \ fs = require('fs');\n      const pkg = JSON.parse(fs.readFileSync('package.json',\
               \ 'utf8'));\n      delete pkg.devDependencies;\n      fs.writeFileSync('package.json',\
               \ JSON.stringify(pkg, null, 2));\n    \"\n    npm install --omit=dev\
               \ --no-package-lock --legacy-peer-deps 2>&1 || echo \"WARN: npm install\
@@ -68,58 +60,8 @@ spec:
               else\n  echo \"Matrix extension not found at $MATRIX_EXT\"\nfi\n\necho\
               \ \"Starting openclaw gateway...\"\nexec openclaw gateway --port 18789\n"
           env:
-            - name: BAILIAN_CODING_PLAN_API_KEY
-              valueFrom:
-                secretKeyRef:
-                  key: BAILIAN_CODING_PLAN_API_KEY
-                  name: openclaw-config
-            - name: COPILOT_GITHUB_TOKEN
-              valueFrom:
-                secretKeyRef:
-                  key: COPILOT_GITHUB_TOKEN
-                  name: openclaw-config
-            - name: ELEVENLABS_API_KEY
-              valueFrom:
-                secretKeyRef:
-                  key: ELEVENLABS_API_KEY
-                  name: openclaw-config
-            - name: GEMINI_API_KEY
-              valueFrom:
-                secretKeyRef:
-                  key: GEMINI_API_KEY
-                  name: openclaw-config
-            - name: GITHUB_TOKEN
-              valueFrom:
-                secretKeyRef:
-                  key: GITHUB_TOKEN
-                  name: openclaw-config
             - name: HOME
               value: /home/node
-            - name: KIMI_API_KEY
-              valueFrom:
-                secretKeyRef:
-                  key: KIMI_API_KEY
-                  name: openclaw-config
-            - name: KIRA_MATRIX_TOKEN
-              valueFrom:
-                secretKeyRef:
-                  key: KIRA_MATRIX_TOKEN
-                  name: openclaw-config
-            - name: LUNA_MATRIX_TOKEN
-              valueFrom:
-                secretKeyRef:
-                  key: LUNA_MATRIX_TOKEN
-                  name: openclaw-config
-            - name: MEL_MATRIX_TOKEN
-              valueFrom:
-                secretKeyRef:
-                  key: MEL_MATRIX_TOKEN
-                  name: openclaw-config
-            - name: MINIMAX_API_KEY
-              valueFrom:
-                secretKeyRef:
-                  key: MINIMAX_API_KEY
-                  name: openclaw-config
             - name: NODE_PATH
               value: /lib/openclaw/extensions/matrix/node_modules
             - name: NPM_CONFIG_PREFIX
@@ -128,36 +70,16 @@ spec:
               value: /home/node/.openclaw/openclaw.json
             - name: OPENCLAW_DATA_DIR
               value: /home/node/.openclaw
-            - name: OPENCLAW_MATRIX_TOKEN
-              valueFrom:
-                secretKeyRef:
-                  key: OPENCLAW_MATRIX_TOKEN
-                  name: openclaw-config
             - name: OPENCLAW_STATE_DIR
               value: /home/node/.openclaw
-            - name: OPENROUTER_API_KEY
-              valueFrom:
-                secretKeyRef:
-                  key: OPENROUTER_API_KEY
-                  name: openclaw-config
             - name: PATH
               value: /home/node/.local/bin:/home/node/.npm-global/bin:/bin:/usr/bin
             - name: PIP_TARGET
               value: /home/node/.local/lib/python
             - name: PYTHONPATH
               value: /home/node/.local/lib/python
-            - name: SEARXNG_URL
-              valueFrom:
-                secretKeyRef:
-                  key: SEARXNG_URL
-                  name: openclaw-config
             - name: TZ
               value: America/Sao_Paulo
-            - name: Z_AI_API_KEY
-              valueFrom:
-                secretKeyRef:
-                  key: Z_AI_API_KEY
-                  name: openclaw-config
           envFrom:
             - secretRef:
                 name: openclaw-config
@@ -172,10 +94,9 @@ spec:
             runAsGroup: 0
             runAsUser: 0
           volumeMounts:
-            - mountPath: /etc/openclaw/config-template.json
-              name: config
+            - mountPath: /etc/openclaw
+              name: openclaw-config
               readOnly: true
-              subPath: config-template.json
             - mountPath: /home/node
               name: shared-storage
               subPath: openclaw-home
@@ -212,10 +133,6 @@ spec:
             runAsGroup: 0
             runAsUser: 0
           volumeMounts:
-            - mountPath: /etc/openclaw/config-template.json
-              name: config
-              readOnly: true
-              subPath: config-template.json
             - mountPath: /dev/net/tun
               name: dev-tun
             - mountPath: /var/lib/tailscale
@@ -240,49 +157,18 @@ spec:
         - name: ghcr-registry-secret
       serviceAccountName: openclaw-nix
       volumes:
-        - configMap:
-            items:
-              - key: config-template.json
-                path: config-template.json
-            name: openclaw-nix
-          name: config
         - hostPath:
             path: /dev/net/tun
           name: dev-tun
+        - configMap:
+            name: openclaw-config
+          name: openclaw-config
         - name: shared-storage
           persistentVolumeClaim:
             claimName: cephfs-shared-storage-root
         - name: tailscale-state
           persistentVolumeClaim:
             claimName: openclaw-nix
----
-apiVersion: v1
-data:
-  config-template.json: '{"agents":{"defaults":{"compaction":{"memoryFlush":{"enabled":true,"prompt":"Write
-    any lasting notes to memory/YYYY-MM-DD.md; reply with NO_REPLY if nothing to store.","softThresholdTokens":4000,"systemPrompt":"Session
-    nearing compaction. Store durable memories now."},"reserveTokensFloor":20000},"contextPruning":{"mode":"cache-ttl","ttl":"30m"},"humanDelay":{"mode":"natural"},"imageModel":{"fallbacks":["kimi-coding/k2p5"],"primary":"github-copilot/gemini-3-flash-preview"},"memorySearch":{"enabled":true,"experimental":{"sessionMemory":true},"extraPaths":[".learnings"],"model":"gemini-embedding-001","provider":"gemini","query":{"hybrid":{"enabled":true}},"sources":["memory","sessions"],"store":{"vector":{"enabled":true}}},"model":{"fallbacks":["kimi-coding/k2p5","zai-coding-plan/glm-5","minimax/MiniMax-M2.5"],"primary":"github-copilot/claude-opus-4.6"},"sandbox":{"browser":{"enabled":true,"headless":true}},"subagents":{"archiveAfterMinutes":60,"maxConcurrent":4,"model":"zai-coding-plan/glm-5","runTimeoutSeconds":900},"timeoutSeconds":600,"userTimezone":"America/Sao_Paulo"},"list":[{"id":"mel","identity":{"avatar":"avatars/mel.png","emoji":"🐕","name":"Mel","theme":"minha
-    fiel assistente"},"workspace":"/home/node/.openclaw/workspace-mel"},{"id":"kira","identity":{"avatar":"avatars/kira.png","emoji":"🐕","name":"Kira","theme":"minha
-    fiel contadora"},"tools":{"deny":["gateway","nodes","agents_list"]},"workspace":"/home/node/.openclaw/workspace-kira"},{"id":"luna","identity":{"avatar":"avatars/luna.png","emoji":"🐕","name":"Luna","theme":"minha
-    fiel companheira"},"workspace":"/home/node/.openclaw/workspace-luna"}]},"bindings":[{"agentId":"kira","match":{"accountId":"@kira","channel":"matrix"}},{"agentId":"luna","match":{"accountId":"@luna","channel":"matrix"}},{"agentId":"mel","match":{"accountId":"@mel","channel":"matrix"}}],"broadcast":{"strategy":"parallel"},"browser":{"enabled":true,"evaluateEnabled":true,"headless":true},"channels":{"matrix":{"accounts":{"default":{"groupAllowFrom":["@zeh:josevictor.me"],"groupPolicy":"allowlist","homeserver":"http://synapse-matrix-synapse:8008"},"kira":{"accessToken":"${KIRA_MATRIX_TOKEN}","homeserver":"http://synapse-matrix-synapse:8008","name":"Kira","userId":"@kira:josevictor.me"},"luna":{"accessToken":"${LUNA_MATRIX_TOKEN}","homeserver":"http://synapse-matrix-synapse:8008","name":"Luna","userId":"@luna:josevictor.me"},"mel":{"accessToken":"${MEL_MATRIX_TOKEN}","homeserver":"http://synapse-matrix-synapse:8008","name":"Mel","userId":"@mel:josevictor.me"}},"autoJoin":"always","dm":{"allowFrom":["@zeh:josevictor.me"],"policy":"allowlist"},"enabled":true,"encryption":false,"groups":{"*":{"allow":true,"requireMention":false}},"mediaMaxMb":150,"userId":"@mel:josevictor.me"},"whatsapp":{"ackReaction":{"direct":true,"emoji":"👀","group":"mentions"},"allowFrom":["+554388109393"],"debounceMs":0,"dmPolicy":"allowlist","enabled":true,"groupAllowFrom":["+554388109393"],"groupPolicy":"allowlist","mediaMaxMb":50}},"commands":{"native":"auto","nativeSkills":"auto","ownerDisplay":"raw","restart":true},"env":{"COPILOT_GITHUB_TOKEN":"${COPILOT_GITHUB_TOKEN}","ELEVENLABS_API_KEY":"${ELEVENLABS_API_KEY}","KIRA_MATRIX_TOKEN":"${KIRA_MATRIX_TOKEN}","LUNA_MATRIX_TOKEN":"${LUNA_MATRIX_TOKEN}","MEL_MATRIX_TOKEN":"${MEL_MATRIX_TOKEN}","MOONSHOT_API_KEY":"${MOONSHOT_API_KEY}","OPENROUTER_API_KEY":"${OPENROUTER_API_KEY}"},"gateway":{"bind":"lan","controlUi":{"dangerouslyAllowHostHeaderOriginFallback":true},"mode":"local","port":18789},"logging":{"level":"debug"},"memory":{"backend":"builtin","citations":"on"},"messages":{"removeAckAfterReply":true,"tts":{"auto":"inbound","elevenlabs":{"apiKey":"${ELEVENLABS_API_KEY}","modelId":"eleven_v3","seed":91,"voiceId":"GOkMqfyKMLVUcYfO2WbB","voiceSettings":{"similarityBoost":0.75,"speed":1,"stability":0.5,"style":0,"useSpeakerBoost":true}},"provider":"elevenlabs","summaryModel":"kimi-coding/k2p5"}},"models":{"mode":"merge","providers":{"bailian":{"api":"openai-completions","apiKey":"${BAILIAN_CODING_PLAN_API_KEY}","baseUrl":"https://coding-intl.dashscope.aliyuncs.com/v1","models":[{"contextWindow":1000000,"cost":{"cacheRead":0,"cacheWrite":0,"input":0,"output":0},"id":"qwen3.5-plus","input":["text","image"],"maxTokens":65536,"name":"qwen3.5-plus","reasoning":false},{"contextWindow":262144,"cost":{"cacheRead":0,"cacheWrite":0,"input":0,"output":0},"id":"qwen3-max-2026-01-23","input":["text"],"maxTokens":65536,"name":"qwen3-max-2026-01-23","reasoning":false},{"contextWindow":262144,"cost":{"cacheRead":0,"cacheWrite":0,"input":0,"output":0},"id":"qwen3-coder-next","input":["text"],"maxTokens":65536,"name":"qwen3-coder-next","reasoning":false},{"contextWindow":1000000,"cost":{"cacheRead":0,"cacheWrite":0,"input":0,"output":0},"id":"qwen3-coder-plus","input":["text"],"maxTokens":65536,"name":"qwen3-coder-plus","reasoning":false},{"contextWindow":204800,"cost":{"cacheRead":0,"cacheWrite":0,"input":0,"output":0},"id":"MiniMax-M2.5","input":["text"],"maxTokens":131072,"name":"MiniMax-M2.5","reasoning":false},{"contextWindow":202752,"cost":{"cacheRead":0,"cacheWrite":0,"input":0,"output":0},"id":"glm-5","input":["text"],"maxTokens":16384,"name":"glm-5","reasoning":false},{"contextWindow":202752,"cost":{"cacheRead":0,"cacheWrite":0,"input":0,"output":0},"id":"glm-4.7","input":["text"],"maxTokens":16384,"name":"glm-4.7","reasoning":false},{"contextWindow":262144,"cost":{"cacheRead":0,"cacheWrite":0,"input":0,"output":0},"id":"kimi-k2.5","input":["text","image"],"maxTokens":32768,"name":"kimi-k2.5","reasoning":false}]},"kimi-coding":{"api":"anthropic-messages","apiKey":"${MOONSHOT_API_KEY}","baseUrl":"https://api.kimi.com/coding","models":[{"contextWindow":256000,"id":"k2p5","input":["text"],"maxTokens":8192,"name":"Kimi
-    K2.5","reasoning":false}]},"minimax":{"api":"anthropic-messages","apiKey":"${MINIMAX_API_KEY}","baseUrl":"https://api.minimaxi.com/anthropic","models":[{"contextWindow":200000,"cost":{"cacheRead":2,"cacheWrite":10,"input":15,"output":60},"id":"MiniMax-M2.5","input":["text"],"maxTokens":8192,"name":"MiniMax
-    M2.5","reasoning":true}]},"zai-coding-plan":{"api":"anthropic-messages","apiKey":"${Z_AI_API_KEY}","baseUrl":"https://api.z.ai/api/anthropic","models":[{"contextWindow":120000,"id":"glm-5","input":["text"],"maxTokens":8192,"name":"GLM-5","reasoning":true}]}}},"plugins":{"allow":["matrix","whatsapp","memory-core","lobster"],"enabled":true,"entries":{"lobster":{"enabled":true},"matrix":{"enabled":true}},"slots":{"memory":"memory-core"}},"session":{"idleMinutes":60,"reset":{"atHour":4,"mode":"daily"},"scope":"per-sender"},"skills":{"allowBundled":[],"install":{"nodeManager":"npm"}},"talk":{"apiKey":"${ELEVENLABS_API_KEY}","interruptOnSpeech":true,"modelId":"eleven_v3","outputFormat":"mp3_44100_128","voiceId":"GOkMqfyKMLVUcYfO2WbB"},"tools":{"allow":["exec","read","write","edit","process","web_search","web_fetch","canvas","nodes","image","message","gateway","cron","browser","sessions_list","sessions_history","sessions_send","sessions_spawn","session_status","agents_list"],"deny":[],"media":{"audio":{"enabled":true,"models":[{"args":["-c","curl
-    -s -X POST https://api.elevenlabs.io/v1/speech-to-text -H \"xi-api-key: REDACTED_ELEVENLABS_KEY\"
-    -F model_id=scribe_v2 -F \"file=@{{MediaPath}}\" -F tag_audio_events=true -F language_code=por
-    | jq -r .text"],"command":"sh","type":"cli"}]},"concurrency":2,"video":{"enabled":true,"maxBytes":52428800,"models":[{"model":"gemini-3-flash-preview","provider":"github-copilot"}]}},"web":{"search":{"perplexity":{"apiKey":"${OPENROUTER_API_KEY}","baseUrl":"https://openrouter.ai/api/v1","model":"perplexity/sonar-pro"},"provider":"perplexity"}}}}'
-kind: ConfigMap
-metadata:
-  annotations:
-    kubenix/k8s-version: '1.32'
-    kubenix/project-name: ze-homelab
-  labels:
-    app.kubernetes.io/instance: openclaw-nix
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: openclaw-nix
-    helm.sh/chart: app-template-4.2.0
-    kubenix/module-name: release
-    kubenix/module-version: 1.0.0
-  name: openclaw-nix
-  namespace: apps
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
