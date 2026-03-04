@@ -1,0 +1,75 @@
+=== OpenClaw-Nix Image Build QA - Task 4 ===
+Date: 2025-03-04
+Image Tag: localhost/openclaw-nix:dev (also v2026.3.2 from previous build)
+
+=== Build Status ===
+✓ Image built successfully with `nix build .#openclaw-nix-image`
+✓ Image loaded into podman (tagged as 'dev')
+
+=== Test Results ===
+
+Test 1: Chromium binary exists
+--------------------------------
+Command: podman run --rm --entrypoint "" localhost/openclaw-nix:dev sh -lc 'ls -la /bin/chromium'
+Result: FAILED
+Output: ls: cannot access '/bin/chromium': No such file or directory
+
+Test 2: Chromium in nix store
+------------------------------
+Command: find /nix/store -name "*chromium*" -type f -executable
+Result: FAILED - No chromium found in nix store
+
+Test 3: Fontconfig binaries
+----------------------------
+Command: ls /bin/fc-list /bin/fc-cache /bin/fc-match
+Result: FAILED - fontconfig binaries not found
+
+Test 4: Check /bin contents
+----------------------------
+Available tools: python, node, npm, git, ffmpeg, jq, curl, sed, etc.
+Missing tools: chromium, fc-list, fc-cache, google-chrome
+
+Test 5: Verify nix store count
+-------------------------------
+Total nix store entries: 266
+Expected: 400+ (with chromium and dependencies)
+
+=== Root Cause Analysis ===
+
+The `cliTools` buildEnv (defined in oci-images/openclaw-nix/default.nix) contains:
+- pkgs.chromium
+- pkgs.fontconfig  
+- pkgs.dejavu_fonts
+- pkgs.noto-fonts
+- etc.
+
+However, these packages are NOT being included in the final image. The issue
+appears to be with how `streamLayeredImage` handles the `buildEnv` closure.
+
+In `extraCommands`, there's a loop that should symlink `${cliTools}/bin/*` into
+`./bin/`, but since `cliTools` and its dependencies aren't in the image's nix
+store, the symlinks cannot be created.
+
+=== Evidence Commands ===
+
+# Check if chromium exists
+podman run --rm --entrypoint "" localhost/openclaw-nix:dev sh -lc 'ls /bin/chromium'
+
+# Check nix store for chromium
+podman run --rm --entrypoint "" localhost/openclaw-nix:dev sh -lc 'ls /nix/store/ | head -50'
+
+# Count store entries  
+podman run --rm --entrypoint "" localhost/openclaw-nix:dev sh -lc 'ls /nix/store/ | wc -l'
+
+=== Conclusion ===
+
+Image builds successfully but is MISSING critical components:
+- Chromium browser (required for headless browsing)
+- Fontconfig utilities (fc-list, fc-cache)
+- Font packages
+
+This is a Nix configuration issue in the OCI image definition. The `cliTools`
+buildEnv is declared in `contents` but its closure is not being properly
+included in the layered image output.
+
+Status: BUILD SUCCEEDED, QA FAILED
