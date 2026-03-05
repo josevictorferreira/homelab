@@ -1,0 +1,32 @@
+apiVersion: scheduling.k8s.io/v1
+description: Critical services that must not be preempted
+globalDefault: false
+kind: PriorityClass
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: high-priority
+value: 1000000
+---
+apiVersion: scheduling.k8s.io/v1
+description: Batch jobs and non-critical services
+globalDefault: false
+kind: PriorityClass
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: low-priority
+value: 10000
+---
+apiVersion: scheduling.k8s.io/v1
+description: Standard workloads
+globalDefault: true
+kind: PriorityClass
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: medium-priority
+value: 100000

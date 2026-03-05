@@ -55,6 +55,19 @@ in
       replicas = 1;
       secretName = "openclaw-config";
 
+      # Resource limits - OpenClaw can spike to 2.8GB memory
+      resources = {
+        requests = {
+          cpu = "500m";
+          memory = "1Gi";
+        };
+        limits = {
+          cpu = "2";
+          memory = "4Gi";
+        };
+      };
+      priorityClassName = "high-priority";
+
       # Main persistence: use default (disabled) — custom volumes via values
       values = {
         # Enable ingress for external access

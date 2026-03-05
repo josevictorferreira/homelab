@@ -69,6 +69,13 @@ spec:
             initialDelaySeconds: 0
             periodSeconds: 10
             timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: '2'
+              memory: 2Gi
+            requests:
+              cpu: 250m
+              memory: 512Mi
           startupProbe:
             failureThreshold: 60
             httpGet:
@@ -168,6 +175,13 @@ spec:
             initialDelaySeconds: 0
             periodSeconds: 10
             timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: '1'
+              memory: 1.5Gi
+            requests:
+              cpu: 250m
+              memory: 256Mi
           startupProbe:
             failureThreshold: 30
             httpGet:
