@@ -53,6 +53,16 @@ in
               tag = "v2.5.2@sha256:531d2bccbe20d0412496e36455715a18d692911eca5e2ee37d32e1e4f50e14bb";
               pullPolicy = "IfNotPresent";
             };
+            resources = {
+              requests = {
+                cpu = "250m";
+                memory = "512Mi";
+              };
+              limits = {
+                cpu = "2";
+                memory = "2Gi";
+              };
+            };
           };
 
           env.TRANSFORMERS_CACHE = "/cache";
@@ -73,6 +83,16 @@ in
               repository = "ghcr.io/immich-app/immich-server";
               tag = "v2.5.2@sha256:8ac5a6d471fbb6fcfec6bc34854dd5a947c1795547f0d9345d9bf1803d1209e3";
               pullPolicy = "IfNotPresent";
+            };
+            resources = {
+              requests = {
+                cpu = "250m";
+                memory = "256Mi";
+              };
+              limits = {
+                cpu = "1";
+                memory = "1.5Gi";
+              };
             };
           };
 

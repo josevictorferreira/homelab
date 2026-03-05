@@ -90,6 +90,13 @@ spec:
             - containerPort: 18789
               name: http
               protocol: TCP
+          resources:
+            limits:
+              cpu: '2'
+              memory: 4Gi
+            requests:
+              cpu: 500m
+              memory: 1Gi
           securityContext:
             runAsGroup: 0
             runAsUser: 0
@@ -155,6 +162,7 @@ spec:
       hostPID: false
       imagePullSecrets:
         - name: ghcr-registry-secret
+      priorityClassName: high-priority
       serviceAccountName: openclaw-nix
       volumes:
         - hostPath:

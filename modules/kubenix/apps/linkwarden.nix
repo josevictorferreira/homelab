@@ -54,11 +54,14 @@ in
         };
 
         resources = {
-          requests = {
-            cpu = "50m";
-            memory = "512Mi";
+          limits = {
+            cpu = "1";
+            memory = "2.5Gi";
           };
-          limits.memory = "2.5Gi";
+          requests = {
+            cpu = "100m";
+            memory = "256Mi";
+          };
         };
 
         service = {

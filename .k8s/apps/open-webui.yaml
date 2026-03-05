@@ -72,6 +72,13 @@ spec:
           ports:
             - containerPort: 8080
               name: http
+          resources:
+            limits:
+              cpu: '1'
+              memory: 1Gi
+            requests:
+              cpu: 100m
+              memory: 256Mi
           tty: true
           volumeMounts:
             - mountPath: /app/backend/data

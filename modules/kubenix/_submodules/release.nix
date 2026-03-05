@@ -72,6 +72,12 @@ in
               description = "resources limits to be applied in the release";
             };
 
+            priorityClassName = mkOption {
+              type = types.nullOr types.str;
+              default = null;
+              description = "priority class name for the pods";
+            };
+
             persistence = mkOption {
               description = "attrset of persistent volumes";
               default = {
@@ -152,7 +158,7 @@ in
                     ];
                   }
                   // optionalAttrs (cfg.secretName != null) {
-                    envFrom = [{ secretRef.name = cfg.secretName; }];
+                    envFrom = [ { secretRef.name = cfg.secretName; } ];
                   }
                   // optionalAttrs (cfg.resources != null) {
                     inherit (cfg) resources;
@@ -220,6 +226,9 @@ in
                       else
                         builtins.toJSON cfg.config.data;
                   };
+                })
+                (mkIf (cfg.priorityClassName != null) {
+                  controllers.main.pod.priorityClassName = cfg.priorityClassName;
                 })
                 cfg.values
               ];
