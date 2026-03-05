@@ -5,6 +5,7 @@ metadata:
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   name: default-limits
+  namespace: apps
 spec:
   limits:
     - default:
@@ -28,6 +29,7 @@ metadata:
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   name: default-limits
+  namespace: backup
 spec:
   limits:
     - default:
@@ -39,6 +41,30 @@ spec:
       max:
         cpu: '1'
         memory: 2Gi
+      min:
+        cpu: 50m
+        memory: 64Mi
+      type: Container
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: default-limits
+  namespace: monitoring
+spec:
+  limits:
+    - default:
+        cpu: 500m
+        memory: 512Mi
+      defaultRequest:
+        cpu: 100m
+        memory: 128Mi
+      max:
+        cpu: '2'
+        memory: 4Gi
       min:
         cpu: 50m
         memory: 64Mi
