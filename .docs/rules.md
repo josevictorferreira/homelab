@@ -58,6 +58,11 @@
 **Context:** `kubenix.lib.secretsInlineFor` injects into JSON configs, but `valueFrom.secretKeyRef` reads from K8s Secret resources. The key must be declared in both places: source secrets file AND kubenix Secret definition.
 **Verify:** Check generated manifest: `sops -d .k8s/apps/<app>-config.enc.yaml | grep <KEY_NAME>`
 
+### Kubenix Files Are Evaluated Independently — No Cross-File Module State
+**Lesson:** Each `.nix` file in `modules/kubenix/` is evaluated via a separate `evalModules` call in `default.nix` (lines 48-58). Files do NOT share NixOS module state. To share resources (e.g., ConfigMap defined in `.enc.nix`, mounted in `.nix`), define as plain `kubernetes.resources.configMaps` in the `.enc.nix` file and reference via persistence/volumes in the main `.nix` file.
+**Context:** Attempting to set `submodules.instances.X.args.config` from a different file broke the build. The correct pattern follows `searxng-config.enc.nix`, `blocky-config.enc.nix`.
+**Verify:** `grep "evalModules" modules/kubenix/default.nix` — each file gets its own evaluation context.
+
 ## Mautrix Bridge Configuration
 
 ### Bridge Config Structure Varies by Type
@@ -318,3 +323,15 @@
 **Lesson:** When a rollout restart kills a pod mid-pull of a large image (6GB+), the pod gets stuck in `Terminating` state and no new pod is created (all ReplicaSets show DESIRED=0). Fix: `kubectl delete pod <name> -n <ns> --force --grace-period=0`, then a new pod is automatically created.
 **Context:** Rollout restart of openclaw-nix (6GB image) caused pod stuck Terminating for 10+ minutes. All 5 ReplicaSets showed DESIRED=0, CURRENT=0. Force-deleting the stuck pod allowed the new ReplicaSet to create a fresh pod.
 **Verify:** After force delete: `kubectl get pods -n <ns> -l app.kubernetes.io/name=<app>` shows new pod in ContainerCreating/Running state.
+
+## Git History & Secret Scrubbing
+
+### `git-filter-repo` Replaces Strings in Working Tree Source Files
+**Lesson:** `git-filter-repo --replace-text` rewrites ALL commits including HEAD, modifying source files in the working tree. After scrubbing, check source files for the replacement string and fix them (e.g., replace `REDACTED_X` with proper env var reference `${X}`), then re-run `make manifests`.
+**Context:** Scrubbing a leaked ElevenLabs key replaced it with `REDACTED_ELEVENLABS_KEY` in `openclaw-config.enc.nix` source code, which then propagated to generated YAML. Required manual fix + regeneration.
+**Verify:** `grep -r "REDACTED" modules/kubenix/` should return nothing after fixing.
+
+### Never Use `sed` Secret Substitution in Kubernetes Entrypoints
+**Lesson:** Never use `sed -i "s/\${VAR}/$VAR/g"` in container entrypoint scripts defined in Nix/YAML manifests. The shell interpolation can leak actual secret values into non-encrypted `.k8s/*.yaml` files at generation time. Instead, let the application resolve `${VAR}` from env vars at runtime, or mount secrets via Kubernetes Secret volumes.
+**Context:** An ElevenLabs API key was committed to `openclaw-nix.yaml` (non-encrypted) because `sed` substituted the env var with its real value during manifest generation. Required key rotation + git history scrub.
+**Verify:** `grep -rn "sed.*secretKeyRef\|sed.*printenv\|sed.*\\\$" modules/kubenix/apps/*.nix` should return nothing.
