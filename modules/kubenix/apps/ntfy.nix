@@ -15,6 +15,16 @@ in
         pullPolicy = "IfNotPresent";
       };
       port = 80;
+      resources = {
+        requests = {
+          cpu = "50m";
+          memory = "64Mi";
+        };
+        limits = {
+          cpu = "200m";
+          memory = "256Mi";
+        };
+      };
       secretName = "ntfy-secrets";
       command = [
         "ntfy"

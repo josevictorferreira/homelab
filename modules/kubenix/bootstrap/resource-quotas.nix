@@ -19,10 +19,10 @@ let
       metadata.name = applications;
       metadata.namespace = applications;
       spec.hard = {
-        "requests.cpu" = "8";
-        "requests.memory" = "16Gi";
-        "limits.cpu" = "16";
-        "limits.memory" = "32Gi";
+        "requests.cpu" = "12";
+        "requests.memory" = "24Gi";
+        "limits.cpu" = "24";
+        "limits.memory" = "48Gi";
       };
     };
     ${backup} = {
