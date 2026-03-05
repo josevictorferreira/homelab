@@ -23,6 +23,8 @@ in
       extraFlags = toString (
         [
           "--node-name=${hostName}"
+          "--kubelet-arg=system-reserved=cpu=250m,memory=256Mi"
+          "--kubelet-arg=kube-reserved=cpu=500m,memory=512Mi"
           "--kubelet-arg=container-log-max-size=10Mi"
           "--kubelet-arg=container-log-max-files=3"
           "--kubelet-arg=image-gc-high-threshold=85"
