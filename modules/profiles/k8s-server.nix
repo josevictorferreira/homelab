@@ -110,5 +110,10 @@ in
         ];
       };
     };
+    services.k3s.extraFlags = lib.mkDefault (toString [
+      "--kubelet-arg=system-reserved=cpu=250m,memory=256Mi"
+      "--kubelet-arg=kube-reserved=cpu=500m,memory=512Mi"
+      "--kubelet-arg=eviction-hard=memory.available<500Mi,nodefs.available<10%"
+    ]);
   };
 }

@@ -34,6 +34,10 @@ let
     "--etcd-arg=max-wals=5"
     "--etcd-arg=auto-compaction-mode=periodic"
     "--etcd-arg=auto-compaction-retention=30m"
+    "--kubelet-arg=system-reserved=cpu=250m,memory=256Mi"
+    "--kubelet-arg=kube-reserved=cpu=500m,memory=512Mi"
+    "--kubelet-arg=eviction-hard=memory.available<500Mi,nodefs.available<10%"
+    "--node-taint=node-role.kubernetes.io/control-plane=true:NoSchedule"
   ]
   ++ (if cfg.isInit then clusterInitFlags else [ ])
   ++ roleLabelFlags;

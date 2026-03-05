@@ -58,7 +58,7 @@ in
           extraVolumes = [
             {
               name = "synapse-python-modules";
-              emptyDir = {};
+              emptyDir = { };
             }
             {
               name = "mautrix-whatsapp-registration";

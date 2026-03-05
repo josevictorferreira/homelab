@@ -1,9 +1,9 @@
 # Nix-based CLI commands for homelab management
 # All logic lives here; Makefile just calls `nix run .#<command>`
-{
-  pkgs,
-  lib,
-  deploy-rs-pkg ? null,
+{ pkgs
+, lib
+, deploy-rs-pkg ? null
+,
 }:
 
 let
