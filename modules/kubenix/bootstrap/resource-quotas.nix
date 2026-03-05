@@ -7,6 +7,7 @@ let
   resourceQuotas = {
     ${monitoring} = {
       metadata.name = monitoring;
+      metadata.namespace = monitoring;
       spec.hard = {
         "requests.cpu" = "2";
         "requests.memory" = "4Gi";
@@ -16,6 +17,7 @@ let
     };
     ${applications} = {
       metadata.name = applications;
+      metadata.namespace = applications;
       spec.hard = {
         "requests.cpu" = "8";
         "requests.memory" = "16Gi";
@@ -25,6 +27,7 @@ let
     };
     ${backup} = {
       metadata.name = backup;
+      metadata.namespace = backup;
       spec.hard = {
         "requests.cpu" = "1";
         "requests.memory" = "2Gi";

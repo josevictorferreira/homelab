@@ -213,6 +213,13 @@
 **Context:** `cp -rsf /nix/store/.../lib ./lib` creates symlinks pointing back to nix store. Use `cp -rL` to dereference and create writable copies, then `chmod -R u+w` to enable modification.
 **Verify:** `stat <file>` shows regular file, not symlink; can `touch <file>` without permission error
 
+## Kubenix Resource Generation
+
+### Kubenix Resource Types Need Explicit Namespace for Namespaced Resources
+**Lesson:** When defining namespaced resources (ResourceQuota, LimitRange, etc.) in kubenix, always set `metadata.namespace`. Kubenix doesn't automatically infer namespace from the attribute name.
+**Context:** Resources without explicit namespace get `namespace: null` in generated YAML, causing kustomize "already registered id" errors or "namespace not specified" errors from the API server.
+**Verify:** Check generated YAML has `metadata.namespace` set: `grep -A5 "kind: ResourceQuota" .k8s/bootstrap/resource-quotas.yaml | grep namespace`
+
 ## Release Submodule (app-template)
 
 ### Release Submodule Requires LoadBalancer Service Entry
