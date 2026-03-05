@@ -38,6 +38,7 @@ let
   limitRanges = {
     ${monitoring} = {
       metadata.name = "default-limits";
+      metadata.namespace = monitoring;
       spec.limits = [
         {
           type = "Container";
@@ -62,6 +63,7 @@ let
     };
     ${applications} = {
       metadata.name = "default-limits";
+      metadata.namespace = applications;
       spec.limits = [
         {
           type = "Container";
@@ -86,6 +88,7 @@ let
     };
     ${backup} = {
       metadata.name = "default-limits";
+      metadata.namespace = backup;
       spec.limits = [
         {
           type = "Container";
