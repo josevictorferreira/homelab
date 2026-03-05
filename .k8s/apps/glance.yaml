@@ -40,6 +40,13 @@ spec:
             - containerPort: 8080
               name: http
               protocol: TCP
+          resources:
+            limits:
+              cpu: 200m
+              memory: 256Mi
+            requests:
+              cpu: 50m
+              memory: 64Mi
           volumeMounts:
             - mountPath: /app/config/glance.yml
               name: config

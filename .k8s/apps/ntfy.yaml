@@ -50,6 +50,13 @@ spec:
             - containerPort: 80
               name: http
               protocol: TCP
+          resources:
+            limits:
+              cpu: 200m
+              memory: 256Mi
+            requests:
+              cpu: 50m
+              memory: 64Mi
           volumeMounts:
             - mountPath: /var/lib/ntfy/config.yml
               name: config

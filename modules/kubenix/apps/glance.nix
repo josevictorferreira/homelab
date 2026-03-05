@@ -11,6 +11,16 @@ _:
         pullPolicy = "IfNotPresent";
       };
       port = 8080;
+      resources = {
+        requests = {
+          cpu = "50m";
+          memory = "64Mi";
+        };
+        limits = {
+          cpu = "200m";
+          memory = "256Mi";
+        };
+      };
       config = {
         filename = "glance.yml";
         mountPath = "/app/config";

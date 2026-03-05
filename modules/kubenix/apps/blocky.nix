@@ -19,6 +19,16 @@ in
       };
       port = 4000;
       replicas = 3;
+      resources = {
+        requests = {
+          cpu = "100m";
+          memory = "128Mi";
+        };
+        limits = {
+          cpu = "500m";
+          memory = "256Mi";
+        };
+      };
       config = {
         filename = "config.yml";
         mountPath = "/app";

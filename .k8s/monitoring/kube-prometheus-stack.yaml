@@ -92794,6 +92794,11 @@ spec:
               value: /var/lib/grafana/plugins
             - name: GF_PATHS_PROVISIONING
               value: /etc/grafana/provisioning
+            - name: GOMEMLIMIT
+              valueFrom:
+                resourceFieldRef:
+                  divisor: '1'
+                  resource: limits.memory
           image: docker.io/grafana/grafana:12.1.1
           imagePullPolicy: IfNotPresent
           livenessProbe:
@@ -92821,6 +92826,13 @@ spec:
             httpGet:
               path: /api/health
               port: 3000
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 256Mi
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
@@ -93063,7 +93075,13 @@ spec:
             periodSeconds: 10
             successThreshold: 1
             timeoutSeconds: 1
-          resources: {}
+          resources:
+            limits:
+              cpu: 200m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
@@ -96205,6 +96223,13 @@ spec:
   paused: false
   portName: http-web
   replicas: 1
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 256Mi
   retention: 120h
   routePrefix: /
   securityContext:
@@ -96277,6 +96302,13 @@ spec:
     matchLabels:
       release: kube-prometheus-stack
   replicas: 1
+  resources:
+    limits:
+      cpu: '2'
+      memory: 4Gi
+    requests:
+      cpu: '1'
+      memory: 2Gi
   retention: 15d
   routePrefix: /
   ruleNamespaceSelector: {}

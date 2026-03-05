@@ -158,7 +158,7 @@ in
                     ];
                   }
                   // optionalAttrs (cfg.secretName != null) {
-                    envFrom = [ { secretRef.name = cfg.secretName; } ];
+                    envFrom = [{ secretRef.name = cfg.secretName; }];
                   }
                   // optionalAttrs (cfg.resources != null) {
                     inherit (cfg) resources;
