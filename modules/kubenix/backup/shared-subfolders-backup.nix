@@ -127,7 +127,7 @@ in
         backoffLimit = 2;
         template.spec = {
           restartPolicy = "OnFailure";
-          imagePullSecrets = [{ name = "ghcr-registry-secret"; }];
+          imagePullSecrets = [ { name = "ghcr-registry-secret"; } ];
           containers = [
             {
               name = "backup";
@@ -164,7 +164,7 @@ in
                   ephemeral-storage = "256Mi";
                 };
                 limits = {
-                  cpu = "1000m";
+                  cpu = "500m";
                   memory = "1Gi";
                   ephemeral-storage = "512Mi";
                 };

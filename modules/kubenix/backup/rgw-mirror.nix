@@ -122,11 +122,11 @@ in
               ];
               resources = {
                 requests = {
-                  cpu = "200m";
+                  cpu = "100m";
                   memory = "256Mi";
                 };
                 limits = {
-                  cpu = "1";
+                  cpu = "500m";
                   memory = "512Mi";
                 };
               };

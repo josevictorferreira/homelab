@@ -64,10 +64,10 @@ spec:
               name: rgw-mirror
               resources:
                 limits:
-                  cpu: '1'
+                  cpu: 500m
                   memory: 512Mi
                 requests:
-                  cpu: 200m
+                  cpu: 100m
                   memory: 256Mi
           restartPolicy: OnFailure
   schedule: 0 4 * * *
