@@ -124,7 +124,7 @@ in
           activeDeadlineSeconds = 3600; # 1 hour timeout
           template.spec = {
             restartPolicy = "OnFailure";
-            imagePullSecrets = [{ name = "ghcr-registry-secret"; }];
+            imagePullSecrets = [ { name = "ghcr-registry-secret"; } ];
             containers = [
               {
                 name = "proton-sync";
@@ -161,7 +161,7 @@ in
                     ephemeral-storage = "1Gi";
                   };
                   limits = {
-                    cpu = "1000m";
+                    cpu = "500m";
                     memory = "1Gi";
                     ephemeral-storage = "5Gi";
                   };
