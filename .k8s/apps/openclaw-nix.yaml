@@ -36,15 +36,21 @@ spec:
         - command:
             - bash
             - -c
-            - "set -e\n\n# Ensure persistent directories exist for npm/pip packages\n\
-              mkdir -p /home/node/.npm-global/bin\nmkdir -p /home/node/.local/lib/python\n\
-              mkdir -p /home/node/.local/bin\nmkdir -p /home/node/.config\nmkdir -p\
-              \ /home/node/.openclaw\n\n# Seed config from ConfigMap template if CephFS\
-              \ file doesn't exist yet\nCONFIG_FILE=\"/home/node/.openclaw/openclaw.json\"\
-              \nif [ ! -f \"$CONFIG_FILE\" ]; then\n  echo \"First run: seeding config\
-              \ from template...\"\n  cp /etc/openclaw/config-template.json \"$CONFIG_FILE\"\
-              \n\n  echo \"Config seeded at $CONFIG_FILE\"\nelse\n  echo \"Using existing\
-              \ config at $CONFIG_FILE\"\nfi\n\necho \"Installing matrix plugin dependencies...\"\
+            - "set -e\n\n# Wait for CephFS mount to be writable (avoids EACCES race\
+              \ on startup)\necho \"Waiting for CephFS mount at /home/node/.openclaw...\"\
+              \nfor i in $(seq 1 30); do\n  if touch /home/node/.openclaw/.mount-check\
+              \ 2>/dev/null; then\n    rm -f /home/node/.openclaw/.mount-check\n \
+              \   echo \"CephFS mount ready\"\n    break\n  fi\n  echo \"Mount not\
+              \ ready, attempt $i/30...\"\n  sleep 2\ndone\n\n# Ensure persistent\
+              \ directories exist for npm/pip packages\nmkdir -p /home/node/.npm-global/bin\n\
+              mkdir -p /home/node/.local/lib/python\nmkdir -p /home/node/.local/bin\n\
+              mkdir -p /home/node/.config\nmkdir -p /home/node/.openclaw\n\n# Seed\
+              \ config from ConfigMap template if CephFS file doesn't exist yet\n\
+              CONFIG_FILE=\"/home/node/.openclaw/openclaw.json\"\nif [ ! -f \"$CONFIG_FILE\"\
+              \ ]; then\n  echo \"First run: seeding config from template...\"\n \
+              \ cp /etc/openclaw/config-template.json \"$CONFIG_FILE\"\n\n  echo \"\
+              Config seeded at $CONFIG_FILE\"\nelse\n  echo \"Using existing config\
+              \ at $CONFIG_FILE\"\nfi\n\necho \"Installing matrix plugin dependencies...\"\
               \n\n# Find the actual nix store path where the gateway loads extensions\
               \ from\nMATRIX_EXT=$(readlink -f /lib/openclaw/extensions/matrix 2>/dev/null\
               \ || echo \"/lib/openclaw/extensions/matrix\")\n\nif [ -d \"$MATRIX_EXT\"\

@@ -136,6 +136,18 @@ in
               ''
                 set -e
 
+                # Wait for CephFS mount to be writable (avoids EACCES race on startup)
+                echo "Waiting for CephFS mount at /home/node/.openclaw..."
+                for i in $(seq 1 30); do
+                  if touch /home/node/.openclaw/.mount-check 2>/dev/null; then
+                    rm -f /home/node/.openclaw/.mount-check
+                    echo "CephFS mount ready"
+                    break
+                  fi
+                  echo "Mount not ready, attempt $i/30..."
+                  sleep 2
+                done
+
                 # Ensure persistent directories exist for npm/pip packages
                 mkdir -p /home/node/.npm-global/bin
                 mkdir -p /home/node/.local/lib/python
@@ -281,13 +293,13 @@ in
             storageClass = "rook-ceph-block";
             size = "1Gi";
             accessMode = "ReadWriteOnce";
-            advancedMounts.main.tailscale = [{ path = "/var/lib/tailscale"; }];
+            advancedMounts.main.tailscale = [ { path = "/var/lib/tailscale"; } ];
           };
 
           dev-tun = {
             type = "hostPath";
             hostPath = "/dev/net/tun";
-            advancedMounts.main.tailscale = [{ path = "/dev/net/tun"; }];
+            advancedMounts.main.tailscale = [ { path = "/dev/net/tun"; } ];
           };
         };
       };
