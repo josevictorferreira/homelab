@@ -17,7 +17,7 @@ let
         echo "=== Starting shared subfolders backup (rclone sync) ==="
         echo "Date: $DATE"
         echo "Timestamp: $TIMESTAMP"
-        echo "Folders to backup: notetaking images backups openclaw"
+        echo "Folders to backup: notetaking images backups openclaw mel-dynamica openclaw-home"
         echo "Destination: s3:${bucket}/"
 
         # Create rclone config
@@ -51,11 +51,11 @@ let
         echo "  \"source_root\": \"/shared\"," >> "$MANIFEST_FILE"
         echo "  \"method\": \"rclone-sync\"," >> "$MANIFEST_FILE"
         echo "  \"destination\": \"s3:${bucket}/current/\"," >> "$MANIFEST_FILE"
-        echo "  \"folders\": [\"notetaking\", \"images\", \"backups\", \"openclaw\"]," >> "$MANIFEST_FILE"
+        echo "  \"folders\": [\"notetaking\", \"images\", \"backups\", \"openclaw\", \"mel-dynamica\", \"openclaw-home\"]," >> "$MANIFEST_FILE"
         echo "  \"files\": [" >> "$MANIFEST_FILE"
 
         FIRST=true
-        for folder in notetaking images backups openclaw; do
+        for folder in notetaking images backups openclaw mel-dynamica openclaw-home; do
           if [ -d "$SOURCE_ROOT/$folder" ]; then
             while IFS= read -r -d $'\0' file; do
               SIZE="$(stat -c%s "$file" 2>/dev/null || echo 0)"
@@ -82,7 +82,7 @@ let
 
         # Sync each folder individually with filters
         echo "Starting rclone sync..."
-        for folder in notetaking images backups openclaw; do
+        for folder in notetaking images backups openclaw mel-dynamica openclaw-home; do
           if [ -d "$SOURCE_ROOT/$folder" ]; then
             echo "Syncing folder: $folder"
             rclone sync "$SOURCE_ROOT/$folder" "minio:${bucket}/current/$folder/" \
@@ -127,7 +127,7 @@ in
         backoffLimit = 2;
         template.spec = {
           restartPolicy = "OnFailure";
-          imagePullSecrets = [{ name = "ghcr-registry-secret"; }];
+          imagePullSecrets = [ { name = "ghcr-registry-secret"; } ];
           containers = [
             {
               name = "backup";
