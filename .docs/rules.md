@@ -302,7 +302,24 @@
 **Context:** The `synapse-matrix-synapse-test-connection` pod failed due to busybox wget issues, but Synapse itself was healthy. Delete stale test pods: `kubectl delete pod <name>-test-connection -n <ns>`
 **Verify:** Check app deployment status separately from test pod status.
 
+## K3s Bootstrap Resources
+
+### K3s Addon Controller Manages Bootstrap Manifests from Init Node
+**Lesson:** Changes to bootstrap resources (ResourceQuota, LimitRange, etc.) cannot be applied via `kubectl` — K3s's `objectset.rio.cattle.io` controller will revert them. Must redeploy NixOS to the init node (`lab-alpha-cp`) to update manifests in `/var/lib/rancher/k3s/server/manifests/`.
+**Context:** K3s auto-deploys manifests from the init node's filesystem. The controller continuously reconciles these files, overwriting any kubectl changes. Check managed fields: `kubectl get <resource> -o yaml | grep "objectset.rio.cattle.io"`.
+**Verify:** After NixOS deploy, check init node: `ssh root@lab-alpha-cp 'cat /var/lib/rancher/k3s/server/manifests/resource-quotas.yaml'`
+
+### `.k8s/` Directory is NOT in Git — K3s Auto-Deploy Only
+**Lesson:** The `.k8s/` directory is `.gitignore`d and generated locally via `make manifests`. Flux/K3s does NOT reconcile from these files for bootstrap resources. Only the source Nix files matter.
+**Context:** Bootstrap manifests are deployed by K3s's auto-deploy mechanism from the init node's filesystem, not by Flux. Changes must be made to `modules/kubenix/bootstrap/*.nix` and deployed via NixOS rebuild.
+**Verify:** `cat .gitignore | grep "^\.k8s"` — should be ignored; check `modules/profiles/k8s-control-plane.nix` for K3s manifest deployment logic.
+
 ## Kubernetes Operations
+
+### ResourceQuota Debugging — Check Per-Pod Limits
+**Lesson:** When pods fail with "exceeded quota" errors, audit actual per-pod CPU/memory limits with: `kubectl get pods -n <ns> -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.containers[*].resources.limits.cpu}{"\n"}{end}'`. Aggregate quota used/limited values hide which specific pods are over-provisioned.
+**Context:** Default container limits (500m CPU, 512Mi memory) silently apply to sidecars like gluetun VPN, exportarr, config-reloaders, quickly exhausting namespace quotas.
+**Verify:** Sum of all container limits across namespace should be < quota hard limits. Use `kubectl get resourcequota -n <ns> -o yaml` to see used vs hard.
 
 ### Always Verify kubectl Context Before Cluster Operations
 **Lesson:** Run `kubectl config current-context` before any cluster operations. Multi-cluster environments (EKS + k3s) make it easy to operate on the wrong cluster.
