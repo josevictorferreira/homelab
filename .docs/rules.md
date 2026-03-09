@@ -360,6 +360,11 @@
 **Context:** An ElevenLabs API key was committed to `openclaw-nix.yaml` (non-encrypted) because `sed` substituted the env var with its real value during manifest generation. Required key rotation + git history scrub.
 **Verify:** `grep -rn "sed.*secretKeyRef\|sed.*printenv\|sed.*\\\$" modules/kubenix/apps/*.nix` should return nothing.
 
+### Nix String Newlines Break Container Images
+**Lesson:** When defining container image strings in Nix, ensure the closing quote is on the SAME line as the content. A trailing newline in the string (e.g., closing quote on a new line) adds `\n` to the image tag, causing "Invalid value: must not have leading or trailing whitespace" errors.
+**Context:** Velero init container image had closing quote on separate line: `image = "velero/velero-plugin-for-aws:v1.13.2@sha256:...\n";` — the `\n` broke the deployment.
+**Verify:** `grep -n 'image = ' modules/kubenix/**/*.nix | grep -v ';$'` — ensure all image strings end with `;` on same line.
+
 ## Flux GitOps
 
 ### Flux Reconciles from Git, Not Local Files
@@ -373,3 +378,20 @@
 **Lesson:** If kopia maintenance jobs fail with "maintenance must be run by designated user" (often caused by clock skew or MinIO unavailability), delete the BackupRepository CR: `kubectl delete backuprepository <name> -n backup`. Velero will recreate it fresh.
 **Context:** Pi downtime caused clock skew which corrupted kopia repository state. The error persisted even after MinIO recovered. Deleting the CR forces Velero to reinitialize the repository.
 **Verify:** After deletion, check `kubectl get backuprepository -n backup` — should show new repository with recent creation timestamp.
+
+### ResourceQuota CPU Contention in Backup Namespace
+**Lesson:** Backup namespace has `limits.cpu: 2`. If multiple jobs run concurrently with 1 CPU limits each, they exhaust quota causing "exceeded quota" errors. Reduce backup job CPU limits to `500m` to allow concurrent operation.
+**Context:** Velero backup pods (250m each), shared-subfolders-backup (1 CPU), and maintenance jobs all compete for the 2 CPU quota. Postgres backup jobs also use 500m.
+**Verify:** `kubectl get resourcequota -n backup -o yaml` shows used vs hard limits; ensure sum of running job limits ≤ 2 CPU.
+
+## Rook-Ceph Object Storage
+
+### OBC "Ghost State" — Bound but RGW Empty
+**Lesson:** When ObjectBucketClaims show `phase: Bound` but `radosgw-admin bucket list` returns empty, the Rook operator is in a stuck state. Fix: 1) Delete all OBCs and ObjectBuckets, 2) Restart rook-ceph-operator deployment, 3) Let Flux recreate OBCs.
+**Context:** Operator marks OBCs Bound but fails to provision actual RGW buckets/users due to stale state or previous failures. Logs show "timeout waiting for RGW Admin API" errors.
+**Verify:** After fix, `kubectl exec -n rook-ceph deploy/rook-ceph-tools -- radosgw-admin bucket list` shows buckets; `kubectl get objectbucket` shows OBs with matching bucket names.
+
+### PVC Released State Blocks Rebinding
+**Lesson:** When a PVC is stuck Pending with "volume already bound to a different claim", the PV is in `Released` state with a stale `claimRef`. Patch the PV to remove claimRef: `kubectl patch pv <name> --type=json -p='[{"op": "remove", "path": "/spec/claimRef"}]'`.
+**Context:** Previous PVC deletion leaves claimRef pointing to deleted PVC, preventing new PVC from binding. Common with static CephFS volumes.
+**Verify:** `kubectl get pv <name> -o jsonpath='{.spec.claimRef}'` returns empty; PVC should transition to Bound.
