@@ -1,6 +1,7 @@
-{ kubenix
-, homelab
-, ...
+{
+  kubenix,
+  homelab,
+  ...
 }:
 
 let
@@ -77,7 +78,7 @@ in
             memory = "256Mi";
           };
           limits = {
-            cpu = "1";
+            cpu = "300m";
             memory = "1Gi";
           };
         };

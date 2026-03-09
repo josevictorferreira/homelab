@@ -55,15 +55,15 @@ in
       replicas = 1;
       secretName = "openclaw-config";
 
-      # Resource limits - OpenClaw can spike to 2.8GB memory
+      # Resource limits - reduced to fit cluster quota
       resources = {
         requests = {
-          cpu = "500m";
-          memory = "1Gi";
+          cpu = "100m";
+          memory = "512Mi";
         };
         limits = {
-          cpu = "2";
-          memory = "4Gi";
+          cpu = "500m";
+          memory = "2Gi";
         };
       };
       priorityClassName = "high-priority";
