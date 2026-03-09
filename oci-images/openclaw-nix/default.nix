@@ -13,9 +13,8 @@ let
   sourceInfo = {
     owner = "openclaw";
     repo = "openclaw";
-    rev = "v2026.3.8";
-    # rev = "v${version}";
-    hash = "sha256-4WfyeBoeFufhzD4MI+z8lhQk+9/ST4UNOmQvQjo+I9c=";
+    rev = "v${version}";
+    sha256 = "sha256-lOBQX+A7Xq1hWHWa/ncCGFlTqxfXdhmCYp5QId6TChc=";
     pnpmDepsHash = "sha256-QnKPVUPgy3znCQRmfqiIPtRLgZ0SPwWqUsJ4USF2LJE=";
   };
 
