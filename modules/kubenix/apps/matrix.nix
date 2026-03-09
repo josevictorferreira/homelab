@@ -334,12 +334,12 @@ in
         # Resources
         resources = {
           requests = {
-            cpu = "250m";
-            memory = "512Mi";
+            cpu = "100m";
+            memory = "256Mi";
           };
           limits = {
-            cpu = "1000m";
-            memory = "2Gi";
+            cpu = "300m";
+            memory = "1Gi";
           };
         };
 

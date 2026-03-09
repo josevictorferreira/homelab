@@ -43,12 +43,12 @@ in
               ];
               resources = {
                 requests = {
-                  cpu = "200m";
-                  memory = "512Mi";
+                  cpu = "100m";
+                  memory = "256Mi";
                 };
                 limits = {
-                  cpu = "2";
-                  memory = "2Gi";
+                  cpu = "500m";
+                  memory = "512Mi";
                 };
               };
               securityContext = {

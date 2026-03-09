@@ -112,6 +112,16 @@ in
         workload.main.podSpec = {
           containers = {
             main = {
+              resources = {
+                requests = {
+                  cpu = "100m";
+                  memory = "128Mi";
+                };
+                limits = {
+                  cpu = "200m";
+                  memory = "256Mi";
+                };
+              };
               probes = {
                 liveness = {
                   path = "/ping";
@@ -136,6 +146,16 @@ in
               enabled = true;
               imageSelector = "exportarrImage";
               args = [ "prowlarr" ];
+              resources = {
+                requests = {
+                  cpu = "50m";
+                  memory = "64Mi";
+                };
+                limits = {
+                  cpu = "100m";
+                  memory = "128Mi";
+                };
+              };
               probes = {
                 liveness = {
                   enabled = true;

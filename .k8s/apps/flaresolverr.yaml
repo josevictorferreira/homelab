@@ -42,11 +42,11 @@ spec:
               port: 8191
           resources:
             limits:
-              cpu: '2'
-              memory: 2Gi
-            requests:
-              cpu: 200m
+              cpu: 500m
               memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 256Mi
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:

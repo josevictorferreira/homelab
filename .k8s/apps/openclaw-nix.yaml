@@ -98,11 +98,11 @@ spec:
               protocol: TCP
           resources:
             limits:
-              cpu: '2'
-              memory: 4Gi
-            requests:
               cpu: 500m
-              memory: 1Gi
+              memory: 2Gi
+            requests:
+              cpu: 100m
+              memory: 512Mi
           securityContext:
             runAsGroup: 0
             runAsUser: 0

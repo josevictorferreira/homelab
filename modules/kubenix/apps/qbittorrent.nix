@@ -178,6 +178,16 @@ in
             };
             containers = {
               main = {
+                resources = {
+                  requests = {
+                    cpu = "100m";
+                    memory = "128Mi";
+                  };
+                  limits = {
+                    cpu = "200m";
+                    memory = "256Mi";
+                  };
+                };
                 env = {
                   QBT_WEBUI_PORT = "8080";
                   QBT_TORRENTING_PORT = "${toString torrentingPort}";
@@ -214,6 +224,16 @@ in
         addons.gluetun = {
           enabled = true;
           killSwitch = true;
+          container.resources = {
+            requests = {
+              cpu = "50m";
+              memory = "64Mi";
+            };
+            limits = {
+              cpu = "100m";
+              memory = "128Mi";
+            };
+          };
           container.env = {
             FIREWALL = "on";
             FIREWALL_INPUT_PORTS = "8080,${toString torrentingPort}";

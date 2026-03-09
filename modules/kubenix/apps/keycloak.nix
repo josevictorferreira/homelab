@@ -1,6 +1,7 @@
-{ kubenix
-, homelab
-, ...
+{
+  kubenix,
+  homelab,
+  ...
 }:
 
 let
@@ -54,12 +55,12 @@ in
         # Resources for single instance (Java needs 1Gi+)
         resources = {
           requests = {
-            cpu = "500m";
-            memory = "1Gi";
+            cpu = "200m";
+            memory = "512Mi";
           };
           limits = {
-            cpu = "2000m";
-            memory = "2Gi";
+            cpu = "500m";
+            memory = "1.5Gi";
           };
         };
 

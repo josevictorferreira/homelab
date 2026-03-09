@@ -1,7 +1,8 @@
-{ lib
-, kubenix
-, homelab
-, ...
+{
+  lib,
+  kubenix,
+  homelab,
+  ...
 }:
 
 let
@@ -55,12 +56,12 @@ in
 
         resources = {
           limits = {
-            cpu = "1";
-            memory = "2.5Gi";
+            cpu = "200m";
+            memory = "1Gi";
           };
           requests = {
-            cpu = "100m";
-            memory = "256Mi";
+            cpu = "50m";
+            memory = "128Mi";
           };
         };
 
