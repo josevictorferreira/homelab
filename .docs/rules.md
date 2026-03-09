@@ -359,3 +359,17 @@
 **Lesson:** Never use `sed -i "s/\${VAR}/$VAR/g"` in container entrypoint scripts defined in Nix/YAML manifests. The shell interpolation can leak actual secret values into non-encrypted `.k8s/*.yaml` files at generation time. Instead, let the application resolve `${VAR}` from env vars at runtime, or mount secrets via Kubernetes Secret volumes.
 **Context:** An ElevenLabs API key was committed to `openclaw-nix.yaml` (non-encrypted) because `sed` substituted the env var with its real value during manifest generation. Required key rotation + git history scrub.
 **Verify:** `grep -rn "sed.*secretKeyRef\|sed.*printenv\|sed.*\\\$" modules/kubenix/apps/*.nix` should return nothing.
+
+## Flux GitOps
+
+### Flux Reconciles from Git, Not Local Files
+**Lesson:** `flux reconcile` and `make reconcile` only sync from the git repository, not local `.k8s/` files. For immediate fixes, use `sops -d .k8s/<path>/<secret>.enc.yaml | kubectl apply -f -` to apply decrypted secrets directly.
+**Context:** Ran Flux reconciliation commands expecting local manifest changes to apply, but Flux's source is the git repo. Local changes require commit+push OR manual kubectl apply.
+**Verify:** After `flux reconcile`, check `kubectl get <resource>` — if unchanged, either commit to git or apply manually.
+
+## Velero Backup
+
+### BackupRepository Recovery After Clock Skew or Storage Outage
+**Lesson:** If kopia maintenance jobs fail with "maintenance must be run by designated user" (often caused by clock skew or MinIO unavailability), delete the BackupRepository CR: `kubectl delete backuprepository <name> -n backup`. Velero will recreate it fresh.
+**Context:** Pi downtime caused clock skew which corrupted kopia repository state. The error persisted even after MinIO recovered. Deleting the CR forces Velero to reinitialize the repository.
+**Verify:** After deletion, check `kubectl get backuprepository -n backup` — should show new repository with recent creation timestamp.
