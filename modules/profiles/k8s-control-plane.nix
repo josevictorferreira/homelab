@@ -162,6 +162,7 @@ in
           pkgs.findutils
           pkgs.gnugrep
           pkgs.getent
+          pkgs.hostname
         ];
         script = ''
           set -euo pipefail
