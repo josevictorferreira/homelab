@@ -22,7 +22,7 @@ in
         sha256 = "1ykzpi98qlwbixc34jfxx0xq3x0rmhbmv5xqvarbzjpkgi3fnlaf";
       };
       includeCRDs = true;
-      noHooks = false;
+      noHooks = true; # Disable hooks to skip test pod (exceeds CPU quota)
       inherit namespace;
 
       values = {
@@ -152,9 +152,18 @@ in
           );
 
           extraEnv = [
-            { name = "PYTHONPATH"; value = "/modules"; }
-            { name = "AWS_CONFIG_FILE"; value = "/modules/aws-config"; }
-            { name = "AWS_EC2_METADATA_DISABLED"; value = "true"; }
+            {
+              name = "PYTHONPATH";
+              value = "/modules";
+            }
+            {
+              name = "AWS_CONFIG_FILE";
+              value = "/modules/aws-config";
+            }
+            {
+              name = "AWS_EC2_METADATA_DISABLED";
+              value = "true";
+            }
             {
               name = "AWS_ACCESS_KEY_ID";
               valueFrom = {
@@ -175,7 +184,6 @@ in
             }
           ];
         };
-
 
         serverName = "josevictor.me";
         publicServerName = "matrix.josevictor.me";
@@ -268,7 +276,6 @@ in
           };
         };
 
-
         # External PostgreSQL (use postgres superuser)
         postgresql.enabled = false;
         externalPostgresql = {
@@ -338,6 +345,9 @@ in
 
         # Disable well-known service (not needed without federation)
         wellknown.enabled = false;
+
+        # Disable test hooks - they exceed namespace CPU quota
+        tests.enabled = false;
       };
     };
     resources = {
