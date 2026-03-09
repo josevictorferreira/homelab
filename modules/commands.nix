@@ -567,11 +567,12 @@ let
         IMAGE_NAME="${openclawImageName}"
         REGISTRY="${openclawRegistry}"
         GITHUB_USER="${githubUser}"
-        VERSION="${openclawVersion}"
+        EXPECTED_VERSION="${openclawVersion}"
 
-        echo "[0/6] Cleaning local image cache for ''${IMAGE_NAME}..."
+        echo "[0/6] Cleaning local image cache for ''${IMAGE_NAME} (expected version: ''${EXPECTED_VERSION})..."
         # Remove any existing local images to prevent tag collision
-        podman images --format json | jq -r ".[] | select(.Names[]? | contains(\"''${IMAGE_NAME}\")) | .Id" | while read -r img_id; do
+        # Use unique to avoid processing same ID multiple times (images with multiple tags)
+        podman images --format json | jq -r "[.[] | select(.Names[]? | contains(\"''${IMAGE_NAME}\")) | .Id] | unique | .[]" | while read -r img_id; do
           if [ -n "$img_id" ]; then
             echo "  Removing cached image: $img_id"
             podman rmi -f "$img_id" 2>/dev/null || true
@@ -606,7 +607,7 @@ let
         echo "  Loaded: ''${LOCAL_TAG}"
 
         # Get the tag portion only
-        TAG=$(echo "''${LOCAL_TAG}" | sed 's/.*://')
+        TAG="''${LOCAL_TAG##*:}"
         echo "  Tag: ''${TAG}"
 
         FULL_TAG="''${REGISTRY}/''${GITHUB_USER}/''${IMAGE_NAME}:latest"

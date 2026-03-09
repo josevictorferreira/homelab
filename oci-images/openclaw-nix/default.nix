@@ -14,8 +14,8 @@ let
     owner = "openclaw";
     repo = "openclaw";
     rev = "v${version}";
-    sha256 = "sha256-lOBQX+A7Xq1hWHWa/ncCGFlTqxfXdhmCYp5QId6TChc=";
-    pnpmDepsHash = "sha256-QnKPVUPgy3znCQRmfqiIPtRLgZ0SPwWqUsJ4USF2LJE=";
+    sha256 = "sha256-PeNbusrYqB0yn+t8BERFr9E1YYpuWaw0w+YTzPFQgo8=";
+    pnpmDepsHash = "sha256-CpgulfZfN1yHXpXBR1wvsSaME8y9ZX+dQQ4JJjp3PRs=";
   };
 
   # Rolldown 1.0.0-rc.3 — pre-built from npm registry
@@ -210,27 +210,29 @@ let
     if [ -n "$GATEWAY_STORE_PATH" ]; then mkdir -p "$out/nix/store/$GATEWAY_STORE_PATH"; ln -s $out/lib "$out/nix/store/$GATEWAY_STORE_PATH/lib"; fi
   '';
 in
-dockerTools.streamLayeredImage {
+dockerTools.buildImage {
   name = "localhost/openclaw-nix";
   tag = imageTag;
-  contents = [
-    openclawRootfs
-    cliTools
-  ];
+  copyToRoot = pkgs.buildEnv {
+    name = "openclaw-image-root";
+    paths = [
+      openclawRootfs
+      cliTools
+    ];
+    pathsToLink = [
+      "/bin"
+      "/lib"
+      "/nix"
+      "/etc"
+      "/usr"
+    ];
+  };
   extraCommands = ''
     mkdir -p ./bin ./config ./state ./logs ./tmp ./var/tmp
     chmod 1777 ./tmp ./var/tmp
 
     mkdir -p ./etc/fonts
     cp ${fontsConf} ./etc/fonts/fonts.conf
-
-    # Symlink all CLI tools into /bin/ (buildEnv bins get lost in layer merging)
-    for bin in ${cliTools}/bin/*; do
-      name=$(basename "$bin")
-      if [ ! -e "./bin/$name" ]; then
-        ln -s "$bin" "./bin/$name"
-      fi
-    done
 
     cat > ./entrypoint.sh << 'EOF'
     ${entrypointScriptText}
