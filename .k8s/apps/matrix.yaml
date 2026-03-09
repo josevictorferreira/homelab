@@ -26,7 +26,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 1d15c584d7fd4e585cca277d188c65b5480352e83f7f1292a3dc0f68487110ee
-        checksum/secrets: abec80a1be4dd53769533a3c1f2fad0f8b07683d28a1c77a10667e4833f29a48
+        checksum/secrets: a656bcf8060d9add498153a6df9003fccbd19dc1d8777cf87f7bde40bf16b08f
       labels:
         app.kubernetes.io/component: synapse
         app.kubernetes.io/instance: synapse
@@ -173,89 +173,6 @@ spec:
                 path: mautrix-slack-registration.yaml
             secretName: mautrix-slack-registration
 ---
-apiVersion: batch/v1
-kind: Job
-metadata:
-  annotations:
-    helm.sh/hook: pre-install
-    helm.sh/hook-delete-policy: hook-succeeded
-    kubenix/k8s-version: '1.32'
-    kubenix/project-name: ze-homelab
-  labels:
-    app.kubernetes.io/component: signingkey-job
-    app.kubernetes.io/instance: synapse
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: matrix-synapse
-    app.kubernetes.io/version: 1.146.0
-    helm.sh/chart: matrix-synapse-3.12.19
-  name: synapse-signingkey-job
-  namespace: apps
-spec:
-  backoffLimit: 1
-  completions: 1
-  parallelism: 1
-  template:
-    metadata:
-      labels:
-        app.kubernetes.io/component: signingkey-job
-        app.kubernetes.io/instance: synapse
-        app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: matrix-synapse
-        app.kubernetes.io/version: 1.146.0
-        helm.sh/chart: matrix-synapse-3.12.19
-    spec:
-      containers:
-        - command:
-            - sh
-            - -c
-            - "echo \"Generating signing key...\"\nif which generate_signing_key.py\
-              \ >/dev/null; then\n  generate_signing_key.py -o /synapse/keys/signing.key\n\
-              else\n  generate_signing_key -o /synapse/keys/signing.key\nfi\n"
-          image: matrixdotorg/synapse:latest
-          imagePullPolicy: IfNotPresent
-          name: signing-key-generate
-          resources: {}
-          securityContext: {}
-          volumeMounts:
-            - mountPath: /synapse/keys
-              name: matrix-synapse-keys
-        - command:
-            - sh
-            - -c
-            - 'printf "Checking rights to update secret... "
-
-              kubectl auth can-i update secret/${SECRET_NAME}
-
-              /scripts/signing-key.sh
-
-              '
-          env:
-            - name: SECRET_NAME
-              value: synapse-signingkey
-          image: bitnami/kubectl:latest
-          imagePullPolicy: IfNotPresent
-          name: signing-key-upload
-          resources: {}
-          securityContext: {}
-          volumeMounts:
-            - mountPath: /scripts
-              name: scripts
-              readOnly: true
-            - mountPath: /synapse/keys
-              name: matrix-synapse-keys
-              readOnly: true
-      restartPolicy: Never
-      securityContext: {}
-      serviceAccount: synapse-signingkey-job
-      volumes:
-        - configMap:
-            defaultMode: 493
-            name: synapse-matrix-synapse-scripts
-          name: scripts
-        - emptyDir: {}
-          name: matrix-synapse-keys
-  ttlSecondsAfterFinished: 0
----
 apiVersion: v1
 data:
   homeserver.yaml: "# NOTE:\n# Secrets are stored in separate configs to better fit\
@@ -308,37 +225,6 @@ metadata:
   namespace: apps
 ---
 apiVersion: v1
-data:
-  signing-key.sh: "#!/bin/sh\n\nset -eu\n\ncheck_key() {\n  set +e\n\n  echo \"Checking\
-    \ for existing signing key...\"\n  key=\"$(kubectl get secret \"$SECRET_NAME\"\
-    \ -o jsonpath=\"{.data['signing\\.key']}\" 2> /dev/null)\"\n  [ $? -ne 0 ] &&\
-    \ return 1\n  [ -z \"$key\" ] && return 2\n  return 0\n}\n\ncreate_key() {\n \
-    \ echo \"Waiting for new signing key to be generated...\"\n  begin=$(date +%s)\n\
-    \  end=$((begin + 300)) # 5 minutes\n  while true; do\n    [ -f /synapse/keys/signing.key\
-    \ ] && return 0\n    [ \"$(date +%s)\" -gt $end ] && return 1\n    sleep 5\n \
-    \ done\n}\n\nstore_key() {\n  echo \"Storing signing key in Kubernetes secret...\"\
-    \n  kubectl patch secret \"$SECRET_NAME\" -p \"{\\\"data\\\":{\\\"signing.key\\\
-    \":\\\"$(base64 /synapse/keys/signing.key | tr -d '\\n')\\\"}}\"\n}\n\nif check_key;\
-    \ then\n  echo \"Key already in place, exiting.\"\n  exit\nfi\n\nif ! create_key;\
-    \ then\n  echo \"Timed out waiting for a signing key to appear.\"\n  exit 1\n\
-    fi\n\nstore_key\n"
-kind: ConfigMap
-metadata:
-  annotations:
-    helm.sh/hook: pre-install
-    helm.sh/hook-delete-policy: hook-succeeded
-    kubenix/k8s-version: '1.32'
-    kubenix/project-name: ze-homelab
-  labels:
-    app.kubernetes.io/instance: synapse
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: matrix-synapse
-    app.kubernetes.io/version: 1.146.0
-    helm.sh/chart: matrix-synapse-3.12.19
-  name: synapse-matrix-synapse-scripts
-  namespace: apps
----
-apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   annotations:
@@ -361,31 +247,6 @@ spec:
   storageClassName: rook-ceph-block
 ---
 apiVersion: v1
-kind: Pod
-metadata:
-  annotations:
-    helm.sh/hook: test-success
-    kubenix/k8s-version: '1.32'
-    kubenix/project-name: ze-homelab
-  labels:
-    app.kubernetes.io/instance: synapse
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: matrix-synapse
-    app.kubernetes.io/version: 1.146.0
-    helm.sh/chart: matrix-synapse-3.12.19
-  name: synapse-matrix-synapse-test-connection
-  namespace: apps
-spec:
-  containers:
-    - args:
-        - synapse-matrix-synapse:8008/_matrix/client/versions
-      command:
-        - wget
-      image: busybox
-      name: wget
-  restartPolicy: Never
----
-apiVersion: v1
 kind: Secret
 metadata:
   annotations:
@@ -400,33 +261,13 @@ metadata:
   name: synapse-matrix-synapse
   namespace: apps
 stringData:
-  config.yaml: "## Registration ##\n\nregistration_shared_secret: \"zg8D96JE1XqiSWk3qMosb0h9\"\
+  config.yaml: "## Registration ##\n\nregistration_shared_secret: \"qqSczegfnbLMXGMWlru1d4kX\"\
     \n\n## API Configuration ##\n\n## Database configuration ##\n\ndatabase:\n  name:\
     \ \"psycopg2\"\n  args:\n    user: \"postgres\"\n    password: \"@@POSTGRES_PASSWORD@@\"\
     \n    database: \"synapse\"\n    host: \"postgresql-18-hl\"\n    port: 5432\n\
     \    sslmode: \"prefer\"\n    cp_min: 5\n    cp_max: 10\n    \n\n## Redis configuration\
     \ ##\n\nredis:\n  enabled: true\n  host: \"redis-headless\"\n  port: 6379\n  password:\
     \ \"@@REDIS_PASSWORD@@\"\n"
----
-apiVersion: v1
-kind: Secret
-metadata:
-  annotations:
-    argocd.argoproj.io/hook: Skip
-    helm.sh/hook: pre-install
-    helm.sh/hook-delete-policy: never
-    helm.sh/resource-policy: keep
-    kubenix/k8s-version: '1.32'
-    kubenix/project-name: ze-homelab
-  labels:
-    app.kubernetes.io/component: signingkey-job
-    app.kubernetes.io/instance: synapse
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: matrix-synapse
-    app.kubernetes.io/version: 1.146.0
-    helm.sh/chart: matrix-synapse-3.12.19
-  name: synapse-signingkey
-  namespace: apps
 ---
 apiVersion: v1
 kind: Service
@@ -480,24 +321,6 @@ spec:
     app.kubernetes.io/name: matrix-synapse
   type: ClusterIP
 ---
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  annotations:
-    helm.sh/hook: pre-install
-    helm.sh/hook-delete-policy: hook-succeeded
-    kubenix/k8s-version: '1.32'
-    kubenix/project-name: ze-homelab
-  labels:
-    app.kubernetes.io/component: signingkey-job
-    app.kubernetes.io/instance: synapse
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: matrix-synapse
-    app.kubernetes.io/version: 1.146.0
-    helm.sh/chart: matrix-synapse-3.12.19
-  name: synapse-signingkey-job
-  namespace: apps
----
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -549,58 +372,3 @@ metadata:
 spec:
   bucketName: matrix-synapse-media
   storageClassName: rook-ceph-objectstore
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-  annotations:
-    helm.sh/hook: pre-install
-    helm.sh/hook-delete-policy: hook-succeeded
-    kubenix/k8s-version: '1.32'
-    kubenix/project-name: ze-homelab
-  labels:
-    app.kubernetes.io/component: signingkey-job
-    app.kubernetes.io/instance: synapse
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: matrix-synapse
-    app.kubernetes.io/version: 1.146.0
-    helm.sh/chart: matrix-synapse-3.12.19
-  name: synapse-signingkey-job
-  namespace: apps
-rules:
-  - apiGroups:
-      - ''
-    resourceNames:
-      - synapse-signingkey
-    resources:
-      - secrets
-    verbs:
-      - get
-      - update
-      - patch
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  annotations:
-    helm.sh/hook: pre-install
-    helm.sh/hook-delete-policy: hook-succeeded
-    kubenix/k8s-version: '1.32'
-    kubenix/project-name: ze-homelab
-  labels:
-    app.kubernetes.io/component: signingkey-job
-    app.kubernetes.io/instance: synapse
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: matrix-synapse
-    app.kubernetes.io/version: 1.146.0
-    helm.sh/chart: matrix-synapse-3.12.19
-  name: synapse-signingkey-job
-  namespace: apps
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: synapse-signingkey-job
-subjects:
-  - kind: ServiceAccount
-    name: synapse-signingkey-job
-    namespace: apps
