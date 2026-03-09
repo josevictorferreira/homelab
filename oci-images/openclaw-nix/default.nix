@@ -1,9 +1,9 @@
-{ pkgs
-, lib
-, inputs
-, system
-, version ? "2026.3.2"
-,
+{
+  pkgs,
+  lib,
+  inputs,
+  system,
+  version ? "2026.3.8",
 }:
 
 let
@@ -13,7 +13,7 @@ let
   sourceInfo = {
     owner = "openclaw";
     repo = "openclaw";
-    rev = "v2026.3.2";
+    rev = "v2026.3.8";
     # rev = "v${version}";
     hash = "sha256-4WfyeBoeFufhzD4MI+z8lhQk+9/ST4UNOmQvQjo+I9c=";
     pnpmDepsHash = "sha256-QnKPVUPgy3znCQRmfqiIPtRLgZ0SPwWqUsJ4USF2LJE=";
@@ -95,7 +95,7 @@ let
     ];
   };
 
-  imageTag = "v${version}-v2";
+  imageTag = "v${version}";
 
   entrypointScriptText = builtins.readFile ./entrypoint.sh;
   # Merged CLI tools environment — single /bin/ with all tools accessible
