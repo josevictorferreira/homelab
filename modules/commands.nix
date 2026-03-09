@@ -560,33 +560,69 @@ let
 
   push-openclaw =
     mkCommand "push-openclaw" "Build and push openclaw-nix image to GHCR"
-      [ pkgs.nix pkgs.podman pkgs.gh pkgs.coreutils ]
+      [ pkgs.nix pkgs.podman pkgs.gh pkgs.coreutils pkgs.jq pkgs.skopeo ]
       ''
         set -e
 
         IMAGE_NAME="${openclawImageName}"
         REGISTRY="${openclawRegistry}"
         GITHUB_USER="${githubUser}"
-        LOCAL_TAG="localhost/''${IMAGE_NAME}:v${openclawVersion}"
-        FULL_TAG="''${REGISTRY}/''${GITHUB_USER}/''${IMAGE_NAME}:latest"
-        VERSION_TAG="''${REGISTRY}/''${GITHUB_USER}/''${IMAGE_NAME}:v${openclawVersion}"
+        VERSION="${openclawVersion}"
+
+        echo "[0/6] Cleaning local image cache for ''${IMAGE_NAME}..."
+        # Remove any existing local images to prevent tag collision
+        podman images --format json | jq -r ".[] | select(.Names[]? | contains(\"''${IMAGE_NAME}\")) | .Id" | while read -r img_id; do
+          if [ -n "$img_id" ]; then
+            echo "  Removing cached image: $img_id"
+            podman rmi -f "$img_id" 2>/dev/null || true
+          fi
+        done
+        # Also remove any dangling images
+        podman image prune -f 2>/dev/null || true
 
         # Build
-        echo "[1/4] Building ''${IMAGE_NAME}..."
-        nix build .#''${IMAGE_NAME}-image --show-trace
+        echo "[1/6] Building ''${IMAGE_NAME}..."
+        nix build .#''${IMAGE_NAME}-image --show-trace --no-link
 
-        # Load into podman
-        echo "[2/4] Loading image into podman..."
-        ./result | podman load
-        rm -f result
+        # Get the actual store path and load into podman
+        echo "[2/6] Loading image into podman..."
+        IMAGE_PATH=$(nix build .#''${IMAGE_NAME}-image --print-out-paths --no-link)
+        # Load image and capture the tag from output
+        LOAD_OUTPUT=$(podman load < "''${IMAGE_PATH}")
+        echo "''${LOAD_OUTPUT}"
+
+        # Extract the actual tag that was loaded (format: "Loaded image: localhost/...:tag")
+        LOCAL_TAG=$(echo "''${LOAD_OUTPUT}" | grep -oP 'Loaded image:\s*\K\S+' || true)
+        if [ -z "''${LOCAL_TAG}" ]; then
+          # Fallback: find the most recently loaded image
+          LOCAL_TAG=$(podman images --sort created --format "{{.Repository}}:{{.Tag}}" | grep "localhost/''${IMAGE_NAME}" | head -1)
+        fi
+
+        if [ -z "''${LOCAL_TAG}" ]; then
+          echo "Error: Could not determine loaded image tag"
+          exit 1
+        fi
+
+        echo "  Loaded: ''${LOCAL_TAG}"
+
+        # Get the tag portion only
+        TAG=$(echo "''${LOCAL_TAG}" | sed 's/.*://')
+        echo "  Tag: ''${TAG}"
+
+        FULL_TAG="''${REGISTRY}/''${GITHUB_USER}/''${IMAGE_NAME}:latest"
+        VERSION_TAG="''${REGISTRY}/''${GITHUB_USER}/''${IMAGE_NAME}:''${TAG}"
 
         # Tag for registry (both latest and version)
-        echo "[3/4] Tagging as ''${FULL_TAG} and ''${VERSION_TAG}..."
+        echo "[3/6] Tagging as ''${FULL_TAG} and ''${VERSION_TAG}..."
         podman tag "''${LOCAL_TAG}" "''${FULL_TAG}"
         podman tag "''${LOCAL_TAG}" "''${VERSION_TAG}"
 
+        # Verify the image ID before pushing
+        LOCAL_ID=$(podman images --format "{{.Id}}" "''${LOCAL_TAG}")
+        echo "  Local image ID: ''${LOCAL_ID}"
+
         # Login
-        echo "[4/4] Logging in to ''${REGISTRY}..."
+        echo "[4/6] Logging in to ''${REGISTRY}..."
         if [ -n "''${GITHUB_TOKEN:-}" ]; then
           echo "$GITHUB_TOKEN" | podman login "''${REGISTRY}" -u "''${GITHUB_USER}" --password-stdin
         elif command -v gh >/dev/null 2>&1; then
@@ -603,9 +639,14 @@ let
         fi
 
         # Push both tags
-        echo "[5/5] Pushing images..."
+        echo "[5/6] Pushing images..."
         podman push "''${FULL_TAG}"
         podman push "''${VERSION_TAG}"
+
+        # Verify push by checking remote image
+        echo "[6/6] Verifying push..."
+        REMOTE_ID=$(skopeo inspect --format "{{.Digest}}" "docker://''${VERSION_TAG}" 2>/dev/null || echo "unknown")
+        echo "  Remote digest: ''${REMOTE_ID}"
 
         echo ""
         echo "✓ Images pushed:"
