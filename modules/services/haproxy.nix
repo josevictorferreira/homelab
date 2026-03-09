@@ -23,9 +23,10 @@ in
         mode tcp
         log global
         option tcplog
-        timeout connect 5s
-        timeout client 50s
-        timeout server 50s
+        timeout connect 10s
+        timeout client 3600s
+        timeout server 3600s
+        timeout tunnel 86400s
 
       frontend kubernetes-api
         bind *:6443
