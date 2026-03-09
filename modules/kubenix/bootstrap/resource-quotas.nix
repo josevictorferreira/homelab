@@ -9,10 +9,10 @@ let
       metadata.name = monitoring;
       metadata.namespace = monitoring;
       spec.hard = {
-        "requests.cpu" = "2";
-        "requests.memory" = "4Gi";
-        "limits.cpu" = "4";
-        "limits.memory" = "8Gi";
+        "requests.cpu" = "4";
+        "requests.memory" = "8Gi";
+        "limits.cpu" = "8";
+        "limits.memory" = "16Gi";
       };
     };
     ${applications} = {
