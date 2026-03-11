@@ -203,16 +203,20 @@ let
     agents = {
       defaults = {
         model = {
-          primary = "github-copilot/claude-opus-4.6";
+          primary = "github-copilot/claude-sonnet-4.6";
           fallbacks = [
             "kimi-coding/k2p5"
             "zai-coding-plan/glm-5"
             "minimax/MiniMax-M2.5"
+            "github-copilot/claude-opus.4.6"
           ];
         };
         imageModel = {
           primary = "github-copilot/gemini-3-flash-preview";
-          fallbacks = [ "kimi-coding/k2p5" ];
+          fallbacks = [
+            "bailian/qwen3.5-plus"
+            "kimi-coding/k2p5"
+          ];
         };
         userTimezone = "America/Sao_Paulo";
         memorySearch = {
@@ -278,6 +282,14 @@ let
             emoji = "🐕";
             avatar = "avatars/mel.png";
           };
+          model = {
+            primary = "kimi-coding/k2p5";
+            fallbacks = [
+              "zai-coding-plan/glm-5"
+              "minimax/MiniMax-M2.5"
+              "bailian/qwen3.5-plus"
+            ];
+          };
         }
         {
           id = "kira";
@@ -304,6 +316,14 @@ let
             theme = "minha fiel companheira";
             emoji = "🐕";
             avatar = "avatars/luna.png";
+          };
+          model = {
+            primary = "bailian/qwen3.5-plus";
+            fallbacks = [
+              "zai-coding-plan/glm-5"
+              "kimi-coding/k2p5"
+              "minimax/MiniMax-M2.5"
+            ];
           };
         }
       ];
