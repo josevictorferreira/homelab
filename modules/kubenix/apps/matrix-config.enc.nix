@@ -211,6 +211,9 @@ in
               };
               bridge = {
                 username_template = "discord_{{.}}";
+                displayname_template = "{{if .Webhook}}Webhook{{else}}{{or .GlobalName .Username}}{{if .Bot}} (bot){{end}}{{end}} (DC)";
+                channel_name_template = "{{if or (eq .Type 3) (eq .Type 4)}}{{.Name}}{{else}}#{{.Name}}{{end}} (DC)";
+                guild_name_template = "{{.Name}} (DC)";
                 command_prefix = "!dc";
                 permissions = {
                   "*" = "relay";
@@ -299,9 +302,9 @@ in
 
               # Slack connector settings (bridgev2 format)
               connector = {
-                # Room naming pattern: slack/workspacename/channelname
-                channel_name_template = "slack/{{.Team.Name}}/{{.Name}}";
-                team_name_template = "{{.Name}}";
+                displayname_template = "{{or .Profile.DisplayName .Profile.RealName .Name}}{{if .IsBot}} (bot){{end}} (SL)";
+                channel_name_template = "slack/{{.Team.Name}}/{{.Name}} (SL)";
+                team_name_template = "{{.Name}} (SL)";
               };
 
               bridge = {
