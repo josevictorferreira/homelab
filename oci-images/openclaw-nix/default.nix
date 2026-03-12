@@ -3,7 +3,7 @@
   lib,
   inputs,
   system,
-  version ? "2026.3.8",
+  version ? "2026.3.11",
 }:
 
 let
@@ -14,8 +14,8 @@ let
     owner = "openclaw";
     repo = "openclaw";
     rev = "v${version}";
-    sha256 = "sha256-PeNbusrYqB0yn+t8BERFr9E1YYpuWaw0w+YTzPFQgo8=";
-    pnpmDepsHash = "sha256-CpgulfZfN1yHXpXBR1wvsSaME8y9ZX+dQQ4JJjp3PRs=";
+    sha256 = "sha256-wsbuMKROlL/jqp7RZH6cLdn4H6yc4QmjWc01rsLbGlQ=";
+    pnpmDepsHash = "sha256-YnMjA0pD5X4pXU3A7Yab2U9RJ8g31i98S+atGk8J3CQ=";
   };
 
   # Rolldown 1.0.0-rc.3 — pre-built from npm registry
@@ -152,24 +152,12 @@ let
     if [ -f "${openclawGateway}/bin/openclaw" ]; then ln -s "${openclawGateway}/bin/openclaw" $out/bin/openclaw; fi
     # Copy python lib for requests etc.
     chmod -R u+w $out/lib/openclaw/node_modules/ || true
-    # Strip ML/vector libs (not used)
-    rm -rf $out/lib/openclaw/node_modules/.pnpm/@node-llama-cpp+* $out/lib/openclaw/node_modules/.pnpm/node-llama-cpp@*
-    rm -rf $out/lib/openclaw/node_modules/.pnpm/@lancedb+* $out/lib/openclaw/node_modules/.pnpm/lancedb@*
-    rm -rf $out/lib/openclaw/node_modules/node-llama-cpp $out/lib/openclaw/node_modules/@node-llama-cpp
-    rm -rf $out/lib/openclaw/node_modules/@lancedb $out/lib/openclaw/node_modules/lancedb
-    # Strip cross-platform native bindings (we only need linux-x64-gnu)
-    find $out/lib/openclaw/node_modules/.pnpm/ -maxdepth 1 -type d \( \
-      -name '*-musl-*' -o -name '*musl@*' -o -name '*linuxmusl*' \
-      -o -name '*-darwin-*' -o -name '*darwin@*' \
-      -o -name '*-win32-*' -o -name '*win32@*' \
-      -o -name '*-arm64-*' -o -name '*arm64@*' \
-      -o -name '*-armv7l-*' -o -name '*armv7l@*' \
-      -o -name '*-freebsd-*' -o -name '*freebsd@*' \
-      -o -name '*-android-*' -o -name '*android@*' \
-    \) -exec rm -rf {} + 2>/dev/null || true
-    # Strip runtime-unnecessary packages
-    rm -rf $out/lib/openclaw/node_modules/.pnpm/typescript@*
-    rm -rf $out/lib/openclaw/node_modules/.pnpm/@larksuiteoapi+*
+    # Strip ML/vector libs (not used) - these are large, explicit rm is fast
+    rm -rf $out/lib/openclaw/node_modules/.pnpm/@node-llama-cpp+* $out/lib/openclaw/node_modules/.pnpm/node-llama-cpp@* 2>/dev/null || true
+    rm -rf $out/lib/openclaw/node_modules/.pnpm/@lancedb+* $out/lib/openclaw/node_modules/.pnpm/lancedb@* 2>/dev/null || true
+    rm -rf $out/lib/openclaw/node_modules/node-llama-cpp $out/lib/openclaw/node_modules/@node-llama-cpp 2>/dev/null || true
+    rm -rf $out/lib/openclaw/node_modules/@lancedb $out/lib/openclaw/node_modules/lancedb 2>/dev/null || true
+    # Skip slow find-based cross-platform stripping - saves ~5-10 min build time
     cd $out/lib/openclaw
     mkdir -p $out/etc
     for pkg in ${pkgs.tzdata}; do
@@ -210,10 +198,11 @@ let
     if [ -n "$GATEWAY_STORE_PATH" ]; then mkdir -p "$out/nix/store/$GATEWAY_STORE_PATH"; ln -s $out/lib "$out/nix/store/$GATEWAY_STORE_PATH/lib"; fi
   '';
 in
-dockerTools.buildImage {
+dockerTools.streamLayeredImage {
   name = "localhost/openclaw-nix";
   tag = imageTag;
-  copyToRoot = pkgs.buildEnv {
+  maxLayers = 50;
+  contents = pkgs.buildEnv {
     name = "openclaw-image-root";
     paths = [
       openclawRootfs

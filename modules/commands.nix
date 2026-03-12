@@ -555,7 +555,7 @@ let
 
   # OpenClaw image configuration
   openclawImageName = "openclaw-nix";
-  openclawVersion = "2026.3.8";
+  openclawVersion = "2026.3.11";
   openclawRegistry = "ghcr.io";
 
   push-openclaw =
@@ -588,8 +588,8 @@ let
         # Get the actual store path and load into podman
         echo "[2/6] Loading image into podman..."
         IMAGE_PATH=$(nix build .#''${IMAGE_NAME}-image --print-out-paths --no-link)
-        # Load image and capture the tag from output
-        LOAD_OUTPUT=$(podman load < "''${IMAGE_PATH}")
+        # streamLayeredImage produces an executable script - run it and pipe to podman load
+        LOAD_OUTPUT=$("''${IMAGE_PATH}" | podman load)
         echo "''${LOAD_OUTPUT}"
 
         # Extract the actual tag that was loaded (format: "Loaded image: localhost/...:tag")
