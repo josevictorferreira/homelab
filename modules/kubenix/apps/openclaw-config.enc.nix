@@ -572,7 +572,7 @@ in
       Z_AI_API_KEY = kubenix.lib.secretsFor "z_ai_api_key";
       COPILOT_GITHUB_TOKEN = kubenix.lib.secretsFor "copilot_github_token";
       MINIMAX_API_KEY = kubenix.lib.secretsFor "minimax_api_key";
-      KIMI_API_KEY = kubenix.lib.secretsFor "moonshot_api_key";
+      MOONSHOT_API_KEY = kubenix.lib.secretsFor "moonshot_api_key";
       OPENCLAW_MATRIX_TOKEN = kubenix.lib.secretsFor "openclaw_matrix_token";
       MEL_MATRIX_TOKEN = kubenix.lib.secretsFor "mel_matrix_token";
       KIRA_MATRIX_TOKEN = kubenix.lib.secretsFor "kira_matrix_token";
