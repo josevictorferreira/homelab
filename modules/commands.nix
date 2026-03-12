@@ -560,7 +560,17 @@ let
 
   push-openclaw =
     mkCommand "push-openclaw" "Build and push openclaw-nix image to GHCR"
-      [ pkgs.nix pkgs.podman pkgs.gh pkgs.coreutils pkgs.jq pkgs.skopeo ]
+      [
+        pkgs.nix
+        pkgs.podman
+        pkgs.gh
+        pkgs.coreutils
+        pkgs.jq
+        pkgs.skopeo
+        pkgs.gnused
+        pkgs.git
+        pkgs.gnumake
+      ]
       ''
         set -e
 
@@ -639,15 +649,31 @@ let
           exit 1
         fi
 
-        # Push both tags
+        # Push both tags (OCI format to ensure remote manifest is always overwritten)
         echo "[5/6] Pushing images..."
-        podman push "''${FULL_TAG}"
-        podman push "''${VERSION_TAG}"
+        podman push --format=oci "''${FULL_TAG}"
+        podman push --format=oci "''${VERSION_TAG}"
 
-        # Verify push by checking remote image
-        echo "[6/6] Verifying push..."
-        REMOTE_ID=$(skopeo inspect --format "{{.Digest}}" "docker://''${VERSION_TAG}" 2>/dev/null || echo "unknown")
-        echo "  Remote digest: ''${REMOTE_ID}"
+        # Fetch remote digest and pin it in the manifest
+        echo "[6/6] Pinning digest in manifest..."
+        REMOTE_DIGEST=$(skopeo inspect --format "{{.Digest}}" "docker://''${VERSION_TAG}" 2>/dev/null || echo "")
+        if [ -z "''${REMOTE_DIGEST}" ]; then
+          echo "  Warning: could not fetch remote digest; skipping manifest pin"
+        else
+          echo "  Remote digest: ''${REMOTE_DIGEST}"
+          PINNED_TAG="''${TAG}@''${REMOTE_DIGEST}"
+          MANIFEST_FILE="$(git -C "$(dirname "$0")" rev-parse --show-toplevel 2>/dev/null || echo ".")/modules/kubenix/apps/openclaw-nix.nix"
+          if [ -f "''${MANIFEST_FILE}" ]; then
+            # Replace tag = "v<version>" or tag = "v<version>@sha256:..." with the new pinned tag
+            sed -i "s|tag = \"''${TAG}[^\"]*\"|tag = \"''${PINNED_TAG}\"|g" "''${MANIFEST_FILE}"
+            echo "  Updated ''${MANIFEST_FILE}: tag = \"''${PINNED_TAG}\""
+            echo "  Re-generating manifests..."
+            make -C "$(dirname "''${MANIFEST_FILE}")/../.." manifests
+            echo "  ✓ Manifests regenerated with pinned digest"
+          else
+            echo "  Warning: manifest file not found at ''${MANIFEST_FILE}; skipping auto-pin"
+          fi
+        fi
 
         echo ""
         echo "✓ Images pushed:"
