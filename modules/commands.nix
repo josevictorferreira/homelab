@@ -668,7 +668,7 @@ let
             sed -i "s|tag = \"''${TAG}[^\"]*\"|tag = \"''${PINNED_TAG}\"|g" "''${MANIFEST_FILE}"
             echo "  Updated ''${MANIFEST_FILE}: tag = \"''${PINNED_TAG}\""
             echo "  Re-generating manifests..."
-            make -C "$(dirname "''${MANIFEST_FILE}")/../.." manifests
+            make -C "$(dirname "''${MANIFEST_FILE}")/../../.." manifests
             echo "  ✓ Manifests regenerated with pinned digest"
           else
             echo "  Warning: manifest file not found at ''${MANIFEST_FILE}; skipping auto-pin"

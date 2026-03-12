@@ -194,8 +194,6 @@ let
     done
     CRYPTO_PKG="$out/lib/openclaw/extensions/matrix/node_modules/@matrix-org/matrix-sdk-crypto-nodejs"
     if [ -d "$CRYPTO_PKG" ]; then chmod -R u+w "$CRYPTO_PKG" || true; cp ${matrixCryptoNative} "$CRYPTO_PKG/matrix-sdk-crypto.linux-x64-gnu.node"; fi
-    GATEWAY_STORE_PATH=$(readlink -f ${openclawGateway} | sed 's|^/nix/store/||' | cut -d'/' -f1)
-    if [ -n "$GATEWAY_STORE_PATH" ]; then mkdir -p "$out/nix/store/$GATEWAY_STORE_PATH"; ln -s /lib "$out/nix/store/$GATEWAY_STORE_PATH/lib"; fi
   '';
 in
 dockerTools.streamLayeredImage {
@@ -222,6 +220,14 @@ dockerTools.streamLayeredImage {
 
     mkdir -p ./etc/fonts
     cp ${fontsConf} ./etc/fonts/fonts.conf
+
+    # Symlink gateway store path's /lib to the image's /lib so openclaw can
+    # resolve its own library paths at runtime. This MUST be in extraCommands
+    # (not in openclawRootfs) to avoid a symlink cycle: buildEnv makes /lib
+    # a symlink into the nix store, so creating store-path/lib -> /lib inside
+    # openclawRootfs causes an infinite loop through the buildEnv symlink.
+    GATEWAY_STORE_PATH=$(echo ${openclawGateway} | sed 's|^/nix/store/||' | cut -d'/' -f1)
+    if [ -n "$GATEWAY_STORE_PATH" ]; then mkdir -p "./nix/store/$GATEWAY_STORE_PATH"; ln -s /lib "./nix/store/$GATEWAY_STORE_PATH/lib"; fi
 
     cat > ./entrypoint.sh << 'EOF'
     ${entrypointScriptText}
