@@ -505,7 +505,6 @@ let
             homeserver = "http://synapse-matrix-synapse:8008";
           };
         };
-        userId = "@mel:josevictor.me";
       };
     };
     talk = {
