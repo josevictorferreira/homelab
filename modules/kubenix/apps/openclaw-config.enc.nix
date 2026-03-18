@@ -326,6 +326,21 @@ let
             ];
           };
         }
+        {
+          id = "spare";
+          workspace = "/home/node/.openclaw/workspace-spare";
+          identity = {
+            name = "Spare";
+            theme = "meu nó reserva";
+            emoji = "⚙️";
+          };
+          tools = {
+            exec = {
+              host = "node";
+              node = "nixos-desktop";
+            };
+          };
+        }
       ];
     };
     tools = {
