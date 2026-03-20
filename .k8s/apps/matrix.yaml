@@ -25,8 +25,8 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: 2e6719f187543eed7327e43c8ecc7fc6b521bc12495c81e4707fe1c4d405aa2b
-        checksum/secrets: c67aa7932d48bfa799742920f0a13914ef348ccf932dabc32d103426aa9330c2
+        checksum/config: 4bdf01fcc93bdfaaeca8cb21c6d856b02e768683dc64b65f50ab7e36508d298d
+        checksum/secrets: be9d2c951170d7bf1fd9e14036ee81e0fd5217a6005530d64e30f08521be092f
       labels:
         app.kubernetes.io/component: synapse
         app.kubernetes.io/instance: synapse
@@ -193,8 +193,9 @@ data:
     \ trusted servers to download signing keys from.\ntrusted_key_servers:\n  - server_name:\
     \ matrix.org\n\n## Workers ##\n\n## Extra config ##\n\napp_service_config_files:\n\
     - /synapse/config/conf.d/mautrix-whatsapp-registration.yaml\n- /synapse/config/conf.d/mautrix-discord-registration.yaml\n\
-    - /synapse/config/conf.d/mautrix-slack-registration.yaml\nmedia_storage_providers:\n\
-    - config:\n    bucket: matrix-synapse-media\n    endpoint_url: http://rook-ceph-rgw-ceph-objectstore.rook-ceph.svc.cluster.local\n\
+    - /synapse/config/conf.d/mautrix-slack-registration.yaml\ncaches:\n  global_factor:\
+    \ 1\nevent_cache_size: 20K\nmedia_storage_providers:\n- config:\n    bucket: matrix-synapse-media\n\
+    \    endpoint_url: http://rook-ceph-rgw-ceph-objectstore.rook-ceph.svc.cluster.local\n\
     \    prefix: synapse/\n    region_name: us-east-1\n    request_checksum_calculation:\
     \ when_required\n    response_checksum_validation: when_required\n  module: s3_storage_provider.S3StorageProviderBackend\n\
     \  store_local: true\n  store_remote: true\n  store_synchronous: false\nrc_admin_redaction:\n\
@@ -261,7 +262,7 @@ metadata:
   name: synapse-matrix-synapse
   namespace: apps
 stringData:
-  config.yaml: "## Registration ##\n\nregistration_shared_secret: \"SNU4k5twora0I2XfyZq7KbME\"\
+  config.yaml: "## Registration ##\n\nregistration_shared_secret: \"zBXSGjAZDbrnuWQMR1R0psB0\"\
     \n\n## API Configuration ##\n\n## Database configuration ##\n\ndatabase:\n  name:\
     \ \"psycopg2\"\n  args:\n    user: \"postgres\"\n    password: \"@@POSTGRES_PASSWORD@@\"\
     \n    database: \"synapse\"\n    host: \"postgresql-18-hl\"\n    port: 5432\n\

@@ -24,7 +24,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/extended-configuration: 0d94e92defb53029afb52dcb57a1db8b0b25ead9be62e8823b566fcd64b0ee36
+        checksum/extended-configuration: c83622280de1b2ec109345d283f505523d0fc57efb285cf5987f4c0bb2eb00b9
       labels:
         app.kubernetes.io/component: primary
         app.kubernetes.io/instance: postgresql-18
@@ -116,13 +116,13 @@ spec:
             timeoutSeconds: 5
           resources:
             limits:
-              cpu: 150m
+              cpu: 1000m
               ephemeral-storage: 1Gi
-              memory: 1Gi
+              memory: 3Gi
             requests:
-              cpu: 50m
+              cpu: 250m
               ephemeral-storage: 50Mi
-              memory: 128Mi
+              memory: 1Gi
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
@@ -438,7 +438,7 @@ data:
 
     min_wal_size = ''512MB''
 
-    shared_buffers = 512MB
+    shared_buffers = ''768MB''
 
     wal_buffers = ''32MB''
 
@@ -450,11 +450,11 @@ data:
 
     checkpoint_completion_target = 0.9
 
-    effective_cache_size = ''10GB''
+    effective_cache_size = ''2304MB''
 
-    work_mem = ''64MB''
+    work_mem = ''16MB''
 
-    maintenance_work_mem = ''2GB''
+    maintenance_work_mem = ''512MB''
 
     synchronous_commit = off
 
