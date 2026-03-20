@@ -25,8 +25,8 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: 1d15c584d7fd4e585cca277d188c65b5480352e83f7f1292a3dc0f68487110ee
-        checksum/secrets: e459936f79281bcd593445b8b0eba2cb88f758eafab133d4e3431a5938a77c89
+        checksum/config: 2e6719f187543eed7327e43c8ecc7fc6b521bc12495c81e4707fe1c4d405aa2b
+        checksum/secrets: c67aa7932d48bfa799742920f0a13914ef348ccf932dabc32d103426aa9330c2
       labels:
         app.kubernetes.io/component: synapse
         app.kubernetes.io/instance: synapse
@@ -203,7 +203,7 @@ data:
     \ 50\n  per_user:\n    burst_count: 100\n    per_second: 50\nrc_joins:\n  local:\n\
     \    burst_count: 100\n    per_second: 50\n  remote:\n    burst_count: 20\n  \
     \  per_second: 10\nrc_joins_per_room:\n  burst_count: 100\n  per_second: 50\n\
-    rc_message:\n  burst_count: 100\n  per_second: 50\n"
+    rc_message:\n  burst_count: 100\n  per_second: 50\nuse_presence: false\n"
   log.yaml: "version: 1\nformatters:\n  precise:\n    format: '%(asctime)s - %(name)s\
     \ - %(lineno)d - %(levelname)s - %(request)s- %(message)s'\nfilters:\n  context:\n\
     \    (): synapse.util.logcontext.LoggingContextFilter\n    request: \"\"\nhandlers:\n\
@@ -261,7 +261,7 @@ metadata:
   name: synapse-matrix-synapse
   namespace: apps
 stringData:
-  config.yaml: "## Registration ##\n\nregistration_shared_secret: \"UNQdBxxu8ZvIQ5bqHpcbF6Pc\"\
+  config.yaml: "## Registration ##\n\nregistration_shared_secret: \"SNU4k5twora0I2XfyZq7KbME\"\
     \n\n## API Configuration ##\n\n## Database configuration ##\n\ndatabase:\n  name:\
     \ \"psycopg2\"\n  args:\n    user: \"postgres\"\n    password: \"@@POSTGRES_PASSWORD@@\"\
     \n    database: \"synapse\"\n    host: \"postgresql-18-hl\"\n    port: 5432\n\
