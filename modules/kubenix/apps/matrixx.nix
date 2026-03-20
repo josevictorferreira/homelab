@@ -99,6 +99,7 @@ in
     };
     ingresses.${name} = {
       metadata = {
+        inherit namespace;
         annotations = {
           "cert-manager.io/cluster-issuer" = "cloudflare-issuer";
         };

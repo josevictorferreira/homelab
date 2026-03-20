@@ -124,6 +124,7 @@ metadata:
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   name: matrixx
+  namespace: apps
 spec:
   ingressClassName: cilium
   rules:
