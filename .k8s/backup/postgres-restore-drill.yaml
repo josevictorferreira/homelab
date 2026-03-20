@@ -86,21 +86,20 @@ spec:
                   \ -U postgres -Atc \"SELECT datname FROM pg_database WHERE datistemplate\
                   \ = false ORDER BY 1;\")\nfor db in linkwarden openwebui n8n immich\
                   \ valoris_production valoris_production_queue keycloak synapse mautrix_slack\
-                  \ mautrix_discord mautrix_whatsapp dendrite; do\n  if echo \"$ACTUAL_DBS\"\
+                  \ mautrix_discord mautrix_whatsapp; do\n  if echo \"$ACTUAL_DBS\"\
                   \ | grep -qw \"$db\"; then\n    echo \"OK: database $db exists\"\
                   \n  else\n    echo \"FAIL: database $db missing\"\n    SMOKE_OK=false\n\
                   \  fi\ndone\n\n# Check each DB has at least 1 table\nfor db in linkwarden\
                   \ openwebui n8n immich valoris_production valoris_production_queue\
-                  \ keycloak synapse mautrix_slack mautrix_discord mautrix_whatsapp\
-                  \ dendrite; do\n  TABLE_COUNT=$(psql -h localhost -U postgres -d\
-                  \ \"$db\" -Atc \"SELECT count(*) FROM information_schema.tables\
-                  \ WHERE table_schema = 'public';\" 2>/dev/null || echo \"0\")\n\
-                  \  if [ \"$TABLE_COUNT\" -gt 0 ]; then\n    echo \"OK: $db has $TABLE_COUNT\
-                  \ tables\"\n  else\n    echo \"WARN: $db has 0 public tables (may\
-                  \ be expected)\"\n  fi\ndone\n\nif [ \"$SMOKE_OK\" = true ]; then\n\
-                  \  echo \"smoke OK\"\n  echo \"=== Postgres restore drill complete\
-                  \ ===\"\n  exit 0\nelse\n  echo \"ERROR: smoke checks failed\"\n\
-                  \  exit 1\nfi\n"
+                  \ keycloak synapse mautrix_slack mautrix_discord mautrix_whatsapp;\
+                  \ do\n  TABLE_COUNT=$(psql -h localhost -U postgres -d \"$db\" -Atc\
+                  \ \"SELECT count(*) FROM information_schema.tables WHERE table_schema\
+                  \ = 'public';\" 2>/dev/null || echo \"0\")\n  if [ \"$TABLE_COUNT\"\
+                  \ -gt 0 ]; then\n    echo \"OK: $db has $TABLE_COUNT tables\"\n\
+                  \  else\n    echo \"WARN: $db has 0 public tables (may be expected)\"\
+                  \n  fi\ndone\n\nif [ \"$SMOKE_OK\" = true ]; then\n  echo \"smoke\
+                  \ OK\"\n  echo \"=== Postgres restore drill complete ===\"\n  exit\
+                  \ 0\nelse\n  echo \"ERROR: smoke checks failed\"\n  exit 1\nfi\n"
               command:
                 - bash
                 - -c
