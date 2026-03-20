@@ -20,7 +20,7 @@ spec:
         - command:
             - /usr/bin/dendrite
             - -config
-            - /etc/dendrite/dendrite.yaml
+            - /var/lib/dendrite/dendrite.yaml
             - -http-bind-address
             - :8008
           image: ghcr.io/element-hq/dendrite-monolith:v0.15.2@sha256:e9a93fe88ab6c3716af5a495e021201e9aee30a8509dadb4a7ebd7d859880144
@@ -30,7 +30,7 @@ spec:
               name: http
               protocol: TCP
           volumeMounts:
-            - mountPath: /etc/dendrite/dendrite.yaml
+            - mountPath: /var/lib/dendrite
               name: config
               readOnly: true
               subPath: dendrite.yaml
@@ -60,7 +60,7 @@ spec:
         - command:
             - /usr/bin/create-account
             - -config
-            - /etc/dendrite/dendrite.yaml
+            - /var/lib/dendrite/dendrite.yaml
             - -username
             - dendrite-test
             - -passwordstdin
@@ -73,7 +73,7 @@ spec:
           image: ghcr.io/element-hq/dendrite-monolith:v0.15.2@sha256:e9a93fe88ab6c3716af5a495e021201e9aee30a8509dadb4a7ebd7d859880144
           name: create-account
           volumeMounts:
-            - mountPath: /etc/dendrite/dendrite.yaml
+            - mountPath: /var/lib/dendrite
               name: config
               readOnly: true
               subPath: dendrite.yaml
