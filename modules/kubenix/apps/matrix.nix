@@ -231,6 +231,8 @@ in
             }
           ];
 
+          use_presence = false;
+
           # Rate limiting exemptions for appservices (bridges)
           # Prevents 429 errors when bridges sync many rooms at once
           rc_joins = {
