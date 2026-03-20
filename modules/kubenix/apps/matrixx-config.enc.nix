@@ -54,4 +54,11 @@ in
       };
     };
   };
+
+  kubernetes.resources.secrets."dendrite-test-password" = {
+    metadata.namespace = namespace;
+    stringData = {
+      dendrite_test_user_password = kubenix.lib.secretsFor "dendrite_test_user_password";
+    };
+  };
 }
