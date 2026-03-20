@@ -23,7 +23,7 @@ in
                 command = [
                   "/usr/bin/dendrite"
                   "-config"
-                  "/var/lib/dendrite.yaml"
+                  "/etc/dendrite/dendrite.yaml"
                   "-http-bind-address"
                   ":8008"
                 ];
@@ -37,7 +37,7 @@ in
                 volumeMounts = [
                   {
                     name = "config";
-                    mountPath = "/var/lib/dendrite.yaml";
+                    mountPath = "/etc/dendrite";
                     readOnly = true;
                   }
                   {
@@ -151,7 +151,7 @@ in
               command = [
                 "/usr/bin/create-account"
                 "-config"
-                  "/var/lib/dendrite.yaml"
+                  "/etc/dendrite/dendrite.yaml"
                 "-username"
                 "dendrite-test"
                 "-passwordstdin"
@@ -167,7 +167,7 @@ in
               }];
               volumeMounts = [{
                 name = "config";
-                    mountPath = "/var/lib/dendrite.yaml";
+                    mountPath = "/etc/dendrite";
                 readOnly = true;
               }];
             }];
