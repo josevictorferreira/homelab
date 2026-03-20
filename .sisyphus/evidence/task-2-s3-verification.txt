@@ -1,0 +1,8 @@
+Synapse S3 Media Storage Verification
+
+- s3_storage_provider import: YES (import succeeded, printed OK)
+- OBC for matrix-synapse-media: YES (kubectl get obc returned object)
+- Secret matrix-synapse-media: YES (kubectl get secret returned object)
+- Local media file count in /synapse/data/media: N/A (counting timed out due to large number of files)
+- S3 object count under prefix synapse/: 995
+- Test upload verification: Not performed (no upload test requested)

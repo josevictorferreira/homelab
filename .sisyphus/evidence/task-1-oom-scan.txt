@@ -1,0 +1,55 @@
+# OOM and CrashLoop Event Scan - apps namespace
+# Timestamp: Fri Mar 20 21:16:21 UTC 2026
+# Scan scope: Last ~1 hour of events
+
+## OOMKilled events: NONE FOUND
+## CrashLoopBackOff events: NONE FOUND (direct filter)
+
+## Event Summary (showing Warning/Unhealthy from last 100 events):
+
+LAST SEEN   TYPE      REASON                   OBJECT                                       MESSAGE
+4m32s       Normal    Scheduled                pod/postgresql-18-bootstrap-afe0d782-5trvk   Successfully assigned apps/postgresql-18-bootstrap-afe0d782-5trvk to lab-beta-cp
+37m         Normal    Scheduled                pod/n8n-5c8f785f4f-hkmrj                     Successfully assigned apps/n8n-5c8f785f4f-hkmrj to lab-beta-cp
+47m         Warning   Unhealthy                pod/postgresql-18-0                          Readiness probe failed: 127.0.0.1:5432 - no response
+46m         Warning   Unhealthy                pod/n8n-5c8f785f4f-z6kb9                     Readiness probe failed: Get "http://10.0.3.22:5678/healthz/readiness": read tcp 10.0.3.183:47422->10.0.3.22:5678: read: connection reset by peer
+46m         Warning   Unhealthy                pod/n8n-5c8f785f4f-z6kb9                     Liveness probe failed: Get "http://10.0.3.22:5678/healthz": dial tcp 10.0.3.22:5678: connect: connection refused
+45m         Warning   Unhealthy                pod/n8n-5c8f785f4f-z6kb9                     Readiness probe failed: Get "http://10.0.3.22:5678/healthz/readiness": dial tcp 10.0.3.22:5678: connect: connection refused
+45m         Warning   Unhealthy                pod/n8n-5c8f785f4f-z6kb9                     Readiness probe failed: Get "http://10.0.3.22:5678/healthz/readiness": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+45m         Warning   Unhealthy                pod/searxng-5f644cc954-mvh8l                 Readiness probe failed: Get "http://10.0.3.97:8080/": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+44m         Warning   Unhealthy                pod/searxng-5f644cc954-mvh8l                 Readiness probe failed: Get "http://10.0.3.97:8080/": dial tcp 10.0.3.97:8080: connect: connection refused
+44m         Warning   Unhealthy                pod/searxng-5f644cc954-mvh8l                 Liveness probe failed: Get "http://10.0.3.97:8080/": dial tcp 10.0.3.97:8080: connect: connection refused
+43m         Warning   Unhealthy                pod/uptimekuma-uptime-kuma-c69f774c9-8pdw8   Readiness probe failed: Get "http://10.0.3.131:3001/dashboard": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+43m         Warning   Unhealthy                pod/n8n-5c8f785f4f-z6kb9                     Liveness probe failed: Get "http://10.0.3.22:5678/healthz": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+43m         Warning   Unhealthy                pod/uptimekuma-uptime-kuma-c69f774c9-8pdw8   Liveness probe failed: command timed out: "extra/healthcheck" timed out after 2s
+42m         Warning   Unhealthy                pod/redis-master-0                           Readiness probe failed: Timed out
+42m         Warning   NodeNotReady             pod/searxng-5f644cc954-mvh8l                 Node is not ready
+42m         Warning   NodeNotReady             pod/valoris-worker-5bdf4b7c9c-lbmfn          Node is not ready
+42m         Warning   NodeNotReady             pod/blocky-84df9d5d55-52pvg                  Node is not ready
+42m         Warning   NodeNotReady             pod/ntfy-54d5ccfc9d-9m6gc                    Node is not ready
+42m         Warning   NodeNotReady             pod/qui-bb5467df6-bpfs6                      Node is not ready
+42m         Warning   NodeNotReady             pod/postgresql-18-0                          Node is not ready
+42m         Warning   NodeNotReady             pod/protonmail-bridge-0                      Node is not ready
+42m         Warning   NodeNotReady             pod/uptimekuma-uptime-kuma-c69f774c9-8pdw8   Node is not ready
+42m         Warning   NodeNotReady             pod/glance-586897767c-n62lq                  Node is not ready
+42m         Warning   Unhealthy                pod/protonmail-bridge-0                      Readiness probe failed: dial tcp 10.0.3.41:143: i/o timeout
+42m         Warning   Unhealthy                pod/uptimekuma-uptime-kuma-c69f774c9-8pdw8   Readiness probe failed: Get "http://10.0.3.131:3001/": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+42m         Normal    Killing                  pod/searxng-5f644cc954-mvh8l                 Container searxng failed liveness probe, will be restarted
+41m         Warning   BackOff                  pod/mautrix-discord-58766db9bc-kr7td         Back-off restarting failed container mautrix-discord in pod mautrix-discord-58766db9bc-kr7td_apps(3881feae-8f21-4451-8a3a-6233b653cde0)
+38m         Warning   BackOff                  pod/matrixx-create-user-52vxc                Back-off restarting failed container create-account in pod matrixx-create-user-52vxc_apps(be015075-6e9d-4df1-996c-bf2ab13c0120)
+37m         Warning   BackOff                  pod/n8n-5c8f785f4f-z6kb9                     Back-off restarting failed container n8n-main in pod n8n-5c8f785f4f-z6kb9_apps(ab7db4e0-bbd6-4ead-8cda-e44a2c0d819b)
+35m         Warning   Unhealthy                pod/n8n-5c8f785f4f-hkmrj                     Liveness probe failed: Get "http://10.0.1.90:5678/healthz": dial tcp 10.0.1.90:5678: connect: connection refused
+35m         Warning   Unhealthy                pod/n8n-5c8f785f4f-hkmrj                     Readiness probe failed: Get "http://10.0.1.90:5678/healthz/readiness": dial tcp 10.0.1.90:5678: connect: connection refused
+7m27s       Warning   Unhealthy                pod/postgresql-18-0                          Readiness probe failed: command timed out: "/bin/sh -c -e exec pg_isready -U \"postgres\" -d \"dbname=linkwarden\" -h 127.0.0.1 -p 5432
+[ -f /opt/bitnami/postgresql/tmp/.initialized ] || [ -f /bitnami/postgresql/.initialized ]
+" timed out after 5s
+112s        Warning   FailedCreate             job/synapse-signingkey-job                   Error creating: pods "synapse-signingkey-job-" is forbidden: error looking up service account apps/synapse-signingkey-job: serviceaccount "synapse-signingkey-job" not found
+30s         Warning   Unhealthy                pod/postgresql-18-0                          Liveness probe failed: command timed out: "/bin/sh -c exec pg_isready -U \"postgres\" -d \"dbname=linkwarden\" -h 127.0.0.1 -p 5432" timed out after 5s
+
+## Notable findings:
+- NO OOMKilled events detected in apps namespace
+- NO direct CrashLoopBackOff events (but BackOff indicates restart failures)
+- mautrix-discord has 22 restarts total (BackOff seen 41m ago)
+- redis-master-0 has 20 restarts total
+- postgresql-18-0 has 7 restarts, shows readiness/liveness probe failures
+- searxng shows container restart due to liveness probe failure
+- NodeNotReady events suggest node-level issues on lab-gamma-wk

@@ -69,15 +69,15 @@ in
             logging_collector = on
             max_wal_size = 2GB
             min_wal_size = '512MB'
-            shared_buffers = 512MB
+            shared_buffers = '768MB'
             wal_buffers = '32MB'
             wal_compression = on
             wal_keep_size = '512MB'
             checkpoint_timeout = '30min'
             checkpoint_completion_target = 0.9
-            effective_cache_size = '10GB'
-            work_mem = '64MB'
-            maintenance_work_mem = '2GB'
+            effective_cache_size = '2304MB'
+            work_mem = '16MB'
+            maintenance_work_mem = '512MB'
             synchronous_commit = off
             autovacuum_max_workers = 5
             autovacuum_naptime = '10s'
@@ -88,13 +88,13 @@ in
           '';
           resources = {
             limits = {
-              cpu = "150m";
-              memory = "1Gi";
+              cpu = "1000m";
+              memory = "3Gi";
               ephemeral-storage = "1Gi";
             };
             requests = {
-              cpu = "50m";
-              memory = "128Mi";
+              cpu = "250m";
+              memory = "1Gi";
               ephemeral-storage = "50Mi";
             };
           };
