@@ -10,10 +10,10 @@ in
       "dendrite.yaml" = kubenix.lib.toYamlStr {
         global = {
           server_name = "josevictor.me";
-          private_key = null;
+          private_key = "/var/lib/dendrite/matrix_key.pem";
           key_validity_period = "168h0m0s";
           database = {
-            connection_string = "postgresql://postgres@postgresql-18-hl.apps.svc.cluster.local:5432/dendrite?sslmode=disable";
+            connection_string = "postgresql://postgres:${kubenix.lib.secretsInlineFor "postgresql_admin_password"}@postgresql-18-hl.apps.svc.cluster.local:5432/dendrite?sslmode=disable";
             max_open_conns = 90;
             max_idle_conns = 5;
             conn_max_lifetime = -1;
@@ -23,6 +23,7 @@ in
         client_api = {
           registration_disabled = true;
           guests_disabled = true;
+          registration_shared_secret = kubenix.lib.secretsFor "dendrite_registration_shared_secret";
         };
         media_api = {
           base_path = "/data/media";
@@ -52,6 +53,7 @@ in
           mscs = [ ];
         };
       };
+      "matrix_key.pem" = kubenix.lib.secretsFor "dendrite_signing_key";
     };
   };
 
