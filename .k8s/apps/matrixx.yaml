@@ -78,6 +78,10 @@ spec:
               readOnly: true
               subPath: dendrite.yaml
       restartPolicy: OnFailure
+      volumes:
+        - name: config
+          secret:
+            secretName: matrixx-config
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
