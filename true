@@ -1,0 +1,44 @@
+flag provided but not defined: -generate-example
+Usage of /usr/bin/dendrite:
+  -config string
+    	The path to the config file. For more information, see the config file in this repository. (default "dendrite.yaml")
+flag provided but not defined: -generate-example
+Usage of /usr/bin/dendrite:
+  -config string
+    	The path to the config file. For more information, see the config file in this repository. (default "dendrite.yaml")
+  -http-bind-address string
+    	The HTTP listening port for the server (default ":8008")
+  -https-bind-address string
+    	The HTTPS listening port for the server (default ":8448")
+  -really-enable-open-registration
+    	This allows open registration without secondary verification (reCAPTCHA). This is NOT RECOMMENDED and will SIGNIFICANTLY increase the risk that your server will be used to send spam or conduct attacks, which may result in your server being banned from rooms.
+  -skip-db-sanity
+    	Ignore sanity checks on the database connections (NOT RECOMMENDED!)
+  -tls-cert string
+    	The PEM formatted X509 certificate to use for TLS
+  -tls-key string
+    	The PEM private key to use for TLS
+  -unix-socket string
+    	EXPERIMENTAL(unstable): The HTTP listening unix socket for the server (disables http[s]-bind-address feature)
+  -unix-socket-permission string
+    	EXPERIMENTAL(unstable): The HTTP listening unix socket permission for the server (in chmod format like 755) (default "755")
+  -version
+    	Shows the current version and exits immediately.
+  -http-bind-address string
+    	The HTTP listening port for the server (default ":8008")
+  -https-bind-address string
+    	The HTTPS listening port for the server (default ":8448")
+  -really-enable-open-registration
+    	This allows open registration without secondary verification (reCAPTCHA). This is NOT RECOMMENDED and will SIGNIFICANTLY increase the risk that your server will be used to send spam or conduct attacks, which may result in your server being banned from rooms.
+  -skip-db-sanity
+    	Ignore sanity checks on the database connections (NOT RECOMMENDED!)
+  -tls-cert string
+    	The PEM formatted X509 certificate to use for TLS
+  -tls-key string
+    	The PEM private key to use for TLS
+  -unix-socket string
+    	EXPERIMENTAL(unstable): The HTTP listening unix socket for the server (disables http[s]-bind-address feature)
+  -unix-socket-permission string
+    	EXPERIMENTAL(unstable): The HTTP listening unix socket permission for the server (in chmod format like 755) (default "755")
+  -version
+    	Shows the current version and exits immediately.
