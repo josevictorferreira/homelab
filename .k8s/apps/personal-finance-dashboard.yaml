@@ -17,7 +17,7 @@ spec:
         app: personal-finances
     spec:
       containers:
-        - image: ghcr.io/josevictorferreira/personal-finances:7fb650a
+        - image: ghcr.io/josevictorferreira/personal-finances@sha256:8813630227cd1565a896447ad78a0c9f00deb15c5389e50d3a83b184c9239031
           imagePullPolicy: IfNotPresent
           name: personal-finances
           ports:
