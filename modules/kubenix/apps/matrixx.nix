@@ -38,6 +38,7 @@ in
                   {
                     name = "config";
                     mountPath = "/etc/dendrite";
+subPath = "dendrite.yaml";
                     readOnly = true;
                   }
                   {
@@ -168,6 +169,7 @@ in
               volumeMounts = [{
                 name = "config";
                     mountPath = "/etc/dendrite";
+subPath = "dendrite.yaml";
                 readOnly = true;
               }];
             }];
