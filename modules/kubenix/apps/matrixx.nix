@@ -38,12 +38,16 @@ in
                   {
                     name = "config";
                     mountPath = "/etc/dendrite";
-subPath = "dendrite.yaml";
                     readOnly = true;
                   }
                   {
                     name = "media";
                     mountPath = "/data/media";
+                  }
+                  {
+                    name = "key";
+                    mountPath = "/var/lib/dendrite";
+                    readOnly = true;
                   }
                 ];
               }
@@ -59,6 +63,16 @@ subPath = "dendrite.yaml";
                 name = "media";
                 persistentVolumeClaim = {
                   claimName = "matrixx-media";
+                };
+              }
+              {
+                name = "key";
+                secret = {
+                  secretName = "matrixx-config";
+                  items = [{
+                    key = "matrix_key.pem";
+                    path = "matrix_key.pem";
+                  }];
                 };
               }
             ];
@@ -138,24 +152,31 @@ subPath = "dendrite.yaml";
         template = {
           spec = {
             restartPolicy = "OnFailure";
-    volumes = [
-      {
-        name = "config";
-        secret = {
-          secretName = "matrixx-config";
-        };
-      }
-    ];
+            volumes = [
+              {
+                name = "config";
+                secret = {
+                  secretName = "matrixx-config";
+                };
+              }
+              {
+                name = "key";
+                secret = {
+                  secretName = "matrixx-config";
+                  items = [{
+                    key = "matrix_key.pem";
+                    path = "matrix_key.pem";
+                  }];
+                };
+              }
+            ];
             containers = [{
               name = "create-account";
               image = "ghcr.io/element-hq/dendrite-monolith:v0.15.2@sha256:e9a93fe88ab6c3716af5a495e021201e9aee30a8509dadb4a7ebd7d859880144";
               command = [
-                "/usr/bin/create-account"
-                "-config"
-                  "/etc/dendrite/dendrite.yaml"
-                "-username"
-                "dendrite-test"
-                "-passwordstdin"
+                "/bin/sh"
+                "-c"
+                "echo $PASSWORD | /usr/bin/create-account -config /etc/dendrite/dendrite.yaml -username dendrite-test -passwordstdin -url http://matrixx.apps.svc.cluster.local:8008"
               ];
               env = [{
                 name = "PASSWORD";
@@ -167,11 +188,16 @@ subPath = "dendrite.yaml";
                 };
               }];
               volumeMounts = [{
-                name = "config";
-                    mountPath = "/etc/dendrite";
-subPath = "dendrite.yaml";
-                readOnly = true;
-              }];
+                  name = "config";
+                  mountPath = "/etc/dendrite";
+                  readOnly = true;
+                }
+                {
+                  name = "key";
+                  mountPath = "/var/lib/dendrite";
+                  readOnly = true;
+                }
+              ];
             }];
           };
         };
