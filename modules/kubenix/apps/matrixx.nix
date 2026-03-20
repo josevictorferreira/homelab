@@ -137,6 +137,14 @@ in
         template = {
           spec = {
             restartPolicy = "OnFailure";
+    volumes = [
+      {
+        name = "config";
+        secret = {
+          secretName = "matrixx-config";
+        };
+      }
+    ];
             containers = [{
               name = "create-account";
               image = "ghcr.io/element-hq/dendrite-monolith:v0.15.2@sha256:e9a93fe88ab6c3716af5a495e021201e9aee30a8509dadb4a7ebd7d859880144";
