@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: Secret
+metadata:
+    annotations:
+        kubenix/k8s-version: "1.32"
+        kubenix/project-name: ze-homelab
+    name: matrixx-config
+    namespace: apps
+stringData:
+    dendrite.yaml: ENC[AES256_GCM,data:YCXIColkroo6VwSaRfaLKEp78Y+Igm6n2U7drQ5Hf2YStbogPA8A8DsJMehGVROOI4sS5qVKJNz+9RCn2bHS3xABtzjh4JK5gkD5UbGUo0ics8/wZ6RhGjVujC5Z3ZpnT/RAxjR6abSgcOAupJL6L4YYKGNtsC9z7rA3Gxh2weYqqVW5/FIdbG6enrxIGJvXsvgT3MerltLwnnTkAzKY6+eYUq+bFkUz74M6QhgC3FFUH5+aNpReDyAmtTsNMUGqREaeRMa+FiQwNEa0ro1af4ITkhvifbMjlK2pxahkSsrjy64Ba5oVEQclFG2zSi+Fgo0nU4W6yRtTUI6XycORk+s9mFMweg89LmBcS1znwXqNoNLUQY7VeZ/qNKWoBvc39R/a3mkwbMtLvM1ROFt6BkncK39fdjPbmjW4BE9p49ZYl3Nv23IEsgB+A4jxTxY/JOsjbUtobsyS0Uryz082jtyZcoV2wSzMi3swOyRunvKyd36sgQzo04FC5zph5hyw/z0+4D19GVcDv8s7eiyM1zfIKAoSauj1mru4scWOEzGxXEVF+2S8z4NW6E/bfxJHqazL53XgD6TLcJlyXtYfdHfvxLdn2TYNwsATQbMsnAXpbfiNht4XORIFV3knFxYAvij41sUb/QbCqzmtCrcZd8ADUj8kb9EnT3nY7I9+aDLJGHDMzWltufgc4wmtuLiK6Ha9cxK+Cyd310qKFepfYJCK+4urd7NPjzC8HmE1iD68T+BlYrTGuD1+vHFdK3fCeyABfFzRSsoGjyz7T6EIBkND7b7SPVrd8+sxUkNFm62fYnjQadcfgSqwvSmgMdiL5WuHGCoU+5bf+7FLuBzH0uq9X2hPcQdHj/FDe2in3HhfBstilBARy4PieDHkCCIPtkS24uFPvyAslVI=,iv:7ptn1Fpl7V+oGc/myKO4oNXL/NtXjR5BqCv7FDPMLqA=,tag:FQSh35vXYAykBprWJdeQDA==,type:str]
+sops:
+    age:
+        - recipient: age16yrhmz8fytj7j9ns80zl40zjcdfd3pdxh48ld7ys7veea774udtqfn9jyx
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBFMFNKYlFDMWFFUDZSdUJu
+            VG9lOEkrSURiRndjei9GODhCYlpvS25tcFNnClk2eXg4WDhhanN5RUVxOXNHd3Az
+            T05jTktjVkwrTkR0WjFEazIxbWFOTHMKLS0tIElKbVp0a2F4cEZvN21VcWFUQksr
+            Vml2SWE2WGNKVmZWMkZWdE93NG9kdmMKRS3tO8UU6qJr67y0dYn1s9Qs3KQgxOJh
+            alXY2MmSwv1qOd37LmxmNU3HpAC95dwUW3RenpfhUti4w6PpkrggEA==
+            -----END AGE ENCRYPTED FILE-----
+        - recipient: age1jx9qu5p0ycvymrl2gykd9z3w8x8n67jxnatxs49j7qzspjr6asqqf8u35h
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBiRmVlR2hHRTArQkxRazJE
+            RHRSS1BEenV4ODBOK3drSGN1WXRVUnNlakcwClJmTXZ3Z1pQTWxOZUxRaExXeUJ0
+            dVBpcDl4QWs3YlYyc01hUjE4SmFLNDgKLS0tIENqdkRvaHlhMEQ0bkFKa0x6QkEr
+            K1Z6U1prVFVZQnRIeitEaEdwTVltMDgK04S3nWFv3mh1lMY8Y7yZhizi/UiBR0/U
+            UkKHoFjqq1RjFxzZGkoLwvwuUsVDKKGBgd3zGr7oR6Yq1G8VmxhjAA==
+            -----END AGE ENCRYPTED FILE-----
+        - recipient: age1myzhwq67gu5zrfk8fvs0p7mh5fk67d20ltwqf9325ya83lm06ytsyax3j2
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBTTkdpSU5oUC9qS2Z4VHkv
+            dXlYcTJ4bkdVeWFNQmhNMGtIakJZZjIwbVNzClZyY2NXamE2L2VSNkg3Mkh5YVF5
+            NkVmNWVpcEZqUUpPdGliLzVHc1kybFEKLS0tIFhERWliUndPc1VXL1RDa3JFdDNI
+            ckh4anYySmNXdEJER25MZHJMeFJRY28Kb+wfsuCUwfVc6kL9isiiXkP38gJYk2Nn
+            inufwHIhwBrhuJY/nQd7tMF6elPU2wQywdCVOwF3JL602K6QpA5skA==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2026-03-20T15:48:59Z"
+    mac: ENC[AES256_GCM,data:4p+qzNo+FKxLMUYjc0z6o3y0By7yeOqJe2FrBbWafo2CfBWeI4RoOthCKbc1lgJa6fb7sqbdBgBF08iUc56Ldx7DrbCtvnV4ofwh0uvIiwRh7wDGzab8aKIsKj7rrCfOimnr2T4RhYXxIm+9SJczZ/fX12qHYv6tEhohBfO3zwI=,iv:4EWkq4FsSu2/RY4ktIGCkLNc+fUkvJl3XPwEFXsSgiw=,tag:bS7zI/KjBphmB0BhuElCag==,type:str]
+    encrypted_regex: ^(data|stringData)$
+    version: 3.10.2

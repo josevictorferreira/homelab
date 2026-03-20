@@ -1,0 +1,61 @@
+# Task 2: Dendrite Config Shape
+
+## Official Documentation
+https://github.com/element-hq/dendrite/blob/main/docs/installation/manual/4_configuration.md
+
+## Minimal dendrite.yaml for monolith (LAN-only, non-federating)
+
+```yaml
+global:
+  server_name: josevictor.me
+  private_key: null  # Generate at first run
+  key_validity_period: 168h0m0s
+  database:
+    connection_string: postgresql://postgres@postgresql-18-hl.apps.svc.cluster.local:5432/dendrite?sslmode=disable
+    max_open_conns: 90
+    max_idle_conns: 5
+    conn_max_lifetime: -1
+  disable_federation: true
+
+client_api:
+  registration_disabled: true
+  guests_disabled: true
+
+media_api:
+  base_path: /data/media
+  max_file_size_bytes: 104857600
+
+sync_api:
+  search:
+    enabled: false
+
+user_api:
+  internal_api:
+    listen: http://[::]:7777
+
+federation_api:
+  internal_api:
+    listen: http://[::]:7776
+
+app_service_api:
+  internal_api:
+    listen: http://[::]:7777
+
+mscs:
+  mscs: []
+```
+
+## Key Decisions
+- server_name: josevictor.me (same as Synapse - shared MXID domain)
+- disable_federation: true (non-federating for safety with shared server_name)
+- registration_disabled: true (only create test user via Job)
+- DB: postgresql-18-hl.apps.svc.cluster.local:5432/dendrite
+- Media path: /data/media (PVC mount)
+- No TLS (handled by Cilium ingress)
+
+## Sources
+- server_name: https://github.com/element-hq/dendrite/blob/main/docs/installation/manual/4_configuration.md#L31
+- database: https://github.com/element-hq/dendrite/blob/main/dendrite-sample.yaml#L44
+- disable_federation: https://github.com/element-hq/dendrite/blob/main/setup/config/config_global.go#L57
+- registration_disabled: https://github.com/element-hq/dendrite/blob/main/dendrite-sample.yaml#L172
+- media base_path: https://github.com/element-hq/dendrite/blob/main/dendrite-sample.yaml#L278
