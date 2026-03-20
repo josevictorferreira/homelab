@@ -1,0 +1,10 @@
+# Task 3: Reserve internal DNS name matrixx.josevictor.me
+
+## Changes Made
+- Added `matrixx = "10.10.10.142";` to config/kubernetes.nix loadBalancer.services
+- Added `"dendrite"` to databases.postgres list
+
+## Verification
+- make check passes
+- Blocky will now map matrixx.josevictor.me -> 10.10.10.110 (LB address)
+- Postgres bootstrap job will create dendrite database

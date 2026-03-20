@@ -1,0 +1,42 @@
+# Task 1: Dendrite Image + CLI Discovery
+
+## Image
+- Repository: ghcr.io/element-hq/dendrite-monolith
+- Tag: v0.15.2
+- Full reference: ghcr.io/element-hq/dendrite-monolith:v0.15.2@sha256:e9a93fe88ab6c3716af5a495e021201e9aee30a8509dadb4a7ebd7d859880144
+- Digest: sha256:e9a93fe88ab6c3716af5a495e021201e9aee30a8509dadb4a7ebd7d859880144
+
+## Runtime Command
+Binary: /usr/bin/dendrite
+
+Flags:
+  -config string           Path to config file (default "dendrite.yaml")
+  -http-bind-address string  HTTP listening port (default ":8008")
+  -https-bind-address string HTTPS listening port (default ":8448") - DO NOT USE (no TLS)
+  -tls-cert string         PEM X509 certificate for TLS
+  -tls-key string          PEM private key for TLS
+  -version                 Show version and exit
+
+## Recommended Invocation
+/usr/bin/dendrite -config /etc/dendrite/dendrite.yaml -http-bind-address :8008
+
+## User Creation CLI
+Binary: /usr/bin/create-account
+
+Flags:
+  -config string           Path to config file
+  -username string         Username to create
+  -password string         Password (or use -passwordfile/-passwordstdin)
+  -passwordfile string     Read password from file
+  -passwordstdin           Read password from stdin
+  -admin                   Create admin account
+  -url string              URL to connect to (default "http://localhost:8008")
+
+Example:
+  create-account -config /etc/dendrite/dendrite.yaml -username dendrite-test -passwordstdin <<< "$PASSWORD"
+
+## Config File Mount
+Mount secret to: /etc/dendrite/dendrite.yaml
+
+## State/Media Directory
+Dendrite stores state in Postgres. Media storage path needs config specification.

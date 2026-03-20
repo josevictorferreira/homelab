@@ -1,0 +1,139 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: matrixx
+  namespace: apps
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: matrixx
+  template:
+    metadata:
+      labels:
+        app: matrixx
+    spec:
+      containers:
+        - command:
+            - /usr/bin/dendrite
+            - -config
+            - /etc/dendrite/dendrite.yaml
+            - -http-bind-address
+            - :8008
+          image: ghcr.io/element-hq/dendrite-monolith:v0.15.2@sha256:e9a93fe88ab6c3716af5a495e021201e9aee30a8509dadb4a7ebd7d859880144
+          name: matrixx
+          ports:
+            - containerPort: 8008
+              name: http
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /etc/dendrite/dendrite.yaml
+              name: config
+              readOnly: true
+              subPath: dendrite.yaml
+            - mountPath: /data/media
+              name: media
+      volumes:
+        - name: config
+          secret:
+            secretName: matrixx-config
+        - name: media
+          persistentVolumeClaim:
+            claimName: matrixx-media
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: matrixx-create-user
+  namespace: apps
+spec:
+  backoffLimit: 4
+  template:
+    spec:
+      containers:
+        - command:
+            - /usr/bin/create-account
+            - -config
+            - /etc/dendrite/dendrite.yaml
+            - -username
+            - dendrite-test
+            - -passwordstdin
+          env:
+            - name: PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: dendrite_test_user_password
+                  name: dendrite-test-password
+          image: ghcr.io/element-hq/dendrite-monolith:v0.15.2@sha256:e9a93fe88ab6c3716af5a495e021201e9aee30a8509dadb4a7ebd7d859880144
+          name: create-account
+          volumeMounts:
+            - mountPath: /etc/dendrite/dendrite.yaml
+              name: config
+              readOnly: true
+              subPath: dendrite.yaml
+      restartPolicy: OnFailure
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: matrixx-media
+  namespace: apps
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: rook-ceph-block
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: matrixx
+  namespace: apps
+spec:
+  ports:
+    - name: http
+      port: 8008
+      targetPort: 8008
+  selector:
+    app: matrixx
+  type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: cloudflare-issuer
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: matrixx
+spec:
+  ingressClassName: cilium
+  rules:
+    - host: matrixx.josevictor.me
+      http:
+        paths:
+          - backend:
+              service:
+                name: matrixx
+                port:
+                  name: http
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - matrixx.josevictor.me
+      secretName: wildcard-tls
