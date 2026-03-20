@@ -20,7 +20,7 @@ spec:
         - command:
             - /usr/bin/dendrite
             - -config
-            - /var/lib/dendrite.yaml
+            - /etc/dendrite/dendrite.yaml
             - -http-bind-address
             - :8008
           image: ghcr.io/element-hq/dendrite-monolith:v0.15.2@sha256:e9a93fe88ab6c3716af5a495e021201e9aee30a8509dadb4a7ebd7d859880144
@@ -30,11 +30,14 @@ spec:
               name: http
               protocol: TCP
           volumeMounts:
-            - mountPath: /var/lib/dendrite.yaml
+            - mountPath: /etc/dendrite
               name: config
               readOnly: true
             - mountPath: /data/media
               name: media
+            - mountPath: /var/lib/dendrite
+              name: key
+              readOnly: true
       volumes:
         - name: config
           secret:
@@ -42,6 +45,12 @@ spec:
         - name: media
           persistentVolumeClaim:
             claimName: matrixx-media
+        - name: key
+          secret:
+            items:
+              - key: matrix_key.pem
+                path: matrix_key.pem
+            secretName: matrixx-config
 ---
 apiVersion: batch/v1
 kind: Job
@@ -57,12 +66,10 @@ spec:
     spec:
       containers:
         - command:
-            - /usr/bin/create-account
-            - -config
-            - /var/lib/dendrite.yaml
-            - -username
-            - dendrite-test
-            - -passwordstdin
+            - /bin/sh
+            - -c
+            - echo $PASSWORD | /usr/bin/create-account -config /etc/dendrite/dendrite.yaml
+              -username dendrite-test -passwordstdin -url http://matrixx.apps.svc.cluster.local:8008
           env:
             - name: PASSWORD
               valueFrom:
@@ -72,13 +79,22 @@ spec:
           image: ghcr.io/element-hq/dendrite-monolith:v0.15.2@sha256:e9a93fe88ab6c3716af5a495e021201e9aee30a8509dadb4a7ebd7d859880144
           name: create-account
           volumeMounts:
-            - mountPath: /var/lib/dendrite.yaml
+            - mountPath: /etc/dendrite
               name: config
+              readOnly: true
+            - mountPath: /var/lib/dendrite
+              name: key
               readOnly: true
       restartPolicy: OnFailure
       volumes:
         - name: config
           secret:
+            secretName: matrixx-config
+        - name: key
+          secret:
+            items:
+              - key: matrix_key.pem
+                path: matrix_key.pem
             secretName: matrixx-config
 ---
 apiVersion: v1
