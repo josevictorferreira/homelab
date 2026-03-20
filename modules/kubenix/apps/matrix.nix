@@ -232,6 +232,8 @@ in
           ];
 
           use_presence = false;
+          caches.global_factor = 1.0;
+          event_cache_size = "20K";
 
           # Rate limiting exemptions for appservices (bridges)
           # Prevents 429 errors when bridges sync many rooms at once
@@ -336,13 +338,18 @@ in
         # Resources
         resources = {
           requests = {
-            cpu = "100m";
-            memory = "256Mi";
+            cpu = "250m";
+            memory = "512Mi";
           };
           limits = {
-            cpu = "300m";
-            memory = "1Gi";
+            cpu = "1000m";
+            memory = "2Gi";
           };
+        };
+
+        metrics.enabled = true;
+        metrics.serviceMonitor = {
+          enabled = true;
         };
 
         # Disable well-known service (not needed without federation)

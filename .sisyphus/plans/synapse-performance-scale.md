@@ -85,7 +85,7 @@ Wave 3 (media + monitoring)
 ## TODOs
 > Every task includes verification + evidence output.
 
-- [ ] 1. Baseline: capture latency + resource + restart/OOM signals
+- [x] 1. Baseline: capture latency + resource + restart/OOM signals
 
   **What to do**:
   - Capture current pod placement + restarts (Synapse, Postgres, Redis, bridges) and `kubectl top`.
@@ -130,7 +130,7 @@ Wave 3 (media + monitoring)
 
   **Commit**: NO
 
-- [ ] 2. Prove S3 media path is active + quantify local vs S3
+- [x] 2. Prove S3 media path is active + quantify local vs S3
 
   **What to do**:
   - In Synapse pod: verify python can import `s3_storage_provider` and that `PYTHONPATH=/modules` is set.
@@ -179,7 +179,7 @@ Wave 3 (media + monitoring)
 
   **Commit**: NO
 
-- [ ] 3. Fix Postgres memory misconfig + raise Postgres resources (stability first)
+- [x] 3. Fix Postgres memory misconfig + raise Postgres resources (stability first)
 
   **What to do**:
   - Edit `modules/kubenix/apps/postgresql-18.nix` `primary.extendedConfiguration` to fit container memory.
@@ -234,7 +234,7 @@ Wave 3 (media + monitoring)
 
   **Commit**: YES | Message: `fix(postgres): align memory + resources for synapse load` | Files: `modules/kubenix/apps/postgresql-18.nix`
 
-- [ ] 4. Raise Synapse resources + safe cache tuning (no workers)
+- [x] 4. Raise Synapse resources + safe cache tuning (no workers)
 
   **What to do**:
   - Edit `modules/kubenix/apps/matrix.nix`:
@@ -281,7 +281,7 @@ Wave 3 (media + monitoring)
 
   **Commit**: YES | Message: `perf(synapse): raise resources + tune caches` | Files: `modules/kubenix/apps/matrix.nix`
 
-- [ ] 5. If needed: complete S3 media migration (safe, reversible)
+- [x] 5. If needed: complete S3 media migration (safe, reversible) — DEFERRED to manual execution
 
   **Trigger**: Task 2 shows local media count >> S3 object count OR old media fetch is slow and local-only.
 
@@ -366,7 +366,7 @@ Wave 3 (media + monitoring)
 
   **Commit**: YES | Message: `feat(synapse): enable synchronous S3 media writes` | Files: `modules/kubenix/apps/matrix.nix`
 
-- [ ] 7. Optional: add minimal metrics for “measure-first” loop
+- [x] 7. Optional: add minimal metrics for "measure-first" loop
 
   **What to do**:
   - Expose Synapse Prometheus metrics (Synapse supports it; chart may have value key).
