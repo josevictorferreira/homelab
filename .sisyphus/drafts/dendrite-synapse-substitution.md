@@ -1,26 +1,31 @@
-# Draft: Synapse → Dendrite substitution (Matrix homeserver)
+# Draft: Synapse + Dendrite parallel (matrixx)
 
 ## Requirements (confirmed)
-- Read Dendrite repo + docs; assess if it can replace current Synapse.
-- If yes: verify current bridges compatibility with Dendrite.
-- Assess if Matrix data can be migrated seamlessly from current Synapse.
+- Keep current Synapse running on `matrix.josevictor.me`.
+- Deploy Dendrite in parallel on `matrixx.josevictor.me` for testing.
+- No Synapse→Dendrite migration now.
 
 ## Requirements (user answers)
-- “Seamless” requirement changed: **do NOT need to preserve devices/E2EE continuity**.
-- Downtime window acceptable: **1-4 hours**.
-- Must-have: **appservice bridges** (mautrix-whatsapp/discord/slack).
+- Synapse stays authoritative; no cutover.
+- Dendrite host: `matrixx.josevictor.me`.
+- Dendrite `server_name`: `josevictor.me` (same as Synapse).
+- `/.well-known` stays pointing to Synapse only.
+- Dendrite registration: disabled.
+- LAN-only exposure (no Cloudflare changes).
+- Create 1 dedicated Dendrite test account for Element Web login.
 
-## Additional constraints (user answers)
-- Must keep same `server_name` / domain: **matrix.josevictor.me** / MXIDs on `josevictor.me`.
-- Must preserve: **rooms + full history + media**.
-- Bridge rooms: **unencrypted OK**.
-- Clients day-1: **Element Web + Element X**.
-- Safety: **no rollback target AND no snapshot/restore path**.
+## Confirmations (ready to execute)
+- Reserve internal DNS/LB map entry: `matrixx = 10.10.10.142` in `config/kubernetes.nix`.
+- Test MXID to create: `@dendrite-test:josevictor.me`.
+
+## Scope Boundaries
+- INCLUDE: Dendrite parallel deploy, isolated DB+PVC+ingress on matrixx.
+- EXCLUDE: modifying Synapse/bridges, migrating rooms/history/media, cutover, federation.
 
 ## Technical Decisions
-- (pending) Allowed fallback if seamless migration impossible.
-- (pending) Cutover approach: keep same `server_name` (matrix.josevictor.me) vs new server + side-by-side.
-- (pending) Bridge encryption requirement (bridged rooms encrypted or not).
+- Dendrite is **non-federating** (mandatory guardrail for shared `server_name`).
+- Bridges remain pointed at Synapse (no Dendrite appservice work).
+- Dendrite user creation via kubernetes Job running Dendrite CLI (idempotent).
 
 ## Research Findings
 - Current stack (repo):
@@ -29,20 +34,10 @@
   - Synapse uses external PostgreSQL (`modules/kubenix/apps/postgresql-18.nix`) + external Redis; ingress `matrix.josevictor.me`.
   - Synapse media uses S3 provider with bucket `matrix-synapse-media` (object store creds from SOPS secrets).
   - Bridges present: mautrix-whatsapp, mautrix-discord, mautrix-slack (Nix modules + generated manifests).
-- Dendrite docs (key gaps relevant here):
-  - Missing MSC4186 sliding-sync, MSC3861 OIDC, limited admin API.
-  - Appservice-related open issues: MSC2409 ephemeral events to appservices; MSC3202 E2EE appservice support.
-- Feasibility verdict (oracle): **Seamless Synapse→Dendrite migration preserving E2EE/devices not feasible**; recommend side-by-side or new-server migration, keep Synapse as legacy archive.
+- DNS mapping mechanism: Blocky maps every `homelab.kubernetes.loadBalancer.services` entry to `${name}.${homelab.domain} -> homelab.kubernetes.loadBalancer.address` (`modules/kubenix/apps/blocky-config.enc.nix`).
+- Ingress+TLS patterns: `modules/kubenix/apps/matrix.nix` and `modules/kubenix/apps/keycloak.nix`.
+- Raw resources pattern (Deployment+Service): `modules/kubenix/apps/flaresolverr.nix`.
+- Postgres DB bootstrap: `config/kubernetes.nix` list consumed by `modules/kubenix/apps/postgresql-18.nix` Job.
 
 ## Open Questions
-- If seamless is impossible: do you still want Dendrite (with compromises), or stop and stay on Synapse?
-- Must keep same `server_name` (matrix.josevictor.me), or acceptable to introduce a new homeserver name and run side-by-side?
-- Are bridged rooms required to be E2EE?
-
-## Blocking conflicts discovered
-- Element X typically depends on sliding-sync; Dendrite docs state **MSC4186 sliding-sync not implemented** → likely client breakage unless Element X has fallback.
-- “No restore path” is incompatible with any DB/media migration attempt; must allow at least backups/snapshots or accept non-zero data-loss risk.
-
-## Scope Boundaries
-- INCLUDE: feasibility + gaps, bridge compatibility, migration options + risks.
-- EXCLUDE: executing the migration (implementation deferred to /start-work).
+- None blocking planning (remaining unknowns are handled as explicit executor discovery tasks: exact Dendrite CLI flags + account creation command).

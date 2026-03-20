@@ -48,6 +48,7 @@
       rabbitmq = "10.10.10.139";
       openclaw = "10.10.10.140";
       openclaw-nix = "10.10.10.141";
+      matrixx = "10.10.10.142";
       nfs = "10.10.10.150";
       grafana = "10.10.10.190";
     };
@@ -66,6 +67,7 @@
       "mautrix_slack"
       "mautrix_discord"
       "mautrix_whatsapp"
+      "dendrite"
     ];
   };
 
