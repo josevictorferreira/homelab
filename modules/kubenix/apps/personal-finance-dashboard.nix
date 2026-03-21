@@ -23,7 +23,7 @@ in
           containers = [
             {
               inherit name;
-              image = "ghcr.io/josevictorferreira/personal-finances:9a837aa";
+              image = "ghcr.io/josevictorferreira/personal-finances@sha256:4ba54a104206a6c634ea495055988e220c09f5e507ca2cc57340b358455e7b96";
               imagePullPolicy = "IfNotPresent";
               ports = [
                 {
