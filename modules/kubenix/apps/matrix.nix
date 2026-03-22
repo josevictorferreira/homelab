@@ -343,7 +343,7 @@ in
           };
           limits = {
             cpu = "1000m";
-            memory = "2Gi";
+            memory = "4Gi";
           };
         };
 
