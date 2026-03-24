@@ -41,32 +41,39 @@ in
                   protocol = "TCP";
                 }
               ];
-              env = [
-                {
-                  name = "TUWUNEL_SERVER_NAME";
-                  value = "matrixx.josevictor.me";
-                }
-                {
-                  name = "TUWUNEL_DATABASE_PATH";
-                  value = "/var/lib/tuwunel";
-                }
-                {
-                  name = "TUWUNEL_ADDRESS";
-                  value = "0.0.0.0";
-                }
-                {
-                  name = "TUWUNEL_PORT";
-                  value = "8008";
-                }
-                {
-                  name = "TUWUNEL_ALLOW_FEDERATION";
-                  value = "false";
-                }
-                {
-                  name = "TUWUNEL_ALLOW_REGISTRATION";
-                  value = "true";
-                }
-              ];
+env = [
+  {
+    name = "TUWUNEL_SERVER_NAME";
+    value = "matrixx.josevictor.me";
+  }
+  {
+    name = "TUWUNEL_DATABASE_PATH";
+    value = "/var/lib/tuwunel";
+  }
+  {
+    name = "TUWUNEL_ADDRESS";
+    value = "0.0.0.0";
+  }
+  {
+    name = "TUWUNEL_PORT";
+    value = "8008";
+  }
+  {
+    name = "TUWUNEL_ALLOW_FEDERATION";
+    value = "false";
+  }
+  {
+    name = "TUWUNEL_ALLOW_REGISTRATION";
+    value = "true";
+  }
+  {
+    name = "TUWUNEL_REGISTRATION_TOKEN";
+    valueFrom.secretKeyRef = {
+      name = "${name}-env";
+      key = "registration_token";
+    };
+  }
+];
               resources = {
                 requests = {
                   cpu = "100m";
@@ -153,25 +160,24 @@ volumes = [
     };
   };
 
-  kubernetes.resources.configMaps."${name}-config" = {
-    metadata = {
-      name = "${name}-config";
-      inherit namespace;
-    };
-    data = {
-      "tuwunel.toml" = ''
-        [global]
-        server_name = "matrixx.josevictor.me"
-        database_path = "/var/lib/tuwunel"
-        address = "0.0.0.0"
-        port = 8008
-        allow_federation = false
-        federate_created_rooms = false
-        allow_registration = true
-        registration_token_file = "/etc/tuwunel/registration_token"
-      '';
-    };
+kubernetes.resources.configMaps."${name}-config" = {
+  metadata = {
+    name = "${name}-config";
+    inherit namespace;
   };
+  data = {
+    "tuwunel.toml" = ''
+      [global]
+      server_name = "matrixx.josevictor.me"
+      database_path = "/var/lib/tuwunel"
+      address = "0.0.0.0"
+      port = 8008
+      allow_federation = false
+      federate_created_rooms = false
+      allow_registration = true
+    '';
+  };
+};
 
   kubernetes.resources.ingresses.${name} = {
     metadata = {
