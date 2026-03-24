@@ -207,7 +207,7 @@ kubernetes.resources.configMaps."${name}-config" = {
       tls = [
         {
           hosts = [ "matrixx.josevictor.me" ];
-          secretName = "josevictor-me-wildcard-tls";
+          secretName = "wildcard-tls";
         }
       ];
     };
