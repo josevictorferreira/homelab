@@ -165,8 +165,8 @@ let
   };
   openclawRootfs = pkgs.runCommand "openclaw-rootfs" { } ''
     mkdir -p $out/lib $out/bin
-    # Copy openclaw gateway lib (the main app)
-    if [ -d "${openclawGateway}/lib" ]; then cp -a "${openclawGateway}/lib"/* $out/lib/ 2>/dev/null || true; fi
+    # Copy openclaw gateway lib (the main app) - use -rL to dereference symlinks for writable files
+    if [ -d "${openclawGateway}/lib" ]; then cp -rL "${openclawGateway}/lib"/* $out/lib/ 2>/dev/null || true; fi
     # Symlink the openclaw binary
     if [ -f "${openclawGateway}/bin/openclaw" ]; then ln -s "${openclawGateway}/bin/openclaw" $out/bin/openclaw; fi
     # Copy python lib for requests etc.
@@ -206,11 +206,6 @@ let
     # Add openclaw self-symlink so extensions can resolve "openclaw/*" imports
     mkdir -p "$out/lib/openclaw/node_modules"
     ln -sf ../ "$out/lib/openclaw/node_modules/openclaw"
-    GATEWAY_STORE=$(readlink -f ${openclawGateway})
-    find $out/lib/openclaw -type l 2>/dev/null | while read link; do
-      tgt=$(readlink "$link")
-      case "$tgt" in "$GATEWAY_STORE"*) ln -sfn "$(echo "$tgt" | sed "s|$GATEWAY_STORE/|$out/|")" "$link" 2>/dev/null || true ;; esac
-    done
     CRYPTO_PKG="$out/lib/openclaw/extensions/matrix/node_modules/@matrix-org/matrix-sdk-crypto-nodejs"
     if [ -d "$CRYPTO_PKG" ]; then chmod -R u+w "$CRYPTO_PKG" || true; cp ${matrixCryptoNative} "$CRYPTO_PKG/matrix-sdk-crypto.linux-x64-gnu.node"; fi
   '';
@@ -239,14 +234,15 @@ dockerTools.streamLayeredImage {
 
     mkdir -p ./etc/fonts
     cp ${fontsConf} ./etc/fonts/fonts.conf
-
-    # Symlink gateway store path's /lib to the image's /lib so openclaw can
-    # resolve its own library paths at runtime. This MUST be in extraCommands
-    # (not in openclawRootfs) to avoid a symlink cycle: buildEnv makes /lib
-    # a symlink into the nix store, so creating store-path/lib -> /lib inside
-    # openclawRootfs causes an infinite loop through the buildEnv symlink.
-    GATEWAY_STORE_PATH=$(echo ${openclawGateway} | sed 's|^/nix/store/||' | cut -d'/' -f1)
-    if [ -n "$GATEWAY_STORE_PATH" ]; then mkdir -p "./nix/store/$GATEWAY_STORE_PATH"; ln -s /lib "./nix/store/$GATEWAY_STORE_PATH/lib"; fi
+    # Symlink openclaw's nix store path to /lib so it can resolve its paths.
+    # The openclaw binary at ${openclawGateway}/bin/openclaw has embedded paths like
+    # /nix/store/<hash>-openclaw-gateway/lib/openclaw/... and needs to find them in the container.
+    # Create: /nix/store/<hash>-openclaw-gateway -> /lib to redirect to image rootfs.
+    GATEWAY_PATH="${openclawGateway}"
+    GATEWAY_DIR=$(dirname "$GATEWAY_PATH")
+    GATEWAY_BASE=$(basename "$GATEWAY_PATH")
+    mkdir -p ".$GATEWAY_DIR"
+    ln -sf /lib ".$GATEWAY_PATH"
 
     cat > ./entrypoint.sh << 'EOF'
     ${entrypointScriptText}

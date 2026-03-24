@@ -57,7 +57,7 @@ in
                 hosts = [
                   (kubenix.lib.domainFor app)
                 ];
-                secretName = "wildcard-tls";
+                secretName = "imgproxy-tls";
               }
             ];
           };
