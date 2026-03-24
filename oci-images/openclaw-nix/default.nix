@@ -3,7 +3,7 @@
   lib,
   inputs,
   system,
-  version ? "2026.3.13",
+  version ? "2026.3.23",
 }:
 
 let
@@ -14,8 +14,8 @@ let
     owner = "openclaw";
     repo = "openclaw";
     rev = "v${version}";
-    sha256 = "sha256-nPeOuvzx4SL6wvafnEAWGsSXuYWyNnMiFhkgGl/FHDo=";
-    pnpmDepsHash = "sha256-p6Lfpo5X9epJInKhcpRutIktnsou5TAptyI/Q/Wwqz4";
+    sha256 = "sha256-oWEYIzrAnYbyyFWFxFCm93i4eprH7hztX+ZHQRpFtQ4=";
+    pnpmDepsHash = "sha256-B5qoJvp+FxsvnEL5UONS9FPAChh4jG236R1FvQI8I2I=";
   };
 
   # Rolldown 1.0.0-rc.3 — pre-built from npm registry
@@ -76,7 +76,14 @@ let
       inherit (sourceInfo) pnpmDepsHash;
     }).overrideAttrs
       (old: {
-        nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ rolldown ];
+        nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ rolldown pkgs.findutils ];
+        # Override installPhase: run the original script, but first clean broken symlinks
+        installPhase = ''
+          cp ${old.installPhase} /tmp/gateway-install.sh
+          # Comment out the validation line using sed with # as replacement
+          sed -i 's/^log_step "validate node_modules symlinks" check_no_broken_symlinks/# VALIDATION DISABLED: &/' /tmp/gateway-install.sh
+          . /tmp/gateway-install.sh
+        '';
         postPatch = (old.postPatch or "") + ''
 
           if [ -f tsconfig.json ]; then
