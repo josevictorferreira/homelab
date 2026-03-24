@@ -186,7 +186,7 @@ spec:
   tls:
     - hosts:
         - imgproxy.josevictor.me
-      secretName: wildcard-tls
+      secretName: imgproxy-tls
 ---
 apiVersion: objectbucket.io/v1alpha1
 kind: ObjectBucketClaim
