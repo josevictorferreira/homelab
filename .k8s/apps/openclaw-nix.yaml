@@ -64,7 +64,8 @@ spec:
               \ failed\"\n    echo \"Matrix plugin dependencies installed\"\n  else\n\
               \    echo \"node_modules already exists with deps, skipping\"\n  fi\n\
               else\n  echo \"Matrix extension not found at $MATRIX_EXT\"\nfi\n\necho\
-              \ \"Starting openclaw gateway...\"\nexec openclaw gateway --port 18789\n"
+              \ \"Starting openclaw gateway...\"\nexec node /lib/openclaw/dist/index.js\
+              \ gateway --port 18789\n"
           env:
             - name: HOME
               value: /home/node
@@ -89,7 +90,7 @@ spec:
           envFrom:
             - secretRef:
                 name: openclaw-config
-          image: ghcr.io/josevictorferreira/openclaw-nix:v2026.3.23@sha256:15fc36dfb1c21dd05aa594b7a1b20c2e688a333c0335ba4eda768267f6efd8a8
+          image: ghcr.io/josevictorferreira/openclaw-nix:v2026.3.23
           imagePullPolicy: Always
           name: main
           ports:
