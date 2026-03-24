@@ -167,8 +167,8 @@ let
     mkdir -p $out/lib $out/bin
     # Copy openclaw gateway lib (the main app) - use -rL to dereference symlinks for writable files
     if [ -d "${openclawGateway}/lib" ]; then cp -rL "${openclawGateway}/lib"/* $out/lib/ 2>/dev/null || true; fi
-    # Symlink the openclaw binary
-    if [ -f "${openclawGateway}/bin/openclaw" ]; then ln -s "${openclawGateway}/bin/openclaw" $out/bin/openclaw; fi
+    # Copy the openclaw binary - symlinks to nix store paths won't work in container
+    if [ -f "${openclawGateway}/bin/openclaw" ]; then cp -rL "${openclawGateway}/bin/openclaw" $out/bin/openclaw; fi
     # Copy python lib for requests etc.
     chmod -R u+w $out/lib/openclaw/node_modules/ || true
     # Strip ML/vector libs (not used) - these are large, explicit rm is fast
@@ -178,6 +178,16 @@ let
     rm -rf $out/lib/openclaw/node_modules/@lancedb $out/lib/openclaw/node_modules/lancedb 2>/dev/null || true
     # Skip slow find-based cross-platform stripping - saves ~5-10 min build time
     cd $out/lib/openclaw
+    # Copy plugin manifests from source extensions/ into dist/extensions/ so gateway can find them
+    if [ -d "$out/lib/openclaw/extensions" ] && [ -d "$out/lib/openclaw/dist/extensions" ]; then
+      chmod -R u+w $out/lib/openclaw/dist/extensions/ || true
+      for manifest in $out/lib/openclaw/extensions/*/openclaw.plugin.json; do
+        extname=$(basename $(dirname "$manifest"))
+        if [ -d "$out/lib/openclaw/dist/extensions/$extname" ]; then
+          cp "$manifest" "$out/lib/openclaw/dist/extensions/$extname/openclaw.plugin.json"
+        fi
+      done
+    fi
     mkdir -p $out/etc
     for pkg in ${pkgs.tzdata}; do
       if [ -d "$pkg/etc" ]; then cp -rsf "$pkg/etc"/* $out/etc/ 2>/dev/null || true; fi
@@ -234,15 +244,16 @@ dockerTools.streamLayeredImage {
 
     mkdir -p ./etc/fonts
     cp ${fontsConf} ./etc/fonts/fonts.conf
-    # Symlink openclaw's nix store path to /lib so it can resolve its paths.
-    # The openclaw binary at ${openclawGateway}/bin/openclaw has embedded paths like
-    # /nix/store/<hash>-openclaw-gateway/lib/openclaw/... and needs to find them in the container.
-    # Create: /nix/store/<hash>-openclaw-gateway -> /lib to redirect to image rootfs.
+    # Symlink openclaw's nix store path to rootfs so it can resolve its embedded paths.
+    # The openclaw wrapper at ${openclawGateway}/bin/openclaw references:
+    #   /nix/store/<hash>-openclaw-gateway/lib/openclaw/...
+    # Create symlink: /nix/store/<hash>-openclaw-gateway -> / (root)
+    # so gateway-path/lib/openclaw/... resolves to /lib/openclaw/...
     GATEWAY_PATH="${openclawGateway}"
     GATEWAY_DIR=$(dirname "$GATEWAY_PATH")
     GATEWAY_BASE=$(basename "$GATEWAY_PATH")
     mkdir -p ".$GATEWAY_DIR"
-    ln -sf /lib ".$GATEWAY_PATH"
+    ln -sf / ".$GATEWAY_PATH"
 
     cat > ./entrypoint.sh << 'EOF'
     ${entrypointScriptText}
