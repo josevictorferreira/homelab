@@ -66,7 +66,7 @@ in
                   }
                   {
                     name = "TUWUNEL_ALLOW_REGISTRATION";
-                    value = "false";
+                    value = "true";
                   }
                   {
                     name = "TUWUNEL_REGISTRATION_TOKEN";
@@ -165,7 +165,7 @@ in
           port = 8008
           allow_federation = false
           federate_created_rooms = false
-          allow_registration = false
+          allow_registration = true
         '';
       };
     };
