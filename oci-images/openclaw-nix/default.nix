@@ -178,13 +178,29 @@ let
     rm -rf $out/lib/openclaw/node_modules/@lancedb $out/lib/openclaw/node_modules/lancedb 2>/dev/null || true
     # Skip slow find-based cross-platform stripping - saves ~5-10 min build time
     cd $out/lib/openclaw
-    # Copy plugin manifests from source extensions/ into dist/extensions/ so gateway can find them
+    # Copy plugin manifests and runtime TS sources from source extensions/ into dist/extensions/
+    # The gateway resolves plugin runtime modules (e.g. light-runtime-api.ts) from dist/extensions/
     if [ -d "$out/lib/openclaw/extensions" ] && [ -d "$out/lib/openclaw/dist/extensions" ]; then
       chmod -R u+w $out/lib/openclaw/dist/extensions/ || true
-      for manifest in $out/lib/openclaw/extensions/*/openclaw.plugin.json; do
-        extname=$(basename $(dirname "$manifest"))
+      for extdir in $out/lib/openclaw/extensions/*/; do
+        extname=$(basename "$extdir")
         if [ -d "$out/lib/openclaw/dist/extensions/$extname" ]; then
-          cp "$manifest" "$out/lib/openclaw/dist/extensions/$extname/openclaw.plugin.json"
+          # Copy plugin manifest
+          if [ -f "$extdir/openclaw.plugin.json" ]; then
+            cp "$extdir/openclaw.plugin.json" "$out/lib/openclaw/dist/extensions/$extname/openclaw.plugin.json"
+          fi
+          # Copy runtime TS sources needed by jiti loader (light-runtime-api.ts, runtime-api.ts, etc.)
+          for tsfile in "$extdir"/*.ts; do
+            [ -f "$tsfile" ] && cp "$tsfile" "$out/lib/openclaw/dist/extensions/$extname/"
+          done
+          # Copy src/ directory if it exists (contains compiled plugin code)
+          if [ -d "$extdir/src" ]; then
+            cp -r "$extdir/src" "$out/lib/openclaw/dist/extensions/$extname/"
+          fi
+          # Copy package.json for dependency resolution
+          if [ -f "$extdir/package.json" ]; then
+            cp "$extdir/package.json" "$out/lib/openclaw/dist/extensions/$extname/package.json"
+          fi
         fi
       done
     fi
