@@ -50,7 +50,6 @@ map
     }
   )
   dnsHosts
-  ++ [ { name = "matrixx.josevictor.me"; value = homelab.kubernetes.loadBalancer.address; } ]
 );
     };
 

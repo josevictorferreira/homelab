@@ -46,7 +46,7 @@ in
                 env = [
                   {
                     name = "TUWUNEL_SERVER_NAME";
-                    value = "matrixx.josevictor.me";
+                    value = "josevictor.me";
                   }
                   {
                     name = "TUWUNEL_DATABASE_PATH";
@@ -159,7 +159,7 @@ in
       data = {
         "tuwunel.toml" = ''
           [global]
-          server_name = "matrixx.josevictor.me"
+          server_name = "josevictor.me"
           database_path = "/var/lib/tuwunel"
           address = "0.0.0.0"
           port = 8008
@@ -178,7 +178,7 @@ in
         ingressClassName = "cilium";
         rules = [
           {
-            host = "matrixx.josevictor.me";
+            host = "matrix.josevictor.me";
             http = {
               paths = [
                 {
@@ -197,7 +197,7 @@ in
         ];
         tls = [
           {
-            hosts = [ "matrixx.josevictor.me" ];
+            hosts = [ "matrix.josevictor.me" ];
             secretName = "wildcard-tls";
           }
         ];
