@@ -21,7 +21,7 @@ spec:
       containers:
         - env:
             - name: TUWUNEL_SERVER_NAME
-              value: matrixx.josevictor.me
+              value: josevictor.me
             - name: TUWUNEL_DATABASE_PATH
               value: /var/lib/tuwunel
             - name: TUWUNEL_ADDRESS
@@ -75,10 +75,6 @@ spec:
               name: config
               readOnly: true
               subPath: tuwunel.toml
-            - mountPath: /etc/tuwunel/registration_token
-              name: token
-              readOnly: true
-              subPath: registration_token
       terminationGracePeriodSeconds: 60
       volumes:
         - name: data
@@ -87,15 +83,12 @@ spec:
         - configMap:
             name: tuwunel-config
           name: config
-        - name: token
-          secret:
-            secretName: tuwunel-env
 ---
 apiVersion: v1
 data:
   tuwunel.toml: '[global]
 
-    server_name = "matrixx.josevictor.me"
+    server_name = "josevictor.me"
 
     database_path = "/var/lib/tuwunel"
 
@@ -115,7 +108,7 @@ metadata:
   annotations:
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
-  name: tuwunel-config
+  name: tuwunel
   namespace: apps
 ---
 apiVersion: v1
@@ -162,7 +155,7 @@ metadata:
 spec:
   ingressClassName: cilium
   rules:
-    - host: matrixx.josevictor.me
+    - host: matrix.josevictor.me
       http:
         paths:
           - backend:
@@ -174,5 +167,5 @@ spec:
             pathType: Prefix
   tls:
     - hosts:
-        - matrixx.josevictor.me
+        - matrix.josevictor.me
       secretName: wildcard-tls
