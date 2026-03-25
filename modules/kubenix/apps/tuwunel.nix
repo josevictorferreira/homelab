@@ -127,7 +127,7 @@ in
               }
               {
                 name = "config";
-                configMap.name = "${name}-config";
+                configMap.name = name;
               }
             ];
           };
