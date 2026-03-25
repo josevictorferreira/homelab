@@ -66,7 +66,7 @@ in
                   }
                   {
                     name = "TUWUNEL_ALLOW_REGISTRATION";
-                    value = "true";
+                    value = "false";
                   }
                   {
                     name = "TUWUNEL_REGISTRATION_TOKEN";
@@ -164,7 +164,7 @@ in
           address = "0.0.0.0"
           port = 8008
           allow_federation = false
-          allow_registration = true;
+          allow_registration = false;
         '';
       };
     };
