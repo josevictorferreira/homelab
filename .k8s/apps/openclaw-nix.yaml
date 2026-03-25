@@ -64,8 +64,20 @@ spec:
               \ failed\"\n    echo \"Matrix plugin dependencies installed\"\n  else\n\
               \    echo \"node_modules already exists with deps, skipping\"\n  fi\n\
               else\n  echo \"Matrix extension not found at $MATRIX_EXT\"\nfi\n\necho\
-              \ \"Starting openclaw gateway...\"\nexec node /lib/openclaw/dist/index.js\
-              \ gateway --port 18789\n"
+              \ \"Installing whatsapp plugin dependencies...\"\nWA_EXT=$(readlink\
+              \ -f /lib/openclaw/extensions/whatsapp 2>/dev/null || echo \"/lib/openclaw/extensions/whatsapp\"\
+              )\n\nif [ -d \"$WA_EXT\" ]; then\n  echo \"Found whatsapp extension\
+              \ at: $WA_EXT\"\n  cd \"$WA_EXT\"\n\n  if [ ! -d \"node_modules/@whiskeysockets\"\
+              \ ]; then\n    echo \"Installing npm dependencies...\"\n    node -e\
+              \ \"\n      const fs = require('fs');\n      const pkg = JSON.parse(fs.readFileSync('package.json',\
+              \ 'utf8'));\n      delete pkg.devDependencies;\n      delete pkg.peerDependencies;\n\
+              \      fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2));\n\
+              \    \"\n    npm install --omit=dev --no-package-lock --legacy-peer-deps\
+              \ 2>&1 || echo \"WARN: npm install failed\"\n    echo \"WhatsApp plugin\
+              \ dependencies installed\"\n  else\n    echo \"node_modules already\
+              \ exists with deps, skipping\"\n  fi\nelse\n  echo \"WhatsApp extension\
+              \ not found at $WA_EXT\"\nfi\n\necho \"Starting openclaw gateway...\"\
+              \nexec node /lib/openclaw/dist/index.js gateway --port 18789\n"
           env:
             - name: HOME
               value: /home/node

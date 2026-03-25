@@ -192,6 +192,31 @@ in
                   echo "Matrix extension not found at $MATRIX_EXT"
                 fi
 
+                echo "Installing whatsapp plugin dependencies..."
+                WA_EXT=$(readlink -f /lib/openclaw/extensions/whatsapp 2>/dev/null || echo "/lib/openclaw/extensions/whatsapp")
+
+                if [ -d "$WA_EXT" ]; then
+                  echo "Found whatsapp extension at: $WA_EXT"
+                  cd "$WA_EXT"
+
+                  if [ ! -d "node_modules/@whiskeysockets" ]; then
+                    echo "Installing npm dependencies..."
+                    node -e "
+                      const fs = require('fs');
+                      const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+                      delete pkg.devDependencies;
+                      delete pkg.peerDependencies;
+                      fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2));
+                    "
+                    npm install --omit=dev --no-package-lock --legacy-peer-deps 2>&1 || echo "WARN: npm install failed"
+                    echo "WhatsApp plugin dependencies installed"
+                  else
+                    echo "node_modules already exists with deps, skipping"
+                  fi
+                else
+                  echo "WhatsApp extension not found at $WA_EXT"
+                fi
+
                 echo "Starting openclaw gateway..."
                 exec node /lib/openclaw/dist/index.js gateway --port 18789
               ''
