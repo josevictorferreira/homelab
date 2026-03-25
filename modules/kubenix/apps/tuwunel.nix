@@ -64,7 +64,7 @@ env = [
   }
   {
     name = "TUWUNEL_ALLOW_REGISTRATION";
-    value = "true";
+    value = "false";
   }
   {
     name = "TUWUNEL_REGISTRATION_TOKEN";
@@ -174,7 +174,7 @@ kubernetes.resources.configMaps."${name}-config" = {
       port = 8008
       allow_federation = false
       federate_created_rooms = false
-      allow_registration = true
+      allow_registration = false
     '';
   };
 };
