@@ -316,7 +316,8 @@ PW|- [x] 5. Deploy via GitOps and verify service+ingress
   ```
 
   **Commit**: YES | Message: `feat(kubenix): add tuwunel (matrixx) homeserver` | Files: `modules/kubenix/apps/tuwunel.nix`, `modules/kubenix/apps/tuwunel-config.enc.nix`, `secrets/k8s-secrets.enc.yaml`
-
+BJ|- [x] DNS: Add `matrixx.josevictor.me` to Blocky `customDNS.mapping` + apply + restart pods
+YJ|- [ ] 6. Bootstrap admin + dummy appservice PoC + lock down registration
 - [ ] 6. Bootstrap admin + dummy appservice PoC + lock down registration
 
   **What to do**:
