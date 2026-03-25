@@ -217,7 +217,22 @@ in
                   echo "WhatsApp extension not found at $WA_EXT"
                 fi
 
-                echo "Starting openclaw gateway..."
+                # Copy plugin runtime TS sources into dist/extensions/ where the gateway resolver looks
+                # The bundled build only includes compiled .js but jiti needs .ts source files
+                echo "Syncing plugin sources to dist/extensions/..."
+                for extdir in /lib/openclaw/extensions/*/; do
+                  extname=$(basename "$extdir")
+                  distdir="/lib/openclaw/dist/extensions/$extname"
+                  if [ -d "$distdir" ]; then
+                    for tsfile in "$extdir"*.ts; do
+                      [ -f "$tsfile" ] && cp "$tsfile" "$distdir/" 2>/dev/null
+                    done
+                    [ -d "$extdir/src" ] && cp -r "$extdir/src" "$distdir/" 2>/dev/null
+                    [ -f "$extdir/package.json" ] && cp "$extdir/package.json" "$distdir/" 2>/dev/null
+                  fi
+                done
+                echo "Plugin sources synced"
+
                 exec node /lib/openclaw/dist/index.js gateway --port 18789
               ''
             ];
