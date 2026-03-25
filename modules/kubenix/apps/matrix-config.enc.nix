@@ -81,7 +81,7 @@ in
 
               # Homeserver connection
               homeserver = {
-                address = "http://synapse-matrix-synapse.${namespace}.svc.cluster.local:8008";
+                address = "http://tuwunel.apps.svc.cluster.local:8008";
                 domain = "josevictor.me";
               };
 
@@ -190,7 +190,7 @@ in
           stringData = {
             "config.yaml" = kubenix.lib.toYamlStr {
               homeserver = {
-                address = "http://synapse-matrix-synapse.${namespace}.svc.cluster.local:8008";
+                address = "http://tuwunel.apps.svc.cluster.local:8008";
                 domain = "josevictor.me";
               };
               appservice = {
@@ -277,7 +277,7 @@ in
           stringData = {
             "config.yaml" = kubenix.lib.toYamlStr {
               homeserver = {
-                address = "http://synapse-matrix-synapse.${namespace}.svc.cluster.local:8008";
+                address = "http://tuwunel.apps.svc.cluster.local:8008";
                 domain = "josevictor.me";
               };
 
