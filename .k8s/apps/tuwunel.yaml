@@ -81,7 +81,7 @@ spec:
           persistentVolumeClaim:
             claimName: tuwunel-data
         - configMap:
-            name: tuwunel-config
+            name: tuwunel
           name: config
 ---
 apiVersion: v1

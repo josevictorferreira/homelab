@@ -348,7 +348,8 @@ YJ|- [ ] 6. Bootstrap admin + dummy appservice PoC + lock down registration
   - Registration safety keys: https://github.com/matrix-construct/tuwunel/blob/46e899f6d879bf6b66bd49852a622e28d03157f0/tuwunel-example.toml#L444-L459
 
   **Acceptance Criteria**:
-  - [ ] `!admin appservices list` shows the dummy appservice.
+  SN|  - [x] `!admin appservices list` shows the dummy appservice.
+WS|  - [x] After lock-down, new registrations are blocked (documented).
   - [ ] After lock-down, new registrations are blocked (documented). (This part is interactive; capture evidence.)
 
   **QA Scenarios**:
@@ -369,10 +370,10 @@ YJ|- [ ] 6. Bootstrap admin + dummy appservice PoC + lock down registration
   **Commit**: NO (this is a config flip; require explicit user approval for commit)
 
 ## Final Verification Wave (MANDATORY)
-- [ ] F1. Plan Compliance Audit — oracle
-- [ ] F2. Code Quality Review — unspecified-high
-- [ ] F3. Real Manual QA — unspecified-high
-- [ ] F4. Scope Fidelity Check — deep
+KS|- [x] F1. Plan Compliance Audit — oracle
+ZV|- [x] F2. Code Quality Review — unspecified-high
+SJ|- [x] F3. Real Manual QA — unspecified-high
+TK|- [x] F4. Scope Fidelity Check — deep
 
 ## Commit Strategy
 - One implementation commit after user approval (Task 5) to add modules + secrets.
