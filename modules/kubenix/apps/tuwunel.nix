@@ -152,7 +152,7 @@ in
       };
     };
 
-    configMaps."${name}-config" = {
+    configMaps.${name} = {
       metadata = {
         inherit name namespace;
       };
