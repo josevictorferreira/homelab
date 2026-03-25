@@ -498,26 +498,26 @@ let
         accounts = {
           mel = {
             name = "Mel";
-            homeserver = "http://synapse-matrix-synapse:8008";
+            homeserver = "http://tuwunel.apps.svc.cluster.local:8008";
             accessToken = "\${MEL_MATRIX_TOKEN}";
             userId = "@mel:josevictor.me";
           };
           kira = {
             name = "Kira";
-            homeserver = "http://synapse-matrix-synapse:8008";
+            homeserver = "http://tuwunel.apps.svc.cluster.local:8008";
             accessToken = "\${KIRA_MATRIX_TOKEN}";
             userId = "@kira:josevictor.me";
           };
           luna = {
             name = "Luna";
-            homeserver = "http://synapse-matrix-synapse:8008";
+            homeserver = "http://tuwunel.apps.svc.cluster.local:8008";
             accessToken = "\${LUNA_MATRIX_TOKEN}";
             userId = "@luna:josevictor.me";
           };
           default = {
             groupPolicy = "allowlist";
             groupAllowFrom = [ "@zeh:josevictor.me" ];
-            homeserver = "http://synapse-matrix-synapse:8008";
+            homeserver = "http://tuwunel.apps.svc.cluster.local:8008";
           };
         };
       };
