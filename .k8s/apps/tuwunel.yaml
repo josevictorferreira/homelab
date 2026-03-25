@@ -31,7 +31,7 @@ spec:
             - name: TUWUNEL_ALLOW_FEDERATION
               value: 'false'
             - name: TUWUNEL_ALLOW_REGISTRATION
-              value: 'false'
+              value: 'true'
             - name: TUWUNEL_REGISTRATION_TOKEN
               valueFrom:
                 secretKeyRef:
@@ -100,7 +100,7 @@ data:
 
     federate_created_rooms = false
 
-    allow_registration = false
+    allow_registration = true
 
     '
 kind: ConfigMap
