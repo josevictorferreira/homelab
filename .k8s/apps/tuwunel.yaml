@@ -79,7 +79,7 @@ spec:
       volumes:
         - name: data
           persistentVolumeClaim:
-            claimName: tuwunel-data
+            claimName: tuwunel-data-v2
         - configMap:
             name: tuwunel
           name: config
@@ -115,7 +115,7 @@ metadata:
   annotations:
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
-  name: tuwunel-data
+  name: tuwunel-data-v2
   namespace: apps
 spec:
   accessModes:
