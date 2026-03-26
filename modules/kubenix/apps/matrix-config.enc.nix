@@ -105,7 +105,7 @@ in
               # Database configuration
               database = {
                 type = "postgres";
-                uri = "postgres://postgres:${kubenix.lib.secretsInlineFor "postgresql_admin_password"}@postgresql-18-hl.${namespace}.svc.cluster.local:5432/mautrix_whatsapp?sslmode=disable";
+                uri = "postgres://postgres:${kubenix.lib.secretsInlineFor "postgresql_admin_password"}@postgresql-18-hl.${namespace}.svc.cluster.local:5432/mautrix_whatsapp_v2?sslmode=disable";
                 max_open_conns = 20;
                 max_idle_conns = 2;
                 max_conn_idle_time = null;
@@ -206,7 +206,7 @@ in
                 hs_token = kubenix.lib.secretsInlineFor "mautrix_discord_hs_token";
                 database = {
                   type = "postgres";
-                  uri = "postgres://postgres:${kubenix.lib.secretsInlineFor "postgresql_admin_password"}@postgresql-18-hl.${namespace}.svc.cluster.local:5432/mautrix_discord?sslmode=disable";
+                  uri = "postgres://postgres:${kubenix.lib.secretsInlineFor "postgresql_admin_password"}@postgresql-18-hl.${namespace}.svc.cluster.local:5432/mautrix_discord_v2?sslmode=disable";
                 };
               };
               bridge = {
@@ -283,7 +283,7 @@ in
 
               database = {
                 type = "postgres";
-                uri = "postgres://postgres:${kubenix.lib.secretsInlineFor "postgresql_admin_password"}@postgresql-18-hl.${namespace}.svc.cluster.local:5432/mautrix_slack?sslmode=disable";
+                uri = "postgres://postgres:${kubenix.lib.secretsInlineFor "postgresql_admin_password"}@postgresql-18-hl.${namespace}.svc.cluster.local:5432/mautrix_slack_v2?sslmode=disable";
               };
 
               appservice = {
