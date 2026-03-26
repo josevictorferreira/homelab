@@ -2,14 +2,15 @@
 
 let
   name = "tuwunel";
+  dataPvcName = "${name}-data-v2";
   namespace = homelab.kubernetes.namespaces.applications;
 in
 {
   kubernetes.resources = {
 
-    persistentVolumeClaims."${name}-data" = {
+    persistentVolumeClaims.${dataPvcName} = {
       metadata = {
-        name = "${name}-data";
+        name = dataPvcName;
         inherit namespace;
       };
       spec = {
@@ -66,7 +67,7 @@ in
                   }
                   {
                     name = "TUWUNEL_ALLOW_REGISTRATION";
-                    value = "false";
+                    value = "true";
                   }
                   {
                     name = "TUWUNEL_REGISTRATION_TOKEN";
@@ -123,7 +124,7 @@ in
             volumes = [
               {
                 name = "data";
-                persistentVolumeClaim.claimName = "${name}-data";
+                persistentVolumeClaim.claimName = dataPvcName;
               }
               {
                 name = "config";
@@ -164,7 +165,7 @@ in
           address = "0.0.0.0"
           port = 8008
           allow_federation = false
-          allow_registration = false;
+          allow_registration = true;
         '';
       };
     };
