@@ -69,6 +69,9 @@
       "mautrix_slack"
       "mautrix_discord"
       "mautrix_whatsapp"
+      "mautrix_slack_v2"
+      "mautrix_discord_v2"
+      "mautrix_whatsapp_v2"
       "readeck"
     ];
   };
