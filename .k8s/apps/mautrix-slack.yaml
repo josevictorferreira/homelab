@@ -59,7 +59,7 @@ spec:
       volumes:
         - name: data
           persistentVolumeClaim:
-            claimName: mautrix-slack
+            claimName: mautrix-slack-v2
         - name: config
           secret:
             secretName: mautrix-slack-config
@@ -73,7 +73,7 @@ metadata:
   annotations:
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
-  name: mautrix-slack
+  name: mautrix-slack-v2
   namespace: apps
 spec:
   accessModes:
