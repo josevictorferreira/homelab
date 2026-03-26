@@ -2,12 +2,13 @@
 
 let
   app = "mautrix-discord";
+  dataPvcName = "${app}-v2";
   namespace = homelab.kubernetes.namespaces.applications;
 in
 {
   kubernetes = {
     resources = {
-      persistentVolumeClaims.${app} = {
+      persistentVolumeClaims.${dataPvcName} = {
         metadata = { inherit namespace; };
         spec = {
           accessModes = [ "ReadWriteOnce" ];
@@ -103,7 +104,7 @@ in
               volumes = [
                 {
                   name = "data";
-                  persistentVolumeClaim.claimName = app;
+                  persistentVolumeClaim.claimName = dataPvcName;
                 }
                 {
                   name = "config";

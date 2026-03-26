@@ -59,7 +59,7 @@ spec:
       volumes:
         - name: data
           persistentVolumeClaim:
-            claimName: mautrix-discord
+            claimName: mautrix-discord-v2
         - name: config
           secret:
             secretName: mautrix-discord-config
@@ -73,7 +73,7 @@ metadata:
   annotations:
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
-  name: mautrix-discord
+  name: mautrix-discord-v2
   namespace: apps
 spec:
   accessModes:
