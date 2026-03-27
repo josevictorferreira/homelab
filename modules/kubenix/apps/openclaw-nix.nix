@@ -55,14 +55,14 @@ in
       replicas = 1;
       secretName = "openclaw-config";
 
-      # Resource limits - reduced to fit cluster quota
+      # Resource limits - increased to handle Matrix E2EE initialization
       resources = {
         requests = {
-          cpu = "100m";
+          cpu = "250m";
           memory = "512Mi";
         };
         limits = {
-          cpu = "500m";
+          cpu = "1500m";
           memory = "2Gi";
         };
       };
@@ -126,7 +126,24 @@ in
               PYTHONPATH = "/home/node/.local/lib/python";
               PATH = "/home/node/.local/bin:/home/node/.npm-global/bin:/bin:/usr/bin";
               NODE_PATH = "/lib/openclaw/extensions/matrix/node_modules";
-
+              MATRIX_MEL_ACCESS_TOKEN = {
+                valueFrom.secretKeyRef = {
+                  name = "openclaw-config";
+                  key = "MEL_MATRIX_TOKEN";
+                };
+              };
+              MATRIX_KIRA_ACCESS_TOKEN = {
+                valueFrom.secretKeyRef = {
+                  name = "openclaw-config";
+                  key = "KIRA_MATRIX_TOKEN";
+                };
+              };
+              MATRIX_LUNA_ACCESS_TOKEN = {
+                valueFrom.secretKeyRef = {
+                  name = "openclaw-config";
+                  key = "LUNA_MATRIX_TOKEN";
+                };
+              };
             };
 
             # Command: install matrix deps then start gateway
