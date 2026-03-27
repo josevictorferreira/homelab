@@ -501,23 +501,27 @@ let
             homeserver = "https://matrix.josevictor.me";
             accessToken = "\${MEL_MATRIX_TOKEN}";
             userId = "@mel:josevictor.me";
+            allowPrivateNetwork = true;
           };
           kira = {
             name = "Kira";
             homeserver = "https://matrix.josevictor.me";
             accessToken = "\${KIRA_MATRIX_TOKEN}";
             userId = "@kira:josevictor.me";
+            allowPrivateNetwork = true;
           };
           luna = {
             name = "Luna";
             homeserver = "https://matrix.josevictor.me";
             accessToken = "\${LUNA_MATRIX_TOKEN}";
             userId = "@luna:josevictor.me";
+            allowPrivateNetwork = true;
           };
           default = {
             groupPolicy = "allowlist";
             groupAllowFrom = [ "@zeh:josevictor.me" ];
             homeserver = "https://matrix.josevictor.me";
+            allowPrivateNetwork = true;
           };
         };
       };
