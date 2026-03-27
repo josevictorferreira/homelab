@@ -90,6 +90,21 @@ spec:
           env:
             - name: HOME
               value: /home/node
+            - name: MATRIX_KIRA_ACCESS_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  key: KIRA_MATRIX_TOKEN
+                  name: openclaw-config
+            - name: MATRIX_LUNA_ACCESS_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  key: LUNA_MATRIX_TOKEN
+                  name: openclaw-config
+            - name: MATRIX_MEL_ACCESS_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  key: MEL_MATRIX_TOKEN
+                  name: openclaw-config
             - name: NODE_PATH
               value: /lib/openclaw/extensions/matrix/node_modules
             - name: NPM_CONFIG_PREFIX
@@ -120,10 +135,10 @@ spec:
               protocol: TCP
           resources:
             limits:
-              cpu: 500m
+              cpu: 1500m
               memory: 2Gi
             requests:
-              cpu: 100m
+              cpu: 250m
               memory: 512Mi
           securityContext:
             runAsGroup: 0
