@@ -493,7 +493,7 @@ let
           allowFrom = [ "@zeh:josevictor.me" ];
           policy = "allowlist";
         };
-        encryption = false;
+        encryption = true;
         mediaMaxMb = 150;
         accounts = {
           mel = {
