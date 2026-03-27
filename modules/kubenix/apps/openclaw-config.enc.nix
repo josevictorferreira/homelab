@@ -8,9 +8,6 @@ let
       ELEVENLABS_API_KEY = "\${ELEVENLABS_API_KEY}";
       MOONSHOT_API_KEY = "\${MOONSHOT_API_KEY}";
       OPENROUTER_API_KEY = "\${OPENROUTER_API_KEY}";
-      MEL_MATRIX_TOKEN = "\${MEL_MATRIX_TOKEN}";
-      KIRA_MATRIX_TOKEN = "\${KIRA_MATRIX_TOKEN}";
-      LUNA_MATRIX_TOKEN = "\${LUNA_MATRIX_TOKEN}";
     };
     browser = {
       enabled = true;
@@ -493,28 +490,22 @@ let
           allowFrom = [ "@zeh:josevictor.me" ];
           policy = "allowlist";
         };
-        encryption = true;
+        encryption = false;
         mediaMaxMb = 150;
         accounts = {
           mel = {
             name = "Mel";
             homeserver = "https://matrix.josevictor.me";
-            accessToken = "\${MEL_MATRIX_TOKEN}";
-            userId = "@mel:josevictor.me";
             allowPrivateNetwork = true;
           };
           kira = {
             name = "Kira";
             homeserver = "https://matrix.josevictor.me";
-            accessToken = "\${KIRA_MATRIX_TOKEN}";
-            userId = "@kira:josevictor.me";
             allowPrivateNetwork = true;
           };
           luna = {
             name = "Luna";
             homeserver = "https://matrix.josevictor.me";
-            accessToken = "\${LUNA_MATRIX_TOKEN}";
-            userId = "@luna:josevictor.me";
             allowPrivateNetwork = true;
           };
           default = {
