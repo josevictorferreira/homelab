@@ -3,7 +3,7 @@
   lib,
   inputs,
   system,
-  version ? "2026.3.23",
+  version ? "2026.3.24",
 }:
 
 let
