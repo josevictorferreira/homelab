@@ -43,7 +43,7 @@ spec:
           envFrom:
             - secretRef:
                 name: ntfy-secrets
-          image: docker.io/binwiederhier/ntfy:v2.16.0@sha256:115357a63dd35e3d08ad03c93ade7d7eef63761726572b809da13f2999f1958f
+          image: docker.io/binwiederhier/ntfy:v2.20.1@sha256:186adf196099f45886bb8950d9ec42c17969d0fa99e0f1a414a92afcc085b478
           imagePullPolicy: IfNotPresent
           name: main
           ports:

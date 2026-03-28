@@ -17,7 +17,7 @@ spec:
         app: mautrix-slack
     spec:
       containers:
-        - image: dock.mau.dev/mautrix/slack:latest
+        - image: dock.mau.dev/mautrix/slack:v0.2603.0@sha256:09dc71b16a1d13cd3646ebf7aac4bc4b5f6445f746ee75d5540de92c145c97b4
           name: mautrix-slack
           ports:
             - containerPort: 29333

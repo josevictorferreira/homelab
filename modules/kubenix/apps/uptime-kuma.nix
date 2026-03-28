@@ -1,6 +1,7 @@
-{ kubenix
-, homelab
-, ...
+{
+  kubenix,
+  homelab,
+  ...
 }:
 
 let
@@ -24,7 +25,7 @@ in
         image = {
           repository = "louislam/uptime-kuma";
           pullPolicy = "IfNotPresent";
-          tag = "2.1.1-slim@sha256:b0467ba27b6e9f14fe3b0f458b5415085cc22d58471431fc8f167952e9dc6442";
+          tag = "2.2.1@sha256:7337368a77873f159435de9ef09567f68c31285ed5f951dec36256c4b267ee44";
         };
 
         volume = {

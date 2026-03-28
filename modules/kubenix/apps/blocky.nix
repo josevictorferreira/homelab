@@ -1,6 +1,7 @@
-{ kubenix
-, homelab
-, ...
+{
+  kubenix,
+  homelab,
+  ...
 }:
 
 let
@@ -14,7 +15,7 @@ in
       inherit namespace;
       image = {
         repository = "ghcr.io/0xerr0r/blocky";
-        tag = "v0.28.3@sha256:5f84a54e4ee950c4ab21db905b7497476ece2f4e1a376d23ab8c4855cabddcba";
+        tag = "v0.29.0@sha256:a3262b2c478d62064346c1d7aa2af99701b1366356955fc9f062e17e3d8c8849";
         pullPolicy = "IfNotPresent";
       };
       port = 4000;

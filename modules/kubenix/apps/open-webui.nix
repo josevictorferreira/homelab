@@ -24,7 +24,7 @@ in
       values = {
         image = {
           repository = "ghcr.io/open-webui/open-webui";
-          tag = "v0.8.5@sha256:2deb90b0423473d8f97febced2e62b8fd898aa3eb61877bb3aa336370214c258";
+          tag = "v0.8.12@sha256:8113fa5510020ef05a44afc0c42d33eabeeb2524a996e3e3fb8c437c00f0d792";
           pullPolicy = "IfNotPresent";
         };
         ollama.enabled = false;
