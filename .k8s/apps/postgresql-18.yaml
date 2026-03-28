@@ -196,29 +196,20 @@ metadata:
   annotations:
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
-  name: postgresql-18-bootstrap-415e7636
+  name: postgresql-18-bootstrap-16151218
   namespace: apps
 spec:
   template:
     metadata:
       annotations:
-        checksum/config: 415e763666a0cf444b88438d63fcf2c7a1d6d94328e202aa848fba9ce43a5665
+        checksum/config: 16151218b8948f7640a55acdc61b930c4798d92f3b4b0fcf011afcb27854c110
     spec:
       containers:
         - args:
             - "set -e\n\t\tpsql -h postgresql-18 -U postgres -c 'ALTER SYSTEM SET\
               \ shared_preload_libraries = \"vchord.so\"'\n    echo \"Ensuring database\
-              \ 'linkwarden' exists...\"\n    psql -h postgresql-18 -U postgres -d\
-              \ postgres -tAc \"SELECT 1 FROM pg_database WHERE datname='linkwarden'\"\
-              \ | grep -q 1 \\\n      || psql -h postgresql-18 -U postgres -d postgres\
-              \ -c \"CREATE DATABASE \\\"linkwarden\\\";\"\n\n    echo \"Installing\
-              \ pgvecto.rs extension in database 'linkwarden'...\"\n    psql -h postgresql-18\
-              \ -U postgres -d linkwarden -c \"DROP EXTENSION IF EXISTS vectors;CREATE\
-              \ EXTENSION IF NOT EXISTS vchord CASCADE;\" || echo \"Extension installation\
-              \ completed for linkwarden\"\n\n\t\tpsql -h postgresql-18 -U postgres\
-              \ -c 'ALTER SYSTEM SET shared_preload_libraries = \"vchord.so\"'\n \
-              \   echo \"Ensuring database 'openwebui' exists...\"\n    psql -h postgresql-18\
-              \ -U postgres -d postgres -tAc \"SELECT 1 FROM pg_database WHERE datname='openwebui'\"\
+              \ 'openwebui' exists...\"\n    psql -h postgresql-18 -U postgres -d\
+              \ postgres -tAc \"SELECT 1 FROM pg_database WHERE datname='openwebui'\"\
               \ | grep -q 1 \\\n      || psql -h postgresql-18 -U postgres -d postgres\
               \ -c \"CREATE DATABASE \\\"openwebui\\\";\"\n\n    echo \"Installing\
               \ pgvecto.rs extension in database 'openwebui'...\"\n    psql -h postgresql-18\
@@ -365,31 +356,23 @@ spec:
 apiVersion: v1
 data:
   databases: "\t\tpsql -h postgresql-18 -U postgres -c 'ALTER SYSTEM SET shared_preload_libraries\
-    \ = \"vchord.so\"'\n    echo \"Ensuring database 'linkwarden' exists...\"\n  \
-    \  psql -h postgresql-18 -U postgres -d postgres -tAc \"SELECT 1 FROM pg_database\
-    \ WHERE datname='linkwarden'\" | grep -q 1 \\\n      || psql -h postgresql-18\
-    \ -U postgres -d postgres -c \"CREATE DATABASE \\\"linkwarden\\\";\"\n\n    echo\
-    \ \"Installing pgvecto.rs extension in database 'linkwarden'...\"\n    psql -h\
-    \ postgresql-18 -U postgres -d linkwarden -c \"DROP EXTENSION IF EXISTS vectors;CREATE\
-    \ EXTENSION IF NOT EXISTS vchord CASCADE;\" || echo \"Extension installation completed\
-    \ for linkwarden\"\n\n\t\tpsql -h postgresql-18 -U postgres -c 'ALTER SYSTEM SET\
-    \ shared_preload_libraries = \"vchord.so\"'\n    echo \"Ensuring database 'openwebui'\
-    \ exists...\"\n    psql -h postgresql-18 -U postgres -d postgres -tAc \"SELECT\
-    \ 1 FROM pg_database WHERE datname='openwebui'\" | grep -q 1 \\\n      || psql\
-    \ -h postgresql-18 -U postgres -d postgres -c \"CREATE DATABASE \\\"openwebui\\\
-    \";\"\n\n    echo \"Installing pgvecto.rs extension in database 'openwebui'...\"\
-    \n    psql -h postgresql-18 -U postgres -d openwebui -c \"DROP EXTENSION IF EXISTS\
-    \ vectors;CREATE EXTENSION IF NOT EXISTS vchord CASCADE;\" || echo \"Extension\
-    \ installation completed for openwebui\"\n\n\t\tpsql -h postgresql-18 -U postgres\
-    \ -c 'ALTER SYSTEM SET shared_preload_libraries = \"vchord.so\"'\n    echo \"\
-    Ensuring database 'n8n' exists...\"\n    psql -h postgresql-18 -U postgres -d\
-    \ postgres -tAc \"SELECT 1 FROM pg_database WHERE datname='n8n'\" | grep -q 1\
-    \ \\\n      || psql -h postgresql-18 -U postgres -d postgres -c \"CREATE DATABASE\
-    \ \\\"n8n\\\";\"\n\n    echo \"Installing pgvecto.rs extension in database 'n8n'...\"\
-    \n    psql -h postgresql-18 -U postgres -d n8n -c \"DROP EXTENSION IF EXISTS vectors;CREATE\
-    \ EXTENSION IF NOT EXISTS vchord CASCADE;\" || echo \"Extension installation completed\
-    \ for n8n\"\n\n\t\tpsql -h postgresql-18 -U postgres -c 'ALTER SYSTEM SET shared_preload_libraries\
-    \ = \"vchord.so\"'\n    echo \"Ensuring database 'immich' exists...\"\n    psql\
+    \ = \"vchord.so\"'\n    echo \"Ensuring database 'openwebui' exists...\"\n   \
+    \ psql -h postgresql-18 -U postgres -d postgres -tAc \"SELECT 1 FROM pg_database\
+    \ WHERE datname='openwebui'\" | grep -q 1 \\\n      || psql -h postgresql-18 -U\
+    \ postgres -d postgres -c \"CREATE DATABASE \\\"openwebui\\\";\"\n\n    echo \"\
+    Installing pgvecto.rs extension in database 'openwebui'...\"\n    psql -h postgresql-18\
+    \ -U postgres -d openwebui -c \"DROP EXTENSION IF EXISTS vectors;CREATE EXTENSION\
+    \ IF NOT EXISTS vchord CASCADE;\" || echo \"Extension installation completed for\
+    \ openwebui\"\n\n\t\tpsql -h postgresql-18 -U postgres -c 'ALTER SYSTEM SET shared_preload_libraries\
+    \ = \"vchord.so\"'\n    echo \"Ensuring database 'n8n' exists...\"\n    psql -h\
+    \ postgresql-18 -U postgres -d postgres -tAc \"SELECT 1 FROM pg_database WHERE\
+    \ datname='n8n'\" | grep -q 1 \\\n      || psql -h postgresql-18 -U postgres -d\
+    \ postgres -c \"CREATE DATABASE \\\"n8n\\\";\"\n\n    echo \"Installing pgvecto.rs\
+    \ extension in database 'n8n'...\"\n    psql -h postgresql-18 -U postgres -d n8n\
+    \ -c \"DROP EXTENSION IF EXISTS vectors;CREATE EXTENSION IF NOT EXISTS vchord\
+    \ CASCADE;\" || echo \"Extension installation completed for n8n\"\n\n\t\tpsql\
+    \ -h postgresql-18 -U postgres -c 'ALTER SYSTEM SET shared_preload_libraries =\
+    \ \"vchord.so\"'\n    echo \"Ensuring database 'immich' exists...\"\n    psql\
     \ -h postgresql-18 -U postgres -d postgres -tAc \"SELECT 1 FROM pg_database WHERE\
     \ datname='immich'\" | grep -q 1 \\\n      || psql -h postgresql-18 -U postgres\
     \ -d postgres -c \"CREATE DATABASE \\\"immich\\\";\"\n\n    echo \"Installing\

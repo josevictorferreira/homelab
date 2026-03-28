@@ -58,7 +58,6 @@
 
   databases = {
     postgres = [
-      "linkwarden"
       "openwebui"
       "n8n"
       "immich"
