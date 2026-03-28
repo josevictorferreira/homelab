@@ -14,8 +14,8 @@ let
     owner = "openclaw";
     repo = "openclaw";
     rev = "v${version}";
-    sha256 = "sha256-oWEYIzrAnYbyyFWFxFCm93i4eprH7hztX+ZHQRpFtQ4=";
-    pnpmDepsHash = "sha256-B5qoJvp+FxsvnEL5UONS9FPAChh4jG236R1FvQI8I2I=";
+    sha256 = "sha256-cvRoCPf63ocTVgZ38qDW/oZDKXvAwhtvURcQLI9qRMY=";
+    pnpmDepsHash = "sha256-UsDwR66NJV+45ar0/5mZoi1v9IQAiG6kxa4RmorQ7h8=";
   };
 
   # Rolldown 1.0.0-rc.3 — pre-built from npm registry
@@ -76,7 +76,10 @@ let
       inherit (sourceInfo) pnpmDepsHash;
     }).overrideAttrs
       (old: {
-        nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ rolldown pkgs.findutils ];
+        nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [
+          rolldown
+          pkgs.findutils
+        ];
         # Override installPhase: run the original script, but first clean broken symlinks
         installPhase = ''
           cp ${old.installPhase} /tmp/gateway-install.sh
@@ -140,6 +143,7 @@ let
       pkgs.findutils
       pkgs.which
       pkgs.tree
+      pkgs.typst
       pkgs.ripgrep
       pkgs.file
       pkgs.wget
