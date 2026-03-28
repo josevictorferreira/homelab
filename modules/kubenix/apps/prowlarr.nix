@@ -18,7 +18,7 @@ in
       values = {
         image = {
           repository = "ghcr.io/home-operations/prowlarr";
-          tag = "2.3.2@sha256:e2459e199564ab852c6e677e951cef36c172a8e71a0e1c90665631b5a0c57438";
+          tag = "2.3.4.5307@sha256:029b2b52134a689bd528f466664d06f1d61dd80a83acd18ad8fd5eda9a65de10";
           pullPolicy = "IfNotPresent";
         };
         exportarrImage = {

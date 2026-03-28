@@ -14,7 +14,7 @@ in
       inherit namespace;
       image = {
         repository = "ghcr.io/autobrr/qui";
-        tag = "v1.13.1@sha256:05b9badae10d21f54722464e8b51abc9487ba93f9bb2fff649fbc09944d0d111";
+        tag = "v1.15.0@sha256:5d9afcb8fead8607e2b63ad7cb4bf6001fa2864fb36f499ae5c4f9a863a784b9";
         pullPolicy = "IfNotPresent";
       };
       port = 7476;

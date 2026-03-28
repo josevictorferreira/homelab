@@ -22,7 +22,7 @@ in
 
         image = {
           repository = "ghcr.io/searxng/searxng";
-          tag = "2026.2.21-89a63114c@sha256:c6e6139c216bb2d6ca3fc03dd64d9f460411b1750f072051bf0b23098e6cebfc";
+          tag = "latest@sha256:53f540d1f5481e737ec2c9eca529dc444c9cda49b63edecd3e75b069e5ec818e";
           pullPolicy = "IfNotPresent";
         };
 
@@ -63,7 +63,11 @@ in
         metadata.namespace = namespace;
         spec.template.spec.containers.${app} = {
           envFrom = [
-            { secretRef = { name = "searxng-secret"; }; }
+            {
+              secretRef = {
+                name = "searxng-secret";
+              };
+            }
           ];
         };
       };

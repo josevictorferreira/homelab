@@ -50,7 +50,7 @@ in
           controllers.main.containers.main = {
             image = {
               repository = "ghcr.io/immich-app/immich-machine-learning";
-              tag = "v2.5.2@sha256:531d2bccbe20d0412496e36455715a18d692911eca5e2ee37d32e1e4f50e14bb";
+              tag = "v2.6.3@sha256:33b17015c3d14f2565e9b8cd36b48a70027b14b5cd20da7fbfff21a370b0309c";
               pullPolicy = "IfNotPresent";
             };
             resources = {
@@ -81,7 +81,7 @@ in
           controllers.main.containers.main = {
             image = {
               repository = "ghcr.io/immich-app/immich-server";
-              tag = "v2.5.2@sha256:8ac5a6d471fbb6fcfec6bc34854dd5a947c1795547f0d9345d9bf1803d1209e3";
+              tag = "v2.6.3@sha256:0cc1f82953d9598eb9e9dd11cbde1f50fe54f9c46c4506b089e8ad7bfc9d1f0c";
               pullPolicy = "IfNotPresent";
             };
             resources = {

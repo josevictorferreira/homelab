@@ -76,7 +76,7 @@ in
               containers = [
                 {
                   name = app;
-                  image = "dock.mau.dev/mautrix/discord:v0.7.3";
+                  image = "dock.mau.dev/mautrix/discord:v0.7.6@sha256:965b25cb81e7c8133d2adda9057f9fd4c25bd645f1649d8d91129edfeb79d53d";
                   ports = [
                     {
                       name = "http";
