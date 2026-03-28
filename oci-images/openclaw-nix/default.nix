@@ -112,6 +112,7 @@ let
       pkgs.dejavu_fonts
       pkgs.noto-fonts
       pkgs.noto-fonts-color-emoji
+      pkgs.liberation_ttf
     ];
   };
 
@@ -159,6 +160,7 @@ let
       pkgs.noto-fonts
       pkgs.noto-fonts-color-emoji
       pkgs.noto-fonts-cjk-sans
+      pkgs.liberation_ttf
     ];
     pathsToLink = [
       "/bin"
@@ -174,11 +176,9 @@ let
     if [ -f "${openclawGateway}/bin/openclaw" ]; then cp -rL "${openclawGateway}/bin/openclaw" $out/bin/openclaw; fi
     # Copy python lib for requests etc.
     chmod -R u+w $out/lib/openclaw/node_modules/ || true
-    # Strip ML/vector libs (not used) - these are large, explicit rm is fast
+    # Strip ML inference libs (not used) - these are large, explicit rm is fast
     rm -rf $out/lib/openclaw/node_modules/.pnpm/@node-llama-cpp+* $out/lib/openclaw/node_modules/.pnpm/node-llama-cpp@* 2>/dev/null || true
-    rm -rf $out/lib/openclaw/node_modules/.pnpm/@lancedb+* $out/lib/openclaw/node_modules/.pnpm/lancedb@* 2>/dev/null || true
     rm -rf $out/lib/openclaw/node_modules/node-llama-cpp $out/lib/openclaw/node_modules/@node-llama-cpp 2>/dev/null || true
-    rm -rf $out/lib/openclaw/node_modules/@lancedb $out/lib/openclaw/node_modules/lancedb 2>/dev/null || true
     # Skip slow find-based cross-platform stripping - saves ~5-10 min build time
     cd $out/lib/openclaw
     # Copy plugin manifests and runtime TS sources from source extensions/ into dist/extensions/
