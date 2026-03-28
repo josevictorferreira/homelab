@@ -113,6 +113,14 @@ let
       pkgs.noto-fonts
       pkgs.noto-fonts-color-emoji
       pkgs.noto-fonts-cjk-sans
+      pkgs.helvetica-neue-lt-std
+    ];
+  };
+    fontDirectories = [
+      pkgs.dejavu_fonts
+      pkgs.noto-fonts
+      pkgs.noto-fonts-color-emoji
+      pkgs.noto-fonts-cjk-sans
     ];
   };
 
@@ -155,7 +163,14 @@ let
       pkgs.rsync
       pkgs.kubectl
       pkgs.chromium
+      pkgs.chromium
       pkgs.fontconfig
+      pkgs.dejavu_fonts
+      pkgs.noto-fonts
+      pkgs.noto-fonts-color-emoji
+      pkgs.noto-fonts-cjk-sans
+      pkgs.helvetica-neue-lt-std
+    ];
       pkgs.dejavu_fonts
       pkgs.noto-fonts
       pkgs.noto-fonts-color-emoji
