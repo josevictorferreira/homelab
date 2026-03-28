@@ -113,6 +113,7 @@ let
       pkgs.noto-fonts
       pkgs.noto-fonts-color-emoji
       pkgs.liberation_ttf
+      pkgs.font-awesome
     ];
   };
 
@@ -161,6 +162,7 @@ let
       pkgs.noto-fonts-color-emoji
       pkgs.noto-fonts-cjk-sans
       pkgs.liberation_ttf
+      pkgs.font-awesome
     ];
     pathsToLink = [
       "/bin"
