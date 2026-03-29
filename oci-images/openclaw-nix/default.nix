@@ -209,6 +209,9 @@ let
         fi
       done
     fi
+    # Copy root package.json to dist/ for plugin loader resolution
+    chmod u+w $out/lib/openclaw/dist/ || true
+    cp $out/lib/openclaw/package.json $out/lib/openclaw/dist/package.json
     mkdir -p $out/etc
     for pkg in ${pkgs.tzdata}; do
       if [ -d "$pkg/etc" ]; then cp -rsf "$pkg/etc"/* $out/etc/ 2>/dev/null || true; fi
