@@ -14,8 +14,8 @@ let
     owner = "openclaw";
     repo = "openclaw";
     rev = "v${version}";
-    sha256 = "sha256-cvRoCPf63ocTVgZ38qDW/oZDKXvAwhtvURcQLI9qRMY=";
-    pnpmDepsHash = "sha256-UsDwR66NJV+45ar0/5mZoi1v9IQAiG6kxa4RmorQ7h8=";
+    sha256 = "sha256-Nv1MEo6W2d7wSxWPMB/6YUkKHc9MUWxTXSLuaJX7Z0A=";
+    pnpmDepsHash = "sha256-+nLNp4hNmdDDSTxJ7xWfAXqYLWSoVKdW+YBdLiVrG7k=";
   };
 
   # Rolldown 1.0.0-rc.3 — pre-built from npm registry
