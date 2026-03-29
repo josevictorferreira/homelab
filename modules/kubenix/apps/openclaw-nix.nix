@@ -242,6 +242,7 @@ in
                   extname=$(basename "$extdir")
                   distdir="/lib/openclaw/dist/extensions/$extname"
                   if [ -d "$distdir" ]; then
+                    mkdir -p "$distdir"
                     for tsfile in "$extdir"*.ts; do
                       [ -f "$tsfile" ] && cp "$tsfile" "$distdir/" 2>/dev/null
                     done

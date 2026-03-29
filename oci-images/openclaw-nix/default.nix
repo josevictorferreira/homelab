@@ -3,7 +3,7 @@
   lib,
   inputs,
   system,
-  version ? "2026.3.28-beta.1",
+  version ? "2026.3.28",
 }:
 
 let
@@ -190,6 +190,7 @@ let
       chmod -R u+w $out/lib/openclaw/dist/extensions/ || true
       for extdir in $out/lib/openclaw/extensions/*/; do
         extname=$(basename "$extdir")
+        mkdir -p "$out/lib/openclaw/dist/extensions/$extname"
         if [ -d "$out/lib/openclaw/dist/extensions/$extname" ]; then
           # Copy plugin manifest
           if [ -f "$extdir/openclaw.plugin.json" ]; then
