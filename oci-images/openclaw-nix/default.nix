@@ -101,7 +101,7 @@ let
         '';
       });
 
-  inherit (import ./lancedb-deps.nix { inherit pkgs; }) lancedbPluginDeps;
+  # lancedb-deps removed - memory-lancedb extension skipped due to missing native bindings
   inherit (import ./matrix-deps.nix { inherit pkgs lib; }) matrixPluginDeps;
   matrixCryptoNative = pkgs.fetchurl {
     url = "https://github.com/matrix-org/matrix-rust-sdk-crypto-nodejs/releases/download/v0.4.0/matrix-sdk-crypto.linux-x64-gnu.node";
@@ -190,6 +190,10 @@ let
       chmod -R u+w $out/lib/openclaw/dist/extensions/ || true
       for extdir in $out/lib/openclaw/extensions/*/; do
         extname=$(basename "$extdir")
+        # Skip memory-lancedb - native bindings not available in Nix image
+        if [ "$extname" = "memory-lancedb" ]; then
+          continue
+        fi
         mkdir -p "$out/lib/openclaw/dist/extensions/$extname"
         if [ -d "$out/lib/openclaw/dist/extensions/$extname" ]; then
           # Copy plugin manifest
@@ -210,14 +214,10 @@ let
           fi
         fi
       done
-      # Copy lancedb deps (with native linux-x64-gnu binding) into memory-lancedb extension node_modules
-      # This fixes missing @lancedb/lancedb-linux-x64-gnu runtime error
-      if [ -d "${lancedbPluginDeps}/lancedb-deps/node_modules/@lancedb" ]; then
-        chmod -R u+w $out/lib/openclaw/extensions/memory-lancedb/ || true
-        mkdir -p $out/lib/openclaw/extensions/memory-lancedb/node_modules/@lancedb
-        cp -rL ${lancedbPluginDeps}/lancedb-deps/node_modules/@lancedb/lancedb $out/lib/openclaw/extensions/memory-lancedb/node_modules/@lancedb/
-      fi
     fi
+    # Remove memory-lancedb from both extensions dirs - native bindings not available
+    chmod -R u+w $out/lib/openclaw/extensions/memory-lancedb $out/lib/openclaw/dist/extensions/memory-lancedb 2>/dev/null || true
+    rm -rf $out/lib/openclaw/extensions/memory-lancedb $out/lib/openclaw/dist/extensions/memory-lancedb || true
     # Copy root package.json to dist/ for plugin loader resolution
     chmod u+w $out/lib/openclaw/dist/ || true
     cp $out/lib/openclaw/package.json $out/lib/openclaw/dist/package.json
