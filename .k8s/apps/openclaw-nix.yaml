@@ -81,12 +81,13 @@ spec:
               \ only includes compiled .js but jiti needs .ts source files\necho \"\
               Syncing plugin sources to dist/extensions/...\"\nfor extdir in /lib/openclaw/extensions/*/;\
               \ do\n  extname=$(basename \"$extdir\")\n  distdir=\"/lib/openclaw/dist/extensions/$extname\"\
-              \n  if [ -d \"$distdir\" ]; then\n    for tsfile in \"$extdir\"*.ts;\
-              \ do\n      [ -f \"$tsfile\" ] && cp \"$tsfile\" \"$distdir/\" 2>/dev/null\n\
-              \    done\n    [ -d \"$extdir/src\" ] && cp -r \"$extdir/src\" \"$distdir/\"\
-              \ 2>/dev/null\n    [ -f \"$extdir/package.json\" ] && cp \"$extdir/package.json\"\
-              \ \"$distdir/\" 2>/dev/null\n  fi\ndone\necho \"Plugin sources synced\"\
-              \n\nexec node /lib/openclaw/dist/index.js gateway --port 18789\n"
+              \n  if [ -d \"$distdir\" ]; then\n    mkdir -p \"$distdir\"\n    for\
+              \ tsfile in \"$extdir\"*.ts; do\n      [ -f \"$tsfile\" ] && cp \"$tsfile\"\
+              \ \"$distdir/\" 2>/dev/null\n    done\n    [ -d \"$extdir/src\" ] &&\
+              \ cp -r \"$extdir/src\" \"$distdir/\" 2>/dev/null\n    [ -f \"$extdir/package.json\"\
+              \ ] && cp \"$extdir/package.json\" \"$distdir/\" 2>/dev/null\n  fi\n\
+              done\necho \"Plugin sources synced\"\n\nexec node /lib/openclaw/dist/index.js\
+              \ gateway --port 18789\n"
           env:
             - name: HOME
               value: /home/node

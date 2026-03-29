@@ -100,7 +100,6 @@ let
               input = [
                 "text"
                 "image"
-                "video"
               ];
               contextWindow = 262144;
               maxTokens = 8192;
