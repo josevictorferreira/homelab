@@ -218,9 +218,13 @@ let
     # Remove memory-lancedb from both extensions dirs - native bindings not available
     chmod -R u+w $out/lib/openclaw/extensions/memory-lancedb $out/lib/openclaw/dist/extensions/memory-lancedb 2>/dev/null || true
     rm -rf $out/lib/openclaw/extensions/memory-lancedb $out/lib/openclaw/dist/extensions/memory-lancedb || true
-    # Copy root package.json to dist/ for plugin loader resolution
+    # Copy root package.json to dist/ but rename to avoid plugin runtime resolution bug.
+    # Gateway findPackageRootSync walks up looking for package.json with name:"openclaw".
+    # If it finds dist/package.json with that name, it stops too early and constructs
+    # dist/dist/plugins/runtime/index.js (double dist) instead of dist/plugins/runtime/index.js.
+    # Renaming to "openclaw-dist" makes it skip this file and continue to /lib/openclaw/.
     chmod u+w $out/lib/openclaw/dist/ || true
-    cp $out/lib/openclaw/package.json $out/lib/openclaw/dist/package.json
+    sed 's/"name": "openclaw"/"name": "openclaw-dist"/' $out/lib/openclaw/package.json > $out/lib/openclaw/dist/package.json
     mkdir -p $out/etc
     for pkg in ${pkgs.tzdata}; do
       if [ -d "$pkg/etc" ]; then cp -rsf "$pkg/etc"/* $out/etc/ 2>/dev/null || true; fi
