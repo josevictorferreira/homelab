@@ -101,6 +101,7 @@ let
         '';
       });
 
+  inherit (import ./lancedb-deps.nix { inherit pkgs; }) lancedbPluginDeps;
   inherit (import ./matrix-deps.nix { inherit pkgs lib; }) matrixPluginDeps;
   matrixCryptoNative = pkgs.fetchurl {
     url = "https://github.com/matrix-org/matrix-rust-sdk-crypto-nodejs/releases/download/v0.4.0/matrix-sdk-crypto.linux-x64-gnu.node";
@@ -208,6 +209,13 @@ let
           fi
         fi
       done
+      # Copy lancedb deps (with native linux-x64-gnu binding) into memory-lancedb extension node_modules
+      # This fixes missing @lancedb/lancedb-linux-x64-gnu runtime error
+      if [ -d "${lancedbPluginDeps}/lancedb-deps/node_modules/@lancedb" ]; then
+        chmod -R u+w $out/lib/openclaw/extensions/memory-lancedb/ || true
+        mkdir -p $out/lib/openclaw/extensions/memory-lancedb/node_modules/@lancedb
+        cp -rL ${lancedbPluginDeps}/lancedb-deps/node_modules/@lancedb/lancedb $out/lib/openclaw/extensions/memory-lancedb/node_modules/@lancedb/
+      fi
     fi
     # Copy root package.json to dist/ for plugin loader resolution
     chmod u+w $out/lib/openclaw/dist/ || true
