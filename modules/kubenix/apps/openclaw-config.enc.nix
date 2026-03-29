@@ -433,20 +433,20 @@ let
         auto = "inbound";
         provider = "elevenlabs";
         summaryModel = "kimi-coding/k2p5";
-        elevenlabs = {
-          apiKey = "\${ELEVENLABS_API_KEY}";
-          voiceId = "GOkMqfyKMLVUcYfO2WbB";
-          modelId = "eleven_v3";
-          seed = 91;
-          voiceSettings = {
-            stability = 0.5;
-            similarityBoost = 0.75;
-            style = 0;
-            useSpeakerBoost = true;
-            speed = 1;
+        providers = {
+          elevenlabs = {
+            apiKey = "\${ELEVENLABS_API_KEY}";
+            voiceId = "GOkMqfyKMLVUcYfO2WbB";
+            modelId = "eleven_v3";
+            seed = 91;
+            voiceSettings = {
+              stability = 0.5;
+              similarityBoost = 0.75;
+              style = 0;
+              useSpeakerBoost = true;
+              speed = 1;
+            };
           };
-        };
-      };
     };
     commands = {
       native = "auto";

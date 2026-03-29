@@ -121,11 +121,12 @@ in
               OPENCLAW_STATE_DIR = "/home/node/.openclaw";
               HOME = "/home/node";
               TZ = "America/Sao_Paulo";
+              OPENCLAW_NIX_MODE = "1";
               NPM_CONFIG_PREFIX = "/home/node/.npm-global";
               PIP_TARGET = "/home/node/.local/lib/python";
               PYTHONPATH = "/home/node/.local/lib/python";
               PATH = "/home/node/.local/bin:/home/node/.npm-global/bin:/bin:/usr/bin";
-              NODE_PATH = "/lib/openclaw/extensions/matrix/node_modules";
+              NODE_PATH = "/lib/openclaw/extensions/matrix/node_modules:/lib/openclaw/node_modules";
               MATRIX_MEL_ACCESS_TOKEN = {
                 valueFrom.secretKeyRef = {
                   name = "openclaw-config";
