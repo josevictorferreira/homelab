@@ -447,121 +447,123 @@ let
               speed = 1;
             };
           };
-    };
-    commands = {
-      native = "auto";
-      nativeSkills = "auto";
-      restart = true;
-      ownerDisplay = "raw";
-    };
-    session = {
-      scope = "per-sender";
-      idleMinutes = 60;
-      reset = {
-        mode = "daily";
-        atHour = 4;
-      };
-    };
-    channels = {
-      whatsapp = {
-        enabled = true;
-        dmPolicy = "allowlist";
-        allowFrom = [ "+554388109393" ];
-        groupAllowFrom = [ "+554388109393" ];
-        groupPolicy = "allowlist";
-        ackReaction = {
-          emoji = "👀";
-          direct = true;
-          group = "mentions";
-        };
-        debounceMs = 0;
-        mediaMaxMb = 50;
-      };
-      matrix = {
-        enabled = true;
-        autoJoin = "always";
-        groups = {
-          "*" = {
-            allow = true;
-            requireMention = false;
-          };
-        };
-        dm = {
-          allowFrom = [ "@zeh:josevictor.me" ];
-          policy = "allowlist";
-        };
-        encryption = false;
-        mediaMaxMb = 150;
-        accounts = {
-          mel = {
-            name = "Mel";
-            homeserver = "https://matrix.josevictor.me";
-            allowPrivateNetwork = true;
-          };
-          kira = {
-            name = "Kira";
-            homeserver = "https://matrix.josevictor.me";
-            allowPrivateNetwork = true;
-          };
-          luna = {
-            name = "Luna";
-            homeserver = "https://matrix.josevictor.me";
-            allowPrivateNetwork = true;
-          };
-          default = {
-            groupPolicy = "allowlist";
-            groupAllowFrom = [ "@zeh:josevictor.me" ];
-            homeserver = "https://matrix.josevictor.me";
-            allowPrivateNetwork = true;
-          };
         };
       };
-    };
-    talk = {
-      voiceId = "GOkMqfyKMLVUcYfO2WbB";
-      modelId = "eleven_v3";
-      outputFormat = "mp3_44100_128";
-      apiKey = "\${ELEVENLABS_API_KEY}";
-      interruptOnSpeech = true;
-    };
-    gateway = {
-      port = 18789;
-      mode = "local";
-      bind = "lan";
-      controlUi = {
-        dangerouslyAllowHostHeaderOriginFallback = true;
+      commands = {
+        native = "auto";
+        nativeSkills = "auto";
+        restart = true;
+        ownerDisplay = "raw";
       };
-    };
-    logging = {
-      level = "debug";
-    };
-    memory = {
-      backend = "builtin";
-      citations = "on";
-    };
-    skills = {
-      allowBundled = [ ];
-      install = {
-        nodeManager = "npm";
+      session = {
+        scope = "per-sender";
+        idleMinutes = 60;
+        reset = {
+          mode = "daily";
+          atHour = 4;
+        };
       };
-    };
-    plugins = {
-      enabled = true;
-      allow = [
-        "matrix"
-        "whatsapp"
-        "memory-core"
-        "lobster"
-      ];
-      slots = {
-        memory = "memory-core";
-      };
-      entries = {
+      channels = {
+        whatsapp = {
+          enabled = true;
+          dmPolicy = "allowlist";
+          allowFrom = [ "+554388109393" ];
+          groupAllowFrom = [ "+554388109393" ];
+          groupPolicy = "allowlist";
+          ackReaction = {
+            emoji = "👀";
+            direct = true;
+            group = "mentions";
+          };
+          debounceMs = 0;
+          mediaMaxMb = 50;
+        };
         matrix = {
           enabled = true;
+          autoJoin = "always";
+          groups = {
+            "*" = {
+              allow = true;
+              requireMention = false;
+            };
+          };
+          dm = {
+            allowFrom = [ "@zeh:josevictor.me" ];
+            policy = "allowlist";
+          };
+          encryption = false;
+          mediaMaxMb = 150;
+          accounts = {
+            mel = {
+              name = "Mel";
+              homeserver = "https://matrix.josevictor.me";
+              allowPrivateNetwork = true;
+            };
+            kira = {
+              name = "Kira";
+              homeserver = "https://matrix.josevictor.me";
+              allowPrivateNetwork = true;
+            };
+            luna = {
+              name = "Luna";
+              homeserver = "https://matrix.josevictor.me";
+              allowPrivateNetwork = true;
+            };
+            default = {
+              groupPolicy = "allowlist";
+              groupAllowFrom = [ "@zeh:josevictor.me" ];
+              homeserver = "https://matrix.josevictor.me";
+              allowPrivateNetwork = true;
+            };
+          };
         };
-        lobster = {
-          enabled = true;
+      };
+      talk = {
+        voiceId = "GOkMqfyKMLVUcYfO2WbB";
+        modelId = "eleven_v3";
+        outputFormat = "mp3_44100_128";
+        apiKey = "\${ELEVENLABS_API_KEY}";
+        interruptOnSpeech = true;
+      };
+      gateway = {
+        port = 18789;
+        mode = "local";
+        bind = "lan";
+        controlUi = {
+          dangerouslyAllowHostHeaderOriginFallback = true;
+        };
+      };
+      logging = {
+        level = "debug";
+      };
+      memory = {
+        backend = "builtin";
+        citations = "on";
+      };
+      skills = {
+        allowBundled = [ ];
+        install = {
+          nodeManager = "npm";
+        };
+      };
+      plugins = {
+        enabled = true;
+        allow = [
+          "matrix"
+          "whatsapp"
+          "memory-core"
+          "lobster"
+        ];
+        slots = {
+          memory = "memory-core";
+        };
+        entries = {
+          matrix = {
+            enabled = true;
+          };
+          lobster = {
+            enabled = true;
+          };
         };
       };
     };
