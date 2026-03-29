@@ -106,13 +106,15 @@ spec:
                   key: MEL_MATRIX_TOKEN
                   name: openclaw-config
             - name: NODE_PATH
-              value: /lib/openclaw/extensions/matrix/node_modules
+              value: /lib/openclaw/extensions/matrix/node_modules:/lib/openclaw/node_modules
             - name: NPM_CONFIG_PREFIX
               value: /home/node/.npm-global
             - name: OPENCLAW_CONFIG_PATH
               value: /home/node/.openclaw/openclaw.json
             - name: OPENCLAW_DATA_DIR
               value: /home/node/.openclaw
+            - name: OPENCLAW_NIX_MODE
+              value: '1'
             - name: OPENCLAW_STATE_DIR
               value: /home/node/.openclaw
             - name: PATH
