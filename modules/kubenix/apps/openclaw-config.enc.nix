@@ -6,6 +6,9 @@ let
     env = {
       COPILOT_GITHUB_TOKEN = "\${COPILOT_GITHUB_TOKEN}";
       ELEVENLABS_API_KEY = "\${ELEVENLABS_API_KEY}";
+      KIRA_MATRIX_TOKEN = "\${KIRA_MATRIX_TOKEN}";
+      LUNA_MATRIX_TOKEN = "\${LUNA_MATRIX_TOKEN}";
+      MEL_MATRIX_TOKEN = "\${MEL_MATRIX_TOKEN}";
       MOONSHOT_API_KEY = "\${MOONSHOT_API_KEY}";
       OPENROUTER_API_KEY = "\${OPENROUTER_API_KEY}";
     };
@@ -19,9 +22,9 @@ let
     models = {
       mode = "merge";
       providers = {
-        bailian = {
+        alibaba-coding-plan = {
           baseUrl = "https://coding-intl.dashscope.aliyuncs.com/v1";
-          apiKey = "\${BAILIAN_CODING_PLAN_API_KEY}";
+          apiKey = "\${alibaba-coding-plan_CODING_PLAN_API_KEY}";
           api = "openai-completions";
           models = [
             {
@@ -83,68 +86,9 @@ let
               contextWindow = 1000000;
               maxTokens = 65536;
             }
-            {
-              id = "MiniMax-M2.5";
-              name = "MiniMax-M2.5";
-              reasoning = false;
-              input = [ "text" ];
-              cost = {
-                input = 0;
-                output = 0;
-                cacheRead = 0;
-                cacheWrite = 0;
-              };
-              contextWindow = 204800;
-              maxTokens = 131072;
-            }
-            {
-              id = "glm-5";
-              name = "glm-5";
-              reasoning = false;
-              input = [ "text" ];
-              cost = {
-                input = 0;
-                output = 0;
-                cacheRead = 0;
-                cacheWrite = 0;
-              };
-              contextWindow = 202752;
-              maxTokens = 16384;
-            }
-            {
-              id = "glm-4.7";
-              name = "glm-4.7";
-              reasoning = false;
-              input = [ "text" ];
-              cost = {
-                input = 0;
-                output = 0;
-                cacheRead = 0;
-                cacheWrite = 0;
-              };
-              contextWindow = 202752;
-              maxTokens = 16384;
-            }
-            {
-              id = "kimi-k2.5";
-              name = "kimi-k2.5";
-              reasoning = false;
-              input = [
-                "text"
-                "image"
-              ];
-              cost = {
-                input = 0;
-                output = 0;
-                cacheRead = 0;
-                cacheWrite = 0;
-              };
-              contextWindow = 262144;
-              maxTokens = 32768;
-            }
           ];
         };
-        kimi-coding = {
+        moonshotai = {
           baseUrl = "https://api.kimi.com/coding";
           apiKey = "\${MOONSHOT_API_KEY}";
           api = "anthropic-messages";
@@ -152,9 +96,13 @@ let
             {
               id = "k2p5";
               name = "Kimi K2.5";
-              reasoning = false;
-              input = [ "text" ];
-              contextWindow = 256000;
+              reasoning = true;
+              input = [
+                "text"
+                "image"
+                "video"
+              ];
+              contextWindow = 262144;
               maxTokens = 8192;
             }
           ];
@@ -167,6 +115,20 @@ let
             {
               id = "MiniMax-M2.5";
               name = "MiniMax M2.5";
+              reasoning = true;
+              input = [ "text" ];
+              cost = {
+                input = 15;
+                output = 60;
+                cacheRead = 2;
+                cacheWrite = 10;
+              };
+              contextWindow = 200000;
+              maxTokens = 8192;
+            }
+            {
+              id = "MiniMax-M2.7";
+              name = "MiniMax M2.7";
               reasoning = true;
               input = [ "text" ];
               cost = {
@@ -193,6 +155,22 @@ let
               contextWindow = 120000;
               maxTokens = 8192;
             }
+            {
+              id = "glm-5.1";
+              name = "GLM-5.1";
+              reasoning = true;
+              input = [ "text" ];
+              contextWindow = 120000;
+              maxTokens = 8192;
+            }
+            {
+              id = "glm-5-turbo";
+              name = "GLM-5 Turbo";
+              reasoning = true;
+              input = [ "text" ];
+              contextWindow = 120000;
+              maxTokens = 8192;
+            }
           ];
         };
       };
@@ -200,19 +178,18 @@ let
     agents = {
       defaults = {
         model = {
-          primary = "github-copilot/claude-sonnet-4.6";
+          primary = "minimax/MiniMax-M2.7";
           fallbacks = [
-            "kimi-coding/k2p5"
-            "zai-coding-plan/glm-5"
-            "minimax/MiniMax-M2.5"
-            "github-copilot/claude-opus.4.6"
+            "moonshotai/k2p5"
+            "zai-coding-plan/glm-5.1"
+            "alibaba-coding-plan/qwen3.5-plus"
           ];
         };
         imageModel = {
           primary = "github-copilot/gemini-3-flash-preview";
           fallbacks = [
-            "bailian/qwen3.5-plus"
-            "kimi-coding/k2p5"
+            "alibaba-coding-plan/qwen3.5-plus"
+            "moonshotai/k2p5"
           ];
         };
         userTimezone = "America/Sao_Paulo";
@@ -259,7 +236,7 @@ let
         subagents = {
           maxConcurrent = 4;
           archiveAfterMinutes = 60;
-          model = "zai-coding-plan/glm-5";
+          model = "zai-coding-plan/glm-5-turbo";
           runTimeoutSeconds = 900;
         };
         sandbox = {
@@ -280,11 +257,11 @@ let
             avatar = "avatars/mel.png";
           };
           model = {
-            primary = "kimi-coding/k2p5";
+            primary = "moonshotai/k2p5";
             fallbacks = [
-              "zai-coding-plan/glm-5"
+              "zai-coding-plan/glm-5-turbo"
               "minimax/MiniMax-M2.5"
-              "bailian/qwen3.5-plus"
+              "alibaba-coding-plan/qwen3.5-plus"
             ];
           };
         }
@@ -296,6 +273,13 @@ let
             theme = "minha fiel contadora";
             emoji = "🐕";
             avatar = "avatars/kira.png";
+          };
+          model = {
+            primary = "zai-coding-plan/glm-5-turbo";
+            fallbacks = [
+              "zai-coding-plan/glm-5.1"
+              "minimax/MiniMax-M2.5"
+            ];
           };
           tools = {
             deny = [
@@ -315,10 +299,10 @@ let
             avatar = "avatars/luna.png";
           };
           model = {
-            primary = "bailian/qwen3.5-plus";
+            primary = "alibaba-coding-plan/qwen3.5-plus";
             fallbacks = [
-              "zai-coding-plan/glm-5"
-              "kimi-coding/k2p5"
+              "zai-coding-plan/glm-5-turbo"
+              "moonshotai/k2p5"
               "minimax/MiniMax-M2.5"
             ];
           };
@@ -432,7 +416,7 @@ let
       tts = {
         auto = "inbound";
         provider = "elevenlabs";
-        summaryModel = "kimi-coding/k2p5";
+        summaryModel = "moonshotai/k2p5";
         providers = {
           elevenlabs = {
             apiKey = "\${ELEVENLABS_API_KEY}";
@@ -491,22 +475,28 @@ let
             allowFrom = [ "@zeh:josevictor.me" ];
             policy = "allowlist";
           };
-          encryption = false;
+          encryption = true;
           mediaMaxMb = 150;
           accounts = {
             mel = {
               name = "Mel";
               homeserver = "https://matrix.josevictor.me";
+              accessToken = "\${MEL_MATRIX_TOKEN}";
+              userId = "@mel:josevictor.me";
               allowPrivateNetwork = true;
             };
             kira = {
               name = "Kira";
               homeserver = "https://matrix.josevictor.me";
+              accessToken = "\${KIRA_MATRIX_TOKEN}";
+              userId = "@kira:josevictor.me";
               allowPrivateNetwork = true;
             };
             luna = {
               name = "Luna";
               homeserver = "https://matrix.josevictor.me";
+              accessToken = "\${LUNA_MATRIX_TOKEN}";
+              userId = "@luna:josevictor.me";
               allowPrivateNetwork = true;
             };
             default = {
@@ -593,7 +583,7 @@ in
       SEARXNG_URL = kubenix.lib.secretsFor "searxng_url";
       WHATSAPP_NUMBER = kubenix.lib.secretsFor "whatsapp_number";
       WHATSAPP_BOT_NUMBER = kubenix.lib.secretsFor "whatsapp_bot_number";
-      BAILIAN_CODING_PLAN_API_KEY = kubenix.lib.secretsFor "bailian_coding_plan_api_key";
+      alibaba-coding-plan_CODING_PLAN_API_KEY = kubenix.lib.secretsFor "bailian_coding_plan_api_key";
     };
   };
 
