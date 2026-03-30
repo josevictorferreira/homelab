@@ -4,13 +4,17 @@ let
   namespace = homelab.kubernetes.namespaces.applications;
   configData = {
     env = {
+      ALIBABA_CODING_PLAN_API_KEY = "\${ALIBABA_CODING_PLAN_API_KEY}";
       COPILOT_GITHUB_TOKEN = "\${COPILOT_GITHUB_TOKEN}";
       ELEVENLABS_API_KEY = "\${ELEVENLABS_API_KEY}";
+      GEMINI_API_KEY = "\${GEMINI_API_KEY}";
       KIRA_MATRIX_TOKEN = "\${KIRA_MATRIX_TOKEN}";
       LUNA_MATRIX_TOKEN = "\${LUNA_MATRIX_TOKEN}";
       MEL_MATRIX_TOKEN = "\${MEL_MATRIX_TOKEN}";
+      MINIMAX_API_KEY = "\${MINIMAX_API_KEY}";
       MOONSHOT_API_KEY = "\${MOONSHOT_API_KEY}";
       OPENROUTER_API_KEY = "\${OPENROUTER_API_KEY}";
+      Z_AI_API_KEY = "\${Z_AI_API_KEY}";
     };
     browser = {
       enabled = true;
@@ -24,7 +28,7 @@ let
       providers = {
         alibaba-coding-plan = {
           baseUrl = "https://coding-intl.dashscope.aliyuncs.com/v1";
-          apiKey = "\${alibaba-coding-plan_CODING_PLAN_API_KEY}";
+          apiKey = "\${ALIBABA_CODING_PLAN_API_KEY}";
           api = "openai-completions";
           models = [
             {
@@ -582,7 +586,7 @@ in
       SEARXNG_URL = kubenix.lib.secretsFor "searxng_url";
       WHATSAPP_NUMBER = kubenix.lib.secretsFor "whatsapp_number";
       WHATSAPP_BOT_NUMBER = kubenix.lib.secretsFor "whatsapp_bot_number";
-      alibaba-coding-plan_CODING_PLAN_API_KEY = kubenix.lib.secretsFor "bailian_coding_plan_api_key";
+      ALIBABA_CODING_PLAN_API_KEY = kubenix.lib.secretsFor "bailian_coding_plan_api_key";
     };
   };
 
