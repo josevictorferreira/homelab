@@ -1,9 +1,9 @@
-{
-  pkgs,
-  lib,
-  inputs,
-  system,
-  version ? "2026.3.28",
+{ pkgs
+, lib
+, inputs
+, system
+, version ? "2026.3.28"
+,
 }:
 
 let

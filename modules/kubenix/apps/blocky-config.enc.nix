@@ -37,20 +37,20 @@ let
     customDNS = {
       customTTL = "1h";
       filterUnmappedTypes = true;
-mapping = builtins.listToAttrs (
-map
-  (
-    entry:
-    let
-      parts = lib.splitString " = " entry;
-    in
-    {
-      name = builtins.head parts;
-      value = builtins.elemAt parts 1;
-    }
-  )
-  dnsHosts
-);
+      mapping = builtins.listToAttrs (
+        map
+          (
+            entry:
+            let
+              parts = lib.splitString " = " entry;
+            in
+            {
+              name = builtins.head parts;
+              value = builtins.elemAt parts 1;
+            }
+          )
+          dnsHosts
+      );
     };
 
     blocking = {
