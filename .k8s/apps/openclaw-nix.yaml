@@ -56,19 +56,19 @@ spec:
               \nALLOWLIST=\"OPENCLAW_MATRIX_TOKEN ELEVENLABS_API_KEY MOONSHOT_API_KEY\
               \ OPENROUTER_API_KEY KIMI_API_KEY MINIMAX_API_KEY Z_AI_API_KEY ALIBABA_CODING_PLAN_API_KEY\
               \ WHATSAPP_NUMBER WHATSAPP_BOT_NUMBER GEMINI_API_KEY GITHUB_TOKEN TS_AUTHKEY\
-              \ KIRA_MATRIX_TOKEN LUNA_MATRIX_TOKEN MEL_MATRIX_TOKEN COPILOT_GITHUB_TOKEN\"\
-              \nfor var_name in $ALLOWLIST; do\n  var_value=$(eval printf '%s' \"\\\
-              $$var_name\")\n  if [ -n \"$var_value\" ]; then\n    escaped_value=$(echo\
-              \ \"$var_value\" | sed 's/[\\\\/&]/\\\\&/g')\n    sed -i \"s|\\\\\\\
-              ${$var_name}|$escaped_value|g\" \"$CONFIG_FILE\"\n  fi\ndone\necho \"\
-              Substitution complete\"\n\necho \"Installing matrix plugin dependencies...\"\
-              \n\n# Find the actual nix store path where the gateway loads extensions\
-              \ from\nMATRIX_EXT=$(readlink -f /lib/openclaw/extensions/matrix 2>/dev/null\
-              \ || echo \"/lib/openclaw/extensions/matrix\")\n\nif [ -d \"$MATRIX_EXT\"\
-              \ ]; then\n  echo \"Found matrix extension at: $MATRIX_EXT\"\n  cd \"\
-              $MATRIX_EXT\"\n\n  if [ ! -d \"node_modules/@vector-im\" ]; then\n \
-              \   echo \"Installing npm dependencies...\"\n    node -e \"\n      const\
-              \ fs = require('fs');\n      const pkg = JSON.parse(fs.readFileSync('package.json',\
+              \ KIRA_MATRIX_TOKEN LUNA_MATRIX_TOKEN MEL_MATRIX_TOKEN SPIKE_MATRIX_TOKEN\
+              \ COPILOT_GITHUB_TOKEN\"\nfor var_name in $ALLOWLIST; do\n  var_value=$(eval\
+              \ printf '%s' \"\\$$var_name\")\n  if [ -n \"$var_value\" ]; then\n\
+              \    escaped_value=$(echo \"$var_value\" | sed 's/[\\\\/&]/\\\\&/g')\n\
+              \    sed -i \"s|\\\\\\${$var_name}|$escaped_value|g\" \"$CONFIG_FILE\"\
+              \n  fi\ndone\necho \"Substitution complete\"\n\necho \"Installing matrix\
+              \ plugin dependencies...\"\n\n# Find the actual nix store path where\
+              \ the gateway loads extensions from\nMATRIX_EXT=$(readlink -f /lib/openclaw/extensions/matrix\
+              \ 2>/dev/null || echo \"/lib/openclaw/extensions/matrix\")\n\nif [ -d\
+              \ \"$MATRIX_EXT\" ]; then\n  echo \"Found matrix extension at: $MATRIX_EXT\"\
+              \n  cd \"$MATRIX_EXT\"\n\n  if [ ! -d \"node_modules/@vector-im\" ];\
+              \ then\n    echo \"Installing npm dependencies...\"\n    node -e \"\n\
+              \      const fs = require('fs');\n      const pkg = JSON.parse(fs.readFileSync('package.json',\
               \ 'utf8'));\n      delete pkg.devDependencies;\n      fs.writeFileSync('package.json',\
               \ JSON.stringify(pkg, null, 2));\n    \"\n    npm install --omit=dev\
               \ --no-package-lock --legacy-peer-deps 2>&1 || echo \"WARN: npm install\
@@ -116,6 +116,11 @@ spec:
               valueFrom:
                 secretKeyRef:
                   key: MEL_MATRIX_TOKEN
+                  name: openclaw-config
+            - name: MATRIX_SPIKE_ACCESS_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  key: SPIKE_MATRIX_TOKEN
                   name: openclaw-config
             - name: NODE_PATH
               value: /lib/openclaw/extensions/matrix/node_modules:/lib/openclaw/node_modules

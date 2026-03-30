@@ -11,6 +11,7 @@ let
       KIRA_MATRIX_TOKEN = "\${KIRA_MATRIX_TOKEN}";
       LUNA_MATRIX_TOKEN = "\${LUNA_MATRIX_TOKEN}";
       MEL_MATRIX_TOKEN = "\${MEL_MATRIX_TOKEN}";
+      SPIKE_MATRIX_TOKEN = "\${SPIKE_MATRIX_TOKEN}";
       MINIMAX_API_KEY = "\${MINIMAX_API_KEY}";
       MOONSHOT_API_KEY = "\${MOONSHOT_API_KEY}";
       OPENROUTER_API_KEY = "\${OPENROUTER_API_KEY}";
@@ -311,6 +312,23 @@ let
           };
         }
         {
+          id = "spike";
+          workspace = "/home/node/.openclaw/workspace-spike";
+          identity = {
+            name = "Spike";
+            theme = "meu fiel companheiro";
+            emoji = "🐕";
+          };
+          model = {
+            primary = "minimax/MiniMax-M2.7";
+            fallbacks = [
+              "moonshotai/k2p5"
+              "zai-coding-plan/glm-5.1"
+              "alibaba-coding-plan/qwen3.5-plus"
+            ];
+          };
+        }
+        {
           id = "spare";
           workspace = "/home/node/.openclaw/workspace-spare";
           identity = {
@@ -389,6 +407,13 @@ let
       };
     };
     bindings = [
+      {
+        agentId = "spike";
+        match = {
+          channel = "matrix";
+          accountId = "@spike";
+        };
+      }
       {
         agentId = "kira";
         match = {
@@ -502,6 +527,13 @@ let
               userId = "@luna:josevictor.me";
               allowPrivateNetwork = true;
             };
+            spike = {
+              name = "Spike";
+              homeserver = "https://matrix.josevictor.me";
+              accessToken = "\${SPIKE_MATRIX_TOKEN}";
+              userId = "@spike:josevictor.me";
+              allowPrivateNetwork = true;
+            };
             default = {
               groupPolicy = "allowlist";
               groupAllowFrom = [ "@zeh:josevictor.me" ];
@@ -581,6 +613,7 @@ in
       MEL_MATRIX_TOKEN = kubenix.lib.secretsFor "mel_matrix_token";
       KIRA_MATRIX_TOKEN = kubenix.lib.secretsFor "kira_matrix_token";
       LUNA_MATRIX_TOKEN = kubenix.lib.secretsFor "luna_matrix_token";
+      SPIKE_MATRIX_TOKEN = kubenix.lib.secretsFor "spike_matrix_token";
       ELEVENLABS_API_KEY = kubenix.lib.secretsFor "elevenlabs_api_key";
       GITHUB_TOKEN = kubenix.lib.secretsFor "github_token";
       SEARXNG_URL = kubenix.lib.secretsFor "searxng_url";
