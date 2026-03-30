@@ -586,7 +586,7 @@ in
       SEARXNG_URL = kubenix.lib.secretsFor "searxng_url";
       WHATSAPP_NUMBER = kubenix.lib.secretsFor "whatsapp_number";
       WHATSAPP_BOT_NUMBER = kubenix.lib.secretsFor "whatsapp_bot_number";
-      ALIBABA_CODING_PLAN_API_KEY = kubenix.lib.secretsFor "bailian_coding_plan_api_key";
+      ALIBABA_CODING_PLAN_API_KEY = kubenix.lib.secretsFor "alibaba_coding_plan_api_key";
     };
   };
 
