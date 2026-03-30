@@ -76,6 +76,14 @@ in
                       key = "registration_token";
                     };
                   }
+                  {
+                    name = "TUWUNEL_WELL_KNOWN__CLIENT";
+                    value = "https://matrix.josevictor.me";
+                  }
+                  {
+                    name = "TUWUNEL_WELL_KNOWN__SERVER";
+                    value = "matrix.josevictor.me:443";
+                  }
                 ];
                 resources = {
                   requests = {
@@ -166,6 +174,10 @@ in
           port = 8008
           allow_federation = false
           allow_registration = true;
+
+          [global.well_known]
+          client = "https://matrix.josevictor.me"
+          server = "matrix.josevictor.me:443"
         '';
       };
     };
@@ -193,10 +205,30 @@ in
               ];
             };
           }
+          {
+            host = "josevictor.me";
+            http = {
+              paths = [
+                {
+                  path = "/.well-known/matrix";
+                  pathType = "Prefix";
+                  backend = {
+                    service = {
+                      inherit name;
+                      port.number = 8008;
+                    };
+                  };
+                }
+              ];
+            };
+          }
         ];
         tls = [
           {
-            hosts = [ "matrix.josevictor.me" ];
+            hosts = [
+              "matrix.josevictor.me"
+              "josevictor.me"
+            ];
             secretName = "wildcard-tls";
           }
         ];
