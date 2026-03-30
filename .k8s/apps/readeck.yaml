@@ -34,6 +34,12 @@ spec:
       automountServiceAccountToken: true
       containers:
         - env:
+            - name: HTTPS_PROXY
+              value: http://flaresolverr:8191
+            - name: HTTP_PROXY
+              value: http://flaresolverr:8191
+            - name: NO_PROXY
+              value: 127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,::1/128
             - name: READECK_LOG_FORMAT
               value: text
             - name: READECK_LOG_LEVEL
