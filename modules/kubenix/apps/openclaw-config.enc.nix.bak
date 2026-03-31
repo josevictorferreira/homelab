@@ -281,9 +281,8 @@ let
           model = {
             primary = "zai-coding-plan/glm-5-turbo";
             fallbacks = [
-              "minimax/MiniMax-M2.7"
-              "moonshotai/k2p5"
-              "alibaba-coding-plan/qwen3.5-plus"
+              "zai-coding-plan/glm-5.1"
+              "minimax/MiniMax-M2.5"
             ];
           };
           tools = {
@@ -442,7 +441,6 @@ let
     };
     messages = {
       removeAckAfterReply = true;
-      ackReactionScope = "all";
       tts = {
         auto = "inbound";
         provider = "elevenlabs";

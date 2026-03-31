@@ -45,9 +45,6 @@ in
           READECK_LOG_FORMAT = "text";
           READECK_SERVER_HOST = "0.0.0.0";
           READECK_SERVER_PORT = "8000";
-          HTTP_PROXY = "http://flaresolverr:8191";
-          HTTPS_PROXY = "http://flaresolverr:8191";
-          NO_PROXY = "127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,::1/128";
         };
       };
     };

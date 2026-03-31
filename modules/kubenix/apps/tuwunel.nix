@@ -46,6 +46,10 @@ in
                 ];
                 env = [
                   {
+                    name = "TUWUNEL_CONFIG";
+                    value = "/etc/tuwunel/tuwunel.toml";
+                  }
+                  {
                     name = "TUWUNEL_SERVER_NAME";
                     value = "josevictor.me";
                   }
