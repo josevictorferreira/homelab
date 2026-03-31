@@ -84,6 +84,13 @@ in
                     name = "TUWUNEL_WELL_KNOWN__SERVER";
                     value = "matrix.josevictor.me:443";
                   }
+                  {
+                    name = "TUWUNEL_EMERGENCY_PASSWORD";
+                    valueFrom.secretKeyRef = {
+                      name = "${name}-env";
+                      key = "TUWUNEL_EMERGENCY_PASSWORD";
+                    };
+                  }
                 ];
                 resources = {
                   requests = {
@@ -173,7 +180,15 @@ in
           address = "0.0.0.0"
           port = 8008
           allow_federation = false
-          allow_registration = true;
+          allow_registration = true
+          new_user_displayname_suffix = ""
+
+          allow_legacy_media = true
+          url_preview_domain_contains_allowlist = ["*"]
+          max_request_size = 52428800
+
+          allow_local_presence = true
+          allow_encryption = true
 
           [global.well_known]
           client = "https://matrix.josevictor.me"

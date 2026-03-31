@@ -9,6 +9,7 @@ in
     metadata = { inherit namespace; };
     stringData = {
       "registration_token" = kubenix.lib.secretsFor "tuwunel_registration_token";
+      "TUWUNEL_EMERGENCY_PASSWORD" = kubenix.lib.secretsFor "tuwunel_emergency_password";
     };
   };
 }
