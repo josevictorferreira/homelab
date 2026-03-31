@@ -20,6 +20,8 @@ spec:
     spec:
       containers:
         - env:
+            - name: TUWUNEL_CONFIG
+              value: /etc/tuwunel/tuwunel.toml
             - name: TUWUNEL_SERVER_NAME
               value: josevictor.me
             - name: TUWUNEL_DATABASE_PATH
