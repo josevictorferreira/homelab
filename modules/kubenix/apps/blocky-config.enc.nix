@@ -54,7 +54,7 @@ let
               dnsHosts
           )
         // {
-          "${homelab.domain}" = homelab.kubernetes.vipAddress;
+          "${homelab.domain}" = homelab.kubernetes.loadBalancer.address;
         };
     };
 
