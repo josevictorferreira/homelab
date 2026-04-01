@@ -48,7 +48,7 @@ in
       inherit namespace;
       image = {
         repository = "ghcr.io/josevictorferreira/openclaw-nix";
-        tag = "v2026.3.28";
+        tag = "v2026.3.31@sha256:3bf0837fc43f76e9ad74c82bfd6d8683186153e00209f6151b8a2e195636e1cc";
         pullPolicy = "Always";
       };
       port = 18789;
@@ -370,13 +370,13 @@ in
             storageClass = "rook-ceph-block";
             size = "1Gi";
             accessMode = "ReadWriteOnce";
-            advancedMounts.main.tailscale = [{ path = "/var/lib/tailscale"; }];
+            advancedMounts.main.tailscale = [ { path = "/var/lib/tailscale"; } ];
           };
 
           dev-tun = {
             type = "hostPath";
             hostPath = "/dev/net/tun";
-            advancedMounts.main.tailscale = [{ path = "/dev/net/tun"; }];
+            advancedMounts.main.tailscale = [ { path = "/dev/net/tun"; } ];
           };
         };
       };

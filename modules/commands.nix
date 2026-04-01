@@ -1,9 +1,9 @@
 # Nix-based CLI commands for homelab management
 # All logic lives here; Makefile just calls `nix run .#<command>`
-{ pkgs
-, lib
-, deploy-rs-pkg ? null
-,
+{
+  pkgs,
+  lib,
+  deploy-rs-pkg ? null,
 }:
 
 let
@@ -555,7 +555,7 @@ let
 
   # OpenClaw image configuration
   openclawImageName = "openclaw-nix";
-  openclawVersion = "2026.3.28-beta.1";
+  openclawVersion = "2026.3.31";
   openclawRegistry = "ghcr.io";
 
   push-openclaw =
