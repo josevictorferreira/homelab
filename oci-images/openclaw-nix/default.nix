@@ -200,10 +200,9 @@ let
           if [ -f "$extdir/openclaw.plugin.json" ]; then
             cp "$extdir/openclaw.plugin.json" "$out/lib/openclaw/dist/extensions/$extname/openclaw.plugin.json"
           fi
-          # Copy runtime TS sources needed by jiti loader (light-runtime-api.ts, runtime-api.ts, etc.)
-          for tsfile in "$extdir"/*.ts; do
-            [ -f "$tsfile" ] && cp "$tsfile" "$out/lib/openclaw/dist/extensions/$extname/"
-          done
+          # Do NOT copy .ts source files — the upstream build already provides compiled .js in dist/extensions/.
+          # collectTopLevelPublicSurfaceArtifacts reads all files and rewriteEntryToBuiltPath converts
+          # .ts → .js, causing duplicate runtime sidecar paths and assertUniqueValues failure.
           # Copy src/ directory if it exists (contains compiled plugin code)
           if [ -d "$extdir/src" ]; then
             cp -r "$extdir/src" "$out/lib/openclaw/dist/extensions/$extname/"
