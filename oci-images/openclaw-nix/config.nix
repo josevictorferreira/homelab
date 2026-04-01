@@ -147,7 +147,7 @@
   };
 
   env = {
-    MOONSHOT_API_KEY = "\${MOONSHOT_API_KEY}";
+    KIMI_API_KEY = "\${KIMI_API_KEY}";
     ELEVENLABS_API_KEY = "\${ELEVENLABS_API_KEY}";
     OPENROUTER_API_KEY = "\${OPENROUTER_API_KEY}";
   };
@@ -156,7 +156,7 @@
     mode = "merge";
     providers."kimi-coding" = {
       baseUrl = "https://api.kimi.com/coding";
-      apiKey = "\${MOONSHOT_API_KEY}";
+      apiKey = "\${KIMI_API_KEY}";
       api = "anthropic-messages";
       models = [
         {

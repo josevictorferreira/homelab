@@ -13,7 +13,7 @@ let
       MEL_MATRIX_TOKEN = "\${MEL_MATRIX_TOKEN}";
       SPIKE_MATRIX_TOKEN = "\${SPIKE_MATRIX_TOKEN}";
       MINIMAX_API_KEY = "\${MINIMAX_API_KEY}";
-      MOONSHOT_API_KEY = "\${MOONSHOT_API_KEY}";
+      KIMI_API_KEY = "\${KIMI_API_KEY}";
       OPENROUTER_API_KEY = "\${OPENROUTER_API_KEY}";
       Z_AI_API_KEY = "\${Z_AI_API_KEY}";
     };
@@ -95,7 +95,7 @@ let
         };
         moonshotai = {
           baseUrl = "https://api.kimi.com/coding";
-          apiKey = "\${MOONSHOT_API_KEY}";
+          apiKey = "\${KIMI_API_KEY}";
           api = "anthropic-messages";
           models = [
             {
@@ -610,7 +610,7 @@ in
       Z_AI_API_KEY = kubenix.lib.secretsFor "z_ai_api_key";
       COPILOT_GITHUB_TOKEN = kubenix.lib.secretsFor "copilot_github_token";
       MINIMAX_API_KEY = kubenix.lib.secretsFor "minimax_api_key";
-      MOONSHOT_API_KEY = kubenix.lib.secretsFor "moonshot_api_key";
+      KIMI_API_KEY = kubenix.lib.secretsFor "moonshot_api_key";
       OPENCLAW_MATRIX_TOKEN = kubenix.lib.secretsFor "openclaw_matrix_token";
       MEL_MATRIX_TOKEN = kubenix.lib.secretsFor "mel_matrix_token";
       KIRA_MATRIX_TOKEN = kubenix.lib.secretsFor "kira_matrix_token";
