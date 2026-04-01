@@ -214,6 +214,19 @@ let
         fi
       done
     fi
+    # Symlink plugin-entry.runtime.ts to dist/ top-level for jiti resolution.
+    # The bundled dist/plugin-entry.runtime-CuPlkRZ7.js uses jiti to load
+    # ./plugin-entry.runtime.ts relative to itself, but the .ts source only
+    # exists inside dist/extensions/<name>/src/. Create a symlink so jiti finds it.
+    chmod u+w $out/lib/openclaw/dist/ || true
+    for extdir in $out/lib/openclaw/dist/extensions/*/src; do
+      if [ -f "$extdir/plugin-entry.runtime.ts" ]; then
+        extname=$(basename $(dirname "$extdir"))
+        ln -sf "extensions/$extname/src/plugin-entry.runtime.ts" \
+          "$out/lib/openclaw/dist/plugin-entry.runtime.ts"
+        break
+      fi
+    done
     # Remove memory-lancedb from both extensions dirs - native bindings not available
     chmod -R u+w $out/lib/openclaw/extensions/memory-lancedb $out/lib/openclaw/dist/extensions/memory-lancedb 2>/dev/null || true
     rm -rf $out/lib/openclaw/extensions/memory-lancedb $out/lib/openclaw/dist/extensions/memory-lancedb || true
