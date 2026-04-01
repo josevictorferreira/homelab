@@ -3,7 +3,7 @@
   lib,
   inputs,
   system,
-  version ? "2026.3.31",
+  version ? "2026.4.1",
 }:
 
 let
@@ -14,7 +14,7 @@ let
     owner = "openclaw";
     repo = "openclaw";
     rev = "v${version}";
-    sha256 = "sha256-pUABN6qjzNZ/0MgA/+pWjT9efhcm/5zicwQ/BRbXVDo=";
+    sha256 = "sha256-nQmR98XsEcm8HQHUpb2WB9r/OFJhjycj1ieXbsRO9Cs=";
     pnpmDepsHash = "sha256-Aiuoff4yDI0GUgu/RzUQ/WXUOcf+AByyathBTVCofI8=";
   };
 
