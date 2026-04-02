@@ -51,7 +51,7 @@ spec:
             - name: TUWUNEL_DB_POOL_AFFINITY
               value: 'false'
             - name: TUWUNEL_DB_POOL_WORKERS
-              value: '64'
+              value: '16'
           image: ghcr.io/matrix-construct/tuwunel:v1.5.1@sha256:25693407bc059eec7e161418edd02b2b7c010516c855056a7672883b04f71b11
           imagePullPolicy: IfNotPresent
           livenessProbe:
@@ -90,7 +90,7 @@ spec:
               name: config
               readOnly: true
               subPath: tuwunel.toml
-      terminationGracePeriodSeconds: 60
+      terminationGracePeriodSeconds: 120
       volumes:
         - name: data
           persistentVolumeClaim:
