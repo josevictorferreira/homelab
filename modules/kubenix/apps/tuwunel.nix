@@ -123,16 +123,18 @@ in
                     path = "/_matrix/client/versions";
                     port = 8008;
                   };
-                  initialDelaySeconds = 30;
+                  initialDelaySeconds = 90;
                   periodSeconds = 10;
+                  failureThreshold = 5;
                 };
                 readinessProbe = {
                   httpGet = {
                     path = "/_matrix/client/versions";
                     port = 8008;
                   };
-                  initialDelaySeconds = 5;
-                  periodSeconds = 5;
+                  initialDelaySeconds = 60;
+                  periodSeconds = 10;
+                  failureThreshold = 3;
                 };
                 volumeMounts = [
                   {
