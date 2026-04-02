@@ -94,6 +94,7 @@ in
             podMonitorSelectorNilUsesHelmValues = false;
             serviceMonitorSelectorNilUsesHelmValues = false;
             retention = "15d";
+            retentionSize = "40Gi";
             resources = {
               requests = {
                 cpu = "1";
@@ -109,7 +110,7 @@ in
                 spec = {
                   storageClassName = "rook-ceph-block";
                   accessModes = [ "ReadWriteOnce" ];
-                  resources.requests.storage = "25Gi";
+                  resources.requests.storage = "50Gi";
                 };
               };
             };
