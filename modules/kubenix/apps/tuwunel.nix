@@ -26,7 +26,11 @@ in
       };
       spec = {
         replicas = 1;
-        strategy.type = "Recreate";
+        strategy.type = "RollingUpdate";
+        strategy.rollingUpdate = {
+          maxUnavailable = 0;
+          maxSurge = 1;
+        };
         selector.matchLabels.app = name;
         template = {
           metadata.labels.app = name;
@@ -132,9 +136,7 @@ in
                     path = "/_matrix/client/versions";
                     port = 8008;
                   };
-                  initialDelaySeconds = 60;
-                  periodSeconds = 10;
-                  failureThreshold = 3;
+                  initialDelaySeconds = 150;
                 };
                 volumeMounts = [
                   {
