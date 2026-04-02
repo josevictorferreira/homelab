@@ -96310,6 +96310,7 @@ spec:
       cpu: '1'
       memory: 2Gi
   retention: 15d
+  retentionSize: 40Gi
   routePrefix: /
   ruleNamespaceSelector: {}
   ruleSelector:
@@ -96337,7 +96338,7 @@ spec:
           - ReadWriteOnce
         resources:
           requests:
-            storage: 25Gi
+            storage: 50Gi
         storageClassName: rook-ceph-block
   tsdb:
     outOfOrderTimeWindow: 0s
