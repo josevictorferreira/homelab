@@ -1,7 +1,8 @@
-{ lib
-, kubenix
-, homelab
-, ...
+{
+  lib,
+  kubenix,
+  homelab,
+  ...
 }:
 
 let
@@ -94,7 +95,7 @@ in
             podMonitorSelectorNilUsesHelmValues = false;
             serviceMonitorSelectorNilUsesHelmValues = false;
             retention = "15d";
-            retentionSize = "40Gi";
+            retentionSize = "40GiB";
             resources = {
               requests = {
                 cpu = "1";
