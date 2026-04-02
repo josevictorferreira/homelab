@@ -55,21 +55,23 @@ spec:
           image: ghcr.io/matrix-construct/tuwunel:v1.5.1@sha256:25693407bc059eec7e161418edd02b2b7c010516c855056a7672883b04f71b11
           imagePullPolicy: IfNotPresent
           livenessProbe:
+            failureThreshold: 5
             httpGet:
               path: /_matrix/client/versions
               port: 8008
-            initialDelaySeconds: 30
-            periodSeconds: 10
+            initialDelaySeconds: 600
+            periodSeconds: 30
           name: tuwunel
           ports:
             - containerPort: 8008
               name: http
               protocol: TCP
           readinessProbe:
+            failureThreshold: 3
             httpGet:
               path: /_matrix/client/versions
               port: 8008
-            initialDelaySeconds: 5
+            initialDelaySeconds: 10
             periodSeconds: 5
           resources:
             limits:
@@ -83,6 +85,13 @@ spec:
             capabilities:
               drop:
                 - ALL
+          startupProbe:
+            failureThreshold: 60
+            httpGet:
+              path: /_matrix/client/versions
+              port: 8008
+            initialDelaySeconds: 10
+            periodSeconds: 10
           volumeMounts:
             - mountPath: /var/lib/tuwunel
               name: data

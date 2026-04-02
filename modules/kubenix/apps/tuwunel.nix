@@ -26,11 +26,7 @@ in
       };
       spec = {
         replicas = 1;
-        strategy.type = "RollingUpdate";
-        strategy.rollingUpdate = {
-          maxUnavailable = 0;
-          maxSurge = 1;
-        };
+        strategy.type = "Recreate";
         selector.matchLabels.app = name;
         template = {
           metadata.labels.app = name;
@@ -122,13 +118,22 @@ in
                   allowPrivilegeEscalation = false;
                   capabilities.drop = [ "ALL" ];
                 };
+                startupProbe = {
+                  httpGet = {
+                    path = "/_matrix/client/versions";
+                    port = 8008;
+                  };
+                  initialDelaySeconds = 10;
+                  periodSeconds = 10;
+                  failureThreshold = 60;
+                };
                 livenessProbe = {
                   httpGet = {
                     path = "/_matrix/client/versions";
                     port = 8008;
                   };
-                  initialDelaySeconds = 90;
-                  periodSeconds = 10;
+                  initialDelaySeconds = 600;
+                  periodSeconds = 30;
                   failureThreshold = 5;
                 };
                 readinessProbe = {
@@ -136,7 +141,9 @@ in
                     path = "/_matrix/client/versions";
                     port = 8008;
                   };
-                  initialDelaySeconds = 150;
+                  initialDelaySeconds = 10;
+                  periodSeconds = 5;
+                  failureThreshold = 3;
                 };
                 volumeMounts = [
                   {
