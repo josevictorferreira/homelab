@@ -31,7 +31,7 @@ in
         template = {
           metadata.labels.app = name;
           spec = {
-            terminationGracePeriodSeconds = 60;
+            terminationGracePeriodSeconds = 120;
             containers = [
               {
                 inherit name;
@@ -101,7 +101,7 @@ in
                   }
                   {
                     name = "TUWUNEL_DB_POOL_WORKERS";
-                    value = "64";
+                    value = "16";
                   }
                 ];
                 resources = {
