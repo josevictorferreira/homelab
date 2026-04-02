@@ -95,6 +95,14 @@ in
                       key = "TUWUNEL_EMERGENCY_PASSWORD";
                     };
                   }
+                  {
+                    name = "TUWUNEL_DB_POOL_AFFINITY";
+                    value = "false";
+                  }
+                  {
+                    name = "TUWUNEL_DB_POOL_WORKERS";
+                    value = "64";
+                  }
                 ];
                 resources = {
                   requests = {
