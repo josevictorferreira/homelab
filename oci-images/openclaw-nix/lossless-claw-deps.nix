@@ -22,7 +22,7 @@ let
     postPatch = ''
       cp ${./lossless-claw-package-lock.json} package-lock.json
     '';
-    npmDepsHash = "sha256-0azym2dn0i8gnv11519mnmw6byz06pnh8zca0y5ccf4q18lvx9bs";
+    npmDepsHash = "sha256-0d5W6H7N1dlYr/wi9XU29qNGpDDXH7lGxYfZryOJxdM=";
     dontNpmBuild = true;
     installPhase = ''
       mkdir -p $out/lossless-claw-deps

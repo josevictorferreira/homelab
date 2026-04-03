@@ -580,9 +580,11 @@ let
           "whatsapp"
           "memory-core"
           "lobster"
+          "lossless-claw"
         ];
         slots = {
           memory = "memory-core";
+          contextEngine = "lossless-claw";
         };
         entries = {
           matrix = {
@@ -590,6 +592,12 @@ let
           };
           lobster = {
             enabled = true;
+          };
+          lossless-claw = {
+            enabled = true;
+            config = {
+              dbPath = "/home/node/.openclaw/lcm.db";
+            };
           };
         };
       };
