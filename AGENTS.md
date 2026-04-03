@@ -123,6 +123,15 @@ make format     # Fix nix formatting
 - **Apps**: `{app}.nix` + `{app}-config.enc.nix` for secrets
 - **Disabled files**: Prefix with `_` (e.g., `_docling.nix`)
 
+** START IMPORTANT SECTION **
+ Prioritize readability, API ergonomics, and maintainability.
+- Prefer simple and elegant solutions over clever or complex ones.
+- Optimize for code that is easy to understand and modify.
+- Design APIs that are intuitive, consistent, and hard to misuse.
+- Avoid unnecessary abstractions or premature optimization.
+- When in doubt, choose clarity over brevity or performance.
+** END IMPORTANT SECTION **
+
 ### Secrets Flow
 
 1. Secrets defined in `secrets/k8s-secrets.enc.yaml`
