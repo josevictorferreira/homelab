@@ -1,20 +1,20 @@
 { homelab, kubenix, ... }:
 let
   readeckTemplate = ''
-    <ul class=\"list list-gap-10 collapsible-container\" data-collapse-after=\"7\">
-      {{ range .JSON.Array \"\" }}
+    <ul class="list list-gap-10 collapsible-container" data-collapse-after="7">
+      {{ range .JSON.Array "" }}
         <li>
-          {{ $title := .String \"title\" }}
+          {{ $title := .String "title" }}
           {{ if gt (len $title) 50 }}
-            {{ $title = (slice $title 0 50) | printf \"%s...\" }}
+            {{ $title = (slice $title 0 50) | printf "%s..." }}
           {{ end }}
-          <a class=\"size-title-dynamic color-primary-if-not-visited\"
-             href=\"{{ .String \"url\" }}\"
-             target=\"_self\"
-             rel=\"noopener noreferrer\">{{ $title }}</a>
-          <ul class=\"list-horizontal-text\">
-            <li>{{ .String \"site_name\" }}</li>
-            {{ $labels := .Array \"labels\" }}
+          <a class="size-title-dynamic color-primary-if-not-visited"
+             href="{{ .String "url" }}"
+             target="_self"
+             rel="noopener noreferrer">{{ $title }}</a>
+          <ul class="list-horizontal-text">
+            <li>{{ .String "site_name" }}</li>
+            {{ $labels := .Array "labels" }}
             {{ range $index, $label := $labels }}
               <li>{{ . }}</li>
             {{ end }}
