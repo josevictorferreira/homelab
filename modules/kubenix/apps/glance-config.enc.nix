@@ -24,7 +24,7 @@ let
                 <li>{{ .String "site_name" }}</li>
                 {{ $labels := .Array "labels" }}
                 {{ range $index, $label := $labels }}
-                  {{ $hue := mul (mod (len .) 12) 30 }}
+                  {{ $hue := mul (mod $index 12) 30 }}
                   <li style="background-color: hsl({{ $hue }}, 50%, 20%); color: hsl({{ $hue }}, 60%, 70%); padding: 1px 6px; border-radius: 4px; font-size: 11px; line-height: 1.4;">{{ . }}</li>
                 {{ end }}
               </ul>
