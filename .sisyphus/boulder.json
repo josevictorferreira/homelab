@@ -1,6 +1,6 @@
 {
-  "active_plan": "/home/josevictor/Workspace/homelab/.sisyphus/plans/tuwunel-matrixx.md",
-  "started_at": "2026-03-24T20:19:19.000Z",
+  "active_plan": "/home/josevictor/Workspace/homelab/.sisyphus/plans/lossless-claw-openclaw-memory.md",
+  "started_at": "2026-04-03T17:40:00.000Z",
   "session_ids": [
     "ses_2deb00d28ffeU6ZMZDaF99KYJ3",
     "ses_2de71e005ffeHY6fzL1xSwNs2H",
@@ -24,8 +24,77 @@
     "ses_2da53e66fffeJT4AN7KVDyjPkd",
     "ses_2da3481efffe1WD9j8zOmbipgZ",
     "ses_2da326248ffeBxroQ5yZpw4rg5",
-    "ses_2da15fccdffeFxMlTQa7A5LawI"
+    "ses_2da15fccdffeFxMlTQa7A5LawI",
+    "ses_2abc5f0c6ffeTQHZ3wne2tUgGc",
+    "ses_2abb9e050ffePUdxBtvBlT3K91",
+    "ses_2abb2c94affehhB4UgRYuyms1Z",
+    "ses_2ababfd98ffeak4B8jkdYbUOGO",
+    "ses_2abaacad5ffehBPHCX4MnBKdU7",
+    "ses_2ab921cbbffe3TT5J5NcM5VRbj",
+    "ses_2ab9262c0ffeFKqY23T76xT2mt",
+    "ses_2ab8e8d51ffeeLDkQ4nVxQ7hsq",
+    "ses_2ab6ebb5affeTlctRE4K7EC97X",
+    "ses_2ab52d6d0ffe3SFe2tJ4f1SE0n",
+    "ses_2ab4f86dbffevs2ypVP6wtf75K",
+    "ses_2ab4d3e99ffeS1ewOTmkEYtO8F",
+    "ses_2aaeb150affeY7HIoR2je5edUr",
+    "ses_2aade1c19ffexmtWUEoGPWw26H",
+    "ses_2aade1b76ffejarCDFNYgdjz3y",
+    "ses_2aade1adcffeczyvx5NgAdxIj3",
+    "ses_2aade1a5effeF3WvEDOJL6oF43",
+    "ses_2aad52bb1ffeJpHjKelKuTjlR1",
+    "ses_2aa9da838ffecnb7qYhctv34eI",
+    "ses_2aa9b41e3ffe8T8XM3pek1fSHt",
+    "ses_2aa9a4481ffeMwtER4INzMR3Qt",
+    "ses_2aa9a43daffe5cfL3B8oknKMUZ"
   ],
-  "plan_name": "tuwunel-matrixx",
-  "worktree_path": null
+  "plan_name": "lossless-claw-openclaw-memory",
+  "worktree_path": null,
+  "task_sessions": {
+    "todo:6": {
+      "task_key": "todo:6",
+      "task_label": "6",
+      "task_title": "Bootstrap admin + dummy appservice PoC + lock down registration",
+      "session_id": "ses_2ababfd98ffeak4B8jkdYbUOGO",
+      "agent": "Sisyphus-Junior",
+      "category": "quick",
+      "updated_at": "2026-04-03T17:13:22.613Z"
+    },
+    "todo:1": {
+      "task_key": "todo:1",
+      "task_label": "1",
+      "task_title": "Package `lossless-claw` deps as pinned Nix FOD",
+      "session_id": "ses_2ab4f86dbffevs2ypVP6wtf75K",
+      "agent": "Sisyphus-Junior",
+      "category": "most-capable",
+      "updated_at": "2026-04-03T18:53:14.143Z"
+    },
+    "todo:2": {
+      "task_key": "todo:2",
+      "task_label": "2",
+      "task_title": "Bundle `lossless-claw` into `openclaw-nix` image rootfs",
+      "session_id": "ses_2ab4d3e99ffeS1ewOTmkEYtO8F",
+      "agent": "Sisyphus-Junior",
+      "category": "general",
+      "updated_at": "2026-04-03T19:11:19.714Z"
+    },
+    "todo:4": {
+      "task_key": "todo:4",
+      "task_label": "4",
+      "task_title": "Patch live CephFS config idempotently at startup",
+      "session_id": "ses_2aaeb150affeY7HIoR2je5edUr",
+      "agent": "Sisyphus-Junior",
+      "category": "business-logic",
+      "updated_at": "2026-04-03T20:45:44.265Z"
+    },
+    "final-wave:f1": {
+      "task_key": "final-wave:f1",
+      "task_label": "F1",
+      "task_title": "Plan Compliance Audit — oracle",
+      "session_id": "ses_2aa9a4481ffeMwtER4INzMR3Qt",
+      "agent": "Sisyphus-Junior",
+      "category": "unspecified-high",
+      "updated_at": "2026-04-03T22:13:53.683Z"
+    }
+  }
 }
