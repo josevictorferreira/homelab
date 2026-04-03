@@ -1,22 +1,22 @@
 { homelab, kubenix, ... }:
 let
-  linkwardenTemplate = ''
-    <ul class="list list-gap-10 collapsible-container" data-collapse-after="7">
-      {{ range .JSON.Array "response" }}
+  readeckTemplate = ''
+    <ul class=\"list list-gap-10 collapsible-container\" data-collapse-after=\"7\">
+      {{ range .JSON.Array \"\" }}
         <li>
-          {{ $title := .String "name" }}
+          {{ $title := .String \"title\" }}
           {{ if gt (len $title) 50 }}
-            {{ $title = (slice $title 0 50) | printf "%s..." }}
+            {{ $title = (slice $title 0 50) | printf \"%s...\" }}
           {{ end }}
-          <a class="size-title-dynamic color-primary-if-not-visited"
-             href="{{ .String "url" }}"
-             target="_self"
-             rel="noopener noreferrer">{{ $title }}</a>
-          <ul class="list-horizontal-text">
-            <li style="color: {{ .String "collection.color" }};">{{ .String "collection.name" }}</li>
-            {{ $tags := .Array "tags" }}
-            {{ range $index, $tag := $tags }}
-              <li>{{ .String "name" }}</li>
+          <a class=\"size-title-dynamic color-primary-if-not-visited\"
+             href=\"{{ .String \"url\" }}\"
+             target=\"_self\"
+             rel=\"noopener noreferrer\">{{ $title }}</a>
+          <ul class=\"list-horizontal-text\">
+            <li>{{ .String \"site_name\" }}</li>
+            {{ $labels := .Array \"labels\" }}
+            {{ range $index, $label := $labels }}
+              <li>{{ . }}</li>
             {{ end }}
           </ul>
         </li>
@@ -260,11 +260,11 @@ let
                 title = "Bookmarks";
                 cache = "1h";
                 method = "GET";
-                url = "http://${homelab.kubernetes.loadBalancer.services.linkwarden}/api/v1/links";
+                url = "http://${homelab.kubernetes.loadBalancer.services.readeck}/api/bookmarks?limit=15";
                 headers = {
-                  Authorization = "Bearer ${kubenix.lib.secretsFor "linkwarden_api_key"}+";
+                  Authorization = "Bearer ${kubenix.lib.secretsFor "readeck_api_token"}";
                 };
-                template = linkwardenTemplate;
+                template = readeckTemplate;
               }
             ];
           }
