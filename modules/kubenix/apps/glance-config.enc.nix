@@ -25,7 +25,7 @@ let
                 {{ $labels := .Array "labels" }}
                 {{ range $index, $label := $labels }}
                   {{ $hue := mul (mod $index 12) 30 }}
-                  <li style="background-color: hsl({{ $hue }}, 50%, 20%); color: hsl({{ $hue }}, 60%, 70%); padding: 1px 6px; border-radius: 4px; font-size: 11px; line-height: 1.4;">{{ replaceAll "{" "" (replaceAll "}" "" .) }}</li>
+                  <li style="background-color: hsl({{ $hue }}, 50%, 20%); color: hsl({{ $hue }}, 60%, 70%); padding: 1px 6px; border-radius: 4px; font-size: 11px; line-height: 1.4;">{{ $s := printf "%s" . }}{{ replaceAll "{" "" (replaceAll "}" "" $s) }}</li>
                 {{ end }}
               </ul>
             </div>
