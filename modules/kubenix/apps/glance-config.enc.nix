@@ -8,17 +8,28 @@ let
           {{ if gt (len $title) 50 }}
             {{ $title = (slice $title 0 50) | printf "%s..." }}
           {{ end }}
-          <a class="size-title-dynamic color-primary-if-not-visited"
-             href="{{ .String "url" }}"
-             target="_self"
-             rel="noopener noreferrer">{{ $title }}</a>
-          <ul class="list-horizontal-text">
-            <li>{{ .String "site_name" }}</li>
-            {{ $labels := .Array "labels" }}
-            {{ range $index, $label := $labels }}
-              <li>{{ . }}</li>
+          {{ $thumb := .String "resources.thumbnail.src" }}
+          {{ $hasThumb := gt (len $thumb) 0 }}
+          <div style="display: flex; gap: 8px; align-items: flex-start;">
+            {{ if $hasThumb }}
+              {{ $thumbUrl := replaceAll "http://readeck.apps.svc.cluster.local:8000" "https://readeck.josevictor.me" $thumb }}
+              <img src="{{ $thumbUrl }}" style="width: 48px; height: 48px; object-fit: cover; border-radius: 6px; flex-shrink: 0;" loading="lazy">
             {{ end }}
-          </ul>
+            <div style="flex: 1; min-width: 0;">
+              <a class="size-title-dynamic color-primary-if-not-visited"
+                 href="{{ .String "url" }}"
+                 target="_self"
+                 rel="noopener noreferrer">{{ $title }}</a>
+              <ul class="list-horizontal-text" style="margin-top: 2px;">
+                <li>{{ .String "site_name" }}</li>
+                {{ $labels := .Array "labels" }}
+                {{ range $index, $label := $labels }}
+                  {{ $hue := mul (mod (len .) 12) 30 }}
+                  <li style="background-color: hsl({{ $hue }}, 50%, 20%); color: hsl({{ $hue }}, 60%, 70%); padding: 1px 6px; border-radius: 4px; font-size: 11px; line-height: 1.4;">{{ . }}</li>
+                {{ end }}
+              </ul>
+            </div>
+          </div>
         </li>
       {{ end }}
     </ul>
