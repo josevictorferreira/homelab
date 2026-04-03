@@ -98,6 +98,15 @@ in
             }
           ];
         };
+        controllers.main.strategy = "RollingUpdate";
+        controllers.main.rollingUpdate = {
+          maxSurge = 1;
+          maxUnavailable = 0;
+        };
+        controllers.main.rollingUpdate = {
+          surge = 1;
+          unavailable = 0;
+        };
 
         # Override service type to ClusterIP (release default is LoadBalancer)
         service.main.type = "ClusterIP";
@@ -258,6 +267,14 @@ in
                 exec node /lib/openclaw/dist/index.js gateway --port 18789
               ''
             ];
+            probes = {
+              readiness = {
+                enabled = true;
+                type = "HTTP";
+                path = "/health";
+                port = 18789;
+              };
+            };
           };
 
           # Tailscale sidecar
