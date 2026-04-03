@@ -231,6 +231,8 @@ in
                     "m.notice" = "<b>{{ .Sender.Displayname }}</b>: {{ .Message }}";
                   };
                 };
+                federate_rooms = false;
+                restricted_rooms = true;
               };
               logging = {
                 min_level = "info";

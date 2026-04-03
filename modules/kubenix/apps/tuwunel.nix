@@ -126,6 +126,7 @@ in
                   initialDelaySeconds = 10;
                   periodSeconds = 10;
                   failureThreshold = 60;
+                  timeoutSeconds = 10;
                 };
                 livenessProbe = {
                   httpGet = {
@@ -135,6 +136,7 @@ in
                   initialDelaySeconds = 600;
                   periodSeconds = 30;
                   failureThreshold = 5;
+                  timeoutSeconds = 10;
                 };
                 readinessProbe = {
                   httpGet = {
@@ -142,8 +144,9 @@ in
                     port = 8008;
                   };
                   initialDelaySeconds = 10;
-                  periodSeconds = 5;
+                  periodSeconds = 30;
                   failureThreshold = 3;
+                  timeoutSeconds = 10;
                 };
                 volumeMounts = [
                   {
