@@ -3,7 +3,7 @@
   lib,
   inputs,
   system,
-  version ? "2026.4.1",
+  version ? "2026.4.2",
 }:
 
 let
