@@ -61,6 +61,7 @@ spec:
               port: 8008
             initialDelaySeconds: 600
             periodSeconds: 30
+            timeoutSeconds: 10
           name: tuwunel
           ports:
             - containerPort: 8008
@@ -72,7 +73,8 @@ spec:
               path: /_matrix/client/versions
               port: 8008
             initialDelaySeconds: 10
-            periodSeconds: 5
+            periodSeconds: 30
+            timeoutSeconds: 10
           resources:
             limits:
               cpu: 500m
@@ -92,6 +94,7 @@ spec:
               port: 8008
             initialDelaySeconds: 10
             periodSeconds: 10
+            timeoutSeconds: 10
           volumeMounts:
             - mountPath: /var/lib/tuwunel
               name: data
