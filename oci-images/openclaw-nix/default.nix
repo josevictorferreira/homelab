@@ -103,9 +103,15 @@ let
 
   # lancedb-deps removed - memory-lancedb extension skipped due to missing native bindings
   inherit (import ./matrix-deps.nix { inherit pkgs lib; }) matrixPluginDeps;
+  inherit (import ./lossless-claw-deps.nix { inherit pkgs; }) losslessClawPackage;
   matrixCryptoNative = pkgs.fetchurl {
     url = "https://github.com/matrix-org/matrix-rust-sdk-crypto-nodejs/releases/download/v0.4.0/matrix-sdk-crypto.linux-x64-gnu.node";
     sha256 = "sha256-cHjU3ZhxKPea/RksT2IfZK3s435D8qh1bx0KnwNN5xg=";
+  };
+  # Lossless-claw extension source from GitHub
+  losslessClawSource = pkgs.fetchurl {
+    url = "https://github.com/Martian-Engineering/lossless-claw/archive/refs/tags/v0.5.3.tar.gz";
+    sha256 = "sha256-3WzvaGPRBbHoR5hqJyk6b70CPfvWKzaaaQCjrWXZQNg=";
   };
 
   fontsConf = pkgs.makeFontsConf {
@@ -184,6 +190,18 @@ let
     rm -rf $out/lib/openclaw/node_modules/node-llama-cpp $out/lib/openclaw/node_modules/@node-llama-cpp 2>/dev/null || true
     # Skip slow find-based cross-platform stripping - saves ~5-10 min build time
     cd $out/lib/openclaw
+        # Extract lossless-claw extension source to temp dir, then copy only needed files
+        mkdir -p /tmp/lossless-extract
+        tar -xzf ${losslessClawSource} -C /tmp/lossless-extract/
+        # Make extensions writable first (gateway copy may have restrictive perms)
+        chmod -R u+w "$out/lib/openclaw/extensions/" 2>/dev/null || true
+        # Copy only plugin runtime artifacts to extensions/lossless-claw
+        mkdir -p "$out/lib/openclaw/extensions/lossless-claw"
+        chmod -R u+w "$out/lib/openclaw/extensions/lossless-claw" 2>/dev/null || true
+        cp -r /tmp/lossless-extract/lossless-claw-0.5.3/openclaw.plugin.json "$out/lib/openclaw/extensions/lossless-claw/" 2>/dev/null || true
+        cp -r /tmp/lossless-extract/lossless-claw-0.5.3/package.json "$out/lib/openclaw/extensions/lossless-claw/" 2>/dev/null || true
+        cp -r /tmp/lossless-extract/lossless-claw-0.5.3/src "$out/lib/openclaw/extensions/lossless-claw/" 2>/dev/null || true
+        rm -rf /tmp/lossless-extract
     # Copy plugin manifests and runtime TS sources from source extensions/ into dist/extensions/
     # The gateway resolves plugin runtime modules (e.g. light-runtime-api.ts) from dist/extensions/
     if [ -d "$out/lib/openclaw/extensions" ] && [ -d "$out/lib/openclaw/dist/extensions" ]; then
@@ -255,6 +273,14 @@ let
       cp -rL ${matrixPluginDeps}/matrix-deps/node_modules $out/lib/openclaw/extensions/matrix/
     fi
     chmod -R u+w $out/lib/openclaw/extensions/matrix/ 2>/dev/null || true
+    # Copy lossless-claw node_modules to dist/extensions path (not extensions path)
+    if [ -d "$out/lib/openclaw/dist/extensions/lossless-claw" ]; then
+      chmod -R u+w "$out/lib/openclaw/dist/extensions/lossless-claw/" 2>/dev/null || true
+      rm -rf "$out/lib/openclaw/dist/extensions/lossless-claw/node_modules" 2>/dev/null || true
+      if [ -d "${losslessClawPackage}/lossless-claw-deps/node_modules" ]; then
+        cp -rL ${losslessClawPackage}/lossless-claw-deps/node_modules "$out/lib/openclaw/dist/extensions/lossless-claw/"
+      fi
+    fi
     # Fix upstream build regression #33001: Rolldown bundles keyed-async-queue into index.js
     # but OpenClaw's runtime TypeScript loader lacks the alias for this subpath.
     # Patch the import to use the main plugin-sdk export which includes KeyedAsyncQueue.

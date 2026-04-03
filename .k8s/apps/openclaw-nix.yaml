@@ -23,8 +23,6 @@ spec:
       app.kubernetes.io/instance: openclaw-nix
       app.kubernetes.io/name: openclaw-nix
   strategy:
-    rollingUpdate:
-      maxSurge: 1
     type: RollingUpdate
   template:
     metadata:
@@ -63,9 +61,18 @@ spec:
               \ printf '%s' \"\\$$var_name\")\n  if [ -n \"$var_value\" ]; then\n\
               \    escaped_value=$(echo \"$var_value\" | sed 's/[\\\\/&]/\\\\&/g')\n\
               \    sed -i \"s|\\\\\\${$var_name}|$escaped_value|g\" \"$CONFIG_FILE\"\
-              \n  fi\ndone\necho \"Substitution complete\"\n\necho \"Installing matrix\
-              \ plugin dependencies...\"\n\n# Find the actual nix store path where\
-              \ the gateway loads extensions from\nMATRIX_EXT=$(readlink -f /lib/openclaw/extensions/matrix\
+              \n  fi\ndone\necho \"Substitution complete\"\necho \"Applying dynamic\
+              \ CephFS config patches...\"\njq '.plugins = (.plugins // {}) | .plugins.enabled\
+              \ = true | .plugins.allow = (((.plugins.allow // []) + [\"lossless-claw\"\
+              ]) | unique) | .plugins.slots = ((.plugins.slots // {}) | .memory =\
+              \ (.memory // \"memory-core\") | .contextEngine = \"lossless-claw\"\
+              ) | .plugins.entries = ((.plugins.entries // {}) | .[\"lossless-claw\"\
+              ] = ((.[\"lossless-claw\"] // {}) | .enabled = true | .config = ((.config\
+              \ // {}) | .dbPath = \"/home/node/.openclaw/lcm.db\")))' \"$CONFIG_FILE\"\
+              \ > \"$CONFIG_FILE.tmp\" && mv \"$CONFIG_FILE.tmp\" \"$CONFIG_FILE\"\
+              \necho \"CephFS config patched\"\n\n\necho \"Installing matrix plugin\
+              \ dependencies...\"\n\n# Find the actual nix store path where the gateway\
+              \ loads extensions from\nMATRIX_EXT=$(readlink -f /lib/openclaw/extensions/matrix\
               \ 2>/dev/null || echo \"/lib/openclaw/extensions/matrix\")\n\nif [ -d\
               \ \"$MATRIX_EXT\" ]; then\n  echo \"Found matrix extension at: $MATRIX_EXT\"\
               \n  cd \"$MATRIX_EXT\"\n\n  if [ ! -d \"node_modules/@vector-im\" ];\
