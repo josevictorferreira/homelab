@@ -136,7 +136,7 @@ spec:
           envFrom:
             - secretRef:
                 name: openclaw-config
-          image: ghcr.io/josevictorferreira/openclaw-nix:v2026.4.1@sha256:6af1ab99f017ec22e3bffbc8c4b56a23d1fc1fdb632d0b89f5b9892a1214927f
+          image: ghcr.io/josevictorferreira/openclaw-nix:v2026.4.2@sha256:6af1ab99f017ec22e3bffbc8c4b56a23d1fc1fdb632d0b89f5b9892a1214927f
           imagePullPolicy: Always
           name: main
           ports:
