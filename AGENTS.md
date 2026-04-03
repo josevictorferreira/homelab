@@ -74,6 +74,7 @@ kubectl get pv -o custom-columns='NAME:.metadata.name,STORAGE-CLASS:.spec.storag
 | Task | Location | Notes |
 |------|----------|-------|
 | Add new K8s app | `modules/kubenix/apps/` | See apps/AGENTS.md |
+| Add new K8s global config | `config/kubernetes.nix` | Configure nodebalance ips, ingress naming and so on |
 | Change node roles | `config/nodes.nix` | Roles auto-enable profiles |
 | Add NixOS role | `modules/profiles/` | See profiles/AGENTS.md |
 | Hardware config | `hosts/hardware/{machine}.nix` | Per-machine type |
@@ -142,7 +143,7 @@ make format     # Fix nix formatting
 | Edit `.k8s/*.yaml` directly | Overwritten by `make manifests` |
 | `kubectl apply` for persistent changes | Not GitOps; use kubenix |
 | Remove Ceph finalizers | DATA LOSS |
-| Commit unencrypted secrets | Must be `.enc.yaml` |
+| Commit unencrypted secrets | Must be `.enc.yaml` and it's content encrypted by sops |
 | `make gmanifests` alone | Use `make manifests` for full pipeline |
 | Manually edit secrets files | Will be overwritten; use `make secrets` |
 | Mark task complete if `make manifests` fails | Fix the error first, then mark complete |
@@ -174,6 +175,10 @@ After initial Tailscale deployment:
 1. Approve routes in Tailscale admin console (Machines → Edit route settings)
 2. Enable 10.10.10.0/24 for both subnet routers
 3. Connect clients with: `tailscale up --accept-routes`
+
+## CLUSTER MANAGEMENT
+
+Our cluster is deployed and accessible in the user system kubectl, the context and cluster name is named as `ze-homelab`. You can access whenever you need to check the production logs or debug something directly in the real environment.
 
 ## INCIDENT RECORD
 

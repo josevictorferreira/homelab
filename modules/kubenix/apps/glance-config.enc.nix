@@ -260,7 +260,7 @@ let
                 title = "Bookmarks";
                 cache = "1h";
                 method = "GET";
-                url = "http://${homelab.kubernetes.loadBalancer.services.readeck}/api/bookmarks?limit=15";
+                url = "http://readeck.${namespace}.svc.cluster.local:8000/api/bookmarks?limit=15";
                 headers = {
                   Authorization = "Bearer ${kubenix.lib.secretsFor "readeck_api_token"}";
                 };
