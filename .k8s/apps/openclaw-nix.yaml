@@ -23,7 +23,9 @@ spec:
       app.kubernetes.io/instance: openclaw-nix
       app.kubernetes.io/name: openclaw-nix
   strategy:
-    type: Recreate
+    rollingUpdate:
+      maxSurge: 1
+    type: RollingUpdate
   template:
     metadata:
       labels:
@@ -143,6 +145,15 @@ spec:
             - containerPort: 18789
               name: http
               protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 18789
+              scheme: HTTP
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            timeoutSeconds: 1
           resources:
             limits:
               cpu: 1500m
