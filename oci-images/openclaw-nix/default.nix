@@ -199,6 +199,7 @@ let
         mkdir -p "$out/lib/openclaw/extensions/lossless-claw"
         chmod -R u+w "$out/lib/openclaw/extensions/lossless-claw" 2>/dev/null || true
         cp -r /tmp/lossless-extract/lossless-claw-0.5.3/openclaw.plugin.json "$out/lib/openclaw/extensions/lossless-claw/" 2>/dev/null || true
+        cp -r /tmp/lossless-extract/lossless-claw-0.5.3/index.ts "$out/lib/openclaw/extensions/lossless-claw/" 2>/dev/null || true
         cp -r /tmp/lossless-extract/lossless-claw-0.5.3/package.json "$out/lib/openclaw/extensions/lossless-claw/" 2>/dev/null || true
         cp -r /tmp/lossless-extract/lossless-claw-0.5.3/src "$out/lib/openclaw/extensions/lossless-claw/" 2>/dev/null || true
         rm -rf /tmp/lossless-extract
@@ -231,6 +232,13 @@ let
           fi
         fi
       done
+    fi
+
+    # lossless-claw: runtime manifest entry is ./index.ts (must exist in dist/extensions)
+    if [ -f "$out/lib/openclaw/extensions/lossless-claw/index.ts" ]; then
+      mkdir -p "$out/lib/openclaw/dist/extensions/lossless-claw"
+      chmod -R u+w "$out/lib/openclaw/dist/extensions/lossless-claw" 2>/dev/null || true
+      cp "$out/lib/openclaw/extensions/lossless-claw/index.ts" "$out/lib/openclaw/dist/extensions/lossless-claw/index.ts"
     fi
     # Symlink plugin-entry.runtime.ts to dist/ top-level for jiti resolution.
     # The bundled dist/plugin-entry.runtime-CuPlkRZ7.js uses jiti to load
