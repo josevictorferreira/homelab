@@ -124,9 +124,9 @@ in
                     port = 8008;
                   };
                   initialDelaySeconds = 10;
-                  periodSeconds = 10;
-                  failureThreshold = 60;
-                  timeoutSeconds = 10;
+                  periodSeconds = 30;
+                  failureThreshold = 30;
+                  timeoutSeconds = 30;
                 };
                 livenessProbe = {
                   httpGet = {
@@ -136,7 +136,7 @@ in
                   initialDelaySeconds = 600;
                   periodSeconds = 30;
                   failureThreshold = 5;
-                  timeoutSeconds = 10;
+                  timeoutSeconds = 30;
                 };
                 readinessProbe = {
                   httpGet = {
@@ -145,8 +145,8 @@ in
                   };
                   initialDelaySeconds = 10;
                   periodSeconds = 30;
-                  failureThreshold = 3;
-                  timeoutSeconds = 10;
+                  failureThreshold = 10;
+                  timeoutSeconds = 30;
                 };
                 volumeMounts = [
                   {
@@ -219,6 +219,17 @@ in
           [global.well_known]
           client = "https://matrix.josevictor.me"
           server = "matrix.josevictor.me:443"
+
+          [rocksdb]
+          write_buffer_size = 268435456
+          max_background_flushes = 8
+          max_background_compactions = 8
+          compression = "zstd"
+
+          [dns]
+          query_over_tcp_only = true
+          dns_cache_entries = 10000
+          ip_lookup_strategy = "Ipv4Only"
         '';
       };
     };

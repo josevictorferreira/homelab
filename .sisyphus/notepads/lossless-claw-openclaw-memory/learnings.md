@@ -29,3 +29,7 @@ Notepad initialized for lossless-claw-openclaw-memory.
 - node_modules must be copied to dist/extensions/lossless-claw/node_modules
 - Verified: podman shows all required files in dist/extensions/lossless-claw/
 - Dynamic CephFS configuration patching using jq in the deployment startup command allows applying stateful overrides safely without requiring custom Docker builds.
+
+## 2026-04-04T00:00:00Z Fix: lossless-claw index.ts missing
+- lossless-claw openclaw.plugin.json entry is ./index.ts; runtime expects it under /lib/openclaw/dist/extensions/lossless-claw/index.ts.
+- Fix: copy index.ts from extracted lossless-claw-0.5.3/ into extensions/lossless-claw, then explicitly copy into dist/extensions/lossless-claw (plugin loop intentionally avoids top-level .ts).
