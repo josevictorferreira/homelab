@@ -81,7 +81,7 @@ kubectl get pv -o custom-columns='NAME:.metadata.name,STORAGE-CLASS:.spec.storag
 | Cluster secrets | `secrets/k8s-secrets.enc.yaml` | Edit via `make secrets` |
 | Storage config | `modules/kubenix/storage/` | Rook-Ceph operator+cluster |
 | Cilium/CNI | `modules/kubenix/system/cilium.nix` | Also handles ingress |
-| Tailscale config | `modules/profiles/tailscale.nix` | Host-level VPN, subnet routing |
+RV| OpenClaw config | `modules/kubenix/apps/openclaw-config.nix` | MIRROR/FAILBACK ONLY - real config is at `~/Homelab/openclaw/openclaw.json` (CephFS). NEVER expose secrets in Nix configmap - it's a fallback when file isn't found.
 
 ## WORKFLOW
 

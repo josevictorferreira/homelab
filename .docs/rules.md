@@ -314,6 +314,19 @@
 **Context:** Bootstrap manifests are deployed by K3s's auto-deploy mechanism from the init node's filesystem, not by Flux. Changes must be made to `modules/kubenix/bootstrap/*.nix` and deployed via NixOS rebuild.
 **Verify:** `cat .gitignore | grep "^\.k8s"` — should be ignored; check `modules/profiles/k8s-control-plane.nix` for K3s manifest deployment logic.
 
+
+## Kubernetes Rolling Updates for Large Images
+
+### bjw-s App-Template Rolling Update Field Names
+**Lesson:** The bjw-s Helm chart uses standard Kubernetes field names: `maxSurge` and `maxUnavailable` (not `surge`/`unavailable`). Configure as: `controllers.main.strategy = "RollingUpdate"` and `controllers.main.rollingUpdate = { maxSurge = 1; maxUnavailable = 0; }`.
+**Context:** Incorrect field names cause silent failures - the deployment falls back to defaults instead of the intended rolling update configuration.
+**Verify:** `kubectl get deployment <name> -n <ns> -o jsonpath='{.spec.strategy}'` shows correct values.
+
+### Zero-Downtime Large Image Upgrades Pattern
+**Lesson:** For large images (6GB+), use `RollingUpdate` strategy with `maxUnavailable: 0` and add a `readinessProbe`. Kubernetes keeps the old pod running while the new pod pulls the image, then switches traffic automatically when ready.
+**Context:** Without this, upgrades cause 15+ minute downtime while the image pulls. With rolling updates, service stays available throughout.
+**Verify:** During upgrade: `kubectl get pods -n <ns>` shows two pods (old Running, new ContainerCreating), then traffic switches when new pod passes readiness probe.
+
 ## Kubernetes Operations
 
 ### ResourceQuota Debugging — Check Per-Pod Limits
@@ -395,3 +408,32 @@
 **Lesson:** When a PVC is stuck Pending with "volume already bound to a different claim", the PV is in `Released` state with a stale `claimRef`. Patch the PV to remove claimRef: `kubectl patch pv <name> --type=json -p='[{"op": "remove", "path": "/spec/claimRef"}]'`.
 **Context:** Previous PVC deletion leaves claimRef pointing to deleted PVC, preventing new PVC from binding. Common with static CephFS volumes.
 **Verify:** `kubectl get pv <name> -o jsonpath='{.spec.claimRef}'` returns empty; PVC should transition to Bound.
+
+## Debugging
+
+### Trace Pod IPs Before Theorizing About External Traffic
+**Lesson:** When logs show a client/server IP hitting your service, always run `kubectl get pods -A -o wide | grep <IP>` immediately. Cluster IPs (10.x.x.x) are internal — don't waste time researching external causes.
+**Context:** Assumed tuwunel join spam was external federation; it was the mautrix-discord bridge pod at 10.0.2.131. 2 min of librarian research wasted on a non-issue.
+**Verify:** `kubectl get pods -A -o wide | grep <suspicious_ip>` before any external research
+
+### Bridge `federate_rooms` Must Match Homeserver Federation Setting
+**Lesson:** When a Matrix homeserver has `allow_federation=false`, all mautrix bridges must set `bridge.federate_rooms = false`. Mismatch causes the bridge to create rooms with federation metadata, triggering join loops that spam homeserver logs and consume memory.
+**Context:** mautrix-discord with `federate_rooms: true` on a non-federated tuwunel caused continuous join failures → memory creep → liveness probe kills → pod restart churn (10 ReplicaSets in 9 days).
+**Verify:** `kubectl exec -n apps <bridge-pod> -- grep federate_rooms /data/config.yaml` should match homeserver setting
+
+### mautrix-discord Has No Channel Filtering — Use Discord Permissions
+**Lesson:** mautrix-discord lacks channel whitelist/blacklist config. To selectively bridge channels, restrict the bot's Discord role permissions at the Discord server level so it can only see desired channels.
+**Context:** Bridge creates Matrix rooms for every channel in a guild it can see. No config option to opt out per-channel. Leaving a Matrix room causes the bridge to re-invite on next sync.
+**Verify:** Check Discord server settings → Roles → Bridge bot role → Channel permissions
+
+## OpenClaw Plugin Integration
+
+### Plugin Entry Path in openclaw.plugin.json Must Exist in dist/extensions/
+**Lesson:** OpenClaw plugins declare their entry point in `openclaw.plugin.json` (e.g., `"./index.ts"`). The runtime resolves this relative to `dist/extensions/<plugin-name>/`. If the declared file is missing, the plugin silently fails to load with only a warning in logs.
+**Context:** The generic plugin copy loop in `oci-images/openclaw-nix/default.nix` intentionally skips `.ts` files to avoid `assertUniqueValues` failures. Plugins with `.ts` entry points (like lossless-claw) need an explicit copy step outside the loop.
+**Verify:** `podman run --rm --entrypoint '' <image> ls /lib/openclaw/dist/extensions/<plugin>/index.ts` — file must exist
+
+### Build → Push → Update Digest → Commit Must Be Atomic
+**Lesson:** After rebuilding an OCI image, always push to registry FIRST, then update the digest in kubenix config, then commit+push. Committing a digest that doesn't exist in the registry means Flux deploys a stale image.
+**Context:** First commit referenced old digest `b4d2ec9c` because image hadn't been rebuilt with new changes. Required a second full build→push→digest-update→commit cycle.
+**Verify:** `podman images | grep <tag>` — confirm IMAGE ID matches before pushing; check digest in `.k8s/apps/<app>.yaml` after `make manifests`

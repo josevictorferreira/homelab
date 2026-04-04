@@ -61,20 +61,20 @@ spec:
               port: 8008
             initialDelaySeconds: 600
             periodSeconds: 30
-            timeoutSeconds: 10
+            timeoutSeconds: 30
           name: tuwunel
           ports:
             - containerPort: 8008
               name: http
               protocol: TCP
           readinessProbe:
-            failureThreshold: 3
+            failureThreshold: 10
             httpGet:
               path: /_matrix/client/versions
               port: 8008
             initialDelaySeconds: 10
             periodSeconds: 30
-            timeoutSeconds: 10
+            timeoutSeconds: 30
           resources:
             limits:
               cpu: 500m
@@ -88,13 +88,13 @@ spec:
               drop:
                 - ALL
           startupProbe:
-            failureThreshold: 60
+            failureThreshold: 30
             httpGet:
               path: /_matrix/client/versions
               port: 8008
             initialDelaySeconds: 10
-            periodSeconds: 10
-            timeoutSeconds: 10
+            periodSeconds: 30
+            timeoutSeconds: 30
           volumeMounts:
             - mountPath: /var/lib/tuwunel
               name: data
@@ -147,6 +147,26 @@ data:
     client = "https://matrix.josevictor.me"
 
     server = "matrix.josevictor.me:443"
+
+
+    [rocksdb]
+
+    write_buffer_size = 268435456
+
+    max_background_flushes = 8
+
+    max_background_compactions = 8
+
+    compression = "zstd"
+
+
+    [dns]
+
+    query_over_tcp_only = true
+
+    dns_cache_entries = 10000
+
+    ip_lookup_strategy = "Ipv4Only"
 
     '
 kind: ConfigMap
