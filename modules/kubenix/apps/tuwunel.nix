@@ -1,4 +1,4 @@
-{ homelab, ... }:
+{ kubenix, homelab, ... }:
 
 let
   name = "tuwunel";
@@ -15,7 +15,7 @@ in
       };
       spec = {
         accessModes = [ "ReadWriteOnce" ];
-        storageClassName = "rook-ceph-block";
+        storageClassName = kubenix.lib.defaultStorageClass;
         resources.requests.storage = "10Gi";
       };
     };
@@ -238,7 +238,7 @@ in
         inherit name namespace;
       };
       spec = {
-        ingressClassName = "cilium";
+        ingressClassName = kubenix.lib.defaultIngressClass;
         rules = [
           {
             host = "matrix.josevictor.me";
@@ -281,7 +281,7 @@ in
               "matrix.josevictor.me"
               "josevictor.me"
             ];
-            secretName = "wildcard-tls";
+            secretName = kubenix.lib.defaultTLSSecret;
           }
         ];
       };

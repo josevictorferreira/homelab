@@ -48,7 +48,7 @@ in
             enabled = true;
             mountPath = "/config";
             size = "1Gi";
-            storageClass = "rook-ceph-block";
+            storageClass = kubenix.lib.defaultStorageClass;
             targetSelector = {
               main = {
                 main = {
@@ -92,9 +92,9 @@ in
         ingress.main = {
           enabled = true;
           primary = true;
-          ingressClassName = "cilium";
+          ingressClassName = kubenix.lib.defaultIngressClass;
           annotations = {
-            "cert-manager.io/cluster-issuer" = "cloudflare-issuer";
+            "cert-manager.io/cluster-issuer" = kubenix.lib.defaultClusterIssuer;
           };
           hosts = [
             { host = "prowlarr.${homelab.domain}"; }
@@ -104,7 +104,7 @@ in
               hosts = [
                 "prowlarr.${homelab.domain}"
               ];
-              secretName = "wildcard-tls";
+              secretName = kubenix.lib.defaultTLSSecret;
             }
           ];
         };

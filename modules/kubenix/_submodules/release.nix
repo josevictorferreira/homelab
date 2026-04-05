@@ -83,7 +83,7 @@ in
               default = {
                 enabled = false;
                 type = "persistentVolumeClaim";
-                storageClass = "rook-ceph-block";
+                storageClass = kubenix.lib.defaultStorageClass;
                 size = "1Gi";
                 accessMode = "ReadWriteOnce";
                 globalMounts = [
@@ -178,7 +178,7 @@ in
                   };
                   ingress.main = {
                     enabled = true;
-                    className = "cilium";
+                    className = kubenix.lib.defaultIngressClass;
                     hosts = [
                       {
                         host = kubenix.lib.domainFor config._module.args.name;
@@ -193,7 +193,7 @@ in
                     ];
                     tls = [
                       {
-                        secretName = "wildcard-tls";
+                        secretName = kubenix.lib.defaultTLSSecret;
                         hosts = [ (kubenix.lib.domainFor config._module.args.name) ];
                       }
                     ];

@@ -1,11 +1,11 @@
-{ homelab, ... }:
+{ kubenix, homelab, ... }:
 
 let
   namespace = homelab.kubernetes.namespaces.applications;
   app = "qui";
   # Use the same PVC that qBittorrent uses for downloads
   # This is required for Local Filesystem Access features (orphan scan, hardlinks, reflinks, automations)
-  downloadsPvcName = "cephfs-shared-storage-downloads";
+  downloadsPvcName = kubenix.lib.sharedStorage.downloadsPVC;
 in
 {
   submodules.instances.${app} = {

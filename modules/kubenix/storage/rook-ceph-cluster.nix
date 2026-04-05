@@ -150,7 +150,7 @@ in
             };
             ingress = {
               enabled = true;
-              ingressClassName = "cilium";
+              ingressClassName = kubenix.lib.defaultIngressClass;
               host = {
                 name = "objectstore.${domain}";
                 path = "/";
@@ -158,11 +158,11 @@ in
               tls = [
                 {
                   hosts = [ "objectstore.${domain}" ];
-                  secretName = "wildcard-tls";
+                  secretName = kubenix.lib.defaultTLSSecret;
                 }
               ];
               annotations = {
-                "cert-manager.io/cluster-issuer" = "cloudflare-issuer";
+                "cert-manager.io/cluster-issuer" = kubenix.lib.defaultClusterIssuer;
               };
             };
           }
@@ -235,7 +235,7 @@ in
 
         ingress.dashboard = {
           enabled = true;
-          ingressClassName = "cilium";
+          ingressClassName = kubenix.lib.defaultIngressClass;
           host = {
             name = "ceph.${domain}";
             path = "/";
@@ -243,11 +243,11 @@ in
           tls = [
             {
               hosts = [ "ceph.${domain}" ];
-              secretName = "wildcard-tls";
+              secretName = kubenix.lib.defaultTLSSecret;
             }
           ];
           annotations = {
-            "cert-manager.io/cluster-issuer" = "cloudflare-issuer";
+            "cert-manager.io/cluster-issuer" = kubenix.lib.defaultClusterIssuer;
           };
         };
       };

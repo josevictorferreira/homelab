@@ -27,9 +27,9 @@ rec {
 
   ingressDomainFor = serviceName: {
     enabled = true;
-    ingressClassName = "cilium";
+    ingressClassName = defaultIngressClass;
     annotations = {
-      "cert-manager.io/cluster-issuer" = "cloudflare-issuer";
+      "cert-manager.io/cluster-issuer" = defaultClusterIssuer;
     };
     hosts = [
       "${serviceName}.${homelab.domain}"
@@ -39,17 +39,17 @@ rec {
         hosts = [
           "${serviceName}.${homelab.domain}"
         ];
-        secretName = "wildcard-tls";
+        secretName = defaultTLSSecret;
       }
     ];
   };
 
   ingressFor = serviceName: {
     enabled = true;
-    ingressClassName = "cilium";
-    className = "cilium";
+    ingressClassName = defaultIngressClass;
+    className = defaultIngressClass;
     annotations = {
-      "cert-manager.io/cluster-issuer" = "cloudflare-issuer";
+      "cert-manager.io/cluster-issuer" = defaultClusterIssuer;
     };
     hosts = [
       {
@@ -73,7 +73,7 @@ rec {
         hosts = [
           (domainFor serviceName)
         ];
-        secretName = "wildcard-tls";
+        secretName = defaultTLSSecret;
       }
     ];
   };
@@ -81,9 +81,9 @@ rec {
   ingressDomainForService = serviceName: {
     enabled = true;
     primary = true;
-    ingressClassName = "cilium";
+    ingressClassName = defaultIngressClass;
     annotations = {
-      "cert-manager.io/cluster-issuer" = "cloudflare-issuer";
+      "cert-manager.io/cluster-issuer" = defaultClusterIssuer;
     };
     hosts = [
       { host = "${serviceName}.${homelab.domain}"; }
@@ -93,10 +93,19 @@ rec {
         hosts = [
           "${serviceName}.${homelab.domain}"
         ];
-        secretName = "wildcard-tls";
+        secretName = defaultTLSSecret;
       }
     ];
   };
 
   objectStoreEndpoint = "http://rook-ceph-rgw-ceph-objectstore.${homelab.kubernetes.namespaces.storage}.svc.cluster.local";
+
+  defaultStorageClass = "rook-ceph-block";
+  defaultIngressClass = "cilium";
+  defaultTLSSecret = "wildcard-tls";
+  defaultClusterIssuer = "cloudflare-issuer";
+  sharedStorage = {
+    rootPVC = "cephfs-shared-storage-root";
+    downloadsPVC = "cephfs-shared-storage-downloads";
+  };
 }

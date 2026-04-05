@@ -46,10 +46,10 @@ in
           service = kubenix.lib.plainServiceFor app;
           ingress = {
             enabled = true;
-            className = "cilium";
+            className = kubenix.lib.defaultIngressClass;
             pathType = "Prefix";
             annotations = {
-              "cert-manager.io/cluster-issuer" = "cloudflare-issuer";
+              "cert-manager.io/cluster-issuer" = kubenix.lib.defaultClusterIssuer;
             };
             hosts = [
               (kubenix.lib.domainFor app)

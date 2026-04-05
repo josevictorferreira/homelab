@@ -1,4 +1,4 @@
-{ homelab, ... }:
+{ kubenix, homelab, ... }:
 
 let
   app = "mautrix-discord";
@@ -12,7 +12,7 @@ in
         metadata = { inherit namespace; };
         spec = {
           accessModes = [ "ReadWriteOnce" ];
-          storageClassName = "rook-ceph-block";
+          storageClassName = kubenix.lib.defaultStorageClass;
           resources.requests.storage = "1Gi";
         };
       };

@@ -119,7 +119,6 @@ let
 in
 {
   kubernetes.resources = {
-    resourceQuotas = resourceQuotas;
-    limitRanges = limitRanges;
+    inherit resourceQuotas limitRanges;
   };
 }

@@ -3,7 +3,7 @@
 let
   app = "sftpgo";
   namespace = homelab.kubernetes.namespaces.applications;
-  pvcName = "cephfs-shared-storage-root";
+  pvcName = kubenix.lib.sharedStorage.rootPVC;
 in
 {
   kubernetes = {
@@ -89,7 +89,7 @@ in
           pvc = {
             accessModes = [ "ReadWriteOnce" ];
             resources.requests.storage = "1Gi";
-            storageClassName = "rook-ceph-block";
+            storageClassName = kubenix.lib.defaultStorageClass;
           };
         };
 
@@ -112,13 +112,13 @@ in
 
         ui.ingress = {
           enabled = true;
-          className = "cilium";
+          className = kubenix.lib.defaultIngressClass;
           annotations = {
-            "cert-manager.io/cluster-issuer" = "cloudflare-issuer";
+            "cert-manager.io/cluster-issuer" = kubenix.lib.defaultClusterIssuer;
           };
           tls = [
             {
-              secretName = "wildcard-tls";
+              secretName = kubenix.lib.defaultTLSSecret;
               hosts = [ "sftpgo.${homelab.domain}" ];
             }
           ];
@@ -137,13 +137,13 @@ in
 
         api.ingress = {
           enabled = true;
-          className = "cilium";
+          className = kubenix.lib.defaultIngressClass;
           annotations = {
-            "cert-manager.io/cluster-issuer" = "cloudflare-issuer";
+            "cert-manager.io/cluster-issuer" = kubenix.lib.defaultClusterIssuer;
           };
           tls = [
             {
-              secretName = "wildcard-tls";
+              secretName = kubenix.lib.defaultTLSSecret;
               hosts = [ "sftpgoapi.${homelab.domain}" ];
             }
           ];

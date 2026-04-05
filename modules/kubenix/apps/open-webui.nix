@@ -32,14 +32,14 @@ in
         ingress = {
           enabled = true;
           host = kubenix.lib.domainFor "openwebui";
-          class = "cilium";
+          class = kubenix.lib.defaultIngressClass;
           tls = true;
-          existingSecret = "wildcard-tls";
+          existingSecret = kubenix.lib.defaultTLSSecret;
         };
         persistence = {
           enabled = true;
           size = "2Gi";
-          storageClass = "rook-ceph-block";
+          storageClass = kubenix.lib.defaultStorageClass;
           provider = "s3";
           s3 = {
             accessKeyExistingSecret = "open-webui-s3";

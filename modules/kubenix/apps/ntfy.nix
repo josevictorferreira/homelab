@@ -35,7 +35,7 @@ in
       persistence = {
         enabled = true;
         type = "persistentVolumeClaim";
-        storageClass = "rook-ceph-block";
+        storageClass = kubenix.lib.defaultStorageClass;
         size = "1Gi";
         accessMode = "ReadWriteOnce";
         globalMounts = [
