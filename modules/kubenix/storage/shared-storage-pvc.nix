@@ -25,7 +25,7 @@ in
             inherit namespace;
           };
           volumeAttributes = {
-            clusterID = "rook-ceph";
+            clusterID = homelab.kubernetes.namespaces.storage;
             inherit fsName;
             staticVolume = "true";
             rootPath = exportPath;

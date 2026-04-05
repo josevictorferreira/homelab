@@ -43,7 +43,7 @@ in
       noHooks = true;
       inherit namespace;
       values = {
-        global.leaderElection.namespace = "cert-manager";
+        global.leaderElection.namespace = homelab.kubernetes.namespaces.certificate;
         crds.enabled = true;
         prometheus.enabled = false;
       };

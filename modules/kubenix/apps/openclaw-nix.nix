@@ -73,9 +73,9 @@ in
         # Enable ingress for external access
         ingress.main = {
           enabled = true;
-          className = "cilium";
+          className = kubenix.lib.defaultIngressClass;
           annotations = {
-            "cert-manager.io/cluster-issuer" = "cloudflare-issuer";
+            "cert-manager.io/cluster-issuer" = kubenix.lib.defaultClusterIssuer;
           };
           hosts = [
             {
@@ -94,7 +94,7 @@ in
               hosts = [
                 "openclaw.${homelab.domain}"
               ];
-              secretName = "wildcard-tls";
+              secretName = kubenix.lib.defaultTLSSecret;
             }
           ];
         };
@@ -368,7 +368,7 @@ in
           # Tailscale sidecar persistence (block storage)
           tailscale-state = {
             type = "persistentVolumeClaim";
-            storageClass = "rook-ceph-block";
+            storageClass = kubenix.lib.defaultStorageClass;
             size = "1Gi";
             accessMode = "ReadWriteOnce";
             advancedMounts.main.tailscale = [{ path = "/var/lib/tailscale"; }];

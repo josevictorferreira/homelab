@@ -88,7 +88,7 @@ in
           rules = [
             {
               alert = "PostgresBackupJobFailed";
-              expr = ''increase(kube_job_status_failed{namespace="apps", job_name=~"postgres-backup.*"}[6h]) > 0'';
+              expr = ''increase(kube_job_status_failed{namespace="${homelab.kubernetes.namespaces.applications}", job_name=~"postgres-backup.*"}[6h]) > 0'';
               "for" = "5m";
               labels.severity = "critical";
               annotations = {
@@ -98,7 +98,7 @@ in
             }
             {
               alert = "PostgresBackupStale";
-              expr = ''time() - kube_cronjob_status_last_successful_time{namespace="apps", cronjob="postgres-backup"} > 93600'';
+              expr = ''time() - kube_cronjob_status_last_successful_time{namespace="${homelab.kubernetes.namespaces.applications}", cronjob="postgres-backup"} > 93600'';
               "for" = "15m";
               labels.severity = "critical";
               annotations = {
@@ -108,7 +108,7 @@ in
             }
             {
               alert = "PostgresRestoreDrillFailed";
-              expr = ''increase(kube_job_status_failed{namespace="apps", job_name=~"postgres-restore-drill.*"}[168h]) > 0'';
+              expr = ''increase(kube_job_status_failed{namespace="${homelab.kubernetes.namespaces.applications}", job_name=~"postgres-restore-drill.*"}[168h]) > 0'';
               "for" = "5m";
               labels.severity = "warning";
               annotations = {
@@ -118,7 +118,7 @@ in
             }
             {
               alert = "PostgresRestoreDrillStale";
-              expr = ''time() - kube_cronjob_status_last_successful_time{namespace="apps", cronjob="postgres-restore-drill"} > 604800'';
+              expr = ''time() - kube_cronjob_status_last_successful_time{namespace="${homelab.kubernetes.namespaces.applications}", cronjob="postgres-restore-drill"} > 604800'';
               "for" = "30m";
               labels.severity = "warning";
               annotations = {

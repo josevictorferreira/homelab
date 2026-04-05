@@ -140,7 +140,7 @@ let
           (mkPromRule {
             uid = "backup-pg-job-failed";
             title = "Postgres Backup Job Failed";
-            expr = ''increase(kube_job_status_failed{namespace="apps", job_name=~"postgres-backup.*"}[6h]) > 0'';
+            expr = ''increase(kube_job_status_failed{namespace="${homelab.kubernetes.namespaces.applications}", job_name=~"postgres-backup.*"}[6h]) > 0'';
             severity = "critical";
             summary = "Postgres backup job failed";
             description = "A postgres-backup job has failed in the last 6 hours.";
@@ -148,7 +148,7 @@ let
           (mkPromRule {
             uid = "backup-pg-stale";
             title = "Postgres Backup Stale (>26h)";
-            expr = ''time() - kube_cronjob_status_last_successful_time{namespace="apps", cronjob="postgres-backup"} > 93600'';
+            expr = ''time() - kube_cronjob_status_last_successful_time{namespace="${homelab.kubernetes.namespaces.applications}", cronjob="postgres-backup"} > 93600'';
             forDuration = "15m";
             severity = "critical";
             summary = "No successful postgres backup in 26+ hours";
@@ -157,7 +157,7 @@ let
           (mkPromRule {
             uid = "backup-pg-drill-failed";
             title = "Postgres Restore Drill Failed";
-            expr = ''increase(kube_job_status_failed{namespace="apps", job_name=~"postgres-restore-drill.*"}[168h]) > 0'';
+            expr = ''increase(kube_job_status_failed{namespace="${homelab.kubernetes.namespaces.applications}", job_name=~"postgres-restore-drill.*"}[168h]) > 0'';
             severity = "warning";
             summary = "Postgres restore drill failed";
             description = "A postgres-restore-drill job has failed in the last 7 days.";
@@ -165,7 +165,7 @@ let
           (mkPromRule {
             uid = "backup-pg-drill-stale";
             title = "Postgres Restore Drill Stale (>7d)";
-            expr = ''time() - kube_cronjob_status_last_successful_time{namespace="apps", cronjob="postgres-restore-drill"} > 604800'';
+            expr = ''time() - kube_cronjob_status_last_successful_time{namespace="${homelab.kubernetes.namespaces.applications}", cronjob="postgres-restore-drill"} > 604800'';
             forDuration = "30m";
             severity = "warning";
             summary = "No successful postgres restore drill in 7+ days";
@@ -182,7 +182,7 @@ let
           (mkPromRule {
             uid = "backup-shared-job-failed";
             title = "Shared Subfolders Backup Job Failed";
-            expr = ''increase(kube_job_status_failed{namespace="apps", job_name=~"shared-subfolders-backup.*"}[6h]) > 0'';
+            expr = ''increase(kube_job_status_failed{namespace="${homelab.kubernetes.namespaces.applications}", job_name=~"shared-subfolders-backup.*"}[6h]) > 0'';
             severity = "critical";
             summary = "Shared subfolders backup job failed";
             description = "A shared-subfolders-backup job has failed in the last 6 hours.";
@@ -190,7 +190,7 @@ let
           (mkPromRule {
             uid = "backup-shared-stale";
             title = "Shared Subfolders Backup Stale (>26h)";
-            expr = ''time() - kube_cronjob_status_last_successful_time{namespace="apps", cronjob="shared-subfolders-backup"} > 93600'';
+            expr = ''time() - kube_cronjob_status_last_successful_time{namespace="${homelab.kubernetes.namespaces.applications}", cronjob="shared-subfolders-backup"} > 93600'';
             forDuration = "15m";
             severity = "critical";
             summary = "No successful shared subfolders backup in 26+ hours";
@@ -207,7 +207,7 @@ let
           (mkPromRule {
             uid = "backup-proton-sync-job-failed";
             title = "Proton Sync Job Failure";
-            expr = ''increase(kube_job_status_failed{namespace="apps", job_name=~"shared-subfolders-proton-sync.*"}[6h]) > 0'';
+            expr = ''increase(kube_job_status_failed{namespace="${homelab.kubernetes.namespaces.applications}", job_name=~"shared-subfolders-proton-sync.*"}[6h]) > 0'';
             severity = "warning";
             summary = "Shared subfolders Proton Drive sync job failed";
             description = "A shared-subfolders-proton-sync job has failed in the last 6 hours.";
@@ -215,7 +215,7 @@ let
           (mkPromRule {
             uid = "backup-proton-sync-stale";
             title = "Proton Sync Staleness";
-            expr = ''time() - kube_cronjob_status_last_successful_time{namespace="apps", cronjob="shared-subfolders-proton-sync"} > 93600'';
+            expr = ''time() - kube_cronjob_status_last_successful_time{namespace="${homelab.kubernetes.namespaces.applications}", cronjob="shared-subfolders-proton-sync"} > 93600'';
             forDuration = "15m";
             severity = "critical";
             summary = "Shared subfolders Proton Drive sync has not succeeded in 26h";
