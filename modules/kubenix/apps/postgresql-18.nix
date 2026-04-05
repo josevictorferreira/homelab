@@ -57,7 +57,7 @@ in
         primary = {
           persistence = {
             enabled = true;
-            storageClass = "rook-ceph-block";
+            storageClass = kubenix.lib.defaultStorageClass;
             reclaimPolicy = "Retain";
             accessModes = [ "ReadWriteOnce" ];
           };

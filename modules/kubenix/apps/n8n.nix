@@ -41,9 +41,9 @@ in
 
         ingress = {
           enabled = true;
-          className = "cilium";
+          className = kubenix.lib.defaultIngressClass;
           annotations = {
-            "cert-manager.io/cluster-issuer" = "cloudflare-issuer";
+            "cert-manager.io/cluster-issuer" = kubenix.lib.defaultClusterIssuer;
           };
           hosts = [
             {
@@ -61,7 +61,7 @@ in
               hosts = [
                 (kubenix.lib.domainFor app)
               ];
-              secretName = "wildcard-tls";
+              secretName = kubenix.lib.defaultTLSSecret;
             }
           ];
         };
@@ -78,7 +78,7 @@ in
 
           persistence = {
             enabled = true;
-            storageClass = "rook-ceph-block";
+            storageClass = kubenix.lib.defaultStorageClass;
             accessMode = "ReadWriteOnce";
             size = "8Gi";
             mountPath = "/home/node/.n8n";

@@ -2,7 +2,7 @@
 
 let
   k8s = homelab.kubernetes;
-  pvcName = "cephfs-shared-storage-downloads";
+  pvcName = kubenix.lib.sharedStorage.downloadsPVC;
   namespace = k8s.namespaces.applications;
   torrentingPort = 62657;
   vueTorrentInstallScript = ''
@@ -224,31 +224,33 @@ in
         addons.gluetun = {
           enabled = true;
           killSwitch = true;
-          container.resources = {
-            requests = {
-              cpu = "50m";
-              memory = "64Mi";
+          container = {
+            resources = {
+              requests = {
+                cpu = "50m";
+                memory = "64Mi";
+              };
+              limits = {
+                cpu = "100m";
+                memory = "128Mi";
+              };
             };
-            limits = {
-              cpu = "100m";
-              memory = "128Mi";
+            env = {
+              FIREWALL = "on";
+              FIREWALL_INPUT_PORTS = "8080,${toString torrentingPort}";
+              DOT = "off";
+              DNS_KEEP_NAMESERVER = "off";
+              VPN_DNS_ADDRESS = "1.1.1.1,1.0.0.1";
+              FIREWALL_OUTBOUND_SUBNETS = "10.42.0.0/16,10.43.0.0/16,10.10.10.0/24";
+              EXCLUDE_NETWORKS = "10.42.0.0/16,10.43.0.0/16,10.10.10.0/24";
             };
+            envFrom = [
+              {
+                secretRef.name = "gluetun-vpn-credentials";
+                secretRef.expandObjectName = false;
+              }
+            ];
           };
-          container.env = {
-            FIREWALL = "on";
-            FIREWALL_INPUT_PORTS = "8080,${toString torrentingPort}";
-            DOT = "off";
-            DNS_KEEP_NAMESERVER = "off";
-            VPN_DNS_ADDRESS = "1.1.1.1,1.0.0.1";
-            FIREWALL_OUTBOUND_SUBNETS = "10.42.0.0/16,10.43.0.0/16,10.10.10.0/24";
-            EXCLUDE_NETWORKS = "10.42.0.0/16,10.43.0.0/16,10.10.10.0/24";
-          };
-          container.envFrom = [
-            {
-              secretRef.name = "gluetun-vpn-credentials";
-              secretRef.expandObjectName = false;
-            }
-          ];
         };
 
       };

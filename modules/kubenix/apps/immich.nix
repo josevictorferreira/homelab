@@ -2,7 +2,7 @@
 
 let
   # Use root PVC with subPath to avoid overlapping CephFS mount issues
-  immichLibraryPVC = "cephfs-shared-storage-root";
+  immichLibraryPVC = kubenix.lib.sharedStorage.rootPVC;
   app = "immich";
   namespace = homelab.kubernetes.namespaces.applications;
 in
@@ -72,7 +72,7 @@ in
             size = "20Gi";
             type = "persistentVolumeClaim";
             accessMode = "ReadWriteOnce";
-            storageClass = "rook-ceph-block";
+            storageClass = kubenix.lib.defaultStorageClass;
           };
         };
 
@@ -104,7 +104,7 @@ in
 
           ingress.main = {
             enabled = true;
-            className = "cilium";
+            className = kubenix.lib.defaultIngressClass;
             hosts = [
               {
                 host = kubenix.lib.domainFor app;
@@ -119,7 +119,7 @@ in
             ];
             tls = [
               {
-                secretName = "wildcard-tls";
+                secretName = kubenix.lib.defaultTLSSecret;
                 hosts = [ (kubenix.lib.domainFor app) ];
               }
             ];

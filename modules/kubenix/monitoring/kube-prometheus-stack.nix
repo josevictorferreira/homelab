@@ -1,8 +1,7 @@
-{
-  lib,
-  kubenix,
-  homelab,
-  ...
+{ lib
+, kubenix
+, homelab
+, ...
 }:
 
 let
@@ -35,7 +34,7 @@ in
           persistence = {
             enabled = true;
             type = "pvc";
-            storageClassName = "rook-ceph-block";
+            storageClassName = kubenix.lib.defaultStorageClass;
             accessModes = [ "ReadWriteOnce" ];
             size = "10Gi";
             finalizers = [ "kubernetes.io/pvc-protection" ];
@@ -109,7 +108,7 @@ in
             storageSpec = {
               volumeClaimTemplate = {
                 spec = {
-                  storageClassName = "rook-ceph-block";
+                  storageClassName = kubenix.lib.defaultStorageClass;
                   accessModes = [ "ReadWriteOnce" ];
                   resources.requests.storage = "50Gi";
                 };

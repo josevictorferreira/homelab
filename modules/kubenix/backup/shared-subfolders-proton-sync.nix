@@ -1,4 +1,4 @@
-{ homelab, ... }:
+{ kubenix, homelab, ... }:
 let
   namespace = homelab.kubernetes.namespaces.backup;
   image = "ghcr.io/josevictorferreira/backup-toolbox@sha256:08bda3ee3383b093cc0ed74d42ed9b167ecb92dd7c01e090a542d0a75dec8abb";
@@ -186,7 +186,7 @@ in
             volumes = [
               {
                 name = "shared-storage";
-                persistentVolumeClaim.claimName = "cephfs-shared-storage-root";
+                persistentVolumeClaim.claimName = kubenix.lib.sharedStorage.rootPVC;
               }
               {
                 name = "proton-config";
@@ -211,7 +211,7 @@ in
       spec = {
         accessModes = [ "ReadWriteOnce" ];
         resources.requests.storage = "1Gi";
-        storageClassName = "rook-ceph-block";
+        storageClassName = kubenix.lib.defaultStorageClass;
       };
     };
 
@@ -224,7 +224,7 @@ in
       spec = {
         accessModes = [ "ReadWriteOnce" ];
         resources.requests.storage = "5Gi";
-        storageClassName = "rook-ceph-block";
+        storageClassName = kubenix.lib.defaultStorageClass;
       };
     };
   };

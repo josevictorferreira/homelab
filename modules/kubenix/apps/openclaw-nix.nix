@@ -1,4 +1,4 @@
-{ homelab, ... }:
+{ kubenix, homelab, ... }:
 
 let
   namespace = homelab.kubernetes.namespaces.applications;
@@ -98,12 +98,6 @@ in
             }
           ];
         };
-        controllers.main.strategy = "RollingUpdate";
-        controllers.main.rollingUpdate = {
-          maxSurge = 1;
-          maxUnavailable = 0;
-        };
-
         # Override service type to ClusterIP (release default is LoadBalancer)
         service.main.type = "ClusterIP";
 
@@ -114,6 +108,11 @@ in
 
         # Security context: run as root for full access
         controllers.main = {
+          strategy = "RollingUpdate";
+          rollingUpdate = {
+            maxSurge = 1;
+            maxUnavailable = 0;
+          };
           containers.main = {
             securityContext = {
               runAsUser = 0;
@@ -352,7 +351,7 @@ in
           # /home/node/shared = full CephFS root (cross-app access)
           shared-storage = {
             type = "persistentVolumeClaim";
-            existingClaim = "cephfs-shared-storage-root";
+            existingClaim = kubenix.lib.sharedStorage.rootPVC;
             advancedMounts.main.main = [
               {
                 path = "/home/node";
@@ -372,13 +371,13 @@ in
             storageClass = "rook-ceph-block";
             size = "1Gi";
             accessMode = "ReadWriteOnce";
-            advancedMounts.main.tailscale = [ { path = "/var/lib/tailscale"; } ];
+            advancedMounts.main.tailscale = [{ path = "/var/lib/tailscale"; }];
           };
 
           dev-tun = {
             type = "hostPath";
             hostPath = "/dev/net/tun";
-            advancedMounts.main.tailscale = [ { path = "/dev/net/tun"; } ];
+            advancedMounts.main.tailscale = [{ path = "/dev/net/tun"; }];
           };
         };
       };

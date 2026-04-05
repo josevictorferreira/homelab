@@ -78,9 +78,9 @@ in
         # Ingress configuration
         ingress = {
           enabled = true;
-          className = "cilium";
+          className = kubenix.lib.defaultIngressClass;
           annotations = {
-            "cert-manager.io/cluster-issuer" = "cloudflare-issuer";
+            "cert-manager.io/cluster-issuer" = kubenix.lib.defaultClusterIssuer;
           };
           hosts = [
             {
@@ -96,7 +96,7 @@ in
           tls = [
             {
               hosts = [ domain ];
-              secretName = "wildcard-tls";
+              secretName = kubenix.lib.defaultTLSSecret;
             }
           ];
         };

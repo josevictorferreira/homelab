@@ -1,4 +1,4 @@
-{ homelab, ... }:
+{ kubenix, homelab, ... }:
 
 let
   app = "protonmail-bridge";
@@ -11,7 +11,7 @@ in
         metadata = { inherit namespace; };
         spec = {
           accessModes = [ "ReadWriteOnce" ];
-          storageClassName = "rook-ceph-block";
+          storageClassName = kubenix.lib.defaultStorageClass;
           resources.requests.storage = "10Gi";
         };
       };

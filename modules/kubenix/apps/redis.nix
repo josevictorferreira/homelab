@@ -35,7 +35,7 @@ in
         master = {
           persistence = {
             enabled = true;
-            storageClass = "rook-ceph-block";
+            storageClass = kubenix.lib.defaultStorageClass;
             reclaimPolicy = "Retain";
             accessModes = [ "ReadWriteOnce" ];
             size = "8Gi";

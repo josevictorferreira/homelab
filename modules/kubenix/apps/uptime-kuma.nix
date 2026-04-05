@@ -28,12 +28,12 @@ in
         };
 
         volume = {
-          storageClassName = "rook-ceph-block";
+          storageClassName = kubenix.lib.defaultStorageClass;
         };
 
         ingress = {
           enabled = true;
-          className = "cilium";
+          className = kubenix.lib.defaultIngressClass;
           annotations = kubenix.lib.serviceAnnotationFor app;
           hosts = [
             {
@@ -49,7 +49,7 @@ in
           tls = [
             {
               hosts = [ (kubenix.lib.domainFor "uptimekuma") ];
-              secretName = "wildcard-tls";
+              secretName = kubenix.lib.defaultTLSSecret;
             }
           ];
         };
