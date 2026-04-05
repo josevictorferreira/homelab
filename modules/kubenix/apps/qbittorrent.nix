@@ -97,7 +97,7 @@ in
             enabled = true;
             mountPath = "/config";
             size = "1Gi";
-            storageClass = "rook-ceph-block";
+            storageClass = kubenix.lib.defaultStorageClass;
             targetSelector.main = {
               main = {
                 mountPath = "/config";

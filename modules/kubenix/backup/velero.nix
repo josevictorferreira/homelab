@@ -90,7 +90,7 @@ in
         template = {
           ttl = "336h";
           includedNamespaces = [ "*" ];
-          excludedNamespaces = [ "rook-ceph" ];
+          excludedNamespaces = [ homelab.kubernetes.namespaces.storage ];
           snapshotVolumes = false;
           defaultVolumesToFsBackup = true;
         };

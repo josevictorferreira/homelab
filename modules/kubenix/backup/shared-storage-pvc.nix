@@ -22,7 +22,7 @@ in
             namespace = homelab.kubernetes.namespaces.applications;
           };
           volumeAttributes = {
-            clusterID = "rook-ceph";
+            clusterID = homelab.kubernetes.namespaces.storage;
             inherit fsName;
             staticVolume = "true";
             rootPath = "/volumes/nfs-exports/homelab-nfs/5a434804-52fc-4e58-b09f-592a37a16a97";
