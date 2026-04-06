@@ -363,15 +363,12 @@ in
               }
               { path = "/home/node/shared"; }
             ];
-          };
-
-          # Tailscale sidecar persistence (block storage)
-          tailscale-state = {
-            type = "persistentVolumeClaim";
-            storageClass = kubenix.lib.defaultStorageClass;
-            size = "1Gi";
-            accessMode = "ReadWriteOnce";
-            advancedMounts.main.tailscale = [ { path = "/var/lib/tailscale"; } ];
+            advancedMounts.main.tailscale = [
+              {
+                path = "/var/lib/tailscale";
+                subPath = "openclaw-tailscale-state";
+              }
+            ];
           };
 
           dev-tun = {
