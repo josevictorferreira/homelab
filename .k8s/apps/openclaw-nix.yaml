@@ -214,7 +214,8 @@ spec:
             - mountPath: /dev/net/tun
               name: dev-tun
             - mountPath: /var/lib/tailscale
-              name: tailscale-state
+              name: shared-storage
+              subPath: openclaw-tailscale-state
       dnsConfig:
         nameservers:
           - 10.43.0.10
@@ -245,32 +246,6 @@ spec:
         - name: shared-storage
           persistentVolumeClaim:
             claimName: cephfs-shared-storage-root
-        - name: tailscale-state
-          persistentVolumeClaim:
-            claimName: openclaw-nix
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  annotations:
-    kubenix/k8s-version: '1.32'
-    kubenix/project-name: ze-homelab
-  labels:
-    app.kubernetes.io/instance: openclaw-nix
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: openclaw-nix
-    helm.sh/chart: app-template-4.2.0
-    kubenix/module-name: release
-    kubenix/module-version: 1.0.0
-  name: openclaw-nix
-  namespace: apps
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 1Gi
-  storageClassName: rook-ceph-block
 ---
 apiVersion: v1
 kind: Service
