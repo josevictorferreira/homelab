@@ -48,7 +48,7 @@ in
       inherit namespace;
       image = {
         repository = "ghcr.io/josevictorferreira/openclaw-nix";
-        tag = "v2026.4.2@sha256:c60e4b3f36c1dcaa93a2bbc4ccbf1b11c4b2831aba02ac709e88ef90ee4c8670";
+        tag = "v2026.4.5@sha256:4dc38758c0413be2d4464ccf6a857f7821626458ac2cf7a02bf9dcfc66c0805b";
         pullPolicy = "Always";
       };
       port = 18789;
@@ -371,13 +371,13 @@ in
             storageClass = kubenix.lib.defaultStorageClass;
             size = "1Gi";
             accessMode = "ReadWriteOnce";
-            advancedMounts.main.tailscale = [{ path = "/var/lib/tailscale"; }];
+            advancedMounts.main.tailscale = [ { path = "/var/lib/tailscale"; } ];
           };
 
           dev-tun = {
             type = "hostPath";
             hostPath = "/dev/net/tun";
-            advancedMounts.main.tailscale = [{ path = "/dev/net/tun"; }];
+            advancedMounts.main.tailscale = [ { path = "/dev/net/tun"; } ];
           };
         };
       };
