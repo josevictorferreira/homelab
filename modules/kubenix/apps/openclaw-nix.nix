@@ -63,7 +63,7 @@ in
         };
         limits = {
           cpu = "1500m";
-          memory = "2Gi";
+          memory = "1Gi";
         };
       };
       priorityClassName = "high-priority";
