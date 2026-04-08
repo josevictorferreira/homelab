@@ -46,7 +46,7 @@ spec:
           envFrom:
             - secretRef:
                 name: immich-secret
-          image: ghcr.io/immich-app/immich-machine-learning:v2.7.2@sha256:2f381909ca2b669f22bf872ee0bea6b7d16dfce109431647a8cad0f2571ff053
+          image: ghcr.io/immich-app/immich-machine-learning:v2.7.2-rocm@sha256:4b329e8118ab9c6851c60820ad2fee4762a375608f922c0adf9144f29bb39dbc
           imagePullPolicy: IfNotPresent
           livenessProbe:
             failureThreshold: 3
@@ -71,9 +71,11 @@ spec:
             timeoutSeconds: 1
           resources:
             limits:
+              amd.com/gpu: '1'
               cpu: 500m
               memory: 1Gi
             requests:
+              amd.com/gpu: '1'
               cpu: 100m
               memory: 256Mi
           startupProbe:
@@ -92,6 +94,8 @@ spec:
       hostIPC: false
       hostNetwork: false
       hostPID: false
+      nodeSelector:
+        node.kubernetes.io/amd-gpu: 'true'
       serviceAccountName: default
       volumes:
         - name: cache
