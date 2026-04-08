@@ -47,20 +47,25 @@ in
         machine-learning = {
           enabled = true;
 
-          controllers.main.containers.main = {
-            image = {
-              repository = "ghcr.io/immich-app/immich-machine-learning";
-              tag = "v2.7.2@sha256:2f381909ca2b669f22bf872ee0bea6b7d16dfce109431647a8cad0f2571ff053";
-              pullPolicy = "IfNotPresent";
-            };
-            resources = {
-              requests = {
-                cpu = "100m";
-                memory = "256Mi";
+          controllers.main = {
+            pod.nodeSelector."node.kubernetes.io/amd-gpu" = "true";
+            containers.main = {
+              image = {
+                repository = "ghcr.io/immich-app/immich-machine-learning";
+                tag = "v2.7.2-rocm@sha256:4b329e8118ab9c6851c60820ad2fee4762a375608f922c0adf9144f29bb39dbc";
+                pullPolicy = "IfNotPresent";
               };
-              limits = {
-                cpu = "500m";
-                memory = "1Gi";
+              resources = {
+                requests = {
+                  cpu = "100m";
+                  memory = "256Mi";
+                  "amd.com/gpu" = "1";
+                };
+                limits = {
+                  cpu = "500m";
+                  memory = "1Gi";
+                  "amd.com/gpu" = "1";
+                };
               };
             };
           };
