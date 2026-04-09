@@ -3,7 +3,7 @@
   lib,
   inputs,
   system,
-  version ? "2026.4.5",
+  version ? "2026.4.9",
 }:
 
 let
@@ -14,8 +14,8 @@ let
     owner = "openclaw";
     repo = "openclaw";
     rev = "v${version}";
-    sha256 = "sha256-dpBLqxSsSlvyaAG6DV/D/BSvrca93LtF4ritnlGZSho=";
-    pnpmDepsHash = "sha256-sBpaoGacWmipWmnKmdVTKu/T8mzOQFAIX0VKORiHvUc=";
+    sha256 = "sha256-wqvLBe+cEoo0x096fK6qKR8bDs4QHPTlxK5e64K4yls=";
+    pnpmDepsHash = "sha256-mdppNeJVf0Def0GohiKks6W3uzsaoJUYJo/ggGmypKQ=";
   };
 
   # Rolldown 1.0.0-rc.3 — pre-built from npm registry
@@ -97,6 +97,11 @@ let
           if [ -f package.json ]; then
             substituteInPlace package.json \
               --replace '"tsc -p tsconfig.plugin-sdk.dts.json"' '"tsc -p tsconfig.plugin-sdk.dts.json || true"'
+          fi
+          if [ -f scripts/bundle-a2ui.mjs ]; then
+            substituteInPlace scripts/bundle-a2ui.mjs \
+              --replace 'runPnpm(["-s", "dlx", "rolldown", "-c", path.join(a2uiAppDir, "rolldown.config.mjs")])' \
+              'runStep("rolldown", ["-c", path.join(a2uiAppDir, "rolldown.config.mjs")])'
           fi
         '';
       });
