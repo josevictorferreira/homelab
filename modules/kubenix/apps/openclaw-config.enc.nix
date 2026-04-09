@@ -91,6 +91,23 @@ let
               contextWindow = 1000000;
               maxTokens = 65536;
             }
+            {
+              id = "qwen3.6-plus";
+              name = "Qwen3.6 Plus";
+              reasoning = true;
+              input = [
+                "text"
+                "image"
+              ];
+              cost = {
+                input = 0;
+                output = 0;
+                cacheRead = 0;
+                cacheWrite = 0;
+              };
+              contextWindow = 1000000;
+              maxTokens = 65536;
+            }
           ];
         };
         moonshotai = {
