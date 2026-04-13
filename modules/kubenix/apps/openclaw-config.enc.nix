@@ -527,28 +527,28 @@ let
           accounts = {
             mel = {
               name = "Mel";
-              homeserver = "https://matrix.josevictor.me";
+              homeserver = "http://tuwunel.apps.svc.cluster.local:8008";
               accessToken = "\${MEL_MATRIX_TOKEN}";
               userId = "@mel:josevictor.me";
               allowPrivateNetwork = true;
             };
             kira = {
               name = "Kira";
-              homeserver = "https://matrix.josevictor.me";
+              homeserver = "http://tuwunel.apps.svc.cluster.local:8008";
               accessToken = "\${KIRA_MATRIX_TOKEN}";
               userId = "@kira:josevictor.me";
               allowPrivateNetwork = true;
             };
             luna = {
               name = "Luna";
-              homeserver = "https://matrix.josevictor.me";
+              homeserver = "http://tuwunel.apps.svc.cluster.local:8008";
               accessToken = "\${LUNA_MATRIX_TOKEN}";
               userId = "@luna:josevictor.me";
               allowPrivateNetwork = true;
             };
             spike = {
               name = "Spike";
-              homeserver = "https://matrix.josevictor.me";
+              homeserver = "http://tuwunel.apps.svc.cluster.local:8008";
               accessToken = "\${SPIKE_MATRIX_TOKEN}";
               userId = "@spike:josevictor.me";
               allowPrivateNetwork = true;
@@ -556,7 +556,7 @@ let
             default = {
               groupPolicy = "allowlist";
               groupAllowFrom = [ "@zeh:josevictor.me" ];
-              homeserver = "https://matrix.josevictor.me";
+              homeserver = "http://tuwunel.apps.svc.cluster.local:8008";
               allowPrivateNetwork = true;
             };
           };
