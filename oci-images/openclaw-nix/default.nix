@@ -275,6 +275,9 @@ let
     done
     mkdir -p $out/share/zoneinfo
     cp -rsf ${pkgs.tzdata}/share/zoneinfo/* $out/share/zoneinfo/ 2>/dev/null || true
+    # Create /etc/localtime so glibc (and Python datetime.now()) resolves TZ correctly
+    # Without this, Python returns UTC despite TZ env var being set
+    ln -sf ${pkgs.tzdata}/share/zoneinfo/America/Sao_Paulo $out/etc/localtime
     mkdir -p $out/etc/ssl/certs
     cp -rsf ${pkgs.cacert}/etc/ssl/certs/* $out/etc/ssl/certs/ 2>/dev/null || true
     if [ -d "${pkgs.python3Packages.requests}/lib" ]; then cp -rsf ${pkgs.python3Packages.requests}/lib/* $out/lib/ 2>/dev/null || true; fi
@@ -370,7 +373,7 @@ dockerTools.streamLayeredImage {
       "UV_CACHE_DIR=/state/cache/uv"
       "PIP_CACHE_DIR=/state/cache/pip"
       "SSL_CERT_FILE=/etc/ssl/certs/ca-bundle.crt"
-      "TZ=America/Sao_Paulo"
+      "TZ=:/etc/localtime"
     ];
   };
 }

@@ -124,7 +124,7 @@ in
               OPENCLAW_DATA_DIR = "/home/node/.openclaw";
               OPENCLAW_STATE_DIR = "/home/node/.openclaw";
               HOME = "/home/node";
-              TZ = "America/Sao_Paulo";
+              TZ = ":/etc/localtime";
               OPENCLAW_NIX_MODE = "1";
               NPM_CONFIG_PREFIX = "/home/node/.npm-global";
               PIP_TARGET = "/home/node/.local/lib/python";
