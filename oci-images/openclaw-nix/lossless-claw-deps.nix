@@ -1,6 +1,5 @@
-{ pkgs, ... }:
+{ pkgs, losslessClawVersion, ... }:
 let
-  losslessClawVersion = "0.9.1";
   losslessClawPackage = pkgs.buildNpmPackage {
     pname = "openclaw-lossless-claw-plugin-deps";
     version = losslessClawVersion;
@@ -22,7 +21,7 @@ let
     postPatch = ''
       cp ${./lossless-claw-package-lock.json} package-lock.json
     '';
-    npmDepsHash = "sha256-rUOSqMVMNjfIZ4PlINgtVNaT8hNArEzUQotDYfegB9I=";
+    npmDepsHash = "sha256-rUOSqMVMNjfIZ4PlINgtVNaT8hNArEzUQotDYfegB9I="; # Update with losslessClawInfo.npmDepsHash
     dontNpmBuild = true;
     installPhase = ''
       mkdir -p $out/lossless-claw-deps
