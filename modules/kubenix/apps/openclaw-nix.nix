@@ -48,7 +48,7 @@ in
       inherit namespace;
       image = {
         repository = "ghcr.io/josevictorferreira/openclaw-nix";
-        tag = "v2026.4.14@sha256:86453812e00f96507977a286aad3a91a941197b8b07ce1cb6619b79fc710a9ba";
+        tag = "v2026.4.14@sha256:16381e704b55170762852df705ceddf2a721b89035632a9360957949ad915499";
         pullPolicy = "Always";
       };
       port = 18789;

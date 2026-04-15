@@ -115,8 +115,8 @@ let
   };
   # Lossless-claw extension source from GitHub
   losslessClawSource = pkgs.fetchurl {
-    url = "https://github.com/Martian-Engineering/lossless-claw/archive/refs/tags/v0.5.3.tar.gz";
-    sha256 = "sha256-3WzvaGPRBbHoR5hqJyk6b70CPfvWKzaaaQCjrWXZQNg=";
+    url = "https://github.com/Martian-Engineering/lossless-claw/archive/refs/tags/v0.9.1.tar.gz";
+    sha256 = "sha256-p6pbryfcF9azu4JSao5UtcjAFZcGsDcz7wwiKR6p1H4=";
   };
 
   fontsConf = pkgs.makeFontsConf {
@@ -203,10 +203,10 @@ let
         # Copy only plugin runtime artifacts to extensions/lossless-claw
         mkdir -p "$out/lib/openclaw/extensions/lossless-claw"
         chmod -R u+w "$out/lib/openclaw/extensions/lossless-claw" 2>/dev/null || true
-        cp -r /tmp/lossless-extract/lossless-claw-0.5.3/openclaw.plugin.json "$out/lib/openclaw/extensions/lossless-claw/" 2>/dev/null || true
-        cp -r /tmp/lossless-extract/lossless-claw-0.5.3/index.ts "$out/lib/openclaw/extensions/lossless-claw/" 2>/dev/null || true
-        cp -r /tmp/lossless-extract/lossless-claw-0.5.3/package.json "$out/lib/openclaw/extensions/lossless-claw/" 2>/dev/null || true
-        cp -r /tmp/lossless-extract/lossless-claw-0.5.3/src "$out/lib/openclaw/extensions/lossless-claw/" 2>/dev/null || true
+        cp -r /tmp/lossless-extract/lossless-claw-0.9.1/openclaw.plugin.json "$out/lib/openclaw/extensions/lossless-claw/" 2>/dev/null || true
+        cp -r /tmp/lossless-extract/lossless-claw-0.9.1/index.ts "$out/lib/openclaw/extensions/lossless-claw/" 2>/dev/null || true
+        cp -r /tmp/lossless-extract/lossless-claw-0.9.1/package.json "$out/lib/openclaw/extensions/lossless-claw/" 2>/dev/null || true
+        cp -r /tmp/lossless-extract/lossless-claw-0.9.1/src "$out/lib/openclaw/extensions/lossless-claw/" 2>/dev/null || true
         rm -rf /tmp/lossless-extract
     # Copy plugin manifests and runtime TS sources from source extensions/ into dist/extensions/
     # The gateway resolves plugin runtime modules (e.g. light-runtime-api.ts) from dist/extensions/
