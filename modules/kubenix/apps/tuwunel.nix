@@ -159,6 +159,11 @@ in
                     subPath = "tuwunel.toml";
                     readOnly = true;
                   }
+                  {
+                    name = "appservice";
+                    mountPath = "/etc/tuwunel/appservices";
+                    readOnly = true;
+                  }
                 ];
               }
             ];
@@ -170,6 +175,18 @@ in
               {
                 name = "config";
                 configMap.name = name;
+              }
+              {
+                name = "appservice";
+                secret = {
+                  secretName = "hookshot-registration";
+                  items = [
+                    {
+                      key = "registration.yml";
+                      path = "registration.yml";
+                    }
+                  ];
+                };
               }
             ];
           };
@@ -215,6 +232,7 @@ in
 
           allow_local_presence = true
           allow_encryption = true
+          appservice_dir = "/etc/tuwunel/appservices"
 
           [global.well_known]
           client = "https://matrix.josevictor.me"
