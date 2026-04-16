@@ -1,0 +1,197 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: hookshot
+  namespace: apps
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hookshot
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: hookshot
+    spec:
+      containers:
+        - command:
+            - node
+            - /bin/matrix-hookshot/App/BridgeApp.js
+            - /data/config/config.yml
+            - /data/config/registration.yml
+          image: docker.io/halfshot/matrix-hookshot:7.3.2@sha256:1c5cefb5d7d8842fd6ec8b63b3753722aaff76ba9106e8649a73d377117f5c32
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 5
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            tcpSocket:
+              port: appservice
+            timeoutSeconds: 5
+          name: hookshot
+          ports:
+            - containerPort: 9000
+              name: webhook
+              protocol: TCP
+            - containerPort: 9001
+              name: metrics
+              protocol: TCP
+            - containerPort: 9993
+              name: appservice
+              protocol: TCP
+          readinessProbe:
+            failureThreshold: 6
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            tcpSocket:
+              port: appservice
+            timeoutSeconds: 5
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 256Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          startupProbe:
+            failureThreshold: 30
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            tcpSocket:
+              port: appservice
+            timeoutSeconds: 5
+          volumeMounts:
+            - mountPath: /data
+              name: data
+      initContainers:
+        - command:
+            - sh
+            - -c
+            - 'set -eu
+
+
+              mkdir -p /data/config /data/passkey
+
+              cp /config-src/config.yml /data/config/config.yml
+
+              cp /config-src/github-private-key.pem /data/config/github-private-key.pem
+
+              cp /registration-src/registration.yml /data/config/registration.yml
+
+              cp /passkey-src/passkey.pem /data/passkey/passkey.pem
+
+              chmod 644 /data/config/config.yml /data/config/registration.yml
+
+              chmod 600 /data/config/github-private-key.pem /data/passkey/passkey.pem
+
+              '
+          image: busybox:1.37
+          name: copy-config
+          volumeMounts:
+            - mountPath: /data
+              name: data
+            - mountPath: /config-src
+              name: config
+              readOnly: true
+            - mountPath: /registration-src
+              name: registration
+              readOnly: true
+            - mountPath: /passkey-src
+              name: passkey
+              readOnly: true
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: hookshot-data
+        - name: config
+          secret:
+            secretName: hookshot-config
+        - name: registration
+          secret:
+            secretName: hookshot-registration
+        - name: passkey
+          secret:
+            secretName: hookshot-passkey
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: hookshot-data
+  namespace: apps
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+  storageClassName: rook-ceph-block
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: hookshot
+  namespace: apps
+spec:
+  ports:
+    - name: webhook
+      port: 9000
+      targetPort: webhook
+    - name: metrics
+      port: 9001
+      targetPort: metrics
+    - name: appservice
+      port: 9993
+      targetPort: appservice
+  selector:
+    app: hookshot
+  type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: cloudflare-issuer
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: hookshot-webhook
+  namespace: apps
+spec:
+  ingressClassName: cilium
+  rules:
+    - host: hookshot.josevictor.me
+      http:
+        paths:
+          - backend:
+              service:
+                name: hookshot
+                port:
+                  name: webhook
+            path: /github/webhook
+            pathType: Prefix
+          - backend:
+              service:
+                name: hookshot
+                port:
+                  name: webhook
+            path: /oauth
+            pathType: Prefix
+  tls:
+    - hosts:
+        - hookshot.josevictor.me
+      secretName: wildcard-tls

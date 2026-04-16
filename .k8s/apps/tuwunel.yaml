@@ -102,6 +102,9 @@ spec:
               name: config
               readOnly: true
               subPath: tuwunel.toml
+            - mountPath: /etc/tuwunel/appservices
+              name: appservice
+              readOnly: true
       terminationGracePeriodSeconds: 120
       volumes:
         - name: data
@@ -110,6 +113,12 @@ spec:
         - configMap:
             name: tuwunel
           name: config
+        - name: appservice
+          secret:
+            items:
+              - key: registration.yml
+                path: registration.yml
+            secretName: hookshot-registration
 ---
 apiVersion: v1
 data:
@@ -140,6 +149,8 @@ data:
     allow_local_presence = true
 
     allow_encryption = true
+
+    appservice_dir = "/etc/tuwunel/appservices"
 
 
     [global.well_known]
