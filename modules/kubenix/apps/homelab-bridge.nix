@@ -27,6 +27,9 @@ in
       };
       secretName = "${app}-env";
       values = {
+        defaultPodOptions.imagePullSecrets = [
+          { name = "ghcr-registry-secret"; }
+        ];
         controllers.main.containers.main.env = {
           PORT = "8080";
           MATRIX_SERVER_URL = "https://matrix.josevictor.me";
