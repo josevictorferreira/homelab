@@ -1,0 +1,132 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/controller: main
+    app.kubernetes.io/instance: homelab-bridge
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: homelab-bridge
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: homelab-bridge
+  namespace: apps
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/controller: main
+      app.kubernetes.io/instance: homelab-bridge
+      app.kubernetes.io/name: homelab-bridge
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/controller: main
+        app.kubernetes.io/instance: homelab-bridge
+        app.kubernetes.io/name: homelab-bridge
+    spec:
+      automountServiceAccountToken: true
+      containers:
+        - env:
+            - name: MATRIX_LOGIN_TYPE
+              value: m.login.password
+            - name: MATRIX_ROOM_ID
+              value: '!qWanbKvLHfAkntFqrn:josevictor.me'
+            - name: MATRIX_SERVER_URL
+              value: https://matrix.josevictor.me
+            - name: MATRIX_USER
+              value: '@homelab-bridge:josevictor.me'
+            - name: PORT
+              value: '8080'
+          envFrom:
+            - secretRef:
+                name: homelab-bridge-env
+          image: ghcr.io/josevictorferreira/homelab-bridge:bd45fe8@sha256:130d3cfad91ee1ac63fbf956d96a89f5bc1e24a2844a9c89259bd146984279c7
+          imagePullPolicy: IfNotPresent
+          name: main
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+          resources:
+            limits:
+              cpu: 200m
+              memory: 256Mi
+            requests:
+              cpu: 50m
+              memory: 64Mi
+      dnsPolicy: ClusterFirst
+      enableServiceLinks: false
+      hostIPC: false
+      hostNetwork: false
+      hostPID: false
+      serviceAccountName: default
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+    lbipam.cilium.io/ips: 10.10.10.144
+    lbipam.cilium.io/sharing-key: homelab-bridge
+  labels:
+    app.kubernetes.io/instance: homelab-bridge
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: homelab-bridge
+    app.kubernetes.io/service: homelab-bridge
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: homelab-bridge
+  namespace: apps
+spec:
+  ports:
+    - name: http
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    app.kubernetes.io/controller: main
+    app.kubernetes.io/instance: homelab-bridge
+    app.kubernetes.io/name: homelab-bridge
+  type: LoadBalancer
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: homelab-bridge
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: homelab-bridge
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: homelab-bridge
+  namespace: apps
+spec:
+  ingressClassName: cilium
+  rules:
+    - host: homelab-bridge.josevictor.me
+      http:
+        paths:
+          - backend:
+              service:
+                name: homelab-bridge
+                port:
+                  number: 8080
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - homelab-bridge.josevictor.me
+      secretName: wildcard-tls
