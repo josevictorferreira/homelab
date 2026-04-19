@@ -32,7 +32,7 @@ in
         ];
         controllers.main.containers.main.env = {
           PORT = "8080";
-          MATRIX_SERVER_URL = "https://matrix.josevictor.me";
+          MATRIX_SERVER_URL = "http://tuwunel.apps.svc.cluster.local:8008";
           MATRIX_USER = "@homelab-bridge:josevictor.me";
           MATRIX_ROOM_ID = "!qWanbKvLHfAkntFqrn:josevictor.me";
           MATRIX_LOGIN_TYPE = "m.login.password";
