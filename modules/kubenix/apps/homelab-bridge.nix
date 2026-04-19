@@ -65,6 +65,7 @@ in
             TS_ACCEPT_DNS = "false";
             TS_AUTH_ONCE = "true";
             TS_SERVE_CONFIG = "/etc/tailscale/serve.json";
+            TS_KUBE_SECRET = "";
           };
         };
 
