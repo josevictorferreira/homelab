@@ -437,3 +437,15 @@
 **Lesson:** After rebuilding an OCI image, always push to registry FIRST, then update the digest in kubenix config, then commit+push. Committing a digest that doesn't exist in the registry means Flux deploys a stale image.
 **Context:** First commit referenced old digest `b4d2ec9c` because image hadn't been rebuilt with new changes. Required a second full build→push→digest-update→commit cycle.
 **Verify:** `podman images | grep <tag>` — confirm IMAGE ID matches before pushing; check digest in `.k8s/apps/<app>.yaml` after `make manifests`
+
+## Manifest Pipeline
+
+### Lock File Stale Entry Blocks New Secret Keys
+**Lesson:** When adding new secret keys to `.enc.nix` files, delete the specific file's line from `manifests.lock` AND delete the file from `.k8s/` before running `make manifests`. Otherwise the `umanifests` stage restores the old git-committed version (without the new keys).
+**Context:** The `umanifests` stage compares SHA256 of the new vals-injected file against the lock file from the previous run. If they match (due to cached Nix derivation), it restores the git version — silently dropping newly added keys.
+**Verify:** `sops -d .k8s/apps/<app>-config.enc.yaml | grep <NEW_KEY>` returns the expected value after `make manifests`
+
+### Never Run Individual Manifest Pipeline Stages
+**Lesson:** Only use `make manifests` to run the pipeline. Never run `nix build .#gen-manifests`, `vals eval`, or other stages individually — they produce misleading results because the `.k8s/` directory is only correctly populated by the full pipeline.
+**Context:** Running `nix build .#gen-manifests` directly updates the Nix store but not `.k8s/`. The `.k8s/` directory is populated by the `cp -rf result/* .k8s/` step inside the pipeline. Individual runs give a false picture of what's actually generated.
+**Verify:** Always check `.k8s/` files after `make manifests`, never after individual stage runs
