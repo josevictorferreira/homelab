@@ -61,6 +61,41 @@ spec:
             requests:
               cpu: 50m
               memory: 64Mi
+        - env:
+            - name: TS_ACCEPT_DNS
+              value: 'false'
+            - name: TS_AUTHKEY
+              valueFrom:
+                secretKeyRef:
+                  key: TS_AUTHKEY
+                  name: homelab-bridge-env
+            - name: TS_AUTH_ONCE
+              value: 'true'
+            - name: TS_HOSTNAME
+              value: homelab-bridge
+            - name: TS_SERVE_CONFIG
+              value: /etc/tailscale/serve.json
+            - name: TS_STATE_DIR
+              value: /var/lib/tailscale
+            - name: TS_USERSPACE
+              value: 'false'
+          image: tailscale/tailscale:latest
+          name: tailscale
+          securityContext:
+            capabilities:
+              add:
+                - NET_ADMIN
+                - NET_RAW
+            runAsGroup: 0
+            runAsUser: 0
+          volumeMounts:
+            - mountPath: /dev/net/tun
+              name: dev-tun
+            - mountPath: /etc/tailscale
+              name: serve-config
+              readOnly: true
+            - mountPath: /var/lib/tailscale
+              name: tailscale-state
       dnsPolicy: ClusterFirst
       enableServiceLinks: false
       hostIPC: false
@@ -69,6 +104,39 @@ spec:
       imagePullSecrets:
         - name: ghcr-registry-secret
       serviceAccountName: default
+      volumes:
+        - hostPath:
+            path: /dev/net/tun
+          name: dev-tun
+        - configMap:
+            name: homelab-bridge-serve-config
+          name: serve-config
+        - name: tailscale-state
+          persistentVolumeClaim:
+            claimName: homelab-bridge
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: homelab-bridge
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: homelab-bridge
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: homelab-bridge
+  namespace: apps
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: rook-ceph-block
 ---
 apiVersion: v1
 kind: Service
@@ -132,3 +200,17 @@ spec:
     - hosts:
         - homelab-bridge.josevictor.me
       secretName: wildcard-tls
+---
+apiVersion: v1
+data:
+  serve.json: "{\n  \"TCP\": { \"443\": { \"HTTPS\": true } },\n  \"Web\": {\n   \
+    \ \"${TS_CERT_DOMAIN}:443\": {\n      \"Handlers\": {\n        \"/\": { \"Proxy\"\
+    : \"http://127.0.0.1:8080\" }\n      }\n    }\n  },\n  \"AllowFunnel\": {\n  \
+    \  \"${TS_CERT_DOMAIN}:443\": true\n  }\n}\n"
+kind: ConfigMap
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: homelab-bridge-serve-config
+  namespace: apps
