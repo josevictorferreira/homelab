@@ -39,14 +39,6 @@ in
       client = "https://matrix.josevictor.me"
       server = "matrix.josevictor.me:443"
 
-      [global.appservice.hookshot]
-      id = "hookshot"
-      url = "http://hookshot.apps.svc.cluster.local:9993"
-      as_token = "${kubenix.lib.secretsInlineFor "hookshot_as_token"}"
-      hs_token = "${kubenix.lib.secretsInlineFor "hookshot_hs_token"}"
-      sender_localpart = "hookshot"
-      rate_limited = false
-
       [rocksdb]
       write_buffer_size = 268435456
       max_background_flushes = 8
