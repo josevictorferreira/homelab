@@ -34,6 +34,76 @@ spec:
       automountServiceAccountToken: true
       containers:
         - command:
+            - /bin/chromium
+            - --headless=new
+            - --no-sandbox
+            - --disable-gpu
+            - --remote-debugging-address=127.0.0.1
+            - --remote-debugging-port=9222
+            - --user-data-dir=/home/node/.chromium/profile
+            - --disk-cache-dir=/home/node/.chromium/cache
+            - about:blank
+          env:
+            - name: HOME
+              value: /home/node/.chromium
+            - name: TMPDIR
+              value: /tmp
+          image: ghcr.io/josevictorferreira/openclaw-nix:v2026.4.15@sha256:4dae4373e87d3f194e6013bdb1eb1c417c39f41479066ae4276b0c84f71dc177
+          imagePullPolicy: Always
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /json/version
+              port: 9222
+              scheme: HTTP
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            timeoutSeconds: 2
+          name: chromium
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /json/version
+              port: 9222
+              scheme: HTTP
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            timeoutSeconds: 2
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+            requests:
+              cpu: 250m
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: false
+            runAsGroup: 1000
+            runAsNonRoot: true
+            runAsUser: 1000
+            seccompProfile:
+              type: RuntimeDefault
+          startupProbe:
+            failureThreshold: 30
+            httpGet:
+              path: /json/version
+              port: 9222
+              scheme: HTTP
+            initialDelaySeconds: 0
+            periodSeconds: 2
+            timeoutSeconds: 1
+          volumeMounts:
+            - mountPath: /home/node/.chromium
+              name: chromium-data
+            - mountPath: /dev/shm
+              name: chromium-shm
+            - mountPath: /tmp
+              name: chromium-tmp
+        - command:
             - bash
             - -c
             - "set -e\n\n# Wait for CephFS mount to be writable (avoids EACCES race\
@@ -237,6 +307,14 @@ spec:
       priorityClassName: high-priority
       serviceAccountName: openclaw-nix
       volumes:
+        - emptyDir: {}
+          name: chromium-data
+        - emptyDir:
+            medium: Memory
+            sizeLimit: 1Gi
+          name: chromium-shm
+        - emptyDir: {}
+          name: chromium-tmp
         - hostPath:
             path: /dev/net/tun
           name: dev-tun
