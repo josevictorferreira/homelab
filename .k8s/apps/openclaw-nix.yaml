@@ -51,22 +51,21 @@ spec:
           image: ghcr.io/josevictorferreira/openclaw-nix:v2026.4.15@sha256:4dae4373e87d3f194e6013bdb1eb1c417c39f41479066ae4276b0c84f71dc177
           imagePullPolicy: Always
           livenessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - /bin/curl --fail --silent http://127.0.0.1:9222/json/version >/dev/null
             failureThreshold: 3
-            httpGet:
-              path: /json/version
-              port: 9222
-              scheme: HTTP
-            initialDelaySeconds: 0
             periodSeconds: 10
             timeoutSeconds: 2
           name: chromium
           readinessProbe:
-            failureThreshold: 3
-            httpGet:
-              path: /json/version
-              port: 9222
-              scheme: HTTP
-            initialDelaySeconds: 0
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - /bin/curl --fail --silent http://127.0.0.1:9222/json/version >/dev/null
             periodSeconds: 10
             timeoutSeconds: 2
           resources:
@@ -88,14 +87,13 @@ spec:
             seccompProfile:
               type: RuntimeDefault
           startupProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - /bin/curl --fail --silent http://127.0.0.1:9222/json/version >/dev/null
             failureThreshold: 30
-            httpGet:
-              path: /json/version
-              port: 9222
-              scheme: HTTP
-            initialDelaySeconds: 0
             periodSeconds: 2
-            timeoutSeconds: 1
           volumeMounts:
             - mountPath: /home/node/.chromium
               name: chromium-data

@@ -321,30 +321,39 @@ in
               probes = {
                 startup = {
                   enabled = true;
-                  type = "HTTP";
-                  path = "/json/version";
-                  port = 9222;
+                  custom = true;
                   spec = {
+                    exec.command = [
+                      "/bin/sh"
+                      "-c"
+                      "/bin/curl --fail --silent http://127.0.0.1:9222/json/version >/dev/null"
+                    ];
                     failureThreshold = 30;
                     periodSeconds = 2;
                   };
                 };
                 readiness = {
                   enabled = true;
-                  type = "HTTP";
-                  path = "/json/version";
-                  port = 9222;
+                  custom = true;
                   spec = {
+                    exec.command = [
+                      "/bin/sh"
+                      "-c"
+                      "/bin/curl --fail --silent http://127.0.0.1:9222/json/version >/dev/null"
+                    ];
                     periodSeconds = 10;
                     timeoutSeconds = 2;
                   };
                 };
                 liveness = {
                   enabled = true;
-                  type = "HTTP";
-                  path = "/json/version";
-                  port = 9222;
+                  custom = true;
                   spec = {
+                    exec.command = [
+                      "/bin/sh"
+                      "-c"
+                      "/bin/curl --fail --silent http://127.0.0.1:9222/json/version >/dev/null"
+                    ];
                     periodSeconds = 10;
                     timeoutSeconds = 2;
                     failureThreshold = 3;
