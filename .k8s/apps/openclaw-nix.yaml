@@ -38,7 +38,7 @@ spec:
             - --headless=new
             - --no-sandbox
             - --disable-gpu
-            - --remote-debugging-address=127.0.0.1
+            - --remote-debugging-address=0.0.0.0
             - --remote-debugging-port=9222
             - --user-data-dir=/home/node/.chromium/profile
             - --disk-cache-dir=/home/node/.chromium/cache
