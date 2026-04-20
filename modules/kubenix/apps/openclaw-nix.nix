@@ -2,6 +2,11 @@
 
 let
   namespace = homelab.kubernetes.namespaces.applications;
+  appImage = {
+    repository = "ghcr.io/josevictorferreira/openclaw-nix";
+    tag = "v2026.4.15@sha256:4dae4373e87d3f194e6013bdb1eb1c417c39f41479066ae4276b0c84f71dc177";
+    pullPolicy = "Always";
+  };
 in
 {
   # RBAC: full cluster access for OpenClaw-Nix pod
@@ -46,11 +51,7 @@ in
     submodule = "release";
     args = {
       inherit namespace;
-      image = {
-        repository = "ghcr.io/josevictorferreira/openclaw-nix";
-        tag = "v2026.4.15@sha256:4dae4373e87d3f194e6013bdb1eb1c417c39f41479066ae4276b0c84f71dc177";
-        pullPolicy = "Always";
-      };
+      image = appImage;
       port = 18789;
       replicas = 1;
       secretName = "openclaw-config";
@@ -113,196 +114,273 @@ in
             maxSurge = 1;
             maxUnavailable = 0;
           };
-          containers.main = {
-            securityContext = {
-              runAsUser = 0;
-              runAsGroup = 0;
-            };
+          containers = {
+            main = {
+              securityContext = {
+                runAsUser = 0;
+                runAsGroup = 0;
+              };
 
-            env = {
-              OPENCLAW_CONFIG_PATH = "/home/node/.openclaw/openclaw.json";
-              OPENCLAW_DATA_DIR = "/home/node/.openclaw";
-              OPENCLAW_STATE_DIR = "/home/node/.openclaw";
-              HOME = "/home/node";
-              TZ = ":/etc/localtime";
-              OPENCLAW_NIX_MODE = "1";
-              NPM_CONFIG_PREFIX = "/home/node/.npm-global";
-              PIP_TARGET = "/home/node/.local/lib/python";
-              PYTHONPATH = "/home/node/.local/lib/python";
-              PATH = "/home/node/.local/bin:/home/node/.npm-global/bin:/bin:/usr/bin";
-              NODE_PATH = "/lib/openclaw/extensions/matrix/node_modules:/lib/openclaw/node_modules";
-              MATRIX_MEL_ACCESS_TOKEN = {
-                valueFrom.secretKeyRef = {
-                  name = "openclaw-config";
-                  key = "MEL_MATRIX_TOKEN";
+              env = {
+                OPENCLAW_CONFIG_PATH = "/home/node/.openclaw/openclaw.json";
+                OPENCLAW_DATA_DIR = "/home/node/.openclaw";
+                OPENCLAW_STATE_DIR = "/home/node/.openclaw";
+                HOME = "/home/node";
+                TZ = ":/etc/localtime";
+                OPENCLAW_NIX_MODE = "1";
+                NPM_CONFIG_PREFIX = "/home/node/.npm-global";
+                PIP_TARGET = "/home/node/.local/lib/python";
+                PYTHONPATH = "/home/node/.local/lib/python";
+                PATH = "/home/node/.local/bin:/home/node/.npm-global/bin:/bin:/usr/bin";
+                NODE_PATH = "/lib/openclaw/extensions/matrix/node_modules:/lib/openclaw/node_modules";
+                MATRIX_MEL_ACCESS_TOKEN = {
+                  valueFrom.secretKeyRef = {
+                    name = "openclaw-config";
+                    key = "MEL_MATRIX_TOKEN";
+                  };
+                };
+                MATRIX_KIRA_ACCESS_TOKEN = {
+                  valueFrom.secretKeyRef = {
+                    name = "openclaw-config";
+                    key = "KIRA_MATRIX_TOKEN";
+                  };
+                };
+                MATRIX_LUNA_ACCESS_TOKEN = {
+                  valueFrom.secretKeyRef = {
+                    name = "openclaw-config";
+                    key = "LUNA_MATRIX_TOKEN";
+                  };
+                };
+                MATRIX_SPIKE_ACCESS_TOKEN = {
+                  valueFrom.secretKeyRef = {
+                    name = "openclaw-config";
+                    key = "SPIKE_MATRIX_TOKEN";
+                  };
                 };
               };
-              MATRIX_KIRA_ACCESS_TOKEN = {
-                valueFrom.secretKeyRef = {
-                  name = "openclaw-config";
-                  key = "KIRA_MATRIX_TOKEN";
-                };
-              };
-              MATRIX_LUNA_ACCESS_TOKEN = {
-                valueFrom.secretKeyRef = {
-                  name = "openclaw-config";
-                  key = "LUNA_MATRIX_TOKEN";
-                };
-              };
-              MATRIX_SPIKE_ACCESS_TOKEN = {
-                valueFrom.secretKeyRef = {
-                  name = "openclaw-config";
-                  key = "SPIKE_MATRIX_TOKEN";
-                };
-              };
-            };
 
-            # Command: install matrix deps then start gateway
-            command = [
-              "bash"
-              "-c"
-              ''
-                set -e
+              # Command: install matrix deps then start gateway
+              command = [
+                "bash"
+                "-c"
+                ''
+                  set -e
 
-                # Wait for CephFS mount to be writable (avoids EACCES race on startup)
-                echo "Waiting for CephFS mount at /home/node/.openclaw..."
-                for i in $(seq 1 30); do
-                  if touch /home/node/.openclaw/.mount-check 2>/dev/null; then
-                    rm -f /home/node/.openclaw/.mount-check
-                    echo "CephFS mount ready"
-                    break
-                  fi
-                  echo "Mount not ready, attempt $i/30..."
-                  sleep 2
-                done
+                  # Wait for CephFS mount to be writable (avoids EACCES race on startup)
+                  echo "Waiting for CephFS mount at /home/node/.openclaw..."
+                  for i in $(seq 1 30); do
+                    if touch /home/node/.openclaw/.mount-check 2>/dev/null; then
+                      rm -f /home/node/.openclaw/.mount-check
+                      echo "CephFS mount ready"
+                      break
+                    fi
+                    echo "Mount not ready, attempt $i/30..."
+                    sleep 2
+                  done
 
-                # Ensure persistent directories exist for npm/pip packages
-                mkdir -p /home/node/.npm-global/bin
-                mkdir -p /home/node/.local/lib/python
-                mkdir -p /home/node/.local/bin
-                mkdir -p /home/node/.config
-                mkdir -p /home/node/.openclaw
+                  # Ensure persistent directories exist for npm/pip packages
+                  mkdir -p /home/node/.npm-global/bin
+                  mkdir -p /home/node/.local/lib/python
+                  mkdir -p /home/node/.local/bin
+                  mkdir -p /home/node/.config
+                  mkdir -p /home/node/.openclaw
 
-                # Seed config from ConfigMap template if CephFS file doesn't exist yet
-                CONFIG_FILE="/home/node/.openclaw/openclaw.json"
-                if [ ! -f "$CONFIG_FILE" ]; then
-                  echo "First run: seeding config from template..."
-                  cp /etc/openclaw/config-template.json "$CONFIG_FILE"
-                  echo "Config seeded at $CONFIG_FILE"
-                else
-                  echo "Using existing config at $CONFIG_FILE"
-                fi
-
-                # Perform environment variable substitution on openclaw.json
-                # This ensures that tokens from secrets are correctly injected
-                echo "Performing environment variable substitution in $CONFIG_FILE..."
-                ALLOWLIST="OPENCLAW_MATRIX_TOKEN ELEVENLABS_API_KEY KIMI_API_KEY OPENROUTER_API_KEY KIMI_API_KEY MINIMAX_API_KEY Z_AI_API_KEY ALIBABA_CODING_PLAN_API_KEY WHATSAPP_NUMBER WHATSAPP_BOT_NUMBER GEMINI_API_KEY GITHUB_TOKEN TS_AUTHKEY KIRA_MATRIX_TOKEN LUNA_MATRIX_TOKEN MEL_MATRIX_TOKEN SPIKE_MATRIX_TOKEN COPILOT_GITHUB_TOKEN"
-                for var_name in $ALLOWLIST; do
-                  var_value=$(eval printf '%s' "\$$var_name")
-                  if [ -n "$var_value" ]; then
-                    escaped_value=$(echo "$var_value" | sed 's/[\\/&]/\\&/g')
-                    sed -i "s|\\\''${$var_name}|$escaped_value|g" "$CONFIG_FILE"
-                  fi
-                done
-                echo "Substitution complete"
-                echo "Applying dynamic CephFS config patches..."
-                jq '.plugins = (.plugins // {}) | .plugins.enabled = true | .plugins.allow = (((.plugins.allow // []) + ["lossless-claw"]) | unique) | .plugins.slots = ((.plugins.slots // {}) | .memory = (.memory // "memory-core") | .contextEngine = "lossless-claw") | .plugins.entries = ((.plugins.entries // {}) | .["lossless-claw"] = ((.["lossless-claw"] // {}) | .enabled = true | .config = ((.config // {}) | .dbPath = "/home/node/.openclaw/lcm.db")))' "$CONFIG_FILE" > "$CONFIG_FILE.tmp" && mv "$CONFIG_FILE.tmp" "$CONFIG_FILE"
-                echo "CephFS config patched"
-
-
-                echo "Installing matrix plugin dependencies..."
-
-                # Find the actual nix store path where the gateway loads extensions from
-                MATRIX_EXT=$(readlink -f /lib/openclaw/extensions/matrix 2>/dev/null || echo "/lib/openclaw/extensions/matrix")
-
-                if [ -d "$MATRIX_EXT" ]; then
-                  echo "Found matrix extension at: $MATRIX_EXT"
-                  cd "$MATRIX_EXT"
-
-                  if [ ! -d "node_modules/@vector-im" ]; then
-                    echo "Installing npm dependencies..."
-                    node -e "
-                      const fs = require('fs');
-                      const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
-                      delete pkg.devDependencies;
-                      fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2));
-                    "
-                    npm install --omit=dev --no-package-lock --legacy-peer-deps 2>&1 || echo "WARN: npm install failed"
-                    echo "Matrix plugin dependencies installed"
+                  # Seed config from ConfigMap template if CephFS file doesn't exist yet
+                  CONFIG_FILE="/home/node/.openclaw/openclaw.json"
+                  if [ ! -f "$CONFIG_FILE" ]; then
+                    echo "First run: seeding config from template..."
+                    cp /etc/openclaw/config-template.json "$CONFIG_FILE"
+                    echo "Config seeded at $CONFIG_FILE"
                   else
-                    echo "node_modules already exists with deps, skipping"
+                    echo "Using existing config at $CONFIG_FILE"
                   fi
-                else
-                  echo "Matrix extension not found at $MATRIX_EXT"
-                fi
 
-                echo "Installing whatsapp plugin dependencies..."
-                WA_EXT=$(readlink -f /lib/openclaw/extensions/whatsapp 2>/dev/null || echo "/lib/openclaw/extensions/whatsapp")
+                  # Perform environment variable substitution on openclaw.json
+                  # This ensures that tokens from secrets are correctly injected
+                  echo "Performing environment variable substitution in $CONFIG_FILE..."
+                  ALLOWLIST="OPENCLAW_MATRIX_TOKEN ELEVENLABS_API_KEY KIMI_API_KEY OPENROUTER_API_KEY KIMI_API_KEY MINIMAX_API_KEY Z_AI_API_KEY ALIBABA_CODING_PLAN_API_KEY WHATSAPP_NUMBER WHATSAPP_BOT_NUMBER GEMINI_API_KEY GITHUB_TOKEN TS_AUTHKEY KIRA_MATRIX_TOKEN LUNA_MATRIX_TOKEN MEL_MATRIX_TOKEN SPIKE_MATRIX_TOKEN COPILOT_GITHUB_TOKEN"
+                  for var_name in $ALLOWLIST; do
+                    var_value=$(eval printf '%s' "\$$var_name")
+                    if [ -n "$var_value" ]; then
+                      escaped_value=$(echo "$var_value" | sed 's/[\\/&]/\\&/g')
+                      sed -i "s|\\\''${$var_name}|$escaped_value|g" "$CONFIG_FILE"
+                    fi
+                  done
+                  echo "Substitution complete"
+                  echo "Applying dynamic CephFS config patches..."
+                  jq '.plugins = (.plugins // {}) | .plugins.enabled = true | .plugins.allow = (((.plugins.allow // []) + ["lossless-claw"]) | unique) | .plugins.slots = ((.plugins.slots // {}) | .memory = (.memory // "memory-core") | .contextEngine = "lossless-claw") | .plugins.entries = ((.plugins.entries // {}) | .["lossless-claw"] = ((.["lossless-claw"] // {}) | .enabled = true | .config = ((.config // {}) | .dbPath = "/home/node/.openclaw/lcm.db")))' "$CONFIG_FILE" > "$CONFIG_FILE.tmp" && mv "$CONFIG_FILE.tmp" "$CONFIG_FILE"
+                  echo "CephFS config patched"
 
-                if [ -d "$WA_EXT" ]; then
-                  echo "Found whatsapp extension at: $WA_EXT"
-                  cd "$WA_EXT"
 
-                  if [ ! -d "node_modules/@whiskeysockets" ]; then
-                    echo "Installing npm dependencies..."
-                    node -e "
-                      const fs = require('fs');
-                      const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
-                      delete pkg.devDependencies;
-                      delete pkg.peerDependencies;
-                      fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2));
-                    "
-                    npm install --omit=dev --no-package-lock --legacy-peer-deps 2>&1 || echo "WARN: npm install failed"
-                    echo "WhatsApp plugin dependencies installed"
+                  echo "Installing matrix plugin dependencies..."
+
+                  # Find the actual nix store path where the gateway loads extensions from
+                  MATRIX_EXT=$(readlink -f /lib/openclaw/extensions/matrix 2>/dev/null || echo "/lib/openclaw/extensions/matrix")
+
+                  if [ -d "$MATRIX_EXT" ]; then
+                    echo "Found matrix extension at: $MATRIX_EXT"
+                    cd "$MATRIX_EXT"
+
+                    if [ ! -d "node_modules/@vector-im" ]; then
+                      echo "Installing npm dependencies..."
+                      node -e "
+                        const fs = require('fs');
+                        const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+                        delete pkg.devDependencies;
+                        fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2));
+                      "
+                      npm install --omit=dev --no-package-lock --legacy-peer-deps 2>&1 || echo "WARN: npm install failed"
+                      echo "Matrix plugin dependencies installed"
+                    else
+                      echo "node_modules already exists with deps, skipping"
+                    fi
                   else
-                    echo "node_modules already exists with deps, skipping"
+                    echo "Matrix extension not found at $MATRIX_EXT"
                   fi
-                else
-                  echo "WhatsApp extension not found at $WA_EXT"
-                fi
 
-                # Plugin sources already synced at image build time by oci-images/openclaw-nix/default.nix
+                  echo "Installing whatsapp plugin dependencies..."
+                  WA_EXT=$(readlink -f /lib/openclaw/extensions/whatsapp 2>/dev/null || echo "/lib/openclaw/extensions/whatsapp")
 
-                exec node /lib/openclaw/dist/index.js gateway --port 18789
-              ''
-            ];
-            probes = {
-              readiness = {
-                enabled = true;
-                type = "HTTP";
-                path = "/health";
-                port = 18789;
-              };
-            };
-          };
+                  if [ -d "$WA_EXT" ]; then
+                    echo "Found whatsapp extension at: $WA_EXT"
+                    cd "$WA_EXT"
 
-          # Tailscale sidecar
-          containers.tailscale = {
-            image = {
-              repository = "tailscale/tailscale";
-              tag = "latest";
-            };
-            securityContext = {
-              runAsUser = 0;
-              runAsGroup = 0;
-              capabilities.add = [
-                "NET_ADMIN"
-                "NET_RAW"
+                    if [ ! -d "node_modules/@whiskeysockets" ]; then
+                      echo "Installing npm dependencies..."
+                      node -e "
+                        const fs = require('fs');
+                        const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+                        delete pkg.devDependencies;
+                        delete pkg.peerDependencies;
+                        fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2));
+                      "
+                      npm install --omit=dev --no-package-lock --legacy-peer-deps 2>&1 || echo "WARN: npm install failed"
+                      echo "WhatsApp plugin dependencies installed"
+                    else
+                      echo "node_modules already exists with deps, skipping"
+                    fi
+                  else
+                    echo "WhatsApp extension not found at $WA_EXT"
+                  fi
+
+                  # Plugin sources already synced at image build time by oci-images/openclaw-nix/default.nix
+
+                  exec node /lib/openclaw/dist/index.js gateway --port 18789
+                ''
               ];
-            };
-            env = {
-              TS_AUTHKEY = {
-                valueFrom.secretKeyRef = {
-                  name = "openclaw-config";
-                  key = "TS_AUTHKEY";
+              probes = {
+                readiness = {
+                  enabled = true;
+                  type = "HTTP";
+                  path = "/health";
+                  port = 18789;
                 };
               };
-              TS_HOSTNAME = "openclaw-nix";
-              TS_USERSPACE = "false";
-              TS_STATE_DIR = "/var/lib/tailscale";
-              TS_ACCEPT_DNS = "false";
-              TS_AUTH_ONCE = "true";
-              TS_KUBE_SECRET = "";
+            };
+
+            chromium = {
+              image = appImage;
+              securityContext = {
+                runAsUser = 1000;
+                runAsGroup = 1000;
+                runAsNonRoot = true;
+                allowPrivilegeEscalation = false;
+                readOnlyRootFilesystem = false;
+                capabilities.drop = [ "ALL" ];
+                seccompProfile.type = "RuntimeDefault";
+              };
+
+              env = {
+                HOME = "/home/node/.chromium";
+                TMPDIR = "/tmp";
+              };
+
+              command = [
+                "/bin/chromium"
+                "--headless=new"
+                "--no-sandbox"
+                "--disable-gpu"
+                "--remote-debugging-address=127.0.0.1"
+                "--remote-debugging-port=9222"
+                "--user-data-dir=/home/node/.chromium/profile"
+                "--disk-cache-dir=/home/node/.chromium/cache"
+                "about:blank"
+              ];
+
+              resources = {
+                requests = {
+                  cpu = "250m";
+                  memory = "512Mi";
+                };
+                limits = {
+                  cpu = "1000m";
+                  memory = "1Gi";
+                };
+              };
+
+              probes = {
+                startup = {
+                  enabled = true;
+                  type = "HTTP";
+                  path = "/json/version";
+                  port = 9222;
+                  spec = {
+                    failureThreshold = 30;
+                    periodSeconds = 2;
+                  };
+                };
+                readiness = {
+                  enabled = true;
+                  type = "HTTP";
+                  path = "/json/version";
+                  port = 9222;
+                  spec = {
+                    periodSeconds = 10;
+                    timeoutSeconds = 2;
+                  };
+                };
+                liveness = {
+                  enabled = true;
+                  type = "HTTP";
+                  path = "/json/version";
+                  port = 9222;
+                  spec = {
+                    periodSeconds = 10;
+                    timeoutSeconds = 2;
+                    failureThreshold = 3;
+                  };
+                };
+              };
+            };
+
+            # Tailscale sidecar
+            tailscale = {
+              image = {
+                repository = "tailscale/tailscale";
+                tag = "latest";
+              };
+              securityContext = {
+                runAsUser = 0;
+                runAsGroup = 0;
+                capabilities.add = [
+                  "NET_ADMIN"
+                  "NET_RAW"
+                ];
+              };
+              env = {
+                TS_AUTHKEY = {
+                  valueFrom.secretKeyRef = {
+                    name = "openclaw-config";
+                    key = "TS_AUTHKEY";
+                  };
+                };
+                TS_HOSTNAME = "openclaw-nix";
+                TS_USERSPACE = "false";
+                TS_STATE_DIR = "/var/lib/tailscale";
+                TS_ACCEPT_DNS = "false";
+                TS_AUTH_ONCE = "true";
+                TS_KUBE_SECRET = "";
+              };
             };
           };
 
@@ -374,7 +452,30 @@ in
           dev-tun = {
             type = "hostPath";
             hostPath = "/dev/net/tun";
-            advancedMounts.main.tailscale = [ { path = "/dev/net/tun"; } ];
+            advancedMounts.main.tailscale = [{ path = "/dev/net/tun"; }];
+          };
+
+          chromium-data = {
+            type = "emptyDir";
+            advancedMounts.main.chromium = [
+              { path = "/home/node/.chromium"; }
+            ];
+          };
+
+          chromium-tmp = {
+            type = "emptyDir";
+            advancedMounts.main.chromium = [
+              { path = "/tmp"; }
+            ];
+          };
+
+          chromium-shm = {
+            type = "emptyDir";
+            medium = "Memory";
+            sizeLimit = "1Gi";
+            advancedMounts.main.chromium = [
+              { path = "/dev/shm"; }
+            ];
           };
         };
       };

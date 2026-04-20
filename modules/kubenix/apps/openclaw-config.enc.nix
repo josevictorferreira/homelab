@@ -20,9 +20,8 @@ let
     browser = {
       enabled = true;
       evaluateEnabled = true;
-      headless = true;
-      executablePath = "/bin/chromium";
-      noSandbox = true;
+      attachOnly = true;
+      cdpUrl = "http://127.0.0.1:9222";
     };
     models = {
       mode = "merge";
