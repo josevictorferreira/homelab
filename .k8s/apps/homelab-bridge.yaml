@@ -47,7 +47,7 @@ spec:
           envFrom:
             - secretRef:
                 name: homelab-bridge-env
-          image: ghcr.io/josevictorferreira/homelab-bridge:e8d1992@sha256:5a15162613f8128a3f34bea84c1f1b9603e4e132eaa97a0bfb8dd76f0211abde
+          image: ghcr.io/josevictorferreira/homelab-bridge:e8d1992@sha256:57cbcfbda5f948e32654d70e64705b042336081141d0f7532e766f589f364e54
           imagePullPolicy: IfNotPresent
           name: main
           ports:
