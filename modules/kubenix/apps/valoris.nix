@@ -80,7 +80,7 @@ in
             ];
             env = {
               KEYCLOAK_ISSUER.value = "https://identity.josevictor.me/realms/valoris";
-              KEYCLOAK_JWKS_URL.value = "https://identity.josevictor.me/realms/valoris/protocol/openid-connect/certs";
+              KEYCLOAK_JWKS_URL.value = "http://keycloak.apps.svc.cluster.local:8080/realms/valoris/protocol/openid-connect/certs";
               KEYCLOAK_AZP.value = "valoris-frontend";
             };
           };
