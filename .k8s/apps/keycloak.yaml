@@ -32,10 +32,11 @@ spec:
       automountServiceAccountToken: false
       containers:
         - args:
-            - start-dev
+            - start
             - --http-enabled=true
             - --hostname=identity.josevictor.me
             - --hostname-strict=false
+            - --proxy-headers=xforwarded
             - --http-port=8080
             - --https-port=8443
             - --db=postgres

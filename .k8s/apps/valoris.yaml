@@ -33,10 +33,11 @@ spec:
     spec:
       automountServiceAccountToken: true
       containers:
-        - command:
-            - nginx
-            - -g
-            - daemon off;
+        - env:
+            - name: KEYCLOAK_AUTHORITY
+              value: https://identity.josevictor.me/realms/valoris
+            - name: KEYCLOAK_CLIENT_ID
+              value: valoris-frontend
           envFrom:
             - secretRef:
                 name: valoris-config
