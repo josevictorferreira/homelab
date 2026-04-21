@@ -28,10 +28,11 @@ in
                 protocol = "TCP";
               }
             ];
-            env = [
+            envFrom = [
               {
-                name = "PORT";
-                value = "8080";
+                secretRef = {
+                  name = "${name}-env";
+                };
               }
             ];
             resources = {
