@@ -18,11 +18,6 @@ in
           pullPolicy = "Always";
         };
         port = 80;
-        command = [
-          "nginx"
-          "-g"
-          "daemon off;"
-        ];
         resources = {
           limits = {
             memory = "1Gi";
@@ -40,6 +35,10 @@ in
               { secretRef.name = secretName; }
               { secretRef.name = "valoris-s3"; }
             ];
+            env = {
+              KEYCLOAK_AUTHORITY.value = "https://identity.josevictor.me/realms/valoris";
+              KEYCLOAK_CLIENT_ID.value = "valoris-frontend";
+            };
           };
         };
       };

@@ -1,6 +1,7 @@
-{ kubenix
-, homelab
-, ...
+{
+  kubenix,
+  homelab,
+  ...
 }:
 
 let
@@ -49,6 +50,11 @@ in
           secretKeys = {
             adminPasswordKey = "KEYCLOAK_ADMIN_PASSWORD";
           };
+          # Production mode: terminate TLS at ingress, trust X-Forwarded-* headers
+          production = true;
+          proxyHeaders = "xforwarded";
+          hostnameStrict = false;
+          httpEnabled = true;
         };
 
         # Resources for single instance (Java needs 1Gi+)
