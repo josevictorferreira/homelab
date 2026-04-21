@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: grafana-alert-relay
+  namespace: apps
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: grafana-alert-relay
+  template:
+    metadata:
+      labels:
+        app: grafana-alert-relay
+    spec:
+      containers:
+        - env:
+            - name: PORT
+              value: '8080'
+          image: ghcr.io/josevictorferreira/grafana-alert-relay:1.0.0
+          name: grafana-alert-relay
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+          resources:
+            limits:
+              cpu: 200m
+              memory: 256Mi
+            requests:
+              cpu: 50m
+              memory: 64Mi
+      imagePullSecrets:
+        - name: ghcr-registry-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: grafana-alert-relay
+  namespace: apps
+spec:
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+  selector:
+    app: grafana-alert-relay
+  type: ClusterIP
