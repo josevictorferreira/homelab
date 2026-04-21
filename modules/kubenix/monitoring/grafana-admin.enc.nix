@@ -29,13 +29,10 @@ let
         receivers = [
           {
             uid = "matrix-alerts";
-            type = "matrix";
+            type = "webhook";
             settings = {
-              homeserverAddress = "http://tuwunel.apps.svc.cluster.local:8008";
-              homeserverUseTLS = false;
-              roomId = "!d0dYdkGOcX7cchTc4H:josevictor.me";
-              userId = "@homelab-bridge:josevictor.me";
-              password = kubenix.lib.secretsFor "homelab_bridge_matrix_password";
+              httpMethod = "POST";
+              url = "http://grafana-alert-relay.apps.svc.cluster.local:8080/webhook";
             };
             disableResolveMessage = false;
           }
