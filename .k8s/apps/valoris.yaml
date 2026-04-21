@@ -175,7 +175,7 @@ spec:
             - name: KEYCLOAK_ISSUER
               value: https://identity.josevictor.me/realms/valoris
             - name: KEYCLOAK_JWKS_URL
-              value: https://identity.josevictor.me/realms/valoris/protocol/openid-connect/certs
+              value: http://keycloak.apps.svc.cluster.local:8080/realms/valoris/protocol/openid-connect/certs
           envFrom:
             - secretRef:
                 name: valoris-config
