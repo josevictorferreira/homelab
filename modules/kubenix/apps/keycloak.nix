@@ -138,7 +138,7 @@ in
           }
           {
             name = "add-valoris-theme";
-            image = "ghcr.io/josevictorferreira/valoris-identity:v0.2.0";
+            image = "ghcr.io/josevictorferreira/valoris-identity:v0.3.0";
             command = [
               "sh"
               "-c"

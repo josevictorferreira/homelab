@@ -173,7 +173,7 @@ spec:
             - sh
             - -c
             - cp /theme.jar /shared/valoris-theme.jar
-          image: ghcr.io/josevictorferreira/valoris-identity:v0.2.0
+          image: ghcr.io/josevictorferreira/valoris-identity:v0.3.0
           name: add-valoris-theme
           volumeMounts:
             - mountPath: /shared
