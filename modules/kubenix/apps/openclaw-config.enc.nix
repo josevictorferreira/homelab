@@ -3,6 +3,10 @@
 let
   namespace = homelab.kubernetes.namespaces.applications;
   configData = {
+    meta = {
+      lastTouchedVersion = "2026.4.14";
+      lastTouchedAt = "2026-04-16T14:42:10.102Z";
+    };
     env = {
       ALIBABA_CODING_PLAN_API_KEY = "\${ALIBABA_CODING_PLAN_API_KEY}";
       COPILOT_GITHUB_TOKEN = "\${COPILOT_GITHUB_TOKEN}";
@@ -17,11 +21,20 @@ let
       OPENROUTER_API_KEY = "\${OPENROUTER_API_KEY}";
       Z_AI_API_KEY = "\${Z_AI_API_KEY}";
     };
+    logging = {
+      level = "info";
+      consoleLevel = "info";
+    };
     browser = {
       enabled = true;
       evaluateEnabled = true;
       attachOnly = true;
-      cdpUrl = "http://127.0.0.1:9222";
+      defaultProfile = "sidecar";
+      profiles.sidecar = {
+        cdpUrl = "http://127.0.0.1:9222";
+        attachOnly = true;
+        color = "#FF4500";
+      };
     };
     models = {
       mode = "merge";
@@ -109,28 +122,10 @@ let
             }
           ];
         };
-        moonshotai = {
-          baseUrl = "https://api.kimi.com/coding";
-          apiKey = "\${KIMI_API_KEY}";
-          api = "anthropic-messages";
-          models = [
-            {
-              id = "k2p5";
-              name = "Kimi K2.5";
-              reasoning = true;
-              input = [
-                "text"
-                "image"
-              ];
-              contextWindow = 262144;
-              maxTokens = 8192;
-            }
-          ];
-        };
         minimax = {
-          baseUrl = "https://api.minimaxi.com/anthropic";
+          baseUrl = "https://api.minimax.io/v1";
           apiKey = "\${MINIMAX_API_KEY}";
-          api = "anthropic-messages";
+          api = "openai-completions";
           models = [
             {
               id = "MiniMax-M2.5";
@@ -170,25 +165,85 @@ let
             {
               id = "glm-5";
               name = "GLM-5";
+              api = "anthropic-messages";
               reasoning = true;
               input = [ "text" ];
+              cost = {
+                input = 0;
+                output = 0;
+                cacheRead = 0;
+                cacheWrite = 0;
+              };
               contextWindow = 120000;
               maxTokens = 8192;
             }
             {
               id = "glm-5.1";
               name = "GLM-5.1";
+              api = "anthropic-messages";
               reasoning = true;
               input = [ "text" ];
-              contextWindow = 120000;
-              maxTokens = 8192;
+              cost = {
+                input = 0;
+                output = 0;
+                cacheRead = 0;
+                cacheWrite = 0;
+              };
+              contextWindow = 200000;
+              maxTokens = 131072;
             }
             {
               id = "glm-5-turbo";
               name = "GLM-5 Turbo";
+              api = "anthropic-messages";
               reasoning = true;
               input = [ "text" ];
+              cost = {
+                input = 0;
+                output = 0;
+                cacheRead = 0;
+                cacheWrite = 0;
+              };
               contextWindow = 120000;
+              maxTokens = 8192;
+            }
+            {
+              id = "glm-5v-turbo";
+              name = "GLM-5V Turbo";
+              api = "anthropic-messages";
+              reasoning = true;
+              input = [
+                "text"
+                "image"
+              ];
+              cost = {
+                input = 0;
+                output = 0;
+                cacheRead = 0;
+                cacheWrite = 0;
+              };
+              contextWindow = 200000;
+              maxTokens = 131072;
+            }
+          ];
+        };
+        kimi-coding = {
+          baseUrl = "https://api.kimi.com/coding/";
+          apiKey = "\${KIMI_API_KEY}";
+          api = "anthropic-messages";
+          models = [
+            {
+              id = "k2p5";
+              name = "Kimi K2.5";
+              reasoning = false;
+              input = [ "text" ];
+              cost = {
+                input = 0;
+                output = 0;
+                cacheRead = 0;
+                cacheWrite = 0;
+              };
+              contextWindow = 256000;
               maxTokens = 8192;
             }
           ];
@@ -198,9 +253,9 @@ let
     agents = {
       defaults = {
         model = {
-          primary = "minimax/MiniMax-M2.7";
+          primary = "kimi-coding/k2p5";
           fallbacks = [
-            "moonshotai/k2p5"
+            "kimi-coding/k2p5"
             "zai-coding-plan/glm-5.1"
             "alibaba-coding-plan/qwen3.5-plus"
           ];
@@ -209,7 +264,7 @@ let
           primary = "github-copilot/gemini-3-flash-preview";
           fallbacks = [
             "alibaba-coding-plan/qwen3.5-plus"
-            "moonshotai/k2p5"
+            "kimi-coding/k2p5"
           ];
         };
         userTimezone = "America/Sao_Paulo";
@@ -256,7 +311,7 @@ let
         subagents = {
           maxConcurrent = 4;
           archiveAfterMinutes = 60;
-          model = "zai-coding-plan/glm-5-turbo";
+          model = "zai-coding-plan/glm-5.1";
           runTimeoutSeconds = 900;
         };
         sandbox = {
@@ -265,42 +320,45 @@ let
             headless = true;
           };
         };
+        models = {
+          "openai-codex/gpt-5.4" = { };
+        };
       };
       list = [
         {
           id = "mel";
           workspace = "/home/node/.openclaw/workspace-mel";
+          model = {
+            primary = "minimax/MiniMax-M2.7";
+            fallbacks = [
+              "kimi-coding/k2p5"
+              "zai-coding-plan/glm-5-turbo"
+              "alibaba-coding-plan/qwen3.5-plus"
+            ];
+          };
           identity = {
             name = "Mel";
             theme = "minha fiel assistente";
             emoji = "🐕";
             avatar = "avatars/mel.png";
           };
-          model = {
-            primary = "moonshotai/k2p5";
-            fallbacks = [
-              "zai-coding-plan/glm-5-turbo"
-              "minimax/MiniMax-M2.5"
-              "alibaba-coding-plan/qwen3.5-plus"
-            ];
-          };
         }
         {
           id = "kira";
           workspace = "/home/node/.openclaw/workspace-kira";
+          model = {
+            primary = "zai-coding-plan/glm-5-turbo";
+            fallbacks = [
+              "minimax/MiniMax-M2.7"
+              "kimi-coding/k2p5"
+              "alibaba-coding-plan/qwen3.5-plus"
+            ];
+          };
           identity = {
             name = "Kira";
             theme = "minha fiel contadora";
             emoji = "🐕";
             avatar = "avatars/kira.png";
-          };
-          model = {
-            primary = "zai-coding-plan/glm-5-turbo";
-            fallbacks = [
-              "minimax/MiniMax-M2.7"
-              "moonshotai/k2p5"
-              "alibaba-coding-plan/qwen3.5-plus"
-            ];
           };
           tools = {
             deny = [
@@ -313,36 +371,36 @@ let
         {
           id = "luna";
           workspace = "/home/node/.openclaw/workspace-luna";
+          model = {
+            primary = "zai-coding-plan/glm-5.1";
+            fallbacks = [
+              "kimi-coding/k2p5"
+              "minimax/MiniMax-M2.5"
+              "alibaba-coding-plan/qwen3.5-plus"
+            ];
+          };
           identity = {
             name = "Luna";
             theme = "minha fiel companheira";
             emoji = "🐕";
             avatar = "avatars/luna.png";
           };
-          model = {
-            primary = "alibaba-coding-plan/qwen3.5-plus";
-            fallbacks = [
-              "zai-coding-plan/glm-5-turbo"
-              "moonshotai/k2p5"
-              "minimax/MiniMax-M2.5"
-            ];
-          };
         }
         {
           id = "spike";
           workspace = "/home/node/.openclaw/workspace-spike";
+          model = {
+            primary = "kimi-coding/k2p5";
+            fallbacks = [
+              "minimax/MiniMax-M2.7"
+              "alibaba-coding-plan/qwen3.5-plus"
+              "zai-coding-plan/glm-5-turbo"
+            ];
+          };
           identity = {
             name = "Spike";
             theme = "meu fiel companheiro";
             emoji = "🐕";
-          };
-          model = {
-            primary = "minimax/MiniMax-M2.7";
-            fallbacks = [
-              "moonshotai/k2p5"
-              "zai-coding-plan/glm-5.1"
-              "alibaba-coding-plan/qwen3.5-plus"
-            ];
           };
         }
         {
@@ -386,14 +444,13 @@ let
         "agents_list"
       ];
       deny = [ ];
+      exec = {
+        security = "full";
+        ask = "off";
+      };
       web = {
         search = {
           provider = "perplexity";
-          perplexity = {
-            apiKey = "\${OPENROUTER_API_KEY}";
-            baseUrl = "https://openrouter.ai/api/v1";
-            model = "perplexity/sonar-pro";
-          };
         };
       };
       media = {
@@ -420,6 +477,29 @@ let
               model = "gemini-3-flash-preview";
             }
           ];
+        };
+      };
+      elevated = {
+        enabled = false;
+        allowFrom = {
+          matrix = [
+            "@zeh:josevictor.me"
+          ];
+          whatsapp = [
+            "+554388109393"
+          ];
+        };
+      };
+      loopDetection = {
+        enabled = true;
+        historySize = 30;
+        warningThreshold = 10;
+        criticalThreshold = 20;
+        globalCircuitBreakerThreshold = 30;
+        detectors = {
+          genericRepeat = true;
+          knownPollNoProgress = true;
+          pingPong = true;
         };
       };
     };
@@ -458,163 +538,243 @@ let
     };
     messages = {
       removeAckAfterReply = true;
-      ackReactionScope = "all";
       tts = {
         auto = "inbound";
         provider = "elevenlabs";
-        summaryModel = "moonshotai/k2p5";
+        summaryModel = "kimi-coding/k2p5";
         providers = {
           elevenlabs = {
             apiKey = "\${ELEVENLABS_API_KEY}";
-            voiceId = "GOkMqfyKMLVUcYfO2WbB";
             modelId = "eleven_v3";
             seed = 91;
+            voiceId = "GOkMqfyKMLVUcYfO2WbB";
             voiceSettings = {
-              stability = 0.5;
               similarityBoost = 0.75;
+              speed = 1;
+              stability = 0.5;
               style = 0;
               useSpeakerBoost = true;
-              speed = 1;
             };
           };
         };
       };
-      commands = {
-        native = "auto";
-        nativeSkills = "auto";
-        restart = true;
-        ownerDisplay = "raw";
+      ackReactionScope = "all";
+    };
+    commands = {
+      native = "auto";
+      nativeSkills = "auto";
+      restart = true;
+      ownerDisplay = "raw";
+    };
+    session = {
+      scope = "per-sender";
+      dmScope = "per-channel-peer";
+      idleMinutes = 60;
+      reset = {
+        mode = "daily";
+        atHour = 4;
       };
-      session = {
-        scope = "per-sender";
-        idleMinutes = 60;
-        reset = {
-          mode = "daily";
-          atHour = 4;
+    };
+    channels = {
+      matrix = {
+        accounts = {
+          default = {
+            network = {
+              dangerouslyAllowPrivateNetwork = true;
+            };
+            groupAllowFrom = [
+              "@zeh:josevictor.me"
+            ];
+            groupPolicy = "allowlist";
+            homeserver = "http://tuwunel.apps.svc.cluster.local:8008";
+          };
+          kira = {
+            accessToken = "\${KIRA_MATRIX_TOKEN}";
+            network = {
+              dangerouslyAllowPrivateNetwork = true;
+            };
+            homeserver = "http://tuwunel.apps.svc.cluster.local:8008";
+            name = "Kira";
+            userId = "@kira:josevictor.me";
+          };
+          luna = {
+            accessToken = "\${LUNA_MATRIX_TOKEN}";
+            network = {
+              dangerouslyAllowPrivateNetwork = true;
+            };
+            homeserver = "http://tuwunel.apps.svc.cluster.local:8008";
+            name = "Luna";
+            userId = "@luna:josevictor.me";
+          };
+          mel = {
+            accessToken = "\${MEL_MATRIX_TOKEN}";
+            network = {
+              dangerouslyAllowPrivateNetwork = true;
+            };
+            homeserver = "http://tuwunel.apps.svc.cluster.local:8008";
+            name = "Mel";
+            userId = "@mel:josevictor.me";
+          };
+          spike = {
+            accessToken = "\${SPIKE_MATRIX_TOKEN}";
+            network = {
+              dangerouslyAllowPrivateNetwork = true;
+            };
+            homeserver = "http://tuwunel.apps.svc.cluster.local:8008";
+            name = "Spike";
+            userId = "@spike:josevictor.me";
+          };
+        };
+        autoJoin = "always";
+        dm = {
+          allowFrom = [
+            "@zeh:josevictor.me"
+          ];
+          policy = "allowlist";
+        };
+        enabled = true;
+        encryption = true;
+        groups = {
+          "*" = {
+            enabled = true;
+            requireMention = false;
+          };
+        };
+        mediaMaxMb = 150;
+        textChunkLimit = 8000;
+        chunkMode = "newline";
+      };
+      whatsapp = {
+        enabled = true;
+        dmPolicy = "allowlist";
+        allowFrom = [ "+554388109393" ];
+        groupAllowFrom = [ "+554388109393" ];
+        groupPolicy = "allowlist";
+        ackReaction = {
+          emoji = "👀";
+          direct = true;
+          group = "mentions";
+        };
+        debounceMs = 0;
+        mediaMaxMb = 50;
+      };
+    };
+    talk = {
+      providers = {
+        elevenlabs = {
+          voiceId = "GOkMqfyKMLVUcYfO2WbB";
+          modelId = "eleven_v3";
+          outputFormat = "mp3_44100_128";
+          apiKey = "\${ELEVENLABS_API_KEY}";
         };
       };
-      channels = {
-        whatsapp = {
+      interruptOnSpeech = true;
+    };
+    gateway = {
+      port = 18789;
+      mode = "local";
+      bind = "lan";
+      controlUi = {
+        allowedOrigins = [
+          "http://localhost:18789"
+          "http://127.0.0.1:18789"
+          "http://10.0.1.219:18789"
+        ];
+        dangerouslyAllowHostHeaderOriginFallback = true;
+      };
+      auth = {
+        rateLimit = {
+          maxAttempts = 10;
+          windowMs = 60000;
+          lockoutMs = 300000;
+        };
+      };
+    };
+    memory = {
+      backend = "builtin";
+      citations = "on";
+    };
+    skills = {
+      allowBundled = [ ];
+      install = {
+        nodeManager = "npm";
+      };
+    };
+    plugins = {
+      enabled = true;
+      allow = [
+        "browser"
+        "github-copilot"
+        "kimi"
+        "lobster"
+        "lossless-claw"
+        "matrix"
+        "memory-core"
+        "minimax"
+        "openai"
+        "perplexity"
+        "whatsapp"
+      ];
+      slots = {
+        memory = "memory-core";
+        contextEngine = "lossless-claw";
+      };
+      entries = {
+        lobster = {
           enabled = true;
-          dmPolicy = "allowlist";
-          allowFrom = [ "+554388109393" ];
-          groupAllowFrom = [ "+554388109393" ];
-          groupPolicy = "allowlist";
-          ackReaction = {
-            emoji = "👀";
-            direct = true;
-            group = "mentions";
-          };
-          debounceMs = 0;
-          mediaMaxMb = 50;
+          config = { };
         };
         matrix = {
           enabled = true;
-          autoJoin = "always";
-          groups = {
-            "*" = {
-              allow = true;
-              requireMention = false;
-            };
-          };
-          dm = {
-            allowFrom = [ "@zeh:josevictor.me" ];
-            policy = "allowlist";
-          };
-          encryption = true;
-          mediaMaxMb = 150;
-          accounts = {
-            mel = {
-              name = "Mel";
-              homeserver = "http://tuwunel.apps.svc.cluster.local:8008";
-              accessToken = "\${MEL_MATRIX_TOKEN}";
-              userId = "@mel:josevictor.me";
-              allowPrivateNetwork = true;
-            };
-            kira = {
-              name = "Kira";
-              homeserver = "http://tuwunel.apps.svc.cluster.local:8008";
-              accessToken = "\${KIRA_MATRIX_TOKEN}";
-              userId = "@kira:josevictor.me";
-              allowPrivateNetwork = true;
-            };
-            luna = {
-              name = "Luna";
-              homeserver = "http://tuwunel.apps.svc.cluster.local:8008";
-              accessToken = "\${LUNA_MATRIX_TOKEN}";
-              userId = "@luna:josevictor.me";
-              allowPrivateNetwork = true;
-            };
-            spike = {
-              name = "Spike";
-              homeserver = "http://tuwunel.apps.svc.cluster.local:8008";
-              accessToken = "\${SPIKE_MATRIX_TOKEN}";
-              userId = "@spike:josevictor.me";
-              allowPrivateNetwork = true;
-            };
-            default = {
-              groupPolicy = "allowlist";
-              groupAllowFrom = [ "@zeh:josevictor.me" ];
-              homeserver = "http://tuwunel.apps.svc.cluster.local:8008";
-              allowPrivateNetwork = true;
+          config = { };
+        };
+        perplexity = {
+          enabled = true;
+          config = {
+            webSearch = {
+              apiKey = "\${OPENROUTER_API_KEY}";
+              baseUrl = "https://openrouter.ai/api/v1";
+              model = "perplexity/sonar-pro";
             };
           };
         };
-      };
-      talk = {
-        voiceId = "GOkMqfyKMLVUcYfO2WbB";
-        modelId = "eleven_v3";
-        outputFormat = "mp3_44100_128";
-        apiKey = "\${ELEVENLABS_API_KEY}";
-        interruptOnSpeech = true;
-      };
-      gateway = {
-        port = 18789;
-        mode = "local";
-        bind = "lan";
-        controlUi = {
-          dangerouslyAllowHostHeaderOriginFallback = true;
+        browser = {
+          enabled = true;
         };
-      };
-      logging = {
-        level = "debug";
-      };
-      memory = {
-        backend = "builtin";
-        citations = "on";
-      };
-      skills = {
-        allowBundled = [ ];
-        install = {
-          nodeManager = "npm";
+        minimax = {
+          enabled = true;
         };
-      };
-      plugins = {
-        enabled = true;
-        allow = [
-          "matrix"
-          "whatsapp"
-          "memory-core"
-          "lobster"
-          "lossless-claw"
-        ];
-        slots = {
-          memory = "memory-core";
-          contextEngine = "lossless-claw";
-        };
-        entries = {
-          matrix = {
-            enabled = true;
+        lossless-claw = {
+          enabled = true;
+          config = {
+            dbPath = "/home/node/.openclaw/lcm.db";
+            summaryModel = "kimi-coding/k2p5";
+            expansionModel = "kimi-coding/k2p5";
           };
-          lobster = {
-            enabled = true;
-          };
-          lossless-claw = {
-            enabled = true;
-            config = {
-              dbPath = "/home/node/.openclaw/lcm.db";
+        };
+        kimi = {
+          enabled = true;
+        };
+        github-copilot = {
+          enabled = true;
+        };
+        memory-core = {
+          config = {
+            dreaming = {
+              enabled = true;
             };
           };
+        };
+        openai = {
+          enabled = true;
+        };
+      };
+    };
+    auth = {
+      profiles = {
+        "openai-codex:tinhodunk@gmail.com" = {
+          provider = "openai-codex";
+          mode = "oauth";
         };
       };
     };
