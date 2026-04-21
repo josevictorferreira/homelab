@@ -158,6 +158,24 @@ spec:
           volumeMounts:
             - mountPath: /shared-quarkus
               name: keycloak-lib-quarkus
+        - command:
+            - sh
+            - -c
+            - cp -r /opt/keycloak/providers/. /shared/
+          image: keycloak/keycloak:26.5.2
+          name: copy-base-providers
+          volumeMounts:
+            - mountPath: /shared
+              name: keycloak-providers
+        - command:
+            - sh
+            - -c
+            - cp /theme.jar /shared/valoris-theme.jar
+          image: ghcr.io/josevictorferreira/valoris-identity:v0.1.0
+          name: add-valoris-theme
+          volumeMounts:
+            - mountPath: /shared
+              name: keycloak-providers
       securityContext:
         fsGroup: 1001
       serviceAccountName: default
