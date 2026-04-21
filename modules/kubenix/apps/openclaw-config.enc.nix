@@ -529,7 +529,7 @@ let
         agentId = "mel";
         match = {
           channel = "matrix";
-          accountId = "@mel";
+          accountId = "@mel:josevictor.me";
         };
       }
     ];

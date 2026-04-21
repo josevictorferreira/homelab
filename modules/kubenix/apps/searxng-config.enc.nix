@@ -1,4 +1,5 @@
 { homelab, kubenix, ... }:
+
 let
   namespace = homelab.kubernetes.namespaces.applications;
   domain = kubenix.lib.domainFor "searxng";
@@ -31,6 +32,14 @@ let
     valkey = {
       url = "redis://:${kubenix.lib.secretsInlineFor "redis_password"}@redis-headless:6379/2";
     };
+    engines = [
+      {
+        name = "tavily";
+        engine = "tavily";
+        api_key = kubenix.lib.secretsFor "tavily_api_key";
+        inactive = false;
+      }
+    ];
   };
   limiter = ''
     [botdetection]
@@ -75,6 +84,7 @@ in
         stringData = {
           "SEARXNG_HOSTNAME" = domain;
           "SEARXNG_SECRET" = kubenix.lib.secretsFor "searxng_secret_key";
+          "TAVILY_API_KEY" = kubenix.lib.secretsFor "tavily_api_key";
         };
       };
     };
