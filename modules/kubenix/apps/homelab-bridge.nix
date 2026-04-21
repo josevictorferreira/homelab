@@ -11,7 +11,7 @@ in
       inherit namespace;
       image = {
         repository = "ghcr.io/josevictorferreira/homelab-bridge";
-        tag = "e8d1992@sha256:57cbcfbda5f948e32654d70e64705b042336081141d0f7532e766f589f364e54";
+        tag = "9c818b3@sha256:5abaf5f5d6520f60762314d050212ed9240231f48a7781b69485b5aa099844a1";
         pullPolicy = "IfNotPresent";
       };
       port = 8080;
