@@ -449,3 +449,15 @@
 **Lesson:** Only use `make manifests` to run the pipeline. Never run `nix build .#gen-manifests`, `vals eval`, or other stages individually — they produce misleading results because the `.k8s/` directory is only correctly populated by the full pipeline.
 **Context:** Running `nix build .#gen-manifests` directly updates the Nix store but not `.k8s/`. The `.k8s/` directory is populated by the `cp -rf result/* .k8s/` step inside the pipeline. Individual runs give a false picture of what's actually generated.
 **Verify:** Always check `.k8s/` files after `make manifests`, never after individual stage runs
+
+## OCI Image Building
+
+### Go Module Build Requirements
+**Lesson:** When building Go OCI images with `buildGoModule`, always create a `go.mod` file and use `vendorHash = null;` if there are no external dependencies.
+**Context:** Without go.mod, the builder fails with "no modules specified". With external deps, use placeholder hash and update from error. Without deps, `null` is required.
+**Verify:** `nix build .#<image-name> --impure` succeeds
+
+### Kubenix Release Submodule Fails for ClusterIP Services
+**Lesson:** For internal ClusterIP services that don't need LoadBalancer IPs, use raw Kubernetes resources pattern (like `flaresolverr.nix`) instead of the release submodule. The release submodule unconditionally evaluates `serviceAnnotationFor` which requires LoadBalancer IP entries.
+**Context:** Even adding `annotations = {}` or service type override doesn't work — the annotation lookup happens before values merge. Raw resources bypass this.
+**Verify:** See `modules/kubenix/apps/flaresolverr.nix` for the correct pattern
