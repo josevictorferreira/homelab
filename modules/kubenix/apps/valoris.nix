@@ -78,6 +78,11 @@ in
               { secretRef.name = secretName; }
               { secretRef.name = "valoris-s3"; }
             ];
+            env = {
+              KEYCLOAK_ISSUER.value = "https://identity.josevictor.me/realms/valoris";
+              KEYCLOAK_JWKS_URL.value = "https://identity.josevictor.me/realms/valoris/protocol/openid-connect/certs";
+              KEYCLOAK_AZP.value = "valoris-frontend";
+            };
           };
         };
       };

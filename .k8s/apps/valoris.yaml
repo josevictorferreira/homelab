@@ -169,6 +169,13 @@ spec:
             - server
             - -p
             - '80'
+          env:
+            - name: KEYCLOAK_AZP
+              value: valoris-frontend
+            - name: KEYCLOAK_ISSUER
+              value: https://identity.josevictor.me/realms/valoris
+            - name: KEYCLOAK_JWKS_URL
+              value: https://identity.josevictor.me/realms/valoris/protocol/openid-connect/certs
           envFrom:
             - secretRef:
                 name: valoris-config
