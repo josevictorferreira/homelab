@@ -317,6 +317,11 @@ let
                   }
                   {
                     type = "reddit";
+                    subreddit = "functionalprint";
+                    "show-thumbnails" = true;
+                  }
+                  {
+                    type = "reddit";
                     subreddit = "StableDiffusion";
                     "show-thumbnails" = true;
                   }
