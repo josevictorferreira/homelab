@@ -106,12 +106,48 @@ in
             }
           ];
         };
-
         # Service configuration
         service = {
           type = "ClusterIP";
           port = 8080;
         };
+
+        # Seed /opt/keycloak/providers emptyDir with base providers + Valoris theme jar.
+        # Chart mounts keycloak-providers emptyDir at /opt/keycloak/providers in main
+        # container, which hides base image providers. Two-step init restores them
+        # and then overlays the Valoris theme jar.
+        extraInitContainers = [
+          {
+            name = "copy-base-providers";
+            image = "keycloak/keycloak:26.5.2";
+            command = [
+              "sh"
+              "-c"
+              "cp -r /opt/keycloak/providers/. /shared/"
+            ];
+            volumeMounts = [
+              {
+                name = "keycloak-providers";
+                mountPath = "/shared";
+              }
+            ];
+          }
+          {
+            name = "add-valoris-theme";
+            image = "ghcr.io/josevictorferreira/valoris-identity:v0.1.0";
+            command = [
+              "sh"
+              "-c"
+              "cp /theme.jar /shared/valoris-theme.jar"
+            ];
+            volumeMounts = [
+              {
+                name = "keycloak-providers";
+                mountPath = "/shared";
+              }
+            ];
+          }
+        ];
       };
     };
   };
