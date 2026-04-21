@@ -24,6 +24,10 @@ in
       inherit namespace;
 
       values = {
+        global = {
+          imagePullSecrets = [ { name = "ghcr-registry-secret"; } ];
+        };
+
         image = {
           repository = "keycloak/keycloak";
           tag = "26.5.2";

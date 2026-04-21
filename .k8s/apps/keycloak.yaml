@@ -131,6 +131,8 @@ spec:
               name: keycloak-themes
             - mountPath: /opt/keycloak/providers
               name: keycloak-providers
+      imagePullSecrets:
+        - name: ghcr-registry-secret
       initContainers:
         - command:
             - sh
