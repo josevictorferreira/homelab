@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
 
 let
   # Matrix plugin dependencies - FOD build using npm
@@ -35,7 +35,7 @@ let
       }
     );
 
-    npmDepsHash = "sha256-XLyg2rVI4x7OzQaeu8RoQX141NrQoI4rNiTsDBdL+7A=";
+    npmDepsHash = "sha256-/wRVF8bPQr66YpAqaug/4DTo2jeljAZjrxA8CPs2O2U=";
 
     # Copy vendored package-lock.json
     postPatch = ''
