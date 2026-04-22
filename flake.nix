@@ -135,14 +135,10 @@
             pkgs = sysPkgs;
             inherit lib inputs system;
           };
-          grafanaAlertRelayImage = import ./oci-images/grafana-alert-relay {
-            pkgs = sysPkgs;
-          };
         in
         {
           gen-manifests = kubenixModule.mkRenderer system sysPkgs;
           openclaw-nix-image = openclawNixImage;
-          grafana-alert-relay-image = grafanaAlertRelayImage;
           inherit (commands)
             lgroups
             check

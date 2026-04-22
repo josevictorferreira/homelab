@@ -32,7 +32,7 @@ let
             type = "webhook";
             settings = {
               httpMethod = "POST";
-              url = "http://grafana-alert-relay.apps.svc.cluster.local:8080/webhook";
+              url = "http://homelab-bridge.apps.svc.cluster.local:8080/webhooks/grafana";
             };
             disableResolveMessage = false;
           }
