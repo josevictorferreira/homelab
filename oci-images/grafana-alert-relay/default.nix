@@ -7,7 +7,7 @@ let
 in
 dockerTools.buildImage {
   name = "ghcr.io/josevictorferreira/grafana-alert-relay";
-  tag = "1.0.0";
+  tag = "1.0.1";
 
   copyToRoot = pkgs.buildEnv {
     name = "rootfs";
