@@ -20,7 +20,7 @@ spec:
         - envFrom:
             - secretRef:
                 name: grafana-alert-relay-env
-          image: ghcr.io/josevictorferreira/grafana-alert-relay:1.0.0
+          image: ghcr.io/josevictorferreira/grafana-alert-relay:1.0.1
           name: grafana-alert-relay
           ports:
             - containerPort: 8080

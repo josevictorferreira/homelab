@@ -20,7 +20,7 @@ in
           ];
           containers.${name} = {
             inherit name;
-            image = "ghcr.io/josevictorferreira/grafana-alert-relay:1.0.0";
+            image = "ghcr.io/josevictorferreira/grafana-alert-relay:1.0.1";
             ports = [
               {
                 name = "http";

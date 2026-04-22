@@ -111,7 +111,7 @@ func formatAlert(alerts map[string]interface{}) string {
 }
 
 func sendMatrixMessage(homeserver, username, password, roomID, message string) error {
-	loginURL := homeserver + "/_matrix/client/r0/login"
+	loginURL := homeserver + "/_matrix/client/v3/login"
 	loginData := map[string]string{
 		"type":     "m.login.password",
 		"user":     username,
@@ -142,8 +142,8 @@ func sendMatrixMessage(homeserver, username, password, roomID, message string) e
 		return fmt.Errorf("no access token in login response")
 	}
 
-	sendURL := fmt.Sprintf("%s/_matrix/client/r0/rooms/%s/send/m.room.message?access_token=%s",
-		homeserver, url.PathEscape(roomID), accessToken)
+	sendURL := fmt.Sprintf("%s/_matrix/client/v3/rooms/%s/send/m.room.message",
+		homeserver, url.PathEscape(roomID))
 	txnID := fmt.Sprintf("msg-%d", time.Now().UnixNano())
 
 	msgContent := map[string]interface{}{
@@ -151,8 +151,9 @@ func sendMatrixMessage(homeserver, username, password, roomID, message string) e
 		"body":    message,
 	}
 	msgJSON, _ := json.Marshal(msgContent)
-	req2, _ := http.NewRequest("PUT", sendURL+"&txn_id="+txnID, bytes.NewBuffer(msgJSON))
+	req2, _ := http.NewRequest("PUT", sendURL+"?txn_id="+txnID, bytes.NewBuffer(msgJSON))
 	req2.Header.Set("Content-Type", "application/json")
+	req2.Header.Set("Authorization", "Bearer "+accessToken)
 	resp2, err := client.Do(req2)
 	if err != nil {
 		return fmt.Errorf("send message failed: %w", err)
