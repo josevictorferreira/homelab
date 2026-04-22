@@ -48,6 +48,7 @@ in
           enabled = true;
 
           controllers.main = {
+            replicas = 0;
             pod.nodeSelector."node.kubernetes.io/amd-gpu" = "true";
             containers.main = {
               image = {
@@ -83,6 +84,7 @@ in
 
         server = {
           enabled = true;
+          controllers.main.replicas = 0;
           controllers.main.containers.main = {
             image = {
               repository = "ghcr.io/immich-app/immich-server";
