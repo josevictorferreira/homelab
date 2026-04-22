@@ -1,7 +1,8 @@
-{ lib
-, kubenix
-, homelab
-, ...
+{
+  lib,
+  kubenix,
+  homelab,
+  ...
 }:
 
 let
@@ -57,6 +58,31 @@ in
             passwordKey = "ADMIN_PASSWORD";
           };
           ingress = kubenix.lib.ingressDomainFor "grafana";
+          affinity.nodeAffinity = {
+            requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms = [
+              {
+                matchExpressions = [
+                  {
+                    key = "kubernetes.io/hostname";
+                    operator = "NotIn";
+                    values = [ "lab-delta-cp" ];
+                  }
+                ];
+              }
+            ];
+            preferredDuringSchedulingIgnoredDuringExecution = [
+              {
+                weight = 100;
+                preference.matchExpressions = [
+                  {
+                    key = "kubernetes.io/hostname";
+                    operator = "In";
+                    values = [ "lab-beta-cp" ];
+                  }
+                ];
+              }
+            ];
+          };
         };
         prometheusOperator = {
           enabled = true;
@@ -113,6 +139,31 @@ in
                   resources.requests.storage = "50Gi";
                 };
               };
+            };
+            affinity.nodeAffinity = {
+              requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms = [
+                {
+                  matchExpressions = [
+                    {
+                      key = "kubernetes.io/hostname";
+                      operator = "NotIn";
+                      values = [ "lab-delta-cp" ];
+                    }
+                  ];
+                }
+              ];
+              preferredDuringSchedulingIgnoredDuringExecution = [
+                {
+                  weight = 100;
+                  preference.matchExpressions = [
+                    {
+                      key = "kubernetes.io/hostname";
+                      operator = "In";
+                      values = [ "lab-beta-cp" ];
+                    }
+                  ];
+                }
+              ];
             };
           };
         };

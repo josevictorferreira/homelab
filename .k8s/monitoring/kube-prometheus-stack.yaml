@@ -92655,6 +92655,23 @@ spec:
         app.kubernetes.io/version: 12.1.1
         helm.sh/chart: grafana-10.0.0
     spec:
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - preference:
+                matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values:
+                      - lab-beta-cp
+              weight: 100
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: NotIn
+                    values:
+                      - lab-delta-cp
       automountServiceAccountToken: true
       containers:
         - env:
@@ -96261,6 +96278,22 @@ metadata:
   namespace: monitoring
 spec:
   affinity:
+    nodeAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - preference:
+            matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                  - lab-beta-cp
+          weight: 100
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: NotIn
+                values:
+                  - lab-delta-cp
     podAntiAffinity:
       preferredDuringSchedulingIgnoredDuringExecution:
         - podAffinityTerm:

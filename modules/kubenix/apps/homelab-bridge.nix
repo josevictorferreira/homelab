@@ -1,4 +1,4 @@
-{ homelab, kubenix, ... }:
+{ homelab, ... }:
 
 let
   namespace = homelab.kubernetes.namespaces.applications;
