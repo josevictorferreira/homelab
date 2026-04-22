@@ -14,7 +14,7 @@ metadata:
   name: immich-machine-learning
   namespace: apps
 spec:
-  replicas: 1
+  replicas: 0
   revisionHistoryLimit: 3
   selector:
     matchLabels:
@@ -118,7 +118,7 @@ metadata:
   name: immich-server
   namespace: apps
 spec:
-  replicas: 1
+  replicas: 0
   revisionHistoryLimit: 3
   selector:
     matchLabels:

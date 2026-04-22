@@ -1,6 +1,7 @@
-{ kubenix
-, homelab
-, ...
+{
+  kubenix,
+  homelab,
+  ...
 }:
 
 let
@@ -21,6 +22,7 @@ in
       noHooks = true;
       inherit namespace;
       values = {
+        replicaCount = 0;
         image = {
           repository = "ghcr.io/open-webui/open-webui";
           tag = "v0.8.12@sha256:8113fa5510020ef05a44afc0c42d33eabeeb2524a996e3e3fb8c437c00f0d792";
