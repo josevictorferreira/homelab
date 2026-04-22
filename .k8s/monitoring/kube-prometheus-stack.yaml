@@ -92672,6 +92672,7 @@ spec:
                     operator: NotIn
                     values:
                       - lab-delta-cp
+                      - lab-alpha-cp
       automountServiceAccountToken: true
       containers:
         - env:
@@ -96294,6 +96295,7 @@ spec:
                 operator: NotIn
                 values:
                   - lab-delta-cp
+                  - lab-alpha-cp
     podAntiAffinity:
       preferredDuringSchedulingIgnoredDuringExecution:
         - podAffinityTerm:
