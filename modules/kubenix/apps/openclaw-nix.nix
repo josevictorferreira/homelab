@@ -106,6 +106,31 @@ in
         defaultPodOptions.imagePullSecrets = [
           { name = "ghcr-registry-secret"; }
         ];
+        defaultPodOptions.affinity.nodeAffinity = {
+          requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms = [
+            {
+              matchExpressions = [
+                {
+                  key = "kubernetes.io/hostname";
+                  operator = "NotIn";
+                  values = [ "lab-delta-cp" ];
+                }
+              ];
+            }
+          ];
+          preferredDuringSchedulingIgnoredDuringExecution = [
+            {
+              weight = 100;
+              preference.matchExpressions = [
+                {
+                  key = "kubernetes.io/hostname";
+                  operator = "In";
+                  values = [ "lab-beta-cp" ];
+                }
+              ];
+            }
+          ];
+        };
 
         # Security context: run as root for full access
         controllers.main = {

@@ -31,6 +31,23 @@ spec:
         app.kubernetes.io/instance: openclaw-nix
         app.kubernetes.io/name: openclaw-nix
     spec:
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - preference:
+                matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values:
+                      - lab-beta-cp
+              weight: 100
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: NotIn
+                    values:
+                      - lab-delta-cp
       automountServiceAccountToken: true
       containers:
         - command:
