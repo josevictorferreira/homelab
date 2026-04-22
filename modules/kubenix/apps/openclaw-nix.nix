@@ -4,7 +4,7 @@ let
   namespace = homelab.kubernetes.namespaces.applications;
   appImage = {
     repository = "ghcr.io/josevictorferreira/openclaw-nix";
-    tag = "v2026.4.15@sha256:4dae4373e87d3f194e6013bdb1eb1c417c39f41479066ae4276b0c84f71dc177";
+    tag = "v2026.4.21@sha256:7f71f17071dfd0190d242f24b230b9ad2c7c3d4ed781b84dc6becdf0e39672e7";
     pullPolicy = "Always";
   };
 in
@@ -461,7 +461,7 @@ in
           dev-tun = {
             type = "hostPath";
             hostPath = "/dev/net/tun";
-            advancedMounts.main.tailscale = [{ path = "/dev/net/tun"; }];
+            advancedMounts.main.tailscale = [ { path = "/dev/net/tun"; } ];
           };
 
           chromium-data = {
