@@ -3,7 +3,7 @@
   lib,
   inputs,
   system,
-  version ? "2026.4.15",
+  version ? "2026.4.21",
 }:
 
 let
@@ -14,8 +14,8 @@ let
     owner = "openclaw";
     repo = "openclaw";
     rev = "v${version}";
-    sha256 = "sha256-QsoiV52a0rcTL4fvF6c/aC1/Krq4qKptYOwlW4N6/4c=";
-    pnpmDepsHash = "sha256-9a+cW5KkUE6V35XqpsRZGvZrKxnmKra2FalDcoQTJMM=";
+    sha256 = "sha256-NW2Rr5/JeLnxEsjTBeOdNlUxM26qlJ+4X2GFw+bIGlM=";
+    pnpmDepsHash = "sha256-FDajXHs4s0+QDRPq4ZxQWWW9rqeSJVYACAl/5Mw2Agc=";
   };
 
   # Rolldown 1.0.0-rc.3 — pre-built from npm registry
@@ -122,9 +122,9 @@ let
   # Lossless-claw plugin info — change version to upgrade
   # Update: version, sha256, npmDepsHash, and optionally dep versions + lock file
   losslessClawInfo = {
-    version = "0.9.1";
-    sha256 = "sha256-QAL5OgDIsqkNS7bTdRsiQjuuQUvbUoPSebIDaK1Yzjg=";
-    npmDepsHash = "sha256-rUOSqMVMNjfIZ4PlINgtVNaT8hNArEzUQotDYfegB9I=";
+    version = "0.9.2";
+    sha256 = "sha256-4PDGO5RHzDb//x3f0JkYjtKbDi5IOHl9HVdt5M8eA64=";
+    npmDepsHash = "sha256-e7cQ8EtuL5I9KjLF7l3aKw+974ifHela43NzRLUH/18=";
   };
   losslessClawSource = pkgs.fetchurl {
     url = "https://registry.npmjs.org/@martian-engineering/lossless-claw/-/lossless-claw-${losslessClawInfo.version}.tgz";

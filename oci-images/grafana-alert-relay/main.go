@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"strings"
 	"time"
@@ -142,7 +143,7 @@ func sendMatrixMessage(homeserver, username, password, roomID, message string) e
 	}
 
 	sendURL := fmt.Sprintf("%s/_matrix/client/r0/rooms/%s/send/m.room.message?access_token=%s",
-		homeserver, roomID, accessToken)
+		homeserver, url.PathEscape(roomID), accessToken)
 	txnID := fmt.Sprintf("msg-%d", time.Now().UnixNano())
 
 	msgContent := map[string]interface{}{

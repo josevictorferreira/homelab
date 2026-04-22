@@ -2,12 +2,15 @@
 
 let
   # Matrix plugin dependencies - FOD build using npm
-  # Dependencies from nix-openclaw matrix extension package.json:
+  # Dependencies from upstream openclaw extensions/matrix/package.json:
   # - @matrix-org/matrix-sdk-crypto-nodejs: ^0.4.0
-  # - @vector-im/matrix-bot-sdk: 0.8.0-element.3
+  # - @matrix-org/matrix-sdk-crypto-wasm: 18.1.0
+  # - @sinclair/typebox: 0.34.49
+  # - fake-indexeddb: ^6.2.5
+  # - jiti: ^2.6.1
   # - markdown-it: 14.1.1
-  # - music-metadata: ^11.12.1
-  # - zod: ^4.3.6
+  # - matrix-js-sdk: 41.3.0
+  # - music-metadata: ^11.12.3
   matrixPluginDeps = pkgs.buildNpmPackage {
     pname = "openclaw-matrix-plugin-deps";
     version = "1.0.0";
@@ -21,15 +24,18 @@ let
         };
         dependencies = {
           "@matrix-org/matrix-sdk-crypto-nodejs" = "0.4.0";
-          "@vector-im/matrix-bot-sdk" = "0.8.0-element.3";
+          "@matrix-org/matrix-sdk-crypto-wasm" = "18.1.0";
+          "@sinclair/typebox" = "0.34.49";
+          "fake-indexeddb" = "6.2.5";
+          "jiti" = "2.6.1";
           "markdown-it" = "14.1.1";
-          "music-metadata" = "11.12.1";
-          "zod" = "4.3.6";
+          "matrix-js-sdk" = "41.3.0";
+          "music-metadata" = "11.12.3";
         };
       }
     );
 
-    npmDepsHash = "sha256-UviJ9mGUxwezhcaUbRcQUlYsEmzxkP1I4Bh8WGz3OzM=";
+    npmDepsHash = "sha256-XLyg2rVI4x7OzQaeu8RoQX141NrQoI4rNiTsDBdL+7A=";
 
     # Copy vendored package-lock.json
     postPatch = ''

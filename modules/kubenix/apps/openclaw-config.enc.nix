@@ -3,10 +3,6 @@
 let
   namespace = homelab.kubernetes.namespaces.applications;
   configData = {
-    meta = {
-      lastTouchedVersion = "2026.4.14";
-      lastTouchedAt = "2026-04-16T14:42:10.102Z";
-    };
     env = {
       ALIBABA_CODING_PLAN_API_KEY = "\${ALIBABA_CODING_PLAN_API_KEY}";
       COPILOT_GITHUB_TOKEN = "\${COPILOT_GITHUB_TOKEN}";
