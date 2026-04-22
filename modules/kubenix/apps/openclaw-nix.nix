@@ -113,7 +113,10 @@ in
                 {
                   key = "kubernetes.io/hostname";
                   operator = "NotIn";
-                  values = [ "lab-delta-cp" ];
+                  values = [
+                    "lab-delta-cp"
+                    "lab-alpha-cp"
+                  ];
                 }
               ];
             }
