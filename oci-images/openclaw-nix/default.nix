@@ -3,7 +3,7 @@
   lib,
   inputs,
   system,
-  version ? "2026.4.21",
+  version ? "2026.4.22",
 }:
 
 let
@@ -14,8 +14,8 @@ let
     owner = "openclaw";
     repo = "openclaw";
     rev = "v${version}";
-    sha256 = "sha256-NW2Rr5/JeLnxEsjTBeOdNlUxM26qlJ+4X2GFw+bIGlM=";
-    pnpmDepsHash = "sha256-FDajXHs4s0+QDRPq4ZxQWWW9rqeSJVYACAl/5Mw2Agc=";
+    sha256 = "sha256-BB+stGBDgMRAPHrVWJS2dFRjw2WrVrFdVf/23Tq1UeA=";
+    pnpmDepsHash = "sha256-z45mB/w7sorAE3CTliDpvMm9eq+/l9L/mmhYJt0t9O4=";
   };
 
   # Rolldown 1.0.0-rc.3 — pre-built from npm registry
@@ -96,11 +96,11 @@ let
           fi
           if [ -f package.json ]; then
             substituteInPlace package.json \
-              --replace '"tsc -p tsconfig.plugin-sdk.dts.json"' '"tsc -p tsconfig.plugin-sdk.dts.json || true"'
+              --replace-fail '"tsgo -p tsconfig.plugin-sdk.dts.json"' '"tsc -p tsconfig.plugin-sdk.dts.json || true"'
           fi
           if [ -f scripts/bundle-a2ui.mjs ]; then
             substituteInPlace scripts/bundle-a2ui.mjs \
-              --replace 'runPnpm(["-s", "dlx", "rolldown", "-c", path.join(a2uiAppDir, "rolldown.config.mjs")])' \
+              --replace 'runPnpm(["-s", "exec", "rolldown", "-c", path.join(a2uiAppDir, "rolldown.config.mjs")])' \
               'runStep("rolldown", ["-c", path.join(a2uiAppDir, "rolldown.config.mjs")])'
           fi
         '';
