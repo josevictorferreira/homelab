@@ -389,6 +389,7 @@ let
                   "comfyanonymous/ComfyUI"
                   "imgproxy/imgproxy"
                   "openclaw/openclaw"
+                  "Martian-Engineering/lossless-claw"
                   # Work Apps
                   "kong/kong"
                   "keycloak/keycloak"
