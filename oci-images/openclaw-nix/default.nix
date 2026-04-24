@@ -260,6 +260,98 @@ let
               fi
             fi
           done
+
+          # The memory CLI only loads plugins activated for the `memory` command.
+          # Embedding provider plugins declare their contract but lack that command activation upstream.
+          ${pkgs.python3}/bin/python3 - "$out/lib/openclaw/extensions" "$out/lib/openclaw/dist/extensions" <<'PYEOF'
+    import json
+    import sys
+    from pathlib import Path
+
+    for extensions_arg in sys.argv[1:]:
+        extensions_dir = Path(extensions_arg)
+        for manifest_path in extensions_dir.glob("*/openclaw.plugin.json"):
+            with manifest_path.open(encoding="utf-8") as file:
+                manifest = json.load(file)
+
+            contracts = manifest.get("contracts")
+            if not isinstance(contracts, dict) or not contracts.get("memoryEmbeddingProviders"):
+                continue
+
+            activation = manifest.setdefault("activation", {})
+            on_commands = activation.setdefault("onCommands", [])
+            if "memory" not in on_commands:
+                on_commands.append("memory")
+
+            with manifest_path.open("w", encoding="utf-8") as file:
+                json.dump(manifest, file, indent=2)
+                file.write("\n")
+    PYEOF
+
+          # Runtime deps are already packaged at /lib/openclaw/node_modules.
+          # Link them into each plugin root so OpenClaw does not try `npm install`
+          # against extension package.json files that contain workspace:* dev deps.
+          ${pkgs.python3}/bin/python3 - "$out/lib/openclaw/node_modules" "$out/lib/openclaw/extensions" "$out/lib/openclaw/dist/extensions" <<'PYEOF'
+    import json
+    import os
+    import sys
+    from pathlib import Path
+
+    root_node_modules = Path(sys.argv[1])
+
+    def dependency_names(package_json):
+        names = []
+        for field in ("dependencies", "optionalDependencies"):
+            deps = package_json.get(field)
+            if isinstance(deps, dict):
+                names.extend(name for name in deps if isinstance(name, str))
+        return names
+
+    def link_dependency(plugin_dir, dep_name):
+        target = root_node_modules.joinpath(*dep_name.split("/"))
+        if not (target / "package.json").exists():
+            return
+
+        link_path = plugin_dir.joinpath("node_modules", *dep_name.split("/"))
+        if link_path.exists():
+            return
+        if link_path.is_symlink():
+            link_path.unlink()
+
+        link_path.parent.mkdir(parents=True, exist_ok=True)
+        os.symlink(os.path.relpath(target, link_path.parent), link_path)
+
+    for extensions_arg in sys.argv[2:]:
+        extensions_dir = Path(extensions_arg)
+        for package_path in extensions_dir.glob("*/package.json"):
+            with package_path.open(encoding="utf-8") as file:
+                package_json = json.load(file)
+
+            for dep_name in dependency_names(package_json):
+                link_dependency(package_path.parent, dep_name)
+    PYEOF
+
+          # Some runtime chunks resolve stable, unhashed module names at runtime.
+          # The upstream postbuild writes these aliases; keep them when repacking.
+          ${pkgs.python3}/bin/python3 - "$out/lib/openclaw/dist" <<'PYEOF'
+    import re
+    import sys
+    from pathlib import Path
+
+    dist_dir = Path(sys.argv[1])
+    pattern = re.compile(r"^(?P<base>.+\.(?:runtime|contract))-[A-Za-z0-9_-]+\.js$")
+
+    for chunk_path in sorted(dist_dir.iterdir()):
+        if not chunk_path.is_file():
+            continue
+
+        match = pattern.match(chunk_path.name)
+        if not match:
+            continue
+
+        alias_path = dist_dir / f"{match.group('base')}.js"
+        alias_path.write_text(f'export * from "./{chunk_path.name}";\n', encoding="utf-8")
+    PYEOF
         fi
 
         # lossless-claw: pre-built index.js already copied to dist/extensions/ above
