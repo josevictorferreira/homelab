@@ -266,16 +266,22 @@ let
         userTimezone = "America/Sao_Paulo";
         memorySearch = {
           enabled = true;
-          sources = [
-            "memory"
-            "sessions"
-          ];
+          sources = [ "memory" ];
           extraPaths = [ ".learnings" ];
           experimental = {
-            sessionMemory = true;
+            sessionMemory = false;
           };
-          provider = "gemini";
-          model = "gemini-embedding-001";
+          sync = {
+            onSessionStart = false;
+            onSearch = false;
+            watch = true;
+          };
+          provider = "openai";
+          model = "openai/text-embedding-3-small";
+          remote = {
+            apiKey = "\${OPENROUTER_API_KEY}";
+            baseUrl = "https://openrouter.ai/api/v1";
+          };
           store = {
             vector = {
               enabled = true;
