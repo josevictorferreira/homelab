@@ -4,6 +4,7 @@ let
   namespace = homelab.kubernetes.namespaces.applications;
   configData = {
     env = {
+      OPENAI_API_KEY = "\${OPENAI_API_KEY}";
       ALIBABA_CODING_PLAN_API_KEY = "\${ALIBABA_CODING_PLAN_API_KEY}";
       COPILOT_GITHUB_TOKEN = "\${COPILOT_GITHUB_TOKEN}";
       ELEVENLABS_API_KEY = "\${ELEVENLABS_API_KEY}";
@@ -266,22 +267,16 @@ let
         userTimezone = "America/Sao_Paulo";
         memorySearch = {
           enabled = true;
-          sources = [ "memory" ];
+          sources = [
+            "memory"
+            "sessions"
+          ];
           extraPaths = [ ".learnings" ];
           experimental = {
-            sessionMemory = false;
+            sessionMemory = true;
           };
-          sync = {
-            onSessionStart = false;
-            onSearch = false;
-            watch = true;
-          };
-          provider = "openai";
-          model = "openai/text-embedding-3-small";
-          remote = {
-            apiKey = "\${OPENROUTER_API_KEY}";
-            baseUrl = "https://openrouter.ai/api/v1";
-          };
+          provider = "gemini";
+          model = "gemini-embedding-001";
           store = {
             vector = {
               enabled = true;
@@ -797,6 +792,7 @@ in
       COPILOT_GITHUB_TOKEN = kubenix.lib.secretsFor "copilot_github_token";
       MINIMAX_API_KEY = kubenix.lib.secretsFor "minimax_api_key";
       KIMI_API_KEY = kubenix.lib.secretsFor "moonshot_api_key";
+      OPENAI_API_KEY = kubenix.lib.secretsFor "openai_api_key";
       OPENCLAW_MATRIX_TOKEN = kubenix.lib.secretsFor "openclaw_matrix_token";
       MEL_MATRIX_TOKEN = kubenix.lib.secretsFor "mel_matrix_token";
       KIRA_MATRIX_TOKEN = kubenix.lib.secretsFor "kira_matrix_token";
