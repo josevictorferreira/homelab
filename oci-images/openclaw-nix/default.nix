@@ -37,6 +37,12 @@ let
     sha256 = "05njq25fg7qx1pmww7mqq5rwhj9f0kk6129ifydij1q2759b3pkj";
   };
 
+  # RTK binary — CLI proxy that reduces LLM token consumption
+  rtkBinary = pkgs.fetchurl {
+    name = "rtk-0.37.2-x86_64-linux-musl";
+    url = "https://github.com/rtk-ai/rtk/releases/download/v0.37.2/rtk-x86_64-unknown-linux-musl.tar.gz";
+    sha256 = "0llfrky5x5cdvqsng9rkiir6lpkaygddnb6sglgb7yxphqsz752d";
+  };
   rolldown = pkgs.stdenv.mkDerivation {
     pname = "rolldown";
     version = "1.0.0-rc.3";
@@ -420,6 +426,112 @@ let
         ln -sf ../ "$out/lib/openclaw/node_modules/openclaw"
         CRYPTO_PKG="$out/lib/openclaw/extensions/matrix/node_modules/@matrix-org/matrix-sdk-crypto-nodejs"
         if [ -d "$CRYPTO_PKG" ]; then chmod -R u+w "$CRYPTO_PKG" || true; cp ${matrixCryptoNative} "$CRYPTO_PKG/matrix-sdk-crypto.linux-x64-gnu.node"; fi
+        # Install RTK binary into /bin (fetched as static ELF, not tarball)
+        cp ${rtkBinary} $out/bin/rtk
+        chmod +x $out/bin/rtk
+
+        # Install RTK OpenClaw plugin files into both extensions/ and dist/extensions/
+        # Install RTK OpenClaw plugin files into both extensions/ and dist/extensions/
+        mkdir -p "$out/lib/openclaw/extensions/rtk-rewrite"
+        mkdir -p "$out/lib/openclaw/dist/extensions/rtk-rewrite"
+        cat > "$out/lib/openclaw/extensions/rtk-rewrite/openclaw.plugin.json" <<'RTKPLUGIN'
+        {
+          "id": "rtk-rewrite",
+          "name": "RTK Token Optimizer",
+          "version": "1.0.0",
+          "description": "Transparently rewrites shell commands to their RTK equivalents for 60-90% LLM token savings",
+          "homepage": "https://github.com/rtk-ai/rtk",
+          "license": "MIT",
+          "configSchema": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "enabled": {
+                "type": "boolean",
+                "default": true,
+                "description": "Enable automatic command rewriting to RTK equivalents"
+              },
+              "verbose": {
+                "type": "boolean",
+                "default": false,
+                "description": "Log rewrite decisions to console for debugging"
+              }
+            }
+          },
+          "uiHints": {
+            "enabled": { "label": "Enable RTK rewriting" },
+            "verbose": { "label": "Verbose logging" }
+          }
+        }
+        RTKPLUGIN
+        cat > "$out/lib/openclaw/extensions/rtk-rewrite/index.ts" <<'RTKTS'
+        import { execSync } from "node:child_process";
+
+        let rtkAvailable: boolean | null = null;
+
+        function checkRtk(): boolean {
+          if (rtkAvailable !== null) return rtkAvailable;
+          try {
+            execSync("which rtk", { stdio: "ignore" });
+            rtkAvailable = true;
+          } catch {
+            rtkAvailable = false;
+          }
+          return rtkAvailable;
+        }
+
+        function tryRewrite(command: string): string | null {
+          try {
+            const result = execSync(`rtk rewrite ''${JSON.stringify(command)}`, {
+              encoding: "utf-8",
+              timeout: 2000,
+            }).trim();
+            return result && result !== command ? result : null;
+          } catch {
+            return null;
+          }
+        }
+
+        export default function register(api: any) {
+          const pluginConfig = api.config ?? {};
+          const enabled = pluginConfig.enabled !== false;
+          const verbose = pluginConfig.verbose === true;
+
+          if (!enabled) return;
+
+          if (!checkRtk()) {
+            console.warn("[rtk] rtk binary not found in PATH — plugin disabled");
+            return;
+          }
+
+          api.on(
+            "before_tool_call",
+            (event: { toolName: string; params: Record<string, unknown> }) => {
+              if (event.toolName !== "exec") return;
+
+              const command = event.params?.command;
+              if (typeof command !== "string") return;
+
+              const rewritten = tryRewrite(command);
+              if (!rewritten) return;
+
+              if (verbose) {
+                console.log(`[rtk] ''${command} -> ''${rewritten}`);
+              }
+
+              return { params: { ...event.params, command: rewritten } };
+            },
+            { priority: 10 }
+          );
+
+          if (verbose) {
+            console.log("[rtk] OpenClaw plugin registered");
+          }
+        }
+        RTKTS
+        cp "$out/lib/openclaw/extensions/rtk-rewrite/openclaw.plugin.json" "$out/lib/openclaw/dist/extensions/rtk-rewrite/openclaw.plugin.json"
+        cp "$out/lib/openclaw/extensions/rtk-rewrite/index.ts" "$out/lib/openclaw/dist/extensions/rtk-rewrite/index.ts"
+        chmod -R u+w "$out/lib/openclaw/extensions/rtk-rewrite/" "$out/lib/openclaw/dist/extensions/rtk-rewrite/" 2>/dev/null || true
   '';
 in
 dockerTools.streamLayeredImage {
