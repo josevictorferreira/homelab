@@ -138,6 +138,22 @@ let
       }
     }
   '';
+  rtkPackageJson = pkgs.writeText "rtk-rewrite-package.json" ''
+    {
+      "name": "@openclaw/rtk-rewrite",
+      "version": "1.0.0",
+      "description": "RTK Token Optimizer plugin for OpenClaw",
+      "type": "module",
+      "openclaw": {
+        "extensions": [
+          "./index.ts"
+        ],
+        "compat": {
+          "pluginApi": ">=2026.4.20"
+        }
+      }
+    }
+  '';
 
   rolldown = pkgs.stdenv.mkDerivation {
     pname = "rolldown";
@@ -539,6 +555,8 @@ let
         cp ${rtkPluginTs} "$out/lib/openclaw/extensions/rtk-rewrite/index.ts"
         cp ${rtkPluginJson} "$out/lib/openclaw/dist/extensions/rtk-rewrite/openclaw.plugin.json"
         cp ${rtkPluginTs} "$out/lib/openclaw/dist/extensions/rtk-rewrite/index.ts"
+        cp ${rtkPackageJson} "$out/lib/openclaw/extensions/rtk-rewrite/package.json"
+        cp ${rtkPackageJson} "$out/lib/openclaw/dist/extensions/rtk-rewrite/package.json"
         chmod -R u+w "$out/lib/openclaw/extensions/rtk-rewrite/" "$out/lib/openclaw/dist/extensions/rtk-rewrite/" 2>/dev/null || true
   '';
 in
