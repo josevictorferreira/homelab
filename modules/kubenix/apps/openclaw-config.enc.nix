@@ -711,6 +711,7 @@ let
         "openai"
         "perplexity"
         "whatsapp"
+        "rtk-rewrite"
       ];
       slots = {
         memory = "memory-core";
@@ -764,6 +765,13 @@ let
         };
         openai = {
           enabled = true;
+        };
+        rtk-rewrite = {
+          enabled = true;
+          config = {
+            enabled = true;
+            verbose = false;
+          };
         };
       };
     };
