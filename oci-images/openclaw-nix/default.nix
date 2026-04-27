@@ -3,7 +3,7 @@
   lib,
   inputs,
   system,
-  version ? "2026.4.23",
+  version ? "2026.4.25",
 }:
 
 let
@@ -14,8 +14,8 @@ let
     owner = "openclaw";
     repo = "openclaw";
     rev = "v${version}";
-    sha256 = "sha256-Mym3yAyOqr3g8oFEt6yBzMbSkyUOkm0ym/IRD2QfcBY=";
-    pnpmDepsHash = "sha256-xwLxNnr4PkQqWa2gJaGmWapKuO7qwSkTpIM6LwIbjLc=";
+    sha256 = "sha256-f8z2Q+ayGfs7ta0plsI8P+dmnn/yxiiQPHBeL29Yze8=";
+    pnpmDepsHash = "sha256-oUKS57eRabl7/G/87CavmAWve3CG9Dnjs6AR1+BwYNk=";
   };
 
   # Rolldown 1.0.0-rc.3 — pre-built from npm registry
@@ -214,7 +214,7 @@ let
           fi
           if [ -f package.json ]; then
             substituteInPlace package.json \
-              --replace-fail '"tsgo -p tsconfig.plugin-sdk.dts.json"' '"tsc -p tsconfig.plugin-sdk.dts.json || true"'
+              --replace-fail '"node scripts/run-tsgo.mjs -p tsconfig.plugin-sdk.dts.json --declaration true"' '"tsc -p tsconfig.plugin-sdk.dts.json || true"'
           fi
           if [ -f scripts/bundle-a2ui.mjs ]; then
             substituteInPlace scripts/bundle-a2ui.mjs \
