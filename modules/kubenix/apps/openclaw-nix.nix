@@ -4,7 +4,7 @@ let
   namespace = homelab.kubernetes.namespaces.applications;
   appImage = {
     repository = "ghcr.io/josevictorferreira/openclaw-nix";
-    tag = "v2026.4.25@sha256:b5831a6dcb7c5273251ac85509177e8093df328e2c0769710e8f0a5e87799a75";
+    tag = "v2026.4.23@sha256:7c389aaf328422e0495d67b98fe1be04556a083abc483a7152549b92c3ffe39c";
     pullPolicy = "Always";
   };
 in
@@ -234,7 +234,6 @@ in
                       sed -i "s|\\\''${$var_name}|$escaped_value|g" "$CONFIG_FILE"
                     fi
                   done
-                  echo "Substitution complete"
                   echo "Applying dynamic CephFS config patches..."
                   jq '.plugins = (.plugins // {}) | .plugins.enabled = true | .plugins.allow = (((.plugins.allow // []) + ["lossless-claw"]) | unique) | .plugins.slots = ((.plugins.slots // {}) | .memory = (.memory // "memory-core") | .contextEngine = "lossless-claw") | .plugins.entries = ((.plugins.entries // {}) | .["lossless-claw"] = ((.["lossless-claw"] // {}) | .enabled = true | .config = ((.config // {}) | .dbPath = "/home/node/.openclaw/lcm.db")))' "$CONFIG_FILE" > "$CONFIG_FILE.tmp" && mv "$CONFIG_FILE.tmp" "$CONFIG_FILE"
                   echo "CephFS config patched"
@@ -249,7 +248,7 @@ in
                     echo "Found matrix extension at: $MATRIX_EXT"
                     cd "$MATRIX_EXT"
 
-                    if [ ! -d "node_modules/@vector-im" ]; then
+                    if [ ! -d "node_modules/matrix-js-sdk" ]; then
                       echo "Installing npm dependencies..."
                       node -e "
                         const fs = require('fs');
@@ -299,9 +298,18 @@ in
               probes = {
                 readiness = {
                   enabled = true;
-                  type = "HTTP";
-                  path = "/health";
-                  port = 18789;
+                  custom = true;
+                  spec = {
+                    httpGet = {
+                      path = "/health";
+                      port = 18789;
+                      scheme = "HTTP";
+                    };
+                    initialDelaySeconds = 120;
+                    periodSeconds = 15;
+                    timeoutSeconds = 5;
+                    failureThreshold = 5;
+                  };
                 };
               };
             };

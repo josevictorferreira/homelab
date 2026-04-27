@@ -66,7 +66,7 @@ spec:
               value: /home/node/.chromium
             - name: TMPDIR
               value: /tmp
-          image: ghcr.io/josevictorferreira/openclaw-nix:v2026.4.25@sha256:b5831a6dcb7c5273251ac85509177e8093df328e2c0769710e8f0a5e87799a75
+          image: ghcr.io/josevictorferreira/openclaw-nix:v2026.4.23@sha256:7c389aaf328422e0495d67b98fe1be04556a083abc483a7152549b92c3ffe39c
           imagePullPolicy: Always
           livenessProbe:
             exec:
@@ -147,23 +147,22 @@ spec:
               \ printf '%s' \"\\$$var_name\")\n  if [ -n \"$var_value\" ]; then\n\
               \    escaped_value=$(echo \"$var_value\" | sed 's/[\\\\/&]/\\\\&/g')\n\
               \    sed -i \"s|\\\\\\${$var_name}|$escaped_value|g\" \"$CONFIG_FILE\"\
-              \n  fi\ndone\necho \"Substitution complete\"\necho \"Applying dynamic\
-              \ CephFS config patches...\"\njq '.plugins = (.plugins // {}) | .plugins.enabled\
-              \ = true | .plugins.allow = (((.plugins.allow // []) + [\"lossless-claw\"\
-              ]) | unique) | .plugins.slots = ((.plugins.slots // {}) | .memory =\
-              \ (.memory // \"memory-core\") | .contextEngine = \"lossless-claw\"\
-              ) | .plugins.entries = ((.plugins.entries // {}) | .[\"lossless-claw\"\
-              ] = ((.[\"lossless-claw\"] // {}) | .enabled = true | .config = ((.config\
-              \ // {}) | .dbPath = \"/home/node/.openclaw/lcm.db\")))' \"$CONFIG_FILE\"\
-              \ > \"$CONFIG_FILE.tmp\" && mv \"$CONFIG_FILE.tmp\" \"$CONFIG_FILE\"\
-              \necho \"CephFS config patched\"\n\n\necho \"Installing matrix plugin\
-              \ dependencies...\"\n\n# Find the actual nix store path where the gateway\
-              \ loads extensions from\nMATRIX_EXT=$(readlink -f /lib/openclaw/extensions/matrix\
-              \ 2>/dev/null || echo \"/lib/openclaw/extensions/matrix\")\n\nif [ -d\
-              \ \"$MATRIX_EXT\" ]; then\n  echo \"Found matrix extension at: $MATRIX_EXT\"\
-              \n  cd \"$MATRIX_EXT\"\n\n  if [ ! -d \"node_modules/@vector-im\" ];\
-              \ then\n    echo \"Installing npm dependencies...\"\n    node -e \"\n\
-              \      const fs = require('fs');\n      const pkg = JSON.parse(fs.readFileSync('package.json',\
+              \n  fi\ndone\necho \"Applying dynamic CephFS config patches...\"\njq\
+              \ '.plugins = (.plugins // {}) | .plugins.enabled = true | .plugins.allow\
+              \ = (((.plugins.allow // []) + [\"lossless-claw\"]) | unique) | .plugins.slots\
+              \ = ((.plugins.slots // {}) | .memory = (.memory // \"memory-core\"\
+              ) | .contextEngine = \"lossless-claw\") | .plugins.entries = ((.plugins.entries\
+              \ // {}) | .[\"lossless-claw\"] = ((.[\"lossless-claw\"] // {}) | .enabled\
+              \ = true | .config = ((.config // {}) | .dbPath = \"/home/node/.openclaw/lcm.db\"\
+              )))' \"$CONFIG_FILE\" > \"$CONFIG_FILE.tmp\" && mv \"$CONFIG_FILE.tmp\"\
+              \ \"$CONFIG_FILE\"\necho \"CephFS config patched\"\n\n\necho \"Installing\
+              \ matrix plugin dependencies...\"\n\n# Find the actual nix store path\
+              \ where the gateway loads extensions from\nMATRIX_EXT=$(readlink -f\
+              \ /lib/openclaw/extensions/matrix 2>/dev/null || echo \"/lib/openclaw/extensions/matrix\"\
+              )\n\nif [ -d \"$MATRIX_EXT\" ]; then\n  echo \"Found matrix extension\
+              \ at: $MATRIX_EXT\"\n  cd \"$MATRIX_EXT\"\n\n  if [ ! -d \"node_modules/matrix-js-sdk\"\
+              \ ]; then\n    echo \"Installing npm dependencies...\"\n    node -e\
+              \ \"\n      const fs = require('fs');\n      const pkg = JSON.parse(fs.readFileSync('package.json',\
               \ 'utf8'));\n      delete pkg.devDependencies;\n      fs.writeFileSync('package.json',\
               \ JSON.stringify(pkg, null, 2));\n    \"\n    npm install --omit=dev\
               \ --no-package-lock --legacy-peer-deps 2>&1 || echo \"WARN: npm install\
@@ -231,7 +230,7 @@ spec:
           envFrom:
             - secretRef:
                 name: openclaw-config
-          image: ghcr.io/josevictorferreira/openclaw-nix:v2026.4.25@sha256:b5831a6dcb7c5273251ac85509177e8093df328e2c0769710e8f0a5e87799a75
+          image: ghcr.io/josevictorferreira/openclaw-nix:v2026.4.23@sha256:7c389aaf328422e0495d67b98fe1be04556a083abc483a7152549b92c3ffe39c
           imagePullPolicy: Always
           name: main
           ports:
@@ -239,14 +238,14 @@ spec:
               name: http
               protocol: TCP
           readinessProbe:
-            failureThreshold: 3
+            failureThreshold: 5
             httpGet:
               path: /health
               port: 18789
               scheme: HTTP
-            initialDelaySeconds: 0
-            periodSeconds: 10
-            timeoutSeconds: 1
+            initialDelaySeconds: 120
+            periodSeconds: 15
+            timeoutSeconds: 5
           resources:
             limits:
               cpu: 1500m
