@@ -300,15 +300,13 @@ in
                   enabled = true;
                   custom = true;
                   spec = {
-                    httpGet = {
-                      path = "/health";
+                    tcpSocket = {
                       port = 18789;
-                      scheme = "HTTP";
                     };
                     initialDelaySeconds = 120;
                     periodSeconds = 15;
                     timeoutSeconds = 5;
-                    failureThreshold = 5;
+                    failureThreshold = 30;
                   };
                 };
               };

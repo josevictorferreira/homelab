@@ -238,13 +238,11 @@ spec:
               name: http
               protocol: TCP
           readinessProbe:
-            failureThreshold: 5
-            httpGet:
-              path: /health
-              port: 18789
-              scheme: HTTP
+            failureThreshold: 30
             initialDelaySeconds: 120
             periodSeconds: 15
+            tcpSocket:
+              port: 18789
             timeoutSeconds: 5
           resources:
             limits:
