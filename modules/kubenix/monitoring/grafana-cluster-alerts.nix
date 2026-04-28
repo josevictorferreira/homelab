@@ -4,14 +4,14 @@ let
   namespace = homelab.kubernetes.namespaces.monitoring;
   datasourceUid = "prometheus";
   mkPromRule =
-    {
-      uid,
-      title,
-      expr,
-      forDuration ? "5m",
-      severity ? "critical",
-      summary,
-      description,
+    { uid
+    , title
+    , expr
+    , forDuration ? "5m"
+    , severity ? "critical"
+    , summary
+    , description
+    ,
     }:
     {
       inherit uid title;

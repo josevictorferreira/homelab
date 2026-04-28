@@ -1,7 +1,6 @@
-{
-  kubenix,
-  homelab,
-  ...
+{ kubenix
+, homelab
+, ...
 }:
 
 let
@@ -25,7 +24,7 @@ in
 
       values = {
         global = {
-          imagePullSecrets = [ { name = "ghcr-registry-secret"; } ];
+          imagePullSecrets = [{ name = "ghcr-registry-secret"; }];
         };
 
         image = {

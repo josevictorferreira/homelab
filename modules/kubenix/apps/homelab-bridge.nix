@@ -76,7 +76,7 @@ in
             storageClass = "rook-ceph-block";
             size = "1Gi";
             accessMode = "ReadWriteOnce";
-            advancedMounts.main.tailscale = [ { path = "/var/lib/tailscale"; } ];
+            advancedMounts.main.tailscale = [{ path = "/var/lib/tailscale"; }];
           };
           # Serve config for Funnel (proxies 443 → localhost:8080)
           serve-config = {
@@ -93,7 +93,7 @@ in
           dev-tun = {
             type = "hostPath";
             hostPath = "/dev/net/tun";
-            advancedMounts.main.tailscale = [ { path = "/dev/net/tun"; } ];
+            advancedMounts.main.tailscale = [{ path = "/dev/net/tun"; }];
           };
         };
       };
