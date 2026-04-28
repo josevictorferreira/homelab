@@ -552,6 +552,10 @@ let
           mkdir -p node_modules/@mariozechner
           cp -rL ${losslessClawPackage}/lossless-claw-deps/node_modules/@mariozechner/* node_modules/@mariozechner/
         fi
+        if [ -d "${losslessClawPackage}/lossless-claw-deps/node_modules/@sinclair" ]; then
+          mkdir -p node_modules/@sinclair
+          cp -rL ${losslessClawPackage}/lossless-claw-deps/node_modules/@sinclair/* node_modules/@sinclair/
+        fi
         cd - >/dev/null
         CRYPTO_PKG="$out/lib/openclaw/extensions/matrix/node_modules/@matrix-org/matrix-sdk-crypto-nodejs"
         if [ -d "$CRYPTO_PKG" ]; then chmod -R u+w "$CRYPTO_PKG" || true; cp ${matrixCryptoNative} "$CRYPTO_PKG/matrix-sdk-crypto.linux-x64-gnu.node"; fi
