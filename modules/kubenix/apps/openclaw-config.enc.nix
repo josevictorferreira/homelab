@@ -57,6 +57,7 @@ let
               };
               contextWindow = 1000000;
               maxTokens = 65536;
+              api = "openai-completions";
             }
             {
               id = "qwen3-max-2026-01-23";
@@ -71,6 +72,7 @@ let
               };
               contextWindow = 262144;
               maxTokens = 65536;
+              api = "openai-completions";
             }
             {
               id = "qwen3-coder-next";
@@ -85,6 +87,7 @@ let
               };
               contextWindow = 262144;
               maxTokens = 65536;
+              api = "openai-completions";
             }
             {
               id = "qwen3-coder-plus";
@@ -99,6 +102,7 @@ let
               };
               contextWindow = 1000000;
               maxTokens = 65536;
+              api = "openai-completions";
             }
             {
               id = "qwen3.6-plus";
@@ -116,6 +120,22 @@ let
               };
               contextWindow = 1000000;
               maxTokens = 65536;
+              api = "openai-completions";
+            }
+            {
+              id = "glm-5";
+              name = "GLM-5";
+              reasoning = true;
+              input = [ "text" ];
+              cost = {
+                input = 0;
+                output = 0;
+                cacheRead = 0;
+                cacheWrite = 0;
+              };
+              contextWindow = 120000;
+              maxTokens = 8192;
+              api = "openai-completions";
             }
           ];
         };
@@ -154,84 +174,14 @@ let
             }
           ];
         };
-        zai-coding-plan = {
-          baseUrl = "https://api.z.ai/api/anthropic";
-          apiKey = "\${Z_AI_API_KEY}";
-          api = "anthropic-messages";
-          models = [
-            {
-              id = "glm-5";
-              name = "GLM-5";
-              api = "anthropic-messages";
-              reasoning = true;
-              input = [ "text" ];
-              cost = {
-                input = 0;
-                output = 0;
-                cacheRead = 0;
-                cacheWrite = 0;
-              };
-              contextWindow = 120000;
-              maxTokens = 8192;
-            }
-            {
-              id = "glm-5.1";
-              name = "GLM-5.1";
-              api = "anthropic-messages";
-              reasoning = true;
-              input = [ "text" ];
-              cost = {
-                input = 0;
-                output = 0;
-                cacheRead = 0;
-                cacheWrite = 0;
-              };
-              contextWindow = 200000;
-              maxTokens = 131072;
-            }
-            {
-              id = "glm-5-turbo";
-              name = "GLM-5 Turbo";
-              api = "anthropic-messages";
-              reasoning = true;
-              input = [ "text" ];
-              cost = {
-                input = 0;
-                output = 0;
-                cacheRead = 0;
-                cacheWrite = 0;
-              };
-              contextWindow = 120000;
-              maxTokens = 8192;
-            }
-            {
-              id = "glm-5v-turbo";
-              name = "GLM-5V Turbo";
-              api = "anthropic-messages";
-              reasoning = true;
-              input = [
-                "text"
-                "image"
-              ];
-              cost = {
-                input = 0;
-                output = 0;
-                cacheRead = 0;
-                cacheWrite = 0;
-              };
-              contextWindow = 200000;
-              maxTokens = 131072;
-            }
-          ];
-        };
         kimi-coding = {
           baseUrl = "https://api.kimi.com/coding/";
           apiKey = "\${KIMI_API_KEY}";
           api = "anthropic-messages";
           models = [
             {
-              id = "k2p5";
-              name = "Kimi K2.5";
+              id = "k2p6";
+              name = "Kimi K2.6";
               reasoning = false;
               input = [ "text" ];
               cost = {
@@ -250,10 +200,10 @@ let
     agents = {
       defaults = {
         model = {
-          primary = "kimi-coding/k2p5";
+          primary = "kimi-coding/k2p6";
           fallbacks = [
-            "kimi-coding/k2p5"
-            "zai-coding-plan/glm-5.1"
+            "kimi-coding/k2p6"
+            "alibaba-coding-plan/glm-5"
             "alibaba-coding-plan/qwen3.5-plus"
           ];
         };
@@ -261,8 +211,18 @@ let
           primary = "github-copilot/gemini-3-flash-preview";
           fallbacks = [
             "alibaba-coding-plan/qwen3.5-plus"
-            "kimi-coding/k2p5"
+            "kimi-coding/k2p6"
           ];
+        };
+        silentReply = {
+          direct = "allow";
+          group = "allow";
+          internal = "allow";
+        };
+        silentReplyRewrite = {
+          direct = true;
+          group = true;
+          internal = true;
         };
         userTimezone = "America/Sao_Paulo";
         memorySearch = {
@@ -275,8 +235,8 @@ let
           experimental = {
             sessionMemory = true;
           };
-          provider = "gemini";
-          model = "gemini-embedding-001";
+          provider = "openai";
+          fallback = "gemini";
           store = {
             vector = {
               enabled = true;
@@ -308,7 +268,7 @@ let
         subagents = {
           maxConcurrent = 4;
           archiveAfterMinutes = 60;
-          model = "zai-coding-plan/glm-5.1";
+          model = "alibaba-coding-plan/glm-5";
           runTimeoutSeconds = 900;
         };
         sandbox = {
@@ -324,12 +284,13 @@ let
       list = [
         {
           id = "mel";
+          skills = [ "lossless-claw" ];
           workspace = "/home/node/.openclaw/workspace-mel";
           model = {
             primary = "minimax/MiniMax-M2.7";
             fallbacks = [
-              "kimi-coding/k2p5"
-              "zai-coding-plan/glm-5-turbo"
+              "kimi-coding/k2p6"
+              "alibaba-coding-plan/glm-5"
               "alibaba-coding-plan/qwen3.5-plus"
             ];
           };
@@ -342,12 +303,13 @@ let
         }
         {
           id = "kira";
+          skills = [ "lossless-claw" ];
           workspace = "/home/node/.openclaw/workspace-kira";
           model = {
-            primary = "zai-coding-plan/glm-5-turbo";
+            primary = "alibaba-coding-plan/glm-5";
             fallbacks = [
               "minimax/MiniMax-M2.7"
-              "kimi-coding/k2p5"
+              "kimi-coding/k2p6"
               "alibaba-coding-plan/qwen3.5-plus"
             ];
           };
@@ -367,11 +329,12 @@ let
         }
         {
           id = "luna";
+          skills = [ "lossless-claw" ];
           workspace = "/home/node/.openclaw/workspace-luna";
           model = {
-            primary = "zai-coding-plan/glm-5.1";
+            primary = "kimi-coding/k2p6";
             fallbacks = [
-              "kimi-coding/k2p5"
+              "alibaba-coding-plan/glm-5"
               "minimax/MiniMax-M2.5"
               "alibaba-coding-plan/qwen3.5-plus"
             ];
@@ -385,13 +348,14 @@ let
         }
         {
           id = "spike";
+          skills = [ "lossless-claw" ];
           workspace = "/home/node/.openclaw/workspace-spike";
           model = {
-            primary = "kimi-coding/k2p5";
+            primary = "kimi-coding/k2p6";
             fallbacks = [
               "minimax/MiniMax-M2.7"
               "alibaba-coding-plan/qwen3.5-plus"
-              "zai-coding-plan/glm-5-turbo"
+              "alibaba-coding-plan/glm-5"
             ];
           };
           identity = {
@@ -454,16 +418,22 @@ let
         concurrency = 2;
         audio = {
           enabled = true;
+          maxBytes = 20971520;
           models = [
             {
-              type = "cli";
-              command = "sh";
-              args = [
-                "-c"
-                "curl -s -X POST https://api.elevenlabs.io/v1/speech-to-text -H \\\"xi-api-key: \${ELEVENLABS_API_KEY}\\\" -F model_id=scribe_v2 -F \\\"file=@{{`{{MediaPath}}`}}\\\" -F tag_audio_events=true -F language_code=por | jq -r .text"
-              ];
+              provider = "elevenlabs";
+              model = "scribe_v2";
+            }
+            {
+              provider = "openai";
+              model = "gpt-4o-mini-transcribe";
+            }
+            {
+              provider = "google";
+              model = "gemini-3.1-flash";
             }
           ];
+          timeoutSeconds = 120;
         };
         video = {
           enabled = true;
@@ -479,12 +449,8 @@ let
       elevated = {
         enabled = false;
         allowFrom = {
-          matrix = [
-            "@zeh:josevictor.me"
-          ];
-          whatsapp = [
-            "+554388109393"
-          ];
+          matrix = [ "@zeh:josevictor.me" ];
+          whatsapp = [ "+554388109393" ];
         };
       };
       loopDetection = {
@@ -505,28 +471,28 @@ let
         agentId = "spike";
         match = {
           channel = "matrix";
-          accountId = "@spike";
+          accountId = "spike";
         };
       }
       {
         agentId = "kira";
         match = {
           channel = "matrix";
-          accountId = "@kira";
+          accountId = "kira";
         };
       }
       {
         agentId = "luna";
         match = {
           channel = "matrix";
-          accountId = "@luna";
+          accountId = "luna";
         };
       }
       {
         agentId = "mel";
         match = {
           channel = "matrix";
-          accountId = "@mel:josevictor.me";
+          accountId = "mel";
         };
       }
     ];
@@ -538,7 +504,7 @@ let
       tts = {
         auto = "inbound";
         provider = "elevenlabs";
-        summaryModel = "kimi-coding/k2p5";
+        summaryModel = "kimi-coding/k2p6";
         providers = {
           elevenlabs = {
             apiKey = "\${ELEVENLABS_API_KEY}";
@@ -555,7 +521,25 @@ let
           };
         };
       };
-      ackReactionScope = "all";
+      ackReactionScope = "group-mentions";
+      ackReaction = "👀";
+      queue = {
+        mode = "collect";
+        debounceMs = 1000;
+        cap = 20;
+        drop = "summarize";
+        byChannel = {
+          whatsapp = "collect";
+          telegram = "collect";
+        };
+      };
+      inbound = {
+        debounceMs = 2000;
+        byChannel = {
+          whatsapp = 5000;
+          slack = 1500;
+        };
+      };
     };
     commands = {
       native = "auto";
@@ -579,9 +563,7 @@ let
             network = {
               dangerouslyAllowPrivateNetwork = true;
             };
-            groupAllowFrom = [
-              "@zeh:josevictor.me"
-            ];
+            groupAllowFrom = [ "@zeh:josevictor.me" ];
             groupPolicy = "allowlist";
             homeserver = "http://tuwunel.apps.svc.cluster.local:8008";
           };
@@ -624,9 +606,7 @@ let
         };
         autoJoin = "always";
         dm = {
-          allowFrom = [
-            "@zeh:josevictor.me"
-          ];
+          allowFrom = [ "@zeh:josevictor.me" ];
           policy = "allowlist";
         };
         enabled = true;
@@ -635,6 +615,14 @@ let
           "*" = {
             enabled = true;
             requireMention = false;
+          };
+          "#alerts:josevictor.me" = {
+            enabled = true;
+            requireMention = false;
+            allowFrom = [
+              "@homelab-bridge:josevictor.me"
+              "@zeh:josevictor.me"
+            ];
           };
         };
         mediaMaxMb = 150;
@@ -647,11 +635,7 @@ let
         allowFrom = [ "+554388109393" ];
         groupAllowFrom = [ "+554388109393" ];
         groupPolicy = "allowlist";
-        ackReaction = {
-          emoji = "👀";
-          direct = true;
-          group = "mentions";
-        };
+        ackReaction = "👀";
         debounceMs = 0;
         mediaMaxMb = 50;
       };
@@ -696,22 +680,27 @@ let
       install = {
         nodeManager = "npm";
       };
+      load = {
+        extraDirs = [ "~/.openclaw/skills" ];
+        watch = true;
+      };
     };
     plugins = {
       enabled = true;
       allow = [
         "browser"
         "github-copilot"
+        "google"
         "kimi"
         "lobster"
         "lossless-claw"
         "matrix"
         "memory-core"
+        "memory-wiki"
         "minimax"
         "openai"
         "perplexity"
         "whatsapp"
-        "rtk-rewrite"
       ];
       slots = {
         memory = "memory-core";
@@ -742,14 +731,6 @@ let
         minimax = {
           enabled = true;
         };
-        lossless-claw = {
-          enabled = true;
-          config = {
-            dbPath = "/home/node/.openclaw/lcm.db";
-            summaryModel = "kimi-coding/k2p5";
-            expansionModel = "kimi-coding/k2p5";
-          };
-        };
         kimi = {
           enabled = true;
         };
@@ -763,14 +744,51 @@ let
             };
           };
         };
+        memory-wiki = {
+          enabled = true;
+          config = {
+            vaultMode = "isolated";
+            vault = {
+              path = "/home/node/.openclaw/wiki/main";
+              renderMode = "native";
+            };
+            bridge = {
+              enabled = false;
+              readMemoryArtifacts = true;
+              indexDreamReports = true;
+              indexDailyNotes = true;
+              indexMemoryRoot = true;
+              followMemoryEvents = true;
+            };
+            ingest = {
+              autoCompile = true;
+              maxConcurrentJobs = 1;
+              allowUrlIngest = true;
+            };
+            search = {
+              backend = "shared";
+              corpus = "wiki";
+            };
+            context = {
+              includeCompiledDigestPrompt = false;
+            };
+            render = {
+              preserveHumanBlocks = true;
+              createBacklinks = true;
+              createDashboards = true;
+            };
+          };
+        };
+        google = {
+          enabled = true;
+        };
         openai = {
           enabled = true;
         };
-        rtk-rewrite = {
+        lossless-claw = {
           enabled = true;
           config = {
-            enabled = true;
-            verbose = false;
+            dbPath = "/home/node/.openclaw/lcm.db";
           };
         };
       };
