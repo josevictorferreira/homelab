@@ -4,7 +4,7 @@ let
   namespace = homelab.kubernetes.namespaces.applications;
   appImage = {
     repository = "ghcr.io/josevictorferreira/openclaw-nix";
-    tag = "v2026.4.27@sha256:1b9c6f52a1651a9cbb2a8057275074f7902796d3847590ef17b740356b953c6c";
+    tag = "v2026.4.27@sha256:27ac3db938f4ea2b7ec109076e9fd1b8da08d6dedcb2c8b5a4f5506ae3259492";
     pullPolicy = "Always";
   };
 in
