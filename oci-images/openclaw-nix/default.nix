@@ -3,7 +3,7 @@
   lib,
   inputs,
   system,
-  version ? "2026.4.26",
+  version ? "2026.4.27",
 }:
 
 let
@@ -341,13 +341,17 @@ let
     d["main"] = "./index.js"
     if "openclaw" in d and "extensions" in d["openclaw"]:
         d["openclaw"]["extensions"] = ["./index.js"]
+    if "dependencies" in d:
+        for k in d["dependencies"]:
+            if k.startswith("@mariozechner/") and d["dependencies"][k] == "0.66.1":
+                d["dependencies"][k] = "0.70.2"
     with open(p, "w") as f: json.dump(d, f, indent=2); f.write("\n")
     PYEOF
             # Also create extensions/lossless-claw for generic copy loop compatibility
             mkdir -p "$out/lib/openclaw/extensions/lossless-claw"
             chmod -R u+w "$out/lib/openclaw/extensions/lossless-claw/" 2>/dev/null || true
             cp /tmp/lossless-extract/package/openclaw.plugin.json "$out/lib/openclaw/extensions/lossless-claw/openclaw.plugin.json" 2>/dev/null || true
-            cp /tmp/lossless-extract/package/package.json "$out/lib/openclaw/extensions/lossless-claw/package.json" 2>/dev/null || true
+            cp "$out/lib/openclaw/dist/extensions/lossless-claw/package.json" "$out/lib/openclaw/extensions/lossless-claw/package.json" 2>/dev/null || true
             rm -rf /tmp/lossless-extract
         # Copy plugin manifests and runtime TS sources from source extensions/ into dist/extensions/
         # The gateway resolves plugin runtime modules (e.g. light-runtime-api.ts) from dist/extensions/
@@ -540,18 +544,14 @@ let
         # Add openclaw self-symlink so extensions can resolve "openclaw/*" imports
         mkdir -p "$out/lib/openclaw/node_modules"
         ln -sf ../ "$out/lib/openclaw/node_modules/openclaw"
-        # Pre-install exact runtime dependency versions that the gateway expects.
-        # The upstream gateway bundles newer versions (e.g. pi-ai@0.70.2) but its
-        # runtime deps manifest pins older versions (e.g. pi-ai@0.66.1). Without
-        # the exact versions, the gateway deadlocks trying to npm-install at startup.
+        # Copy pi-ai dependencies to the root node_modules so openclaw can find them
+        # (Nix sandbox prevents npm install here)
         cd "$out/lib/openclaw"
         chmod -R u+w node_modules || true
-        # Install packages that need specific older versions
-        ${openclawPkgs.nodejs_22}/bin/npm install \
-          '@mariozechner/pi-ai@0.66.1' \
-          '@mariozechner/pi-coding-agent@0.66.1' \
-          '@mariozechner/pi-agent-core@0.66.1' \
-          --no-save --legacy-peer-deps 2>&1 || true
+        if [ -d "${losslessClawPackage}/lossless-claw-deps/node_modules/@mariozechner" ]; then
+          mkdir -p node_modules/@mariozechner
+          cp -rL ${losslessClawPackage}/lossless-claw-deps/node_modules/@mariozechner/* node_modules/@mariozechner/
+        fi
         cd - >/dev/null
         CRYPTO_PKG="$out/lib/openclaw/extensions/matrix/node_modules/@matrix-org/matrix-sdk-crypto-nodejs"
         if [ -d "$CRYPTO_PKG" ]; then chmod -R u+w "$CRYPTO_PKG" || true; cp ${matrixCryptoNative} "$CRYPTO_PKG/matrix-sdk-crypto.linux-x64-gnu.node"; fi
