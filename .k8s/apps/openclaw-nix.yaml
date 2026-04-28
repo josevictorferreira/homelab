@@ -66,7 +66,7 @@ spec:
               value: /home/node/.chromium
             - name: TMPDIR
               value: /tmp
-          image: ghcr.io/josevictorferreira/openclaw-nix:v2026.4.27@sha256:45a9d1f29a0c367ee5d95b993b664ffe7874dc4b5491c293c14af163cde1e3d2
+          image: ghcr.io/josevictorferreira/openclaw-nix:v2026.4.27@sha256:1b9c6f52a1651a9cbb2a8057275074f7902796d3847590ef17b740356b953c6c
           imagePullPolicy: Always
           livenessProbe:
             exec:
@@ -230,7 +230,7 @@ spec:
           envFrom:
             - secretRef:
                 name: openclaw-config
-          image: ghcr.io/josevictorferreira/openclaw-nix:v2026.4.27@sha256:45a9d1f29a0c367ee5d95b993b664ffe7874dc4b5491c293c14af163cde1e3d2
+          image: ghcr.io/josevictorferreira/openclaw-nix:v2026.4.27@sha256:1b9c6f52a1651a9cbb2a8057275074f7902796d3847590ef17b740356b953c6c
           imagePullPolicy: Always
           name: main
           ports:
