@@ -540,6 +540,19 @@ let
         # Add openclaw self-symlink so extensions can resolve "openclaw/*" imports
         mkdir -p "$out/lib/openclaw/node_modules"
         ln -sf ../ "$out/lib/openclaw/node_modules/openclaw"
+        # Pre-install exact runtime dependency versions that the gateway expects.
+        # The upstream gateway bundles newer versions (e.g. pi-ai@0.70.2) but its
+        # runtime deps manifest pins older versions (e.g. pi-ai@0.66.1). Without
+        # the exact versions, the gateway deadlocks trying to npm-install at startup.
+        cd "$out/lib/openclaw"
+        chmod -R u+w node_modules || true
+        # Install packages that need specific older versions
+        ${openclawPkgs.nodejs_22}/bin/npm install \
+          '@mariozechner/pi-ai@0.66.1' \
+          '@mariozechner/pi-coding-agent@0.66.1' \
+          '@mariozechner/pi-agent-core@0.66.1' \
+          --no-save --legacy-peer-deps 2>&1 || true
+        cd - >/dev/null
         CRYPTO_PKG="$out/lib/openclaw/extensions/matrix/node_modules/@matrix-org/matrix-sdk-crypto-nodejs"
         if [ -d "$CRYPTO_PKG" ]; then chmod -R u+w "$CRYPTO_PKG" || true; cp ${matrixCryptoNative} "$CRYPTO_PKG/matrix-sdk-crypto.linux-x64-gnu.node"; fi
         # Install RTK binary into /bin (extract from tar.gz)
