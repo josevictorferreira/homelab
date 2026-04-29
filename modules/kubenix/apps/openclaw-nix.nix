@@ -150,7 +150,7 @@ in
                 OPENCLAW_DATA_DIR = "/home/node/.openclaw";
                 OPENCLAW_STATE_DIR = "/home/node/.openclaw";
                 HOME = "/home/node";
-                TZ = ":/etc/localtime";
+                TZ = homelab.timeZone;
                 OPENCLAW_NIX_MODE = "1";
                 NPM_CONFIG_PREFIX = "/home/node/.npm-global";
                 OPENCLAW_PLUGIN_STAGE_DIR = "/tmp/openclaw-plugin-stage";

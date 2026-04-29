@@ -337,6 +337,10 @@ in
                     name = "OPENCLAW_PLUGIN_STAGE_DIR";
                     value = stageDir;
                   }
+                  {
+                    name = "TZ";
+                    value = homelab.timeZone;
+                  }
                 ];
                 resources = {
                   requests = {
