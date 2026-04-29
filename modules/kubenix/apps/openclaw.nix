@@ -210,11 +210,11 @@ in
                 resources = {
                   requests = {
                     cpu = "250m";
-                    memory = "512Mi";
+                    memory = "256Mi";
                   };
                   limits = {
-                    cpu = "1500m";
-                    memory = "2Gi";
+                    cpu = "500m";
+                    memory = "1Gi";
                   };
                 };
                 securityContext = {
