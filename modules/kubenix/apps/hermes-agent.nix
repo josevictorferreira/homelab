@@ -89,12 +89,11 @@ in
               volumeMounts = dataVolumeMounts;
               resources = {
                 requests = {
-                  cpu = "250m";
-                  memory = "512Mi";
+                  cpu = "100m";
+                  memory = "256Mi";
                 };
                 limits = {
-                  cpu = "1";
-                  memory = "2Gi";
+                  cpu = "500m";
                 };
               };
               securityContext = commonSecurityContext // {

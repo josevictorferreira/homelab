@@ -133,11 +133,10 @@ spec:
           name: gateway
           resources:
             limits:
-              cpu: '1'
-              memory: 2Gi
+              cpu: 500m
             requests:
-              cpu: 250m
-              memory: 512Mi
+              cpu: 100m
+              memory: 256Mi
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
