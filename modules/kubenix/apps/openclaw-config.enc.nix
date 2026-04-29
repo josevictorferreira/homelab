@@ -15,6 +15,7 @@ let
       SPIKE_MATRIX_TOKEN = "\${SPIKE_MATRIX_TOKEN}";
       MINIMAX_API_KEY = "\${MINIMAX_API_KEY}";
       KIMI_API_KEY = "\${KIMI_API_KEY}";
+      HUGGINGFACE_HUB_TOKEN = "\${HUGGINGFACE_HUB_TOKEN}";
       OPENROUTER_API_KEY = "\${OPENROUTER_API_KEY}";
       Z_AI_API_KEY = "\${Z_AI_API_KEY}";
     };
@@ -818,6 +819,7 @@ in
       COPILOT_GITHUB_TOKEN = kubenix.lib.secretsFor "copilot_github_token";
       MINIMAX_API_KEY = kubenix.lib.secretsFor "minimax_api_key";
       KIMI_API_KEY = kubenix.lib.secretsFor "moonshot_api_key";
+      HUGGINGFACE_HUB_TOKEN = kubenix.lib.secretsFor "huggingface_hub_token";
       OPENAI_API_KEY = kubenix.lib.secretsFor "openai_api_key";
       OPENCLAW_MATRIX_TOKEN = kubenix.lib.secretsFor "openclaw_matrix_token";
       MEL_MATRIX_TOKEN = kubenix.lib.secretsFor "mel_matrix_token";

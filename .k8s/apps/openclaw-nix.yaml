@@ -139,28 +139,29 @@ spec:
               \ config at $CONFIG_FILE\"\nfi\n\n# Perform environment variable substitution\
               \ on openclaw.json\n# This ensures that tokens from secrets are correctly\
               \ injected\necho \"Performing environment variable substitution in $CONFIG_FILE...\"\
-              \nALLOWLIST=\"OPENCLAW_MATRIX_TOKEN ELEVENLABS_API_KEY KIMI_API_KEY\
-              \ OPENROUTER_API_KEY OPENAI_API_KEY MINIMAX_API_KEY Z_AI_API_KEY ALIBABA_CODING_PLAN_API_KEY\
-              \ WHATSAPP_NUMBER WHATSAPP_BOT_NUMBER GEMINI_API_KEY GITHUB_TOKEN TS_AUTHKEY\
-              \ KIRA_MATRIX_TOKEN LUNA_MATRIX_TOKEN MEL_MATRIX_TOKEN SPIKE_MATRIX_TOKEN\
-              \ COPILOT_GITHUB_TOKEN\"\nfor var_name in $ALLOWLIST; do\n  var_value=$(eval\
-              \ printf '%s' \"\\$$var_name\")\n  if [ -n \"$var_value\" ]; then\n\
-              \    escaped_value=$(echo \"$var_value\" | sed 's/[\\\\/&]/\\\\&/g')\n\
-              \    sed -i \"s|\\\\\\${$var_name}|$escaped_value|g\" \"$CONFIG_FILE\"\
-              \n  fi\ndone\necho \"Applying dynamic CephFS config patches...\"\njq\
-              \ '.plugins = (.plugins // {}) | .plugins.enabled = true | .plugins.allow\
-              \ = (((.plugins.allow // []) + [\"lossless-claw\"]) | unique) | .plugins.slots\
-              \ = ((.plugins.slots // {}) | .memory = (.memory // \"memory-core\"\
-              ) | .contextEngine = \"lossless-claw\") | .plugins.entries = ((.plugins.entries\
-              \ // {}) | .[\"lossless-claw\"] = ((.[\"lossless-claw\"] // {}) | .enabled\
-              \ = true | .config = ((.config // {}) | .dbPath = \"/home/node/.openclaw/lcm.db\"\
-              )))' \"$CONFIG_FILE\" > \"$CONFIG_FILE.tmp\" && mv \"$CONFIG_FILE.tmp\"\
-              \ \"$CONFIG_FILE\"\necho \"CephFS config patched\"\n\n\necho \"Installing\
-              \ matrix plugin dependencies...\"\n\n# Find the actual nix store path\
-              \ where the gateway loads extensions from\nMATRIX_EXT=$(readlink -f\
-              \ /lib/openclaw/extensions/matrix 2>/dev/null || echo \"/lib/openclaw/extensions/matrix\"\
-              )\n\nif [ -d \"$MATRIX_EXT\" ]; then\n  echo \"Found matrix extension\
-              \ at: $MATRIX_EXT\"\n  cd \"$MATRIX_EXT\"\n\n  if [ ! -d \"node_modules/matrix-js-sdk\"\
+              \nALLOWLIST=\"OPENCLAW_MATRIX_TOKEN ELEVENLABS_API_KEY HUGGINGFACE_HUB_TOKEN\
+              \ KIMI_API_KEY OPENROUTER_API_KEY OPENAI_API_KEY MINIMAX_API_KEY Z_AI_API_KEY\
+              \ ALIBABA_CODING_PLAN_API_KEY WHATSAPP_NUMBER WHATSAPP_BOT_NUMBER GEMINI_API_KEY\
+              \ GITHUB_TOKEN TS_AUTHKEY KIRA_MATRIX_TOKEN LUNA_MATRIX_TOKEN MEL_MATRIX_TOKEN\
+              \ SPIKE_MATRIX_TOKEN COPILOT_GITHUB_TOKEN\"\nfor var_name in $ALLOWLIST;\
+              \ do\n  var_value=$(eval printf '%s' \"\\$$var_name\")\n  if [ -n \"\
+              $var_value\" ]; then\n    escaped_value=$(echo \"$var_value\" | sed\
+              \ 's/[\\\\/&]/\\\\&/g')\n    sed -i \"s|\\\\\\${$var_name}|$escaped_value|g\"\
+              \ \"$CONFIG_FILE\"\n  fi\ndone\necho \"Applying dynamic CephFS config\
+              \ patches...\"\njq '.plugins = (.plugins // {}) | .plugins.enabled =\
+              \ true | .plugins.allow = (((.plugins.allow // []) + [\"lossless-claw\"\
+              ]) | unique) | .plugins.slots = ((.plugins.slots // {}) | .memory =\
+              \ (.memory // \"memory-core\") | .contextEngine = \"lossless-claw\"\
+              ) | .plugins.entries = ((.plugins.entries // {}) | .[\"lossless-claw\"\
+              ] = ((.[\"lossless-claw\"] // {}) | .enabled = true | .config = ((.config\
+              \ // {}) | .dbPath = \"/home/node/.openclaw/lcm.db\")))' \"$CONFIG_FILE\"\
+              \ > \"$CONFIG_FILE.tmp\" && mv \"$CONFIG_FILE.tmp\" \"$CONFIG_FILE\"\
+              \necho \"CephFS config patched\"\n\n\necho \"Installing matrix plugin\
+              \ dependencies...\"\n\n# Find the actual nix store path where the gateway\
+              \ loads extensions from\nMATRIX_EXT=$(readlink -f /lib/openclaw/extensions/matrix\
+              \ 2>/dev/null || echo \"/lib/openclaw/extensions/matrix\")\n\nif [ -d\
+              \ \"$MATRIX_EXT\" ]; then\n  echo \"Found matrix extension at: $MATRIX_EXT\"\
+              \n  cd \"$MATRIX_EXT\"\n\n  if [ ! -d \"node_modules/matrix-js-sdk\"\
               \ ]; then\n    echo \"Installing npm dependencies...\"\n    node -e\
               \ \"\n      const fs = require('fs');\n      const pkg = JSON.parse(fs.readFileSync('package.json',\
               \ 'utf8'));\n      delete pkg.devDependencies;\n      fs.writeFileSync('package.json',\

@@ -18,6 +18,14 @@ in
       ELEVENLABS_API_KEY = kubenix.lib.secretsFor "elevenlabs_api_key";
       GITHUB_TOKEN = kubenix.lib.secretsFor "github_token";
       ALIBABA_CODING_PLAN_API_KEY = kubenix.lib.secretsFor "alibaba_coding_plan_api_key";
+      MATRIX_HOMESERVER = kubenix.lib.secretsFor "hermes_matrix_homeserver";
+      MATRIX_ACCESS_TOKEN = kubenix.lib.secretsFor "hermes_matrix_access_token";
+      MATRIX_ALLOWED_USERS = kubenix.lib.secretsFor "hermes_matrix_allowed_users";
+      MATRIX_ENCRYPTION = kubenix.lib.secretsFor "hermes_matrix_encryption";
+      MATRIX_RECOVERY_KEY = kubenix.lib.secretsFor "hermes_matrix_recovery_key";
+      MATRIX_HOME_ROOM = kubenix.lib.secretsFor "hermes_matrix_home_room";
+      MATRIX_REQUIRE_MENTION = kubenix.lib.secretsFor "hermes_matrix_require_mention";
+      MATRIX_AUTO_THREAD = kubenix.lib.secretsFor "hermes_matrix_auto_thread";
     };
   };
 }
