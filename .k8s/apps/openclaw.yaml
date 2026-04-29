@@ -1,0 +1,178 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app: openclaw
+  name: openclaw
+  namespace: apps
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: openclaw
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: openclaw
+    spec:
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - preference:
+                matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values:
+                      - lab-beta-cp
+              weight: 100
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: NotIn
+                    values:
+                      - lab-delta-cp
+                      - lab-alpha-cp
+      automountServiceAccountToken: false
+      containers:
+        - command:
+            - /bin/bash
+            - -lc
+            - "set -euo pipefail\n\nSTATE_DIR=/persistent/openclaw\nHOME_DIR=$STATE_DIR/home\n\
+              mkdir -p \"$STATE_DIR\" \"$HOME_DIR\"\n\nif [ ! -f \"$STATE_DIR/.openclaw-ready\"\
+              \ ]; then\n  echo \"Initializing persistent OpenClaw state...\"\n  mkdir\
+              \ -p \"$HOME_DIR/.openclaw\" \"$HOME_DIR/.cache\" \"$HOME_DIR/.local\"\
+              \ \"$HOME_DIR/workspace\"\n  touch \"$STATE_DIR/.openclaw-ready\"\n\
+              \  echo \"Persistent state initialized.\"\nelse\n  echo \"Using existing\
+              \ persistent state at $STATE_DIR\"\nfi\n\nmkdir -p \"$HOME_DIR/.openclaw\"\
+              \ \"$HOME_DIR/.cache/ms-playwright\" \"$HOME_DIR/workspace\"\n\nif [\
+              \ ! -f \"$HOME_DIR/.openclaw/openclaw.json\" ]; then\n  echo \"Seeding\
+              \ OpenClaw config from ConfigMap...\"\n  cp /config/config-template.json\
+              \ \"$HOME_DIR/.openclaw/openclaw.json\"\nfi\n\nexport HOME=/root\nexport\
+              \ OPENCLAW_DATA_DIR=/root/.openclaw\nexport OPENCLAW_STATE_DIR=/root/.openclaw\n\
+              export OPENCLAW_CONFIG_PATH=/root/.openclaw/openclaw.json\nexport NPM_CONFIG_PREFIX=/usr/local\n\
+              export PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright\nexport PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\n\
+              \nmount --bind \"$HOME_DIR\" /root\n\ncd /root/workspace\nexec node\
+              \ /app/openclaw.mjs gateway --port 18789 --bind lan --allow-unconfigured\
+              \ --verbose\n"
+          env:
+            - name: HOME
+              value: /root
+            - name: OPENCLAW_DATA_DIR
+              value: /root/.openclaw
+            - name: OPENCLAW_STATE_DIR
+              value: /root/.openclaw
+            - name: OPENCLAW_CONFIG_PATH
+              value: /root/.openclaw/openclaw.json
+          envFrom:
+            - secretRef:
+                name: openclaw-test-config
+          image: ghcr.io/openclaw/openclaw:2026.4.26@sha256:2e32f4f2e4f653f12d5dc6e5c93cc71e60f49d1dfaf061b18e53c3e61a38fb48
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 4
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 120
+            periodSeconds: 30
+            timeoutSeconds: 5
+          name: openclaw
+          ports:
+            - containerPort: 18789
+              name: http
+              protocol: TCP
+          readinessProbe:
+            failureThreshold: 12
+            httpGet:
+              path: /readyz
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+          resources:
+            limits:
+              cpu: 500m
+              memory: 1Gi
+            requests:
+              cpu: 250m
+              memory: 256Mi
+          securityContext:
+            allowPrivilegeEscalation: true
+            capabilities:
+              add:
+                - SYS_ADMIN
+                - SYS_CHROOT
+            runAsGroup: 0
+            runAsUser: 0
+          startupProbe:
+            failureThreshold: 360
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 5
+          volumeMounts:
+            - mountPath: /persistent
+              name: persistent
+            - mountPath: /config
+              name: config
+              readOnly: true
+      terminationGracePeriodSeconds: 60
+      volumes:
+        - name: persistent
+          persistentVolumeClaim:
+            claimName: cephfs-shared-storage-root
+        - configMap:
+            name: openclaw-test-config
+          name: config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: openclaw
+  namespace: apps
+spec:
+  ports:
+    - name: http
+      port: 18789
+      protocol: TCP
+      targetPort: http
+  selector:
+    app: openclaw
+  type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: cloudflare-issuer
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: openclaw
+  namespace: apps
+spec:
+  ingressClassName: cilium
+  rules:
+    - host: openclaw-test.josevictor.me
+      http:
+        paths:
+          - backend:
+              service:
+                name: openclaw
+                port:
+                  number: 18789
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - openclaw-test.josevictor.me
+      secretName: wildcard-tls

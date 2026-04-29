@@ -438,6 +438,21 @@
 **Context:** First commit referenced old digest `b4d2ec9c` because image hadn't been rebuilt with new changes. Required a second full build→push→digest-update→commit cycle.
 **Verify:** `podman images | grep <tag>` — confirm IMAGE ID matches before pushing; check digest in `.k8s/apps/<app>.yaml` after `make manifests`
 
+### OpenClaw Matrix Credential Touch Can Block on CephFS
+**Lesson:** If OpenClaw hangs after `starting channels and sidecars...`, inspect `/proc/1/fd` for Matrix credential `*.tmp` files and patch/avoid non-essential `touchMatrixCredentials` writes on CephFS.
+**Context:** Atomic `lastUsedAt` credential writes can block channel handoff even when stored credentials are already valid.
+**Verify:** Logs reach `[gateway] ready` and `/proc/1/fd` has no `/credentials/matrix/*.tmp` descriptors.
+
+### Keep OpenClaw Runtime Deps Off CephFS
+**Lesson:** Set `OPENCLAW_PLUGIN_STAGE_DIR` to pod-local storage such as `/tmp/openclaw-plugin-stage` instead of the CephFS state dir.
+**Context:** Persistent `plugin-runtime-deps` mirror/deps locks on CephFS can stall startup and survive interrupted pods.
+**Verify:** Startup logs stage/install runtime deps from the pod-local dir and no `.openclaw-runtime-*.lock` appears under `/home/node/.openclaw/plugin-runtime-deps`.
+
+### Verify OpenClaw Readiness by Logs and Real Routes
+**Lesson:** Treat `http server listening` and TCP readiness as insufficient; require `[gateway] ready`, channel/provider logs, websocket responses, and `GET /health` returning `{"ok":true,"status":"live"}`.
+**Context:** `/__openclaw__/health` timed out in v2026.4.27 while `/health`, the Control UI, and websocket health calls worked after gateway readiness.
+**Verify:** `kubectl logs ... | grep "gateway] ready"` and `curl -m 15 http://127.0.0.1:18789/health` inside the pod.
+
 ## Manifest Pipeline
 
 ### Lock File Stale Entry Blocks New Secret Keys
@@ -461,3 +476,25 @@
 **Lesson:** For internal ClusterIP services that don't need LoadBalancer IPs, use raw Kubernetes resources pattern (like `flaresolverr.nix`) instead of the release submodule. The release submodule unconditionally evaluates `serviceAnnotationFor` which requires LoadBalancer IP entries.
 **Context:** Even adding `annotations = {}` or service type override doesn't work — the annotation lookup happens before values merge. Raw resources bypass this.
 **Verify:** See `modules/kubenix/apps/flaresolverr.nix` for the correct pattern
+
+## Hermes Agent Deployment Lessons
+
+### Setuid Binaries Need SETUID/SETGID Caps Even With runAsUser=0
+**Lesson:** When a container runs as root and uses `gosu`/`su-exec`/`setpriv` to drop privileges, dropping `ALL` capabilities breaks the privilege drop with `operation not permitted`. Add `["SETUID" "SETGID"]` to `capabilities.add` (also `CHOWN`/`FOWNER` if entrypoint chowns paths).
+**Context:** Hermes/openclaw-style images use `tini → entrypoint → gosu → app`. `runAsUser=0` puts you in root namespace but cap-drop strips the kernel privileges gosu needs for setuid().
+**Verify:** `kubectl logs <pod> --previous | grep -i 'switching\|operation not permitted'` after CrashLoopBackOff.
+
+### CephFS subPath Rejects chown Even With CAP_CHOWN
+**Lesson:** Don't put `chown -R` init containers on CephFS-backed `subPath` mounts. CephFS enforces ownership beyond the kernel cap check; even an init container with CAP_CHOWN gets `Permission denied`. Rely on the app entrypoint's chown-with-fallback, or pre-create the subdir with correct ownership via a privileged one-shot.
+**Context:** Wasted ~25 min on an init container that works fine on RBD but always fails on CephFS subPath.
+**Verify:** `kubectl logs <pod> -c <init>` shows `chown: <path>: Permission denied` despite `capabilities.add: [CHOWN]`.
+
+### Pod Preemption Looks Like Scheduling Failure
+**Lesson:** When a pod oscillates `Pending` → `Terminating` → `Pending` without restart count climbing, suspect preemption, not resource starvation. Check `kubectl get pod <name> -o jsonpath='{.status.conditions[?(@.type=="DisruptionTarget")]}'` and `kubectl get events --field-selector reason=Preempted -A`.
+**Context:** Openclaw-nix (priority 1000000) preempting hermes-agent (priority 100000) on lab-beta-cp during rolling updates. Looked like capacity issue, was a priority class mismatch.
+**Verify:** `kubectl get pods -A -o custom-columns='NS:.metadata.namespace,NAME:.metadata.name,PRIO:.spec.priority' --field-selector spec.nodeName=<node> --no-headers | sort -k3 -nr | head`.
+
+### Always `git diff --cached` Before Commit
+**Lesson:** Explicit `git add <file>` arguments do NOT unstage other already-staged files — they accumulate. Pre-existing staged work from prior sessions can sneak into your commit. Always run `git diff --cached --stat` before `git commit` to verify exactly what's staged.
+**Context:** Committed 2 unintended openclaw files (669 added lines) alongside a 2-line hermes capability fix.
+**Verify:** `git diff --cached --stat` matches your intent before every `git commit`.
