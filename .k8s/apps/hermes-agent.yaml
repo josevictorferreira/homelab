@@ -78,26 +78,6 @@ spec:
               subPath: hermes
       imagePullSecrets:
         - name: ghcr-registry-secret
-      initContainers:
-        - command:
-            - sh
-            - -c
-            - mkdir -p /opt/data && chown -R 10000:10000 /opt/data && chmod 0750 /opt/data
-          image: busybox:1.36
-          name: wait-data
-          securityContext:
-            allowPrivilegeEscalation: false
-            capabilities:
-              add:
-                - CHOWN
-                - FOWNER
-              drop:
-                - ALL
-            runAsUser: 0
-          volumeMounts:
-            - mountPath: /opt/data
-              name: hermes-data
-              subPath: hermes
       terminationGracePeriodSeconds: 30
       volumes:
         - name: hermes-data
@@ -165,26 +145,6 @@ spec:
               subPath: hermes
       imagePullSecrets:
         - name: ghcr-registry-secret
-      initContainers:
-        - command:
-            - sh
-            - -c
-            - mkdir -p /opt/data && chown -R 10000:10000 /opt/data && chmod 0750 /opt/data
-          image: busybox:1.36
-          name: init-data
-          securityContext:
-            allowPrivilegeEscalation: false
-            capabilities:
-              add:
-                - CHOWN
-                - FOWNER
-              drop:
-                - ALL
-            runAsUser: 0
-          volumeMounts:
-            - mountPath: /opt/data
-              name: hermes-data
-              subPath: hermes
       terminationGracePeriodSeconds: 60
       volumes:
         - name: hermes-data
