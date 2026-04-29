@@ -51,6 +51,7 @@ in
         };
         spec = {
           terminationGracePeriodSeconds = 60;
+          imagePullSecrets = [ { name = "ghcr-registry-secret"; } ];
           initContainers = [
             {
               name = "init-data";
@@ -141,6 +142,7 @@ in
         };
         spec = {
           terminationGracePeriodSeconds = 30;
+          imagePullSecrets = [ { name = "ghcr-registry-secret"; } ];
           initContainers = [
             {
               name = "wait-data";
