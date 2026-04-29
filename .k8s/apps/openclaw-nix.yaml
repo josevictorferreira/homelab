@@ -229,7 +229,7 @@ spec:
             - name: PYTHONPATH
               value: /home/node/.local/lib/python
             - name: TZ
-              value: :/etc/localtime
+              value: America/Sao_Paulo
           envFrom:
             - secretRef:
                 name: openclaw-config

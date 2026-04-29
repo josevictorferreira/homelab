@@ -58,6 +58,10 @@ in
                     value = "/var/lib/tuwunel";
                   }
                   {
+                    name = "TZ";
+                    value = homelab.timeZone;
+                  }
+                  {
                     name = "TUWUNEL_ADDRESS";
                     value = "0.0.0.0";
                   }

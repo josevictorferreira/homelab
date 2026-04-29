@@ -39,6 +39,8 @@ spec:
               value: '10000'
             - name: HERMES_HOME
               value: /opt/data
+            - name: TZ
+              value: America/Sao_Paulo
           envFrom:
             - secretRef:
                 name: hermes-agent-env
@@ -125,6 +127,8 @@ spec:
               value: '10000'
             - name: HERMES_HOME
               value: /opt/data
+            - name: TZ
+              value: America/Sao_Paulo
           envFrom:
             - secretRef:
                 name: hermes-agent-env

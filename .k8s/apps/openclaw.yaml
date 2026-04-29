@@ -113,6 +113,8 @@ spec:
               value: '1'
             - name: OPENCLAW_PLUGIN_STAGE_DIR
               value: /tmp/openclaw-plugin-stage
+            - name: TZ
+              value: America/Sao_Paulo
           envFrom:
             - secretRef:
                 name: openclaw-test-config

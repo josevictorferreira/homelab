@@ -84,6 +84,10 @@ in
                   name = "HERMES_HOME";
                   value = "/opt/data";
                 }
+                {
+                  name = "TZ";
+                  value = homelab.timeZone;
+                }
               ];
               envFrom = envFromSecret;
               volumeMounts = dataVolumeMounts;
@@ -164,6 +168,10 @@ in
                 {
                   name = "HERMES_HOME";
                   value = "/opt/data";
+                }
+                {
+                  name = "TZ";
+                  value = homelab.timeZone;
                 }
               ];
               envFrom = envFromSecret;
