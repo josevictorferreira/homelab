@@ -1,0 +1,236 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app: hermes-agent
+    component: dashboard
+  name: hermes-agent-dashboard
+  namespace: apps
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hermes-agent
+      component: dashboard
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: hermes-agent
+        component: dashboard
+    spec:
+      containers:
+        - args:
+            - dashboard
+            - --host
+            - 0.0.0.0
+            - --port
+            - '9119'
+            - --no-open
+            - --insecure
+          env:
+            - name: HERMES_UID
+              value: '10000'
+            - name: HERMES_GID
+              value: '10000'
+            - name: HERMES_HOME
+              value: /opt/data
+          envFrom:
+            - secretRef:
+                name: hermes-agent-env
+          image: ghcr.io/josevictorferreira/hermes-agent:6b09df3@sha256:0a5ce49bc1edc9a8764bb183279c067d88d7160ad3ea71a2648262348a9187f4
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            tcpSocket:
+              port: 9119
+          name: dashboard
+          ports:
+            - containerPort: 9119
+              name: http
+              protocol: TCP
+          readinessProbe:
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            tcpSocket:
+              port: 9119
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 256Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsUser: 0
+          volumeMounts:
+            - mountPath: /opt/data
+              name: hermes-data
+              subPath: hermes
+      initContainers:
+        - command:
+            - sh
+            - -c
+            - mkdir -p /opt/data && chown -R 10000:10000 /opt/data && chmod 0750 /opt/data
+          image: busybox:1.36
+          name: wait-data
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              add:
+                - CHOWN
+                - FOWNER
+              drop:
+                - ALL
+            runAsUser: 0
+          volumeMounts:
+            - mountPath: /opt/data
+              name: hermes-data
+              subPath: hermes
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: hermes-data
+          persistentVolumeClaim:
+            claimName: cephfs-shared-storage-root
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app: hermes-agent
+    component: gateway
+  name: hermes-agent-gateway
+  namespace: apps
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hermes-agent
+      component: gateway
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: hermes-agent
+        component: gateway
+    spec:
+      containers:
+        - args:
+            - gateway
+            - run
+          env:
+            - name: HERMES_UID
+              value: '10000'
+            - name: HERMES_GID
+              value: '10000'
+            - name: HERMES_HOME
+              value: /opt/data
+          envFrom:
+            - secretRef:
+                name: hermes-agent-env
+          image: ghcr.io/josevictorferreira/hermes-agent:6b09df3@sha256:0a5ce49bc1edc9a8764bb183279c067d88d7160ad3ea71a2648262348a9187f4
+          imagePullPolicy: IfNotPresent
+          name: gateway
+          resources:
+            limits:
+              cpu: '2'
+              memory: 4Gi
+            requests:
+              cpu: 500m
+              memory: 1Gi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsUser: 0
+          volumeMounts:
+            - mountPath: /opt/data
+              name: hermes-data
+              subPath: hermes
+      initContainers:
+        - command:
+            - sh
+            - -c
+            - mkdir -p /opt/data && chown -R 10000:10000 /opt/data && chmod 0750 /opt/data
+          image: busybox:1.36
+          name: init-data
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              add:
+                - CHOWN
+                - FOWNER
+              drop:
+                - ALL
+            runAsUser: 0
+          volumeMounts:
+            - mountPath: /opt/data
+              name: hermes-data
+              subPath: hermes
+      terminationGracePeriodSeconds: 60
+      volumes:
+        - name: hermes-data
+          persistentVolumeClaim:
+            claimName: cephfs-shared-storage-root
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app: hermes-agent
+  name: hermes-agent-dashboard
+  namespace: apps
+spec:
+  ports:
+    - name: http
+      port: 9119
+      protocol: TCP
+      targetPort: 9119
+  selector:
+    app: hermes-agent
+    component: dashboard
+  type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: cloudflare-issuer
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: hermes-agent-dashboard
+  namespace: apps
+spec:
+  ingressClassName: cilium
+  rules:
+    - host: hermes.josevictor.me
+      http:
+        paths:
+          - backend:
+              service:
+                name: hermes-agent-dashboard
+                port:
+                  number: 9119
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - hermes.josevictor.me
+      secretName: wildcard-tls
