@@ -7,42 +7,99 @@ let
   port = 18789;
   host = "openclaw-test.${homelab.domain}";
   image = "ghcr.io/openclaw/openclaw:2026.4.26@sha256:2e32f4f2e4f653f12d5dc6e5c93cc71e60f49d1dfaf061b18e53c3e61a38fb48";
+  losslessClawVersion = "0.9.2";
   startupScript = ''
-    set -euo pipefail
+            set -euo pipefail
 
-    STATE_DIR=/persistent/openclaw
-    HOME_DIR=$STATE_DIR/home
-    mkdir -p "$STATE_DIR" "$HOME_DIR"
+            STATE_DIR=/persistent/openclaw
+            HOME_DIR=$STATE_DIR/home
+            mkdir -p "$STATE_DIR" "$HOME_DIR"
 
-    if [ ! -f "$STATE_DIR/.openclaw-ready" ]; then
-      echo "Initializing persistent OpenClaw state..."
-      mkdir -p "$HOME_DIR/.openclaw" "$HOME_DIR/.cache" "$HOME_DIR/.local" "$HOME_DIR/workspace"
-      touch "$STATE_DIR/.openclaw-ready"
-      echo "Persistent state initialized."
-    else
-      echo "Using existing persistent state at $STATE_DIR"
-    fi
+            if [ ! -f "$STATE_DIR/.openclaw-ready" ]; then
+              echo "Initializing persistent OpenClaw state..."
+              mkdir -p "$HOME_DIR/.openclaw" "$HOME_DIR/.cache" "$HOME_DIR/.local" "$HOME_DIR/workspace"
+              touch "$STATE_DIR/.openclaw-ready"
+              echo "Persistent state initialized."
+            else
+              echo "Using existing persistent state at $STATE_DIR"
+            fi
 
-    mkdir -p "$HOME_DIR/.openclaw" "$HOME_DIR/.cache/ms-playwright" "$HOME_DIR/workspace"
+            mkdir -p "$HOME_DIR/.openclaw" "$HOME_DIR/.cache/ms-playwright" "$HOME_DIR/workspace"
 
-    if [ ! -f "$HOME_DIR/.openclaw/openclaw.json" ]; then
-      echo "Seeding OpenClaw config from ConfigMap..."
-      cp /config/config-template.json "$HOME_DIR/.openclaw/openclaw.json"
-    fi
+            if [ ! -f "$HOME_DIR/.openclaw/openclaw.json" ]; then
+              echo "Seeding OpenClaw config from ConfigMap..."
+              cp /config/config-template.json "$HOME_DIR/.openclaw/openclaw.json"
+            fi
 
-    export HOME=/root
-    export OPENCLAW_DATA_DIR=/root/.openclaw
-    export OPENCLAW_STATE_DIR=/root/.openclaw
-    export OPENCLAW_CONFIG_PATH=/root/.openclaw/openclaw.json
-    export OPENCLAW_PLUGIN_STAGE_DIR=/tmp/openclaw-plugin-stage
-    export NPM_CONFIG_PREFIX=/usr/local
-    export PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright
-    export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+            export HOME=/root
+            export OPENCLAW_DATA_DIR=/root/.openclaw
+            export OPENCLAW_STATE_DIR=/root/.openclaw
+            export OPENCLAW_CONFIG_PATH=/root/.openclaw/openclaw.json
+            export OPENCLAW_PLUGIN_STAGE_DIR=/tmp/openclaw-plugin-stage
+            export NPM_CONFIG_PREFIX=/usr/local
+            export PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright
+            export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
-    mount --bind "$HOME_DIR" /root
+            mount --bind "$HOME_DIR" /root
 
-    cd /root/workspace
-    exec node /app/openclaw.mjs gateway --port 18789 --bind lan --allow-unconfigured --verbose
+            sync_plugin_config() {
+              echo "Ensuring required OpenClaw plugins are enabled..."
+              node <<'NODE'
+    const fs = require("fs");
+
+    const configPath = "/root/.openclaw/openclaw.json";
+    const requiredPlugins = ["lossless-claw", "matrix"];
+
+    const config = JSON.parse(fs.readFileSync(configPath, "utf8"));
+    config.plugins ??= {};
+    config.plugins.enabled = true;
+
+    const allow = new Set(Array.isArray(config.plugins.allow) ? config.plugins.allow : []);
+    for (const plugin of requiredPlugins) allow.add(plugin);
+    config.plugins.allow = Array.from(allow);
+
+    config.plugins.entries ??= {};
+    config.plugins.entries.matrix = {
+      ...(config.plugins.entries.matrix ?? {}),
+      enabled: true,
+    };
+
+    config.plugins.entries["lossless-claw"] = {
+      ...(config.plugins.entries["lossless-claw"] ?? {}),
+      enabled: true,
+      config: {
+        ...((config.plugins.entries["lossless-claw"] ?? {}).config ?? {}),
+        enabled: true,
+      },
+    };
+
+    fs.writeFileSync(configPath, JSON.stringify(config, null, 2) + "\n", { mode: 0o600 });
+    NODE
+            }
+
+            install_lossless_claw() {
+              plugin_dir=/root/.openclaw/extensions/lossless-claw
+              if [ -f "$plugin_dir/openclaw.plugin.json" ]; then
+                echo "lossless-claw plugin already installed."
+                return
+              fi
+
+              echo "Installing lossless-claw plugin into persistent OpenClaw state..."
+              tmp_dir="$(mktemp -d)"
+              trap 'rm -rf "$tmp_dir"' EXIT
+              rm -rf "$plugin_dir"
+              mkdir -p "$plugin_dir"
+              npm pack @martian-engineering/lossless-claw@${losslessClawVersion} --pack-destination "$tmp_dir" >/dev/null
+              tar -xzf "$tmp_dir"/martian-engineering-lossless-claw-${losslessClawVersion}.tgz -C "$plugin_dir" --strip-components=1
+              npm install --omit=dev --ignore-scripts --legacy-peer-deps --prefix "$plugin_dir"
+              echo "lossless-claw plugin installed."
+            }
+
+            sync_plugin_config
+            install_lossless_claw
+
+            cd /root/workspace
+            exec node /app/openclaw.mjs gateway --port 18789 --bind lan --allow-unconfigured --verbose
   '';
 in
 {

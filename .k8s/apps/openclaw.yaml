@@ -43,24 +43,53 @@ spec:
         - command:
             - /bin/bash
             - -lc
-            - "set -euo pipefail\n\nSTATE_DIR=/persistent/openclaw\nHOME_DIR=$STATE_DIR/home\n\
-              mkdir -p \"$STATE_DIR\" \"$HOME_DIR\"\n\nif [ ! -f \"$STATE_DIR/.openclaw-ready\"\
-              \ ]; then\n  echo \"Initializing persistent OpenClaw state...\"\n  mkdir\
-              \ -p \"$HOME_DIR/.openclaw\" \"$HOME_DIR/.cache\" \"$HOME_DIR/.local\"\
-              \ \"$HOME_DIR/workspace\"\n  touch \"$STATE_DIR/.openclaw-ready\"\n\
-              \  echo \"Persistent state initialized.\"\nelse\n  echo \"Using existing\
-              \ persistent state at $STATE_DIR\"\nfi\n\nmkdir -p \"$HOME_DIR/.openclaw\"\
-              \ \"$HOME_DIR/.cache/ms-playwright\" \"$HOME_DIR/workspace\"\n\nif [\
-              \ ! -f \"$HOME_DIR/.openclaw/openclaw.json\" ]; then\n  echo \"Seeding\
-              \ OpenClaw config from ConfigMap...\"\n  cp /config/config-template.json\
-              \ \"$HOME_DIR/.openclaw/openclaw.json\"\nfi\n\nexport HOME=/root\nexport\
-              \ OPENCLAW_DATA_DIR=/root/.openclaw\nexport OPENCLAW_STATE_DIR=/root/.openclaw\n\
-              export OPENCLAW_CONFIG_PATH=/root/.openclaw/openclaw.json\nexport OPENCLAW_PLUGIN_STAGE_DIR=/tmp/openclaw-plugin-stage\n\
-              export NPM_CONFIG_PREFIX=/usr/local\nexport PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright\n\
-              export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\n\
-              \nmount --bind \"$HOME_DIR\" /root\n\ncd /root/workspace\nexec node\
-              \ /app/openclaw.mjs gateway --port 18789 --bind lan --allow-unconfigured\
-              \ --verbose\n"
+            - "        set -euo pipefail\n\n        STATE_DIR=/persistent/openclaw\n\
+              \        HOME_DIR=$STATE_DIR/home\n        mkdir -p \"$STATE_DIR\" \"\
+              $HOME_DIR\"\n\n        if [ ! -f \"$STATE_DIR/.openclaw-ready\" ]; then\n\
+              \          echo \"Initializing persistent OpenClaw state...\"\n    \
+              \      mkdir -p \"$HOME_DIR/.openclaw\" \"$HOME_DIR/.cache\" \"$HOME_DIR/.local\"\
+              \ \"$HOME_DIR/workspace\"\n          touch \"$STATE_DIR/.openclaw-ready\"\
+              \n          echo \"Persistent state initialized.\"\n        else\n \
+              \         echo \"Using existing persistent state at $STATE_DIR\"\n \
+              \       fi\n\n        mkdir -p \"$HOME_DIR/.openclaw\" \"$HOME_DIR/.cache/ms-playwright\"\
+              \ \"$HOME_DIR/workspace\"\n\n        if [ ! -f \"$HOME_DIR/.openclaw/openclaw.json\"\
+              \ ]; then\n          echo \"Seeding OpenClaw config from ConfigMap...\"\
+              \n          cp /config/config-template.json \"$HOME_DIR/.openclaw/openclaw.json\"\
+              \n        fi\n\n        export HOME=/root\n        export OPENCLAW_DATA_DIR=/root/.openclaw\n\
+              \        export OPENCLAW_STATE_DIR=/root/.openclaw\n        export OPENCLAW_CONFIG_PATH=/root/.openclaw/openclaw.json\n\
+              \        export OPENCLAW_PLUGIN_STAGE_DIR=/tmp/openclaw-plugin-stage\n\
+              \        export NPM_CONFIG_PREFIX=/usr/local\n        export PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright\n\
+              \        export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\n\
+              \n        mount --bind \"$HOME_DIR\" /root\n\n        sync_plugin_config()\
+              \ {\n          echo \"Ensuring required OpenClaw plugins are enabled...\"\
+              \n          node <<'NODE'\nconst fs = require(\"fs\");\n\nconst configPath\
+              \ = \"/root/.openclaw/openclaw.json\";\nconst requiredPlugins = [\"\
+              lossless-claw\", \"matrix\"];\n\nconst config = JSON.parse(fs.readFileSync(configPath,\
+              \ \"utf8\"));\nconfig.plugins ??= {};\nconfig.plugins.enabled = true;\n\
+              \nconst allow = new Set(Array.isArray(config.plugins.allow) ? config.plugins.allow\
+              \ : []);\nfor (const plugin of requiredPlugins) allow.add(plugin);\n\
+              config.plugins.allow = Array.from(allow);\n\nconfig.plugins.entries\
+              \ ??= {};\nconfig.plugins.entries.matrix = {\n  ...(config.plugins.entries.matrix\
+              \ ?? {}),\n  enabled: true,\n};\n\nconfig.plugins.entries[\"lossless-claw\"\
+              ] = {\n  ...(config.plugins.entries[\"lossless-claw\"] ?? {}),\n  enabled:\
+              \ true,\n  config: {\n    ...((config.plugins.entries[\"lossless-claw\"\
+              ] ?? {}).config ?? {}),\n    enabled: true,\n  },\n};\n\nfs.writeFileSync(configPath,\
+              \ JSON.stringify(config, null, 2) + \"\\n\", { mode: 0o600 });\nNODE\n\
+              \        }\n\n        install_lossless_claw() {\n          plugin_dir=/root/.openclaw/extensions/lossless-claw\n\
+              \          if [ -f \"$plugin_dir/openclaw.plugin.json\" ]; then\n  \
+              \          echo \"lossless-claw plugin already installed.\"\n      \
+              \      return\n          fi\n\n          echo \"Installing lossless-claw\
+              \ plugin into persistent OpenClaw state...\"\n          tmp_dir=\"$(mktemp\
+              \ -d)\"\n          trap 'rm -rf \"$tmp_dir\"' EXIT\n          rm -rf\
+              \ \"$plugin_dir\"\n          mkdir -p \"$plugin_dir\"\n          npm\
+              \ pack @martian-engineering/lossless-claw@0.9.2 --pack-destination \"\
+              $tmp_dir\" >/dev/null\n          tar -xzf \"$tmp_dir\"/martian-engineering-lossless-claw-0.9.2.tgz\
+              \ -C \"$plugin_dir\" --strip-components=1\n          npm install --omit=dev\
+              \ --ignore-scripts --legacy-peer-deps --prefix \"$plugin_dir\"\n   \
+              \       echo \"lossless-claw plugin installed.\"\n        }\n\n    \
+              \    sync_plugin_config\n        install_lossless_claw\n\n        cd\
+              \ /root/workspace\n        exec node /app/openclaw.mjs gateway --port\
+              \ 18789 --bind lan --allow-unconfigured --verbose\n"
           env:
             - name: HOME
               value: /root
