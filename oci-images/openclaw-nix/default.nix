@@ -286,37 +286,63 @@ let
           '';
           postPatch = (old.postPatch or "") + ''
 
-                  if [ -f tsconfig.json ]; then
-                    substituteInPlace tsconfig.json \
-                      --replace-fail '"strict": true' '"strict": false' \
-                      --replace-fail '"noEmitOnError": true' '"noEmitOnError": false'
-                  fi
-                  if [ -f package.json ]; then
-                    substituteInPlace package.json \
-                      --replace-fail '"node scripts/run-tsgo.mjs -p tsconfig.plugin-sdk.dts.json --declaration true"' '"tsc -p tsconfig.plugin-sdk.dts.json || true"'
-                  fi
-                  if [ -f scripts/bundle-a2ui.mjs ]; then
-                    substituteInPlace scripts/bundle-a2ui.mjs \
-                      --replace 'runPnpm(["-s", "exec", "rolldown", "-c", path.join(a2uiAppDir, "rolldown.config.mjs")])' \
-                      'runStep("rolldown", ["-c", path.join(a2uiAppDir, "rolldown.config.mjs")])'
-                  fi
-                  if [ -f src/media-understanding/attachments.normalize.ts ]; then
-                    substituteInPlace src/media-understanding/attachments.normalize.ts \
-                      --replace-fail 'import { getFileExtension, isAudioFileName, kindFromMime } from "../media/mime.js";' \
-                      'import { getFileExtension, isAudioFileName, kindFromMime, normalizeMimeType } from "../media/mime.js";' \
-                      --replace-fail '  const kind = kindFromMime(attachment.mime);' \
-                      '  const mime = normalizeMimeType(attachment.mime);
-          if (mime === "audio/webm" || mime === "video/webm") {
-            return "audio";
-          }
+                                    if [ -f tsconfig.json ]; then
+                                      substituteInPlace tsconfig.json \
+                                        --replace-fail '"strict": true' '"strict": false' \
+                                        --replace-fail '"noEmitOnError": true' '"noEmitOnError": false'
+                                    fi
+                                    if [ -f package.json ]; then
+                                      substituteInPlace package.json \
+                                        --replace-fail '"node scripts/run-tsgo.mjs -p tsconfig.plugin-sdk.dts.json --declaration true"' '"tsc -p tsconfig.plugin-sdk.dts.json || true"'
+                                    fi
+                                    if [ -f scripts/bundle-a2ui.mjs ]; then
+                                      substituteInPlace scripts/bundle-a2ui.mjs \
+                                        --replace 'runPnpm(["-s", "exec", "rolldown", "-c", path.join(a2uiAppDir, "rolldown.config.mjs")])' \
+                                        'runStep("rolldown", ["-c", path.join(a2uiAppDir, "rolldown.config.mjs")])'
+                                    fi
+                                    if [ -f src/media-understanding/attachments.normalize.ts ]; then
+                                      substituteInPlace src/media-understanding/attachments.normalize.ts \
+                                        --replace-fail 'import { getFileExtension, isAudioFileName, kindFromMime } from "../media/mime.js";' \
+                                        'import { getFileExtension, isAudioFileName, kindFromMime, normalizeMimeType } from "../media/mime.js";' \
+                                        --replace-fail '  const kind = kindFromMime(attachment.mime);' \
+                                        '  const mime = normalizeMimeType(attachment.mime);
+                            if (mime === "audio/webm" || mime === "video/webm") {
+                              return "audio";
+                            }
 
-          const kind = kindFromMime(mime);' \
-                      --replace-fail '  if ([".mp4", ".mov", ".mkv", ".webm", ".avi", ".m4v"].includes(ext)) {' \
-                      '  if (ext === ".webm") {
-            return "audio";
-          }
-          if ([".mp4", ".mov", ".mkv", ".avi", ".m4v"].includes(ext)) {'
-                  fi
+                            const kind = kindFromMime(mime);' \
+                                        --replace-fail '  if ([".mp4", ".mov", ".mkv", ".webm", ".avi", ".m4v"].includes(ext)) {' \
+                                        '  if (ext === ".webm") {
+                              return "audio";
+                            }
+                            if ([".mp4", ".mov", ".mkv", ".avi", ".m4v"].includes(ext)) {'
+                          fi
+                          if [ -f src/media/mime.ts ]; then
+                            substituteInPlace src/media/mime.ts \
+                              --replace-fail '  "audio/mp4": ".m4a",' \
+                              '  "audio/mp4": ".m4a",
+          "audio/webm": ".webm",' \
+                              --replace-fail '  ".xml": "text/xml",' \
+                              '  ".xml": "text/xml",
+          ".webm": "audio/webm",' \
+                              --replace-fail '  ".wav",' \
+                              '  ".wav",
+          ".webm",'
+                          fi
+                          if [ -f src/media/audio.ts ]; then
+                            substituteInPlace src/media/audio.ts \
+                              --replace-fail '  "audio/m4a",' \
+                              '  "audio/m4a",
+          "audio/webm",
+          "video/webm",' \
+                              --replace-fail '".oga", ".ogg", ".opus", ".mp3", ".m4a"' \
+                              '".oga", ".ogg", ".opus", ".mp3", ".m4a", ".webm"'
+                          fi
+                          if [ -f src/media/store.ts ]; then
+                            substituteInPlace src/media/store.ts \
+                              --replace-fail 'return buildSavedMediaResult({ dir, id, size: buffer.byteLength, contentType: mime });' \
+                              'return buildSavedMediaResult({ dir, id, size: buffer.byteLength, contentType: mime === "video/webm" ? "audio/webm" : mime });'
+                          fi
         '';
         })
     else
