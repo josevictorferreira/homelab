@@ -357,9 +357,9 @@
 **Verify:** `grep -rn 'imageTag\|openclawVersion\|image.tag' oci-images/ modules/` — ensure no double-suffix in computed tag.
 
 ### Force Delete Pods Stuck Terminating During Large Image Pulls
-**Lesson:** When a rollout restart kills a pod mid-pull of a large image (6GB+), the pod gets stuck in `Terminating` state and no new pod is created (all ReplicaSets show DESIRED=0). Fix: `kubectl delete pod <name> -n <ns> --force --grace-period=0`, then a new pod is automatically created.
-**Context:** Rollout restart of openclaw-nix (6GB image) caused pod stuck Terminating for 10+ minutes. All 5 ReplicaSets showed DESIRED=0, CURRENT=0. Force-deleting the stuck pod allowed the new ReplicaSet to create a fresh pod.
-**Verify:** After force delete: `kubectl get pods -n <ns> -l app.kubernetes.io/name=<app>` shows new pod in ContainerCreating/Running state.
+**Lesson:** When a rollout restart kills a pod mid-pull of a large image (6GB+), the pod gets stuck in `Terminating` state and no new pod is created (all ReplicaSets show DESIRED=0). Fix: `kubectl delete pod <name> -n <ns> --force --grace-period=0`, then a new pod is automatically created. If the replacement pod fails with sandbox errors (`Failed to reserve sandbox name`), the stale sandbox may need cleanup on the node via `crictl stopp/rmp` — but crictl can also hang, so a node reboot may be needed.
+**Context:** Rollout restart of openclaw-nix (6GB image) caused pod stuck Terminating for 10+ minutes. Force-deleting left a stale container sandbox on the node that blocked the next pod's sandbox creation. `crictl` cleanup also hung with DeadlineExceeded.
+**Verify:** After force delete: `kubectl get pods -n <ns> -l app.kubernetes.io/name=<app>` shows new pod in ContainerCreating/Running state. If sandbox errors appear, SSH to node and check `crictl pods` for stale entries.
 
 ## Git History & Secret Scrubbing
 
@@ -448,6 +448,11 @@
 **Context:** Persistent `plugin-runtime-deps` mirror/deps locks on CephFS can stall startup and survive interrupted pods.
 **Verify:** Startup logs stage/install runtime deps from the pod-local dir and no `.openclaw-runtime-*.lock` appears under `/home/node/.openclaw/plugin-runtime-deps`.
 
+### Prestage OpenClaw Bundled Plugin Runtime Deps
+**Lesson:** When enabling bundled OpenClaw plugins with `stageRuntimeDependencies`, run `maybeRepairBundledPluginRuntimeDeps` in an initContainer sharing `OPENCLAW_PLUGIN_STAGE_DIR` with the main container.
+**Context:** If runtime deps install after `http server listening`, the gateway can log ready while `/health` times out under npm install/mirroring load.
+**Verify:** Init logs show `Bundled OpenClaw plugin runtime dependencies prepared` before main logs reach `[gateway] ready`, and `GET /health` returns `{"ok":true,"status":"live"}`.
+
 ### Verify OpenClaw Readiness by Logs and Real Routes
 **Lesson:** Treat `http server listening` and TCP readiness as insufficient; require `[gateway] ready`, channel/provider logs, websocket responses, and `GET /health` returning `{"ok":true,"status":"live"}`.
 **Context:** `/__openclaw__/health` timed out in v2026.4.27 while `/health`, the Control UI, and websocket health calls worked after gateway readiness.
@@ -457,7 +462,7 @@
 
 ### Lock File Stale Entry Blocks New Secret Keys
 **Lesson:** When adding new secret keys to `.enc.nix` files, delete the specific file's line from `manifests.lock` AND delete the file from `.k8s/` before running `make manifests`. Otherwise the `umanifests` stage restores the old git-committed version (without the new keys).
-**Context:** The `umanifests` stage compares SHA256 of the new vals-injected file against the lock file from the previous run. If they match (due to cached Nix derivation), it restores the git version — silently dropping newly added keys.
+**Context:** The `umanifests` stage compares SHA256 of the new vals-injected file against the lock file. If they match (due to cached Nix derivation), it restores the git version — silently dropping newly added keys. This happened 3 times in one session; always remove the lock entry after adding new secret keys.
 **Verify:** `sops -d .k8s/apps/<app>-config.enc.yaml | grep <NEW_KEY>` returns the expected value after `make manifests`
 
 ### Never Run Individual Manifest Pipeline Stages
@@ -494,6 +499,11 @@
 **Context:** Openclaw-nix (priority 1000000) preempting hermes-agent (priority 100000) on lab-beta-cp during rolling updates. Looked like capacity issue, was a priority class mismatch.
 **Verify:** `kubectl get pods -A -o custom-columns='NS:.metadata.namespace,NAME:.metadata.name,PRIO:.spec.priority' --field-selector spec.nodeName=<node> --no-headers | sort -k3 -nr | head`.
 
+### Avoid Hard Node Affinity for Non-Pinned Apps
+**Lesson:** Prefer soft node affinity for apps that can run on multiple nodes; hard `requiredDuringScheduling` can trap rollouts when a preferred node is `NotReady` or another node lacks resources.
+**Context:** `openclaw` kept rescheduling onto/flapping around `lab-beta-cp`; removing hard exclusion and changing preferred node restored scheduling flexibility.
+**Verify:** `kubectl describe pod <pod>` shows scheduling events; generated manifest should avoid unnecessary `requiredDuringSchedulingIgnoredDuringExecution`.
+
 ### Always `git diff --cached` Before Commit
 **Lesson:** Explicit `git add <file>` arguments do NOT unstage other already-staged files — they accumulate. Pre-existing staged work from prior sessions can sneak into your commit. Always run `git diff --cached --stat` before `git commit` to verify exactly what's staged.
 **Context:** Committed 2 unintended openclaw files (669 added lines) alongside a 2-line hermes capability fix.
@@ -503,3 +513,36 @@
 **Lesson:** For Node.js apps (OpenClaw, etc.), aggressive startup+readiness+liveness probes hitting endpoints that don't respond quickly can accumulate hundreds of TCP connections, overwhelming the event loop and preventing initialization. Use `/health` (not `/healthz`/`/readyz`), reduce probe frequency (periodSeconds ≥ 30 for readiness/liveness), and increase initialDelaySeconds generously.
 **Context:** OpenClaw pod stuck at 'starting channels and sidecars...' with 252 TCP connections from probes hitting /healthz and /readyz which time out. The HTTP server was listening but couldn't respond due to connection backlog.
 **Verify:** `kubectl exec <pod> -- ss -tn | wc -l` shows reasonable connection count (< 20) during startup.
+
+## Tooling & Environment
+
+### `rtk` Wrapper Truncates Piped Output
+**Lesson:** The `rtk` wrapper tool truncates piped stdout to ~5KB, silently dropping output from commands like `sops -d`. Use raw binary paths (e.g., `/etc/profiles/per-user/josevictor/bin/sops`) for accurate results.
+**Context:** `sops -d` via `rtk` showed only 41 lines (29 keys) from a 181-line file with 144 keys. Wasted significant time investigating non-existent decryption issues.
+**Verify:** Compare `rtk sops -d file | wc -l` vs `/etc/profiles/per-user/josevictor/bin/sops -d file | wc -l` — should match.
+
+## Cluster-Internal Communication
+
+### Use Internal Service URLs for In-Cluster Apps
+**Lesson:** When configuring apps to talk to each other within the cluster, use `http://<service>.<namespace>.svc.cluster.local:<port>` instead of external URLs. Pods may not resolve external DNS (especially during node outages).
+**Context:** Hermes gateway pod crashed with `Cannot connect to host matrix.josevictor.me:443 [Name or service not known]` because external DNS was unreachable. Fixed by using `http://tuwunel.apps.svc.cluster.local:8008`.
+**Verify:** `kubectl exec <pod> -- wget -qO- http://<service>.<ns>.svc.cluster.local:<port>/_matrix/client/versions` returns valid response.
+
+## Tuwunel Matrix Operations
+
+### Register Matrix Bot Users via Registration Token API
+**Lesson:** To create bot users on tuwunel, use `POST /_matrix/client/v3/register` with `auth.type: m.login.registration_token` and the token from `secrets/k8s-secrets.enc.yaml` key `tuwunel_registration_token`. The resulting `access_token` is the bot's credential.
+**Context:** Hermes needed a dedicated Matrix user `@hermes:josevictor.me`. The initial `syt_` prefixed token was invalid for tuwunel (Conduwuit uses different token format than Synapse).
+**Verify:** `wget -qO- --post-data='{...}' --header='Content-Type: application/json' http://tuwunel.apps.svc.cluster.local:8008/_matrix/client/v3/register` returns `access_token` and `user_id`.
+
+### Check Upstream Source Indentation Before `substituteInPlace`
+**Lesson:** When writing `substituteInPlace` patches in Nix `postPatch`, inspect the actual upstream source file's indentation (tabs vs spaces, width) before writing the match string. Use `--replace-fail` to get clear errors on mismatch instead of silent no-ops.
+**Context:** Used `\t` tab escapes in a Nix indented string to match TypeScript source that actually uses 2-space indentation. Build failed with "pattern doesn't match anything in file". Extracting the source tarball first (`tar -tzf /nix/store/...`) to inspect indentation would have avoided the wasted attempt.
+**Verify:** Check source: `tar -xzf <tarball> --to-stdout <path> | head -20` shows actual indentation; use `--replace-fail` flag in `substituteInPlace` to fail fast on pattern mismatch.
+
+## OCI Image Source Patching
+
+### Verify Upstream Source Tag Exists Before Building
+**Lesson:** Before building a custom OCI image that fetches upstream source, verify the tag actually exists: `git ls-remote --tags <upstream-url> "refs/tags/v<version>"`. A mismatch between the stored hash and the version string will cause build failures at fetch time.
+**Context:** Local derivation had `version = "2026.4.27"` but the hash was for `v2026.4.26` tarball. The v2026.4.27 tag didn't exist upstream, causing 404 during `nix build`. Wasted time investigating SSL/curl errors when the real issue was a non-existent tag.
+**Verify:** `git ls-remote --tags https://github.com/<org>/<repo> "refs/tags/v<version>"` returns a result before building.

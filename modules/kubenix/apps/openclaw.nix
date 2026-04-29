@@ -280,20 +280,6 @@ in
               }
             ];
             affinity.nodeAffinity = {
-              requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms = [
-                {
-                  matchExpressions = [
-                    {
-                      key = "kubernetes.io/hostname";
-                      operator = "NotIn";
-                      values = [
-                        "lab-delta-cp"
-                        "lab-alpha-cp"
-                      ];
-                    }
-                  ];
-                }
-              ];
               preferredDuringSchedulingIgnoredDuringExecution = [
                 {
                   weight = 100;
@@ -301,7 +287,7 @@ in
                     {
                       key = "kubernetes.io/hostname";
                       operator = "In";
-                      values = [ "lab-beta-cp" ];
+                      values = [ "lab-delta-cp" ];
                     }
                   ];
                 }
