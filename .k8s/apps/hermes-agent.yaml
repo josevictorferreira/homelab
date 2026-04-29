@@ -76,6 +76,8 @@ spec:
             - mountPath: /opt/data
               name: hermes-data
               subPath: hermes
+      imagePullSecrets:
+        - name: ghcr-registry-secret
       initContainers:
         - command:
             - sh
@@ -161,6 +163,8 @@ spec:
             - mountPath: /opt/data
               name: hermes-data
               subPath: hermes
+      imagePullSecrets:
+        - name: ghcr-registry-secret
       initContainers:
         - command:
             - sh
