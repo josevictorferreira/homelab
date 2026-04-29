@@ -4,7 +4,7 @@
 **Commit:** 2935f27
 **Branch:** main
 
-> **Before starting any implementation, read `.docs/rules.md` for project-specific lessons and gotchas.**
+> **Before starting any implementation, read this `AGENTS.md` and `.docs/rules.md` for project-specific lessons and gotchas.**
 
 ## AGENT SESSION RULES
 
@@ -188,6 +188,28 @@ After initial Tailscale deployment:
 ## CLUSTER MANAGEMENT
 
 Our cluster is deployed and accessible in the user system kubectl, the context and cluster name is named as `ze-homelab`. You can access whenever you need to check the production logs or debug something directly in the real environment.
+
+## SESSION LEARNINGS
+
+### Live Deployment Drift Can Hide Fixed Source
+**Lesson:** When an app behaves unlike current Nix/.k8s output, compare the live Deployment template with generated manifest and check Flux `suspend`, `lastAppliedRevision`, and `lastAttemptedRevision`.
+**Context:** `openclaw-nix` live spec still mounted the old RBD PVC and migration script while git/generated manifests had already restored CephFS.
+**Verify:** `kubectl get kustomization flux-system -n flux-system -o yaml` and `kubectl get deploy openclaw-nix -n apps -o yaml | grep -E "openclaw-nix-state|migration/source"`.
+
+### Probe Handler Changes Can Block Flux Apply
+**Lesson:** When changing a probe handler type, remove/patch the old handler if Flux dry-run reports `may not specify more than 1 handler type`; otherwise server-side apply can merge old `httpGet` with new `tcpSocket`.
+**Context:** `openclaw-nix` reconciliation blocked after unsuspending Flux because live `readinessProbe.httpGet` conflicted with desired `readinessProbe.tcpSocket`.
+**Verify:** `kubectl get kustomization flux-system -n flux-system -o jsonpath='{.status.conditions[*].message}'` and inspect the Deployment probe fields.
+
+### Keep OpenClaw Nix State on CephFS
+**Lesson:** Keep `openclaw-nix` `/home/node/.openclaw` mounted from CephFS `shared-storage` subPath `openclaw`; do not migrate it to an RBD PVC without explicit user approval.
+**Context:** The CephFS-to-RBD migration copied an active state tree, left `cp` stuck in uninterruptible sleep, and prevented the gateway from opening port 18789.
+**Verify:** Deployment volumes should not include `openclaw-nix-state`, and main mounts should include `/home/node/.openclaw` from `shared-storage`.
+
+### Avoid Full Env Dumps in Pods
+**Lesson:** Never run broad `env`, `printenv`, or `/proc/*/environ` dumps in live pods; inspect only explicit non-secret variables.
+**Context:** `openclaw-nix` exposes secret-bearing env vars, and diagnostic output can leak them into transcripts.
+**Verify:** Use allowlisted commands like `kubectl exec ... -- sh -c 'printf "%s\n" "$OPENCLAW_PLUGIN_STAGE_DIR"'` instead of full environment dumps.
 
 ## INCIDENT RECORD
 

@@ -55,8 +55,9 @@ spec:
               \ OpenClaw config from ConfigMap...\"\n  cp /config/config-template.json\
               \ \"$HOME_DIR/.openclaw/openclaw.json\"\nfi\n\nexport HOME=/root\nexport\
               \ OPENCLAW_DATA_DIR=/root/.openclaw\nexport OPENCLAW_STATE_DIR=/root/.openclaw\n\
-              export OPENCLAW_CONFIG_PATH=/root/.openclaw/openclaw.json\nexport NPM_CONFIG_PREFIX=/usr/local\n\
-              export PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright\nexport PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\n\
+              export OPENCLAW_CONFIG_PATH=/root/.openclaw/openclaw.json\nexport OPENCLAW_PLUGIN_STAGE_DIR=/tmp/openclaw-plugin-stage\n\
+              export NPM_CONFIG_PREFIX=/usr/local\nexport PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright\n\
+              export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\n\
               \nmount --bind \"$HOME_DIR\" /root\n\ncd /root/workspace\nexec node\
               \ /app/openclaw.mjs gateway --port 18789 --bind lan --allow-unconfigured\
               \ --verbose\n"
@@ -75,30 +76,29 @@ spec:
           image: ghcr.io/openclaw/openclaw:2026.4.26@sha256:2e32f4f2e4f653f12d5dc6e5c93cc71e60f49d1dfaf061b18e53c3e61a38fb48
           imagePullPolicy: IfNotPresent
           livenessProbe:
-            failureThreshold: 4
+            failureThreshold: 3
             httpGet:
-              path: /healthz
+              path: /health
               port: http
-            initialDelaySeconds: 120
-            periodSeconds: 30
-            timeoutSeconds: 5
+            initialDelaySeconds: 300
+            periodSeconds: 60
+            timeoutSeconds: 10
           name: openclaw
           ports:
             - containerPort: 18789
               name: http
               protocol: TCP
           readinessProbe:
-            failureThreshold: 12
+            failureThreshold: 3
             httpGet:
-              path: /readyz
+              path: /health
               port: http
-            initialDelaySeconds: 10
-            periodSeconds: 10
+            periodSeconds: 30
             timeoutSeconds: 5
           resources:
             limits:
-              cpu: 500m
-              memory: 1Gi
+              cpu: '1'
+              memory: 2Gi
             requests:
               cpu: 250m
               memory: 256Mi
@@ -111,12 +111,12 @@ spec:
             runAsGroup: 0
             runAsUser: 0
           startupProbe:
-            failureThreshold: 360
+            failureThreshold: 60
             httpGet:
-              path: /healthz
+              path: /health
               port: http
-            periodSeconds: 10
-            timeoutSeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
           volumeMounts:
             - mountPath: /persistent
               name: persistent
