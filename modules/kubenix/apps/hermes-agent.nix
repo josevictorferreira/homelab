@@ -26,8 +26,9 @@ let
   };
 in
 {
-  # Init container chowns the CephFS subPath so the hermes user (UID 10000)
-  # can write to /opt/data after gosu drops privileges.
+  # No init container: CephFS rejects chown from unprivileged-capability containers.
+  # The hermes entrypoint runs as root (UID 0), then gosu-drops to UID 10000.
+  # Its internal chown tolerates failure on CephFS (continues with warning).
   kubernetes.resources.deployments."${name}-gateway" = {
     metadata = {
       name = "${name}-gateway";
@@ -52,27 +53,6 @@ in
         spec = {
           terminationGracePeriodSeconds = 60;
           imagePullSecrets = [ { name = "ghcr-registry-secret"; } ];
-          initContainers = [
-            {
-              name = "init-data";
-              image = "busybox:1.36";
-              command = [
-                "sh"
-                "-c"
-                "mkdir -p /opt/data && chown -R 10000:10000 /opt/data && chmod 0750 /opt/data"
-              ];
-              volumeMounts = dataVolumeMounts;
-              securityContext = {
-                runAsUser = 0;
-                allowPrivilegeEscalation = false;
-                capabilities.drop = [ "ALL" ];
-                capabilities.add = [
-                  "CHOWN"
-                  "FOWNER"
-                ];
-              };
-            }
-          ];
           containers = [
             {
               name = "gateway";
@@ -143,27 +123,6 @@ in
         spec = {
           terminationGracePeriodSeconds = 30;
           imagePullSecrets = [ { name = "ghcr-registry-secret"; } ];
-          initContainers = [
-            {
-              name = "wait-data";
-              image = "busybox:1.36";
-              command = [
-                "sh"
-                "-c"
-                "mkdir -p /opt/data && chown -R 10000:10000 /opt/data && chmod 0750 /opt/data"
-              ];
-              volumeMounts = dataVolumeMounts;
-              securityContext = {
-                runAsUser = 0;
-                allowPrivilegeEscalation = false;
-                capabilities.drop = [ "ALL" ];
-                capabilities.add = [
-                  "CHOWN"
-                  "FOWNER"
-                ];
-              };
-            }
-          ];
           containers = [
             {
               name = "dashboard";
