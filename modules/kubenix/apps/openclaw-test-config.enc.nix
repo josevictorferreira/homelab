@@ -278,6 +278,8 @@ let
         "github-copilot"
         "google"
         "kimi"
+        "lossless-claw"
+        "matrix"
         "minimax"
         "openai"
         "perplexity"
@@ -286,6 +288,11 @@ let
         github-copilot.enabled = true;
         google.enabled = true;
         kimi.enabled = true;
+        lossless-claw = {
+          enabled = true;
+          config.enabled = true;
+        };
+        matrix.enabled = true;
         minimax.enabled = true;
         openai.enabled = true;
         perplexity = {

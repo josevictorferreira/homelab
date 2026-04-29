@@ -555,7 +555,7 @@ let
 
   # OpenClaw image configuration
   openclawImageName = "openclaw-nix";
-  openclawVersion = "2026.4.27";
+  openclawVersion = "2026.4.26";
   openclawRegistry = "ghcr.io";
 
   push-openclaw =
@@ -664,8 +664,8 @@ let
           PINNED_TAG="''${TAG}@''${REMOTE_DIGEST}"
           MANIFEST_FILE="$(git -C "$(dirname "$0")" rev-parse --show-toplevel 2>/dev/null || echo ".")/modules/kubenix/apps/openclaw-nix.nix"
           if [ -f "''${MANIFEST_FILE}" ]; then
-            # Replace tag = "v<version>" or tag = "v<version>@sha256:..." with the new pinned tag
-            sed -i "s|tag = \"''${TAG}[^\"]*\"|tag = \"''${PINNED_TAG}\"|g" "''${MANIFEST_FILE}"
+        # Replace any OpenClaw version tag, including the previous unreproducible v2026.4.27 tag.
+        sed -i "s|tag = \"v[0-9][^\"]*\"|tag = \"''${PINNED_TAG}\"|g" "''${MANIFEST_FILE}"
             echo "  Updated ''${MANIFEST_FILE}: tag = \"''${PINNED_TAG}\""
             echo "  Re-generating manifests..."
             make -C "$(dirname "''${MANIFEST_FILE}")/../../.." manifests

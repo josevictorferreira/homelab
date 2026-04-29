@@ -498,3 +498,8 @@
 **Lesson:** Explicit `git add <file>` arguments do NOT unstage other already-staged files — they accumulate. Pre-existing staged work from prior sessions can sneak into your commit. Always run `git diff --cached --stat` before `git commit` to verify exactly what's staged.
 **Context:** Committed 2 unintended openclaw files (669 added lines) alongside a 2-line hermes capability fix.
 **Verify:** `git diff --cached --stat` matches your intent before every `git commit`.
+
+### Probe Storms Can Block Node.js App Initialization
+**Lesson:** For Node.js apps (OpenClaw, etc.), aggressive startup+readiness+liveness probes hitting endpoints that don't respond quickly can accumulate hundreds of TCP connections, overwhelming the event loop and preventing initialization. Use `/health` (not `/healthz`/`/readyz`), reduce probe frequency (periodSeconds ≥ 30 for readiness/liveness), and increase initialDelaySeconds generously.
+**Context:** OpenClaw pod stuck at 'starting channels and sidecars...' with 252 TCP connections from probes hitting /healthz and /readyz which time out. The HTTP server was listening but couldn't respond due to connection backlog.
+**Verify:** `kubectl exec <pod> -- ss -tn | wc -l` shows reasonable connection count (< 20) during startup.

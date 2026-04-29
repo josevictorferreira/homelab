@@ -1,13 +1,13 @@
-{
-  pkgs,
-  lib,
-  inputs,
-  system,
-  version ? "2026.4.27",
-  tagSuffix ? "",
-  legacyOpenClawPatches ? true,
-  matrixSendQueuePatch ? true,
-  disableMatrixCredentialTouch ? false,
+{ pkgs
+, lib
+, inputs
+, system
+, version ? "2026.4.26"
+, tagSuffix ? ""
+, legacyOpenClawPatches ? true
+, matrixSendQueuePatch ? true
+, disableMatrixCredentialTouch ? false
+,
 }:
 
 let
@@ -271,36 +271,54 @@ let
   # Legacy build overrides kept default-on until runtime validation proves they can be removed.
   openclawGateway =
     if legacyOpenClawPatches then
-      openclawGatewayBase.overrideAttrs (old: {
-        nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [
-          rolldown
-          pkgs.findutils
-        ];
-        # Override installPhase: run the original script, but first clean broken symlinks
-        installPhase = ''
-          cp ${old.installPhase} /tmp/gateway-install.sh
-          # Comment out the validation line using sed with # as replacement
-          sed -i 's/^log_step "validate node_modules symlinks" check_no_broken_symlinks/# VALIDATION DISABLED: &/' /tmp/gateway-install.sh
-          . /tmp/gateway-install.sh
-        '';
-        postPatch = (old.postPatch or "") + ''
+      openclawGatewayBase.overrideAttrs
+        (old: {
+          nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [
+            rolldown
+            pkgs.findutils
+          ];
+          # Override installPhase: run the original script, but first clean broken symlinks
+          installPhase = ''
+            cp ${old.installPhase} /tmp/gateway-install.sh
+            # Comment out the validation line using sed with # as replacement
+            sed -i 's/^log_step "validate node_modules symlinks" check_no_broken_symlinks/# VALIDATION DISABLED: &/' /tmp/gateway-install.sh
+            . /tmp/gateway-install.sh
+          '';
+          postPatch = (old.postPatch or "") + ''
 
-          if [ -f tsconfig.json ]; then
-            substituteInPlace tsconfig.json \
-              --replace-fail '"strict": true' '"strict": false' \
-              --replace-fail '"noEmitOnError": true' '"noEmitOnError": false'
-          fi
-          if [ -f package.json ]; then
-            substituteInPlace package.json \
-              --replace-fail '"node scripts/run-tsgo.mjs -p tsconfig.plugin-sdk.dts.json --declaration true"' '"tsc -p tsconfig.plugin-sdk.dts.json || true"'
-          fi
-          if [ -f scripts/bundle-a2ui.mjs ]; then
-            substituteInPlace scripts/bundle-a2ui.mjs \
-              --replace 'runPnpm(["-s", "exec", "rolldown", "-c", path.join(a2uiAppDir, "rolldown.config.mjs")])' \
-              'runStep("rolldown", ["-c", path.join(a2uiAppDir, "rolldown.config.mjs")])'
-          fi
+                  if [ -f tsconfig.json ]; then
+                    substituteInPlace tsconfig.json \
+                      --replace-fail '"strict": true' '"strict": false' \
+                      --replace-fail '"noEmitOnError": true' '"noEmitOnError": false'
+                  fi
+                  if [ -f package.json ]; then
+                    substituteInPlace package.json \
+                      --replace-fail '"node scripts/run-tsgo.mjs -p tsconfig.plugin-sdk.dts.json --declaration true"' '"tsc -p tsconfig.plugin-sdk.dts.json || true"'
+                  fi
+                  if [ -f scripts/bundle-a2ui.mjs ]; then
+                    substituteInPlace scripts/bundle-a2ui.mjs \
+                      --replace 'runPnpm(["-s", "exec", "rolldown", "-c", path.join(a2uiAppDir, "rolldown.config.mjs")])' \
+                      'runStep("rolldown", ["-c", path.join(a2uiAppDir, "rolldown.config.mjs")])'
+                  fi
+                  if [ -f src/media-understanding/attachments.normalize.ts ]; then
+                    substituteInPlace src/media-understanding/attachments.normalize.ts \
+                      --replace-fail 'import { getFileExtension, isAudioFileName, kindFromMime } from "../media/mime.js";' \
+                      'import { getFileExtension, isAudioFileName, kindFromMime, normalizeMimeType } from "../media/mime.js";' \
+                      --replace-fail '  const kind = kindFromMime(attachment.mime);' \
+                      '  const mime = normalizeMimeType(attachment.mime);
+          if (mime === "audio/webm" || mime === "video/webm") {
+            return "audio";
+          }
+
+          const kind = kindFromMime(mime);' \
+                      --replace-fail '  if ([".mp4", ".mov", ".mkv", ".webm", ".avi", ".m4v"].includes(ext)) {' \
+                      '  if (ext === ".webm") {
+            return "audio";
+          }
+          if ([".mp4", ".mov", ".mkv", ".avi", ".m4v"].includes(ext)) {'
+                  fi
         '';
-      })
+        })
     else
       openclawGatewayBase;
 
@@ -432,6 +450,10 @@ let
             chmod -R u+w "$out/lib/openclaw/extensions/lossless-claw/" 2>/dev/null || true
             cp /tmp/lossless-extract/package/openclaw.plugin.json "$out/lib/openclaw/extensions/lossless-claw/openclaw.plugin.json" 2>/dev/null || true
             cp "$out/lib/openclaw/dist/extensions/lossless-claw/package.json" "$out/lib/openclaw/extensions/lossless-claw/package.json" 2>/dev/null || true
+            if [ -d /tmp/lossless-extract/package/skills ]; then
+              cp -r /tmp/lossless-extract/package/skills "$out/lib/openclaw/dist/extensions/lossless-claw/"
+              cp -r /tmp/lossless-extract/package/skills "$out/lib/openclaw/extensions/lossless-claw/"
+            fi
             rm -rf /tmp/lossless-extract
         # Copy plugin manifests and runtime TS sources from source extensions/ into dist/extensions/
         # The gateway resolves plugin runtime modules (e.g. light-runtime-api.ts) from dist/extensions/
