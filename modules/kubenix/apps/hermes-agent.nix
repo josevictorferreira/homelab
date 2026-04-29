@@ -22,7 +22,16 @@ let
   ];
   commonSecurityContext = {
     allowPrivilegeEscalation = false;
-    capabilities.drop = [ "ALL" ];
+    # gosu needs SETUID/SETGID to drop from root → UID 10000.
+    capabilities = {
+      drop = [ "ALL" ];
+      add = [
+        "SETUID"
+        "SETGID"
+        "CHOWN"
+        "FOWNER"
+      ];
+    };
   };
 in
 {
