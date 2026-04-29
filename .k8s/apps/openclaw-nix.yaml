@@ -23,7 +23,7 @@ spec:
       app.kubernetes.io/instance: openclaw-nix
       app.kubernetes.io/name: openclaw-nix
   strategy:
-    type: RollingUpdate
+    type: Recreate
   template:
     metadata:
       labels:
@@ -66,7 +66,7 @@ spec:
               value: /home/node/.chromium
             - name: TMPDIR
               value: /tmp
-          image: ghcr.io/josevictorferreira/openclaw-nix:v2026.4.27@sha256:20d48ce5f4ea150e3732d1b00e6067d192c61bf25de3b8ec3d8a37414e4c7301
+          image: ghcr.io/josevictorferreira/openclaw-nix:v2026.4.27-matrix-touch-noop@sha256:66cce910bf42fac376cd4112916b4e80be274dc5cc45e80d1e849fca944c9a83
           imagePullPolicy: Always
           livenessProbe:
             exec:
@@ -130,13 +130,13 @@ spec:
               \ ready, attempt $i/30...\"\n  sleep 2\ndone\n\n# Ensure persistent\
               \ directories exist for npm/pip packages\nmkdir -p /home/node/.npm-global/bin\n\
               mkdir -p /home/node/.local/lib/python\nmkdir -p /home/node/.local/bin\n\
-              mkdir -p /home/node/.config\nmkdir -p /home/node/.openclaw\n\n# Seed\
-              \ config from ConfigMap template if CephFS file doesn't exist yet\n\
-              CONFIG_FILE=\"/home/node/.openclaw/openclaw.json\"\nif [ ! -f \"$CONFIG_FILE\"\
-              \ ]; then\n  echo \"First run: seeding config from template...\"\n \
-              \ cp /etc/openclaw/config-template.json \"$CONFIG_FILE\"\n  echo \"\
-              Config seeded at $CONFIG_FILE\"\nelse\n  echo \"Using existing config\
-              \ at $CONFIG_FILE\"\nfi\n\n# Perform environment variable substitution\
+              mkdir -p /home/node/.config\nmkdir -p /home/node/.openclaw\nmkdir -p\
+              \ \"$OPENCLAW_PLUGIN_STAGE_DIR\"\n\n# Seed config from ConfigMap template\
+              \ if CephFS file doesn't exist yet\nCONFIG_FILE=\"/home/node/.openclaw/openclaw.json\"\
+              \nif [ ! -f \"$CONFIG_FILE\" ]; then\n  echo \"First run: seeding config\
+              \ from template...\"\n  cp /etc/openclaw/config-template.json \"$CONFIG_FILE\"\
+              \n  echo \"Config seeded at $CONFIG_FILE\"\nelse\n  echo \"Using existing\
+              \ config at $CONFIG_FILE\"\nfi\n\n# Perform environment variable substitution\
               \ on openclaw.json\n# This ensures that tokens from secrets are correctly\
               \ injected\necho \"Performing environment variable substitution in $CONFIG_FILE...\"\
               \nALLOWLIST=\"OPENCLAW_MATRIX_TOKEN ELEVENLABS_API_KEY KIMI_API_KEY\
@@ -182,7 +182,7 @@ spec:
               \ dependencies installed\"\n  else\n    echo \"node_modules already\
               \ exists with deps, skipping\"\n  fi\nelse\n  echo \"WhatsApp extension\
               \ not found at $WA_EXT\"\nfi\n\n# Plugin sources already synced at image\
-              \ build time by oci-images/openclaw-nix/default.nix\n\nexec node /lib/openclaw/dist/index.js\
+              \ build time by oci-images/openclaw-nix/default.nix\nexec node /lib/openclaw/dist/index.js\
               \ gateway --port 18789\n"
           env:
             - name: HOME
@@ -217,6 +217,8 @@ spec:
               value: /home/node/.openclaw
             - name: OPENCLAW_NIX_MODE
               value: '1'
+            - name: OPENCLAW_PLUGIN_STAGE_DIR
+              value: /tmp/openclaw-plugin-stage
             - name: OPENCLAW_STATE_DIR
               value: /home/node/.openclaw
             - name: PATH
@@ -230,7 +232,7 @@ spec:
           envFrom:
             - secretRef:
                 name: openclaw-config
-          image: ghcr.io/josevictorferreira/openclaw-nix:v2026.4.27@sha256:20d48ce5f4ea150e3732d1b00e6067d192c61bf25de3b8ec3d8a37414e4c7301
+          image: ghcr.io/josevictorferreira/openclaw-nix:v2026.4.27-matrix-touch-noop@sha256:66cce910bf42fac376cd4112916b4e80be274dc5cc45e80d1e849fca944c9a83
           imagePullPolicy: Always
           name: main
           ports:

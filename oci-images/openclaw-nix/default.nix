@@ -4,6 +4,10 @@
   inputs,
   system,
   version ? "2026.4.27",
+  tagSuffix ? "",
+  legacyOpenClawPatches ? true,
+  matrixSendQueuePatch ? true,
+  disableMatrixCredentialTouch ? false,
 }:
 
 let
@@ -154,7 +158,79 @@ let
       }
     }
   '';
-
+  matrixCredentialTouchPatchScript = pkgs.writeText "openclaw-matrix-credential-touch-noop.py" (
+    builtins.concatStringsSep "\n" [
+      "#!/usr/bin/env python3"
+      "import sys"
+      "from pathlib import Path"
+      ""
+      "needle = 'async function touchMatrixCredentials(env = process.env, accountId) {'"
+      "replacement = '''async function touchMatrixCredentials(env = process.env, accountId) {"
+      "  // CephFS-backed state can block startup on atomic lastUsedAt writes."
+      "  return;"
+      "}'''"
+      ""
+      "def find_function_end(text, start):"
+      "    depth = 0"
+      "    i = text.find('{', start)"
+      "    if i == -1:"
+      "        return -1"
+      "    quote = None"
+      "    escape = False"
+      "    line_comment = False"
+      "    block_comment = False"
+      "    while i < len(text):"
+      "        ch = text[i]"
+      "        nxt = text[i + 1] if i + 1 < len(text) else ''"
+      "        if line_comment:"
+      "            if ch == '\\n':"
+      "                line_comment = False"
+      "        elif block_comment:"
+      "            if ch == '*' and nxt == '/':"
+      "                block_comment = False"
+      "                i += 1"
+      "        elif quote:"
+      "            if escape:"
+      "                escape = False"
+      "            elif ch == '\\\\':"
+      "                escape = True"
+      "            elif ch == quote:"
+      "                quote = None"
+      "        elif ch == '/' and nxt == '/':"
+      "            line_comment = True"
+      "            i += 1"
+      "        elif ch == '/' and nxt == '*':"
+      "            block_comment = True"
+      "            i += 1"
+      "        elif ch == chr(34) or ch == chr(39) or ch == chr(96):"
+      "            quote = ch"
+      "        elif ch == '{':"
+      "            depth += 1"
+      "        elif ch == '}':"
+      "            depth -= 1"
+      "            if depth == 0:"
+      "                return i + 1"
+      "        i += 1"
+      "    return -1"
+      ""
+      "root = Path(sys.argv[1])"
+      "patched = False"
+      "for path in sorted(root.glob('credentials-*.js')):"
+      "    text = path.read_text()"
+      "    start = text.find(needle)"
+      "    if start == -1:"
+      "        continue"
+      "    end = find_function_end(text, start)"
+      "    if end == -1:"
+      "        raise SystemExit(f'could not find end of touchMatrixCredentials in {path}')"
+      "    path.write_text(text[:start] + replacement + text[end:])"
+      "    patched = True"
+      "    print(f'patched {path}')"
+      "if not patched:"
+      "    raise SystemExit('touchMatrixCredentials function not found')"
+      ""
+    ]
+  );
   rolldown = pkgs.stdenv.mkDerivation {
     pname = "rolldown";
     version = "1.0.0-rc.3";
@@ -187,13 +263,15 @@ let
     overlays = [ openclawOverlay ];
   };
 
-  # Override gateway: custom source + rolldown in PATH
+  openclawGatewayBase = openclawPkgs.openclaw-gateway.override {
+    inherit sourceInfo;
+    inherit (sourceInfo) pnpmDepsHash;
+  };
+
+  # Legacy build overrides kept default-on until runtime validation proves they can be removed.
   openclawGateway =
-    (openclawPkgs.openclaw-gateway.override {
-      inherit sourceInfo;
-      inherit (sourceInfo) pnpmDepsHash;
-    }).overrideAttrs
-      (old: {
+    if legacyOpenClawPatches then
+      openclawGatewayBase.overrideAttrs (old: {
         nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [
           rolldown
           pkgs.findutils
@@ -222,7 +300,9 @@ let
               'runStep("rolldown", ["-c", path.join(a2uiAppDir, "rolldown.config.mjs")])'
           fi
         '';
-      });
+      })
+    else
+      openclawGatewayBase;
 
   # lancedb-deps removed - memory-lancedb extension skipped due to missing native bindings
   inherit (import ./matrix-deps.nix { inherit pkgs lib; }) matrixPluginDeps;
@@ -258,7 +338,7 @@ let
     ];
   };
 
-  imageTag = "v${version}";
+  imageTag = "v${version}${tagSuffix}";
 
   entrypointScriptText = builtins.readFile ./entrypoint.sh;
   # Merged CLI tools environment — single /bin/ with all tools accessible
@@ -533,14 +613,16 @@ let
             cp -rL ${losslessClawPackage}/lossless-claw-deps/node_modules "$out/lib/openclaw/dist/extensions/lossless-claw/"
           fi
         fi
-        # Fix upstream build regression #33001: Rolldown bundles keyed-async-queue into index.js
-        # but OpenClaw's runtime TypeScript loader lacks the alias for this subpath.
-        # Patch the import to use the main plugin-sdk export which includes KeyedAsyncQueue.
-        SEND_QUEUE="$out/lib/openclaw/extensions/matrix/src/matrix/send-queue.ts"
-        if [ -f "$SEND_QUEUE" ]; then
-          chmod u+w "$SEND_QUEUE"
-          sed -i 's|openclaw/plugin-sdk/keyed-async-queue|openclaw/plugin-sdk|g' "$SEND_QUEUE"
-        fi
+        ${lib.optionalString matrixSendQueuePatch ''
+          # Fix upstream build regression #33001: Rolldown bundles keyed-async-queue into index.js
+          # but OpenClaw's runtime TypeScript loader lacks the alias for this subpath.
+          # Patch the import to use the main plugin-sdk export which includes KeyedAsyncQueue.
+          SEND_QUEUE="$out/lib/openclaw/extensions/matrix/src/matrix/send-queue.ts"
+          if [ -f "$SEND_QUEUE" ]; then
+            chmod u+w "$SEND_QUEUE"
+            sed -i 's|openclaw/plugin-sdk/keyed-async-queue|openclaw/plugin-sdk|g' "$SEND_QUEUE"
+          fi
+        ''}
         # Add openclaw self-symlink so extensions can resolve "openclaw/*" imports
         mkdir -p "$out/lib/openclaw/node_modules"
         ln -sf ../ "$out/lib/openclaw/node_modules/openclaw"
@@ -559,6 +641,9 @@ let
         cd - >/dev/null
         CRYPTO_PKG="$out/lib/openclaw/extensions/matrix/node_modules/@matrix-org/matrix-sdk-crypto-nodejs"
         if [ -d "$CRYPTO_PKG" ]; then chmod -R u+w "$CRYPTO_PKG" || true; cp ${matrixCryptoNative} "$CRYPTO_PKG/matrix-sdk-crypto.linux-x64-gnu.node"; fi
+        ${lib.optionalString disableMatrixCredentialTouch ''
+          ${pkgs.python3}/bin/python3 ${matrixCredentialTouchPatchScript} "$out/lib/openclaw/dist/extensions/matrix"
+        ''}
         # Install RTK binary into /bin (extract from tar.gz)
         mkdir -p /tmp/rtk-extract
         tar -xzf ${rtkBinary} -C /tmp/rtk-extract/

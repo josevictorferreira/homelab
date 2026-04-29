@@ -7,101 +7,28 @@ let
   port = 18789;
   host = "openclaw-test.${homelab.domain}";
   image = "ghcr.io/openclaw/openclaw:2026.4.26@sha256:2e32f4f2e4f653f12d5dc6e5c93cc71e60f49d1dfaf061b18e53c3e61a38fb48";
-  # This test intentionally runs OpenClaw inside a mutable Debian rootfs stored on CephFS.
-  # SYS_ADMIN is required for the bind mounts that make the persistent rootfs usable.
   startupScript = ''
     set -euo pipefail
 
     STATE_DIR=/persistent/openclaw
-    ROOTFS=$STATE_DIR/rootfs
-    INIT_ROOTFS=$STATE_DIR/rootfs.init.$$
+    HOME_DIR=$STATE_DIR/home
+    mkdir -p "$STATE_DIR" "$HOME_DIR"
 
-    mkdir -p "$STATE_DIR"
-    exec 9>"$STATE_DIR/rootfs.lock"
-    echo "Waiting for OpenClaw rootfs lock..."
-    flock 9
+    if [ ! -f "$STATE_DIR/.openclaw-ready" ]; then
+      echo "Initializing persistent OpenClaw state..."
+      mkdir -p "$HOME_DIR/.openclaw" "$HOME_DIR/.cache" "$HOME_DIR/.local" "$HOME_DIR/workspace"
+      touch "$STATE_DIR/.openclaw-ready"
+      echo "Persistent state initialized."
+    else
+      echo "Using existing persistent state at $STATE_DIR"
+    fi
 
-        if [ ! -e "$ROOTFS/.openclaw-rootfs-ready" ]; then
-          if [ -d "$ROOTFS" ] && [ "$(ls -A "$ROOTFS" 2>/dev/null)" ]; then
-            echo "Persistent rootfs exists without readiness marker at $ROOTFS" >&2
-            echo "Refusing to overwrite possible user state; move it aside manually to reinitialize." >&2
-            exit 1
-          fi
+    mkdir -p "$HOME_DIR/.openclaw" "$HOME_DIR/.cache/ms-playwright" "$HOME_DIR/workspace"
 
-          echo "Initializing persistent Debian rootfs at $ROOTFS..."
-          rm -rf "$INIT_ROOTFS"
-          mkdir -p "$INIT_ROOTFS"
-          tar -C / \
-            --one-file-system \
-            --exclude='./config' \
-            --exclude='./dev' \
-            --exclude='./persistent' \
-            --exclude='./proc' \
-            --exclude='./run' \
-            --exclude='./sys' \
-            --exclude='./tmp' \
-            --exclude='./var/run/secrets' \
-            -cpf - . | tar -C "$INIT_ROOTFS" -xpf -
-
-          mkdir -p \
-            "$INIT_ROOTFS/dev" \
-            "$INIT_ROOTFS/etc/openclaw" \
-            "$INIT_ROOTFS/proc" \
-            "$INIT_ROOTFS/root/.openclaw" \
-            "$INIT_ROOTFS/run" \
-            "$INIT_ROOTFS/sys" \
-            "$INIT_ROOTFS/tmp" \
-            "$INIT_ROOTFS/usr/local/bin" \
-            "$INIT_ROOTFS/workspace"
-          chmod 1777 "$INIT_ROOTFS/tmp"
-          touch "$INIT_ROOTFS/.openclaw-rootfs-ready"
-          mv "$INIT_ROOTFS" "$ROOTFS"
-          touch "$ROOTFS/.openclaw-rootfs-ready"
-          echo "Persistent rootfs initialized."
-        else
-          echo "Using existing persistent rootfs at $ROOTFS"
-        fi
-
-        bind_dir() {
-          src="$1"
-          dst="$2"
-          mkdir -p "$dst"
-          if ! mountpoint -q "$dst"; then
-            mount --bind "$src" "$dst"
-          fi
-        }
-
-        bind_rdir() {
-          src="$1"
-          dst="$2"
-          mkdir -p "$dst"
-          if ! mountpoint -q "$dst"; then
-            mount --rbind "$src" "$dst"
-            mount --make-rslave "$dst" || true
-          fi
-        }
-
-        bind_file() {
-          src="$1"
-          dst="$2"
-          mkdir -p "$(dirname "$dst")"
-          touch "$dst"
-          if ! mountpoint -q "$dst"; then
-            mount --bind "$src" "$dst"
-          fi
-        }
-
-        bind_dir /proc "$ROOTFS/proc"
-        bind_rdir /sys "$ROOTFS/sys"
-        bind_rdir /dev "$ROOTFS/dev"
-        bind_dir /config "$ROOTFS/etc/openclaw"
-        bind_file /etc/resolv.conf "$ROOTFS/etc/resolv.conf"
-        bind_file /etc/hosts "$ROOTFS/etc/hosts"
-        bind_file /etc/hostname "$ROOTFS/etc/hostname"
-
-        cat > "$ROOTFS/usr/local/bin/openclaw-chroot-entrypoint" <<'EOF'
-    #!/usr/bin/env bash
-    set -euo pipefail
+    if [ ! -f "$HOME_DIR/.openclaw/openclaw.json" ]; then
+      echo "Seeding OpenClaw config from ConfigMap..."
+      cp /config/config-template.json "$HOME_DIR/.openclaw/openclaw.json"
+    fi
 
     export HOME=/root
     export OPENCLAW_DATA_DIR=/root/.openclaw
@@ -111,19 +38,10 @@ let
     export PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright
     export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
-    mkdir -p /root/.openclaw /root/.cache/ms-playwright /workspace
+    mount --bind "$HOME_DIR" /root
 
-    if [ ! -f "$OPENCLAW_CONFIG_PATH" ]; then
-      echo "Seeding OpenClaw config from ConfigMap..."
-      cp /etc/openclaw/config-template.json "$OPENCLAW_CONFIG_PATH"
-    fi
-
-    cd /workspace
+    cd /root/workspace
     exec node /app/openclaw.mjs gateway --port 18789 --bind lan --allow-unconfigured --verbose
-    EOF
-        chmod 0755 "$ROOTFS/usr/local/bin/openclaw-chroot-entrypoint"
-
-        exec unshare --root="$ROOTFS" --wd=/ /usr/local/bin/openclaw-chroot-entrypoint
   '';
 in
 {
@@ -231,7 +149,7 @@ in
                     path = "/healthz";
                     port = "http";
                   };
-                  failureThreshold = 120;
+                  failureThreshold = 360;
                   periodSeconds = 10;
                   timeoutSeconds = 5;
                 };

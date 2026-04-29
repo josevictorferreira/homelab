@@ -4,7 +4,7 @@ let
   namespace = homelab.kubernetes.namespaces.applications;
   appImage = {
     repository = "ghcr.io/josevictorferreira/openclaw-nix";
-    tag = "v2026.4.27@sha256:20d48ce5f4ea150e3732d1b00e6067d192c61bf25de3b8ec3d8a37414e4c7301";
+    tag = "v2026.4.27-matrix-touch-noop@sha256:66cce910bf42fac376cd4112916b4e80be274dc5cc45e80d1e849fca944c9a83";
     pullPolicy = "Always";
   };
 in
@@ -137,11 +137,7 @@ in
 
         # Security context: run as root for full access
         controllers.main = {
-          strategy = "RollingUpdate";
-          rollingUpdate = {
-            maxSurge = 1;
-            maxUnavailable = 0;
-          };
+          strategy = "Recreate";
           containers = {
             main = {
               securityContext = {
@@ -157,6 +153,7 @@ in
                 TZ = ":/etc/localtime";
                 OPENCLAW_NIX_MODE = "1";
                 NPM_CONFIG_PREFIX = "/home/node/.npm-global";
+                OPENCLAW_PLUGIN_STAGE_DIR = "/tmp/openclaw-plugin-stage";
                 PIP_TARGET = "/home/node/.local/lib/python";
                 PYTHONPATH = "/home/node/.local/lib/python";
                 PATH = "/home/node/.local/bin:/home/node/.npm-global/bin:/bin:/usr/bin";
@@ -212,6 +209,7 @@ in
                   mkdir -p /home/node/.local/bin
                   mkdir -p /home/node/.config
                   mkdir -p /home/node/.openclaw
+                  mkdir -p "$OPENCLAW_PLUGIN_STAGE_DIR"
 
                   # Seed config from ConfigMap template if CephFS file doesn't exist yet
                   CONFIG_FILE="/home/node/.openclaw/openclaw.json"
@@ -291,7 +289,6 @@ in
                   fi
 
                   # Plugin sources already synced at image build time by oci-images/openclaw-nix/default.nix
-
                   exec node /lib/openclaw/dist/index.js gateway --port 18789
                 ''
               ];
