@@ -34,6 +34,7 @@ let
     export OPENCLAW_DATA_DIR=/root/.openclaw
     export OPENCLAW_STATE_DIR=/root/.openclaw
     export OPENCLAW_CONFIG_PATH=/root/.openclaw/openclaw.json
+    export OPENCLAW_PLUGIN_STAGE_DIR=/tmp/openclaw-plugin-stage
     export NPM_CONFIG_PREFIX=/usr/local
     export PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright
     export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
@@ -131,8 +132,8 @@ in
                     memory = "256Mi";
                   };
                   limits = {
-                    cpu = "500m";
-                    memory = "1Gi";
+                    cpu = "1";
+                    memory = "2Gi";
                   };
                 };
                 securityContext = {
@@ -146,32 +147,31 @@ in
                 };
                 startupProbe = {
                   httpGet = {
-                    path = "/healthz";
+                    path = "/health";
                     port = "http";
                   };
-                  failureThreshold = 360;
-                  periodSeconds = 10;
-                  timeoutSeconds = 5;
+                  failureThreshold = 60;
+                  periodSeconds = 5;
+                  timeoutSeconds = 3;
                 };
                 readinessProbe = {
                   httpGet = {
-                    path = "/readyz";
+                    path = "/health";
                     port = "http";
                   };
-                  initialDelaySeconds = 10;
-                  periodSeconds = 10;
+                  periodSeconds = 30;
                   timeoutSeconds = 5;
-                  failureThreshold = 12;
+                  failureThreshold = 3;
                 };
                 livenessProbe = {
                   httpGet = {
-                    path = "/healthz";
+                    path = "/health";
                     port = "http";
                   };
-                  initialDelaySeconds = 120;
-                  periodSeconds = 30;
-                  timeoutSeconds = 5;
-                  failureThreshold = 4;
+                  initialDelaySeconds = 300;
+                  periodSeconds = 60;
+                  timeoutSeconds = 10;
+                  failureThreshold = 3;
                 };
                 volumeMounts = [
                   {
