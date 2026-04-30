@@ -156,30 +156,62 @@ spec:
               ] = ((.[\"lossless-claw\"] // {}) | .enabled = true | .config = ((.config\
               \ // {}) | .dbPath = \"/home/node/.openclaw/lcm.db\")))' \"$CONFIG_FILE\"\
               \ > \"$CONFIG_FILE.tmp\" && mv \"$CONFIG_FILE.tmp\" \"$CONFIG_FILE\"\
-              \necho \"CephFS config patched\"\n\necho \"Preparing bundled OpenClaw\
-              \ plugin runtime dependencies...\"\nnode --input-type=module <<'NODE'\n\
-              import fs from \"node:fs\";\nimport path from \"node:path\";\nimport\
-              \ { pathToFileURL } from \"node:url\";\n\nconst distDir = \"/lib/openclaw/dist\"\
-              ;\nconst doctorFile = fs.readdirSync(distDir).find((name) =>\n  name.startsWith(\"\
-              doctor-bundled-plugin-runtime-deps-\") && name.endsWith(\".js\")\n);\n\
-              if (!doctorFile) {\n  throw new Error(\"doctor-bundled-plugin-runtime-deps\
-              \ module not found in \" + distDir);\n}\n\nconst { maybeRepairBundledPluginRuntimeDeps\
-              \ } = await import(\n  pathToFileURL(path.join(distDir, doctorFile)).href\n\
-              );\n\nconst configPath = process.env.OPENCLAW_CONFIG_PATH;\nconst config\
-              \ = JSON.parse(fs.readFileSync(configPath, \"utf8\"));\nconst repairEnv\
-              \ = Object.fromEntries(\n  [\n    \"HOME\",\n    \"NODE_PATH\",\n  \
-              \  \"NPM_CONFIG_PREFIX\",\n    \"OPENCLAW_CONFIG_PATH\",\n    \"OPENCLAW_DATA_DIR\"\
-              ,\n    \"OPENCLAW_NIX_MODE\",\n    \"OPENCLAW_PLUGIN_STAGE_DIR\",\n\
-              \    \"OPENCLAW_STATE_DIR\",\n    \"PATH\",\n  ]\n    .filter((name)\
+              \necho \"CephFS config patched\"\n\necho \"Materializing bundled OpenClaw\
+              \ plugin runtime dependencies from the Nix image...\"\nnode --input-type=module\
+              \ <<'NODE'\nimport fs from \"node:fs\";\nimport path from \"node:path\"\
+              ;\nimport { pathToFileURL } from \"node:url\";\n\nconst packageRoot\
+              \ = \"/lib/openclaw\";\nconst bakedNodeModules = path.join(packageRoot,\
+              \ \"node_modules\");\nconst distDir = \"/lib/openclaw/dist\";\nconst\
+              \ runtimeDepsFile = fs.readdirSync(distDir).find((name) =>\n  name.startsWith(\"\
+              bundled-runtime-deps-\") && name.endsWith(\".js\")\n);\nif (!runtimeDepsFile)\
+              \ {\n  throw new Error(\"bundled-runtime-deps module not found in \"\
+              \ + distDir);\n}\n\nconst runtimeDeps = await import(\n  pathToFileURL(path.join(distDir,\
+              \ runtimeDepsFile)).href\n);\nconst scanBundledPluginRuntimeDeps = runtimeDeps.a;\n\
+              const resolveBundledRuntimeDependencyPackageInstallRootPlan = runtimeDeps.l;\n\
+              const createBundledRuntimeDepsInstallSpecs = runtimeDeps.n;\n\nif (\n\
+              \  typeof scanBundledPluginRuntimeDeps !== \"function\" ||\n  typeof\
+              \ resolveBundledRuntimeDependencyPackageInstallRootPlan !== \"function\"\
+              \ ||\n  typeof createBundledRuntimeDepsInstallSpecs !== \"function\"\
+              \n) {\n  throw new Error(\"bundled-runtime-deps exports are not in the\
+              \ expected shape\");\n}\n\nconst configPath = process.env.OPENCLAW_CONFIG_PATH;\n\
+              const config = JSON.parse(fs.readFileSync(configPath, \"utf8\"));\n\
+              const stageEnv = Object.fromEntries(\n  [\n    \"HOME\",\n    \"NODE_PATH\"\
+              ,\n    \"NPM_CONFIG_PREFIX\",\n    \"OPENCLAW_CONFIG_PATH\",\n    \"\
+              OPENCLAW_DATA_DIR\",\n    \"OPENCLAW_NIX_MODE\",\n    \"OPENCLAW_PLUGIN_STAGE_DIR\"\
+              ,\n    \"OPENCLAW_STATE_DIR\",\n    \"PATH\",\n  ]\n    .filter((name)\
               \ => process.env[name] !== undefined)\n    .map((name) => [name, process.env[name]])\n\
-              );\nconst repairConfig = {\n  plugins: config.plugins,\n};\n\nawait\
-              \ maybeRepairBundledPluginRuntimeDeps({\n  config: repairConfig,\n \
-              \ includeConfiguredChannels: false,\n  env: repairEnv,\n  runtime: {\n\
-              \    log: (message) => console.log(message),\n    error: (message) =>\
-              \ console.error(message),\n  },\n  prompter: {\n    shouldRepair: true,\n\
-              \    repairMode: { nonInteractive: true },\n    confirmAutoFix: async\
-              \ () => true,\n  },\n});\nNODE\necho \"Bundled OpenClaw plugin runtime\
-              \ dependencies prepared.\"\n\necho \"Installing matrix plugin dependencies...\"\
+              );\nconst scan = scanBundledPluginRuntimeDeps({\n  packageRoot,\n  config,\n\
+              \  includeConfiguredChannels: false,\n  env: stageEnv,\n});\nif (scan.conflicts.length\
+              \ > 0) {\n  throw new Error(\n    \"Conflicting bundled runtime dependency\
+              \ versions: \" +\n      scan.conflicts.map((conflict) => conflict.name).join(\"\
+              , \")\n  );\n}\n\nconst installSpecs = createBundledRuntimeDepsInstallSpecs({\
+              \ deps: scan.deps });\nconst installRoot = resolveBundledRuntimeDependencyPackageInstallRootPlan(\n\
+              \  packageRoot,\n  { env: stageEnv }\n).installRoot;\nconst dependencies\
+              \ = Object.fromEntries(\n  installSpecs\n    .map((spec) => {\n    \
+              \  const separator = spec.lastIndexOf(\"@\");\n      return [spec.slice(0,\
+              \ separator), spec.slice(separator + 1)];\n    })\n    .sort(([left],\
+              \ [right]) => left.localeCompare(right))\n);\n\nfs.mkdirSync(installRoot,\
+              \ { recursive: true });\nfs.rmSync(path.join(installRoot, \".openclaw-runtime-deps.lock\"\
+              ), {\n  recursive: true,\n  force: true,\n});\nfs.writeFileSync(\n \
+              \ path.join(installRoot, \"package.json\"),\n  JSON.stringify({ name:\
+              \ \"openclaw-runtime-deps-install\", private: true, dependencies },\
+              \ null, 2) + \"\\n\",\n  \"utf8\"\n);\n\nconst stagedNodeModules = path.join(installRoot,\
+              \ \"node_modules\");\nconst current = fs.existsSync(stagedNodeModules)\
+              \ ? fs.lstatSync(stagedNodeModules) : null;\nif (current?.isSymbolicLink())\
+              \ {\n  const target = fs.readlinkSync(stagedNodeModules);\n  if (path.resolve(installRoot,\
+              \ target) !== bakedNodeModules) {\n    fs.rmSync(stagedNodeModules,\
+              \ { recursive: true, force: true });\n  }\n} else if (current) {\n \
+              \ fs.rmSync(stagedNodeModules, { recursive: true, force: true });\n\
+              }\nif (!fs.existsSync(stagedNodeModules)) {\n  fs.symlinkSync(bakedNodeModules,\
+              \ stagedNodeModules, \"dir\");\n}\n\nfor (const spec of installSpecs)\
+              \ {\n  const separator = spec.lastIndexOf(\"@\");\n  const depName =\
+              \ spec.slice(0, separator);\n  if (!fs.existsSync(path.join(stagedNodeModules,\
+              \ depName, \"package.json\"))) {\n    throw new Error(\"Baked bundled\
+              \ runtime dependency is missing: \" + spec);\n  }\n}\n\nconsole.log(\n\
+              \  \"Bundled runtime dependency stage materialized at \" +\n    installRoot\
+              \ +\n    \" (\" +\n    installSpecs.length +\n    \" specs).\"\n);\n\
+              NODE\necho \"Bundled OpenClaw plugin runtime dependencies prepared from\
+              \ baked image dependencies.\"\n\necho \"Installing matrix plugin dependencies...\"\
               \n\n# Find the actual nix store path where the gateway loads extensions\
               \ from\nMATRIX_EXT=$(readlink -f /lib/openclaw/extensions/matrix 2>/dev/null\
               \ || echo \"/lib/openclaw/extensions/matrix\")\n\nif [ -d \"$MATRIX_EXT\"\
