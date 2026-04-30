@@ -16,6 +16,7 @@ in
       GLM_API_KEY = kubenix.lib.secretsFor "z_ai_api_key";
       ELEVENLABS_API_KEY = kubenix.lib.secretsFor "elevenlabs_api_key";
       GITHUB_TOKEN = kubenix.lib.secretsFor "github_token";
+      OPENAI_API_KEY = kubenix.lib.secretsFor "openai_api_key";
       MATRIX_HOMESERVER = kubenix.lib.secretsFor "hermes_matrix_homeserver";
       MATRIX_ACCESS_TOKEN = kubenix.lib.secretsFor "hermes_matrix_access_token";
       MATRIX_ALLOWED_USERS = kubenix.lib.secretsFor "hermes_matrix_allowed_users";
