@@ -236,27 +236,40 @@ in
                   jq '.plugins = (.plugins // {}) | .plugins.enabled = true | .plugins.allow = (((.plugins.allow // []) + ["lossless-claw"]) | unique) | .plugins.slots = ((.plugins.slots // {}) | .memory = (.memory // "memory-core") | .contextEngine = "lossless-claw") | .plugins.entries = ((.plugins.entries // {}) | .["lossless-claw"] = ((.["lossless-claw"] // {}) | .enabled = true | .config = ((.config // {}) | .dbPath = "/home/node/.openclaw/lcm.db")))' "$CONFIG_FILE" > "$CONFIG_FILE.tmp" && mv "$CONFIG_FILE.tmp" "$CONFIG_FILE"
                   echo "CephFS config patched"
 
-                  echo "Preparing bundled OpenClaw plugin runtime dependencies..."
+                  echo "Materializing bundled OpenClaw plugin runtime dependencies from the Nix image..."
                   node --input-type=module <<'NODE'
                   import fs from "node:fs";
                   import path from "node:path";
                   import { pathToFileURL } from "node:url";
 
+                  const packageRoot = "/lib/openclaw";
+                  const bakedNodeModules = path.join(packageRoot, "node_modules");
                   const distDir = "/lib/openclaw/dist";
-                  const doctorFile = fs.readdirSync(distDir).find((name) =>
-                    name.startsWith("doctor-bundled-plugin-runtime-deps-") && name.endsWith(".js")
+                  const runtimeDepsFile = fs.readdirSync(distDir).find((name) =>
+                    name.startsWith("bundled-runtime-deps-") && name.endsWith(".js")
                   );
-                  if (!doctorFile) {
-                    throw new Error("doctor-bundled-plugin-runtime-deps module not found in " + distDir);
+                  if (!runtimeDepsFile) {
+                    throw new Error("bundled-runtime-deps module not found in " + distDir);
                   }
 
-                  const { maybeRepairBundledPluginRuntimeDeps } = await import(
-                    pathToFileURL(path.join(distDir, doctorFile)).href
+                  const runtimeDeps = await import(
+                    pathToFileURL(path.join(distDir, runtimeDepsFile)).href
                   );
+                  const scanBundledPluginRuntimeDeps = runtimeDeps.a;
+                  const resolveBundledRuntimeDependencyPackageInstallRootPlan = runtimeDeps.l;
+                  const createBundledRuntimeDepsInstallSpecs = runtimeDeps.n;
+
+                  if (
+                    typeof scanBundledPluginRuntimeDeps !== "function" ||
+                    typeof resolveBundledRuntimeDependencyPackageInstallRootPlan !== "function" ||
+                    typeof createBundledRuntimeDepsInstallSpecs !== "function"
+                  ) {
+                    throw new Error("bundled-runtime-deps exports are not in the expected shape");
+                  }
 
                   const configPath = process.env.OPENCLAW_CONFIG_PATH;
                   const config = JSON.parse(fs.readFileSync(configPath, "utf8"));
-                  const repairEnv = Object.fromEntries(
+                  const stageEnv = Object.fromEntries(
                     [
                       "HOME",
                       "NODE_PATH",
@@ -271,26 +284,75 @@ in
                       .filter((name) => process.env[name] !== undefined)
                       .map((name) => [name, process.env[name]])
                   );
-                  const repairConfig = {
-                    plugins: config.plugins,
-                  };
-
-                  await maybeRepairBundledPluginRuntimeDeps({
-                    config: repairConfig,
+                  const scan = scanBundledPluginRuntimeDeps({
+                    packageRoot,
+                    config,
                     includeConfiguredChannels: false,
-                    env: repairEnv,
-                    runtime: {
-                      log: (message) => console.log(message),
-                      error: (message) => console.error(message),
-                    },
-                    prompter: {
-                      shouldRepair: true,
-                      repairMode: { nonInteractive: true },
-                      confirmAutoFix: async () => true,
-                    },
+                    env: stageEnv,
                   });
+                  if (scan.conflicts.length > 0) {
+                    throw new Error(
+                      "Conflicting bundled runtime dependency versions: " +
+                        scan.conflicts.map((conflict) => conflict.name).join(", ")
+                    );
+                  }
+
+                  const installSpecs = createBundledRuntimeDepsInstallSpecs({ deps: scan.deps });
+                  const installRoot = resolveBundledRuntimeDependencyPackageInstallRootPlan(
+                    packageRoot,
+                    { env: stageEnv }
+                  ).installRoot;
+                  const dependencies = Object.fromEntries(
+                    installSpecs
+                      .map((spec) => {
+                        const separator = spec.lastIndexOf("@");
+                        return [spec.slice(0, separator), spec.slice(separator + 1)];
+                      })
+                      .sort(([left], [right]) => left.localeCompare(right))
+                  );
+
+                  fs.mkdirSync(installRoot, { recursive: true });
+                  fs.rmSync(path.join(installRoot, ".openclaw-runtime-deps.lock"), {
+                    recursive: true,
+                    force: true,
+                  });
+                  fs.writeFileSync(
+                    path.join(installRoot, "package.json"),
+                    JSON.stringify({ name: "openclaw-runtime-deps-install", private: true, dependencies }, null, 2) + "\n",
+                    "utf8"
+                  );
+
+                  const stagedNodeModules = path.join(installRoot, "node_modules");
+                  const current = fs.existsSync(stagedNodeModules) ? fs.lstatSync(stagedNodeModules) : null;
+                  if (current?.isSymbolicLink()) {
+                    const target = fs.readlinkSync(stagedNodeModules);
+                    if (path.resolve(installRoot, target) !== bakedNodeModules) {
+                      fs.rmSync(stagedNodeModules, { recursive: true, force: true });
+                    }
+                  } else if (current) {
+                    fs.rmSync(stagedNodeModules, { recursive: true, force: true });
+                  }
+                  if (!fs.existsSync(stagedNodeModules)) {
+                    fs.symlinkSync(bakedNodeModules, stagedNodeModules, "dir");
+                  }
+
+                  for (const spec of installSpecs) {
+                    const separator = spec.lastIndexOf("@");
+                    const depName = spec.slice(0, separator);
+                    if (!fs.existsSync(path.join(stagedNodeModules, depName, "package.json"))) {
+                      throw new Error("Baked bundled runtime dependency is missing: " + spec);
+                    }
+                  }
+
+                  console.log(
+                    "Bundled runtime dependency stage materialized at " +
+                      installRoot +
+                      " (" +
+                      installSpecs.length +
+                      " specs)."
+                  );
                   NODE
-                  echo "Bundled OpenClaw plugin runtime dependencies prepared."
+                  echo "Bundled OpenClaw plugin runtime dependencies prepared from baked image dependencies."
 
                   echo "Installing matrix plugin dependencies..."
 
