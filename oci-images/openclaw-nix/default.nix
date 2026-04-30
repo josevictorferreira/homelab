@@ -1,13 +1,13 @@
-{ pkgs
-, lib
-, inputs
-, system
-, version ? "2026.4.26"
-, tagSuffix ? ""
-, legacyOpenClawPatches ? true
-, matrixSendQueuePatch ? true
-, disableMatrixCredentialTouch ? false
-,
+{
+  pkgs,
+  lib,
+  inputs,
+  system,
+  version ? "2026.4.29-beta.1",
+  tagSuffix ? "",
+  legacyOpenClawPatches ? true,
+  matrixSendQueuePatch ? true,
+  disableMatrixCredentialTouch ? false,
 }:
 
 let
@@ -18,8 +18,8 @@ let
     owner = "openclaw";
     repo = "openclaw";
     rev = "v${version}";
-    sha256 = "sha256-AzhcS9lkJwlGfv/boGe6KJv9xQYI+l2VdzeqCRJGEIE=";
-    pnpmDepsHash = "sha256-747LHwqhqEytFBM5pyyAzPHIzKOEXOSRaSZCu1VFnJA=";
+    sha256 = "sha256-baaNp5Y3wOkZW+K9BoGjJQNv8x/H8MQRc+enLHyu4x8=";
+    pnpmDepsHash = "sha256-M5FnEZVqbm/Ut6tmW1Rwfb3g/OnJgnLIpRAJS2DxhLE=";
   };
 
   # Rolldown 1.0.0-rc.3 — pre-built from npm registry
@@ -271,20 +271,19 @@ let
   # Legacy build overrides kept default-on until runtime validation proves they can be removed.
   openclawGateway =
     if legacyOpenClawPatches then
-      openclawGatewayBase.overrideAttrs
-        (old: {
-          nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [
-            rolldown
-            pkgs.findutils
-          ];
-          # Override installPhase: run the original script, but first clean broken symlinks
-          installPhase = ''
-            cp ${old.installPhase} /tmp/gateway-install.sh
-            # Comment out the validation line using sed with # as replacement
-            sed -i 's/^log_step "validate node_modules symlinks" check_no_broken_symlinks/# VALIDATION DISABLED: &/' /tmp/gateway-install.sh
-            . /tmp/gateway-install.sh
-          '';
-          postPatch = (old.postPatch or "") + ''
+      openclawGatewayBase.overrideAttrs (old: {
+        nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [
+          rolldown
+          pkgs.findutils
+        ];
+        # Override installPhase: run the original script, but first clean broken symlinks
+        installPhase = ''
+          cp ${old.installPhase} /tmp/gateway-install.sh
+          # Comment out the validation line using sed with # as replacement
+          sed -i 's/^log_step "validate node_modules symlinks" check_no_broken_symlinks/# VALIDATION DISABLED: &/' /tmp/gateway-install.sh
+          . /tmp/gateway-install.sh
+        '';
+        postPatch = (old.postPatch or "") + ''
 
                                     if [ -f tsconfig.json ]; then
                                       substituteInPlace tsconfig.json \
@@ -344,7 +343,7 @@ let
                               'return buildSavedMediaResult({ dir, id, size: buffer.byteLength, contentType: mime === "video/webm" ? "audio/webm" : mime });'
                           fi
         '';
-        })
+      })
     else
       openclawGatewayBase;
 
