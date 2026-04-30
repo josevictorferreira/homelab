@@ -231,6 +231,51 @@ let
       ""
     ]
   );
+  bundledRuntimeDepsNixModePatchScript = pkgs.writeText "openclaw-bundled-runtime-deps-nix-mode.py" (
+    builtins.concatStringsSep "\n" [
+      "import sys"
+      "from pathlib import Path"
+      ""
+      "dist_dir = Path(sys.argv[1])"
+      ''files = sorted(dist_dir.glob("bundled-runtime-deps-*.js"))''
+      "if len(files) != 1:"
+      "    raise SystemExit(f\"expected exactly one bundled-runtime-deps chunk, found {len(files)}\")"
+      ""
+      "path = files[0]"
+      "text = path.read_text()"
+      ""
+      "helper_anchor = \"function installBundledRuntimeDeps(params) {\\n\""
+      "helper = ("
+      "    \"function materializeBundledRuntimeDepsFromNixImage(installRoot, installSpecs) {\\n\""
+      "    + \"\\tconst bakedNodeModules = \\\"/lib/openclaw/node_modules\\\";\\n\""
+      "    + \"\\tif (!fs.existsSync(bakedNodeModules)) return false;\\n\""
+      "    + \"\\tfs.mkdirSync(installRoot, { recursive: true });\\n\""
+      "    + \"\\tensureNpmInstallExecutionManifest(installRoot, installSpecs);\\n\""
+      "    + \"\\tconst nodeModulesPath = path.join(installRoot, \\\"node_modules\\\");\\n\""
+      "    + \"\\tfs.rmSync(nodeModulesPath, { recursive: true, force: true });\\n\""
+      "    + \"\\tfs.symlinkSync(bakedNodeModules, nodeModulesPath, \\\"dir\\\");\\n\""
+      "    + \"\\tassertBundledRuntimeDepsInstalled(installRoot, installSpecs);\\n\""
+      "    + \"\\tremoveLegacyRuntimeDepsManifest(installRoot);\\n\""
+      "    + \"\\treturn true;\\n\""
+      "    + \"}\\n\""
+      ")"
+      "if helper not in text:"
+      "    if helper_anchor not in text:"
+      "        raise SystemExit(\"installBundledRuntimeDeps anchor not found\")"
+      "    text = text.replace(helper_anchor, helper + helper_anchor, 1)"
+      ""
+      "needle = \"\\tif (isRuntimeDepsPlanMaterialized(params.installRoot, installSpecs)) {\\n\\t\\tremoveLegacyRuntimeDepsManifest(params.installRoot);\\n\\t\\treturn;\\n\\t}\\n\""
+      "replacement = needle + \"\\tif ((params.env?.OPENCLAW_NIX_MODE ?? process.env.OPENCLAW_NIX_MODE) === \\\"1\\\" && materializeBundledRuntimeDepsFromNixImage(params.installRoot, installSpecs)) return;\\n\""
+      "if text.count(replacement) < 2:"
+      "    if text.count(needle) < 2:"
+      "        raise SystemExit(\"install materialization anchors not found\")"
+      "    text = text.replace(needle, replacement, 2)"
+      ""
+      "path.write_text(text)"
+      ''print(f"patched {path}")''
+      ""
+    ]
+  );
   rolldown = pkgs.stdenv.mkDerivation {
     pname = "rolldown";
     version = "1.0.0-rc.3";
@@ -695,6 +740,7 @@ let
         ${lib.optionalString disableMatrixCredentialTouch ''
           ${pkgs.python3}/bin/python3 ${matrixCredentialTouchPatchScript} "$out/lib/openclaw/dist/extensions/matrix"
         ''}
+        ${pkgs.python3}/bin/python3 ${bundledRuntimeDepsNixModePatchScript} "$out/lib/openclaw/dist"
         # Install RTK binary into /bin (extract from tar.gz)
         mkdir -p /tmp/rtk-extract
         tar -xzf ${rtkBinary} -C /tmp/rtk-extract/
