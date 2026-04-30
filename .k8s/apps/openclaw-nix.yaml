@@ -66,7 +66,7 @@ spec:
               value: /home/node/.chromium
             - name: TMPDIR
               value: /tmp
-          image: ghcr.io/josevictorferreira/openclaw-nix:latest
+          image: ghcr.io/josevictorferreira/openclaw-nix:v2026.4.29-beta.1-matrix-touch-noop-webm-audio
           imagePullPolicy: Always
           livenessProbe:
             exec:
@@ -156,14 +156,37 @@ spec:
               ] = ((.[\"lossless-claw\"] // {}) | .enabled = true | .config = ((.config\
               \ // {}) | .dbPath = \"/home/node/.openclaw/lcm.db\")))' \"$CONFIG_FILE\"\
               \ > \"$CONFIG_FILE.tmp\" && mv \"$CONFIG_FILE.tmp\" \"$CONFIG_FILE\"\
-              \necho \"CephFS config patched\"\n\n\necho \"Installing matrix plugin\
-              \ dependencies...\"\n\n# Find the actual nix store path where the gateway\
-              \ loads extensions from\nMATRIX_EXT=$(readlink -f /lib/openclaw/extensions/matrix\
-              \ 2>/dev/null || echo \"/lib/openclaw/extensions/matrix\")\n\nif [ -d\
-              \ \"$MATRIX_EXT\" ]; then\n  echo \"Found matrix extension at: $MATRIX_EXT\"\
-              \n  cd \"$MATRIX_EXT\"\n\n  if [ ! -d \"node_modules/matrix-js-sdk\"\
-              \ ]; then\n    echo \"Installing npm dependencies...\"\n    node -e\
-              \ \"\n      const fs = require('fs');\n      const pkg = JSON.parse(fs.readFileSync('package.json',\
+              \necho \"CephFS config patched\"\n\necho \"Preparing bundled OpenClaw\
+              \ plugin runtime dependencies...\"\nnode --input-type=module <<'NODE'\n\
+              import fs from \"node:fs\";\nimport path from \"node:path\";\nimport\
+              \ { pathToFileURL } from \"node:url\";\n\nconst distDir = \"/lib/openclaw/dist\"\
+              ;\nconst doctorFile = fs.readdirSync(distDir).find((name) =>\n  name.startsWith(\"\
+              doctor-bundled-plugin-runtime-deps-\") && name.endsWith(\".js\")\n);\n\
+              if (!doctorFile) {\n  throw new Error(\"doctor-bundled-plugin-runtime-deps\
+              \ module not found in \" + distDir);\n}\n\nconst { maybeRepairBundledPluginRuntimeDeps\
+              \ } = await import(\n  pathToFileURL(path.join(distDir, doctorFile)).href\n\
+              );\n\nconst configPath = process.env.OPENCLAW_CONFIG_PATH;\nconst config\
+              \ = JSON.parse(fs.readFileSync(configPath, \"utf8\"));\nconst repairEnv\
+              \ = Object.fromEntries(\n  [\n    \"HOME\",\n    \"NODE_PATH\",\n  \
+              \  \"NPM_CONFIG_PREFIX\",\n    \"OPENCLAW_CONFIG_PATH\",\n    \"OPENCLAW_DATA_DIR\"\
+              ,\n    \"OPENCLAW_NIX_MODE\",\n    \"OPENCLAW_PLUGIN_STAGE_DIR\",\n\
+              \    \"OPENCLAW_STATE_DIR\",\n    \"PATH\",\n  ]\n    .filter((name)\
+              \ => process.env[name] !== undefined)\n    .map((name) => [name, process.env[name]])\n\
+              );\nconst repairConfig = {\n  plugins: config.plugins,\n};\n\nawait\
+              \ maybeRepairBundledPluginRuntimeDeps({\n  config: repairConfig,\n \
+              \ includeConfiguredChannels: false,\n  env: repairEnv,\n  runtime: {\n\
+              \    log: (message) => console.log(message),\n    error: (message) =>\
+              \ console.error(message),\n  },\n  prompter: {\n    shouldRepair: true,\n\
+              \    repairMode: { nonInteractive: true },\n    confirmAutoFix: async\
+              \ () => true,\n  },\n});\nNODE\necho \"Bundled OpenClaw plugin runtime\
+              \ dependencies prepared.\"\n\necho \"Installing matrix plugin dependencies...\"\
+              \n\n# Find the actual nix store path where the gateway loads extensions\
+              \ from\nMATRIX_EXT=$(readlink -f /lib/openclaw/extensions/matrix 2>/dev/null\
+              \ || echo \"/lib/openclaw/extensions/matrix\")\n\nif [ -d \"$MATRIX_EXT\"\
+              \ ]; then\n  echo \"Found matrix extension at: $MATRIX_EXT\"\n  cd \"\
+              $MATRIX_EXT\"\n\n  if [ ! -d \"node_modules/matrix-js-sdk\" ]; then\n\
+              \    echo \"Installing npm dependencies...\"\n    node -e \"\n     \
+              \ const fs = require('fs');\n      const pkg = JSON.parse(fs.readFileSync('package.json',\
               \ 'utf8'));\n      delete pkg.devDependencies;\n      fs.writeFileSync('package.json',\
               \ JSON.stringify(pkg, null, 2));\n    \"\n    npm install --omit=dev\
               \ --no-package-lock --legacy-peer-deps 2>&1 || echo \"WARN: npm install\
@@ -233,7 +256,7 @@ spec:
           envFrom:
             - secretRef:
                 name: openclaw-config
-          image: ghcr.io/josevictorferreira/openclaw-nix:latest
+          image: ghcr.io/josevictorferreira/openclaw-nix:v2026.4.29-beta.1-matrix-touch-noop-webm-audio
           imagePullPolicy: Always
           name: main
           ports:
