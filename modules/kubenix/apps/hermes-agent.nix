@@ -88,6 +88,12 @@ in
                   name = "TZ";
                   value = homelab.timeZone;
                 }
+              ]
+              ++ [
+                {
+                  name = "PATH";
+                  value = "/opt/hermes/.venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin";
+                }
               ];
               envFrom = envFromSecret;
               volumeMounts = dataVolumeMounts;
@@ -172,6 +178,12 @@ in
                 {
                   name = "TZ";
                   value = homelab.timeZone;
+                }
+              ]
+              ++ [
+                {
+                  name = "PATH";
+                  value = "/opt/hermes/.venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin";
                 }
               ];
               envFrom = envFromSecret;
