@@ -365,7 +365,7 @@ let
   losslessClawInfo = {
     version = "0.9.2";
     sha256 = "sha256-4PDGO5RHzDb//x3f0JkYjtKbDi5IOHl9HVdt5M8eA64=";
-    npmDepsHash = "sha256-e7cQ8EtuL5I9KjLF7l3aKw+974ifHela43NzRLUH/18=";
+    npmDepsHash = "sha256-krIx9psuqvRa6mK7hk+P/uRgX/S0Gcru65wfpmgDPd0=";
   };
   losslessClawSource = pkgs.fetchurl {
     url = "https://registry.npmjs.org/@martian-engineering/lossless-claw/-/lossless-claw-${losslessClawInfo.version}.tgz";
@@ -465,9 +465,13 @@ let
     if "openclaw" in d and "extensions" in d["openclaw"]:
         d["openclaw"]["extensions"] = ["./index.js"]
     if "dependencies" in d:
-        for k in d["dependencies"]:
-            if k.startswith("@mariozechner/") and d["dependencies"][k] == "0.66.1":
-                d["dependencies"][k] = "0.70.2"
+        deps = d["dependencies"]
+        if deps.get("@mariozechner/pi-agent-core") == "0.66.1":
+            deps["@mariozechner/pi-agent-core"] = "0.70.2"
+        if deps.get("@mariozechner/pi-ai") == "0.66.1":
+            deps["@mariozechner/pi-ai"] = "0.70.6"
+        if deps.get("@mariozechner/pi-coding-agent") == "0.66.1":
+            deps["@mariozechner/pi-coding-agent"] = "0.70.6"
     with open(p, "w") as f: json.dump(d, f, indent=2); f.write("\n")
     PYEOF
             # Also create extensions/lossless-claw for generic copy loop compatibility

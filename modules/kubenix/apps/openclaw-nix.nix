@@ -4,7 +4,7 @@ let
   namespace = homelab.kubernetes.namespaces.applications;
   appImage = {
     repository = "ghcr.io/josevictorferreira/openclaw-nix";
-    tag = "latest";
+    tag = "v2026.4.29-beta.1-matrix-touch-noop-webm-audio";
     pullPolicy = "Always";
   };
 in
@@ -236,6 +236,61 @@ in
                   jq '.plugins = (.plugins // {}) | .plugins.enabled = true | .plugins.allow = (((.plugins.allow // []) + ["lossless-claw"]) | unique) | .plugins.slots = ((.plugins.slots // {}) | .memory = (.memory // "memory-core") | .contextEngine = "lossless-claw") | .plugins.entries = ((.plugins.entries // {}) | .["lossless-claw"] = ((.["lossless-claw"] // {}) | .enabled = true | .config = ((.config // {}) | .dbPath = "/home/node/.openclaw/lcm.db")))' "$CONFIG_FILE" > "$CONFIG_FILE.tmp" && mv "$CONFIG_FILE.tmp" "$CONFIG_FILE"
                   echo "CephFS config patched"
 
+                  echo "Preparing bundled OpenClaw plugin runtime dependencies..."
+                  node --input-type=module <<'NODE'
+                  import fs from "node:fs";
+                  import path from "node:path";
+                  import { pathToFileURL } from "node:url";
+
+                  const distDir = "/lib/openclaw/dist";
+                  const doctorFile = fs.readdirSync(distDir).find((name) =>
+                    name.startsWith("doctor-bundled-plugin-runtime-deps-") && name.endsWith(".js")
+                  );
+                  if (!doctorFile) {
+                    throw new Error("doctor-bundled-plugin-runtime-deps module not found in " + distDir);
+                  }
+
+                  const { maybeRepairBundledPluginRuntimeDeps } = await import(
+                    pathToFileURL(path.join(distDir, doctorFile)).href
+                  );
+
+                  const configPath = process.env.OPENCLAW_CONFIG_PATH;
+                  const config = JSON.parse(fs.readFileSync(configPath, "utf8"));
+                  const repairEnv = Object.fromEntries(
+                    [
+                      "HOME",
+                      "NODE_PATH",
+                      "NPM_CONFIG_PREFIX",
+                      "OPENCLAW_CONFIG_PATH",
+                      "OPENCLAW_DATA_DIR",
+                      "OPENCLAW_NIX_MODE",
+                      "OPENCLAW_PLUGIN_STAGE_DIR",
+                      "OPENCLAW_STATE_DIR",
+                      "PATH",
+                    ]
+                      .filter((name) => process.env[name] !== undefined)
+                      .map((name) => [name, process.env[name]])
+                  );
+                  const repairConfig = {
+                    plugins: config.plugins,
+                  };
+
+                  await maybeRepairBundledPluginRuntimeDeps({
+                    config: repairConfig,
+                    includeConfiguredChannels: false,
+                    env: repairEnv,
+                    runtime: {
+                      log: (message) => console.log(message),
+                      error: (message) => console.error(message),
+                    },
+                    prompter: {
+                      shouldRepair: true,
+                      repairMode: { nonInteractive: true },
+                      confirmAutoFix: async () => true,
+                    },
+                  });
+                  NODE
+                  echo "Bundled OpenClaw plugin runtime dependencies prepared."
 
                   echo "Installing matrix plugin dependencies..."
 
