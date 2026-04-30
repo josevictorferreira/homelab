@@ -33,8 +33,22 @@ let
       ];
     };
   };
+  cliWrapper = {
+    name = "${name}-cli-wrapper";
+    mountPath = "/usr/local/bin/hermes";
+    volumeName = "cli-wrapper";
+  };
+
 in
 {
+  kubernetes.resources.configMaps."${cliWrapper.name}" = {
+    metadata.namespace = namespace;
+    data.hermes = ''
+      #!/bin/sh
+      exec gosu 10000:10000 /opt/hermes/.venv/bin/hermes "$@"
+    '';
+  };
+
   # No init container: CephFS rejects chown from unprivileged-capability containers.
   # The hermes entrypoint runs as root (UID 0), then gosu-drops to UID 10000.
   # Its internal chown tolerates failure on CephFS (continues with warning).
@@ -92,11 +106,17 @@ in
               ++ [
                 {
                   name = "PATH";
-                  value = "/opt/hermes/.venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin";
+                  value = "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/hermes/.venv/bin";
                 }
               ];
               envFrom = envFromSecret;
-              volumeMounts = dataVolumeMounts;
+              volumeMounts = dataVolumeMounts ++ [
+                {
+                  name = cliWrapper.volumeName;
+                  mountPath = cliWrapper.mountPath;
+                  subPath = "hermes";
+                }
+              ];
               resources = {
                 requests = {
                   cpu = "100m";
@@ -111,7 +131,15 @@ in
               };
             }
           ];
-          volumes = dataVolumes;
+          volumes = dataVolumes ++ [
+            {
+              name = cliWrapper.volumeName;
+              configMap = {
+                name = cliWrapper.name;
+                defaultMode = 493;
+              };
+            }
+          ];
         };
       };
     };
@@ -183,11 +211,17 @@ in
               ++ [
                 {
                   name = "PATH";
-                  value = "/opt/hermes/.venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin";
+                  value = "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/hermes/.venv/bin";
                 }
               ];
               envFrom = envFromSecret;
-              volumeMounts = dataVolumeMounts;
+              volumeMounts = dataVolumeMounts ++ [
+                {
+                  name = cliWrapper.volumeName;
+                  mountPath = cliWrapper.mountPath;
+                  subPath = "hermes";
+                }
+              ];
               resources = {
                 requests = {
                   cpu = "100m";
@@ -213,7 +247,15 @@ in
               };
             }
           ];
-          volumes = dataVolumes;
+          volumes = dataVolumes ++ [
+            {
+              name = cliWrapper.volumeName;
+              configMap = {
+                name = cliWrapper.name;
+                defaultMode = 493;
+              };
+            }
+          ];
         };
       };
     };

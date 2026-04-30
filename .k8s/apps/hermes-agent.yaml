@@ -42,7 +42,7 @@ spec:
             - name: TZ
               value: America/Sao_Paulo
             - name: PATH
-              value: /opt/hermes/.venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+              value: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/hermes/.venv/bin
           envFrom:
             - secretRef:
                 name: hermes-agent-env
@@ -85,6 +85,9 @@ spec:
             - mountPath: /opt/data
               name: hermes-data
               subPath: hermes
+            - mountPath: /usr/local/bin/hermes
+              name: cli-wrapper
+              subPath: hermes
       imagePullSecrets:
         - name: ghcr-registry-secret
       terminationGracePeriodSeconds: 30
@@ -92,6 +95,10 @@ spec:
         - name: hermes-data
           persistentVolumeClaim:
             claimName: cephfs-shared-storage-root
+        - configMap:
+            defaultMode: 493
+            name: hermes-agent-cli-wrapper
+          name: cli-wrapper
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -132,7 +139,7 @@ spec:
             - name: TZ
               value: America/Sao_Paulo
             - name: PATH
-              value: /opt/hermes/.venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+              value: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/hermes/.venv/bin
           envFrom:
             - secretRef:
                 name: hermes-agent-env
@@ -160,6 +167,9 @@ spec:
             - mountPath: /opt/data
               name: hermes-data
               subPath: hermes
+            - mountPath: /usr/local/bin/hermes
+              name: cli-wrapper
+              subPath: hermes
       imagePullSecrets:
         - name: ghcr-registry-secret
       terminationGracePeriodSeconds: 60
@@ -167,6 +177,25 @@ spec:
         - name: hermes-data
           persistentVolumeClaim:
             claimName: cephfs-shared-storage-root
+        - configMap:
+            defaultMode: 493
+            name: hermes-agent-cli-wrapper
+          name: cli-wrapper
+---
+apiVersion: v1
+data:
+  hermes: '#!/bin/sh
+
+    exec gosu 10000:10000 /opt/hermes/.venv/bin/hermes "$@"
+
+    '
+kind: ConfigMap
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: hermes-agent-cli-wrapper
+  namespace: apps
 ---
 apiVersion: v1
 kind: Service
