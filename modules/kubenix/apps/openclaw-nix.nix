@@ -4,7 +4,7 @@ let
   namespace = homelab.kubernetes.namespaces.applications;
   appImage = {
     repository = "ghcr.io/josevictorferreira/openclaw-nix";
-    tag = "v2026.4.29-beta.1-matrix-touch-noop-webm-audio@sha256:21545ece078999ce4d7709590b866ee55d5f7077d1696c3107f66b785b3ed849";
+    tag = "v2026.4.29-beta.1-matrix-touch-noop-webm-audio@sha256:3e59b4ea4a5e7cf3e27b5ba4e69e180874003cce4519cc44e3d8f1f187bf8d3a";
     pullPolicy = "Always";
   };
 in
