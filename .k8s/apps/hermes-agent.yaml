@@ -41,6 +41,8 @@ spec:
               value: /opt/data
             - name: TZ
               value: America/Sao_Paulo
+            - name: PATH
+              value: /opt/hermes/.venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
           envFrom:
             - secretRef:
                 name: hermes-agent-env
@@ -129,6 +131,8 @@ spec:
               value: /opt/data
             - name: TZ
               value: America/Sao_Paulo
+            - name: PATH
+              value: /opt/hermes/.venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
           envFrom:
             - secretRef:
                 name: hermes-agent-env
