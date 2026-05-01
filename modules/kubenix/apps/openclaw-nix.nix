@@ -245,12 +245,15 @@ in
                   );
                   const scanBundledPluginRuntimeDeps = runtimeDeps.a;
                   const resolveBundledRuntimeDependencyPackageInstallRootPlan = runtimeDeps.l;
+                  const resolveBundledRuntimeDependencyPackageInstallRoot = runtimeDeps.i;
                   const createBundledRuntimeDepsInstallSpecs = runtimeDeps.n;
 
                   if (
                     typeof scanBundledPluginRuntimeDeps !== "function" ||
-                    typeof resolveBundledRuntimeDependencyPackageInstallRootPlan !== "function" ||
-                    typeof createBundledRuntimeDepsInstallSpecs !== "function"
+                    (
+                      typeof resolveBundledRuntimeDependencyPackageInstallRootPlan !== "function" &&
+                      typeof resolveBundledRuntimeDependencyPackageInstallRoot !== "function"
+                    )
                   ) {
                     throw new Error("bundled-runtime-deps exports are not in the expected shape");
                   }
@@ -285,11 +288,13 @@ in
                     );
                   }
 
-                  const installSpecs = createBundledRuntimeDepsInstallSpecs({ deps: scan.deps });
-                  const installRoot = resolveBundledRuntimeDependencyPackageInstallRootPlan(
-                    packageRoot,
-                    { env: stageEnv }
-                  ).installRoot;
+                  const installSpecs = typeof createBundledRuntimeDepsInstallSpecs === "function"
+                    ? createBundledRuntimeDepsInstallSpecs({ deps: scan.deps })
+                    : scan.deps.map((dep) => `''${dep.name}@''${dep.version}`);
+                  const installRootPlan = typeof resolveBundledRuntimeDependencyPackageInstallRootPlan === "function"
+                    ? resolveBundledRuntimeDependencyPackageInstallRootPlan(packageRoot, { env: stageEnv })
+                    : { installRoot: resolveBundledRuntimeDependencyPackageInstallRoot(packageRoot, { env: stageEnv }) };
+                  const installRoot = installRootPlan.installRoot;
                   const dependencies = Object.fromEntries(
                     installSpecs
                       .map((spec) => {

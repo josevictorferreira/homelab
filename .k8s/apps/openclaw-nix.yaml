@@ -148,29 +148,34 @@ spec:
               \ + distDir);\n}\n\nconst runtimeDeps = await import(\n  pathToFileURL(path.join(distDir,\
               \ runtimeDepsFile)).href\n);\nconst scanBundledPluginRuntimeDeps = runtimeDeps.a;\n\
               const resolveBundledRuntimeDependencyPackageInstallRootPlan = runtimeDeps.l;\n\
+              const resolveBundledRuntimeDependencyPackageInstallRoot = runtimeDeps.i;\n\
               const createBundledRuntimeDepsInstallSpecs = runtimeDeps.n;\n\nif (\n\
-              \  typeof scanBundledPluginRuntimeDeps !== \"function\" ||\n  typeof\
-              \ resolveBundledRuntimeDependencyPackageInstallRootPlan !== \"function\"\
-              \ ||\n  typeof createBundledRuntimeDepsInstallSpecs !== \"function\"\
-              \n) {\n  throw new Error(\"bundled-runtime-deps exports are not in the\
-              \ expected shape\");\n}\n\nconst configPath = process.env.OPENCLAW_CONFIG_PATH;\n\
-              const config = JSON.parse(fs.readFileSync(configPath, \"utf8\"));\n\
-              const stageEnv = Object.fromEntries(\n  [\n    \"HOME\",\n    \"NODE_PATH\"\
-              ,\n    \"NPM_CONFIG_PREFIX\",\n    \"OPENCLAW_CONFIG_PATH\",\n    \"\
-              OPENCLAW_DATA_DIR\",\n    \"OPENCLAW_NIX_MODE\",\n    \"OPENCLAW_PLUGIN_STAGE_DIR\"\
+              \  typeof scanBundledPluginRuntimeDeps !== \"function\" ||\n  (\n  \
+              \  typeof resolveBundledRuntimeDependencyPackageInstallRootPlan !==\
+              \ \"function\" &&\n    typeof resolveBundledRuntimeDependencyPackageInstallRoot\
+              \ !== \"function\"\n  )\n) {\n  throw new Error(\"bundled-runtime-deps\
+              \ exports are not in the expected shape\");\n}\n\nconst configPath =\
+              \ process.env.OPENCLAW_CONFIG_PATH;\nconst config = JSON.parse(fs.readFileSync(configPath,\
+              \ \"utf8\"));\nconst stageEnv = Object.fromEntries(\n  [\n    \"HOME\"\
+              ,\n    \"NODE_PATH\",\n    \"NPM_CONFIG_PREFIX\",\n    \"OPENCLAW_CONFIG_PATH\"\
+              ,\n    \"OPENCLAW_DATA_DIR\",\n    \"OPENCLAW_NIX_MODE\",\n    \"OPENCLAW_PLUGIN_STAGE_DIR\"\
               ,\n    \"OPENCLAW_STATE_DIR\",\n    \"PATH\",\n  ]\n    .filter((name)\
               \ => process.env[name] !== undefined)\n    .map((name) => [name, process.env[name]])\n\
               );\nconst scan = scanBundledPluginRuntimeDeps({\n  packageRoot,\n  config,\n\
               \  includeConfiguredChannels: false,\n  env: stageEnv,\n});\nif (scan.conflicts.length\
               \ > 0) {\n  throw new Error(\n    \"Conflicting bundled runtime dependency\
               \ versions: \" +\n      scan.conflicts.map((conflict) => conflict.name).join(\"\
-              , \")\n  );\n}\n\nconst installSpecs = createBundledRuntimeDepsInstallSpecs({\
-              \ deps: scan.deps });\nconst installRoot = resolveBundledRuntimeDependencyPackageInstallRootPlan(\n\
-              \  packageRoot,\n  { env: stageEnv }\n).installRoot;\nconst dependencies\
-              \ = Object.fromEntries(\n  installSpecs\n    .map((spec) => {\n    \
-              \  const separator = spec.lastIndexOf(\"@\");\n      return [spec.slice(0,\
-              \ separator), spec.slice(separator + 1)];\n    })\n    .sort(([left],\
-              \ [right]) => left.localeCompare(right))\n);\n\nfs.mkdirSync(installRoot,\
+              , \")\n  );\n}\n\nconst installSpecs = typeof createBundledRuntimeDepsInstallSpecs\
+              \ === \"function\"\n  ? createBundledRuntimeDepsInstallSpecs({ deps:\
+              \ scan.deps })\n  : scan.deps.map((dep) => `${dep.name}@${dep.version}`);\n\
+              const installRootPlan = typeof resolveBundledRuntimeDependencyPackageInstallRootPlan\
+              \ === \"function\"\n  ? resolveBundledRuntimeDependencyPackageInstallRootPlan(packageRoot,\
+              \ { env: stageEnv })\n  : { installRoot: resolveBundledRuntimeDependencyPackageInstallRoot(packageRoot,\
+              \ { env: stageEnv }) };\nconst installRoot = installRootPlan.installRoot;\n\
+              const dependencies = Object.fromEntries(\n  installSpecs\n    .map((spec)\
+              \ => {\n      const separator = spec.lastIndexOf(\"@\");\n      return\
+              \ [spec.slice(0, separator), spec.slice(separator + 1)];\n    })\n \
+              \   .sort(([left], [right]) => left.localeCompare(right))\n);\n\nfs.mkdirSync(installRoot,\
               \ { recursive: true });\nfs.rmSync(path.join(installRoot, \".openclaw-runtime-deps.lock\"\
               ), {\n  recursive: true,\n  force: true,\n});\nfs.writeFileSync(\n \
               \ path.join(installRoot, \"package.json\"),\n  JSON.stringify({ name:\
