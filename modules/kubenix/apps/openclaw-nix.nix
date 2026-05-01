@@ -220,20 +220,6 @@ in
                     echo "Using existing config at $CONFIG_FILE"
                   fi
 
-                  # Perform environment variable substitution on openclaw.json
-                  # This ensures that tokens from secrets are correctly injected
-                  echo "Performing environment variable substitution in $CONFIG_FILE..."
-                  ALLOWLIST="OPENCLAW_MATRIX_TOKEN ELEVENLABS_API_KEY HUGGINGFACE_HUB_TOKEN KIMI_API_KEY OPENROUTER_API_KEY OPENAI_API_KEY MINIMAX_API_KEY Z_AI_API_KEY ALIBABA_CODING_PLAN_API_KEY WHATSAPP_NUMBER WHATSAPP_BOT_NUMBER GEMINI_API_KEY GITHUB_TOKEN TS_AUTHKEY KIRA_MATRIX_TOKEN LUNA_MATRIX_TOKEN MEL_MATRIX_TOKEN SPIKE_MATRIX_TOKEN COPILOT_GITHUB_TOKEN"
-                  for var_name in $ALLOWLIST; do
-                    var_value=$(eval printf '%s' "\$$var_name")
-                    if [ -n "$var_value" ]; then
-                      escaped_value=$(echo "$var_value" | sed 's/[\\/&]/\\&/g')
-                      sed -i "s|\\\''${$var_name}|$escaped_value|g" "$CONFIG_FILE"
-                    fi
-                  done
-                  echo "Applying dynamic CephFS config patches..."
-                  jq '.plugins = (.plugins // {}) | .plugins.enabled = true | .plugins.allow = ((((.plugins.allow // []) - ["memory-core"]) + ["lossless-claw"]) | unique) | .plugins.slots = ((.plugins.slots // {}) | .memory = null | .contextEngine = "lossless-claw") | .plugins.entries = ((.plugins.entries // {}) | .["lossless-claw"] = ((.["lossless-claw"] // {}) | .enabled = true | .config = ((.config // {}) | .dbPath = "/home/node/.openclaw/lcm.db")))' "$CONFIG_FILE" > "$CONFIG_FILE.tmp" && mv "$CONFIG_FILE.tmp" "$CONFIG_FILE"
-                  echo "CephFS config patched"
 
                   echo "Materializing bundled OpenClaw plugin runtime dependencies from the Nix image..."
                   node --input-type=module <<'NODE'
