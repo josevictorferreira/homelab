@@ -297,59 +297,10 @@ spec:
             - mountPath: /etc/openclaw
               name: openclaw-config
               readOnly: true
-            - mountPath: /home/node
-              name: shared-storage
-              subPath: openclaw-home
             - mountPath: /home/node/.openclaw
               name: shared-storage
               subPath: openclaw
-            - mountPath: /home/node/shared
-              name: shared-storage
-        - env:
-            - name: TS_ACCEPT_DNS
-              value: 'false'
-            - name: TS_AUTHKEY
-              valueFrom:
-                secretKeyRef:
-                  key: TS_AUTHKEY
-                  name: openclaw-config
-            - name: TS_AUTH_ONCE
-              value: 'true'
-            - name: TS_HOSTNAME
-              value: openclaw-nix
-            - name: TS_KUBE_SECRET
-              value: ''
-            - name: TS_STATE_DIR
-              value: /var/lib/tailscale
-            - name: TS_USERSPACE
-              value: 'false'
-          image: tailscale/tailscale:latest
-          name: tailscale
-          securityContext:
-            capabilities:
-              add:
-                - NET_ADMIN
-                - NET_RAW
-            runAsGroup: 0
-            runAsUser: 0
-          volumeMounts:
-            - mountPath: /dev/net/tun
-              name: dev-tun
-            - mountPath: /var/lib/tailscale
-              name: shared-storage
-              subPath: openclaw-tailscale-state
-      dnsConfig:
-        nameservers:
-          - 10.43.0.10
-          - 100.100.100.100
-        options:
-          - name: ndots
-            value: '5'
-        searches:
-          - apps.svc.cluster.local
-          - svc.cluster.local
-          - cluster.local
-      dnsPolicy: None
+      dnsPolicy: ClusterFirst
       enableServiceLinks: false
       hostIPC: false
       hostNetwork: false
@@ -367,9 +318,6 @@ spec:
           name: chromium-shm
         - emptyDir: {}
           name: chromium-tmp
-        - hostPath:
-            path: /dev/net/tun
-          name: dev-tun
         - configMap:
             name: openclaw-config
           name: openclaw-config

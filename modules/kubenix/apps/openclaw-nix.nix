@@ -2,6 +2,7 @@
 
 let
   namespace = homelab.kubernetes.namespaces.applications;
+  enableTailscaleSidecar = false;
   appImage = {
     repository = "ghcr.io/josevictorferreira/openclaw-nix";
     tag = "v2026.4.29-matrix-touch-noop-webm-audio@sha256:3e59b4ea4a5e7cf3e27b5ba4e69e180874003cce4519cc44e3d8f1f187bf8d3a";
@@ -494,62 +495,71 @@ in
                 };
               };
             };
-
-            # Tailscale sidecar
-            tailscale = {
-              image = {
-                repository = "tailscale/tailscale";
-                tag = "latest";
-              };
-              securityContext = {
-                runAsUser = 0;
-                runAsGroup = 0;
-                capabilities.add = [
-                  "NET_ADMIN"
-                  "NET_RAW"
-                ];
-              };
-              env = {
-                TS_AUTHKEY = {
-                  valueFrom.secretKeyRef = {
-                    name = "openclaw-config";
-                    key = "TS_AUTHKEY";
+          }
+          // (
+            if enableTailscaleSidecar then
+              {
+                tailscale = {
+                  image = {
+                    repository = "tailscale/tailscale";
+                    tag = "latest";
+                  };
+                  securityContext = {
+                    runAsUser = 0;
+                    runAsGroup = 0;
+                    capabilities.add = [
+                      "NET_ADMIN"
+                      "NET_RAW"
+                    ];
+                  };
+                  env = {
+                    TS_AUTHKEY = {
+                      valueFrom.secretKeyRef = {
+                        name = "openclaw-config";
+                        key = "TS_AUTHKEY";
+                      };
+                    };
+                    TS_HOSTNAME = "openclaw-nix";
+                    TS_USERSPACE = "false";
+                    TS_STATE_DIR = "/var/lib/tailscale";
+                    TS_ACCEPT_DNS = "false";
+                    TS_AUTH_ONCE = "true";
+                    TS_KUBE_SECRET = "";
                   };
                 };
-                TS_HOSTNAME = "openclaw-nix";
-                TS_USERSPACE = "false";
-                TS_STATE_DIR = "/var/lib/tailscale";
-                TS_ACCEPT_DNS = "false";
-                TS_AUTH_ONCE = "true";
-                TS_KUBE_SECRET = "";
-              };
-            };
-          };
+              }
+            else
+              { }
+          );
 
           # Service account for cluster-admin RBAC
           serviceAccount.name = "openclaw-nix";
 
           # DNS config: cluster DNS + Tailscale MagicDNS
-          pod = {
-            dnsPolicy = "None";
-            dnsConfig = {
-              nameservers = [
-                "10.43.0.10"
-                "100.100.100.100"
-              ];
-              searches = [
-                "apps.svc.cluster.local"
-                "svc.cluster.local"
-                "cluster.local"
-              ];
-              options = [
-                {
-                  name = "ndots";
-                  value = "5";
-                }
-              ];
-            };
-          };
+          pod =
+            if enableTailscaleSidecar then
+              {
+                dnsPolicy = "None";
+                dnsConfig = {
+                  nameservers = [
+                    "10.43.0.10"
+                    "100.100.100.100"
+                  ];
+                  searches = [
+                    "apps.svc.cluster.local"
+                    "svc.cluster.local"
+                    "cluster.local"
+                  ];
+                  options = [
+                    {
+                      name = "ndots";
+                      value = "5";
+                    }
+                  ];
+                };
+              }
+            else
+              { };
         };
 
         persistence = {
@@ -565,37 +575,41 @@ in
             ];
           };
 
-          # CephFS shared storage — single PVC, multiple subPath mounts
-          # /home/node = openclaw-home subPath (HOME dir, persistent npm/pip, .config)
-          # /home/node/.openclaw = openclaw subPath (workspace, memory, runtime state)
-          # /home/node/shared = full CephFS root (cross-app access)
+          # CephFS persistent state: keep configuration and OpenClaw data only.
           shared-storage = {
             type = "persistentVolumeClaim";
             existingClaim = kubenix.lib.sharedStorage.rootPVC;
             advancedMounts.main.main = [
               {
-                path = "/home/node";
-                subPath = "openclaw-home";
-              }
-              {
                 path = "/home/node/.openclaw";
                 subPath = "openclaw";
               }
-              { path = "/home/node/shared"; }
-            ];
-            advancedMounts.main.tailscale = [
-              {
-                path = "/var/lib/tailscale";
-                subPath = "openclaw-tailscale-state";
-              }
             ];
           };
-
-          dev-tun = {
-            type = "hostPath";
-            hostPath = "/dev/net/tun";
-            advancedMounts.main.tailscale = [ { path = "/dev/net/tun"; } ];
-          };
+        }
+        // (
+          if enableTailscaleSidecar then
+            {
+              dev-tun = {
+                type = "hostPath";
+                hostPath = "/dev/net/tun";
+                advancedMounts.main.tailscale = [ { path = "/dev/net/tun"; } ];
+              };
+              tailscale-state = {
+                type = "persistentVolumeClaim";
+                existingClaim = kubenix.lib.sharedStorage.rootPVC;
+                advancedMounts.main.tailscale = [
+                  {
+                    path = "/var/lib/tailscale";
+                    subPath = "openclaw-tailscale-state";
+                  }
+                ];
+              };
+            }
+          else
+            { }
+        )
+        // {
 
           chromium-data = {
             type = "emptyDir";
