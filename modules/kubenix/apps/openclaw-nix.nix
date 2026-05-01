@@ -59,10 +59,11 @@ in
 
       resources = {
         requests = {
-          cpu = "250m";
+          cpu = "500m";
           memory = "512Mi";
         };
         limits = {
+          cpu = "2000m";
           memory = "2Gi";
         };
       };
