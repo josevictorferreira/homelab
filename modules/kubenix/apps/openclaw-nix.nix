@@ -116,6 +116,7 @@ in
                   values = [
                     "lab-delta-cp"
                     "lab-alpha-cp"
+                    "lab-gamma-wk"
                   ];
                 }
               ];
