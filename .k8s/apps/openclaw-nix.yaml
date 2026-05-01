@@ -66,7 +66,7 @@ spec:
               value: /home/node/.chromium
             - name: TMPDIR
               value: /tmp
-          image: ghcr.io/josevictorferreira/openclaw-nix:v2026.4.29-beta.1-matrix-touch-noop-webm-audio@sha256:3e59b4ea4a5e7cf3e27b5ba4e69e180874003cce4519cc44e3d8f1f187bf8d3a
+          image: ghcr.io/josevictorferreira/openclaw-nix:v2026.4.29-matrix-touch-noop-webm-audio@sha256:3e59b4ea4a5e7cf3e27b5ba4e69e180874003cce4519cc44e3d8f1f187bf8d3a
           imagePullPolicy: Always
           livenessProbe:
             exec:
@@ -277,6 +277,8 @@ spec:
               value: /tmp/openclaw-plugin-stage
             - name: OPENCLAW_STATE_DIR
               value: /home/node/.openclaw
+            - name: OPENCLAW_TRAJECTORY
+              value: 'false'
             - name: PATH
               value: /home/node/.local/bin:/home/node/.npm-global/bin:/bin:/usr/bin
             - name: PIP_TARGET
@@ -288,7 +290,7 @@ spec:
           envFrom:
             - secretRef:
                 name: openclaw-config
-          image: ghcr.io/josevictorferreira/openclaw-nix:v2026.4.29-beta.1-matrix-touch-noop-webm-audio@sha256:3e59b4ea4a5e7cf3e27b5ba4e69e180874003cce4519cc44e3d8f1f187bf8d3a
+          image: ghcr.io/josevictorferreira/openclaw-nix:v2026.4.29-matrix-touch-noop-webm-audio@sha256:3e59b4ea4a5e7cf3e27b5ba4e69e180874003cce4519cc44e3d8f1f187bf8d3a
           imagePullPolicy: Always
           name: main
           ports:
