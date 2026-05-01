@@ -5,7 +5,7 @@ let
   enableTailscaleSidecar = false;
   appImage = {
     repository = "ghcr.io/josevictorferreira/openclaw-nix";
-    tag = "v2026.4.29-matrix-touch-noop-webm-audio@sha256:3e59b4ea4a5e7cf3e27b5ba4e69e180874003cce4519cc44e3d8f1f187bf8d3a";
+    tag = "v2026.4.23@sha256:6c8bf3b42cde608c83a548dcdfb973ae4fd85ef93fe763edeb378d1ae59751cc";
     pullPolicy = "Always";
   };
 in
