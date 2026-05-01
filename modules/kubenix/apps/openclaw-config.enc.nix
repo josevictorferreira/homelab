@@ -690,12 +690,15 @@ let
       enabled = true;
       allow = [
         "browser"
+        "github-copilot"
         "google"
+        "kimi"
         "lobster"
         "lossless-claw"
         "matrix"
         "memory-core"
         "memory-wiki"
+        "minimax"
         "openai"
         "perplexity"
         "whatsapp"
@@ -724,6 +727,15 @@ let
           };
         };
         browser = {
+          enabled = true;
+        };
+        minimax = {
+          enabled = true;
+        };
+        kimi = {
+          enabled = true;
+        };
+        github-copilot = {
           enabled = true;
         };
         memory-core = {
