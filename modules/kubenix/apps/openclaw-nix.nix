@@ -153,11 +153,11 @@ in
                 TZ = homelab.timeZone;
                 OPENCLAW_NIX_MODE = "1";
                 OPENCLAW_TRAJECTORY = "false";
-                NPM_CONFIG_PREFIX = "/home/node/.npm-global";
-                OPENCLAW_PLUGIN_STAGE_DIR = "/tmp/openclaw-plugin-stage";
-                PIP_TARGET = "/home/node/.local/lib/python";
-                PYTHONPATH = "/home/node/.local/lib/python";
-                PATH = "/home/node/.local/bin:/home/node/.npm-global/bin:/bin:/usr/bin";
+                NPM_CONFIG_PREFIX = "/data/npm-global";
+                OPENCLAW_PLUGIN_STAGE_DIR = "/data/plugin-stage";
+                PIP_TARGET = "/data/local/lib/python";
+                PYTHONPATH = "/data/local/lib/python";
+                PATH = "/data/local/bin:/data/npm-global/bin:/bin:/usr/bin";
                 NODE_PATH = "/lib/openclaw/extensions/matrix/node_modules:/lib/openclaw/node_modules";
                 MATRIX_MEL_ACCESS_TOKEN = {
                   valueFrom.secretKeyRef = {
@@ -204,13 +204,14 @@ in
                     sleep 2
                   done
 
-                  # Ensure persistent directories exist for npm/pip packages
-                  mkdir -p /home/node/.npm-global/bin
-                  mkdir -p /home/node/.local/lib/python
-                  mkdir -p /home/node/.local/bin
+
+                  # Ensure persistent directories exist for npm/pip packages on /data block storage
+                  mkdir -p /data/npm-global/bin
+                  mkdir -p /data/local/lib/python
+                  mkdir -p /data/local/bin
+                  mkdir -p /data/plugin-stage
                   mkdir -p /home/node/.config
                   mkdir -p /home/node/.openclaw
-                  mkdir -p "$OPENCLAW_PLUGIN_STAGE_DIR"
 
                   # Seed config from ConfigMap template if CephFS file doesn't exist yet
                   CONFIG_FILE="/home/node/.openclaw/openclaw.json"
@@ -632,6 +633,26 @@ in
             sizeLimit = "1Gi";
             advancedMounts.main.chromium = [
               { path = "/dev/shm"; }
+            ];
+          };
+          data-block = {
+            type = "persistentVolumeClaim";
+            annotations."helm.sh/resource-policy" = "keep";
+            accessMode = "ReadWriteOnce";
+            size = "10Gi";
+            storageClass = "rook-ceph-block";
+            advancedMounts.main.main = [
+              { path = "/data"; }
+            ];
+          };
+          lcm-db = {
+            type = "persistentVolumeClaim";
+            annotations."helm.sh/resource-policy" = "keep";
+            accessMode = "ReadWriteOnce";
+            size = "5Gi";
+            storageClass = "rook-ceph-block";
+            advancedMounts.main.main = [
+              { path = "/home/node/.openclaw/lcm.db.d"; }
             ];
           };
         };
