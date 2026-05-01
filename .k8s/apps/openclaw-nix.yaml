@@ -127,11 +127,11 @@ spec:
               \nfor i in $(seq 1 30); do\n  if touch /home/node/.openclaw/.mount-check\
               \ 2>/dev/null; then\n    rm -f /home/node/.openclaw/.mount-check\n \
               \   echo \"CephFS mount ready\"\n    break\n  fi\n  echo \"Mount not\
-              \ ready, attempt $i/30...\"\n  sleep 2\ndone\n\n# Ensure persistent\
-              \ directories exist for npm/pip packages\nmkdir -p /home/node/.npm-global/bin\n\
-              mkdir -p /home/node/.local/lib/python\nmkdir -p /home/node/.local/bin\n\
-              mkdir -p /home/node/.config\nmkdir -p /home/node/.openclaw\nmkdir -p\
-              \ \"$OPENCLAW_PLUGIN_STAGE_DIR\"\n\n# Seed config from ConfigMap template\
+              \ ready, attempt $i/30...\"\n  sleep 2\ndone\n\n\n# Ensure persistent\
+              \ directories exist for npm/pip packages on /data block storage\nmkdir\
+              \ -p /data/npm-global/bin\nmkdir -p /data/local/lib/python\nmkdir -p\
+              \ /data/local/bin\nmkdir -p /data/plugin-stage\nmkdir -p /home/node/.config\n\
+              mkdir -p /home/node/.openclaw\n\n# Seed config from ConfigMap template\
               \ if CephFS file doesn't exist yet\nCONFIG_FILE=\"/home/node/.openclaw/openclaw.json\"\
               \nif [ ! -f \"$CONFIG_FILE\" ]; then\n  echo \"First run: seeding config\
               \ from template...\"\n  cp /etc/openclaw/config-template.json \"$CONFIG_FILE\"\
@@ -246,7 +246,7 @@ spec:
             - name: NODE_PATH
               value: /lib/openclaw/extensions/matrix/node_modules:/lib/openclaw/node_modules
             - name: NPM_CONFIG_PREFIX
-              value: /home/node/.npm-global
+              value: /data/npm-global
             - name: OPENCLAW_CONFIG_PATH
               value: /home/node/.openclaw/openclaw.json
             - name: OPENCLAW_DATA_DIR
@@ -254,17 +254,17 @@ spec:
             - name: OPENCLAW_NIX_MODE
               value: '1'
             - name: OPENCLAW_PLUGIN_STAGE_DIR
-              value: /tmp/openclaw-plugin-stage
+              value: /data/plugin-stage
             - name: OPENCLAW_STATE_DIR
               value: /home/node/.openclaw
             - name: OPENCLAW_TRAJECTORY
               value: 'false'
             - name: PATH
-              value: /home/node/.local/bin:/home/node/.npm-global/bin:/bin:/usr/bin
+              value: /data/local/bin:/data/npm-global/bin:/bin:/usr/bin
             - name: PIP_TARGET
-              value: /home/node/.local/lib/python
+              value: /data/local/lib/python
             - name: PYTHONPATH
-              value: /home/node/.local/lib/python
+              value: /data/local/lib/python
             - name: TZ
               value: America/Sao_Paulo
           envFrom:
@@ -295,6 +295,10 @@ spec:
             runAsGroup: 0
             runAsUser: 0
           volumeMounts:
+            - mountPath: /data
+              name: data-block
+            - mountPath: /home/node/.openclaw/lcm.db.d
+              name: lcm-db
             - mountPath: /etc/openclaw
               name: openclaw-config
               readOnly: true
@@ -319,12 +323,66 @@ spec:
           name: chromium-shm
         - emptyDir: {}
           name: chromium-tmp
+        - name: data-block
+          persistentVolumeClaim:
+            claimName: openclaw-nix-data-block
+        - name: lcm-db
+          persistentVolumeClaim:
+            claimName: openclaw-nix-lcm-db
         - configMap:
             name: openclaw-config
           name: openclaw-config
         - name: shared-storage
           persistentVolumeClaim:
             claimName: cephfs-shared-storage-root
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    helm.sh/resource-policy: keep
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: openclaw-nix
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: openclaw-nix
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: openclaw-nix-data-block
+  namespace: apps
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: rook-ceph-block
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    helm.sh/resource-policy: keep
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: openclaw-nix
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: openclaw-nix
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: openclaw-nix-lcm-db
+  namespace: apps
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: rook-ceph-block
 ---
 apiVersion: v1
 kind: Service
