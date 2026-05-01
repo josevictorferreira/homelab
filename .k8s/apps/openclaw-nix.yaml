@@ -130,14 +130,15 @@ spec:
               \ ready, attempt $i/30...\"\n  sleep 2\ndone\n\n\n# Ensure persistent\
               \ directories exist for npm/pip packages on /data block storage\nmkdir\
               \ -p /data/npm-global/bin\nmkdir -p /data/local/lib/python\nmkdir -p\
-              \ /data/local/bin\nmkdir -p /data/plugin-stage\nmkdir -p /home/node/.config\n\
-              mkdir -p /home/node/.openclaw\n\n# Seed config from ConfigMap template\
-              \ if CephFS file doesn't exist yet\nCONFIG_FILE=\"/home/node/.openclaw/openclaw.json\"\
-              \nif [ ! -f \"$CONFIG_FILE\" ]; then\n  echo \"First run: seeding config\
-              \ from template...\"\n  cp /etc/openclaw/config-template.json \"$CONFIG_FILE\"\
-              \n  echo \"Config seeded at $CONFIG_FILE\"\nelse\n  echo \"Using existing\
-              \ config at $CONFIG_FILE\"\nfi\n\nexec node /lib/openclaw/dist/index.js\
-              \ gateway --port 18789\n"
+              \ /data/local/bin\nmkdir -p /data/plugin-stage\nmkdir -p /data/openclaw\n\
+              mkdir -p /home/node/.config\nmkdir -p /home/node/.openclaw\n\n# Seed\
+              \ config from ConfigMap template if CephFS file doesn't exist yet\n\
+              CONFIG_FILE=\"/home/node/.openclaw/openclaw.json\"\nif [ ! -f \"$CONFIG_FILE\"\
+              \ ]; then\n  echo \"First run: seeding config from template...\"\n \
+              \ cp /etc/openclaw/config-template.json \"$CONFIG_FILE\"\n  echo \"\
+              Config seeded at $CONFIG_FILE\"\nelse\n  echo \"Using existing config\
+              \ at $CONFIG_FILE\"\nfi\n\nexec node /lib/openclaw/dist/index.js gateway\
+              \ --port 18789\n"
           env:
             - name: HOME
               value: /home/node
@@ -168,13 +169,13 @@ spec:
             - name: OPENCLAW_CONFIG_PATH
               value: /home/node/.openclaw/openclaw.json
             - name: OPENCLAW_DATA_DIR
-              value: /home/node/.openclaw
+              value: /data/openclaw
             - name: OPENCLAW_NIX_MODE
               value: '1'
             - name: OPENCLAW_PLUGIN_STAGE_DIR
               value: /data/plugin-stage
             - name: OPENCLAW_STATE_DIR
-              value: /home/node/.openclaw
+              value: /data/openclaw
             - name: OPENCLAW_TRAJECTORY
               value: 'false'
             - name: PATH
@@ -215,7 +216,7 @@ spec:
           volumeMounts:
             - mountPath: /data
               name: data-block
-            - mountPath: /home/node/.openclaw/lcm.db.d
+            - mountPath: /data/openclaw/lcm.db.d
               name: lcm-db
             - mountPath: /etc/openclaw
               name: openclaw-config

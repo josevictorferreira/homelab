@@ -147,8 +147,8 @@ in
 
               env = {
                 OPENCLAW_CONFIG_PATH = "/home/node/.openclaw/openclaw.json";
-                OPENCLAW_DATA_DIR = "/home/node/.openclaw";
-                OPENCLAW_STATE_DIR = "/home/node/.openclaw";
+                OPENCLAW_DATA_DIR = "/data/openclaw";
+                OPENCLAW_STATE_DIR = "/data/openclaw";
                 HOME = "/home/node";
                 TZ = homelab.timeZone;
                 OPENCLAW_NIX_MODE = "1";
@@ -210,6 +210,7 @@ in
                   mkdir -p /data/local/lib/python
                   mkdir -p /data/local/bin
                   mkdir -p /data/plugin-stage
+                  mkdir -p /data/openclaw
                   mkdir -p /home/node/.config
                   mkdir -p /home/node/.openclaw
 
@@ -406,7 +407,7 @@ in
             ];
           };
 
-          # CephFS persistent state: keep configuration and OpenClaw data only.
+          # CephFS persistent config only. Runtime state/data live on RBD-backed /data.
           shared-storage = {
             type = "persistentVolumeClaim";
             existingClaim = kubenix.lib.sharedStorage.rootPVC;
@@ -481,7 +482,7 @@ in
             size = "5Gi";
             storageClass = "rook-ceph-block";
             advancedMounts.main.main = [
-              { path = "/home/node/.openclaw/lcm.db.d"; }
+              { path = "/data/openclaw/lcm.db.d"; }
             ];
           };
         };
