@@ -149,23 +149,23 @@ spec:
               \ 's/[\\\\/&]/\\\\&/g')\n    sed -i \"s|\\\\\\${$var_name}|$escaped_value|g\"\
               \ \"$CONFIG_FILE\"\n  fi\ndone\necho \"Applying dynamic CephFS config\
               \ patches...\"\njq '.plugins = (.plugins // {}) | .plugins.enabled =\
-              \ true | .plugins.allow = (((.plugins.allow // []) + [\"lossless-claw\"\
-              ]) | unique) | .plugins.slots = ((.plugins.slots // {}) | .memory =\
-              \ (.memory // \"memory-core\") | .contextEngine = \"lossless-claw\"\
-              ) | .plugins.entries = ((.plugins.entries // {}) | .[\"lossless-claw\"\
-              ] = ((.[\"lossless-claw\"] // {}) | .enabled = true | .config = ((.config\
-              \ // {}) | .dbPath = \"/home/node/.openclaw/lcm.db\")))' \"$CONFIG_FILE\"\
-              \ > \"$CONFIG_FILE.tmp\" && mv \"$CONFIG_FILE.tmp\" \"$CONFIG_FILE\"\
-              \necho \"CephFS config patched\"\n\necho \"Materializing bundled OpenClaw\
-              \ plugin runtime dependencies from the Nix image...\"\nnode --input-type=module\
-              \ <<'NODE'\nimport fs from \"node:fs\";\nimport path from \"node:path\"\
-              ;\nimport { pathToFileURL } from \"node:url\";\n\nconst packageRoot\
-              \ = \"/lib/openclaw\";\nconst bakedNodeModules = path.join(packageRoot,\
-              \ \"node_modules\");\nconst distDir = \"/lib/openclaw/dist\";\nconst\
-              \ runtimeDepsFile = fs.readdirSync(distDir).find((name) =>\n  name.startsWith(\"\
-              bundled-runtime-deps-\") && name.endsWith(\".js\")\n);\nif (!runtimeDepsFile)\
-              \ {\n  throw new Error(\"bundled-runtime-deps module not found in \"\
-              \ + distDir);\n}\n\nconst runtimeDeps = await import(\n  pathToFileURL(path.join(distDir,\
+              \ true | .plugins.allow = ((((.plugins.allow // []) - [\"memory-core\"\
+              ]) + [\"lossless-claw\"]) | unique) | .plugins.slots = ((.plugins.slots\
+              \ // {}) | .memory = null | .contextEngine = \"lossless-claw\") | .plugins.entries\
+              \ = ((.plugins.entries // {}) | .[\"lossless-claw\"] = ((.[\"lossless-claw\"\
+              ] // {}) | .enabled = true | .config = ((.config // {}) | .dbPath =\
+              \ \"/home/node/.openclaw/lcm.db\")))' \"$CONFIG_FILE\" > \"$CONFIG_FILE.tmp\"\
+              \ && mv \"$CONFIG_FILE.tmp\" \"$CONFIG_FILE\"\necho \"CephFS config\
+              \ patched\"\n\necho \"Materializing bundled OpenClaw plugin runtime\
+              \ dependencies from the Nix image...\"\nnode --input-type=module <<'NODE'\n\
+              import fs from \"node:fs\";\nimport path from \"node:path\";\nimport\
+              \ { pathToFileURL } from \"node:url\";\n\nconst packageRoot = \"/lib/openclaw\"\
+              ;\nconst bakedNodeModules = path.join(packageRoot, \"node_modules\"\
+              );\nconst distDir = \"/lib/openclaw/dist\";\nconst runtimeDepsFile =\
+              \ fs.readdirSync(distDir).find((name) =>\n  name.startsWith(\"bundled-runtime-deps-\"\
+              ) && name.endsWith(\".js\")\n);\nif (!runtimeDepsFile) {\n  throw new\
+              \ Error(\"bundled-runtime-deps module not found in \" + distDir);\n\
+              }\n\nconst runtimeDeps = await import(\n  pathToFileURL(path.join(distDir,\
               \ runtimeDepsFile)).href\n);\nconst scanBundledPluginRuntimeDeps = runtimeDeps.a;\n\
               const resolveBundledRuntimeDependencyPackageInstallRootPlan = runtimeDeps.l;\n\
               const createBundledRuntimeDepsInstallSpecs = runtimeDeps.n;\n\nif (\n\

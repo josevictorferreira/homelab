@@ -71,7 +71,6 @@ let
         {
           type = "Container";
           default = {
-            cpu = "500m";
             memory = "512Mi";
           };
           defaultRequest = {
