@@ -232,7 +232,7 @@ in
                     fi
                   done
                   echo "Applying dynamic CephFS config patches..."
-                  jq '.plugins = (.plugins // {}) | .plugins.enabled = true | .plugins.allow = (((.plugins.allow // []) + ["lossless-claw"]) | unique) | .plugins.slots = ((.plugins.slots // {}) | .memory = (.memory // "memory-core") | .contextEngine = "lossless-claw") | .plugins.entries = ((.plugins.entries // {}) | .["lossless-claw"] = ((.["lossless-claw"] // {}) | .enabled = true | .config = ((.config // {}) | .dbPath = "/home/node/.openclaw/lcm.db")))' "$CONFIG_FILE" > "$CONFIG_FILE.tmp" && mv "$CONFIG_FILE.tmp" "$CONFIG_FILE"
+                  jq '.plugins = (.plugins // {}) | .plugins.enabled = true | .plugins.allow = ((((.plugins.allow // []) - ["memory-core"]) + ["lossless-claw"]) | unique) | .plugins.slots = ((.plugins.slots // {}) | .memory = null | .contextEngine = "lossless-claw") | .plugins.entries = ((.plugins.entries // {}) | .["lossless-claw"] = ((.["lossless-claw"] // {}) | .enabled = true | .config = ((.config // {}) | .dbPath = "/home/node/.openclaw/lcm.db")))' "$CONFIG_FILE" > "$CONFIG_FILE.tmp" && mv "$CONFIG_FILE.tmp" "$CONFIG_FILE"
                   echo "CephFS config patched"
 
                   echo "Materializing bundled OpenClaw plugin runtime dependencies from the Nix image..."
