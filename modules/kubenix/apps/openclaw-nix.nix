@@ -4,7 +4,7 @@ let
   namespace = homelab.kubernetes.namespaces.applications;
   appImage = {
     repository = "ghcr.io/josevictorferreira/openclaw-nix";
-    tag = "v2026.4.29-beta.1-matrix-touch-noop-webm-audio@sha256:3e59b4ea4a5e7cf3e27b5ba4e69e180874003cce4519cc44e3d8f1f187bf8d3a";
+    tag = "v2026.4.29-matrix-touch-noop-webm-audio@sha256:3e59b4ea4a5e7cf3e27b5ba4e69e180874003cce4519cc44e3d8f1f187bf8d3a";
     pullPolicy = "Always";
   };
 in
@@ -56,7 +56,6 @@ in
       replicas = 1;
       secretName = "openclaw-config";
 
-      # Resource limits - increased to handle Matrix E2EE initialization
       resources = {
         requests = {
           cpu = "250m";
@@ -152,6 +151,7 @@ in
                 HOME = "/home/node";
                 TZ = homelab.timeZone;
                 OPENCLAW_NIX_MODE = "1";
+                OPENCLAW_TRAJECTORY = "false";
                 NPM_CONFIG_PREFIX = "/home/node/.npm-global";
                 OPENCLAW_PLUGIN_STAGE_DIR = "/tmp/openclaw-plugin-stage";
                 PIP_TARGET = "/home/node/.local/lib/python";

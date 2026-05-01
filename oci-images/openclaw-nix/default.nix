@@ -3,7 +3,7 @@
   lib,
   inputs,
   system,
-  version ? "2026.4.29-beta.1",
+  version ? "2026.4.29",
   tagSuffix ? "",
   legacyOpenClawPatches ? true,
   matrixSendQueuePatch ? true,
