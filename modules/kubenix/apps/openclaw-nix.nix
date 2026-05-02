@@ -417,6 +417,11 @@ in
                 path = "/home/node/.openclaw";
                 subPath = "openclaw";
               }
+              {
+                path = "/shared/notetaking";
+                subPath = "notetaking";
+                readOnly = true;
+              }
             ];
           };
         }
