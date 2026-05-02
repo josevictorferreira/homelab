@@ -225,6 +225,10 @@ spec:
             - mountPath: /home/node/.openclaw
               name: shared-storage
               subPath: openclaw
+            - mountPath: /shared/notetaking
+              name: shared-storage
+              readOnly: true
+              subPath: notetaking
       dnsPolicy: ClusterFirst
       enableServiceLinks: false
       hostIPC: false
