@@ -16,7 +16,7 @@ in
       spec = {
         accessModes = [ "ReadWriteOnce" ];
         storageClassName = kubenix.lib.defaultStorageClass;
-        resources.requests.storage = "10Gi";
+        resources.requests.storage = "30Gi";
       };
     };
 

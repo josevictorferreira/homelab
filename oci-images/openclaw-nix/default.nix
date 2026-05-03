@@ -3,7 +3,7 @@
   lib,
   inputs,
   system,
-  version ? "2026.5.2-beta.2",
+  version ? "2026.5.2",
   tagSuffix ? "",
   legacyOpenClawPatches ? true,
   matrixSendQueuePatch ? true,
@@ -18,7 +18,7 @@ let
     owner = "openclaw";
     repo = "openclaw";
     rev = "v${version}";
-    sha256 = "sha256-6n6fcoJkUxyL6L6Kdb56Pc/iIOA18b6gB/FCXjvH8w8=";
+    sha256 = "sha256-Yq+T+mXhNtFQfgFkRACXB58YUfEDzKUgvL/8p6L7zKU=";
     pnpmDepsHash = "sha256-8QL0qNZ2dYvlGkiWK/dFnZOHTsqK61RE20v/3+ppcD8=";
   };
 
@@ -277,115 +277,115 @@ let
     ]
   );
 
-# Inline Python scripts — extracted as pkgs.writeText to avoid PYEOF heredoc issues in Nix runCommand
-# (Nix '' string stripping leaves PYEOF indented, causing bash heredoc failure)
-losslessClawPatchScript = pkgs.writeText "openclaw-lossless-claw-patch.py" (
-  builtins.concatStringsSep "\n" [
-    "import json, sys"
-    "p = sys.argv[1]"
-    "with open(p) as f: d = json.load(f)"
-    "d[\"main\"] = \"./index.js\""
-    "if \"openclaw\" in d and \"extensions\" in d[\"openclaw\"]:"
-    "    d[\"openclaw\"][\"extensions\"] = [\"./index.js\"]"
-    "if \"dependencies\" in d:"
-    "    deps = d[\"dependencies\"]"
-    "    if deps.get(\"@mariozechner/pi-agent-core\") == \"0.66.1\":"
-    "        deps[\"@mariozechner/pi-agent-core\"] = \"0.70.2\""
-    "    if deps.get(\"@mariozechner/pi-ai\") == \"0.66.1\":"
-    "        deps[\"@mariozechner/pi-ai\"] = \"0.70.6\""
-    "    if deps.get(\"@mariozechner/pi-coding-agent\") == \"0.66.1\":"
-    "        deps[\"@mariozechner/pi-coding-agent\"] = \"0.70.6\""
-    "with open(p, \"w\") as f: json.dump(d, f, indent=2); f.write(\"\\n\")"
-  ]
-);
-memoryEmbeddingPatchScript = pkgs.writeText "openclaw-memory-embedding-activation.py" (
-  builtins.concatStringsSep "\n" [
-    "import json"
-    "import sys"
-    "from pathlib import Path"
-    ""
-    "for extensions_arg in sys.argv[1:]:"
-    "    extensions_dir = Path(extensions_arg)"
-    "    for manifest_path in extensions_dir.glob(\"*/openclaw.plugin.json\"):"
-    "        with manifest_path.open(encoding=\"utf-8\") as file:"
-    "            manifest = json.load(file)"
-    ""
-    "        contracts = manifest.get(\"contracts\")"
-    "        if not isinstance(contracts, dict) or not contracts.get(\"memoryEmbeddingProviders\"):"
-    "            continue"
-    ""
-    "        activation = manifest.setdefault(\"activation\", {})"
-    "        on_commands = activation.setdefault(\"onCommands\", [])"
-    "        if \"memory\" not in on_commands:"
-    "            on_commands.append(\"memory\")"
-    ""
-    "        with manifest_path.open(\"w\", encoding=\"utf-8\") as file:"
-    "            json.dump(manifest, file, indent=2)"
-    "            file.write(\"\\n\")"
-  ]
-);
-linkNodeModulesPatchScript = pkgs.writeText "openclaw-link-node-modules.py" (
-  builtins.concatStringsSep "\n" [
-    "import json"
-    "import os"
-    "import sys"
-    "from pathlib import Path"
-    ""
-    "root_node_modules = Path(sys.argv[1])"
-    ""
-    "def dependency_names(package_json):"
-    "    names = []"
-    "    for field in (\"dependencies\", \"optionalDependencies\"):"
-    "        deps = package_json.get(field)"
-    "        if isinstance(deps, dict):"
-    "            names.extend(name for name in deps if isinstance(name, str))"
-    "    return names"
-    ""
-    "def link_dependency(plugin_dir, dep_name):"
-    "    target = root_node_modules.joinpath(*dep_name.split(\"/\"))"
-    "    if not (target / \"package.json\").exists():"
-    "        return"
-    ""
-    "    link_path = plugin_dir.joinpath(\"node_modules\", *dep_name.split(\"/\"))"
-    "    if link_path.exists():"
-    "        return"
-    "    if link_path.is_symlink():"
-    "        link_path.unlink()"
-    ""
-    "    link_path.parent.mkdir(parents=True, exist_ok=True)"
-    "    os.symlink(os.path.relpath(target, link_path.parent), link_path)"
-    ""
-    "for extensions_arg in sys.argv[2:]:"
-    "    extensions_dir = Path(extensions_arg)"
-    "    for package_path in extensions_dir.glob(\"*/package.json\"):"
-    "        with package_path.open(encoding=\"utf-8\") as file:"
-    "            package_json = json.load(file)"
-    ""
-    "        for dep_name in dependency_names(package_json):"
-    "            link_dependency(package_path.parent, dep_name)"
-  ]
-);
-runtimeAliasesPatchScript = pkgs.writeText "openclaw-runtime-aliases.py" (
-  builtins.concatStringsSep "\n" [
-    "import re"
-    "import sys"
-    "from pathlib import Path"
-    ""
-    "dist_dir = Path(sys.argv[1])"
-    "pattern = re.compile(r\"^(?P<base>.+\\.(?:runtime|contract))-[A-Za-z0-9_-]+\\.js$\")"
-    ""
-    "for chunk_path in sorted(dist_dir.iterdir()):"
-    "    if not chunk_path.is_file():"
-    "        continue"
-    ""
-    "    match = pattern.match(chunk_path.name)"
-    "    if not match:"
-    "        continue"
-    ""
-    "    alias_path = dist_dir / f\"{match.group('base')}.js\""
-    "    alias_path.write_text(f'export * from \"./{chunk_path.name}\";\\n', encoding=\"utf-8\")"
-  ]
-);
+  # Inline Python scripts — extracted as pkgs.writeText to avoid PYEOF heredoc issues in Nix runCommand
+  # (Nix '' string stripping leaves PYEOF indented, causing bash heredoc failure)
+  losslessClawPatchScript = pkgs.writeText "openclaw-lossless-claw-patch.py" (
+    builtins.concatStringsSep "\n" [
+      "import json, sys"
+      "p = sys.argv[1]"
+      "with open(p) as f: d = json.load(f)"
+      "d[\"main\"] = \"./index.js\""
+      "if \"openclaw\" in d and \"extensions\" in d[\"openclaw\"]:"
+      "    d[\"openclaw\"][\"extensions\"] = [\"./index.js\"]"
+      "if \"dependencies\" in d:"
+      "    deps = d[\"dependencies\"]"
+      "    if deps.get(\"@mariozechner/pi-agent-core\") == \"0.66.1\":"
+      "        deps[\"@mariozechner/pi-agent-core\"] = \"0.70.2\""
+      "    if deps.get(\"@mariozechner/pi-ai\") == \"0.66.1\":"
+      "        deps[\"@mariozechner/pi-ai\"] = \"0.70.6\""
+      "    if deps.get(\"@mariozechner/pi-coding-agent\") == \"0.66.1\":"
+      "        deps[\"@mariozechner/pi-coding-agent\"] = \"0.70.6\""
+      "with open(p, \"w\") as f: json.dump(d, f, indent=2); f.write(\"\\n\")"
+    ]
+  );
+  memoryEmbeddingPatchScript = pkgs.writeText "openclaw-memory-embedding-activation.py" (
+    builtins.concatStringsSep "\n" [
+      "import json"
+      "import sys"
+      "from pathlib import Path"
+      ""
+      "for extensions_arg in sys.argv[1:]:"
+      "    extensions_dir = Path(extensions_arg)"
+      "    for manifest_path in extensions_dir.glob(\"*/openclaw.plugin.json\"):"
+      "        with manifest_path.open(encoding=\"utf-8\") as file:"
+      "            manifest = json.load(file)"
+      ""
+      "        contracts = manifest.get(\"contracts\")"
+      "        if not isinstance(contracts, dict) or not contracts.get(\"memoryEmbeddingProviders\"):"
+      "            continue"
+      ""
+      "        activation = manifest.setdefault(\"activation\", {})"
+      "        on_commands = activation.setdefault(\"onCommands\", [])"
+      "        if \"memory\" not in on_commands:"
+      "            on_commands.append(\"memory\")"
+      ""
+      "        with manifest_path.open(\"w\", encoding=\"utf-8\") as file:"
+      "            json.dump(manifest, file, indent=2)"
+      "            file.write(\"\\n\")"
+    ]
+  );
+  linkNodeModulesPatchScript = pkgs.writeText "openclaw-link-node-modules.py" (
+    builtins.concatStringsSep "\n" [
+      "import json"
+      "import os"
+      "import sys"
+      "from pathlib import Path"
+      ""
+      "root_node_modules = Path(sys.argv[1])"
+      ""
+      "def dependency_names(package_json):"
+      "    names = []"
+      "    for field in (\"dependencies\", \"optionalDependencies\"):"
+      "        deps = package_json.get(field)"
+      "        if isinstance(deps, dict):"
+      "            names.extend(name for name in deps if isinstance(name, str))"
+      "    return names"
+      ""
+      "def link_dependency(plugin_dir, dep_name):"
+      "    target = root_node_modules.joinpath(*dep_name.split(\"/\"))"
+      "    if not (target / \"package.json\").exists():"
+      "        return"
+      ""
+      "    link_path = plugin_dir.joinpath(\"node_modules\", *dep_name.split(\"/\"))"
+      "    if link_path.exists():"
+      "        return"
+      "    if link_path.is_symlink():"
+      "        link_path.unlink()"
+      ""
+      "    link_path.parent.mkdir(parents=True, exist_ok=True)"
+      "    os.symlink(os.path.relpath(target, link_path.parent), link_path)"
+      ""
+      "for extensions_arg in sys.argv[2:]:"
+      "    extensions_dir = Path(extensions_arg)"
+      "    for package_path in extensions_dir.glob(\"*/package.json\"):"
+      "        with package_path.open(encoding=\"utf-8\") as file:"
+      "            package_json = json.load(file)"
+      ""
+      "        for dep_name in dependency_names(package_json):"
+      "            link_dependency(package_path.parent, dep_name)"
+    ]
+  );
+  runtimeAliasesPatchScript = pkgs.writeText "openclaw-runtime-aliases.py" (
+    builtins.concatStringsSep "\n" [
+      "import re"
+      "import sys"
+      "from pathlib import Path"
+      ""
+      "dist_dir = Path(sys.argv[1])"
+      "pattern = re.compile(r\"^(?P<base>.+\\.(?:runtime|contract))-[A-Za-z0-9_-]+\\.js$\")"
+      ""
+      "for chunk_path in sorted(dist_dir.iterdir()):"
+      "    if not chunk_path.is_file():"
+      "        continue"
+      ""
+      "    match = pattern.match(chunk_path.name)"
+      "    if not match:"
+      "        continue"
+      ""
+      "    alias_path = dist_dir / f\"{match.group('base')}.js\""
+      "    alias_path.write_text(f'export * from \"./{chunk_path.name}\";\\n', encoding=\"utf-8\")"
+    ]
+  );
   rolldown = pkgs.stdenv.mkDerivation {
     pname = "rolldown";
     version = "1.0.0-rc.3";
@@ -518,9 +518,9 @@ runtimeAliasesPatchScript = pkgs.writeText "openclaw-runtime-aliases.py" (
   # Lossless-claw plugin info — change version to upgrade
   # Update: version, sha256, npmDepsHash, and optionally dep versions + lock file
   losslessClawInfo = {
-    version = "0.9.2";
-    sha256 = "sha256-4PDGO5RHzDb//x3f0JkYjtKbDi5IOHl9HVdt5M8eA64=";
-    npmDepsHash = "sha256-krIx9psuqvRa6mK7hk+P/uRgX/S0Gcru65wfpmgDPd0=";
+    version = "0.9.3";
+    sha256 = "sha256-cqmuQZCsrOBoKz/DZCB/cpxvldHxLxwjXoQZ52y2Aug=";
+    npmDepsHash = "sha256-2Zvvd22WbueGSxfmjVlz6+5zqvTYI6A1NAsRMppuyfk=";
   };
   losslessClawSource = pkgs.fetchurl {
     url = "https://registry.npmjs.org/@martian-engineering/lossless-claw/-/lossless-claw-${losslessClawInfo.version}.tgz";

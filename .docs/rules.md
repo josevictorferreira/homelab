@@ -323,9 +323,9 @@
 **Verify:** `kubectl get deployment <name> -n <ns> -o jsonpath='{.spec.strategy}'` shows correct values.
 
 ### Zero-Downtime Large Image Upgrades Pattern
-**Lesson:** For large images (6GB+), use `RollingUpdate` strategy with `maxUnavailable: 0` and add a `readinessProbe`. Kubernetes keeps the old pod running while the new pod pulls the image, then switches traffic automatically when ready.
-**Context:** Without this, upgrades cause 15+ minute downtime while the image pulls. With rolling updates, service stays available throughout.
-**Verify:** During upgrade: `kubectl get pods -n <ns>` shows two pods (old Running, new ContainerCreating), then traffic switches when new pod passes readiness probe.
+**Lesson:** For large images (2GB+), expect image pulls to exceed Deployment `progressDeadlineSeconds`; do not treat `ProgressDeadlineExceeded` as failure unless pod events show pull/runtime errors.
+**Context:** OpenClaw v2026.5.2 pulled a 2.3GB image for ~13 minutes, `rollout status` timed out, then the pod became healthy without intervention.
+**Verify:** Check pod events for `Pulling`/`Pulled`, then require `kubectl get pod` `2/2 Running`, zero restarts, logs `[gateway] ready`, and `/health` returns `{"ok":true,"status":"live"}`.
 
 ## Kubernetes Operations
 

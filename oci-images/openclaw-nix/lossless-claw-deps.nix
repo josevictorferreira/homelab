@@ -11,9 +11,6 @@ let
           build = "echo 'No build needed'";
         };
         dependencies = {
-          "@mariozechner/pi-agent-core" = "0.70.2";
-          "@mariozechner/pi-ai" = "0.70.6";
-          "@mariozechner/pi-coding-agent" = "0.70.6";
           "@sinclair/typebox" = "0.34.48";
         };
       }
@@ -22,7 +19,7 @@ let
     postPatch = ''
       cp ${./lossless-claw-package-lock.json} package-lock.json
     '';
-    npmDepsHash = "sha256-krIx9psuqvRa6mK7hk+P/uRgX/S0Gcru65wfpmgDPd0="; # Keep in sync with losslessClawInfo.npmDepsHash
+    npmDepsHash = "sha256-2Zvvd22WbueGSxfmjVlz6+5zqvTYI6A1NAsRMppuyfk="; # Keep in sync with losslessClawInfo.npmDepsHash
     dontNpmBuild = true;
     installPhase = ''
       mkdir -p $out/lossless-claw-deps
