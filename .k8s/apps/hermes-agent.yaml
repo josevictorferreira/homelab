@@ -87,7 +87,6 @@ spec:
               subPath: hermes
             - mountPath: /shared/notetaking
               name: hermes-data
-              readOnly: true
               subPath: notetaking
             - mountPath: /usr/local/bin/hermes
               name: cli-wrapper
@@ -173,7 +172,6 @@ spec:
               subPath: hermes
             - mountPath: /shared/notetaking
               name: hermes-data
-              readOnly: true
               subPath: notetaking
             - mountPath: /usr/local/bin/hermes
               name: cli-wrapper
