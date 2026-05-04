@@ -3,7 +3,7 @@
   lib,
   inputs,
   system,
-  version ? "2026.5.2",
+  version ? "2026.5.3",
   tagSuffix ? "",
   legacyOpenClawPatches ? true,
   matrixSendQueuePatch ? true,
@@ -18,8 +18,8 @@ let
     owner = "openclaw";
     repo = "openclaw";
     rev = "v${version}";
-    sha256 = "sha256-Yq+T+mXhNtFQfgFkRACXB58YUfEDzKUgvL/8p6L7zKU=";
-    pnpmDepsHash = "sha256-8QL0qNZ2dYvlGkiWK/dFnZOHTsqK61RE20v/3+ppcD8=";
+    sha256 = "sha256-6WIjb/0dFuGPtXnzpUCrkZ7RYEiRttOTc9Jc0OKbfdE=";
+    pnpmDepsHash = "sha256-b2gCWbAC2Y8xWtRh3jxbnU2VhXICqqbH1zyJCbdjSwM=";
   };
 
   # Rolldown 1.0.0-rc.3 — pre-built from npm registry
@@ -502,7 +502,8 @@ let
     else
       openclawGatewayBase;
 
-  # lancedb-deps removed - memory-lancedb extension skipped due to missing native bindings
+  # memory-lancedb native deps are bundled in upstream root node_modules.
+  # Link them into the plugin roots below instead of using stale local deps.
   inherit (import ./matrix-deps.nix { inherit pkgs lib; }) matrixPluginDeps;
   inherit
     (import ./lossless-claw-deps.nix {
@@ -629,8 +630,8 @@ let
               chmod -R u+w $out/lib/openclaw/dist/extensions/ || true
               for extdir in $out/lib/openclaw/extensions/*/; do
                 extname=$(basename "$extdir")
-                # Skip memory-lancedb (native bindings not available) and lossless-claw (pre-built from npm)
-                if [ "$extname" = "memory-lancedb" ] || [ "$extname" = "lossless-claw" ]; then
+                # Skip lossless-claw (pre-built from npm)
+                if [ "$extname" = "lossless-claw" ]; then
                   continue
                 fi
                 mkdir -p "$out/lib/openclaw/dist/extensions/$extname"
@@ -685,9 +686,19 @@ let
                 break
               fi
             done
-            # Remove memory-lancedb from both extensions dirs - native bindings not available
-            chmod -R u+w $out/lib/openclaw/extensions/memory-lancedb $out/lib/openclaw/dist/extensions/memory-lancedb 2>/dev/null || true
-            rm -rf $out/lib/openclaw/extensions/memory-lancedb $out/lib/openclaw/dist/extensions/memory-lancedb || true
+            # memory-lancedb is bundled as TypeScript source with native deps in root node_modules.
+            # The plugin manifest points at ./index.ts, so copy only its runtime TS files into dist.
+            if [ -d "$out/lib/openclaw/extensions/memory-lancedb" ]; then
+              mkdir -p "$out/lib/openclaw/dist/extensions/memory-lancedb"
+              chmod -R u+w "$out/lib/openclaw/extensions/memory-lancedb" "$out/lib/openclaw/dist/extensions/memory-lancedb" 2>/dev/null || true
+              for file in api.ts cli-metadata.ts config.ts index.ts lancedb-runtime.ts; do
+                if [ -f "$out/lib/openclaw/extensions/memory-lancedb/$file" ]; then
+                  cp "$out/lib/openclaw/extensions/memory-lancedb/$file" "$out/lib/openclaw/dist/extensions/memory-lancedb/$file"
+                fi
+              done
+              cp "$out/lib/openclaw/extensions/memory-lancedb/openclaw.plugin.json" "$out/lib/openclaw/dist/extensions/memory-lancedb/openclaw.plugin.json" 2>/dev/null || true
+              cp "$out/lib/openclaw/extensions/memory-lancedb/package.json" "$out/lib/openclaw/dist/extensions/memory-lancedb/package.json" 2>/dev/null || true
+            fi
             # Do NOT copy/modify dist/package.json.
             # The upstream build places its own package.json in dist/ (if any).
             # findPackageRootSync walks up looking for name:"openclaw" — if it finds

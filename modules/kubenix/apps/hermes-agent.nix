@@ -13,6 +13,12 @@ let
       mountPath = "/opt/data";
       subPath = "hermes";
     }
+    {
+      name = "hermes-data";
+      mountPath = "/shared/notetaking";
+      subPath = "notetaking";
+      readOnly = true;
+    }
   ];
   dataVolumes = [
     {

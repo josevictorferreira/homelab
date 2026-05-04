@@ -134,7 +134,7 @@
           openclawNixImage = import ./oci-images/openclaw-nix {
             pkgs = sysPkgs;
             inherit lib inputs system;
-            tagSuffix = "-matrix-touch-noop-webm-audio";
+            tagSuffix = "-matrix-touch-noop-webm-audio-lancedb";
             disableMatrixCredentialTouch = false;
           };
         in

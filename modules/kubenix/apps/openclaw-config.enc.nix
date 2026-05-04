@@ -620,10 +620,22 @@ let
           "#alerts:josevictor.me" = {
             enabled = true;
             requireMention = false;
-            allowFrom = [
-              "@homelab-bridge:josevictor.me"
-              "@zeh:josevictor.me"
-            ];
+          };
+          "#kira:josevictor.me" = {
+            enabled = true;
+            requireMention = false;
+          };
+          "#luna:josevictor.me" = {
+            enabled = true;
+            requireMention = false;
+          };
+          "#mel:josevictor.me" = {
+            enabled = true;
+            requireMention = false;
+          };
+          "#spike:josevictor.me" = {
+            enabled = true;
+            requireMention = false;
           };
         };
         mediaMaxMb = 150;
