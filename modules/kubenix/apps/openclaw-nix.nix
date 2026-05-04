@@ -5,7 +5,7 @@ let
   enableTailscaleSidecar = false;
   appImage = {
     repository = "ghcr.io/josevictorferreira/openclaw-nix";
-    tag = "v2026.5.2-matrix-touch-noop-webm-audio@sha256:91af13f234d4bd42302289e60d5665900d8fc2a83b0f2965985f3ce4c2bd40e4";
+    tag = "v2026.5.3-matrix-touch-noop-webm-audio-lancedb@sha256:f51f7e830d8818a9c89134ca03b04291c43d1ed606c932c67aef0ec4568b2ce7";
     pullPolicy = "Always";
   };
 in
@@ -144,7 +144,7 @@ in
                 PIP_TARGET = "/data/local/lib/python";
                 PYTHONPATH = "/data/local/lib/python";
                 PATH = "/data/local/bin:/data/npm-global/bin:/bin:/usr/bin";
-                NODE_PATH = "/lib/openclaw/extensions/matrix/node_modules:/lib/openclaw/node_modules";
+                NODE_PATH = "/lib/openclaw/extensions/memory-lancedb/node_modules:/lib/openclaw/dist/extensions/memory-lancedb/node_modules:/lib/openclaw/extensions/matrix/node_modules:/lib/openclaw/node_modules";
                 MATRIX_MEL_ACCESS_TOKEN = {
                   valueFrom.secretKeyRef = {
                     name = "openclaw-config";
