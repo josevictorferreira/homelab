@@ -17,7 +17,6 @@ let
       name = "hermes-data";
       mountPath = "/shared/notetaking";
       subPath = "notetaking";
-      readOnly = true;
     }
   ];
   dataVolumes = [
