@@ -3,7 +3,7 @@
   lib,
   inputs,
   system,
-  version ? "2026.5.3",
+  version ? "2026.5.4",
   tagSuffix ? "",
   legacyOpenClawPatches ? true,
   matrixSendQueuePatch ? true,
@@ -18,8 +18,8 @@ let
     owner = "openclaw";
     repo = "openclaw";
     rev = "v${version}";
-    sha256 = "sha256-6WIjb/0dFuGPtXnzpUCrkZ7RYEiRttOTc9Jc0OKbfdE=";
-    pnpmDepsHash = "sha256-b2gCWbAC2Y8xWtRh3jxbnU2VhXICqqbH1zyJCbdjSwM=";
+    sha256 = "sha256-hT/URmVBQuwlYMkZsMdiwVauHQlhVTCXRovSdhmKoSw=";
+    pnpmDepsHash = "sha256-kz9vE1A/GTkw/HH2ts4hxTJzrdkYhiLaJQP0AeAS3Bo=";
   };
 
   # Rolldown 1.0.0-rc.3 — pre-built from npm registry
@@ -553,6 +553,7 @@ let
       (pkgs.python3.withPackages (ps: [
         ps.pip
         ps.requests
+        ps.python-dateutil
       ]))
       pkgs.uv
       pkgs.ffmpeg-headless
