@@ -97,7 +97,7 @@ in
                 }
                 {
                   name = "HERMES_GID";
-                  value = "10000";
+                  value = "2002";
                 }
                 {
                   name = "HERMES_HOME";
@@ -202,7 +202,7 @@ in
                 }
                 {
                   name = "HERMES_GID";
-                  value = "10000";
+                  value = "2002";
                 }
                 {
                   name = "HERMES_HOME";
