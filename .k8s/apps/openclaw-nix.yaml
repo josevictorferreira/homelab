@@ -58,7 +58,7 @@ spec:
               value: /home/node/.chromium
             - name: TMPDIR
               value: /tmp
-          image: ghcr.io/josevictorferreira/openclaw-nix:v2026.5.4-matrix-touch-noop-webm-audio-lancedb@sha256:96b84dfda46b13b3878b202d0f321307a8cbff12fa038076a86b02e3068c3fc7
+          image: ghcr.io/josevictorferreira/openclaw-nix:v2026.5.5-matrix-touch-noop-webm-audio-lancedb@sha256:d334dc72a7fb4aa11655250e1d18d8d17d84f52bbd6077ed848c52732a880ce9
           imagePullPolicy: Always
           livenessProbe:
             exec:
@@ -181,7 +181,7 @@ spec:
           envFrom:
             - secretRef:
                 name: openclaw-config
-          image: ghcr.io/josevictorferreira/openclaw-nix:v2026.5.4-matrix-touch-noop-webm-audio-lancedb@sha256:96b84dfda46b13b3878b202d0f321307a8cbff12fa038076a86b02e3068c3fc7
+          image: ghcr.io/josevictorferreira/openclaw-nix:v2026.5.5-matrix-touch-noop-webm-audio-lancedb@sha256:d334dc72a7fb4aa11655250e1d18d8d17d84f52bbd6077ed848c52732a880ce9
           imagePullPolicy: Always
           name: main
           ports:
