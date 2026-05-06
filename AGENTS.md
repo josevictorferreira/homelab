@@ -211,6 +211,26 @@ Our cluster is deployed and accessible in the user system kubectl, the context a
 **Context:** `openclaw-nix` exposes secret-bearing env vars, and diagnostic output can leak them into transcripts.
 **Verify:** Use allowlisted commands like `kubectl exec ... -- sh -c 'printf "%s\n" "$OPENCLAW_PLUGIN_STAGE_DIR"'` instead of full environment dumps.
 
+### OpenClaw Matrix m.direct Can Go Stale
+**Lesson:** If a Matrix agent acks but does not reply, compare its session key with working agents and inspect the bot's `m.direct` account data for the current room ID.
+**Context:** Stale `m.direct` data made `mel` classify a 2-person DM as `matrix:channel:<room-id>`, while working agents used `matrix:<account>:direct:@user`.
+**Verify:** `GET /_matrix/client/v3/user/<bot>/account_data/m.direct` includes the current `!roomId` under the peer user.
+
+### Debug OpenClaw Matrix Delivery Before Model Runtime
+**Lesson:** Check Matrix room history for `m.reaction` vs `m.room.message`, then compare OpenClaw session kind (`direct` vs `channel`) before blaming model/provider failures.
+**Context:** `mel` generated transcript text and sent 👀 reactions, but no text message; the issue was routing/classification after generation.
+**Verify:** `openclaw sessions --agent <agent> --active 120 --json` and Matrix `/rooms/<room>/messages` show whether generated text became an outbound message.
+
+### Use Allowlisted OpenClaw Config Reads
+**Lesson:** Never dump broad `openclaw.json` sections or unconstrained `jq paths`; query only explicit non-secret fields.
+**Context:** Live OpenClaw config contains provider API keys and Matrix access tokens, and broad structural inspection can leak values into transcripts.
+**Verify:** Project queries should redact or avoid `.channels.matrix.accounts.*.accessToken`, provider `apiKey`, and secret-bearing config subtrees.
+
+### Source-Only OpenClaw Plugins Need dist Entries
+**Lesson:** For bundled OpenClaw plugins whose `openclaw.plugin.json` points at `./index.ts`, explicitly copy the runtime TS files into `dist/extensions/<plugin>/` and validate native imports.
+**Context:** `memory-lancedb` in OpenClaw 2026.5.3 had no compiled dist plugin, but its native LanceDB deps already existed in root `node_modules`.
+**Verify:** `podman run --rm --entrypoint '' <image> test -f /lib/openclaw/dist/extensions/<plugin>/index.ts` and run a Node import check for native deps.
+
 ## INCIDENT RECORD
 
 ### 2026-01-27: CephFS Data Loss
