@@ -344,12 +344,22 @@
 **Context:** Scaled down Synapse to free PVC for migration, but Flux auto-scaled it back up. Either suspend the Flux Kustomization (`flux suspend kustomization <name>`) or accept the race condition and retry.
 **Verify:** After scaling down: `flux suspend kustomization apps -n flux-system` before starting manual PVC operations.
 
+### RBD VolumeAttachment Survives Cross-Node Force-Delete
+**Lesson:** Force-deleting a pod with RWO PVCs on one node and recreating on another causes Multi-Attach errors. Deleting Kubernetes `VolumeAttachment` resources does NOT release Ceph-side RBD watchers. Either: (1) wait 30-60s for RBD lock timeout, or (2) use rook-ceph-tools: `rbd lock ls replicapool/<image>` then `rbd lock remove` or `rbd feature disable exclusive-lock`.
+**Context:** OpenClaw pod force-deleted on lab-beta-cp, recreated on lab-gamma-wk. Both PVCs got stuck with "rbd image is still being used" for 6+ minutes despite VolumeAttachment cleanup.
+**Verify:** `kubectl exec -n rook-ceph deploy/rook-ceph-tools -- rbd status replicapool/csi-vol-<id>` — watcher should be on the NEW node, not the old one.
+
 ## Podman OCI Image Management
 
 ### Podman Push Silently Pushes Stale Image Due to GHCR Tag Collision
 **Lesson:** After `podman tag localhost/image:tag ghcr.io/.../image:tag`, a subsequent `podman pull ghcr.io/...` (e.g., to verify) overwrites the local GHCR tag with the REMOTE stale version. Always: (1) `podman rmi ghcr.io/...` to clear cached tag, (2) `podman tag localhost/...` to retag from local, (3) verify image ID with `podman images`, (4) push with `--format oci`.
 **Context:** Pushed openclaw-nix image that appeared correct but cluster pulled a stale version because podman's local GHCR tag pointed to the remote's old manifest, not the locally built image.
 **Verify:** `podman images | grep <ghcr-tag>` — IMAGE ID must match `localhost/` build before pushing.
+
+### Verify Remote Digest After Push — Local ≠ Remote
+**Lesson:** After `podman push`, always verify the remote digest with `skopeo inspect --format "{{.Digest}}" docker://<tag>` or `podman pull` + `podman images --digests`. The local digest from `streamLayeredImage` can differ from the remote digest computed by the registry.
+**Context:** Pinned `sha256:3f864ce` (local) in the manifest; remote was `sha256:96b84df`. Cluster pods got "not found" for 20 minutes. `make push-openclaw` auto-pin with `skopeo inspect` timed out, leaving the wrong local digest committed.
+**Verify:** After push: `podman pull ghcr.io/.../image:tag && podman images --digests | grep <tag>` — digest must match the one in `modules/kubenix/apps/openclaw-nix.nix`.
 
 ### Trace Full imageTag Computation Before Changing Version Strings
 **Lesson:** When bumping container image versions, trace the full tag computation chain (`version` → `imageTag` → pushed tag → K8s manifest tag). Changing version in one place without understanding the formula can produce unexpected tags like `v2026.3.2-v2-v2` (double suffix).
