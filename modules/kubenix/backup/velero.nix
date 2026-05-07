@@ -20,7 +20,7 @@ in
         volumeSnapshotLocation = [ ];
       };
 
-      deployNodeAgent = true;
+      deployNodeAgent = false;
 
       metrics = {
         enabled = true;
@@ -30,7 +30,7 @@ in
           autodetect = true;
         };
         nodeAgentPodMonitor = {
-          enabled = true;
+          enabled = false;
         };
       };
 
