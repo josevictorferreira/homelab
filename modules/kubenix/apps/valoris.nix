@@ -26,21 +26,19 @@ in
             memory = "256Mi";
           };
         };
+        priorityClassName = "preemptible";
         values = {
           defaultPodOptions.imagePullSecrets = [
             { name = "ghcr-registry-secret"; }
           ];
-          controllers.main = {
-            replicas = 0;
-            containers.main = {
-              envFrom = [
-                { secretRef.name = secretName; }
-                { secretRef.name = "valoris-s3"; }
-              ];
-              env = {
-                KEYCLOAK_AUTHORITY.value = "https://identity.josevictor.me/realms/valoris";
-                KEYCLOAK_CLIENT_ID.value = "valoris-frontend";
-              };
+          controllers.main.containers.main = {
+            envFrom = [
+              { secretRef.name = secretName; }
+              { secretRef.name = "valoris-s3"; }
+            ];
+            env = {
+              KEYCLOAK_AUTHORITY.value = "https://identity.josevictor.me/realms/valoris";
+              KEYCLOAK_CLIENT_ID.value = "valoris-frontend";
             };
           };
         };
@@ -72,22 +70,20 @@ in
             memory = "256Mi";
           };
         };
+        priorityClassName = "preemptible";
         values = {
           defaultPodOptions.imagePullSecrets = [
             { name = "ghcr-registry-secret"; }
           ];
-          controllers.main = {
-            replicas = 0;
-            containers.main = {
-              envFrom = [
-                { secretRef.name = secretName; }
-                { secretRef.name = "valoris-s3"; }
-              ];
-              env = {
-                KEYCLOAK_ISSUER.value = "https://identity.josevictor.me/realms/valoris";
-                KEYCLOAK_JWKS_URL.value = "http://keycloak.apps.svc.cluster.local:8080/realms/valoris/protocol/openid-connect/certs";
-                KEYCLOAK_AZP.value = "valoris-frontend";
-              };
+          controllers.main.containers.main = {
+            envFrom = [
+              { secretRef.name = secretName; }
+              { secretRef.name = "valoris-s3"; }
+            ];
+            env = {
+              KEYCLOAK_ISSUER.value = "https://identity.josevictor.me/realms/valoris";
+              KEYCLOAK_JWKS_URL.value = "http://keycloak.apps.svc.cluster.local:8080/realms/valoris/protocol/openid-connect/certs";
+              KEYCLOAK_AZP.value = "valoris-frontend";
             };
           };
         };
@@ -109,18 +105,16 @@ in
           "bin/jobs"
           "start"
         ];
+        priorityClassName = "preemptible";
         values = {
           defaultPodOptions.imagePullSecrets = [
             { name = "ghcr-registry-secret"; }
           ];
-          controllers.main = {
-            replicas = 0;
-            containers.main = {
-              envFrom = [
-                { secretRef.name = secretName; }
-                { secretRef.name = "valoris-s3"; }
-              ];
-            };
+          controllers.main.containers.main = {
+            envFrom = [
+              { secretRef.name = secretName; }
+              { secretRef.name = "valoris-s3"; }
+            ];
           };
         };
       };

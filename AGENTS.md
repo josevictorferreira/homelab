@@ -231,6 +231,16 @@ Our cluster is deployed and accessible in the user system kubectl, the context a
 **Context:** `memory-lancedb` in OpenClaw 2026.5.3 had no compiled dist plugin, but its native LanceDB deps already existed in root `node_modules`.
 **Verify:** `podman run --rm --entrypoint '' <image> test -f /lib/openclaw/dist/extensions/<plugin>/index.ts` and run a Node import check for native deps.
 
+### Push Multi-GB OCI Images via Background nohup
+**Lesson:** `podman push` for openclaw-nix-sized images (~7GB) routinely exceeds 10-minute Bash timeouts. Always launch with `nohup podman push --format oci ... > /tmp/opencode/push.log 2>&1 &` and poll `kill -0 $PID` in a loop with a 30-minute budget.
+**Context:** A foreground push hit the 600000ms tool timeout mid-blob, leaving GHCR with `manifest unknown`. Diagnosis + retry cost ~15 min that a background launch would have avoided.
+**Verify:** After completion, `podman pull <ghcr-tag>` succeeds and `podman images --digests <repo>` shows the expected sha256.
+
+### openclaw-nix Pod Has Two Containers — Use `-c main` for App Commands
+**Lesson:** The openclaw-nix pod runs `chromium` first and `main` second. `kubectl exec deploy/openclaw-nix -- ...` defaults to `chromium`, which lacks app tooling. Always pass `-c main` for `/health`, `openclaw`, log inspection, etc.
+**Context:** A health probe via `kubectl exec deploy/openclaw-nix` failed with "container chromium is not valid for pod" because the default container had no curl/openclaw binary.
+**Verify:** `kubectl get pod <pod> -n apps -o jsonpath='{range .spec.containers[*]}{.name}{"\n"}{end}'` lists `chromium` then `main`.
+
 ## INCIDENT RECORD
 
 ### 2026-01-27: CephFS Data Loss

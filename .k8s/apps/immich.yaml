@@ -14,7 +14,7 @@ metadata:
   name: immich-machine-learning
   namespace: apps
 spec:
-  replicas: 0
+  replicas: 1
   revisionHistoryLimit: 3
   selector:
     matchLabels:
@@ -96,6 +96,7 @@ spec:
       hostPID: false
       nodeSelector:
         node.kubernetes.io/amd-gpu: 'true'
+      priorityClassName: preemptible
       serviceAccountName: default
       volumes:
         - name: cache
@@ -118,7 +119,7 @@ metadata:
   name: immich-server
   namespace: apps
 spec:
-  replicas: 0
+  replicas: 1
   revisionHistoryLimit: 3
   selector:
     matchLabels:
@@ -204,6 +205,7 @@ spec:
       hostIPC: false
       hostNetwork: false
       hostPID: false
+      priorityClassName: preemptible
       serviceAccountName: default
       volumes:
         - configMap:

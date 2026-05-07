@@ -59,6 +59,7 @@ spec:
           volumeMounts:
             - mountPath: /app/data
               name: storage
+      priorityClassName: preemptible
       securityContext: {}
       serviceAccountName: default
       volumes:

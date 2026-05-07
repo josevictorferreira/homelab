@@ -19,5 +19,11 @@
       globalDefault = false;
       description = "Batch jobs and non-critical services";
     };
+    preemptible = {
+      metadata.name = "preemptible";
+      value = 100;
+      globalDefault = false;
+      description = "Nice-to-have services that yield to higher-priority workloads when capacity is constrained";
+    };
   };
 }

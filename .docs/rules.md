@@ -556,3 +556,10 @@
 **Lesson:** Before building a custom OCI image that fetches upstream source, verify the tag actually exists: `git ls-remote --tags <upstream-url> "refs/tags/v<version>"`. A mismatch between the stored hash and the version string will cause build failures at fetch time.
 **Context:** Local derivation had `version = "2026.4.27"` but the hash was for `v2026.4.26` tarball. The v2026.4.27 tag didn't exist upstream, causing 404 during `nix build`. Wasted time investigating SSL/curl errors when the real issue was a non-existent tag.
 **Verify:** `git ls-remote --tags https://github.com/<org>/<repo> "refs/tags/v<version>"` returns a result before building.
+
+## Network Troubleshooting
+
+### Unreachable Node ≠ Broken Node — Check Switch Port First
+**Lesson:** When a node becomes unreachable from kubectl/SSH but boots fine at the local console with no failed units, suspect L1 (cable/switch port/NIC) before NixOS/k3s. A dead switch port mimics a node failure perfectly from the cluster's perspective — the node looks down to peers, the API server can't reach it, and Ceph mons/OSDs flag it offline.
+**Context:** `lab-beta-cp` appeared down to the cluster and refused SSH. At the console it booted cleanly with `systemctl is-system-running` healthy and no failed units. Moving the ethernet cable to a different switch port immediately restored cluster membership.
+**Verify:** From another node: `ping <ip> && ip neigh show <ip>` — no ARP reply means L2 unreachable. From the suspect node's console: `ip -br link` shows `NO-CARRIER`, `ethtool <iface>` shows `Link detected: no`. Try a different cable AND a different switch port before deeper debugging.

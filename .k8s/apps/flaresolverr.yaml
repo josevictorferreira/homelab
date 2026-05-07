@@ -7,7 +7,7 @@ metadata:
   name: flaresolverr
   namespace: apps
 spec:
-  replicas: 0
+  replicas: 1
   selector:
     matchLabels:
       app: flaresolverr
@@ -52,6 +52,7 @@ spec:
             capabilities:
               drop:
                 - ALL
+      priorityClassName: preemptible
       terminationGracePeriodSeconds: 60
 ---
 apiVersion: v1
