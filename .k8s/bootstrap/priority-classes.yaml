@@ -30,3 +30,15 @@ metadata:
     kubenix/project-name: ze-homelab
   name: medium-priority
 value: 100000
+---
+apiVersion: scheduling.k8s.io/v1
+description: Nice-to-have services that yield to higher-priority workloads when capacity
+  is constrained
+globalDefault: false
+kind: PriorityClass
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: preemptible
+value: 100

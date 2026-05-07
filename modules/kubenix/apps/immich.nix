@@ -48,8 +48,11 @@ in
           enabled = true;
 
           controllers.main = {
-            replicas = 0;
-            pod.nodeSelector."node.kubernetes.io/amd-gpu" = "true";
+            replicas = 1;
+            pod = {
+              priorityClassName = "preemptible";
+              nodeSelector."node.kubernetes.io/amd-gpu" = "true";
+            };
             containers.main = {
               image = {
                 repository = "ghcr.io/immich-app/immich-machine-learning";
@@ -84,7 +87,10 @@ in
 
         server = {
           enabled = true;
-          controllers.main.replicas = 0;
+          controllers.main = {
+            replicas = 1;
+            pod.priorityClassName = "preemptible";
+          };
           controllers.main.containers.main = {
             image = {
               repository = "ghcr.io/immich-app/immich-server";

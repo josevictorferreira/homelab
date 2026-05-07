@@ -1,6 +1,7 @@
-{ kubenix
-, homelab
-, ...
+{
+  kubenix,
+  homelab,
+  ...
 }:
 
 let
@@ -21,7 +22,8 @@ in
       inherit namespace;
 
       values = {
-        replicas = 0;
+        replicas = 1;
+        priorityClassName = "preemptible";
         image = {
           repository = "louislam/uptime-kuma";
           pullPolicy = "IfNotPresent";

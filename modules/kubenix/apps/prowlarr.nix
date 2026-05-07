@@ -16,7 +16,8 @@ in
       noHooks = true;
       namespace = k8s.namespaces.applications;
       values = {
-        workload.main.replicas = 0;
+        workload.main.replicas = 1;
+        podOptions.priorityClassName = "preemptible";
         image = {
           repository = "ghcr.io/home-operations/prowlarr";
           tag = "2.3.4.5307@sha256:029b2b52134a689bd528f466664d06f1d61dd80a83acd18ad8fd5eda9a65de10";

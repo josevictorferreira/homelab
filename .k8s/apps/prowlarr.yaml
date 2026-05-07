@@ -16,7 +16,7 @@ metadata:
   name: prowlarr
   namespace: apps
 spec:
-  replicas: 0
+  replicas: 1
   revisionHistoryLimit: 3
   selector:
     matchLabels:
@@ -279,6 +279,7 @@ spec:
       hostUsers: true
       nodeSelector:
         kubernetes.io/arch: amd64
+      priorityClassName: preemptible
       restartPolicy: Always
       securityContext:
         fsGroup: 568

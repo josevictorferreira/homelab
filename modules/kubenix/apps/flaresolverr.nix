@@ -10,12 +10,13 @@ in
       inherit name namespace;
     };
     spec = {
-      replicas = 0;
+      replicas = 1;
       selector.matchLabels.app = name;
       template = {
         metadata.labels.app = name;
         spec = {
           terminationGracePeriodSeconds = 60;
+          priorityClassName = "preemptible";
           containers = [
             {
               inherit name;

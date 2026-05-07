@@ -14,7 +14,7 @@ metadata:
   name: open-webui
   namespace: apps
 spec:
-  replicas: 0
+  replicas: 1
   revisionHistoryLimit: 10
   selector:
     matchLabels:
@@ -95,6 +95,7 @@ spec:
           volumeMounts:
             - mountPath: /tmp/app-data
               name: data
+      priorityClassName: preemptible
       serviceAccountName: open-webui
       volumes:
         - emptyDir: {}
