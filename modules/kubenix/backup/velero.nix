@@ -92,7 +92,7 @@ in
           includedNamespaces = [ "*" ];
           excludedNamespaces = [ homelab.kubernetes.namespaces.storage ];
           snapshotVolumes = false;
-          defaultVolumesToFsBackup = true;
+          defaultVolumesToFsBackup = false;
         };
       };
     }
