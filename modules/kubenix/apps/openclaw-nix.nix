@@ -405,7 +405,6 @@ in
               {
                 path = "/shared/notetaking";
                 subPath = "notetaking";
-                readOnly = true;
               }
             ];
           };

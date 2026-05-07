@@ -218,7 +218,6 @@ spec:
               subPath: openclaw
             - mountPath: /shared/notetaking
               name: shared-storage
-              readOnly: true
               subPath: notetaking
       dnsPolicy: ClusterFirst
       enableServiceLinks: false
