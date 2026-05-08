@@ -357,9 +357,9 @@
 **Verify:** `podman images | grep <ghcr-tag>` — IMAGE ID must match `localhost/` build before pushing.
 
 ### Verify Remote Digest After Push — Local ≠ Remote
-**Lesson:** After `podman push`, always verify the remote digest with `skopeo inspect --format "{{.Digest}}" docker://<tag>` or `podman pull` + `podman images --digests`. The local digest from `streamLayeredImage` can differ from the remote digest computed by the registry.
-**Context:** Pinned `sha256:3f864ce` (local) in the manifest; remote was `sha256:96b84df`. Cluster pods got "not found" for 20 minutes. `make push-openclaw` auto-pin with `skopeo inspect` timed out, leaving the wrong local digest committed.
-**Verify:** After push: `podman pull ghcr.io/.../image:tag && podman images --digests | grep <tag>` — digest must match the one in `modules/kubenix/apps/openclaw-nix.nix`. If `skopeo inspect` times out, use the digest from `podman images --digests` after the pull.
+**Lesson:** After `podman push`, always verify the REMOTE digest with `skopeo inspect --format "{{.Digest}}" docker://<tag>` or `podman pull` + `podman images --digests`. The local digest from `streamLayeredImage` or `podman images --digests` BEFORE pushing can differ from the remote digest computed by the registry after push.
+**Context:** Pinned `sha256:3f864ce` (local) in the manifest; remote was `sha256:96b84df`. Cluster pods got "not found" for 20 minutes. `make push-openclaw` auto-pin with `skopeo inspect` timed out, leaving the wrong local digest committed. Another incident: used `podman images --digests` before push, got local digest `sha256:1a0b12a`, committed it, but remote digest after push was `sha256:090c3e3e`, causing ImagePullBackOff.
+**Verify:** After push: `podman pull ghcr.io/.../image:tag && podman images --digests | grep <tag>` — digest must match the one in `modules/kubenix/apps/<app>.nix`. If `skopeo inspect` times out, use the digest from `podman images --digests` AFTER the pull.
 
 ### Trace Full imageTag Computation Before Changing Version Strings
 **Lesson:** When bumping container image versions, trace the full tag computation chain (`version` → `imageTag` → pushed tag → K8s manifest tag). Changing version in one place without understanding the formula can produce unexpected tags like `v2026.3.2-v2-v2` (double suffix).
