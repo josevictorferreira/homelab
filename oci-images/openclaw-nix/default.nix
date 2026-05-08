@@ -3,7 +3,7 @@
   lib,
   inputs,
   system,
-  version ? "2026.5.5",
+  version ? "2026.5.7",
   tagSuffix ? "",
   legacyOpenClawPatches ? true,
   matrixSendQueuePatch ? true,
@@ -18,8 +18,8 @@ let
     owner = "openclaw";
     repo = "openclaw";
     rev = "v${version}";
-    sha256 = "sha256-X13PRFDR5NAEKvuvm0/6BSnICm1ZM+vW2HRpOd8ymA4=";
-    pnpmDepsHash = "sha256-kz9vE1A/GTkw/HH2ts4hxTJzrdkYhiLaJQP0AeAS3Bo=";
+    sha256 = "sha256-ICkq6YfMJVvRC93sM+7/q2JI82wUhjaYAI3pRzmTHYc=";
+    pnpmDepsHash = "sha256-LXaRfZ0WY8VDpDc2zFr+Oel6AuYo6SiTrp37yokT1VU=";
   };
 
   # Rolldown 1.0.0-rc.3 — pre-built from npm registry
