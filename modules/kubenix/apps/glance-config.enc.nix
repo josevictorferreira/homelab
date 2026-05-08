@@ -389,6 +389,7 @@ let
                   "comfyanonymous/ComfyUI"
                   "imgproxy/imgproxy"
                   "openclaw/openclaw"
+                  "nousresearch/hermes-agent"
                   "Martian-Engineering/lossless-claw"
                   # Work Apps
                   "kong/kong"
