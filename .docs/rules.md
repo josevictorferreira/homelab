@@ -359,7 +359,7 @@
 ### Verify Remote Digest After Push — Local ≠ Remote
 **Lesson:** After `podman push`, always verify the remote digest with `skopeo inspect --format "{{.Digest}}" docker://<tag>` or `podman pull` + `podman images --digests`. The local digest from `streamLayeredImage` can differ from the remote digest computed by the registry.
 **Context:** Pinned `sha256:3f864ce` (local) in the manifest; remote was `sha256:96b84df`. Cluster pods got "not found" for 20 minutes. `make push-openclaw` auto-pin with `skopeo inspect` timed out, leaving the wrong local digest committed.
-**Verify:** After push: `podman pull ghcr.io/.../image:tag && podman images --digests | grep <tag>` — digest must match the one in `modules/kubenix/apps/openclaw-nix.nix`.
+**Verify:** After push: `podman pull ghcr.io/.../image:tag && podman images --digests | grep <tag>` — digest must match the one in `modules/kubenix/apps/openclaw-nix.nix`. If `skopeo inspect` times out, use the digest from `podman images --digests` after the pull.
 
 ### Trace Full imageTag Computation Before Changing Version Strings
 **Lesson:** When bumping container image versions, trace the full tag computation chain (`version` → `imageTag` → pushed tag → K8s manifest tag). Changing version in one place without understanding the formula can produce unexpected tags like `v2026.3.2-v2-v2` (double suffix).
@@ -527,6 +527,9 @@
 ## Tooling & Environment
 
 ### `rtk` Wrapper Truncates Piped Output
+**Lesson:** The `rtk` wrapper tool truncates piped stdout to ~5KB, silently dropping output from commands like `sops -d`. Use raw binary paths (e.g., `/etc/profiles/per-user/josevictor/bin/sops`) for accurate results.
+**Context:** `sops -d` via `rtk` showed only 41 lines (29 keys) from a 181-line file with 144 keys. Wasted significant time investigating non-existent decryption issues.
+**Verify:** Compare `rtk sops -d file | wc -l` vs `/etc/profiles/per-user/josevictor/bin/sops -d file | wc -l` — should match.
 **Lesson:** The `rtk` wrapper tool truncates piped stdout to ~5KB, silently dropping output from commands like `sops -d`. Use raw binary paths (e.g., `/etc/profiles/per-user/josevictor/bin/sops`) for accurate results.
 **Context:** `sops -d` via `rtk` showed only 41 lines (29 keys) from a 181-line file with 144 keys. Wasted significant time investigating non-existent decryption issues.
 **Verify:** Compare `rtk sops -d file | wc -l` vs `/etc/profiles/per-user/josevictor/bin/sops -d file | wc -l` — should match.
