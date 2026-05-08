@@ -46,7 +46,7 @@ spec:
           envFrom:
             - secretRef:
                 name: hermes-agent-env
-          image: ghcr.io/josevictorferreira/hermes-agent:v0.12.0@sha256:97fae445c474d362b404b498ff3a4d012d3388bc1fb693e0a620ff7a7212c24d
+          image: ghcr.io/josevictorferreira/hermes-agent:v0.13.0@sha256:090c3e3e10cbd13210107bbf1512cb3b3ae8c0465f042b9d1e8258e55cefe420
           imagePullPolicy: IfNotPresent
           livenessProbe:
             initialDelaySeconds: 60
@@ -146,7 +146,7 @@ spec:
           envFrom:
             - secretRef:
                 name: hermes-agent-env
-          image: ghcr.io/josevictorferreira/hermes-agent:v0.12.0@sha256:97fae445c474d362b404b498ff3a4d012d3388bc1fb693e0a620ff7a7212c24d
+          image: ghcr.io/josevictorferreira/hermes-agent:v0.13.0@sha256:090c3e3e10cbd13210107bbf1512cb3b3ae8c0465f042b9d1e8258e55cefe420
           imagePullPolicy: IfNotPresent
           name: gateway
           resources:
