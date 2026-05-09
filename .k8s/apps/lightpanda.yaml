@@ -24,22 +24,26 @@ spec:
             - 0.0.0.0
             - --port
             - '9222'
+            - --timeout
+            - '0'
           image: lightpanda/browser:nightly
           livenessProbe:
+            httpGet:
+              path: /json/version
+              port: 9222
             initialDelaySeconds: 10
             periodSeconds: 10
-            tcpSocket:
-              port: 9222
           name: lightpanda
           ports:
             - containerPort: 9222
               name: cdp
               protocol: TCP
           readinessProbe:
+            httpGet:
+              path: /json/version
+              port: 9222
             initialDelaySeconds: 5
             periodSeconds: 5
-            tcpSocket:
-              port: 9222
           resources:
             limits:
               cpu: 500m

@@ -34,6 +34,8 @@ in
                 "0.0.0.0"
                 "--port"
                 "9222"
+                "--timeout"
+                "0"
               ];
               resources = {
                 requests = {
@@ -52,14 +54,16 @@ in
                 };
               };
               livenessProbe = {
-                tcpSocket = {
+                httpGet = {
+                  path = "/json/version";
                   port = 9222;
                 };
                 initialDelaySeconds = 10;
                 periodSeconds = 10;
               };
               readinessProbe = {
-                tcpSocket = {
+                httpGet = {
+                  path = "/json/version";
                   port = 9222;
                 };
                 initialDelaySeconds = 5;
