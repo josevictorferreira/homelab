@@ -141,6 +141,10 @@ spec:
               value: /opt/data
             - name: TZ
               value: America/Sao_Paulo
+            - name: AGENT_BROWSER_ENGINE
+              value: lightpanda
+            - name: AGENT_BROWSER_ENDPOINT
+              value: http://lightpanda.apps.svc.cluster.local:9222
             - name: PATH
               value: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/hermes/.venv/bin
           envFrom:

@@ -5,7 +5,7 @@ let
   enableTailscaleSidecar = false;
   appImage = {
     repository = "ghcr.io/josevictorferreira/openclaw-nix";
-    tag = "v2026.5.7-matrix-touch-noop-webm-audio-lancedb@sha256:01bb3b64b7388d1fa2820acd63c9521b4b1b27f66bddafa8fb9af1a8bc6332f4";
+    tag = "v2026.5.7-lightpanda@sha256:fe639fc3e37109c03898bf99c5839c310284f5717d107aace2b14dbd4ef3318e";
     pullPolicy = "Always";
   };
 in
@@ -137,6 +137,8 @@ in
                 OPENCLAW_STATE_DIR = "/data/openclaw";
                 HOME = "/home/node";
                 TZ = homelab.timeZone;
+                AGENT_BROWSER_ENGINE = "lightpanda";
+                AGENT_BROWSER_ENDPOINT = "http://lightpanda.${namespace}.svc.cluster.local:9222";
                 OPENCLAW_NIX_MODE = "1";
                 OPENCLAW_TRAJECTORY = "false";
                 NPM_CONFIG_PREFIX = "/data/npm-global";
@@ -230,89 +232,6 @@ in
               };
             };
 
-            chromium = {
-              image = appImage;
-              securityContext = {
-                runAsUser = 1000;
-                runAsGroup = 1000;
-                runAsNonRoot = true;
-                allowPrivilegeEscalation = false;
-                readOnlyRootFilesystem = false;
-                capabilities.drop = [ "ALL" ];
-                seccompProfile.type = "RuntimeDefault";
-              };
-
-              env = {
-                HOME = "/home/node/.chromium";
-                TMPDIR = "/tmp";
-              };
-
-              command = [
-                "/bin/chromium"
-                "--headless=new"
-                "--no-sandbox"
-                "--disable-gpu"
-                "--remote-debugging-address=0.0.0.0"
-                "--remote-debugging-port=9222"
-                "--user-data-dir=/home/node/.chromium/profile"
-                "--disk-cache-dir=/home/node/.chromium/cache"
-                "about:blank"
-              ];
-
-              resources = {
-                requests = {
-                  cpu = "250m";
-                  memory = "512Mi";
-                };
-                limits = {
-                  cpu = "1000m";
-                  memory = "1Gi";
-                };
-              };
-
-              probes = {
-                startup = {
-                  enabled = true;
-                  custom = true;
-                  spec = {
-                    exec.command = [
-                      "/bin/sh"
-                      "-c"
-                      "/bin/curl --fail --silent http://127.0.0.1:9222/json/version >/dev/null"
-                    ];
-                    failureThreshold = 30;
-                    periodSeconds = 2;
-                  };
-                };
-                readiness = {
-                  enabled = true;
-                  custom = true;
-                  spec = {
-                    exec.command = [
-                      "/bin/sh"
-                      "-c"
-                      "/bin/curl --fail --silent http://127.0.0.1:9222/json/version >/dev/null"
-                    ];
-                    periodSeconds = 10;
-                    timeoutSeconds = 2;
-                  };
-                };
-                liveness = {
-                  enabled = true;
-                  custom = true;
-                  spec = {
-                    exec.command = [
-                      "/bin/sh"
-                      "-c"
-                      "/bin/curl --fail --silent http://127.0.0.1:9222/json/version >/dev/null"
-                    ];
-                    periodSeconds = 10;
-                    timeoutSeconds = 2;
-                    failureThreshold = 3;
-                  };
-                };
-              };
-            };
           }
           // (
             if enableTailscaleSidecar then
@@ -433,28 +352,6 @@ in
         )
         // {
 
-          chromium-data = {
-            type = "emptyDir";
-            advancedMounts.main.chromium = [
-              { path = "/home/node/.chromium"; }
-            ];
-          };
-
-          chromium-tmp = {
-            type = "emptyDir";
-            advancedMounts.main.chromium = [
-              { path = "/tmp"; }
-            ];
-          };
-
-          chromium-shm = {
-            type = "emptyDir";
-            medium = "Memory";
-            sizeLimit = "1Gi";
-            advancedMounts.main.chromium = [
-              { path = "/dev/shm"; }
-            ];
-          };
           data-block = {
             type = "persistentVolumeClaim";
             annotations."helm.sh/resource-policy" = "keep";
