@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: lightpanda
+  namespace: apps
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lightpanda
+  template:
+    metadata:
+      labels:
+        app: lightpanda
+    spec:
+      containers:
+        - command:
+            - lightpanda
+            - serve
+            - --host
+            - 0.0.0.0
+            - --port
+            - '9222'
+          image: lightpanda/browser:nightly
+          livenessProbe:
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            tcpSocket:
+              port: 9222
+          name: lightpanda
+          ports:
+            - containerPort: 9222
+              name: cdp
+              protocol: TCP
+          readinessProbe:
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            tcpSocket:
+              port: 9222
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+      terminationGracePeriodSeconds: 60
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: lightpanda
+  namespace: apps
+spec:
+  ports:
+    - name: cdp
+      port: 9222
+      targetPort: 9222
+  selector:
+    app: lightpanda
+  type: ClusterIP

@@ -44,74 +44,6 @@ spec:
       automountServiceAccountToken: true
       containers:
         - command:
-            - /bin/chromium
-            - --headless=new
-            - --no-sandbox
-            - --disable-gpu
-            - --remote-debugging-address=0.0.0.0
-            - --remote-debugging-port=9222
-            - --user-data-dir=/home/node/.chromium/profile
-            - --disk-cache-dir=/home/node/.chromium/cache
-            - about:blank
-          env:
-            - name: HOME
-              value: /home/node/.chromium
-            - name: TMPDIR
-              value: /tmp
-          image: ghcr.io/josevictorferreira/openclaw-nix:v2026.5.7-matrix-touch-noop-webm-audio-lancedb@sha256:01bb3b64b7388d1fa2820acd63c9521b4b1b27f66bddafa8fb9af1a8bc6332f4
-          imagePullPolicy: Always
-          livenessProbe:
-            exec:
-              command:
-                - /bin/sh
-                - -c
-                - /bin/curl --fail --silent http://127.0.0.1:9222/json/version >/dev/null
-            failureThreshold: 3
-            periodSeconds: 10
-            timeoutSeconds: 2
-          name: chromium
-          readinessProbe:
-            exec:
-              command:
-                - /bin/sh
-                - -c
-                - /bin/curl --fail --silent http://127.0.0.1:9222/json/version >/dev/null
-            periodSeconds: 10
-            timeoutSeconds: 2
-          resources:
-            limits:
-              cpu: 1000m
-              memory: 1Gi
-            requests:
-              cpu: 250m
-              memory: 512Mi
-          securityContext:
-            allowPrivilegeEscalation: false
-            capabilities:
-              drop:
-                - ALL
-            readOnlyRootFilesystem: false
-            runAsGroup: 1000
-            runAsNonRoot: true
-            runAsUser: 1000
-            seccompProfile:
-              type: RuntimeDefault
-          startupProbe:
-            exec:
-              command:
-                - /bin/sh
-                - -c
-                - /bin/curl --fail --silent http://127.0.0.1:9222/json/version >/dev/null
-            failureThreshold: 30
-            periodSeconds: 2
-          volumeMounts:
-            - mountPath: /home/node/.chromium
-              name: chromium-data
-            - mountPath: /dev/shm
-              name: chromium-shm
-            - mountPath: /tmp
-              name: chromium-tmp
-        - command:
             - bash
             - -c
             - "set -e\n\n# Wait for CephFS mount to be writable (avoids EACCES race\
@@ -132,6 +64,10 @@ spec:
               \ at $CONFIG_FILE\"\nfi\n\nexec node /lib/openclaw/dist/index.js gateway\
               \ --port 18789\n"
           env:
+            - name: AGENT_BROWSER_ENDPOINT
+              value: http://lightpanda.apps.svc.cluster.local:9222
+            - name: AGENT_BROWSER_ENGINE
+              value: lightpanda
             - name: HOME
               value: /home/node
             - name: MATRIX_KIRA_ACCESS_TOKEN
@@ -181,7 +117,7 @@ spec:
           envFrom:
             - secretRef:
                 name: openclaw-config
-          image: ghcr.io/josevictorferreira/openclaw-nix:v2026.5.7-matrix-touch-noop-webm-audio-lancedb@sha256:01bb3b64b7388d1fa2820acd63c9521b4b1b27f66bddafa8fb9af1a8bc6332f4
+          image: ghcr.io/josevictorferreira/openclaw-nix:v2026.5.7-lightpanda@sha256:fe639fc3e37109c03898bf99c5839c310284f5717d107aace2b14dbd4ef3318e
           imagePullPolicy: Always
           name: main
           ports:
@@ -229,14 +165,6 @@ spec:
       priorityClassName: high-priority
       serviceAccountName: openclaw-nix
       volumes:
-        - emptyDir: {}
-          name: chromium-data
-        - emptyDir:
-            medium: Memory
-            sizeLimit: 1Gi
-          name: chromium-shm
-        - emptyDir: {}
-          name: chromium-tmp
         - name: data-block
           persistentVolumeClaim:
             claimName: openclaw-nix-data-block

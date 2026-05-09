@@ -107,6 +107,14 @@ in
                   name = "TZ";
                   value = homelab.timeZone;
                 }
+                {
+                  name = "AGENT_BROWSER_ENGINE";
+                  value = "lightpanda";
+                }
+                {
+                  name = "AGENT_BROWSER_ENDPOINT";
+                  value = "http://lightpanda.${namespace}.svc.cluster.local:9222";
+                }
               ]
               ++ [
                 {

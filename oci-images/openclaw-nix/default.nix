@@ -576,7 +576,6 @@ let
       pkgs.openssh
       pkgs.rsync
       pkgs.kubectl
-      pkgs.chromium
       pkgs.fontconfig
       pkgs.dejavu_fonts
       pkgs.noto-fonts
