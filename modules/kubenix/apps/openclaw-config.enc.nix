@@ -29,7 +29,7 @@ let
       attachOnly = true;
       defaultProfile = "sidecar";
       profiles.sidecar = {
-        cdpUrl = "http://127.0.0.1:9222";
+        cdpUrl = "http://lightpanda.apps.svc.cluster.local:9222";
         attachOnly = true;
         color = "#FF4500";
       };
