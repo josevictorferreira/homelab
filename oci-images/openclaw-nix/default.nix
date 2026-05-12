@@ -3,7 +3,7 @@
   lib,
   inputs,
   system,
-  version ? "2026.5.7",
+  version ? "2026.5.12-beta.1",
   tagSuffix ? "",
   legacyOpenClawPatches ? true,
   matrixSendQueuePatch ? true,
@@ -18,8 +18,8 @@ let
     owner = "openclaw";
     repo = "openclaw";
     rev = "v${version}";
-    sha256 = "sha256-ICkq6YfMJVvRC93sM+7/q2JI82wUhjaYAI3pRzmTHYc=";
-    pnpmDepsHash = "sha256-LXaRfZ0WY8VDpDc2zFr+Oel6AuYo6SiTrp37yokT1VU=";
+    sha256 = "sha256-ePHQBO0sQOTzvZEUqU+7I/+GYKoNgLAtTvhr0Cirvfc=";
+    pnpmDepsHash = lib.fakeHash;
   };
 
   # Rolldown 1.0.0-rc.3 — pre-built from npm registry
@@ -412,7 +412,23 @@ let
   };
 
   # Get overlay and pkgs from nix-openclaw
-  openclawOverlay = import (inputs.nix-openclaw + "/nix/overlay.nix");
+  openclawToolPkgs =
+    if inputs.nix-openclaw.inputs ? nix-openclaw-tools
+        && inputs.nix-openclaw.inputs.nix-openclaw-tools ? packages
+        && builtins.hasAttr system inputs.nix-openclaw.inputs.nix-openclaw-tools.packages
+    then inputs.nix-openclaw.inputs.nix-openclaw-tools.packages.${system}
+    else { };
+  qmdPkgs =
+    if inputs.nix-openclaw.inputs ? qmd
+        && inputs.nix-openclaw.inputs.qmd ? packages
+        && builtins.hasAttr system inputs.nix-openclaw.inputs.qmd.packages
+    then inputs.nix-openclaw.inputs.qmd.packages.${system}
+    else { };
+  openclawOverlay = final: prev:
+    import (inputs.nix-openclaw + "/nix/overlay.nix") {
+      openclawToolPkgs = openclawToolPkgs;
+      qmdPkgs = qmdPkgs;
+    } final prev;
   openclawPkgs = import inputs.nix-openclaw.inputs.nixpkgs {
     inherit system;
     overlays = [ openclawOverlay ];
@@ -420,8 +436,31 @@ let
 
   openclawGatewayBase = openclawPkgs.openclaw-gateway.override {
     inherit sourceInfo;
-    inherit (sourceInfo) pnpmDepsHash;
+    pnpmDepsHash = sourceInfo.pnpmDepsHash or null;
   };
+
+  # Fix ERR_PNPM_LOCKFILE_CONFIG_MISMATCH: the lockfile declares patchedDependencies
+  # but the root package.json pnpm section is empty. Inject the declaration before fetch.
+  customPnpmDeps = openclawPkgs.fetchPnpmDeps {
+    inherit (sourceInfo) pnpmDepsHash;
+    pname = "openclaw-gateway";
+    src = openclawGatewayBase.passthru.resolvedSrc;
+    pnpm = openclawPkgs.pnpm_10;
+    fetcherVersion = 3;
+    nativeBuildInputs = [ openclawPkgs.git ];
+    prePnpmInstall = ''
+      # Add patchedDependencies to package.json so pnpm doesn't complain about lockfile mismatch
+      jq '.pnpm.patchedDependencies = {
+        "@agentclientprotocol/claude-agent-acp@0.33.1": "patches/@agentclientprotocol__claude-agent-acp@0.33.1.patch",
+        "baileys@7.0.0-rc10": "patches/baileys@7.0.0-rc10.patch"
+      }' package.json > package.json.tmp && mv package.json.tmp package.json
+    '';
+  };
+
+  openclawGatewayBaseWithFix = openclawGatewayBase.overrideAttrs (old: {
+    pnpmDeps = customPnpmDeps;
+    env = (old.env or {}) // { PNPM_DEPS = customPnpmDeps; };
+  });
 
   # Legacy build overrides kept default-on until runtime validation proves they can be removed.
   openclawGateway =
@@ -500,7 +539,7 @@ let
         '';
       })
     else
-      openclawGatewayBase;
+  openclawGatewayBaseWithFix;
 
   # memory-lancedb native deps are bundled in upstream root node_modules.
   # Link them into the plugin roots below instead of using stale local deps.
