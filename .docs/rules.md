@@ -264,6 +264,16 @@
 **Context:** Moving all packages to `buildEnv` and removing the rootfs bin loop also removed the `openclaw` binary, causing `exec: openclaw: not found` crash.
 **Verify:** `podman run --rm --entrypoint '' <image> which openclaw` returns a path before pushing
 
+### Match OpenClaw's pnpm Major During Nix Builds
+**Lesson:** Check upstream `packageManager` before fetching deps; OpenClaw releases that require pnpm 11 may fail under nix-openclaw's pnpm 10 with lockfile/patchedDependencies mismatches.
+**Context:** v2026.5.12-beta.1 needed a pnpm 11 override for `fetchPnpmDeps`, and the fixed-output derivation must use `hash = sourceInfo.pnpmDepsHash`.
+**Verify:** `nix build .#openclaw-nix-image --show-trace` gets past `openclaw-gateway-pnpm-deps` without `ERR_PNPM_LOCKFILE_CONFIG_MISMATCH`.
+
+### OpenClaw Root Guard Requires Explicit Container Opt-In
+**Lesson:** If the Kubernetes container intentionally runs as UID 0, set `OPENCLAW_ALLOW_ROOT=1` in the pod env after OpenClaw upgrades.
+**Context:** Newer OpenClaw exits immediately with `[openclaw] Refusing to run as root`, causing CrashLoopBackOff even though the image pulled successfully.
+**Verify:** `kubectl logs -n apps deploy/openclaw-nix -c main --previous` has no root refusal, and `/health` returns `{"ok":true,"status":"live"}`.
+
 ### OpenClaw Config: `dangerouslyAllowHostHeaderOriginFallback` Required for Non-Loopback
 **Lesson:** The `gateway.controlUi.dangerouslyAllowHostHeaderOriginFallback` config is REQUIRED when binding gateway to non-loopback addresses (e.g., `bind: "lan"`), despite being flagged as an "unknown config key" by the doctor.
 **Context:** OpenClaw v2026.2.25+ enforces origin validation for Control UI. The doctor warns about the key being unrecognized, but the gateway fails to start without it on non-loopback binds. Do NOT remove this config.
