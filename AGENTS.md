@@ -191,6 +191,11 @@ Our cluster is deployed and accessible in the user system kubectl, the context a
 
 ## SESSION LEARNINGS
 
+### Hermes ConfigMap Is Only a Backup
+**Lesson:** The Hermes config ConfigMap is a fallback/backup only. For real runtime configuration, inspect and modify the actual config mounted inside the pod.
+**Context:** Hermes may use a live mounted config that differs from the generated ConfigMap; treating the ConfigMap as authoritative can lead to incorrect conclusions or ineffective changes.
+**Verify:** Check the running pod's mounted config path and compare it with the ConfigMap before deciding which source controls runtime behavior.
+
 ### Live Deployment Drift Can Hide Fixed Source
 **Lesson:** When an app behaves unlike current Nix/.k8s output, compare the live Deployment template with generated manifest and check Flux `suspend`, `lastAppliedRevision`, and `lastAttemptedRevision`.
 **Context:** `openclaw-nix` live spec still mounted the old RBD PVC and migration script while git/generated manifests had already restored CephFS.
