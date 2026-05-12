@@ -19,7 +19,51 @@ let
     repo = "openclaw";
     rev = "v${version}";
     sha256 = "sha256-ePHQBO0sQOTzvZEUqU+7I/+GYKoNgLAtTvhr0Cirvfc=";
-    pnpmDepsHash = lib.fakeHash;
+    pnpmDepsHash = "sha256-LRwFCd2pbBwQ7HFk7bNt8pF5TIAM/TRNuTj8CImdApY=";
+    applyPublicSurfaceHardlinksPatch = false;
+    applySkipPluginAutoEnableNixModePatch = false;
+  };
+  openclawSrc = pkgs.fetchFromGitHub {
+    inherit (sourceInfo)
+      owner
+      repo
+      rev
+      sha256
+      ;
+  };
+  pnpm11ExeTgz = pkgs.fetchurl {
+    url = "https://registry.npmjs.org/@pnpm/exe/-/exe-11.1.0.tgz";
+    hash = "sha512-JnyoFKP06JxEAINmtjVRFTfsG6qQspgc8BN+Nlqnibsrj4iB2SXwBsmLFcQLAMJDcxDW6euHw4Zc1mxnsqoPSA==";
+  };
+  pnpm11 = pkgs.stdenvNoCC.mkDerivation {
+    pname = "pnpm";
+    version = "11.1.0";
+    src = pnpm11ExeTgz;
+    installPhase = ''
+      runHook preInstall
+      mkdir -p $out/lib/pnpm $out/bin
+      cp -r . $out/lib/pnpm
+      cat > $out/bin/pnpm <<'EOF'
+      #!${pkgs.runtimeShell}
+      if [ "$1" = "config" ] && [ "$2" = "set" ] && [ "$3" = "manage-package-manager-versions" ]; then
+        exit 0
+      fi
+      if [ "$1" = "exec" ] && [ -n "''${2:-}" ] && [ -x "./node_modules/.bin/$2" ]; then
+        cmd="$2"
+        shift 2
+        bin="./node_modules/.bin/$cmd"
+        IFS= read -r first_line < "$bin" || first_line=""
+        case "$first_line" in
+          *node*) exec ${pkgs.nodejs_22}/bin/node "$bin" "$@" ;;
+          *) exec "$bin" "$@" ;;
+        esac
+      fi
+      exec ${pkgs.nodejs_22}/bin/node @out@/lib/pnpm/dist/pnpm.mjs "$@"
+      EOF
+      substituteInPlace $out/bin/pnpm --replace-fail @out@ $out
+      chmod +x $out/bin/pnpm
+      runHook postInstall
+    '';
   };
 
   # Rolldown 1.0.0-rc.3 — pre-built from npm registry
@@ -386,6 +430,22 @@ let
       "    alias_path.write_text(f'export * from \"./{chunk_path.name}\";\\n', encoding=\"utf-8\")"
     ]
   );
+  fixNodeBinShebangs = pkgs.writeShellScript "openclaw-fix-node-bin-shebangs" ''
+    for bin in node_modules/.bin/*; do
+      [ -f "$bin" ] || continue
+      IFS= read -r first_line < "$bin" || continue
+      if [ "$first_line" = "#!/usr/bin/env node" ]; then
+        tmp=$(mktemp)
+        {
+          printf '%s\n' "#!${pkgs.nodejs_22}/bin/node"
+          tail -n +2 "$bin"
+        } > "$tmp"
+        cat "$tmp" > "$bin"
+        rm -f "$tmp"
+        chmod +x "$bin"
+      fi
+    done
+  '';
   rolldown = pkgs.stdenv.mkDerivation {
     pname = "rolldown";
     version = "1.0.0-rc.3";
@@ -413,18 +473,25 @@ let
 
   # Get overlay and pkgs from nix-openclaw
   openclawToolPkgs =
-    if inputs.nix-openclaw.inputs ? nix-openclaw-tools
-        && inputs.nix-openclaw.inputs.nix-openclaw-tools ? packages
-        && builtins.hasAttr system inputs.nix-openclaw.inputs.nix-openclaw-tools.packages
-    then inputs.nix-openclaw.inputs.nix-openclaw-tools.packages.${system}
-    else { };
+    if
+      inputs.nix-openclaw.inputs ? nix-openclaw-tools
+      && inputs.nix-openclaw.inputs.nix-openclaw-tools ? packages
+      && builtins.hasAttr system inputs.nix-openclaw.inputs.nix-openclaw-tools.packages
+    then
+      inputs.nix-openclaw.inputs.nix-openclaw-tools.packages.${system}
+    else
+      { };
   qmdPkgs =
-    if inputs.nix-openclaw.inputs ? qmd
-        && inputs.nix-openclaw.inputs.qmd ? packages
-        && builtins.hasAttr system inputs.nix-openclaw.inputs.qmd.packages
-    then inputs.nix-openclaw.inputs.qmd.packages.${system}
-    else { };
-  openclawOverlay = final: prev:
+    if
+      inputs.nix-openclaw.inputs ? qmd
+      && inputs.nix-openclaw.inputs.qmd ? packages
+      && builtins.hasAttr system inputs.nix-openclaw.inputs.qmd.packages
+    then
+      inputs.nix-openclaw.inputs.qmd.packages.${system}
+    else
+      { };
+  openclawOverlay =
+    final: prev:
     import (inputs.nix-openclaw + "/nix/overlay.nix") {
       openclawToolPkgs = openclawToolPkgs;
       qmdPkgs = qmdPkgs;
@@ -439,27 +506,50 @@ let
     pnpmDepsHash = sourceInfo.pnpmDepsHash or null;
   };
 
-  # Fix ERR_PNPM_LOCKFILE_CONFIG_MISMATCH: the lockfile declares patchedDependencies
-  # but the root package.json pnpm section is empty. Inject the declaration before fetch.
+  # OpenClaw 2026.5.12-beta.1 declares pnpm@11.1.0; pnpm 10 rejects its lockfile.
   customPnpmDeps = openclawPkgs.fetchPnpmDeps {
-    inherit (sourceInfo) pnpmDepsHash;
     pname = "openclaw-gateway";
-    src = openclawGatewayBase.passthru.resolvedSrc;
-    pnpm = openclawPkgs.pnpm_10;
+    src = openclawSrc;
+    pnpm = pnpm11;
+    hash = sourceInfo.pnpmDepsHash;
     fetcherVersion = 3;
     nativeBuildInputs = [ openclawPkgs.git ];
-    prePnpmInstall = ''
-      # Add patchedDependencies to package.json so pnpm doesn't complain about lockfile mismatch
-      jq '.pnpm.patchedDependencies = {
-        "@agentclientprotocol/claude-agent-acp@0.33.1": "patches/@agentclientprotocol__claude-agent-acp@0.33.1.patch",
-        "baileys@7.0.0-rc10": "patches/baileys@7.0.0-rc10.patch"
-      }' package.json > package.json.tmp && mv package.json.tmp package.json
-    '';
   };
 
   openclawGatewayBaseWithFix = openclawGatewayBase.overrideAttrs (old: {
     pnpmDeps = customPnpmDeps;
-    env = (old.env or {}) // { PNPM_DEPS = customPnpmDeps; };
+    env = (old.env or { }) // {
+      NODE_OPTIONS = "--max-old-space-size=8192";
+      PNPM_DEPS = customPnpmDeps;
+    };
+    nativeBuildInputs = [ pnpm11 ] ++ (old.nativeBuildInputs or [ ]);
+    buildPhase = ''
+      cp ${old.buildPhase} /tmp/gateway-build.sh
+      substituteInPlace /tmp/gateway-build.sh \
+        --replace-fail 'log_step "patchShebangs node_modules/.bin" bash -e -c ". \"$STDENV_SETUP\"; patchShebangs node_modules/.bin"' \
+        'log_step "patchShebangs node_modules/.bin" bash -e -c ". \"$STDENV_SETUP\"; patchShebangs node_modules/.bin"
+      log_step "rewrite env node shebangs" ${fixNodeBinShebangs}'
+      substituteInPlace /tmp/gateway-build.sh \
+        --replace-fail 'log_step "pnpm prune --prod" env CI=true pnpm prune --prod' \
+        'log_step "pnpm prune --prod" env CI=true pnpm install --prod --offline --frozen-lockfile --ignore-scripts --store-dir "$store_path"'
+      . /tmp/gateway-build.sh
+    '';
+    postPatch = (old.postPatch or "") + ''
+
+      tmp_package_json=$(mktemp)
+      jq '.pnpm.onlyBuiltDependencies = [
+        "@lydell/node-pty",
+        "@napi-rs/canvas",
+        "esbuild",
+        "sharp",
+        "sqlite-vec",
+        "tree-sitter-bash",
+        "web-tree-sitter"
+      ]' package.json > "$tmp_package_json"
+      mv "$tmp_package_json" package.json
+      substituteInPlace package.json \
+        --replace-fail '"node scripts/run-tsgo.mjs -p tsconfig.plugin-sdk.dts.json --declaration true"' '"tsc -p tsconfig.plugin-sdk.dts.json || true"'
+    '';
   });
 
   # Legacy build overrides kept default-on until runtime validation proves they can be removed.
@@ -470,6 +560,10 @@ let
           rolldown
           pkgs.findutils
         ];
+        pnpmDeps = customPnpmDeps;
+        env = (old.env or { }) // {
+          PNPM_DEPS = customPnpmDeps;
+        };
         # Override installPhase: run the original script, but first clean broken symlinks
         installPhase = ''
           cp ${old.installPhase} /tmp/gateway-install.sh
@@ -539,7 +633,7 @@ let
         '';
       })
     else
-  openclawGatewayBaseWithFix;
+      openclawGatewayBaseWithFix;
 
   # memory-lancedb native deps are bundled in upstream root node_modules.
   # Link them into the plugin roots below instead of using stale local deps.

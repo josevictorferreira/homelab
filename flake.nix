@@ -136,6 +136,7 @@
             inherit lib inputs system;
             tagSuffix = "-lightpanda";
             disableMatrixCredentialTouch = false;
+            legacyOpenClawPatches = false;
           };
         in
         {

@@ -94,6 +94,8 @@ spec:
               value: /lib/openclaw/extensions/memory-lancedb/node_modules:/lib/openclaw/dist/extensions/memory-lancedb/node_modules:/lib/openclaw/extensions/matrix/node_modules:/lib/openclaw/node_modules
             - name: NPM_CONFIG_PREFIX
               value: /data/npm-global
+            - name: OPENCLAW_ALLOW_ROOT
+              value: '1'
             - name: OPENCLAW_CONFIG_PATH
               value: /home/node/.openclaw/openclaw.json
             - name: OPENCLAW_DATA_DIR
@@ -117,7 +119,7 @@ spec:
           envFrom:
             - secretRef:
                 name: openclaw-config
-          image: ghcr.io/josevictorferreira/openclaw-nix:v2026.5.12-beta.1-lightpanda
+          image: ghcr.io/josevictorferreira/openclaw-nix:v2026.5.12-beta.1-lightpanda@sha256:077e29af4eb221253ffbc02f4a08a613a7e2be23d15267343e23e784cf198580
           imagePullPolicy: Always
           name: main
           ports:

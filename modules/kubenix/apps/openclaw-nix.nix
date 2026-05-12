@@ -5,7 +5,7 @@ let
   enableTailscaleSidecar = false;
   appImage = {
     repository = "ghcr.io/josevictorferreira/openclaw-nix";
-    tag = "v2026.5.12-beta.1-lightpanda";
+    tag = "v2026.5.12-beta.1-lightpanda@sha256:077e29af4eb221253ffbc02f4a08a613a7e2be23d15267343e23e784cf198580";
     pullPolicy = "Always";
   };
 in
@@ -139,6 +139,7 @@ in
                 TZ = homelab.timeZone;
                 AGENT_BROWSER_ENGINE = "lightpanda";
                 AGENT_BROWSER_ENDPOINT = "http://lightpanda.${namespace}.svc.cluster.local:9222";
+                OPENCLAW_ALLOW_ROOT = "1";
                 OPENCLAW_NIX_MODE = "1";
                 OPENCLAW_TRAJECTORY = "false";
                 NPM_CONFIG_PREFIX = "/data/npm-global";
