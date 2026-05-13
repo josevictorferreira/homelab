@@ -158,6 +158,14 @@ make format     # Fix nix formatting
 | Mark task complete if `make manifests` fails | Fix the error first, then mark complete |
 | Commit without user permission | Always ask for explicit approval before committing |
 
+### After Upgrading a Release, Commit and Push Before Flux Reconciles
+
+**Lesson:** Once an upgrade is verified working (image pushed, manifests generated, pod healthy), commit and push immediately. If you only `kubectl apply` the local manifests without committing, Flux's next reconciliation will revert the deployment to whatever version is currently in origin — undoing the upgrade.
+
+**Context:** Agents tend to treat `kubectl apply` as deployment, but this is a GitOps cluster. Flux is the source of truth, and it only reads from git. An uncommitted upgrade is an upgrade that will disappear.
+
+**Verify:** After upgrade: `git status` should show no uncommitted changes related to the upgraded app. `kubectl get deploy <app> -o jsonpath='{.spec.template.spec.containers[0].image}'` should match the committed manifest.
+
 ## NODES
 
 | Node | IP | Roles |
