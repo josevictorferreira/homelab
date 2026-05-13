@@ -144,6 +144,7 @@ in
                 OPENCLAW_TRAJECTORY = "false";
                 NPM_CONFIG_PREFIX = "/data/npm-global";
                 OPENCLAW_PLUGIN_STAGE_DIR = "/data/plugin-stage";
+                OPENCLAW_BUNDLED_PLUGINS_DIR = "/lib/openclaw/dist/extensions";
                 PIP_TARGET = "/data/local/lib/python";
                 PYTHONPATH = "/data/local/lib/python";
                 PATH = "/data/local/bin:/data/npm-global/bin:/bin:/usr/bin";

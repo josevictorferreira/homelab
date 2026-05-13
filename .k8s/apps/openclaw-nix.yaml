@@ -96,6 +96,8 @@ spec:
               value: /data/npm-global
             - name: OPENCLAW_ALLOW_ROOT
               value: '1'
+            - name: OPENCLAW_BUNDLED_PLUGINS_DIR
+              value: /lib/openclaw/dist/extensions
             - name: OPENCLAW_CONFIG_PATH
               value: /home/node/.openclaw/openclaw.json
             - name: OPENCLAW_DATA_DIR
