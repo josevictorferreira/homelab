@@ -739,212 +739,211 @@ let
     ];
   };
   openclawRootfs = pkgs.runCommand "openclaw-rootfs" { } ''
-                mkdir -p $out/lib $out/bin
-                # Copy openclaw gateway lib (the main app) - use -rL to dereference symlinks for writable files
-                if [ -d "${openclawGateway}/lib" ]; then cp -rL "${openclawGateway}/lib"/* $out/lib/ 2>/dev/null || true; fi
-                # Copy the openclaw binary - symlinks to nix store paths won't work in container
-                if [ -f "${openclawGateway}/bin/openclaw" ]; then cp -rL "${openclawGateway}/bin/openclaw" $out/bin/openclaw; fi
-                # Copy python lib for requests etc.
-                chmod -R u+w $out/lib/openclaw/ || true
-                # Strip ML inference libs (not used) - these are large, explicit rm is fast
-                rm -rf $out/lib/openclaw/node_modules/.pnpm/@node-llama-cpp+* $out/lib/openclaw/node_modules/.pnpm/node-llama-cpp@* 2>/dev/null || true
-                rm -rf $out/lib/openclaw/node_modules/node-llama-cpp $out/lib/openclaw/node_modules/@node-llama-cpp 2>/dev/null || true
-                # Skip slow find-based cross-platform stripping - saves ~5-10 min build time
-                cd $out/lib/openclaw
-                    # Extract lossless-claw from npm tarball (pre-built dist/index.js)
-                    mkdir -p /tmp/lossless-extract
-                    tar -xzf ${losslessClawSource} -C /tmp/lossless-extract/
-                    # dist/extensions/lossless-claw may already exist from upstream build (read-only) — chmod first
-                    chmod -R u+w "$out/lib/openclaw/dist/extensions/lossless-claw/" 2>/dev/null || true
-                    mkdir -p "$out/lib/openclaw/dist/extensions/lossless-claw"
-                    cp /tmp/lossless-extract/package/dist/index.js "$out/lib/openclaw/dist/extensions/lossless-claw/index.js" 2>/dev/null || true
-                    cp /tmp/lossless-extract/package/openclaw.plugin.json "$out/lib/openclaw/dist/extensions/lossless-claw/openclaw.plugin.json" 2>/dev/null || true
-                    cp /tmp/lossless-extract/package/package.json "$out/lib/openclaw/dist/extensions/lossless-claw/package.json" 2>/dev/null || true
-                    # Fix package.json paths: npm has main=dist/index.js but we place index.js at root
-                    ${pkgs.python3}/bin/python3 ${losslessClawPatchScript} "$out/lib/openclaw/dist/extensions/lossless-claw/package.json"
-                    # Also create extensions/lossless-claw for generic copy loop compatibility
-                    mkdir -p "$out/lib/openclaw/extensions/lossless-claw"
-                    chmod -R u+w "$out/lib/openclaw/extensions/lossless-claw/" 2>/dev/null || true
-                    cp /tmp/lossless-extract/package/openclaw.plugin.json "$out/lib/openclaw/extensions/lossless-claw/openclaw.plugin.json" 2>/dev/null || true
-                    cp "$out/lib/openclaw/dist/extensions/lossless-claw/package.json" "$out/lib/openclaw/extensions/lossless-claw/package.json" 2>/dev/null || true
-                    if [ -d /tmp/lossless-extract/package/skills ]; then
-                      cp -r /tmp/lossless-extract/package/skills "$out/lib/openclaw/dist/extensions/lossless-claw/"
-                      cp -r /tmp/lossless-extract/package/skills "$out/lib/openclaw/extensions/lossless-claw/"
-                    fi
-                    rm -rf /tmp/lossless-extract
-                # Copy plugin manifests and runtime TS sources from source extensions/ into dist/extensions/
-                # The gateway resolves plugin runtime modules (e.g. light-runtime-api.ts) from dist/extensions/
-                if [ -d "$out/lib/openclaw/extensions" ] && [ -d "$out/lib/openclaw/dist/extensions" ]; then
-                  chmod -R u+w $out/lib/openclaw/dist/extensions/ || true
-                  for extdir in $out/lib/openclaw/extensions/*/; do
-                    extname=$(basename "$extdir")
-                    # Skip lossless-claw (pre-built from npm)
-                    if [ "$extname" = "lossless-claw" ]; then
-                      continue
-                    fi
-                    mkdir -p "$out/lib/openclaw/dist/extensions/$extname"
-                    if [ -d "$out/lib/openclaw/dist/extensions/$extname" ]; then
-                      # Copy plugin manifest
-                      if [ -f "$extdir/openclaw.plugin.json" ]; then
-                        cp "$extdir/openclaw.plugin.json" "$out/lib/openclaw/dist/extensions/$extname/openclaw.plugin.json"
-                      fi
-                      # Do NOT copy .ts source files — the upstream build already provides compiled .js in dist/extensions/.
-                      # collectTopLevelPublicSurfaceArtifacts reads all files and rewriteEntryToBuiltPath converts
-                      # .ts → .js, causing duplicate runtime sidecar paths and assertUniqueValues failure.
-                      # Copy src/ directory if it exists (contains compiled plugin code)
-                      if [ -d "$extdir/src" ]; then
-                        cp -r "$extdir/src" "$out/lib/openclaw/dist/extensions/$extname/"
-                      fi
-                      # Copy skills/ directory if it exists (contains plugin skills that OpenClaw loads at runtime)
-                      if [ -d "$extdir/skills" ]; then
-                        cp -r "$extdir/skills" "$out/lib/openclaw/dist/extensions/$extname/"
-                      fi
-                      # Copy package.json for dependency resolution
-                      if [ -f "$extdir/package.json" ]; then
-                        cp "$extdir/package.json" "$out/lib/openclaw/dist/extensions/$extname/package.json"
-                      fi
-                    fi
-                  done
-
-                  # The memory CLI only loads plugins activated for the `memory` command.
-                  # Embedding provider plugins declare their contract but lack that command activation upstream.
-                  ${pkgs.python3}/bin/python3 ${memoryEmbeddingPatchScript} "$out/lib/openclaw/extensions" "$out/lib/openclaw/dist/extensions"
-
-                  # Runtime deps are already packaged at /lib/openclaw/node_modules.
-                  # Copy them into each plugin root so OpenClaw does not try `npm install`
-                  # against extension package.json files that contain workspace:* dev deps.
-                  # Use copies (not symlinks) because OpenClaw 2026.5.12+ enforces a plugin root
-                  # boundary check — symlinks resolving to the nix store fail that check.
-                  ${pkgs.python3}/bin/python3 ${copyNodeModulesPatchScript} "$out/lib/openclaw/node_modules" "$out/lib/openclaw/extensions" "$out/lib/openclaw/dist/extensions" "$out/lib/openclaw/dist-runtime/extensions"
-
-                  # Patch the bundled channel boundary check to recognize dist-runtime/extensions/
-                  # as a valid boundary root. Without this, resolveBundledChannelBoundaryRoot only
-                  # checks dist/extensions and extensions/, falling through to the wrong root for
-                  # dist-runtime which causes 'module path escapes plugin root' errors.
-                  chmod u+w "$out/lib/openclaw/dist/bundled-DSLJOhq0.js" || true
-                  substituteInPlace "$out/lib/openclaw/dist/bundled-DSLJOhq0.js" \
-                    --replace-fail 'const distRoot = path.resolve(params.packageRoot, "dist", "extensions", params.metadata.dirName);' \
-                    'const distRuntimeRoot = path.resolve(params.packageRoot, "dist-runtime", "extensions", params.metadata.dirName);
-    if (params.modulePath === distRuntimeRoot || params.modulePath.startsWith(distRuntimeRoot + path.sep)) return distRuntimeRoot;
-    const distRoot = path.resolve(params.packageRoot, "dist", "extensions", params.metadata.dirName);'
-
-                  # Some runtime chunks resolve stable, unhashed module names at runtime.
-                  # The upstream postbuild writes these aliases; keep them when repacking.
-                  ${pkgs.python3}/bin/python3 ${runtimeAliasesPatchScript} "$out/lib/openclaw/dist"
+            mkdir -p $out/lib $out/bin
+            # Copy openclaw gateway lib (the main app) - use -rL to dereference symlinks for writable files
+            if [ -d "${openclawGateway}/lib" ]; then cp -rL "${openclawGateway}/lib"/* $out/lib/ 2>/dev/null || true; fi
+            # Copy the openclaw binary - symlinks to nix store paths won't work in container
+            if [ -f "${openclawGateway}/bin/openclaw" ]; then cp -rL "${openclawGateway}/bin/openclaw" $out/bin/openclaw; fi
+            # Copy python lib for requests etc.
+            chmod -R u+w $out/lib/openclaw/ || true
+            # Strip ML inference libs (not used) - these are large, explicit rm is fast
+            rm -rf $out/lib/openclaw/node_modules/.pnpm/@node-llama-cpp+* $out/lib/openclaw/node_modules/.pnpm/node-llama-cpp@* 2>/dev/null || true
+            rm -rf $out/lib/openclaw/node_modules/node-llama-cpp $out/lib/openclaw/node_modules/@node-llama-cpp 2>/dev/null || true
+            # Skip slow find-based cross-platform stripping - saves ~5-10 min build time
+            cd $out/lib/openclaw
+                # Extract lossless-claw from npm tarball (pre-built dist/index.js)
+                mkdir -p /tmp/lossless-extract
+                tar -xzf ${losslessClawSource} -C /tmp/lossless-extract/
+                # dist/extensions/lossless-claw may already exist from upstream build (read-only) — chmod first
+                chmod -R u+w "$out/lib/openclaw/dist/extensions/lossless-claw/" 2>/dev/null || true
+                mkdir -p "$out/lib/openclaw/dist/extensions/lossless-claw"
+                cp /tmp/lossless-extract/package/dist/index.js "$out/lib/openclaw/dist/extensions/lossless-claw/index.js" 2>/dev/null || true
+                cp /tmp/lossless-extract/package/openclaw.plugin.json "$out/lib/openclaw/dist/extensions/lossless-claw/openclaw.plugin.json" 2>/dev/null || true
+                cp /tmp/lossless-extract/package/package.json "$out/lib/openclaw/dist/extensions/lossless-claw/package.json" 2>/dev/null || true
+                # Fix package.json paths: npm has main=dist/index.js but we place index.js at root
+                ${pkgs.python3}/bin/python3 ${losslessClawPatchScript} "$out/lib/openclaw/dist/extensions/lossless-claw/package.json"
+                # Also create extensions/lossless-claw for generic copy loop compatibility
+                mkdir -p "$out/lib/openclaw/extensions/lossless-claw"
+                chmod -R u+w "$out/lib/openclaw/extensions/lossless-claw/" 2>/dev/null || true
+                cp /tmp/lossless-extract/package/openclaw.plugin.json "$out/lib/openclaw/extensions/lossless-claw/openclaw.plugin.json" 2>/dev/null || true
+                cp "$out/lib/openclaw/dist/extensions/lossless-claw/package.json" "$out/lib/openclaw/extensions/lossless-claw/package.json" 2>/dev/null || true
+                if [ -d /tmp/lossless-extract/package/skills ]; then
+                  cp -r /tmp/lossless-extract/package/skills "$out/lib/openclaw/dist/extensions/lossless-claw/"
+                  cp -r /tmp/lossless-extract/package/skills "$out/lib/openclaw/extensions/lossless-claw/"
                 fi
-
-                # lossless-claw: pre-built index.js already copied to dist/extensions/ above
-                # Symlink plugin-entry.runtime.ts to dist/ top-level for jiti resolution.
-                # The bundled dist/plugin-entry.runtime-CuPlkRZ7.js uses jiti to load
-                # ./plugin-entry.runtime.ts relative to itself, but the .ts source only
-                # exists inside dist/extensions/<name>/src/. Create a symlink so jiti finds it.
-                chmod u+w $out/lib/openclaw/dist/ || true
-                for extdir in $out/lib/openclaw/dist/extensions/*/src; do
-                  if [ -f "$extdir/plugin-entry.runtime.ts" ]; then
-                    extname=$(basename $(dirname "$extdir"))
-                    ln -sf "extensions/$extname/src/plugin-entry.runtime.ts" \
-                      "$out/lib/openclaw/dist/plugin-entry.runtime.ts"
-                    break
+                rm -rf /tmp/lossless-extract
+            # Copy plugin manifests and runtime TS sources from source extensions/ into dist/extensions/
+            # The gateway resolves plugin runtime modules (e.g. light-runtime-api.ts) from dist/extensions/
+            if [ -d "$out/lib/openclaw/extensions" ] && [ -d "$out/lib/openclaw/dist/extensions" ]; then
+              chmod -R u+w $out/lib/openclaw/dist/extensions/ || true
+              for extdir in $out/lib/openclaw/extensions/*/; do
+                extname=$(basename "$extdir")
+                # Skip lossless-claw (pre-built from npm)
+                if [ "$extname" = "lossless-claw" ]; then
+                  continue
+                fi
+                mkdir -p "$out/lib/openclaw/dist/extensions/$extname"
+                if [ -d "$out/lib/openclaw/dist/extensions/$extname" ]; then
+                  # Copy plugin manifest
+                  if [ -f "$extdir/openclaw.plugin.json" ]; then
+                    cp "$extdir/openclaw.plugin.json" "$out/lib/openclaw/dist/extensions/$extname/openclaw.plugin.json"
                   fi
-                done
-                # memory-lancedb is bundled as TypeScript source with native deps in root node_modules.
-                # The plugin manifest points at ./index.ts, so copy only its runtime TS files into dist.
-                if [ -d "$out/lib/openclaw/extensions/memory-lancedb" ]; then
-                  mkdir -p "$out/lib/openclaw/dist/extensions/memory-lancedb"
-                  chmod -R u+w "$out/lib/openclaw/extensions/memory-lancedb" "$out/lib/openclaw/dist/extensions/memory-lancedb" 2>/dev/null || true
-                  for file in api.ts cli-metadata.ts config.ts index.ts lancedb-runtime.ts; do
-                    if [ -f "$out/lib/openclaw/extensions/memory-lancedb/$file" ]; then
-                      cp "$out/lib/openclaw/extensions/memory-lancedb/$file" "$out/lib/openclaw/dist/extensions/memory-lancedb/$file"
-                    fi
-                  done
-                  cp "$out/lib/openclaw/extensions/memory-lancedb/openclaw.plugin.json" "$out/lib/openclaw/dist/extensions/memory-lancedb/openclaw.plugin.json" 2>/dev/null || true
-                  cp "$out/lib/openclaw/extensions/memory-lancedb/package.json" "$out/lib/openclaw/dist/extensions/memory-lancedb/package.json" 2>/dev/null || true
-                fi
-                # Do NOT copy/modify dist/package.json.
-                # The upstream build places its own package.json in dist/ (if any).
-                # findPackageRootSync walks up looking for name:"openclaw" — if it finds
-                # one in dist/, it resolves runtime paths relative to dist/, causing
-                # dist/dist/plugins/... (double dist). Leaving the upstream dist/package.json
-                # untouched (which has name:"openclaw-dist" from upstream build) ensures
-                # findPackageRootSync continues to /lib/openclaw/package.json (name:"openclaw")
-                # and resolves dist/plugins/runtime/ correctly.
-                mkdir -p $out/etc
-                for pkg in ${pkgs.tzdata}; do
-                  if [ -d "$pkg/etc" ]; then cp -rsf "$pkg/etc"/* $out/etc/ 2>/dev/null || true; fi
-                done
-                mkdir -p $out/share/zoneinfo
-                cp -rsf ${pkgs.tzdata}/share/zoneinfo/* $out/share/zoneinfo/ 2>/dev/null || true
-                # Create /etc/localtime so glibc (and Python datetime.now()) resolves TZ correctly
-                # Without this, Python returns UTC despite TZ env var being set
-                ln -sf ${pkgs.tzdata}/share/zoneinfo/America/Sao_Paulo $out/etc/localtime
-                mkdir -p $out/etc/ssl/certs
-                cp -rsf ${pkgs.cacert}/etc/ssl/certs/* $out/etc/ssl/certs/ 2>/dev/null || true
-                if [ -d "${pkgs.python3Packages.requests}/lib" ]; then cp -rsf ${pkgs.python3Packages.requests}/lib/* $out/lib/ 2>/dev/null || true; fi
-                # Config is mounted externally via volume, no baked-in config needed
-                mkdir -p $out/etc/openclaw
-                if [ -d "${matrixPluginDeps}/matrix-deps/node_modules" ]; then
-                  chmod -R u+w $out/lib/openclaw/extensions/matrix/ || true
-                  rm -rf $out/lib/openclaw/extensions/matrix/node_modules
-                  cp -rL ${matrixPluginDeps}/matrix-deps/node_modules $out/lib/openclaw/extensions/matrix/
-                fi
-                chmod -R u+w $out/lib/openclaw/extensions/matrix/ 2>/dev/null || true
-                # Copy lossless-claw node_modules to dist/extensions path (not extensions path)
-                if [ -d "$out/lib/openclaw/dist/extensions/lossless-claw" ]; then
-                  chmod -R u+w "$out/lib/openclaw/dist/extensions/lossless-claw/" 2>/dev/null || true
-                  rm -rf "$out/lib/openclaw/dist/extensions/lossless-claw/node_modules" 2>/dev/null || true
-                  if [ -d "${losslessClawPackage}/lossless-claw-deps/node_modules" ]; then
-                    cp -rL ${losslessClawPackage}/lossless-claw-deps/node_modules "$out/lib/openclaw/dist/extensions/lossless-claw/"
+                  # Do NOT copy .ts source files — the upstream build already provides compiled .js in dist/extensions/.
+                  # collectTopLevelPublicSurfaceArtifacts reads all files and rewriteEntryToBuiltPath converts
+                  # .ts → .js, causing duplicate runtime sidecar paths and assertUniqueValues failure.
+                  # Copy src/ directory if it exists (contains compiled plugin code)
+                  if [ -d "$extdir/src" ]; then
+                    cp -r "$extdir/src" "$out/lib/openclaw/dist/extensions/$extname/"
+                  fi
+                  # Copy skills/ directory if it exists (contains plugin skills that OpenClaw loads at runtime)
+                  if [ -d "$extdir/skills" ]; then
+                    cp -r "$extdir/skills" "$out/lib/openclaw/dist/extensions/$extname/"
+                  fi
+                  # Copy package.json for dependency resolution
+                  if [ -f "$extdir/package.json" ]; then
+                    cp "$extdir/package.json" "$out/lib/openclaw/dist/extensions/$extname/package.json"
                   fi
                 fi
-                ${lib.optionalString matrixSendQueuePatch ''
-                  # Fix upstream build regression #33001: Rolldown bundles keyed-async-queue into index.js
-                  # but OpenClaw's runtime TypeScript loader lacks the alias for this subpath.
-                  # Patch the import to use the main plugin-sdk export which includes KeyedAsyncQueue.
-                  SEND_QUEUE="$out/lib/openclaw/extensions/matrix/src/matrix/send-queue.ts"
-                  if [ -f "$SEND_QUEUE" ]; then
-                    chmod u+w "$SEND_QUEUE"
-                    sed -i 's|openclaw/plugin-sdk/keyed-async-queue|openclaw/plugin-sdk|g' "$SEND_QUEUE"
-                  fi
-                ''}
-                # Add openclaw self-symlink so extensions can resolve "openclaw/*" imports
-                mkdir -p "$out/lib/openclaw/node_modules"
-                ln -sf ../ "$out/lib/openclaw/node_modules/openclaw"
-                # Copy pi-ai dependencies to the root node_modules so openclaw can find them
-                # (Nix sandbox prevents npm install here)
-                cd "$out/lib/openclaw"
-                chmod -R u+w node_modules || true
-                if [ -d "${losslessClawPackage}/lossless-claw-deps/node_modules/@mariozechner" ]; then
-                  mkdir -p node_modules/@mariozechner
-                  cp -rL ${losslessClawPackage}/lossless-claw-deps/node_modules/@mariozechner/* node_modules/@mariozechner/
-                fi
-                if [ -d "${losslessClawPackage}/lossless-claw-deps/node_modules/@sinclair" ]; then
-                  mkdir -p node_modules/@sinclair
-                  cp -rL ${losslessClawPackage}/lossless-claw-deps/node_modules/@sinclair/* node_modules/@sinclair/
-                fi
-                cd - >/dev/null
-                CRYPTO_PKG="$out/lib/openclaw/extensions/matrix/node_modules/@matrix-org/matrix-sdk-crypto-nodejs"
-                if [ -d "$CRYPTO_PKG" ]; then chmod -R u+w "$CRYPTO_PKG" || true; cp ${matrixCryptoNative} "$CRYPTO_PKG/matrix-sdk-crypto.linux-x64-gnu.node"; fi
-                ${lib.optionalString disableMatrixCredentialTouch ''
-                  ${pkgs.python3}/bin/python3 ${matrixCredentialTouchPatchScript} "$out/lib/openclaw/dist/extensions/matrix"
-                ''}
-                # Disabled for v2026.5.2-beta.2 — bundled runtime deps structure changed
-        # ${pkgs.python3}/bin/python3 ${bundledRuntimeDepsNixModePatchScript} "$out/lib/openclaw/dist"
-                # Install RTK binary into /bin (extract from tar.gz)
-                mkdir -p /tmp/rtk-extract
-                tar -xzf ${rtkBinary} -C /tmp/rtk-extract/
-                cp /tmp/rtk-extract/rtk $out/bin/rtk
-                chmod +x $out/bin/rtk
-                rm -rf /tmp/rtk-extract
+              done
 
-                mkdir -p "$out/lib/openclaw/extensions/rtk-rewrite"
-                mkdir -p "$out/lib/openclaw/dist/extensions/rtk-rewrite"
-                cp ${rtkPluginJson} "$out/lib/openclaw/extensions/rtk-rewrite/openclaw.plugin.json"
-                cp ${rtkPluginTs} "$out/lib/openclaw/extensions/rtk-rewrite/index.ts"
-                cp ${rtkPluginJson} "$out/lib/openclaw/dist/extensions/rtk-rewrite/openclaw.plugin.json"
-                cp ${rtkPluginTs} "$out/lib/openclaw/dist/extensions/rtk-rewrite/index.ts"
-                cp ${rtkPackageJson} "$out/lib/openclaw/extensions/rtk-rewrite/package.json"
-                cp ${rtkPackageJson} "$out/lib/openclaw/dist/extensions/rtk-rewrite/package.json"
-                chmod -R u+w "$out/lib/openclaw/extensions/rtk-rewrite/" "$out/lib/openclaw/dist/extensions/rtk-rewrite/" 2>/dev/null || true
+              # The memory CLI only loads plugins activated for the `memory` command.
+              # Embedding provider plugins declare their contract but lack that command activation upstream.
+              ${pkgs.python3}/bin/python3 ${memoryEmbeddingPatchScript} "$out/lib/openclaw/extensions" "$out/lib/openclaw/dist/extensions"
+
+              # Runtime deps are already packaged at /lib/openclaw/node_modules.
+              # Copy them into each plugin root so OpenClaw does not try `npm install`
+              # against extension package.json files that contain workspace:* dev deps.
+              # Use copies (not symlinks) because OpenClaw 2026.5.12+ enforces a plugin root
+              # boundary check — symlinks resolving to the nix store fail that check.
+              ${pkgs.python3}/bin/python3 ${copyNodeModulesPatchScript} "$out/lib/openclaw/node_modules" "$out/lib/openclaw/extensions" "$out/lib/openclaw/dist/extensions"
+
+              # Remove dist-runtime/extensions to force OpenClaw to use dist/extensions/
+              # instead. The dist-runtime wrapper index.js re-exports to dist/extensions/
+              # via ../../../dist/... — Node.js resolves the import outside the
+              # dist-runtime boundary root, causing 'module path escapes plugin root'
+              # errors. With dist-runtime removed, resolveBundledPluginsDir falls back
+              # to dist/extensions/ which has correct boundary roots. The boundary
+              # check patch in bundled-DSLJOhq0.js is no longer needed either.
+              chmod u+w "$out/lib/openclaw/dist-runtime" || true
+              rm -rf "$out/lib/openclaw/dist-runtime/extensions"
+
+              # Some runtime chunks resolve stable, unhashed module names at runtime.
+              # The upstream postbuild writes these aliases; keep them when repacking.
+              ${pkgs.python3}/bin/python3 ${runtimeAliasesPatchScript} "$out/lib/openclaw/dist"
+            fi
+
+            # lossless-claw: pre-built index.js already copied to dist/extensions/ above
+            # Symlink plugin-entry.runtime.ts to dist/ top-level for jiti resolution.
+            # The bundled dist/plugin-entry.runtime-CuPlkRZ7.js uses jiti to load
+            # ./plugin-entry.runtime.ts relative to itself, but the .ts source only
+            # exists inside dist/extensions/<name>/src/. Create a symlink so jiti finds it.
+            chmod u+w $out/lib/openclaw/dist/ || true
+            for extdir in $out/lib/openclaw/dist/extensions/*/src; do
+              if [ -f "$extdir/plugin-entry.runtime.ts" ]; then
+                extname=$(basename $(dirname "$extdir"))
+                ln -sf "extensions/$extname/src/plugin-entry.runtime.ts" \
+                  "$out/lib/openclaw/dist/plugin-entry.runtime.ts"
+                break
+              fi
+            done
+            # memory-lancedb is bundled as TypeScript source with native deps in root node_modules.
+            # The plugin manifest points at ./index.ts, so copy only its runtime TS files into dist.
+            if [ -d "$out/lib/openclaw/extensions/memory-lancedb" ]; then
+              mkdir -p "$out/lib/openclaw/dist/extensions/memory-lancedb"
+              chmod -R u+w "$out/lib/openclaw/extensions/memory-lancedb" "$out/lib/openclaw/dist/extensions/memory-lancedb" 2>/dev/null || true
+              for file in api.ts cli-metadata.ts config.ts index.ts lancedb-runtime.ts; do
+                if [ -f "$out/lib/openclaw/extensions/memory-lancedb/$file" ]; then
+                  cp "$out/lib/openclaw/extensions/memory-lancedb/$file" "$out/lib/openclaw/dist/extensions/memory-lancedb/$file"
+                fi
+              done
+              cp "$out/lib/openclaw/extensions/memory-lancedb/openclaw.plugin.json" "$out/lib/openclaw/dist/extensions/memory-lancedb/openclaw.plugin.json" 2>/dev/null || true
+              cp "$out/lib/openclaw/extensions/memory-lancedb/package.json" "$out/lib/openclaw/dist/extensions/memory-lancedb/package.json" 2>/dev/null || true
+            fi
+            # Do NOT copy/modify dist/package.json.
+            # The upstream build places its own package.json in dist/ (if any).
+            # findPackageRootSync walks up looking for name:"openclaw" — if it finds
+            # one in dist/, it resolves runtime paths relative to dist/, causing
+            # dist/dist/plugins/... (double dist). Leaving the upstream dist/package.json
+            # untouched (which has name:"openclaw-dist" from upstream build) ensures
+            # findPackageRootSync continues to /lib/openclaw/package.json (name:"openclaw")
+            # and resolves dist/plugins/runtime/ correctly.
+            mkdir -p $out/etc
+            for pkg in ${pkgs.tzdata}; do
+              if [ -d "$pkg/etc" ]; then cp -rsf "$pkg/etc"/* $out/etc/ 2>/dev/null || true; fi
+            done
+            mkdir -p $out/share/zoneinfo
+            cp -rsf ${pkgs.tzdata}/share/zoneinfo/* $out/share/zoneinfo/ 2>/dev/null || true
+            # Create /etc/localtime so glibc (and Python datetime.now()) resolves TZ correctly
+            # Without this, Python returns UTC despite TZ env var being set
+            ln -sf ${pkgs.tzdata}/share/zoneinfo/America/Sao_Paulo $out/etc/localtime
+            mkdir -p $out/etc/ssl/certs
+            cp -rsf ${pkgs.cacert}/etc/ssl/certs/* $out/etc/ssl/certs/ 2>/dev/null || true
+            if [ -d "${pkgs.python3Packages.requests}/lib" ]; then cp -rsf ${pkgs.python3Packages.requests}/lib/* $out/lib/ 2>/dev/null || true; fi
+            # Config is mounted externally via volume, no baked-in config needed
+            mkdir -p $out/etc/openclaw
+            if [ -d "${matrixPluginDeps}/matrix-deps/node_modules" ]; then
+              chmod -R u+w $out/lib/openclaw/extensions/matrix/ || true
+              rm -rf $out/lib/openclaw/extensions/matrix/node_modules
+              cp -rL ${matrixPluginDeps}/matrix-deps/node_modules $out/lib/openclaw/extensions/matrix/
+            fi
+            chmod -R u+w $out/lib/openclaw/extensions/matrix/ 2>/dev/null || true
+            # Copy lossless-claw node_modules to dist/extensions path (not extensions path)
+            if [ -d "$out/lib/openclaw/dist/extensions/lossless-claw" ]; then
+              chmod -R u+w "$out/lib/openclaw/dist/extensions/lossless-claw/" 2>/dev/null || true
+              rm -rf "$out/lib/openclaw/dist/extensions/lossless-claw/node_modules" 2>/dev/null || true
+              if [ -d "${losslessClawPackage}/lossless-claw-deps/node_modules" ]; then
+                cp -rL ${losslessClawPackage}/lossless-claw-deps/node_modules "$out/lib/openclaw/dist/extensions/lossless-claw/"
+              fi
+            fi
+            ${lib.optionalString matrixSendQueuePatch ''
+              # Fix upstream build regression #33001: Rolldown bundles keyed-async-queue into index.js
+              # but OpenClaw's runtime TypeScript loader lacks the alias for this subpath.
+              # Patch the import to use the main plugin-sdk export which includes KeyedAsyncQueue.
+              SEND_QUEUE="$out/lib/openclaw/extensions/matrix/src/matrix/send-queue.ts"
+              if [ -f "$SEND_QUEUE" ]; then
+                chmod u+w "$SEND_QUEUE"
+                sed -i 's|openclaw/plugin-sdk/keyed-async-queue|openclaw/plugin-sdk|g' "$SEND_QUEUE"
+              fi
+            ''}
+            # Add openclaw self-symlink so extensions can resolve "openclaw/*" imports
+            mkdir -p "$out/lib/openclaw/node_modules"
+            ln -sf ../ "$out/lib/openclaw/node_modules/openclaw"
+            # Copy pi-ai dependencies to the root node_modules so openclaw can find them
+            # (Nix sandbox prevents npm install here)
+            cd "$out/lib/openclaw"
+            chmod -R u+w node_modules || true
+            if [ -d "${losslessClawPackage}/lossless-claw-deps/node_modules/@mariozechner" ]; then
+              mkdir -p node_modules/@mariozechner
+              cp -rL ${losslessClawPackage}/lossless-claw-deps/node_modules/@mariozechner/* node_modules/@mariozechner/
+            fi
+            if [ -d "${losslessClawPackage}/lossless-claw-deps/node_modules/@sinclair" ]; then
+              mkdir -p node_modules/@sinclair
+              cp -rL ${losslessClawPackage}/lossless-claw-deps/node_modules/@sinclair/* node_modules/@sinclair/
+            fi
+            cd - >/dev/null
+            CRYPTO_PKG="$out/lib/openclaw/extensions/matrix/node_modules/@matrix-org/matrix-sdk-crypto-nodejs"
+            if [ -d "$CRYPTO_PKG" ]; then chmod -R u+w "$CRYPTO_PKG" || true; cp ${matrixCryptoNative} "$CRYPTO_PKG/matrix-sdk-crypto.linux-x64-gnu.node"; fi
+            ${lib.optionalString disableMatrixCredentialTouch ''
+              ${pkgs.python3}/bin/python3 ${matrixCredentialTouchPatchScript} "$out/lib/openclaw/dist/extensions/matrix"
+            ''}
+            # Disabled for v2026.5.2-beta.2 — bundled runtime deps structure changed
+    # ${pkgs.python3}/bin/python3 ${bundledRuntimeDepsNixModePatchScript} "$out/lib/openclaw/dist"
+            # Install RTK binary into /bin (extract from tar.gz)
+            mkdir -p /tmp/rtk-extract
+            tar -xzf ${rtkBinary} -C /tmp/rtk-extract/
+            cp /tmp/rtk-extract/rtk $out/bin/rtk
+            chmod +x $out/bin/rtk
+            rm -rf /tmp/rtk-extract
+
+            mkdir -p "$out/lib/openclaw/extensions/rtk-rewrite"
+            mkdir -p "$out/lib/openclaw/dist/extensions/rtk-rewrite"
+            cp ${rtkPluginJson} "$out/lib/openclaw/extensions/rtk-rewrite/openclaw.plugin.json"
+            cp ${rtkPluginTs} "$out/lib/openclaw/extensions/rtk-rewrite/index.ts"
+            cp ${rtkPluginJson} "$out/lib/openclaw/dist/extensions/rtk-rewrite/openclaw.plugin.json"
+            cp ${rtkPluginTs} "$out/lib/openclaw/dist/extensions/rtk-rewrite/index.ts"
+            cp ${rtkPackageJson} "$out/lib/openclaw/extensions/rtk-rewrite/package.json"
+            cp ${rtkPackageJson} "$out/lib/openclaw/dist/extensions/rtk-rewrite/package.json"
+            chmod -R u+w "$out/lib/openclaw/extensions/rtk-rewrite/" "$out/lib/openclaw/dist/extensions/rtk-rewrite/" 2>/dev/null || true
   '';
 in
 dockerTools.streamLayeredImage {
