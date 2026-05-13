@@ -5,7 +5,7 @@ let
   enableTailscaleSidecar = false;
   appImage = {
     repository = "ghcr.io/josevictorferreira/openclaw-nix";
-    tag = "v2026.5.12-beta.4-lightpanda@sha256:b0a604e321d19a1b0afe528ce5ab54cf7dec320e624f79e67af1c2fdf297cef8";
+    tag = "v2026.5.12-beta.4-lightpanda@sha256:27cb01ae3c6b8232b731206e418c07b6ee1d51e6690bcef87aa482586a778414";
     pullPolicy = "Always";
   };
 in
@@ -144,7 +144,6 @@ in
                 OPENCLAW_TRAJECTORY = "false";
                 NPM_CONFIG_PREFIX = "/data/npm-global";
                 OPENCLAW_PLUGIN_STAGE_DIR = "/data/plugin-stage";
-                OPENCLAW_BUNDLED_PLUGINS_DIR = "/lib/openclaw/dist/extensions";
                 PIP_TARGET = "/data/local/lib/python";
                 PYTHONPATH = "/data/local/lib/python";
                 PATH = "/data/local/bin:/data/npm-global/bin:/bin:/usr/bin";
