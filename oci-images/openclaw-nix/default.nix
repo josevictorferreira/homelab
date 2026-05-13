@@ -3,7 +3,7 @@
   lib,
   inputs,
   system,
-  version ? "2026.5.12-beta.3",
+  version ? "2026.5.12-beta.4",
   tagSuffix ? "",
   legacyOpenClawPatches ? true,
   matrixSendQueuePatch ? true,
@@ -18,8 +18,8 @@ let
     owner = "openclaw";
     repo = "openclaw";
     rev = "v${version}";
-    sha256 = "sha256-nSaKF1IwP1C9KUuwlFLc+dm3+/ZzBNU6/Qv/cXbIbGc=";
-    pnpmDepsHash = "sha256-/6wevsGXEuPFSA64V9IYQLEvb0Bbu54h0ckMl3rvnQ4=";
+    sha256 = "sha256-qGaMvtRPhCrdp73SXWY3HXoNRLMorJ90qk323TZcHR0=";
+    pnpmDepsHash = "sha256-hhSZpqvuua4W33avfWhgJcNR1cLzUDyWwSqDxDaf2Pg=";
     applyPublicSurfaceHardlinksPatch = false;
     applySkipPluginAutoEnableNixModePatch = false;
   };
@@ -368,10 +368,11 @@ let
       "            file.write(\"\\n\")"
     ]
   );
-  linkNodeModulesPatchScript = pkgs.writeText "openclaw-link-node-modules.py" (
+  copyNodeModulesPatchScript = pkgs.writeText "openclaw-copy-node-modules.py" (
     builtins.concatStringsSep "\n" [
       "import json"
       "import os"
+      "import shutil"
       "import sys"
       "from pathlib import Path"
       ""
@@ -385,19 +386,18 @@ let
       "            names.extend(name for name in deps if isinstance(name, str))"
       "    return names"
       ""
-      "def link_dependency(plugin_dir, dep_name):"
+      "def copy_dependency(plugin_dir, dep_name):"
       "    target = root_node_modules.joinpath(*dep_name.split(\"/\"))"
       "    if not (target / \"package.json\").exists():"
       "        return"
       ""
-      "    link_path = plugin_dir.joinpath(\"node_modules\", *dep_name.split(\"/\"))"
-      "    if link_path.exists():"
-      "        return"
-      "    if link_path.is_symlink():"
-      "        link_path.unlink()"
+      "    dest = plugin_dir.joinpath(\"node_modules\", *dep_name.split(\"/\"))"
+      "    if dest.exists() or dest.is_symlink():"
+      "        if dest.is_symlink():"
+      "            dest.unlink()"
       ""
-      "    link_path.parent.mkdir(parents=True, exist_ok=True)"
-      "    os.symlink(os.path.relpath(target, link_path.parent), link_path)"
+      "    dest.parent.mkdir(parents=True, exist_ok=True)"
+      "    shutil.copytree(target, dest, symlinks=False)"
       ""
       "for extensions_arg in sys.argv[2:]:"
       "    extensions_dir = Path(extensions_arg)"
@@ -406,7 +406,7 @@ let
       "            package_json = json.load(file)"
       ""
       "        for dep_name in dependency_names(package_json):"
-      "            link_dependency(package_path.parent, dep_name)"
+      "            copy_dependency(package_path.parent, dep_name)"
     ]
   );
   runtimeAliasesPatchScript = pkgs.writeText "openclaw-runtime-aliases.py" (
@@ -796,9 +796,11 @@ let
               ${pkgs.python3}/bin/python3 ${memoryEmbeddingPatchScript} "$out/lib/openclaw/extensions" "$out/lib/openclaw/dist/extensions"
 
               # Runtime deps are already packaged at /lib/openclaw/node_modules.
-              # Link them into each plugin root so OpenClaw does not try `npm install`
+              # Copy them into each plugin root so OpenClaw does not try `npm install`
               # against extension package.json files that contain workspace:* dev deps.
-              ${pkgs.python3}/bin/python3 ${linkNodeModulesPatchScript} "$out/lib/openclaw/node_modules" "$out/lib/openclaw/extensions" "$out/lib/openclaw/dist/extensions"
+              # Use copies (not symlinks) because OpenClaw 2026.5.12+ enforces a plugin root
+              # boundary check — symlinks resolving to the nix store fail that check.
+              ${pkgs.python3}/bin/python3 ${copyNodeModulesPatchScript} "$out/lib/openclaw/node_modules" "$out/lib/openclaw/extensions" "$out/lib/openclaw/dist/extensions"
 
               # Some runtime chunks resolve stable, unhashed module names at runtime.
               # The upstream postbuild writes these aliases; keep them when repacking.
