@@ -453,6 +453,21 @@
 **Context:** The generic plugin copy loop in `oci-images/openclaw-nix/default.nix` intentionally skips `.ts` files to avoid `assertUniqueValues` failures. Plugins with `.ts` entry points (like lossless-claw) need an explicit copy step outside the loop.
 **Verify:** `podman run --rm --entrypoint '' <image> ls /lib/openclaw/dist/extensions/<plugin>/index.ts` — file must exist
 
+### OpenClaw Plugin Discovery Roots Use OPENCLAW_STATE_DIR, Not HOME
+**Lesson:** The global plugin extensions directory is `$OPENCLAW_STATE_DIR/extensions/` (currently `/data/openclaw/extensions/`), NOT `$HOME/.openclaw/extensions/`. To find the actual path, check `OPENCLAW_STATE_DIR` in the container env. The three discovery roots are: `stock` (nix store `dist/extensions/`), `global` (`$OPENCLAW_STATE_DIR/extensions/`), `workspace` (`$WORKSPACE/.openclaw/extensions/`).
+**Context:** Spent 60+ min copying plugins to `/home/node/.openclaw/extensions/` which is the CephFS config mount, not the global discovery root. `resolveConfigDir()` uses `OPENCLAW_STATE_DIR`, not `HOME`.
+**Verify:** `kubectl exec deploy/openclaw-nix -c main -- env | grep OPENCLAW_STATE_DIR` and confirm plugins at `$OPENCLAW_STATE_DIR/extensions/<plugin>/`
+
+### OpenClaw Memory Plugin Slot — Only ONE Active Memory Plugin
+**Lesson:** OpenClaw only allows ONE plugin with `kind: "memory"` active at a time, controlled by `plugins.slots.memory` in config. Other memory-kind plugins are silently disabled with NO error in logs. When adding a new memory plugin (e.g., hindsight-openclaw), you MUST change the slot.
+**Context:** hindsight-openclaw was discovered but never registered because `plugins.slots.memory` was set to `memory-lancedb`. No error was logged — the plugin just didn't appear in the startup plugin count.
+**Verify:** `jq '.plugins.slots' <openclaw.json>` matches the intended memory plugin; startup log shows the correct plugin count
+
+### Non-Bundled OpenClaw Plugins Need hooks.allowConversationAccess
+**Lesson:** External (non-bundled) plugins that register conversation-level hooks (e.g., `agent_end`) must set `plugins.entries.<id>.hooks.allowConversationAccess = true` in config. Without it, hooks are silently blocked.
+**Context:** hindsight-openclaw registered `agent_end` hook but it was blocked with `[hooks] hook blocked: plugin hindsight-openclaw attempted to register hook agent_end without permission`. Adding `hooks.allowConversationAccess = true` to the plugin entry fixed it.
+**Verify:** `kubectl logs ... | grep 'hook blocked'` shows no blocked hooks after plugin loads
+
 ### Build → Push → Update Digest → Commit Must Be Atomic
 **Lesson:** After rebuilding an OCI image, always push to registry FIRST, then update the digest in kubenix config, then commit+push. Committing a digest that doesn't exist in the registry means Flux deploys a stale image.
 **Context:** First commit referenced old digest `b4d2ec9c` because image hadn't been rebuilt with new changes. Required a second full build→push→digest-update→commit cycle.
