@@ -149,7 +149,7 @@ in
                 PIP_TARGET = "/data/local/lib/python";
                 PYTHONPATH = "/data/local/lib/python";
                 PATH = "/data/local/bin:/data/npm-global/bin:/bin:/usr/bin";
-                NODE_PATH = "/lib/openclaw/extensions/memory-lancedb/node_modules:/lib/openclaw/dist/extensions/memory-lancedb/node_modules:/lib/openclaw/extensions/matrix/node_modules:/lib/openclaw/node_modules";
+                NODE_PATH = "/data/npm-global/lib/node_modules:/lib/openclaw/extensions/memory-lancedb/node_modules:/lib/openclaw/dist/extensions/memory-lancedb/node_modules:/lib/openclaw/extensions/matrix/node_modules:/lib/openclaw/node_modules";
                 MATRIX_MEL_ACCESS_TOKEN = {
                   valueFrom.secretKeyRef = {
                     name = "openclaw-config";
@@ -215,6 +215,13 @@ in
                   else
                     echo "Using existing config at $CONFIG_FILE"
                   fi
+
+                  # Install Hindsight vectorize-io memory plugin
+                  echo "Installing @vectorize-io/hindsight-openclaw..."
+                  npm install -g @vectorize-io/hindsight-openclaw
+                  # Copy into OpenClaw's extension directory so it can discover the plugin
+                  cp -r /data/npm-global/lib/node_modules/@vectorize-io/hindsight-openclaw \
+                    /lib/openclaw/dist/extensions/hindsight-openclaw
 
                   exec node /lib/openclaw/dist/index.js gateway --port 18789
                 ''
