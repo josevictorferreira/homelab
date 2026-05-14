@@ -219,9 +219,10 @@ in
                   # Install Hindsight vectorize-io memory plugin
                   echo "Installing @vectorize-io/hindsight-openclaw..."
                   npm install -g @vectorize-io/hindsight-openclaw
-                  # Copy to OpenClaw's bundled extension directory for plugin discovery
+                  # Copy to OpenClaw's global extensions directory for plugin discovery
+                  mkdir -p /data/openclaw/extensions
                   cp -r /data/npm-global/lib/node_modules/@vectorize-io/hindsight-openclaw \
-                    /lib/openclaw/dist/extensions/hindsight-openclaw
+                    /data/openclaw/extensions/hindsight-openclaw
 
                   exec node /lib/openclaw/dist/index.js gateway --port 18789
                 ''

@@ -717,7 +717,7 @@ let
         "whatsapp"
       ];
       slots = {
-        memory = "memory-core";
+        memory = "hindsight-openclaw";
         contextEngine = "lossless-claw";
       };
       entries = {
@@ -809,6 +809,9 @@ let
           enabled = true;
           config = {
             hindsightApiUrl = "http://hindsight-api.apps.svc.cluster.local:8888";
+          };
+          hooks = {
+            allowConversationAccess = true;
           };
         };
       };

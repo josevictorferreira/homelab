@@ -64,9 +64,10 @@ spec:
               \ config at $CONFIG_FILE\"\nfi\n\n# Install Hindsight vectorize-io memory\
               \ plugin\necho \"Installing @vectorize-io/hindsight-openclaw...\"\n\
               npm install -g @vectorize-io/hindsight-openclaw\n# Copy to OpenClaw's\
-              \ bundled extension directory for plugin discovery\ncp -r /data/npm-global/lib/node_modules/@vectorize-io/hindsight-openclaw\
-              \ \\\n  /lib/openclaw/dist/extensions/hindsight-openclaw\n\nexec node\
-              \ /lib/openclaw/dist/index.js gateway --port 18789\n"
+              \ global extensions directory for plugin discovery\nmkdir -p /data/openclaw/extensions\n\
+              cp -r /data/npm-global/lib/node_modules/@vectorize-io/hindsight-openclaw\
+              \ \\\n  /data/openclaw/extensions/hindsight-openclaw\n\nexec node /lib/openclaw/dist/index.js\
+              \ gateway --port 18789\n"
           env:
             - name: AGENT_BROWSER_ENDPOINT
               value: http://lightpanda.apps.svc.cluster.local:9222
