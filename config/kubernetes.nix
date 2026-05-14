@@ -73,6 +73,7 @@
       "mautrix_discord_v2"
       "mautrix_whatsapp_v2"
       "readeck"
+      "hindsight"
     ];
   };
 
