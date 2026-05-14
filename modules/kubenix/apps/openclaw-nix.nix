@@ -216,12 +216,12 @@ in
                     echo "Using existing config at $CONFIG_FILE"
                   fi
 
-                  # Install Hindsight vectorize-io memory plugin
-                  echo "Installing @vectorize-io/hindsight-openclaw..."
-                  npm install -g @vectorize-io/hindsight-openclaw
-                  # Copy into OpenClaw's extension directory so it can discover the plugin
-                  cp -r /data/npm-global/lib/node_modules/@vectorize-io/hindsight-openclaw \
-                    /lib/openclaw/dist/extensions/hindsight-openclaw
+                  # Install Hindsight vectorize-io memory plugin (idempotent - persists on CephFS)
+                  if [ ! -f /home/node/.openclaw/home/.openclaw/plugin-packages/hindsight-openclaw/openclaw.plugin.json ]; then
+                    echo "Installing @vectorize-io/hindsight-openclaw..."
+                    npm install -g @vectorize-io/hindsight-openclaw
+                    openclaw plugins install --force /data/npm-global/lib/node_modules/@vectorize-io/hindsight-openclaw
+                  fi
 
                   exec node /lib/openclaw/dist/index.js gateway --port 18789
                 ''
