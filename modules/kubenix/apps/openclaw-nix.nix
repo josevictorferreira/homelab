@@ -5,7 +5,7 @@ let
   enableTailscaleSidecar = false;
   appImage = {
     repository = "ghcr.io/josevictorferreira/openclaw-nix";
-    tag = "v2026.5.12-beta.7-lightpanda@sha256:783c496f3fe68b0ac5db12f87ab20fe6ab40fb32d017352cb5abc4bcd300c5d5";
+    tag = "v2026.5.12-beta.7-lightpanda@sha256:8330d1b9a95889769422d4e6b4b768299c89a517152068b13989a07a25c7276b";
     pullPolicy = "Always";
   };
 in

@@ -445,6 +445,25 @@ let
       "        alias_path.write_text(f'export * from \"./{best}\";\\n', encoding=\"utf-8\")"
     ]
   );
+  bundledChannelResolverPatchScript = pkgs.writeText "openclaw-bundled-channel-resolver.py" (
+    builtins.concatStringsSep "\n" [
+      "from pathlib import Path"
+      "import sys"
+      ""
+      "dist_dir = Path(sys.argv[1])"
+      "old = \"return [\\n\\t\\tpath.join(rootDir, \\\"extensions\\\"),\\n\\t\\tpath.join(rootDir, \\\"dist-runtime\\\", \\\"extensions\\\"),\\n\\t\\tpath.join(rootDir, \\\"dist\\\", \\\"extensions\\\")\\n\\t].find((candidate) => fs.existsSync(candidate));\""
+      "new = \"return [\\n\\t\\tpath.join(rootDir, \\\"dist\\\", \\\"extensions\\\"),\\n\\t\\tpath.join(rootDir, \\\"dist-runtime\\\", \\\"extensions\\\"),\\n\\t\\tpath.join(rootDir, \\\"extensions\\\")\\n\\t].find((candidate) => fs.existsSync(candidate));\""
+      "patched = False"
+      "for path in dist_dir.glob(\"*.js\"):"
+      "    text = path.read_text()"
+      "    if old not in text:"
+      "        continue"
+      "    path.write_text(text.replace(old, new, 1))"
+      "    patched = True"
+      "if not patched:"
+      "    raise SystemExit(\"bundled channel resolver anchor not found\")"
+    ]
+  );
   fixNodeBinShebangs = pkgs.writeShellScript "openclaw-fix-node-bin-shebangs" ''
     for bin in node_modules/.bin/*; do
       [ -f "$bin" ] || continue
@@ -817,19 +836,16 @@ let
               # boundary check — symlinks resolving to the nix store fail that check.
               ${pkgs.python3}/bin/python3 ${copyNodeModulesPatchScript} "$out/lib/openclaw/node_modules" "$out/lib/openclaw/extensions" "$out/lib/openclaw/dist/extensions"
 
-              # Remove dist-runtime/extensions to force OpenClaw to use dist/extensions/
-              # instead. The dist-runtime wrapper index.js re-exports to dist/extensions/
-              # via ../../../dist/... — Node.js resolves the import outside the
-              # dist-runtime boundary root, causing 'module path escapes plugin root'
-              # errors. With dist-runtime removed, resolveBundledPluginsDir falls back
-              # to dist/extensions/ which has correct boundary roots. The boundary
-              # check patch in bundled-DSLJOhq0.js is no longer needed either.
+              # Prefer dist/extensions for bundled channel metadata. The bundled-channel
+              # runtime has its own resolver; if it scans source extensions/ first it can
+              # mix source metadata with compiled dist entries and trip plugin-root checks.
               chmod u+w "$out/lib/openclaw/dist-runtime" || true
               rm -rf "$out/lib/openclaw/dist-runtime/extensions"
 
               # Some runtime chunks resolve stable, unhashed module names at runtime.
               # The upstream postbuild writes these aliases; keep them when repacking.
               ${pkgs.python3}/bin/python3 ${runtimeAliasesPatchScript} "$out/lib/openclaw/dist"
+              ${pkgs.python3}/bin/python3 ${bundledChannelResolverPatchScript} "$out/lib/openclaw/dist"
             fi
 
             # lossless-claw: pre-built index.js already copied to dist/extensions/ above
