@@ -61,8 +61,12 @@ spec:
               \ \"$CONFIG_FILE\" ]; then\n  echo \"First run: seeding config from\
               \ template...\"\n  cp /etc/openclaw/config-template.json \"$CONFIG_FILE\"\
               \n  echo \"Config seeded at $CONFIG_FILE\"\nelse\n  echo \"Using existing\
-              \ config at $CONFIG_FILE\"\nfi\n\nexec node /lib/openclaw/dist/index.js\
-              \ gateway --port 18789\n"
+              \ config at $CONFIG_FILE\"\nfi\n\n# Install Hindsight vectorize-io memory\
+              \ plugin\necho \"Installing @vectorize-io/hindsight-openclaw...\"\n\
+              npm install -g @vectorize-io/hindsight-openclaw\n# Copy into OpenClaw's\
+              \ extension directory so it can discover the plugin\ncp -r /data/npm-global/lib/node_modules/@vectorize-io/hindsight-openclaw\
+              \ \\\n  /lib/openclaw/dist/extensions/hindsight-openclaw\n\nexec node\
+              \ /lib/openclaw/dist/index.js gateway --port 18789\n"
           env:
             - name: AGENT_BROWSER_ENDPOINT
               value: http://lightpanda.apps.svc.cluster.local:9222
@@ -93,7 +97,7 @@ spec:
             - name: NODE_COMPILE_CACHE
               value: /data/openclaw-compile-cache
             - name: NODE_PATH
-              value: /lib/openclaw/extensions/memory-lancedb/node_modules:/lib/openclaw/dist/extensions/memory-lancedb/node_modules:/lib/openclaw/extensions/matrix/node_modules:/lib/openclaw/node_modules
+              value: /data/npm-global/lib/node_modules:/lib/openclaw/extensions/memory-lancedb/node_modules:/lib/openclaw/dist/extensions/memory-lancedb/node_modules:/lib/openclaw/extensions/matrix/node_modules:/lib/openclaw/node_modules
             - name: NPM_CONFIG_PREFIX
               value: /data/npm-global
             - name: OPENCLAW_ALLOW_ROOT

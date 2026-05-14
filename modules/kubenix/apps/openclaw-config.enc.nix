@@ -704,6 +704,7 @@ let
         "browser"
         "github-copilot"
         "google"
+        "hindsight-openclaw"
         "kimi"
         "lobster"
         "lossless-claw"
@@ -802,6 +803,12 @@ let
           enabled = true;
           config = {
             dbPath = "/home/node/.openclaw/lcm.db";
+          };
+        };
+        hindsight-openclaw = {
+          enabled = true;
+          config = {
+            hindsightApiUrl = "http://hindsight-api.apps.svc.cluster.local:8888";
           };
         };
       };
