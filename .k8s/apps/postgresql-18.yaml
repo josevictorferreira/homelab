@@ -196,13 +196,13 @@ metadata:
   annotations:
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
-  name: postgresql-18-bootstrap-16151218
+  name: postgresql-18-bootstrap-aa12a25b
   namespace: apps
 spec:
   template:
     metadata:
       annotations:
-        checksum/config: 16151218b8948f7640a55acdc61b930c4798d92f3b4b0fcf011afcb27854c110
+        checksum/config: aa12a25b9381f55bc773f7f76c1e7b4ac2fde40217f13c631e58c2b6aee0c46e
     spec:
       containers:
         - args:
@@ -339,7 +339,16 @@ spec:
               \ database 'readeck'...\"\n    psql -h postgresql-18 -U postgres -d\
               \ readeck -c \"DROP EXTENSION IF EXISTS vectors;CREATE EXTENSION IF\
               \ NOT EXISTS vchord CASCADE;\" || echo \"Extension installation completed\
-              \ for readeck\"\n\n"
+              \ for readeck\"\n\n\t\tpsql -h postgresql-18 -U postgres -c 'ALTER SYSTEM\
+              \ SET shared_preload_libraries = \"vchord.so\"'\n    echo \"Ensuring\
+              \ database 'hindsight' exists...\"\n    psql -h postgresql-18 -U postgres\
+              \ -d postgres -tAc \"SELECT 1 FROM pg_database WHERE datname='hindsight'\"\
+              \ | grep -q 1 \\\n      || psql -h postgresql-18 -U postgres -d postgres\
+              \ -c \"CREATE DATABASE \\\"hindsight\\\";\"\n\n    echo \"Installing\
+              \ pgvecto.rs extension in database 'hindsight'...\"\n    psql -h postgresql-18\
+              \ -U postgres -d hindsight -c \"DROP EXTENSION IF EXISTS vectors;CREATE\
+              \ EXTENSION IF NOT EXISTS vchord CASCADE;\" || echo \"Extension installation\
+              \ completed for hindsight\"\n\n"
           command:
             - sh
             - -c
@@ -473,7 +482,15 @@ data:
     \";\"\n\n    echo \"Installing pgvecto.rs extension in database 'readeck'...\"\
     \n    psql -h postgresql-18 -U postgres -d readeck -c \"DROP EXTENSION IF EXISTS\
     \ vectors;CREATE EXTENSION IF NOT EXISTS vchord CASCADE;\" || echo \"Extension\
-    \ installation completed for readeck\"\n"
+    \ installation completed for readeck\"\n\n\t\tpsql -h postgresql-18 -U postgres\
+    \ -c 'ALTER SYSTEM SET shared_preload_libraries = \"vchord.so\"'\n    echo \"\
+    Ensuring database 'hindsight' exists...\"\n    psql -h postgresql-18 -U postgres\
+    \ -d postgres -tAc \"SELECT 1 FROM pg_database WHERE datname='hindsight'\" | grep\
+    \ -q 1 \\\n      || psql -h postgresql-18 -U postgres -d postgres -c \"CREATE\
+    \ DATABASE \\\"hindsight\\\";\"\n\n    echo \"Installing pgvecto.rs extension\
+    \ in database 'hindsight'...\"\n    psql -h postgresql-18 -U postgres -d hindsight\
+    \ -c \"DROP EXTENSION IF EXISTS vectors;CREATE EXTENSION IF NOT EXISTS vchord\
+    \ CASCADE;\" || echo \"Extension installation completed for hindsight\"\n"
 kind: ConfigMap
 metadata:
   annotations:

@@ -244,10 +244,10 @@ Our cluster is deployed and accessible in the user system kubectl, the context a
 **Context:** `memory-lancedb` in OpenClaw 2026.5.3 had no compiled dist plugin, but its native LanceDB deps already existed in root `node_modules`.
 **Verify:** `podman run --rm --entrypoint '' <image> test -f /lib/openclaw/dist/extensions/<plugin>/index.ts` and run a Node import check for native deps.
 
-### OpenClaw dist-runtime/extensions Takes Priority Over dist/extensions
-**Lesson:** OpenClaw 2026.5.12+ checks `dist-runtime/extensions/` before `dist/extensions/` when resolving bundled plugins. If `dist-runtime/extensions/*/index.js` are thin re-exports pointing to `../../../dist/extensions/*/index.js`, the boundary check fails because the resolved path escapes the `distRuntimeRoot`. Remove `dist-runtime/extensions/` from the image to force use of `dist/extensions/` where our patched files live.
-**Context:** Spent 3+ build-deploy cycles debugging "module path escapes plugin root" — the root cause was `resolveBundledPluginsDir()` preferring `dist-runtime` which has re-export wrappers that escape boundary checks.
-**Verify:** `podman run --rm --entrypoint '' <image> ls /lib/openclaw/dist-runtime/extensions/` should return empty or not exist.
+### OpenClaw Bundled Plugin Resolvers Must Prefer dist/extensions
+**Lesson:** OpenClaw 2026.5.12+ has multiple bundled plugin/channel resolvers; ensure they prefer `dist/extensions` over both `dist-runtime/extensions` and source `extensions` to avoid boundary-check failures.
+**Context:** `dist-runtime` re-export wrappers and source-first bundled-channel scans can both trigger `plugin module path escapes plugin root or fails alias checks` even when the built plugin exists under `dist/extensions`.
+**Verify:** `podman run --rm --entrypoint '' <image> sh -c 'test ! -e /lib/openclaw/dist-runtime/extensions && cd /lib/openclaw && node --input-type=module -e "import(\"./dist/bundled-Q-5GCwtV.js\").then(m=>console.log(!!m.n(\"matrix\")))"'` prints `true`.
 
 ### Check Plugin Load Errors Early After OpenClaw Deployment
 **Lesson:** After OpenClaw pod reaches `Running`, immediately check logs for `[channels] failed to load bundled channel` errors. `/health` returning `ok` does not confirm plugin/channel loading succeeded.

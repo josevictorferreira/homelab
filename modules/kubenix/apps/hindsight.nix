@@ -36,8 +36,9 @@ in
               HINDSIGHT_API_TEXT_SEARCH_EXTENSION = "native";
               HINDSIGHT_API_PORT = "8888";
               HINDSIGHT_API_HOST = "0.0.0.0";
-              HINDSIGHT_API_LLM_PROVIDER = "openai";
-              HINDSIGHT_API_LLM_MODEL = "gpt-5-mini";
+              HINDSIGHT_API_LLM_PROVIDER = "openrouter";
+              HINDSIGHT_API_LLM_MODEL = "openai/gpt-oss-20b";
+              HINDSIGHT_API_REFLECT_LLM_MODEL = "openai/gpt-oss-120b";
             };
             probes = {
               liveness = {

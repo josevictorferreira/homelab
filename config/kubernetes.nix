@@ -51,6 +51,8 @@
       personal-finances = "10.10.10.142";
       readeck = "10.10.10.143";
       homelab-bridge = "10.10.10.144";
+      hindsight-api = "10.10.10.145";
+      hindsight-cp = "10.10.10.146";
 
       nfs = "10.10.10.150";
       grafana = "10.10.10.190";
