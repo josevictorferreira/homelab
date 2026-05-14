@@ -54,15 +54,15 @@ spec:
               \ ready, attempt $i/30...\"\n  sleep 2\ndone\n\n\n# Ensure persistent\
               \ directories exist for npm/pip packages on /data block storage\nmkdir\
               \ -p /data/npm-global/bin\nmkdir -p /data/local/lib/python\nmkdir -p\
-              \ /data/local/bin\nmkdir -p /data/plugin-stage\nmkdir -p /data/openclaw\n\
-              mkdir -p /home/node/.config\nmkdir -p /home/node/.openclaw\n\n# Seed\
-              \ config from ConfigMap template if CephFS file doesn't exist yet\n\
-              CONFIG_FILE=\"/home/node/.openclaw/openclaw.json\"\nif [ ! -f \"$CONFIG_FILE\"\
-              \ ]; then\n  echo \"First run: seeding config from template...\"\n \
-              \ cp /etc/openclaw/config-template.json \"$CONFIG_FILE\"\n  echo \"\
-              Config seeded at $CONFIG_FILE\"\nelse\n  echo \"Using existing config\
-              \ at $CONFIG_FILE\"\nfi\n\nexec node /lib/openclaw/dist/index.js gateway\
-              \ --port 18789\n"
+              \ /data/local/bin\nmkdir -p /data/plugin-stage\nmkdir -p /data/openclaw-compile-cache\n\
+              mkdir -p /data/openclaw\nmkdir -p /home/node/.config\nmkdir -p /home/node/.openclaw\n\
+              \n# Seed config from ConfigMap template if CephFS file doesn't exist\
+              \ yet\nCONFIG_FILE=\"/home/node/.openclaw/openclaw.json\"\nif [ ! -f\
+              \ \"$CONFIG_FILE\" ]; then\n  echo \"First run: seeding config from\
+              \ template...\"\n  cp /etc/openclaw/config-template.json \"$CONFIG_FILE\"\
+              \n  echo \"Config seeded at $CONFIG_FILE\"\nelse\n  echo \"Using existing\
+              \ config at $CONFIG_FILE\"\nfi\n\nexec node /lib/openclaw/dist/index.js\
+              \ gateway --port 18789\n"
           env:
             - name: AGENT_BROWSER_ENDPOINT
               value: http://lightpanda.apps.svc.cluster.local:9222
@@ -90,6 +90,8 @@ spec:
                 secretKeyRef:
                   key: SPIKE_MATRIX_TOKEN
                   name: openclaw-config
+            - name: NODE_COMPILE_CACHE
+              value: /data/openclaw-compile-cache
             - name: NODE_PATH
               value: /lib/openclaw/extensions/memory-lancedb/node_modules:/lib/openclaw/dist/extensions/memory-lancedb/node_modules:/lib/openclaw/extensions/matrix/node_modules:/lib/openclaw/node_modules
             - name: NPM_CONFIG_PREFIX
@@ -101,6 +103,8 @@ spec:
             - name: OPENCLAW_DATA_DIR
               value: /data/openclaw
             - name: OPENCLAW_NIX_MODE
+              value: '1'
+            - name: OPENCLAW_NO_RESPAWN
               value: '1'
             - name: OPENCLAW_PLUGIN_STAGE_DIR
               value: /data/plugin-stage
@@ -119,7 +123,7 @@ spec:
           envFrom:
             - secretRef:
                 name: openclaw-config
-          image: ghcr.io/josevictorferreira/openclaw-nix:v2026.5.12-beta.6-lightpanda@sha256:1681ad34a4beec59c1a1c9a9fbe889e74f6467ca4a754764e575e0fbf1a555b4
+          image: ghcr.io/josevictorferreira/openclaw-nix:v2026.5.12-beta.6-lightpanda@sha256:622fc4df88822927facd49411d5a31cfba5dc6ed041b7c59740966e463c48e07
           imagePullPolicy: Always
           name: main
           ports:

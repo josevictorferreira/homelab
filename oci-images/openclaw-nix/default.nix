@@ -434,7 +434,7 @@ let
       "# If upstream already provided the alias, overwrite it if circular."
       "for base, hashed_names in candidates.items():"
       "    alias_path = dist_dir / f\"{base}.js\""
-      "    stable_ref = f\"from './{base}.js'\"  # circular: re-exports from self via stable name"
+      "    stable_ref = f\"./{base}.js\"  # circular: re-exports from self via stable name"
       "    best = None"
       "    for name in hashed_names:"
       "        content = (dist_dir / name).read_text(encoding='utf-8')"
@@ -669,7 +669,7 @@ let
   losslessClawInfo = {
     version = "0.9.3";
     sha256 = "sha256-cqmuQZCsrOBoKz/DZCB/cpxvldHxLxwjXoQZ52y2Aug=";
-    npmDepsHash = "sha256-2Zvvd22WbueGSxfmjVlz6+5zqvTYI6A1NAsRMppuyfk=";
+    npmDepsHash = "sha256-6p1mZQSIa7y3UMxgvt01x6bqnPMt7KBDMjEF/bDJ1f8="; # Keep in sync with lossless-claw-deps.nix
   };
   losslessClawSource = pkgs.fetchurl {
     url = "https://registry.npmjs.org/@martian-engineering/lossless-claw/-/lossless-claw-${losslessClawInfo.version}.tgz";

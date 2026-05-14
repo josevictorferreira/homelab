@@ -5,7 +5,7 @@ let
   enableTailscaleSidecar = false;
   appImage = {
     repository = "ghcr.io/josevictorferreira/openclaw-nix";
-    tag = "v2026.5.12-beta.6-lightpanda@sha256:1681ad34a4beec59c1a1c9a9fbe889e74f6467ca4a754764e575e0fbf1a555b4";
+    tag = "v2026.5.12-beta.6-lightpanda@sha256:622fc4df88822927facd49411d5a31cfba5dc6ed041b7c59740966e463c48e07";
     pullPolicy = "Always";
   };
 in
@@ -142,6 +142,8 @@ in
                 OPENCLAW_ALLOW_ROOT = "1";
                 OPENCLAW_NIX_MODE = "1";
                 OPENCLAW_TRAJECTORY = "false";
+                OPENCLAW_NO_RESPAWN = "1";
+                NODE_COMPILE_CACHE = "/data/openclaw-compile-cache";
                 NPM_CONFIG_PREFIX = "/data/npm-global";
                 OPENCLAW_PLUGIN_STAGE_DIR = "/data/plugin-stage";
                 PIP_TARGET = "/data/local/lib/python";
@@ -199,6 +201,7 @@ in
                   mkdir -p /data/local/lib/python
                   mkdir -p /data/local/bin
                   mkdir -p /data/plugin-stage
+                  mkdir -p /data/openclaw-compile-cache
                   mkdir -p /data/openclaw
                   mkdir -p /home/node/.config
                   mkdir -p /home/node/.openclaw
