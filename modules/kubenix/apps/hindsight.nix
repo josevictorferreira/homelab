@@ -69,6 +69,20 @@ in
                   failureThreshold = 3;
                 };
               };
+              startup = {
+                enabled = true;
+                custom = true;
+                spec = {
+                  httpGet = {
+                    path = "/health";
+                    port = 8888;
+                  };
+                  initialDelaySeconds = 10;
+                  periodSeconds = 10;
+                  timeoutSeconds = 5;
+                  failureThreshold = 18;
+                };
+              };
             };
           };
         };

@@ -115,11 +115,39 @@ in
                   name = "AGENT_BROWSER_ENDPOINT";
                   value = "http://lightpanda.${namespace}.svc.cluster.local:9222";
                 }
+                {
+                  name = "HINDSIGHT_MODE";
+                  value = "local_external";
+                }
+                {
+                  name = "HINDSIGHT_API_URL";
+                  value = "http://hindsight-api.${namespace}.svc.cluster.local:8888";
+                }
+                {
+                  name = "HINDSIGHT_BANK_ID";
+                  value = "hermes";
+                }
+                {
+                  name = "HINDSIGHT_BUDGET";
+                  value = "mid";
+                }
+                {
+                  name = "HINDSIGHT_API_KEY";
+                  value = "dummy";
+                }
+                {
+                  name = "HINDSIGHT_LLM_API_KEY";
+                  value = "dummy";
+                }
               ]
               ++ [
                 {
                   name = "PATH";
                   value = "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/hermes/.venv/bin";
+                }
+                {
+                  name = "PYTHONPATH";
+                  value = "/opt/data/.local/lib/python3.13/site-packages";
                 }
               ];
               envFrom = envFromSecret;

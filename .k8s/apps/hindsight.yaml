@@ -81,6 +81,14 @@ spec:
             requests:
               cpu: 500m
               memory: 1Gi
+          startupProbe:
+            failureThreshold: 18
+            httpGet:
+              path: /health
+              port: 8888
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
       dnsPolicy: ClusterFirst
       enableServiceLinks: false
       hostIPC: false
