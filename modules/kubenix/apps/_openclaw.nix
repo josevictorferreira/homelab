@@ -6,7 +6,7 @@ let
   configName = "openclaw-test-config";
   port = 18789;
   host = "openclaw-test.${homelab.domain}";
-  image = "ghcr.io/openclaw/openclaw:2026.4.26@sha256:2e32f4f2e4f653f12d5dc6e5c93cc71e60f49d1dfaf061b18e53c3e61a38fb48";
+  image = "ghcr.io/openclaw/openclaw:2026.5.12-beta.6@sha256:9e9945d86e9be5f32c88ea17df177c4c2cd5a833f58c38dcb4dd1ce5503948dc";
   losslessClawVersion = "0.9.2";
   stageDir = "/tmp/openclaw-plugin-stage";
   runtimeDir = "/tmp/openclaw-runtime";

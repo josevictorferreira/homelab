@@ -80,7 +80,7 @@ in
         };
         spec = {
           terminationGracePeriodSeconds = 60;
-          imagePullSecrets = [ { name = "ghcr-registry-secret"; } ];
+          imagePullSecrets = [{ name = "ghcr-registry-secret"; }];
           containers = [
             {
               name = "gateway";
@@ -181,7 +181,7 @@ in
         };
         spec = {
           terminationGracePeriodSeconds = 30;
-          imagePullSecrets = [ { name = "ghcr-registry-secret"; } ];
+          imagePullSecrets = [{ name = "ghcr-registry-secret"; }];
           containers = [
             {
               name = "dashboard";
