@@ -244,12 +244,22 @@ Our cluster is deployed and accessible in the user system kubectl, the context a
 **Context:** `memory-lancedb` in OpenClaw 2026.5.3 had no compiled dist plugin, but its native LanceDB deps already existed in root `node_modules`.
 **Verify:** `podman run --rm --entrypoint '' <image> test -f /lib/openclaw/dist/extensions/<plugin>/index.ts` and run a Node import check for native deps.
 
+### OpenClaw dist-runtime/extensions Takes Priority Over dist/extensions
+**Lesson:** OpenClaw 2026.5.12+ checks `dist-runtime/extensions/` before `dist/extensions/` when resolving bundled plugins. If `dist-runtime/extensions/*/index.js` are thin re-exports pointing to `../../../dist/extensions/*/index.js`, the boundary check fails because the resolved path escapes the `distRuntimeRoot`. Remove `dist-runtime/extensions/` from the image to force use of `dist/extensions/` where our patched files live.
+**Context:** Spent 3+ build-deploy cycles debugging "module path escapes plugin root" — the root cause was `resolveBundledPluginsDir()` preferring `dist-runtime` which has re-export wrappers that escape boundary checks.
+**Verify:** `podman run --rm --entrypoint '' <image> ls /lib/openclaw/dist-runtime/extensions/` should return empty or not exist.
+
+### Check Plugin Load Errors Early After OpenClaw Deployment
+**Lesson:** After OpenClaw pod reaches `Running`, immediately check logs for `[channels] failed to load bundled channel` errors. `/health` returning `ok` does not confirm plugin/channel loading succeeded.
+**Context:** Pod showed 1/1 Running and `/health` OK, but matrix/whatsapp channels silently failed to load. The boundary check error was only visible in pod logs, not in health endpoints.
+**Verify:** `kubectl logs -n apps deploy/openclaw-nix -c main --tail=50 | grep -E 'failed to load|not registered|escapes plugin root'` shows no errors.
+
 ### Push Multi-GB OCI Images via Background nohup
 **Lesson:** `podman push` for openclaw-nix-sized images (~7GB) routinely exceeds 10-minute Bash timeouts. Always launch with `nohup podman push --format oci ... > /tmp/opencode/push.log 2>&1 &` and poll `kill -0 $PID` in a loop with a 30-minute budget.
 **Context:** A foreground push hit the 600000ms tool timeout mid-blob, leaving GHCR with `manifest unknown`. Diagnosis + retry cost ~15 min that a background launch would have avoided.
 **Verify:** After completion, `podman pull <ghcr-tag>` succeeds and `podman images --digests <repo>` shows the expected sha256.
 
-### openclaw-nix Pod Has Two Containers — Use `-c main` for App Commands
+### openclaw-nix Pod May Have Only One Container (varies by version)
 **Lesson:** The openclaw-nix pod runs `chromium` first and `main` second. `kubectl exec deploy/openclaw-nix -- ...` defaults to `chromium`, which lacks app tooling. Always pass `-c main` for `/health`, `openclaw`, log inspection, etc.
 **Context:** A health probe via `kubectl exec deploy/openclaw-nix` failed with "container chromium is not valid for pod" because the default container had no curl/openclaw binary.
 **Verify:** `kubectl get pod <pod> -n apps -o jsonpath='{range .spec.containers[*]}{.name}{"\n"}{end}'` lists `chromium` then `main`.
