@@ -3,7 +3,7 @@
   lib,
   inputs,
   system,
-  version ? "2026.5.12-beta.6",
+  version ? "2026.5.12-beta.7",
   tagSuffix ? "",
   legacyOpenClawPatches ? true,
   matrixSendQueuePatch ? true,
@@ -18,8 +18,8 @@ let
     owner = "openclaw";
     repo = "openclaw";
     rev = "v${version}";
-    sha256 = "sha256-iUmIvAY1qmUL0vZCP3KDUgxAkXUp8IKNVrXkWmCSK8Y=";
-    pnpmDepsHash = "sha256-anPUA+NforftapNxPyA2LrrMOrqpHmL/WgUCLH4UaLw=";
+    sha256 = "sha256-I8C/7YrtKoFdtazS9/PStBTijVshY0YAX0Zf3wBSs+Q=";
+    pnpmDepsHash = "sha256-xAl2JX/sQKG3vQ7sBxy6O38rC661BRCZNU5fPjqu+h8=";
     applyPublicSurfaceHardlinksPatch = false;
     applySkipPluginAutoEnableNixModePatch = false;
   };
