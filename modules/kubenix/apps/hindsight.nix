@@ -39,8 +39,10 @@ in
               HINDSIGHT_API_LLM_PROVIDER = "openrouter";
               HINDSIGHT_API_LLM_MODEL = "openai/gpt-oss-20b";
               HINDSIGHT_API_REFLECT_LLM_MODEL = "openai/gpt-oss-120b";
-              HINDSIGHT_API_EMBEDDINGS_PROVIDER = "openrouter";
-              HINDSIGHT_API_EMBEDDINGS_OPENROUTER_MODEL = "openai/text-embedding-3-small";
+              HINDSIGHT_API_EMBEDDINGS_PROVIDER = "litellm-sdk";
+              HINDSIGHT_API_EMBEDDINGS_LITELLM_SDK_API_BASE = "https://openrouter.ai/api/v1";
+              HINDSIGHT_API_EMBEDDINGS_LITELLM_SDK_MODEL = "openai/text-embedding-3-small";
+              HINDSIGHT_API_EMBEDDINGS_LITELLM_SDK_OUTPUT_DIMENSIONS = "384";
               HINDSIGHT_API_RERANKER_PROVIDER = "openrouter";
               HINDSIGHT_API_RERANKER_OPENROUTER_MODEL = "cohere/rerank-4-fast";
               HINDSIGHT_API_WORKER_MAX_SLOTS = "2";
