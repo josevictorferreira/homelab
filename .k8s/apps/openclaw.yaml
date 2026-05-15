@@ -70,28 +70,26 @@ spec:
               , accountId: \"luna\" } },\n];\n\nconfig.plugins ??= {};\nconfig.plugins.enabled\
               \ = true;\nconfig.plugins.slots ??= {};\nconfig.plugins.slots.memory\
               \ = \"hindsight-openclaw\";\nconfig.plugins.slots.contextEngine = \"\
-              lossless-claw\";\nconfig.plugins.entries ??= {};\ndelete config.plugins.entries[\"\
+              legacy\";\nconfig.plugins.entries ??= {};\ndelete config.plugins.entries[\"\
               memory-lancedb\"];\nconfig.plugins.entries[\"hindsight-openclaw\"] =\
               \ {\n  ...(config.plugins.entries[\"hindsight-openclaw\"] ?? {}),\n\
               \  enabled: true,\n  hooks: {\n    ...(config.plugins.entries[\"hindsight-openclaw\"\
-              ]?.hooks ?? {}),\n    allowConversationAccess: true,\n  },\n};\nconfig.plugins.entries[\"\
-              lossless-claw\"] = {\n  ...(config.plugins.entries[\"lossless-claw\"\
-              ] ?? {}),\n  enabled: true,\n  config: {\n    ...(config.plugins.entries[\"\
-              lossless-claw\"]?.config ?? {}),\n    dbPath: \"/home/node/.local/openclaw/lcm.db\"\
-              ,\n  },\n};\nconfig.plugins.entries.matrix = {\n  ...(config.plugins.entries.matrix\
-              \ ?? {}),\n  enabled: true,\n};\nconfig.plugins.entries.whatsapp = {\n\
-              \  ...(config.plugins.entries.whatsapp ?? {}),\n  enabled: false,\n\
-              };\n\n// Construct Luna Matrix account from env var (avoids depending\
-              \ on shared config)\nconfig.channels ??= {};\nconfig.channels.matrix\
-              \ ??= {};\nconfig.channels.matrix.enabled = true;\nconfig.channels.matrix.accounts\
-              \ = {\n  luna: {\n    userId: \"@luna:josevictor.me\",\n    homeserver:\
-              \ \"http://tuwunel.apps.svc.cluster.local:8008\",\n    accessToken:\
-              \ process.env.LUNA_MATRIX_TOKEN || \"\",\n    name: \"Luna\",\n    network:\
-              \ { dangerouslyAllowPrivateNetwork: true },\n  },\n};\nif (config.channels?.whatsapp)\
-              \ {\n  config.channels.whatsapp.enabled = false;\n}\n\nfs.writeFileSync(targetPath,\
-              \ JSON.stringify(config, null, 2) + \"\\n\", { mode: 0o600 });\n'\n\n\
-              \        cd \"$STATE_DIR/workspace-luna\"\n        exec node /app/openclaw.mjs\
-              \ gateway --port 18789 --bind lan --allow-unconfigured --verbose\n"
+              ]?.hooks ?? {}),\n    allowConversationAccess: true,\n  },\n};\ndelete\
+              \ config.plugins.entries[\"lossless-claw\"];\nconfig.plugins.entries.matrix\
+              \ = {\n  ...(config.plugins.entries.matrix ?? {}),\n  enabled: true,\n\
+              };\nconfig.plugins.entries.whatsapp = {\n  ...(config.plugins.entries.whatsapp\
+              \ ?? {}),\n  enabled: false,\n};\n\n// Construct Luna Matrix account\
+              \ from env var (avoids depending on shared config)\nconfig.channels\
+              \ ??= {};\nconfig.channels.matrix ??= {};\nconfig.channels.matrix.enabled\
+              \ = true;\nconfig.channels.matrix.accounts = {\n  luna: {\n    userId:\
+              \ \"@luna:josevictor.me\",\n    homeserver: \"http://tuwunel.apps.svc.cluster.local:8008\"\
+              ,\n    accessToken: process.env.LUNA_MATRIX_TOKEN || \"\",\n    name:\
+              \ \"Luna\",\n    network: { dangerouslyAllowPrivateNetwork: true },\n\
+              \  },\n};\nif (config.channels?.whatsapp) {\n  config.channels.whatsapp.enabled\
+              \ = false;\n}\n\nfs.writeFileSync(targetPath, JSON.stringify(config,\
+              \ null, 2) + \"\\n\", { mode: 0o600 });\n'\n\n        cd \"$STATE_DIR/workspace-luna\"\
+              \n        exec node /app/openclaw.mjs gateway --port 18789 --bind lan\
+              \ --allow-unconfigured --verbose\n"
           env:
             - name: HOME
               value: /home/node
