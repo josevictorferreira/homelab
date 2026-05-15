@@ -59,13 +59,16 @@ spec:
               \ runtime config at $CONFIG_FILE...\"\n        node -e '\nconst fs =\
               \ require(\"fs\");\n\nconst sourcePath = process.env.SHARED_CONFIG;\n\
               const targetPath = process.env.OPENCLAW_CONFIG_PATH;\nconst config =\
-              \ JSON.parse(fs.readFileSync(sourcePath, \"utf8\"));\n\nconst keepAgent\
-              \ = \"luna\";\n\nif (config.agents && Array.isArray(config.agents.list))\
-              \ {\n  config.agents.list = config.agents.list.filter((agent) => agent\
-              \ && agent.id === keepAgent);\n}\n\nif (Array.isArray(config.bindings))\
-              \ {\n  config.bindings = config.bindings.filter((binding) => binding\
-              \ && binding.agentId === keepAgent);\n}\n\nconfig.plugins ??= {};\n\
-              config.plugins.enabled = true;\nconfig.plugins.slots ??= {};\nconfig.plugins.slots.memory\
+              \ JSON.parse(fs.readFileSync(sourcePath, \"utf8\"));\n\nconfig.agents\
+              \ ??= {};\nconfig.agents.list = [\n  {\n    id: \"luna\",\n    workspace:\
+              \ \"/home/node/.openclaw/workspace-luna\",\n    model: {\n      primary:\
+              \ \"zai-coding-plan/glm-5.1\",\n      fallbacks: [\"opencode-go/glm-5.1\"\
+              , \"huggingface/zai-org/glm-5.1\"],\n    },\n    identity: { name: \"\
+              Luna\", theme: \"minha fiel companheira\", emoji: \"\U0001F415\", avatar:\
+              \ \"avatars/luna.png\" },\n    reasoningDefault: \"off\",\n  },\n];\n\
+              config.bindings = [\n  { agentId: \"luna\", match: { channel: \"matrix\"\
+              , accountId: \"luna\" } },\n];\n\nconfig.plugins ??= {};\nconfig.plugins.enabled\
+              \ = true;\nconfig.plugins.slots ??= {};\nconfig.plugins.slots.memory\
               \ = \"hindsight-openclaw\";\nconfig.plugins.slots.contextEngine = \"\
               lossless-claw\";\nconfig.plugins.entries ??= {};\ndelete config.plugins.entries[\"\
               memory-lancedb\"];\nconfig.plugins.entries[\"hindsight-openclaw\"] =\
