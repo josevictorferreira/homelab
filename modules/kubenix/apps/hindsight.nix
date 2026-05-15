@@ -40,7 +40,7 @@ in
               HINDSIGHT_API_LLM_MODEL = "openai/gpt-oss-20b";
               HINDSIGHT_API_REFLECT_LLM_MODEL = "openai/gpt-oss-120b";
               HINDSIGHT_API_EMBEDDINGS_PROVIDER = "openrouter";
-              HINDSIGHT_API_EMBEDDINGS_OPENROUTER_MODEL = "google/gemini-embedding-2-preview";
+              HINDSIGHT_API_EMBEDDINGS_OPENROUTER_MODEL = "openai/text-embedding-3-small";
               HINDSIGHT_API_RERANKER_PROVIDER = "openrouter";
               HINDSIGHT_API_RERANKER_OPENROUTER_MODEL = "cohere/rerank-4-fast";
               HINDSIGHT_API_WORKER_MAX_SLOTS = "2";

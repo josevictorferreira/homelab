@@ -35,7 +35,7 @@ spec:
       containers:
         - env:
             - name: HINDSIGHT_API_EMBEDDINGS_OPENROUTER_MODEL
-              value: google/gemini-embedding-2-preview
+              value: openai/text-embedding-3-small
             - name: HINDSIGHT_API_EMBEDDINGS_PROVIDER
               value: openrouter
             - name: HINDSIGHT_API_HOST
