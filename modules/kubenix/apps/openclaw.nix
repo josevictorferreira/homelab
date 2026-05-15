@@ -52,15 +52,22 @@ let
     const targetPath = process.env.OPENCLAW_CONFIG_PATH;
     const config = JSON.parse(fs.readFileSync(sourcePath, "utf8"));
 
-    const keepAgent = "luna";
-
-    if (config.agents && Array.isArray(config.agents.list)) {
-      config.agents.list = config.agents.list.filter((agent) => agent && agent.id === keepAgent);
-    }
-
-    if (Array.isArray(config.bindings)) {
-      config.bindings = config.bindings.filter((binding) => binding && binding.agentId === keepAgent);
-    }
+    config.agents ??= {};
+    config.agents.list = [
+      {
+        id: "luna",
+        workspace: "/home/node/.openclaw/workspace-luna",
+        model: {
+          primary: "zai-coding-plan/glm-5.1",
+          fallbacks: ["opencode-go/glm-5.1", "huggingface/zai-org/glm-5.1"],
+        },
+        identity: { name: "Luna", theme: "minha fiel companheira", emoji: "🐕", avatar: "avatars/luna.png" },
+        reasoningDefault: "off",
+      },
+    ];
+    config.bindings = [
+      { agentId: "luna", match: { channel: "matrix", accountId: "luna" } },
+    ];
 
     config.plugins ??= {};
     config.plugins.enabled = true;
