@@ -4,7 +4,7 @@
 **Commit:** 2935f27
 **Branch:** main
 
-> **Before starting any implementation, read this `AGENTS.md` and `.docs/rules.md` for project-specific lessons and gotchas.**
+> **Before starting any implementation, read this `AGENTS.md` for project-specific lessons and gotchas.**
 
 ## AGENT SESSION RULES
 
@@ -197,7 +197,7 @@ After initial Tailscale deployment:
 
 Our cluster is deployed and accessible in the user system kubectl, the context and cluster name is named as `ze-homelab`. You can access whenever you need to check the production logs or debug something directly in the real environment.
 
-## SESSION LEARNINGS
+## PROJECT & SESSION LEARNINGS
 
 ### Nix File Edits: git checkout on Garble
 **Lesson:** If `edit` on a Nix file produces garbled or duplicated output (common near `let/in` boundaries), immediately `git checkout <file>` — don't try surgical fixes. Use a Python/external script for bulk insertions instead.
@@ -214,8 +214,6 @@ Our cluster is deployed and accessible in the user system kubectl, the context a
 **Context:** fetchurl returned 404 because the URL included `v0.5.3` instead of `0.5.3`.
 **Verify:** Browse `https://github.com/tensorchord/VectorChord/releases/tag/<tag>` and check the actual asset download links.
 
-
-### Hermes ConfigMap Is Only a Backup
 
 ### Hermes ConfigMap Is Only a Backup
 **Lesson:** The Hermes config ConfigMap is a fallback/backup only. For real runtime configuration, inspect and modify the actual config mounted inside the pod.
@@ -281,6 +279,548 @@ Our cluster is deployed and accessible in the user system kubectl, the context a
 **Lesson:** The openclaw-nix pod runs `chromium` first and `main` second. `kubectl exec deploy/openclaw-nix -- ...` defaults to `chromium`, which lacks app tooling. Always pass `-c main` for `/health`, `openclaw`, log inspection, etc.
 **Context:** A health probe via `kubectl exec deploy/openclaw-nix` failed with "container chromium is not valid for pod" because the default container had no curl/openclaw binary.
 **Verify:** `kubectl get pod <pod> -n apps -o jsonpath='{range .spec.containers[*]}{.name}{"\n"}{end}'` lists `chromium` then `main`.
+
+### NixOS Profile System
+
+#### Profile Discovery Auto-Generates Roles
+**Lesson:** Roles are automatically discovered from `modules/profiles/*.nix` filenames. Every `.nix` file = a valid role.
+**Context:** Adding a new role like "tailscale-router" requires creating a corresponding `.nix` file, even if it's just a marker.
+**Verify:** `ls modules/profiles/*.nix | grep <role-name>`
+
+#### Secrets Defined in Common Module
+**Lesson:** Check `modules/common/sops.nix` before defining secrets in profiles. Common secrets are already declared there.
+**Context:** Duplicate secret definitions cause Nix evaluation errors. The common module defines shared secrets like `tailscale_auth_key`.
+**Verify:** `grep "secret_name" modules/common/sops.nix`
+
+### Nix Flake Evaluation
+
+#### Flake Uses Git State, Not Working Directory
+**Lesson:** `make check` and `make manifests` evaluate the flake from git state. New files must be `git add`-ed before validation/manifest generation.
+**Context:** Nix flakes are pure and use git to determine the source tree. Unstaged files (especially `modules/kubenix/**/*.nix`) are invisible to `nix flake check` and `make manifests`.
+**Verify:** `git status` — ensure new files are staged, then `nix build .#gen-manifests` to confirm discovery
+
+### Tailscale Integration
+
+#### Subnet Router Role Detection
+**Lesson:** Use `builtins.elem "tailscale-router" hostConfig.roles` to detect if a node should act as subnet router.
+**Context:** This allows conditional configuration (advertise-routes, useRoutingFeatures) based on role assignment in nodes.nix.
+**Verify:** Check `config/nodes.nix` for role assignment
+
+### Kubernetes Deployment
+
+#### OCI Chart Hash Resolution
+**Lesson:** When adding new OCI Helm charts, use a placeholder hash (32 zeros) and let `make manifests` fail with the correct hash in the error message.
+**Context:** Kubenix requires exact SHA256 hashes; multiple format attempts failed until getting from error output.
+**Verify:** Check error output: `wanted: sha256-...`
+
+#### CloudPirates Keycloak Secret Keys
+**Lesson:** CloudPirates Keycloak chart requires lowercase secret keys: `db-username`, `db-password`, `KEYCLOAK_ADMIN_PASSWORD`.
+**Context:** Chart validation fails with uppercase keys like `DB_USERNAME` or `DB_PASSWORD`.
+**Verify:** Check chart values.yaml for required key format.
+
+#### StatefulSet Updates
+**Lesson:** Kubernetes StatefulSets forbid updates to most fields. Use `kubectl delete statefulset <name> -n <ns> --cascade=orphan` then `flux reconcile` to recreate.
+**Context:** Standard updates fail with "Forbidden: updates to statefulset spec for fields other than...".
+**Verify:** State recreates successfully with new spec.
+
+#### Use `sops --set` to Add Keys to Encrypted Files
+**Lesson:** Never decrypt→edit→re-encrypt SOPS files (`sops -d > plain && edit && sops -e plain > enc`). This corrupts encryption metadata. Use `sops --set '["key"] "value"' secrets/file.enc.yaml` to add keys in-place.
+**Context:** Re-encrypting with `sops -e` produces different metadata/MAC, corrupting the file. `sops --set` modifies atomically.
+**Verify:** `sops -d secrets/file.enc.yaml | grep <new_key>` returns expected value after `--set`
+
+#### SOPS Secrets Must Be Verified Before Manifest Generation
+**Lesson:** After adding/modifying `secrets/k8s-secrets.enc.yaml`, verify key exists: `sops -d secrets/k8s-secrets.enc.yaml | grep <key>` before `make manifests`.
+**Context:** vals injection during `make vmanifests` fails if secret keys are missing, causing cryptic manifest generation errors.
+**Verify:** `sops -d secrets/k8s-secrets.enc.yaml | grep <key>` returns expected value
+
+#### Kubenix Secrets for Environment Variables Require Explicit Definition
+**Lesson:** When adding env vars with `valueFrom.secretKeyRef`, the key must be explicitly defined in the kubenix Secret config (e.g., `*-config.enc.nix`) using `kubenix.lib.secretsFor`, not just exist in `secrets/k8s-secrets.enc.yaml`.
+**Context:** `kubenix.lib.secretsInlineFor` injects into JSON configs, but `valueFrom.secretKeyRef` reads from K8s Secret resources. The key must be declared in both places.
+**Verify:** Check generated manifest: `sops -d .k8s/apps/<app>-config.enc.yaml | grep <KEY_NAME>`
+
+#### Kubenix Files Are Evaluated Independently — No Cross-File Module State
+**Lesson:** Each `.nix` file in `modules/kubenix/` is evaluated via a separate `evalModules` call in `default.nix` (lines 48-58). Files do NOT share NixOS module state. To share resources (e.g., ConfigMap defined in `.enc.nix`, mounted in `.nix`), define as plain `kubernetes.resources.configMaps` in the `.enc.nix` file and reference via persistence/volumes in the main `.nix` file.
+**Context:** Attempting to set `submodules.instances.X.args.config` from a different file broke the build. The correct pattern follows `searxng-config.enc.nix`, `blocky-config.enc.nix`.
+**Verify:** `grep "evalModules" modules/kubenix/default.nix` — each file gets its own evaluation context.
+
+### Mautrix Bridge Configuration
+
+#### Bridge Config Structure Varies by Type
+**Lesson:** mautrix-whatsapp uses root-level `database:`, but mautrix-discord requires `appservice.database:` (nested). mautrix-slack uses bridgev2 format with `database:` at root level but `username_template:` moved from appservice to root.
+**Context:** Different mautrix bridges have different config schemas. Slack fails with "Legacy bridge config detected" if using pre-bridgev2 structure. Generate example config from bridge image first.
+**Verify:** Generate with `docker run --rm dock.mau.dev/mautrix/slack:latest -e` then compare structure
+
+#### mautrix-discord Bot Token Login Process
+**Lesson:** Unlike WhatsApp bridge, mautrix-discord requires interactive login via Matrix — the bot token cannot be pre-configured in the config file.
+**Context:** The Discord bot token is stored in SOPS for reference but must be provided interactively. After deployment:
+1. Create a Discord bot at https://discord.com/developers/applications
+2. Enable "Server Members Intent" and "Message Content Intent" under Privileged Gateway Intents
+3. Copy the bot token
+4. In Matrix, start a DM with `@discordbot:josevictor.me`
+5. Send: `login bot <token>`
+**Verify:** Bridge shows as "connected" in pod logs after login
+
+#### mautrix-discord Has No Channel Filtering — Use Discord Permissions
+**Lesson:** mautrix-discord lacks channel whitelist/blacklist config. To selectively bridge channels, restrict the bot's Discord role permissions at the Discord server level.
+**Context:** Bridge creates Matrix rooms for every channel in a guild it can see. No config option to opt out per-channel.
+**Verify:** Check Discord server settings → Roles → Bridge bot role → Channel permissions
+
+#### Bridge `federate_rooms` Must Match Homeserver Federation Setting
+**Lesson:** When a Matrix homeserver has `allow_federation=false`, all mautrix bridges must set `bridge.federate_rooms = false`. Mismatch causes join loops that spam homeserver logs and consume memory.
+**Context:** mautrix-discord with `federate_rooms: true` on a non-federated tuwunel caused continuous join failures → memory creep → liveness probe kills → pod restart churn.
+**Verify:** `kubectl exec -n apps <bridge-pod> -- grep federate_rooms /data/config.yaml` should match homeserver setting
+
+### NixOS Systemd Services
+
+#### Systemd PATH Is Minimal — Explicitly Declare All Binary Dependencies
+**Lesson:** NixOS systemd services have a stripped PATH. If a script calls a tool indirectly (e.g., `mc` calls `getent`), add the transitive dependency to `path = [ pkgs.getent ]`. Always test with a deploy, not just `make check`.
+**Context:** `mc` (minio-client) calls `getent` internally to resolve home dir. `pkgs.getent` is a separate package from `glibc.bin` on aarch64.
+**Verify:** After deploy: `journalctl -u <service> --no-pager | grep -i "not found\|error"`
+
+#### MinIO Client (`mc`) CLI Flags Vary by Version
+**Lesson:** Always check `mc <subcommand> --help` on the target host before scripting `mc` commands. Flags like `--id` for `mc ilm rule add` don't exist in all versions.
+**Context:** `mc ilm rule add --id expire-14d --expire-days 14` fails silently (unknown flag). The correct form is `mc ilm rule add --expire-days 14 pi/bucket`.
+**Verify:** `ssh root@<host> 'mc <subcommand> --help'` before writing bootstrap scripts
+
+### ProtonMail Bridge Deployment
+
+#### Password Store Initialization Required
+**Lesson:** ProtonMail Bridge requires `pass` password manager initialized with GPG key before first run. Add an init container to generate GPG key and run `pass init`.
+**Context:** The bridge stores credentials using `pass` which needs a GPG key. Without initialization, bridge fails with "pass not initialized".
+**Verify:** Init container logs show "pass initialized successfully"
+
+#### Auto-Updated Binary Requires Runtime Dependencies
+**Lesson:** ProtonMail Bridge auto-updates on first run, potentially requiring libraries not in base image. Check logs for "error while loading shared libraries" and install missing packages in main container (not init container).
+**Context:** Bridge v3.19 auto-updated to v3.22 requiring `libfido2.so.1`. Init containers have separate filesystems.
+**Verify:** `kubectl logs` shows successful startup without library errors
+
+#### Enable TTY/Stdin for Interactive CLI Access
+**Lesson:** Containers running interactive CLIs need `tty: true` and `stdin: true` in spec to support `kubectl attach` or exec-based interaction.
+**Context:** Without TTY enabled, `kubectl attach` fails with "container did not allocate one".
+**Verify:** `kubectl attach -it <pod>` provides interactive prompt
+
+### Velero Backup
+
+#### Velero BSL Updates Require Recreation
+**Lesson:** When changing BackupStorageLocation fields (like region or bucket), delete the BSL CR to force recreation: `kubectl delete bsl default -n velero`.
+**Context:** Kubernetes/Velero often ignores updates to existing BSLs or fails to reload them properly.
+**Verify:** `kubectl get bsl default -n velero -o yaml` matches new config.
+
+#### MinIO S3 Client Compatibility
+**Lesson:** Always set `s3ForcePathStyle: true` and a valid region (e.g. `minio` or `us-east-1`) when using MinIO as target.
+**Context:** Without explicit path style and region, the AWS SDK used by Velero fails to connect to MinIO.
+**Verify:** `kubectl get bsl default -n velero -o yaml` shows `s3ForcePathStyle: true`.
+
+#### Enable Kopia for Filesystem Backups
+**Lesson:** To enable PVC filesystem backups, explicitly set `deployNodeAgent: true` in Velero Helm chart values.
+**Context:** Default chart values may disable the node agent (formerly Restic daemonset), preventing FS backups.
+**Verify:** `kubectl get pods -n velero -l name=node-agent` shows running pods.
+
+#### BackupRepository Recovery After Clock Skew or Storage Outage
+**Lesson:** If kopia maintenance jobs fail with "maintenance must be run by designated user" (often caused by clock skew or MinIO unavailability), delete the BackupRepository CR: `kubectl delete backuprepository <name> -n backup`. Velero will recreate it fresh.
+**Context:** Pi downtime caused clock skew which corrupted kopia repository state.
+**Verify:** After deletion, check `kubectl get backuprepository -n backup` — should show new repository with recent creation timestamp.
+
+#### ResourceQuota CPU Contention in Backup Namespace
+**Lesson:** Backup namespace has `limits.cpu: 2`. If multiple jobs run concurrently with 1 CPU limits each, they exhaust quota. Reduce backup job CPU limits to `500m` to allow concurrent operation.
+**Context:** Velero backup pods (250m each), shared-subfolders-backup (1 CPU), and maintenance jobs all compete for the 2 CPU quota.
+**Verify:** `kubectl get resourcequota -n backup -o yaml` shows used vs hard limits; ensure sum of running job limits ≤ 2 CPU.
+
+### Kubernetes Container Security
+
+#### runAsNonRoot Fails with Non-Numeric Users
+**Lesson:** Don't use `runAsNonRoot: true` when container images use non-numeric users. Kubernetes can't verify string usernames (like `flaresolverr`) are non-root. Instead use `allowPrivilegeEscalation: false` + `capabilities: { drop = [ "ALL" ]; }`.
+**Context:** FlareSolverr image uses user `flaresolverr` (not UID 1000). Setting `runAsNonRoot: true` causes `CreateContainerConfigError: cannot verify user is non-root`.
+**Verify:** Check `kubectl describe pod` shows `CreateContainerConfigError` with message about non-numeric user.
+
+### Prometheus & Grafana Monitoring
+
+#### Query Prometheus Directly via kubectl exec, Not Grafana MCP
+**Lesson:** Grafana MCP `query_prometheus` has broken time format parsing. Use `kubectl exec -n monitoring prometheus-kube-prometheus-stack-prometheus-0 -c prometheus -- wget -qO- 'http://localhost:9090/api/v1/query?query=<promql>'` instead.
+**Context:** MCP rejects all time formats ("now", unix timestamps). Direct Prometheus API via kubectl exec is reliable and faster.
+**Verify:** `kubectl exec -n monitoring prometheus-kube-prometheus-stack-prometheus-0 -c prometheus -- wget -qO- 'http://localhost:9090/api/v1/query?query=up'`
+
+### Postgres Backup & Restore Drill
+
+#### Use Trust Auth for Ephemeral Scratch Postgres
+**Lesson:** Always use `ALLOW_EMPTY_PASSWORD=yes` + `POSTGRESQL_ENABLE_TRUST_AUTH=yes` for scratch/ephemeral Bitnami postgres. `pg_dumpall` includes `ALTER ROLE postgres WITH PASSWORD` which changes the scratch password mid-restore, breaking subsequent `\connect` commands.
+**Context:** Three approaches failed before trust auth: scratch-only password (breaks after ALTER ROLE), prod password (breaks initial connect), ON_ERROR_STOP removal (masks real errors).
+**Verify:** Check scratch-postgres container env has both `ALLOW_EMPTY_PASSWORD=yes` and `POSTGRESQL_ENABLE_TRUST_AUTH=yes`
+
+#### Size activeDeadlineSeconds for Large SQL Restores
+**Lesson:** For `pg_dumpall` restore jobs, set `activeDeadlineSeconds` to 3x the expected restore time. A 1.5 GiB uncompressed dump takes ~25-30 min on emptyDir-backed scratch postgres. Current setting: 2700s (45min).
+**Context:** 1200s (20min) caused DeadlineExceeded on a job that was actively restoring successfully.
+**Verify:** `grep activeDeadlineSeconds modules/kubenix/apps/postgres-restore-drill.nix` — should be ≥ 2700
+
+### Nix OCI Image Building
+
+#### Use buildImage for Podman Compatibility
+**Lesson:** Prefer `dockerTools.buildImage` over `streamLayeredImage` for podman. `buildImage` produces a tarball that loads directly with `podman load < result`. `streamLayeredImage` produces a streaming script that can timeout or fail with podman.
+**Context:** Both work with Docker, but podman handles tarballs more reliably than streaming scripts.
+**Verify:** `file result` shows "gzip compressed data" not "POSIX shell script"
+
+#### Copy Custom Files in extraCommands, Not pathsToLink
+**Lesson:** When using `buildImage`, manually copy entrypoint scripts and config templates in `extraCommands` using `cp`. Don't rely on `pathsToLink` to include `/`.
+**Context:** `pathsToLink` only affects symlinking from derivation outputs, not ad-hoc files.
+**Verify:** `podman run --rm --entrypoint "" <image> ls -la /entrypoint.sh /etc/openclaw/`
+
+#### Include ALL Runtime Dependencies in OCI Image PATH
+**Lesson:** Container entrypoints need ALL binaries in the image PATH. Commonly missed: `gnused` (for shell scripts), `coreutils` (for basic commands).
+**Context:** Unlike NixOS where PATH is managed by the system, containers only have what you explicitly include.
+**Verify:** `podman run --rm --entrypoint "" <image> sh -c 'which sed && which cat && which ls'`
+
+#### FOD npm Builds Need Sandbox Bypass
+**Lesson:** `buildNpmPackage` with network access requires `__noChroot = true;` which needs `nix.extraOptions = "allow-dirty = true"` in nix.conf. For CI/pure builds, use placeholder hash and update from error message.
+**Context:** Nix sandbox blocks network. FOD derivation with `__noChroot` fails with "disabled in 'allowed-impure-functions' settings" unless explicitly allowed.
+**Verify:** Build error shows "hash mismatch" (expected) or "network access denied" (need sandbox bypass)
+
+#### OpenClaw Matrix Extension Has Empty node_modules
+**Lesson:** nix-openclaw bundles extensions at `/lib/openclaw/extensions/` but `node_modules` directories are EMPTY. Matrix plugin requires 5 npm packages (matrix-bot-sdk, matrix-sdk-crypto-nodejs, markdown-it, music-metadata, zod) — must pre-install in image.
+**Context:** Unlike WhatsApp which bundles deps in core (Baileys), Matrix uses external packages with native bindings.
+**Verify:** `ls /lib/openclaw/extensions/matrix/node_modules` — if empty, deps missing
+
+#### Use mkDerivation Not buildEnv for Writable OCI Rootfs
+**Lesson:** When building OCI images that need runtime file modifications (like adding node_modules), use `mkDerivation` with `cp -rL` instead of `buildEnv`. `buildEnv` creates symlink trees to read-only nix store paths.
+**Context:** `buildEnv` is great for PATH construction but creates read-only symlinks. For writable rootfs layers, use `mkDerivation` + `cp -rL` + `chmod -R u+w`.
+**Verify:** `ls -la <path>` shows real files not symlinks to `/nix/store/`
+
+#### Dereference Nix Store Paths with cp -rL
+**Lesson:** When copying from nix store derivations, use `cp -rL` (dereference) not `cp -rsf`. The `-s` flag creates symlinks, not actual copies, making files read-only.
+**Context:** `cp -rsf /nix/store/.../lib ./lib` creates symlinks pointing back to nix store. Use `cp -rL` to dereference and create writable copies, then `chmod -R u+w`.
+**Verify:** `stat <file>` shows regular file, not symlink; can `touch <file>` without permission error
+
+#### Go Module Build Requirements
+**Lesson:** When building Go OCI images with `buildGoModule`, always create a `go.mod` file and use `vendorHash = null;` if there are no external dependencies.
+**Context:** Without go.mod, the builder fails with "no modules specified". With external deps, use placeholder hash and update from error. Without deps, `null` is required.
+**Verify:** `nix build .#<image-name> --impure` succeeds
+
+### Kubenix Resource Generation
+
+#### Kubenix Resource Types Need Explicit Namespace for Namespaced Resources
+**Lesson:** When defining namespaced resources (ResourceQuota, LimitRange, etc.) in kubenix, always set `metadata.namespace`. Kubenix doesn't automatically infer namespace from the attribute name.
+**Context:** Resources without explicit namespace get `namespace: null` in generated YAML, causing kustomize "already registered id" errors.
+**Verify:** Check generated YAML has `metadata.namespace` set
+
+### Release Submodule (app-template)
+
+#### Release Submodule Requires LoadBalancer Service Entry
+**Lesson:** The release submodule unconditionally calls `kubenix.lib.serviceAnnotationFor` for every app. Even when using ClusterIP, the service name must exist in `homelab.kubernetes.loadBalancer.services` or Nix evaluation fails.
+**Context:** The annotation lookup happens eagerly during evaluation before values merge. The workaround: add an IP entry to the loadBalancer map even for ClusterIP-only services.
+**Verify:** Add entry in `config/kubernetes.nix` loadBalancer.services before running `make manifests`
+
+#### Persistence Schema Requires Full Fields Even When Disabled
+**Lesson:** When disabling the release submodule's default persistence, don't pass minimal `{ enabled = false; }`. The bjw-s chart v4 validates `persistence.main` against a schema that requires fields like `type`, `storageClass` even when disabled.
+**Context:** Either omit the `persistence` argument entirely (uses default with `enabled = false` + all fields) or don't fight it and add extra persistence volumes via `values.persistence.*`.
+**Verify:** `nix build .#gen-manifests` fails with "oneOf" schema validation if persistence is malformed
+
+#### Use advancedMounts to Scope Volumes to Specific Containers
+**Lesson:** The release submodule's default persistence uses `globalMounts` which mounts to ALL containers including sidecars. Use `advancedMounts` to restrict volumes to specific containers.
+**Context:** Tailscale sidecar shouldn't get /config, /state, /logs, or workspace mounts. Structure: `advancedMounts.<controller>.<container> = [{ name = "..."; path = "..."; }]`.
+**Verify:** Check generated Deployment YAML — tailscale container should only have its own mounts
+
+#### Kubenix Release Submodule Fails for ClusterIP Services
+**Lesson:** For internal ClusterIP services that don't need LoadBalancer IPs, use raw Kubernetes resources pattern (like `flaresolverr.nix`) instead of the release submodule.
+**Context:** Even adding `annotations = {}` or service type override doesn't work — the annotation lookup happens before values merge.
+**Verify:** See `modules/kubenix/apps/flaresolverr.nix` for the correct pattern
+
+### OpenClaw Version Upgrade
+
+#### Provide Missing Build Tools via npm Tarball Derivations
+**Lesson:** When a Nix build needs a tool that uses `pnpm dlx` (network-dependent), check if the build script has a `command -v <tool>` fallback. If yes, create a Nix derivation from pre-built npm tarballs and add it to `nativeBuildInputs`.
+**Context:** OpenClaw v2026.2.22+ needs rolldown for `canvas:a2ui:bundle`. `pnpm dlx rolldown` fails in sandbox. `bundle-a2ui.sh` checks `command -v rolldown` first.
+**Verify:** `nix build .#openclaw-nix-image` succeeds; check logs for `canvas:a2ui:bundle` completing without `pnpm dlx`
+
+#### Verify Image Push — `make push-openclaw` Has Tag Mismatch
+**Lesson:** `make push-openclaw` tags `localhost/openclaw-nix:dev` but the stream creates `:v{version}`. This silently pushes a STALE `:dev` image. Always push manually.
+**Context:** The tag mismatch in `modules/commands.nix` means `podman tag` targets a non-existent or old image.
+**Verify:** After push: `podman images | grep openclaw` — confirm GHCR tag's IMAGE ID matches the `:v{VERSION}` tag, not `:dev`
+
+#### Use Named let Bindings Not srcs for Multi-Tarball Derivations
+**Lesson:** In `mkDerivation`, don't use `srcs = [...]` + `builtins.elemAt srcs N` in build scripts. Instead, define each `fetchurl` as a named `let` binding and reference it directly in shell via `${tgzName}` interpolation.
+**Context:** `builtins.elemAt` is a Nix-level function, not available in bash.
+**Verify:** `nix eval` the derivation successfully; no `undefined variable` errors
+
+#### streamLayeredImage: Use extraCommands to Merge /bin/ Across Contents
+**Lesson:** `streamLayeredImage` `contents` entries that both provide `/bin/` don't merge — Docker overlay layers mean last writer wins. Use `pkgs.buildEnv` for all CLI tools + `extraCommands` to symlink `${buildEnv}/bin/*` into `./bin/`.
+**Context:** Spent 60+ min debugging "missing tools" that were in the image's nix store but not in `/bin/`.
+**Verify:** `tar tf /nix/store/*-customisation-layer/layer.tar | grep './bin/grep'` shows symlink in top layer
+
+#### Don't Remove App Binaries When Refactoring Image /bin/
+**Lesson:** When refactoring OCI image `/bin/` construction (e.g., moving tools to `buildEnv`), ensure the main app binary (`openclaw`) is still explicitly added to rootfs `/bin/` via symlink or copy.
+**Context:** Moving all packages to `buildEnv` and removing the rootfs bin loop also removed the `openclaw` binary, causing `exec: openclaw: not found` crash.
+**Verify:** `podman run --rm --entrypoint '' <image> which openclaw` returns a path before pushing
+
+#### Match OpenClaw's pnpm Major During Nix Builds
+**Lesson:** Check upstream `packageManager` before fetching deps; OpenClaw releases that require pnpm 11 may fail under nix-openclaw's pnpm 10 with lockfile/patchedDependencies mismatches.
+**Context:** v2026.5.12-beta.1 needed a pnpm 11 override for `fetchPnpmDeps`.
+**Verify:** `nix build .#openclaw-nix-image --show-trace` gets past `openclaw-gateway-pnpm-deps` without `ERR_PNPM_LOCKFILE_CONFIG_MISMATCH`.
+
+#### OpenClaw Root Guard Requires Explicit Container Opt-In
+**Lesson:** If the Kubernetes container intentionally runs as UID 0, set `OPENCLAW_ALLOW_ROOT=1` in the pod env after OpenClaw upgrades.
+**Context:** Newer OpenClaw exits immediately with `[openclaw] Refusing to run as root`, causing CrashLoopBackOff.
+**Verify:** `kubectl logs -n apps deploy/openclaw-nix -c main --previous` has no root refusal.
+
+#### OpenClaw Config: `dangerouslyAllowHostHeaderOriginFallback` Required for Non-Loopback
+**Lesson:** The `gateway.controlUi.dangerouslyAllowHostHeaderOriginFallback` config is REQUIRED when binding gateway to non-loopback addresses (e.g., `bind: "lan"`), despite being flagged as an "unknown config key" by the doctor.
+**Context:** OpenClaw v2026.2.25+ enforces origin validation for Control UI. The doctor warns about the key being unrecognized, but the gateway fails to start without it. Do NOT remove this config.
+**Verify:** Gateway starts without `Error: non-loopback Control UI requires gateway.controlUi.allowedOrigins` error.
+
+#### Use Explicit Version Tags Instead of `latest` for K8s Images
+**Lesson:** Use specific version tags (e.g., `2026.2.25`) instead of `latest` for container images deployed to Kubernetes. Node-level image caching causes `latest` to stay stale even with `imagePullPolicy: Always`.
+**Context:** Kubernetes nodes cache images tagged as `latest`. A rollout restart doesn't force a fresh pull.
+**Verify:** `kubectl get pod <pod> -o yaml | grep imageID` shows the expected digest for the version tag.
+
+### Synapse S3 Media Storage
+
+#### Synapse Media Path is /synapse/data/media
+**Lesson:** Synapse stores media at `/synapse/data/media` NOT `/data/media_store`. Check the actual mount before planning migrations.
+**Context:** The matrix-synapse chart uses /synapse/data as the data directory, not /data.
+**Verify:** `kubectl exec -n apps deploy/synapse-matrix-synapse -c synapse -- ls -la /synapse/data/media/`
+
+#### Runtime Pip Install Requires psycopg2-binary
+**Lesson:** When installing synapse-s3-storage-provider at runtime, install `psycopg2-binary` separately before the provider package to avoid compilation errors.
+**Context:** The container lacks build tools for psycopg2. Use `pip install boto3 psycopg2-binary` then `pip install --no-deps synapse-s3-storage-provider`.
+**Verify:** Check pod logs for "Failed to build psycopg2" — should not appear.
+
+#### s3_media_upload Script Not Installed with --no-deps
+**Lesson:** Using `--no-deps` when installing synapse-s3-storage-provider skips the `s3_media_upload` console script. Download it manually from GitHub or install without --no-deps into a separate directory.
+**Context:** The migration script is defined as an entry point and isn't copied when using --no-deps.
+**Verify:** `kubectl exec -n apps deploy/synapse-matrix-synapse -c synapse -- python /modules/s3_media_upload --help`
+
+#### s3_media_upload Only Migrates DB-Tracked Files — Use Direct S3 Sync for Pre-Existing Media
+**Lesson:** `s3_media_upload` only uploads files tracked in the Synapse database. For media predating the S3 provider (existing on PVC), use direct `aws s3 sync` instead.
+**Context:** The script queries the DB for media to upload — if files exist on disk but aren't in the DB's media tracking tables, they're skipped.
+**Verify:** After `s3_media_upload update`, check cache.db row count — if 0 but files exist on disk, use direct sync instead.
+
+#### Helm Test Pods Are Ephemeral — Ignore Failures for Running Apps
+**Lesson:** Pods with `helm.sh/hook: test-success` are one-time validation jobs, not ongoing health checks. Failed test pods don't indicate app problems.
+**Context:** The `synapse-matrix-synapse-test-connection` pod failed due to busybox wget issues, but Synapse itself was healthy.
+**Verify:** Check app deployment status separately from test pod status.
+
+### K3s Bootstrap Resources
+
+#### K3s Addon Controller Manages Bootstrap Manifests from Init Node
+**Lesson:** Changes to bootstrap resources (ResourceQuota, LimitRange, etc.) cannot be applied via `kubectl` — K3s's `objectset.rio.cattle.io` controller will revert them. Must redeploy NixOS to the init node (`lab-alpha-cp`) to update manifests in `/var/lib/rancher/k3s/server/manifests/`.
+**Context:** K3s auto-deploys manifests from the init node's filesystem. The controller continuously reconciles these files, overwriting any kubectl changes.
+**Verify:** After NixOS deploy, check init node: `ssh root@lab-alpha-cp 'cat /var/lib/rancher/k3s/server/manifests/resource-quotas.yaml'`
+
+#### `.k8s/` Directory is NOT in Git — K3s Auto-Deploy Only
+**Lesson:** The `.k8s/` directory is `.gitignore`d and generated locally via `make manifests`. Flux/K3s does NOT reconcile from these files for bootstrap resources. Only the source Nix files matter.
+**Context:** Bootstrap manifests are deployed by K3s's auto-deploy mechanism from the init node's filesystem, not by Flux.
+**Verify:** `cat .gitignore | grep "^\.k8s"` — should be ignored
+
+### Kubernetes Rolling Updates for Large Images
+
+#### bjw-s App-Template Rolling Update Field Names
+**Lesson:** The bjw-s Helm chart uses standard Kubernetes field names: `maxSurge` and `maxUnavailable` (not `surge`/`unavailable`). Configure as: `controllers.main.strategy = "RollingUpdate"` and `controllers.main.rollingUpdate = { maxSurge = 1; maxUnavailable = 0; }`.
+**Context:** Incorrect field names cause silent failures — the deployment falls back to defaults instead of the intended rolling update configuration.
+**Verify:** `kubectl get deployment <name> -n <ns> -o jsonpath='{.spec.strategy}'` shows correct values.
+
+#### Zero-Downtime Large Image Upgrades Pattern
+**Lesson:** For large images (2GB+), expect image pulls to exceed Deployment `progressDeadlineSeconds`; do not treat `ProgressDeadlineExceeded` as failure unless pod events show pull/runtime errors.
+**Context:** OpenClaw v2026.5.2 pulled a 2.3GB image for ~13 minutes, `rollout status` timed out, then the pod became healthy without intervention.
+**Verify:** Check pod events for `Pulling`/`Pulled`, then require `kubectl get pod` `2/2 Running`, zero restarts, logs `[gateway] ready`, and `/health` returns `{"ok":true,"status":"live"}`.
+
+### Kubernetes Operations
+
+#### Always Verify kubectl Context Before Cluster Operations
+**Lesson:** Run `kubectl config current-context` before any cluster operations. Multi-cluster environments (EKS + k3s) make it easy to operate on the wrong cluster.
+**Context:** Ran commands against AWS EKS instead of homelab k3s for significant time.
+**Verify:** `kubectl config current-context` matches expected cluster name before proceeding.
+
+#### RWO PVCs + GitOps Auto-Scale = Conflict — Suspend Flux for Manual Ops
+**Lesson:** When manually mounting a ReadWriteOnce PVC (e.g., for migration jobs), GitOps controllers will auto-scale deployments back up, causing PVC mount conflicts.
+**Context:** Scaled down Synapse to free PVC for migration, but Flux auto-scaled it back up. Either suspend the Flux Kustomization or accept the race condition.
+**Verify:** After scaling down: `flux suspend kustomization apps -n flux-system` before starting manual PVC operations.
+
+#### RBD VolumeAttachment Survives Cross-Node Force-Delete
+**Lesson:** Force-deleting a pod with RWO PVCs on one node and recreating on another causes Multi-Attach errors. Deleting Kubernetes `VolumeAttachment` resources does NOT release Ceph-side RBD watchers. Either: (1) wait 30-60s for RBD lock timeout, or (2) use rook-ceph-tools: `rbd lock ls replicapool/<image>` then `rbd lock remove` or `rbd feature disable exclusive-lock`.
+**Context:** OpenClaw pod force-deleted on lab-beta-cp, recreated on lab-gamma-wk. Both PVCs got stuck with "rbd image is still being used" for 6+ minutes.
+**Verify:** `kubectl exec -n rook-ceph deploy/rook-ceph-tools -- rbd status replicapool/csi-vol-<id>` — watcher should be on the NEW node.
+
+### Podman OCI Image Management
+
+#### Podman Push Silently Pushes Stale Image Due to GHCR Tag Collision
+**Lesson:** After `podman tag localhost/image:tag ghcr.io/.../image:tag`, a subsequent `podman pull ghcr.io/...` overwrites the local GHCR tag with the REMOTE stale version. Always: (1) `podman rmi ghcr.io/...` to clear cached tag, (2) `podman tag localhost/...` to retag from local, (3) verify image ID, (4) push with `--format oci`.
+**Context:** Pushed openclaw-nix image that appeared correct but cluster pulled a stale version.
+**Verify:** `podman images | grep <ghcr-tag>` — IMAGE ID must match `localhost/` build before pushing.
+
+#### Verify Remote Digest After Push — Local ≠ Remote
+**Lesson:** After `podman push`, always verify the REMOTE digest with `skopeo inspect --format "{{.Digest}}" docker://<tag>` or `podman pull` + `podman images --digests`. The local digest BEFORE pushing can differ from the remote digest.
+**Context:** Pinned local digest in manifest; remote was different. Cluster pods got "not found" for 20 minutes.
+**Verify:** After push: `podman pull ghcr.io/.../image:tag && podman images --digests | grep <tag>` — digest must match the one in `modules/kubenix/apps/<app>.nix`.
+
+#### Trace Full imageTag Computation Before Changing Version Strings
+**Lesson:** When bumping container image versions, trace the full tag computation chain (`version` → `imageTag` → pushed tag → K8s manifest tag). Changing version in one place without understanding the formula can produce unexpected tags like `v2026.3.2-v2-v2`.
+**Context:** Changed `version = "2026.3.2-v2"` but `imageTag = "v${version}-v2"` produced `v2026.3.2-v2-v2`.
+**Verify:** `grep -rn 'imageTag\|openclawVersion\|image.tag' oci-images/ modules/` — ensure no double-suffix.
+
+#### Force Delete Pods Stuck Terminating During Large Image Pulls
+**Lesson:** When a rollout restart kills a pod mid-pull of a large image (6GB+), the pod gets stuck in `Terminating` state and no new pod is created. Fix: `kubectl delete pod <name> -n <ns> --force --grace-period=0`, then a new pod is automatically created. If the replacement pod fails with sandbox errors, a node reboot may be needed.
+**Context:** Rollout restart of openclaw-nix (6GB image) caused pod stuck Terminating for 10+ minutes.
+**Verify:** After force delete: `kubectl get pods -n <ns> -l app.kubernetes.io/name=<app>` shows new pod in ContainerCreating/Running state.
+
+### Git History & Secret Scrubbing
+
+#### `git-filter-repo` Replaces Strings in Working Tree Source Files
+**Lesson:** `git-filter-repo --replace-text` rewrites ALL commits including HEAD, modifying source files in the working tree. After scrubbing, check source files for the replacement string and fix them, then re-run `make manifests`.
+**Context:** Scrubbing a leaked ElevenLabs key replaced it with `REDACTED_ELEVENLABS_KEY` in `openclaw-config.enc.nix` source code.
+**Verify:** `grep -r "REDACTED" modules/kubenix/` should return nothing after fixing.
+
+#### Never Use `sed` Secret Substitution in Kubernetes Entrypoints
+**Lesson:** Never use `sed -i "s/\${VAR}/$VAR/g"` in container entrypoint scripts defined in Nix/YAML manifests. The shell interpolation can leak actual secret values into non-encrypted `.k8s/*.yaml` files at generation time.
+**Context:** An ElevenLabs API key was committed to `openclaw-nix.yaml` (non-encrypted) because `sed` substituted the env var with its real value.
+**Verify:** `grep -rn "sed.*secretKeyRef\|sed.*printenv\|sed.*\\\$" modules/kubenix/apps/*.nix` should return nothing.
+
+#### Nix String Newlines Break Container Images
+**Lesson:** When defining container image strings in Nix, ensure the closing quote is on the SAME line as the content. A trailing newline in the string adds `\n` to the image tag, causing "Invalid value: must not have leading or trailing whitespace" errors.
+**Context:** Velero init container image had closing quote on separate line — the `\n` broke the deployment.
+**Verify:** `grep -n 'image = ' modules/kubenix/**/*.nix | grep -v ';$'` — ensure all image strings end with `;` on same line.
+
+### Build → Push → Update Digest → Commit Must Be Atomic
+**Lesson:** After rebuilding an OCI image, always push to registry FIRST, then update the digest in kubenix config, then commit+push. Committing a digest that doesn't exist in the registry means Flux deploys a stale image.
+**Context:** First commit referenced old digest because image hadn't been rebuilt with new changes.
+**Verify:** `podman images | grep <tag>` — confirm IMAGE ID matches before pushing; check digest in `.k8s/apps/<app>.yaml` after `make manifests`
+
+### Rook-Ceph Object Storage
+
+#### OBC "Ghost State" — Bound but RGW Empty
+**Lesson:** When ObjectBucketClaims show `phase: Bound` but `radosgw-admin bucket list` returns empty, the Rook operator is in a stuck state. Fix: 1) Delete all OBCs and ObjectBuckets, 2) Restart rook-ceph-operator deployment, 3) Let Flux recreate OBCs.
+**Context:** Operator marks OBCs Bound but fails to provision actual RGW buckets/users due to stale state.
+**Verify:** After fix, `kubectl exec -n rook-ceph deploy/rook-ceph-tools -- radosgw-admin bucket list` shows buckets.
+
+#### PVC Released State Blocks Rebinding
+**Lesson:** When a PVC is stuck Pending with "volume already bound to a different claim", the PV is in `Released` state with a stale `claimRef`. Patch the PV to remove claimRef: `kubectl patch pv <name> --type=json -p='[{"op": "remove", "path": "/spec/claimRef"}]'`.
+**Context:** Previous PVC deletion leaves claimRef pointing to deleted PVC, preventing new PVC from binding.
+**Verify:** `kubectl get pv <name> -o jsonpath='{.spec.claimRef}'` returns empty; PVC should transition to Bound.
+
+### Debugging
+
+#### Trace Pod IPs Before Theorizing About External Traffic
+**Lesson:** When logs show a client/server IP hitting your service, always run `kubectl get pods -A -o wide | grep <IP>` immediately. Cluster IPs (10.x.x.x) are internal — don't waste time researching external causes.
+**Context:** Assumed tuwunel join spam was external federation; it was the mautrix-discord bridge pod at 10.0.2.131.
+**Verify:** `kubectl get pods -A -o wide | grep <suspicious_ip>` before any external research
+
+#### ResourceQuota Debugging — Check Per-Pod Limits
+**Lesson:** When pods fail with "exceeded quota" errors, audit actual per-pod CPU/memory limits. Aggregate quota used/limited values hide which specific pods are over-provisioned.
+**Context:** Default container limits (500m CPU, 512Mi memory) silently apply to sidecars like gluetun VPN, exportarr, config-reloaders, quickly exhausting namespace quotas.
+**Verify:** Sum of all container limits across namespace should be < quota hard limits.
+
+### OpenClaw Plugin Integration
+
+#### Plugin Entry Path in openclaw.plugin.json Must Exist in dist/extensions/
+**Lesson:** OpenClaw plugins declare their entry point in `openclaw.plugin.json` (e.g., `"./index.ts"`). The runtime resolves this relative to `dist/extensions/<plugin-name>/`. If the declared file is missing, the plugin silently fails to load.
+**Context:** The generic plugin copy loop intentionally skips `.ts` files to avoid `assertUniqueValues` failures. Plugins with `.ts` entry points need an explicit copy step.
+**Verify:** `podman run --rm --entrypoint '' <image> ls /lib/openclaw/dist/extensions/<plugin>/index.ts` — file must exist
+
+#### OpenClaw Plugin Discovery Roots Use OPENCLAW_STATE_DIR, Not HOME
+**Lesson:** The global plugin extensions directory is `$OPENCLAW_STATE_DIR/extensions/` (currently `/data/openclaw/extensions/`), NOT `$HOME/.openclaw/extensions/`. The three discovery roots are: `stock` (nix store `dist/extensions/`), `global` (`$OPENCLAW_STATE_DIR/extensions/`), `workspace` (`$WORKSPACE/.openclaw/extensions/`).
+**Context:** Spent 60+ min copying plugins to `/home/node/.openclaw/extensions/` which is the CephFS config mount, not the global discovery root.
+**Verify:** `kubectl exec deploy/openclaw-nix -c main -- env | grep OPENCLAW_STATE_DIR`
+
+#### OpenClaw Memory Plugin Slot — Only ONE Active Memory Plugin
+**Lesson:** OpenClaw only allows ONE plugin with `kind: "memory"` active at a time, controlled by `plugins.slots.memory` in config. Other memory-kind plugins are silently disabled with NO error in logs.
+**Context:** hindsight-openclaw was discovered but never registered because `plugins.slots.memory` was set to `memory-lancedb`.
+**Verify:** `jq '.plugins.slots' <openclaw.json>` matches the intended memory plugin
+
+#### Non-Bundled OpenClaw Plugins Need hooks.allowConversationAccess
+**Lesson:** External (non-bundled) plugins that register conversation-level hooks (e.g., `agent_end`) must set `plugins.entries.<id>.hooks.allowConversationAccess = true` in config. Without it, hooks are silently blocked.
+**Context:** hindsight-openclaw registered `agent_end` hook but it was blocked with `[hooks] hook blocked`.
+**Verify:** `kubectl logs ... | grep 'hook blocked'` shows no blocked hooks after plugin loads
+
+#### Verify OpenClaw Readiness by Logs and Real Routes
+**Lesson:** Treat `http server listening` and TCP readiness as insufficient; require `[gateway] ready`, channel/provider logs, websocket responses, and `GET /health` returning `{"ok":true,"status":"live"}`.
+**Context:** `/__openclaw__/health` timed out in v2026.4.27 while `/health`, the Control UI, and websocket health calls worked after gateway readiness.
+**Verify:** `kubectl logs ... | grep "gateway] ready"` and `curl -m 15 http://127.0.0.1:18789/health` inside the pod.
+
+### Manifest Pipeline
+
+#### Lock File Stale Entry Blocks New Secret Keys
+**Lesson:** When adding new secret keys to `.enc.nix` files, delete the specific file's line from `manifests.lock` AND delete the file from `.k8s/` before running `make manifests`. Otherwise the `umanifests` stage restores the old git-committed version.
+**Context:** The `umanifests` stage compares SHA256 of the new vals-injected file against the lock file. If they match, it restores the git version — silently dropping newly added keys.
+**Verify:** `sops -d .k8s/apps/<app>-config.enc.yaml | grep <NEW_KEY>` returns the expected value after `make manifests`
+
+#### Never Run Individual Manifest Pipeline Stages
+**Lesson:** Only use `make manifests` to run the pipeline. Never run `nix build .#gen-manifests`, `vals eval`, or other stages individually — they produce misleading results because the `.k8s/` directory is only correctly populated by the full pipeline.
+**Context:** Running `nix build .#gen-manifests` directly updates the Nix store but not `.k8s/`.
+**Verify:** Always check `.k8s/` files after `make manifests`, never after individual stage runs
+
+### Hermes Agent Deployment
+
+#### Setuid Binaries Need SETUID/SETGID Caps Even With runAsUser=0
+**Lesson:** When a container runs as root and uses `gosu`/`su-exec`/`setpriv` to drop privileges, dropping `ALL` capabilities breaks the privilege drop with `operation not permitted`. Add `["SETUID" "SETGID"]` to `capabilities.add` (also `CHOWN`/`FOWNER` if entrypoint chowns paths).
+**Context:** Hermes/openclaw-style images use `tini → entrypoint → gosu → app`. `runAsUser=0` puts you in root namespace but cap-drop strips the kernel privileges gosu needs.
+**Verify:** `kubectl logs <pod> --previous | grep -i 'switching\|operation not permitted'` after CrashLoopBackOff.
+
+#### CephFS subPath Rejects chown Even With CAP_CHOWN
+**Lesson:** Don't put `chown -R` init containers on CephFS-backed `subPath` mounts. CephFS enforces ownership beyond the kernel cap check; even an init container with CAP_CHOWN gets `Permission denied`. Rely on the app entrypoint's chown-with-fallback, or pre-create the subdir with correct ownership via a privileged one-shot.
+**Context:** Wasted ~25 min on an init container that works fine on RBD but always fails on CephFS subPath.
+**Verify:** `kubectl logs <pod> -c <init>` shows `chown: <path>: Permission denied` despite `capabilities.add: [CHOWN]`.
+
+#### Pod Preemption Looks Like Scheduling Failure
+**Lesson:** When a pod oscillates `Pending` → `Terminating` → `Pending` without restart count climbing, suspect preemption, not resource starvation. Check `kubectl get pod <name> -o jsonpath='{.status.conditions[?(@.type=="DisruptionTarget")]}'` and `kubectl get events --field-selector reason=Preempted -A`.
+**Context:** Openclaw-nix (priority 1000000) preempting hermes-agent (priority 100000) on lab-beta-cp during rolling updates.
+**Verify:** `kubectl get pods -A -o custom-columns='NS:.metadata.namespace,NAME:.metadata.name,PRIO:.spec.priority' --field-selector spec.nodeName=<node> --no-headers | sort -k3 -nr | head`.
+
+#### Avoid Hard Node Affinity for Non-Pinned Apps
+**Lesson:** Prefer soft node affinity for apps that can run on multiple nodes; hard `requiredDuringScheduling` can trap rollouts when a preferred node is `NotReady` or another node lacks resources.
+**Context:** `openclaw` kept rescheduling onto/flapping around `lab-beta-cp`; removing hard exclusion and changing preferred node restored scheduling flexibility.
+**Verify:** `kubectl describe pod <pod>` shows scheduling events; generated manifest should avoid unnecessary `requiredDuringSchedulingIgnoredDuringExecution`.
+
+#### Probe Storms Can Block Node.js App Initialization
+**Lesson:** For Node.js apps (OpenClaw, etc.), aggressive startup+readiness+liveness probes hitting endpoints that don't respond quickly can accumulate hundreds of TCP connections, overwhelming the event loop and preventing initialization. Use `/health` (not `/healthz`/`/readyz`), reduce probe frequency (periodSeconds ≥ 30 for readiness/liveness), and increase initialDelaySeconds generously.
+**Context:** OpenClaw pod stuck at 'starting channels and sidecars...' with 252 TCP connections from probes hitting /healthz and /readyz which time out.
+**Verify:** `kubectl exec <pod> -- ss -tn | wc -l` shows reasonable connection count (< 20) during startup.
+
+### Tooling & Environment
+
+#### `rtk` Wrapper Truncates Piped Output
+**Lesson:** The `rtk` wrapper tool truncates piped stdout to ~5KB, silently dropping output from commands like `sops -d`. Use raw binary paths (e.g., `/etc/profiles/per-user/josevictor/bin/sops`) for accurate results.
+**Context:** `sops -d` via `rtk` showed only 41 lines (29 keys) from a 181-line file with 144 keys.
+**Verify:** Compare `rtk sops -d file | wc -l` vs `/etc/profiles/per-user/josevictor/bin/sops -d file | wc -l` — should match.
+
+### Cluster-Internal Communication
+
+#### Use Internal Service URLs for In-Cluster Apps
+**Lesson:** When configuring apps to talk to each other within the cluster, use `http://<service>.<namespace>.svc.cluster.local:<port>` instead of external URLs. Pods may not resolve external DNS (especially during node outages).
+**Context:** Hermes gateway pod crashed with `Cannot connect to host matrix.josevictor.me:443 [Name or service not known]` because external DNS was unreachable.
+**Verify:** `kubectl exec <pod> -- wget -qO- http://<service>.<ns>.svc.cluster.local:<port>/_matrix/client/versions` returns valid response.
+
+### Tuwunel Matrix Operations
+
+#### Register Matrix Bot Users via Registration Token API
+**Lesson:** To create bot users on tuwunel, use `POST /_matrix/client/v3/register` with `auth.type: m.login.registration_token` and the token from `secrets/k8s-secrets.enc.yaml` key `tuwunel_registration_token`. The resulting `access_token` is the bot's credential.
+**Context:** Hermes needed a dedicated Matrix user `@hermes:josevictor.me`. The initial `syt_` prefixed token was invalid for tuwunel (Conduwuit uses different token format than Synapse).
+**Verify:** `wget -qO- --post-data='{...}' --header='Content-Type: application/json' http://tuwunel.apps.svc.cluster.local:8008/_matrix/client/v3/register` returns `access_token` and `user_id`.
+
+### OCI Image Source Patching
+
+#### Check Upstream Source Indentation Before `substituteInPlace`
+**Lesson:** When writing `substituteInPlace` patches in Nix `postPatch`, inspect the actual upstream source file's indentation (tabs vs spaces, width) before writing the match string. Use `--replace-fail` to get clear errors on mismatch instead of silent no-ops.
+**Context:** Used `\t` tab escapes in a Nix indented string to match TypeScript source that actually uses 2-space indentation.
+**Verify:** Check source: `tar -xzf <tarball> --to-stdout <path> | head -20` shows actual indentation; use `--replace-fail` flag in `substituteInPlace` to fail fast.
+
+#### Verify Upstream Source Tag Exists Before Building
+**Lesson:** Before building a custom OCI image that fetches upstream source, verify the tag actually exists: `git ls-remote --tags <upstream-url> "refs/tags/v<version>"`. A mismatch between the stored hash and the version string will cause build failures at fetch time.
+**Context:** Local derivation had `version = "2026.4.27"` but the hash was for `v2026.4.26` tarball. The v2026.4.27 tag didn't exist upstream.
+**Verify:** `git ls-remote --tags https://github.com/<org>/<repo> "refs/tags/v<version>"` returns a result before building.
+
+### Network Troubleshooting
+
+#### Unreachable Node ≠ Broken Node — Check Switch Port First
+**Lesson:** When a node becomes unreachable from kubectl/SSH but boots fine at the local console with no failed units, suspect L1 (cable/switch port/NIC) before NixOS/k3s. A dead switch port mimics a node failure perfectly from the cluster's perspective.
+**Context:** `lab-beta-cp` appeared down to the cluster and refused SSH. At the console it booted cleanly. Moving the ethernet cable to a different switch port immediately restored cluster membership.
+**Verify:** From another node: `ping <ip> && ip neigh show <ip>` — no ARP reply means L2 unreachable. From the suspect node's console: `ip -br link` shows `NO-CARRIER`, `ethtool <iface>` shows `Link detected: no`. Try a different cable AND a different switch port before deeper debugging.
+
+#### Cross-Architecture NixOS Deploy to Pi (aarch64)
+**Lesson:** Cannot cross-compile x86_64→aarch64 via `nixos-rebuild --target-host`. SSH into the Pi and rebuild from GitHub: `ssh root@10.10.10.209 "nixos-rebuild switch --flake github:josevictorferreira/homelab#lab-pi-bk"`.
+**Context:** `--target-host` tries to build locally (wrong arch). `--build-host` on Pi via local flake path also fails. Pi must build natively from a remote flake ref.
+**Verify:** `ssh root@10.10.10.209 "nixos-rebuild switch --flake github:josevictorferreira/homelab#lab-pi-bk"` completes without arch errors
+
+#### Always `git diff --cached` Before Commit
+**Lesson:** Explicit `git add <file>` arguments do NOT unstage other already-staged files — they accumulate. Pre-existing staged work from prior sessions can sneak into your commit. Always run `git diff --cached --stat` before `git commit` to verify exactly what's staged.
+**Context:** Committed 2 unintended openclaw files (669 added lines) alongside a 2-line hermes capability fix.
+**Verify:** `git diff --cached --stat` matches your intent before every `git commit`.
 
 ## INCIDENT RECORD
 
