@@ -51,12 +51,16 @@ spec:
               \ \"$STATE_DIR\" \"$EXTENSIONS_DIR\" \"$PLUGIN_STAGE_DIR\"\n       \
               \ mkdir -p \"$STATE_DIR/logs\" \"$STATE_DIR/tmp\" \"$STATE_DIR/workspace-luna\"\
               \n\n        echo \"Syncing tested plugin bundle into persisted local\
-              \ state...\"\n        cp -a /opt/openclaw-debian/extensions/. \"$EXTENSIONS_DIR/\"\
-              \n\n        echo \"Generating Luna-only runtime config at $CONFIG_FILE...\"\
-              \n        node -e '\nconst fs = require(\"fs\");\n\nconst sourcePath\
-              \ = process.env.SHARED_CONFIG;\nconst targetPath = process.env.OPENCLAW_CONFIG_PATH;\n\
-              const config = JSON.parse(fs.readFileSync(sourcePath, \"utf8\"));\n\n\
-              const keepAgent = \"luna\";\n\nif (config.agents && Array.isArray(config.agents.list))\
+              \ state...\"\n        if [ ! -f \"$EXTENSIONS_DIR/.synced\" ]; then\n\
+              \          cp -a /opt/openclaw-debian/extensions/. \"$EXTENSIONS_DIR/\"\
+              \n          touch \"$EXTENSIONS_DIR/.synced\"\n          echo \"Plugin\
+              \ sync complete.\"\n        else\n          echo \"Plugins already synced,\
+              \ skipping copy.\"\n        fi\n\n        echo \"Generating Luna-only\
+              \ runtime config at $CONFIG_FILE...\"\n        node -e '\nconst fs =\
+              \ require(\"fs\");\n\nconst sourcePath = process.env.SHARED_CONFIG;\n\
+              const targetPath = process.env.OPENCLAW_CONFIG_PATH;\nconst config =\
+              \ JSON.parse(fs.readFileSync(sourcePath, \"utf8\"));\n\nconst keepAgent\
+              \ = \"luna\";\n\nif (config.agents && Array.isArray(config.agents.list))\
               \ {\n  config.agents.list = config.agents.list.filter((agent) => agent\
               \ && agent.id === keepAgent);\n}\n\nif (Array.isArray(config.bindings))\
               \ {\n  config.bindings = config.bindings.filter((binding) => binding\
