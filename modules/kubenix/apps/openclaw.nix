@@ -227,6 +227,10 @@ in
                     value = "/home/node/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin";
                   }
                   {
+                    name = "NODE_OPTIONS";
+                    value = "--unhandled-rejections=warn";
+                  }
+                  {
                     name = "TZ";
                     value = homelab.timeZone;
                   }

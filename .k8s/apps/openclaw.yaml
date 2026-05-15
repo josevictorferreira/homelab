@@ -115,6 +115,8 @@ spec:
               value: /home/node/.local/lib/node_modules:/app/node_modules
             - name: PATH
               value: /home/node/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+            - name: NODE_OPTIONS
+              value: --unhandled-rejections=warn
             - name: TZ
               value: America/Sao_Paulo
           envFrom:
