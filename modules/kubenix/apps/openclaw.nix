@@ -36,7 +36,13 @@ let
             mkdir -p "$STATE_DIR/logs" "$STATE_DIR/tmp" "$STATE_DIR/workspace-luna"
 
             echo "Syncing tested plugin bundle into persisted local state..."
-            cp -a /opt/openclaw-debian/extensions/. "$EXTENSIONS_DIR/"
+            if [ ! -f "$EXTENSIONS_DIR/.synced" ]; then
+              cp -a /opt/openclaw-debian/extensions/. "$EXTENSIONS_DIR/"
+              touch "$EXTENSIONS_DIR/.synced"
+              echo "Plugin sync complete."
+            else
+              echo "Plugins already synced, skipping copy."
+            fi
 
             echo "Generating Luna-only runtime config at $CONFIG_FILE..."
             node -e '
