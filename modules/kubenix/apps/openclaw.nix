@@ -225,7 +225,7 @@ in
                     memory = "512Mi";
                   };
                   limits = {
-                    cpu = "1";
+                    cpu = "250m";
                     memory = "2Gi";
                   };
                 };
