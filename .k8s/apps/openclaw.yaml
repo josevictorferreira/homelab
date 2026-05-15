@@ -1,0 +1,230 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app: openclaw
+  name: openclaw
+  namespace: apps
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: openclaw
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: openclaw
+    spec:
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - preference:
+                matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values:
+                      - lab-delta-cp
+              weight: 100
+      automountServiceAccountToken: false
+      containers:
+        - command:
+            - /bin/bash
+            - -lc
+            - "        set -euo pipefail\n\n        SHARED_DIR=/home/node/.openclaw\n\
+              \        SHARED_CONFIG=\"$SHARED_DIR/openclaw.json\"\n        LOCAL_DIR=/home/node/.local\n\
+              \        STATE_DIR=\"$LOCAL_DIR/openclaw\"\n        CONFIG_FILE=\"$STATE_DIR/openclaw.json\"\
+              \n        EXTENSIONS_DIR=\"$STATE_DIR/extensions\"\n        PLUGIN_STAGE_DIR=\"\
+              $STATE_DIR/plugin-stage\"\n\n        echo \"Preparing OpenClaw Debian\
+              \ Luna node...\"\n        for i in $(seq 1 30); do\n          if [ -f\
+              \ \"$SHARED_CONFIG\" ] && touch \"$SHARED_DIR/.debian-node-mount-check\"\
+              \ 2>/dev/null; then\n            rm -f \"$SHARED_DIR/.debian-node-mount-check\"\
+              \n            break\n          fi\n          echo \"Waiting for shared\
+              \ OpenClaw config, attempt $i/30...\"\n          sleep 2\n        done\n\
+              \n        if [ ! -f \"$SHARED_CONFIG\" ]; then\n          echo \"Shared\
+              \ OpenClaw config not found at $SHARED_CONFIG\" >&2\n          exit\
+              \ 1\n        fi\n\n        mkdir -p \"$LOCAL_DIR/bin\" \"$LOCAL_DIR/lib/node_modules\"\
+              \ \"$STATE_DIR\" \"$EXTENSIONS_DIR\" \"$PLUGIN_STAGE_DIR\"\n       \
+              \ mkdir -p \"$STATE_DIR/logs\" \"$STATE_DIR/tmp\" \"$STATE_DIR/workspace-luna\"\
+              \n\n        echo \"Syncing tested plugin bundle into persisted local\
+              \ state...\"\n        cp -a /opt/openclaw-debian/extensions/. \"$EXTENSIONS_DIR/\"\
+              \n\n        echo \"Generating Luna-only runtime config at $CONFIG_FILE...\"\
+              \n        node -e '\nconst fs = require(\"fs\");\n\nconst sourcePath\
+              \ = process.env.SHARED_CONFIG;\nconst targetPath = process.env.OPENCLAW_CONFIG_PATH;\n\
+              const config = JSON.parse(fs.readFileSync(sourcePath, \"utf8\"));\n\n\
+              const keepAgent = \"luna\";\n\nif (config.agents && Array.isArray(config.agents.list))\
+              \ {\n  config.agents.list = config.agents.list.filter((agent) => agent\
+              \ && agent.id === keepAgent);\n}\n\nif (Array.isArray(config.bindings))\
+              \ {\n  config.bindings = config.bindings.filter((binding) => binding\
+              \ && binding.agentId === keepAgent);\n}\n\nconfig.plugins ??= {};\n\
+              config.plugins.enabled = true;\nconfig.plugins.slots ??= {};\nconfig.plugins.slots.memory\
+              \ = \"hindsight-openclaw\";\nconfig.plugins.slots.contextEngine = \"\
+              lossless-claw\";\nconfig.plugins.entries ??= {};\ndelete config.plugins.entries[\"\
+              memory-lancedb\"];\nconfig.plugins.entries[\"hindsight-openclaw\"] =\
+              \ {\n  ...(config.plugins.entries[\"hindsight-openclaw\"] ?? {}),\n\
+              \  enabled: true,\n  hooks: {\n    ...(config.plugins.entries[\"hindsight-openclaw\"\
+              ]?.hooks ?? {}),\n    allowConversationAccess: true,\n  },\n};\nconfig.plugins.entries[\"\
+              lossless-claw\"] = {\n  ...(config.plugins.entries[\"lossless-claw\"\
+              ] ?? {}),\n  enabled: true,\n  config: {\n    ...(config.plugins.entries[\"\
+              lossless-claw\"]?.config ?? {}),\n    dbPath: \"/home/node/.local/openclaw/lcm.db\"\
+              ,\n  },\n};\nconfig.plugins.entries.matrix = {\n  ...(config.plugins.entries.matrix\
+              \ ?? {}),\n  enabled: true,\n};\nconfig.plugins.entries.whatsapp = {\n\
+              \  ...(config.plugins.entries.whatsapp ?? {}),\n  enabled: false,\n\
+              };\n\nif (config.channels?.matrix?.accounts) {\n  const lunaAccount\
+              \ = config.channels.matrix.accounts.luna;\n  config.channels.matrix.accounts\
+              \ = lunaAccount ? { luna: lunaAccount } : {};\n}\nif (config.channels?.matrix)\
+              \ {\n  config.channels.matrix.enabled = true;\n}\nif (config.channels?.whatsapp)\
+              \ {\n  config.channels.whatsapp.enabled = false;\n}\n\nfs.writeFileSync(targetPath,\
+              \ JSON.stringify(config, null, 2) + \"\\n\", { mode: 0o600 });\n'\n\n\
+              \        cd \"$STATE_DIR/workspace-luna\"\n        exec node /app/openclaw.mjs\
+              \ gateway --port 18789 --bind lan --allow-unconfigured --verbose\n"
+          env:
+            - name: HOME
+              value: /home/node
+            - name: OPENCLAW_CONFIG_PATH
+              value: /home/node/.local/openclaw/openclaw.json
+            - name: OPENCLAW_DATA_DIR
+              value: /home/node/.local/openclaw
+            - name: OPENCLAW_STATE_DIR
+              value: /home/node/.local/openclaw
+            - name: SHARED_CONFIG
+              value: /home/node/.openclaw/openclaw.json
+            - name: OPENCLAW_PLUGIN_STAGE_DIR
+              value: /home/node/.local/openclaw/plugin-stage
+            - name: OPENCLAW_DISABLE_BONJOUR
+              value: '1'
+            - name: OPENCLAW_NO_RESPAWN
+              value: '1'
+            - name: OPENCLAW_ALLOW_ROOT
+              value: '1'
+            - name: NPM_CONFIG_PREFIX
+              value: /home/node/.local
+            - name: NODE_PATH
+              value: /home/node/.local/lib/node_modules:/app/node_modules
+            - name: PATH
+              value: /home/node/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+            - name: TZ
+              value: America/Sao_Paulo
+          envFrom:
+            - secretRef:
+                name: openclaw-config
+          image: ghcr.io/josevictorferreira/openclaw-debian:2026.5.12-luna-hindsight-lossless@sha256:b35af506302760641156c23bdfe99c1875968077f4359eecd87da5a1f00ca512
+          imagePullPolicy: Always
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 300
+            periodSeconds: 60
+            timeoutSeconds: 10
+          name: openclaw
+          ports:
+            - containerPort: 18789
+              name: http
+              protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: http
+            periodSeconds: 30
+            timeoutSeconds: 5
+          resources:
+            limits:
+              cpu: '1'
+              memory: 2Gi
+            requests:
+              cpu: 250m
+              memory: 512Mi
+          securityContext:
+            runAsGroup: 0
+            runAsUser: 0
+          startupProbe:
+            failureThreshold: 60
+            httpGet:
+              path: /health
+              port: http
+            periodSeconds: 5
+            timeoutSeconds: 3
+          volumeMounts:
+            - mountPath: /home/node/.openclaw
+              name: openclaw-shared
+              subPath: openclaw
+            - mountPath: /home/node/.local
+              name: openclaw-local
+      imagePullSecrets:
+        - name: ghcr-registry-secret
+      terminationGracePeriodSeconds: 60
+      volumes:
+        - name: openclaw-shared
+          persistentVolumeClaim:
+            claimName: cephfs-shared-storage-root
+        - name: openclaw-local
+          persistentVolumeClaim:
+            claimName: openclaw-local
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: openclaw-local
+  namespace: apps
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: rook-ceph-block
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: openclaw
+  namespace: apps
+spec:
+  ports:
+    - name: http
+      port: 18789
+      protocol: TCP
+      targetPort: http
+  selector:
+    app: openclaw
+  type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: cloudflare-issuer
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: openclaw
+  namespace: apps
+spec:
+  ingressClassName: cilium
+  rules:
+    - host: openclaw-debian.josevictor.me
+      http:
+        paths:
+          - backend:
+              service:
+                name: openclaw
+                port:
+                  number: 18789
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - openclaw-debian.josevictor.me
+      secretName: wildcard-tls
