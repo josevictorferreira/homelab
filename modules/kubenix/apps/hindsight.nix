@@ -39,6 +39,12 @@ in
               HINDSIGHT_API_LLM_PROVIDER = "openrouter";
               HINDSIGHT_API_LLM_MODEL = "openai/gpt-oss-20b";
               HINDSIGHT_API_REFLECT_LLM_MODEL = "openai/gpt-oss-120b";
+              HINDSIGHT_API_EMBEDDINGS_PROVIDER = "openrouter";
+              HINDSIGHT_API_EMBEDDINGS_OPENROUTER_MODEL = "google/gemini-embedding-2-preview";
+              HINDSIGHT_API_RERANKER_PROVIDER = "openrouter";
+              HINDSIGHT_API_RERANKER_OPENROUTER_MODEL = "cohere/rerank-4-fast";
+              HINDSIGHT_API_WORKER_MAX_SLOTS = "2";
+              HINDSIGHT_API_WORKER_CONSOLIDATION_MAX_SLOTS = "1";
             };
             probes = {
               liveness = {
@@ -125,7 +131,9 @@ in
                 enabled = true;
                 custom = true;
                 spec = {
-                  tcpSocket = { port = 3000; };
+                  tcpSocket = {
+                    port = 3000;
+                  };
                   initialDelaySeconds = 30;
                   periodSeconds = 10;
                   timeoutSeconds = 5;
@@ -136,7 +144,9 @@ in
                 enabled = true;
                 custom = true;
                 spec = {
-                  tcpSocket = { port = 3000; };
+                  tcpSocket = {
+                    port = 3000;
+                  };
                   initialDelaySeconds = 10;
                   periodSeconds = 5;
                   timeoutSeconds = 3;
