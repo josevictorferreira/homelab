@@ -199,6 +199,24 @@ Our cluster is deployed and accessible in the user system kubectl, the context a
 
 ## SESSION LEARNINGS
 
+### Nix File Edits: git checkout on Garble
+**Lesson:** If `edit` on a Nix file produces garbled or duplicated output (common near `let/in` boundaries), immediately `git checkout <file>` — don't try surgical fixes. Use a Python/external script for bulk insertions instead.
+**Context:** The `edit` tool repeatedly duplicated `let/in` block content and export lists in `flake.nix` and `commands.nix`, requiring multiple restore cycles.
+**Verify:** After any edit on Nix files with `let/in`, run `nix-instantiate --parse <file>` before further edits.
+
+### Extract .deb in Nix Builds Requires binutils-unwrapped
+**Lesson:** Extracting `.deb` packages in `runCommand` requires `binutils-unwrapped` (for `ar`) in `nativeBuildInputs`, not available by default.
+**Context:** VectorChord .deb extraction failed with "ar: command not found" despite having `tar` and `xz`.
+**Verify:** `nativeBuildInputs = [ pkgs.binutils-unwrapped pkgs.xz pkgs.gnutar ];` in the derivation.
+
+### GitHub Releases URLs Lack 'v' Prefix
+**Lesson:** VectorChord GitHub release asset URLs use the tag without `v` prefix (e.g., `.../0.5.3/postgresql-17-...` not `.../v0.5.3/...`).
+**Context:** fetchurl returned 404 because the URL included `v0.5.3` instead of `0.5.3`.
+**Verify:** Browse `https://github.com/tensorchord/VectorChord/releases/tag/<tag>` and check the actual asset download links.
+
+
+### Hermes ConfigMap Is Only a Backup
+
 ### Hermes ConfigMap Is Only a Backup
 **Lesson:** The Hermes config ConfigMap is a fallback/backup only. For real runtime configuration, inspect and modify the actual config mounted inside the pod.
 **Context:** Hermes may use a live mounted config that differs from the generated ConfigMap; treating the ConfigMap as authoritative can lead to incorrect conclusions or ineffective changes.

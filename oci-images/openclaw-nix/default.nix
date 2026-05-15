@@ -937,8 +937,14 @@ let
               cp -rL ${losslessClawPackage}/lossless-claw-deps/node_modules/@sinclair/* node_modules/@sinclair/
             fi
             cd - >/dev/null
-            CRYPTO_PKG="$out/lib/openclaw/extensions/matrix/node_modules/@matrix-org/matrix-sdk-crypto-nodejs"
-            if [ -d "$CRYPTO_PKG" ]; then chmod -R u+w "$CRYPTO_PKG" || true; cp ${matrixCryptoNative} "$CRYPTO_PKG/matrix-sdk-crypto.linux-x64-gnu.node"; fi
+            for CRYPTO_PKG in \
+              "$out/lib/openclaw/extensions/matrix/node_modules/@matrix-org/matrix-sdk-crypto-nodejs" \
+              "$out/lib/openclaw/dist/extensions/matrix/node_modules/@matrix-org/matrix-sdk-crypto-nodejs"; do
+              if [ -d "$CRYPTO_PKG" ]; then
+                chmod -R u+w "$CRYPTO_PKG" || true
+                cp ${matrixCryptoNative} "$CRYPTO_PKG/matrix-sdk-crypto.linux-x64-gnu.node"
+              fi
+            done
             ${lib.optionalString disableMatrixCredentialTouch ''
               ${pkgs.python3}/bin/python3 ${matrixCredentialTouchPatchScript} "$out/lib/openclaw/dist/extensions/matrix"
             ''}
@@ -960,6 +966,13 @@ let
             cp ${rtkPackageJson} "$out/lib/openclaw/extensions/rtk-rewrite/package.json"
             cp ${rtkPackageJson} "$out/lib/openclaw/dist/extensions/rtk-rewrite/package.json"
             chmod -R u+w "$out/lib/openclaw/extensions/rtk-rewrite/" "$out/lib/openclaw/dist/extensions/rtk-rewrite/" 2>/dev/null || true
+
+            # Runtime bundled plugin/channel discovery must use dist/extensions.
+            # Keeping the source extensions tree in the image lets a second
+            # bundled-channel resolver mix source roots with built entries,
+            # which trips OpenClaw 2026.5.12 plugin-root boundary checks.
+            chmod -R u+w "$out/lib/openclaw/extensions" 2>/dev/null || true
+            rm -rf "$out/lib/openclaw/extensions"
   '';
 in
 dockerTools.streamLayeredImage {
