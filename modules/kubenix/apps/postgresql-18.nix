@@ -8,8 +8,8 @@
 let
   image = {
     registry = "ghcr.io";
-    repository = "josevictorferreira/postgresql-vchord";
-    tag = "17.6-pgvector0.8.2-vchord0.5.3";
+    repository = "josevictorferreira/postgresql-vchord-bitnami";
+    tag = "38c40fefe0c58cff6622de77f787634320e1ae5e";
   };
   namespace = homelab.kubernetes.namespaces.applications;
   bootstrapDatabases = homelab.kubernetes.databases.postgres;
