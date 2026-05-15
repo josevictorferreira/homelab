@@ -275,10 +275,10 @@ Our cluster is deployed and accessible in the user system kubectl, the context a
 **Context:** A foreground push hit the 600000ms tool timeout mid-blob, leaving GHCR with `manifest unknown`. Diagnosis + retry cost ~15 min that a background launch would have avoided.
 **Verify:** After completion, `podman pull <ghcr-tag>` succeeds and `podman images --digests <repo>` shows the expected sha256.
 
-### openclaw-nix Pod May Have Only One Container (varies by version)
-**Lesson:** The openclaw-nix pod runs `chromium` first and `main` second. `kubectl exec deploy/openclaw-nix -- ...` defaults to `chromium`, which lacks app tooling. Always pass `-c main` for `/health`, `openclaw`, log inspection, etc.
-**Context:** A health probe via `kubectl exec deploy/openclaw-nix` failed with "container chromium is not valid for pod" because the default container had no curl/openclaw binary.
-**Verify:** `kubectl get pod <pod> -n apps -o jsonpath='{range .spec.containers[*]}{.name}{"\n"}{end}'` lists `chromium` then `main`.
+### OpenClaw Pod Container Names Vary by Deployment
+**Lesson:** The openclaw-nix pod runs `chromium` first and `main` second — always pass `-c main`. The Debian openclaw pod runs a single container named `openclaw`. Always check container names before `kubectl exec`: `kubectl get pod <pod> -n apps -o jsonpath='{range .spec.containers[*]}{.name}{"\n"}{end}'`.
+**Context:** `kubectl exec` defaults to the first container, which may lack app tooling. Both `-c main` (openclaw-nix) and `-c openclaw` (Debian) are needed depending on deployment.
+**Verify:** `kubectl get pod <pod> -n apps -o jsonpath='{range .spec.containers[*]}{.name}{"\n"}{end}'` lists the correct container names.
 
 ### NixOS Profile System
 
@@ -322,6 +322,17 @@ Our cluster is deployed and accessible in the user system kubectl, the context a
 **Lesson:** Kubernetes StatefulSets forbid updates to most fields. Use `kubectl delete statefulset <name> -n <ns> --cascade=orphan` then `flux reconcile` to recreate.
 **Context:** Standard updates fail with "Forbidden: updates to statefulset spec for fields other than...".
 **Verify:** State recreates successfully with new spec.
+
+#### Bitnami Charts Require Bitnami-Compatible Images
+**Lesson:** When replacing the default image in a Bitnami Helm chart (postgresql, keycloak, etc.), the replacement MUST be Bitnami-based — with the proper `/opt/bitnami/scripts/` entrypoint and a UID 1001 user. A bare Nix-built image with `Cmd = ["/bin/bash"]` will exit immediately (code 0) with no logs.
+**Context:** Switched postgresql-18 from `postgresql-vchord-bitnami` (working) to a custom Nix `postgresql-vchord` image. Container started, ran `/bin/bash`, exited 0 immediately — CrashLoopBackOff with no log output.
+**Verify:** Before deploying a custom image for a Bitnami chart: check the chart's expected entrypoint, user UID, and directory structure. For postgresql: `kubectl get statefulset <name> -o jsonpath='{.spec.template.spec.containers[0].command}'` — if empty, the image's CMD is used.
+
+#### Flux Reconciliation Blocked by Immutable Job Templates
+**Lesson:** Adding/changing `imagePullSecrets` (or any field in `spec.template`) on a Job blocks Flux server-side apply because Job pod templates are immutable. The dry-run fails and the ENTIRE kustomization (including StatefulSet updates) is blocked. Fix: `kubectl delete job <name> -n <ns>` then let Flux re-reconcile.
+**Context:** Added `imagePullSecrets` to `postgresql-18.nix` for both StatefulSet and bootstrap Job. Flux reconciliation stayed `Ready: False` for 20+ minutes because `spec.template: field is immutable` on the existing Job. Deleting the Job unblocked the kustomization.
+**Verify:** After changing a Job's template: `kubectl get kustomization flux-system -n flux-system -o jsonpath='{.status.conditions[?(@.type=="Ready")].message}' | grep 'immutable'` — if it matches, delete the Job and re-reconcile.
+
 
 #### Use `sops --set` to Add Keys to Encrypted Files
 **Lesson:** Never decrypt→edit→re-encrypt SOPS files (`sops -d > plain && edit && sops -e plain > enc`). This corrupts encryption metadata. Use `sops --set '["key"] "value"' secrets/file.enc.yaml` to add keys in-place.
@@ -812,16 +823,25 @@ Our cluster is deployed and accessible in the user system kubectl, the context a
 **Context:** `lab-beta-cp` appeared down to the cluster and refused SSH. At the console it booted cleanly. Moving the ethernet cable to a different switch port immediately restored cluster membership.
 **Verify:** From another node: `ping <ip> && ip neigh show <ip>` — no ARP reply means L2 unreachable. From the suspect node's console: `ip -br link` shows `NO-CARRIER`, `ethtool <iface>` shows `Link detected: no`. Try a different cable AND a different switch port before deeper debugging.
 
-#### Cross-Architecture NixOS Deploy to Pi (aarch64)
-**Lesson:** Cannot cross-compile x86_64→aarch64 via `nixos-rebuild --target-host`. SSH into the Pi and rebuild from GitHub: `ssh root@10.10.10.209 "nixos-rebuild switch --flake github:josevictorferreira/homelab#lab-pi-bk"`.
-**Context:** `--target-host` tries to build locally (wrong arch). `--build-host` on Pi via local flake path also fails. Pi must build natively from a remote flake ref.
-**Verify:** `ssh root@10.10.10.209 "nixos-rebuild switch --flake github:josevictorferreira/homelab#lab-pi-bk"` completes without arch errors
+### Cross-Architecture NixOS Deploy to Pi (aarch64)
+**Lesson:** Cannot cross-compile x86_64→aarch64 via `nixos-rebuild --target-host`. For committed changes, SSH into the Pi and rebuild from GitHub: `ssh root@10.10.10.209 "nixos-rebuild switch --flake github:josevictorferreira/homelab#lab-pi-bk"`. For UNCOMMITTED local changes, use the local flake path instead: `ssh root@10.10.10.209 "nixos-rebuild switch --flake /path/to/local/flake#lab-pi-bk"` — the `github:` reference evaluates the committed version and ignores working tree changes.
+**Context:** `--target-host` tries to build locally (wrong arch). `--build-host` on Pi via local flake path also fails. Pi must build natively. The `github:` flake ref is convenient for committed changes but silently ignores uncommitted work, causing confusing "where are my changes?" debugging.
+**Verify:** After deploy from local path: `ssh root@10.10.10.209 'systemctl list-units | grep k3s'` shows expected services. After deploy from GitHub: `git status` shows no uncommitted changes related to the deployment.
 
 #### Always `git diff --cached` Before Commit
 **Lesson:** Explicit `git add <file>` arguments do NOT unstage other already-staged files — they accumulate. Pre-existing staged work from prior sessions can sneak into your commit. Always run `git diff --cached --stat` before `git commit` to verify exactly what's staged.
 **Context:** Committed 2 unintended openclaw files (669 added lines) alongside a 2-line hermes capability fix.
 **Verify:** `git diff --cached --stat` matches your intent before every `git commit`.
 
+### Multi-Node OpenClaw with Shared CephFS Must Construct Agent Config Independently
+**Lesson:** When deploying a second OpenClaw node sharing CephFS `.openclaw`, do NOT filter agents from the shared `openclaw.json`. Instead, construct agent definitions, bindings, and channel accounts directly in the startup script from env vars. Filtering from shared config breaks when agents are removed from the shared config (produces empty lists).
+**Context:** After removing Luna from shared CephFS config to avoid duplicate Matrix consumers, the Debian node's `config.agents.list.filter(id === "luna")` produced `[]`, causing OpenClaw to have no agents. Had to reconstruct agent definition entirely in the startup script.
+**Verify:** `kubectl exec deploy/<debian-openclaw> -c openclaw -- python3 -c "import json; cfg=json.load(open('/home/node/.local/openclaw/openclaw.json')); print(len(cfg['agents']['list']), cfg['agents']['list'][0]['id'])"` returns `1 luna`.
+
+### OpenClaw `[matrix] disabled` Is a Benign Startup Transient
+**Lesson:** When OpenClaw logs `[matrix] disabled` shortly after `[matrix] [account] starting provider`, do NOT debug the message source. It is a transient startup artifact. The health-monitor detects the disconnect and restarts the provider, after which Matrix works normally. To verify: send a test message and check for agent response in logs, rather than tracing the log message through upstream dist files.
+**Context:** Spent 60+ min searching for the source of `[matrix] disabled` across upstream JS bundles, comparing configs, and trying plugin fixes — all unnecessary because the channel self-recovers via health-monitor.
+**Verify:** `kubectl logs deploy/<openclaw-deploy> -c <container> --tail=200 | grep -E 'agent_end|embedded run.*done|embedded run.*end'` shows completed agent runs after the `disabled` message.
 ## INCIDENT RECORD
 
 ### 2026-01-27: CephFS Data Loss

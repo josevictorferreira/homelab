@@ -346,7 +346,7 @@ in
               dev-tun = {
                 type = "hostPath";
                 hostPath = "/dev/net/tun";
-                advancedMounts.main.tailscale = [ { path = "/dev/net/tun"; } ];
+                advancedMounts.main.tailscale = [{ path = "/dev/net/tun"; }];
               };
               tailscale-state = {
                 type = "persistentVolumeClaim";

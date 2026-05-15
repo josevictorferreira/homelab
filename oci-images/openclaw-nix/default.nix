@@ -1,13 +1,13 @@
-{
-  pkgs,
-  lib,
-  inputs,
-  system,
-  version ? "2026.5.12",
-  tagSuffix ? "",
-  legacyOpenClawPatches ? true,
-  matrixSendQueuePatch ? true,
-  disableMatrixCredentialTouch ? false,
+{ pkgs
+, lib
+, inputs
+, system
+, version ? "2026.5.12"
+, tagSuffix ? ""
+, legacyOpenClawPatches ? true
+, matrixSendQueuePatch ? true
+, disableMatrixCredentialTouch ? false
+,
 }:
 
 let
@@ -526,10 +526,13 @@ let
       { };
   openclawOverlay =
     final: prev:
-    import (inputs.nix-openclaw + "/nix/overlay.nix") {
-      openclawToolPkgs = openclawToolPkgs;
-      qmdPkgs = qmdPkgs;
-    } final prev;
+    import (inputs.nix-openclaw + "/nix/overlay.nix")
+      {
+        openclawToolPkgs = openclawToolPkgs;
+        qmdPkgs = qmdPkgs;
+      }
+      final
+      prev;
   openclawPkgs = import inputs.nix-openclaw.inputs.nixpkgs {
     inherit system;
     overlays = [ openclawOverlay ];
@@ -589,23 +592,24 @@ let
   # Legacy build overrides kept default-on until runtime validation proves they can be removed.
   openclawGateway =
     if legacyOpenClawPatches then
-      openclawGatewayBase.overrideAttrs (old: {
-        nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [
-          rolldown
-          pkgs.findutils
-        ];
-        pnpmDeps = customPnpmDeps;
-        env = (old.env or { }) // {
-          PNPM_DEPS = customPnpmDeps;
-        };
-        # Override installPhase: run the original script, but first clean broken symlinks
-        installPhase = ''
-          cp ${old.installPhase} /tmp/gateway-install.sh
-          # Comment out the validation line using sed with # as replacement
-          sed -i 's/^log_step "validate node_modules symlinks" check_no_broken_symlinks/# VALIDATION DISABLED: &/' /tmp/gateway-install.sh
-          . /tmp/gateway-install.sh
-        '';
-        postPatch = (old.postPatch or "") + ''
+      openclawGatewayBase.overrideAttrs
+        (old: {
+          nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [
+            rolldown
+            pkgs.findutils
+          ];
+          pnpmDeps = customPnpmDeps;
+          env = (old.env or { }) // {
+            PNPM_DEPS = customPnpmDeps;
+          };
+          # Override installPhase: run the original script, but first clean broken symlinks
+          installPhase = ''
+            cp ${old.installPhase} /tmp/gateway-install.sh
+            # Comment out the validation line using sed with # as replacement
+            sed -i 's/^log_step "validate node_modules symlinks" check_no_broken_symlinks/# VALIDATION DISABLED: &/' /tmp/gateway-install.sh
+            . /tmp/gateway-install.sh
+          '';
+          postPatch = (old.postPatch or "") + ''
 
                                     if [ -f tsconfig.json ]; then
                                       substituteInPlace tsconfig.json \
@@ -665,7 +669,7 @@ let
                               'return buildSavedMediaResult({ dir, id, size: buffer.byteLength, contentType: mime === "video/webm" ? "audio/webm" : mime });'
                           fi
         '';
-      })
+        })
     else
       openclawGatewayBaseWithFix;
 
