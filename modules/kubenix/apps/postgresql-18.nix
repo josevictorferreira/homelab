@@ -39,6 +39,7 @@ in
       noHooks = true;
       inherit namespace;
       values = {
+        global.imagePullSecrets = [ { name = "ghcr-registry-secret"; } ];
         inherit image;
 
         postgresqlSharedPreloadLibraries = "vchord.so";
@@ -120,6 +121,7 @@ in
       spec.template = {
         metadata.annotations."checksum/config" = configChecksum;
         spec = {
+          imagePullSecrets = [ { name = "ghcr-registry-secret"; } ];
           restartPolicy = "OnFailure";
           containers = [
             {

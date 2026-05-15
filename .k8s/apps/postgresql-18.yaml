@@ -156,6 +156,8 @@ spec:
               name: data
       hostIPC: false
       hostNetwork: false
+      imagePullSecrets:
+        - name: ghcr-registry-secret
       securityContext:
         fsGroup: 1001
         fsGroupChangePolicy: Always
@@ -360,6 +362,8 @@ spec:
                   name: postgresql-auth
           image: ghcr.io/josevictorferreira/postgresql-vchord:17.6-pgvector0.8.2-vchord0.5.3
           name: psql
+      imagePullSecrets:
+        - name: ghcr-registry-secret
       restartPolicy: OnFailure
 ---
 apiVersion: v1
