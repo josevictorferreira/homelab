@@ -94,13 +94,19 @@ let
       enabled: false,
     };
 
-    if (config.channels?.matrix?.accounts) {
-      const lunaAccount = config.channels.matrix.accounts.luna;
-      config.channels.matrix.accounts = lunaAccount ? { luna: lunaAccount } : {};
-    }
-    if (config.channels?.matrix) {
-      config.channels.matrix.enabled = true;
-    }
+    // Construct Luna Matrix account from env var (avoids depending on shared config)
+    config.channels ??= {};
+    config.channels.matrix ??= {};
+    config.channels.matrix.enabled = true;
+    config.channels.matrix.accounts = {
+      luna: {
+        userId: "@luna:josevictor.me",
+        homeserver: "http://tuwunel.apps.svc.cluster.local:8008",
+        accessToken: process.env.LUNA_MATRIX_TOKEN || "",
+        name: "Luna",
+        network: { dangerouslyAllowPrivateNetwork: true },
+      },
+    };
     if (config.channels?.whatsapp) {
       config.channels.whatsapp.enabled = false;
     }
