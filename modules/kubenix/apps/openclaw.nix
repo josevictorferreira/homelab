@@ -73,7 +73,7 @@ let
     config.plugins.enabled = true;
     config.plugins.slots ??= {};
     config.plugins.slots.memory = "hindsight-openclaw";
-    config.plugins.slots.contextEngine = "lossless-claw";
+    config.plugins.slots.contextEngine = "legacy";
     config.plugins.entries ??= {};
     delete config.plugins.entries["memory-lancedb"];
     config.plugins.entries["hindsight-openclaw"] = {
@@ -84,14 +84,7 @@ let
         allowConversationAccess: true,
       },
     };
-    config.plugins.entries["lossless-claw"] = {
-      ...(config.plugins.entries["lossless-claw"] ?? {}),
-      enabled: true,
-      config: {
-        ...(config.plugins.entries["lossless-claw"]?.config ?? {}),
-        dbPath: "/home/node/.local/openclaw/lcm.db",
-      },
-    };
+    delete config.plugins.entries["lossless-claw"];
     config.plugins.entries.matrix = {
       ...(config.plugins.entries.matrix ?? {}),
       enabled: true,
