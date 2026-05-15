@@ -17,6 +17,8 @@ rec {
         "system-admin"
         "backup-server"
         "tailscale"
+        "k8s-server"
+        "k8s-worker"
       ];
     };
     lab-alpha-cp = {
