@@ -92657,22 +92657,13 @@ spec:
     spec:
       affinity:
         nodeAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-            - preference:
-                matchExpressions:
-                  - key: kubernetes.io/hostname
-                    operator: In
-                    values:
-                      - lab-beta-cp
-              weight: 100
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
               - matchExpressions:
                   - key: kubernetes.io/hostname
-                    operator: NotIn
+                    operator: In
                     values:
-                      - lab-delta-cp
-                      - lab-alpha-cp
+                      - lab-pi-bk
       automountServiceAccountToken: true
       containers:
         - env:
