@@ -3,6 +3,12 @@
 let
   baseImage = /nix/store/wv99byzkvph4j9m0bqbm0c7wb21kgqyk-openclaw-debian-base.tar;
 
+  losslessClawVersion = "0.10.0";
+  losslessClawSource = pkgs.fetchurl {
+    url = "https://registry.npmjs.org/@martian-engineering/lossless-claw/-/lossless-claw-${losslessClawVersion}.tgz";
+    sha256 = "sha256-1q/YTpgT4Jcc/yFPuwLjq6MhlG+SGzcbguIzkd8BFgI=";
+  };
+
   toolPkgs = [
     pkgs.jq
     pkgs.ffmpeg-headless
@@ -86,12 +92,25 @@ let
     fi
   '';
 
+  losslessClawOverlay = pkgs.runCommand "lossless-claw-overlay" { } ''
+    mkdir -p $out/opt/openclaw-debian/extensions/lossless-claw
+    mkdir -p /tmp/lossless-extract
+    tar -xzf ${losslessClawSource} -C /tmp/lossless-extract --strip-components=1
+    cp -r /tmp/lossless-extract/dist $out/opt/openclaw-debian/extensions/lossless-claw/
+    cp /tmp/lossless-extract/openclaw.plugin.json $out/opt/openclaw-debian/extensions/lossless-claw/
+    cp /tmp/lossless-extract/package.json $out/opt/openclaw-debian/extensions/lossless-claw/
+    if [ -d /tmp/lossless-extract/skills ]; then
+      cp -r /tmp/lossless-extract/skills $out/opt/openclaw-debian/extensions/lossless-claw/
+    fi
+    rm -rf /tmp/lossless-extract
+  '';
+
 in
 pkgs.dockerTools.buildImage {
   name = "localhost/openclaw-debian";
-  tag = "2026.5.12-luna-hindsight-lossless-tools";
+  tag = "2026.5.12-luna-hindsight-lossless-v0.10.0";
   fromImage = baseImage;
-  copyToRoot = toolsRoot;
+  copyToRoot = [ toolsRoot losslessClawOverlay ];
   extraCommands = ''
     mkdir -p ./usr/local/share/fonts
     ${pkgs.fontconfig}/bin/fc-cache -f ./usr/local/share/fonts 2>/dev/null || true
