@@ -35,72 +35,35 @@ spec:
         - command:
             - /bin/bash
             - -lc
-            - "        set -euo pipefail\n\n        SHARED_DIR=/home/node/.openclaw\n\
-              \        SHARED_CONFIG=\"$SHARED_DIR/openclaw.json\"\n        LOCAL_DIR=/home/node/.local\n\
-              \        STATE_DIR=\"$LOCAL_DIR/openclaw\"\n        CONFIG_FILE=\"$STATE_DIR/openclaw.json\"\
-              \n        EXTENSIONS_DIR=\"$STATE_DIR/extensions\"\n        PLUGIN_STAGE_DIR=\"\
-              $STATE_DIR/plugin-stage\"\n\n        echo \"Preparing OpenClaw Debian\
-              \ Luna node...\"\n        for i in $(seq 1 30); do\n          if [ -f\
-              \ \"$SHARED_CONFIG\" ] && touch \"$SHARED_DIR/.debian-node-mount-check\"\
-              \ 2>/dev/null; then\n            rm -f \"$SHARED_DIR/.debian-node-mount-check\"\
-              \n            break\n          fi\n          echo \"Waiting for shared\
-              \ OpenClaw config, attempt $i/30...\"\n          sleep 2\n        done\n\
-              \n        if [ ! -f \"$SHARED_CONFIG\" ]; then\n          echo \"Shared\
-              \ OpenClaw config not found at $SHARED_CONFIG\" >&2\n          exit\
-              \ 1\n        fi\n\n        mkdir -p \"$LOCAL_DIR/bin\" \"$LOCAL_DIR/lib/node_modules\"\
-              \ \"$STATE_DIR\" \"$EXTENSIONS_DIR\" \"$PLUGIN_STAGE_DIR\"\n       \
-              \ mkdir -p \"$STATE_DIR/logs\" \"$STATE_DIR/tmp\" \"$STATE_DIR/workspace-luna\"\
-              \n\n        echo \"Syncing tested plugin bundle into persisted local\
-              \ state...\"\n        if [ ! -f \"$EXTENSIONS_DIR/.synced\" ]; then\n\
-              \          cp -a /opt/openclaw-debian/extensions/. \"$EXTENSIONS_DIR/\"\
-              \n          touch \"$EXTENSIONS_DIR/.synced\"\n          echo \"Plugin\
-              \ sync complete.\"\n        else\n          echo \"Plugins already synced,\
-              \ skipping copy.\"\n        fi\n\n        echo \"Generating Luna-only\
-              \ runtime config at $CONFIG_FILE...\"\n        node -e '\nconst fs =\
-              \ require(\"fs\");\n\nconst sourcePath = process.env.SHARED_CONFIG;\n\
-              const targetPath = process.env.OPENCLAW_CONFIG_PATH;\nconst config =\
-              \ JSON.parse(fs.readFileSync(sourcePath, \"utf8\"));\n\nconfig.agents\
-              \ ??= {};\nconfig.agents.list = [\n  {\n    id: \"luna\",\n    workspace:\
-              \ \"/home/node/.openclaw/workspace-luna\",\n    model: {\n      primary:\
-              \ \"zai-coding-plan/glm-5.1\",\n      fallbacks: [\"opencode-go/glm-5.1\"\
-              , \"huggingface/zai-org/glm-5.1\"],\n    },\n    identity: { name: \"\
-              Luna\", theme: \"minha fiel companheira\", emoji: \"\U0001F415\", avatar:\
-              \ \"avatars/luna.png\" },\n    reasoningDefault: \"off\",\n  },\n];\n\
-              config.bindings = [\n  { agentId: \"luna\", match: { channel: \"matrix\"\
-              , accountId: \"luna\" } },\n];\n\nconfig.plugins ??= {};\nconfig.plugins.enabled\
-              \ = true;\nconfig.plugins.slots ??= {};\nconfig.plugins.slots.memory\
-              \ = \"hindsight-openclaw\";\nconfig.plugins.slots.contextEngine = \"\
-              legacy\";\nconfig.plugins.entries ??= {};\ndelete config.plugins.entries[\"\
-              memory-lancedb\"];\nconfig.plugins.entries[\"hindsight-openclaw\"] =\
-              \ {\n  ...(config.plugins.entries[\"hindsight-openclaw\"] ?? {}),\n\
-              \  enabled: true,\n  hooks: {\n    ...(config.plugins.entries[\"hindsight-openclaw\"\
-              ]?.hooks ?? {}),\n    allowConversationAccess: true,\n  },\n};\ndelete\
-              \ config.plugins.entries[\"lossless-claw\"];\nconfig.plugins.entries.matrix\
-              \ = {\n  ...(config.plugins.entries.matrix ?? {}),\n  enabled: true,\n\
-              };\nconfig.plugins.entries.whatsapp = {\n  ...(config.plugins.entries.whatsapp\
-              \ ?? {}),\n  enabled: false,\n};\n\n// Construct Luna Matrix account\
-              \ from env var (avoids depending on shared config)\nconfig.channels\
-              \ ??= {};\nconfig.channels.matrix ??= {};\nconfig.channels.matrix.enabled\
-              \ = true;\nconfig.channels.matrix.accounts = {\n  luna: {\n    userId:\
-              \ \"@luna:josevictor.me\",\n    homeserver: \"http://tuwunel.apps.svc.cluster.local:8008\"\
-              ,\n    accessToken: process.env.LUNA_MATRIX_TOKEN || \"\",\n    name:\
-              \ \"Luna\",\n    network: { dangerouslyAllowPrivateNetwork: true },\n\
-              \  },\n};\nif (config.channels?.whatsapp) {\n  config.channels.whatsapp.enabled\
-              \ = false;\n}\n\nfs.writeFileSync(targetPath, JSON.stringify(config,\
-              \ null, 2) + \"\\n\", { mode: 0o600 });\n'\n\n        cd \"$STATE_DIR/workspace-luna\"\
-              \n        exec node /app/openclaw.mjs gateway --port 18789 --bind lan\
-              \ --allow-unconfigured --verbose\n"
+            - "set -euo pipefail\n\nSHARED_DIR=/home/node/.openclaw\nSHARED_CONFIG=\"\
+              $SHARED_DIR/openclaw.json\"\nLOCAL_DIR=/home/node/.local\nSTATE_DIR=\"\
+              $LOCAL_DIR/openclaw\"\nEXTENSIONS_DIR=\"$STATE_DIR/extensions\"\nPLUGIN_STAGE_DIR=\"\
+              $STATE_DIR/plugin-stage\"\n\necho \"Preparing OpenClaw Debian node...\"\
+              \nfor i in $(seq 1 30); do\n  if [ -f \"$SHARED_CONFIG\" ] && touch\
+              \ \"$SHARED_DIR/.debian-node-mount-check\" 2>/dev/null; then\n    rm\
+              \ -f \"$SHARED_DIR/.debian-node-mount-check\"\n    break\n  fi\n  echo\
+              \ \"Waiting for shared OpenClaw config, attempt $i/30...\"\n  sleep\
+              \ 2\ndone\n\nif [ ! -f \"$SHARED_CONFIG\" ]; then\n  echo \"Shared OpenClaw\
+              \ config not found at $SHARED_CONFIG\" >&2\n  exit 1\nfi\n\nmkdir -p\
+              \ \"$LOCAL_DIR/bin\" \"$LOCAL_DIR/lib/node_modules\" \"$STATE_DIR\"\
+              \ \"$EXTENSIONS_DIR\" \"$PLUGIN_STAGE_DIR\"\nmkdir -p \"$STATE_DIR/logs\"\
+              \ \"$STATE_DIR/tmp\"\n\necho \"Syncing tested plugin bundle into persisted\
+              \ local state...\"\nif [ ! -f \"$EXTENSIONS_DIR/.synced\" ]; then\n\
+              \  cp -a /opt/openclaw-debian/extensions/. \"$EXTENSIONS_DIR/\"\n  touch\
+              \ \"$EXTENSIONS_DIR/.synced\"\n  echo \"Plugin sync complete.\"\nelse\n\
+              \  echo \"Plugins already synced, skipping copy.\"\nfi\n\necho \"Using\
+              \ shared config directly from $SHARED_CONFIG\"\ncd \"$STATE_DIR\"\n\
+              exec node /app/openclaw.mjs gateway --port 18789 --bind lan --allow-unconfigured\
+              \ --verbose\n"
           env:
             - name: HOME
               value: /home/node
             - name: OPENCLAW_CONFIG_PATH
-              value: /home/node/.local/openclaw/openclaw.json
+              value: /home/node/.openclaw/openclaw.json
             - name: OPENCLAW_DATA_DIR
               value: /home/node/.local/openclaw
             - name: OPENCLAW_STATE_DIR
               value: /home/node/.local/openclaw
-            - name: SHARED_CONFIG
-              value: /home/node/.openclaw/openclaw.json
             - name: OPENCLAW_PLUGIN_STAGE_DIR
               value: /home/node/.local/openclaw/plugin-stage
             - name: OPENCLAW_DISABLE_BONJOUR
