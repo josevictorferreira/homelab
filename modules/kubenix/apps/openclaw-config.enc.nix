@@ -817,8 +817,6 @@ let
             recallTimeoutMs = 5000;
             recallMaxTokens = 512;
             recallMaxQueryChars = 600;
-            excludeProviders = [ "heartbeat" "cron" ];
-            dynamicBankGranularity = [ "agent" "user" ];
             debug = false;
             logLevel = "info";
           };
