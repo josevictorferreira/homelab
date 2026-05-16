@@ -104,6 +104,65 @@ rec {
   defaultIngressClass = "cilium";
   defaultTLSSecret = "wildcard-tls";
   defaultClusterIssuer = "cloudflare-issuer";
+
+  nodeAffinityFor =
+    appName:
+    let
+      cfg = homelab.kubernetes.affinity.apps.${appName} or { };
+      node = cfg.node or null;
+      preferred = cfg.preferred or null;
+      avoid = cfg.avoid or [ ];
+      requiredTerms =
+        if node != null then
+          [
+            {
+              matchExpressions = [
+                {
+                  key = "kubernetes.io/hostname";
+                  operator = "In";
+                  values = [ node ];
+                }
+              ];
+            }
+          ]
+        else if avoid != [ ] then
+          [
+            {
+              matchExpressions = [
+                {
+                  key = "kubernetes.io/hostname";
+                  operator = "NotIn";
+                  values = avoid;
+                }
+              ];
+            }
+          ]
+        else
+          [ ];
+      preferredTerms =
+        if preferred != null && node == null then
+          [
+            {
+              weight = 100;
+              preference.matchExpressions = [
+                {
+                  key = "kubernetes.io/hostname";
+                  operator = "In";
+                  values = [ preferred ];
+                }
+              ];
+            }
+          ]
+        else
+          [ ];
+    in
+    (pkgs.lib.optionalAttrs (requiredTerms != [ ]) {
+      requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms = requiredTerms;
+    })
+    // (pkgs.lib.optionalAttrs (preferredTerms != [ ]) {
+      preferredDuringSchedulingIgnoredDuringExecution = preferredTerms;
+    });
+
   sharedStorage = {
     rootPVC = "cephfs-shared-storage-root";
     downloadsPVC = "cephfs-shared-storage-downloads";

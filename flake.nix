@@ -146,11 +146,16 @@
           postgresqlVchordImage = import ./oci-images/postgresql-vchord.nix {
             pkgs = sysPkgs;
           };
+          openclawDebianImage = import ./oci-images/openclaw-debian.nix {
+            pkgs = sysPkgs;
+            inherit lib;
+          };
         in
         {
           gen-manifests = kubenixModule.mkRenderer system sysPkgs;
           openclaw-nix-image = openclawNixImage;
           postgresql-vchord-image = postgresqlVchordImage;
+          openclaw-debian-image = openclawDebianImage;
           inherit (commands)
             lgroups
             check
@@ -176,6 +181,7 @@
             image-outdated
             push-openclaw
             ghcr-size
+            push-openclaw-debian
             ;
         }
       );
