@@ -5,7 +5,7 @@ let
   namespace = homelab.kubernetes.namespaces.applications;
   port = 18789;
   host = "openclaw-debian.${homelab.domain}";
-  image = "ghcr.io/josevictorferreira/openclaw-debian:2026.5.12-luna-hindsight-lossless-tools@sha256:9ced5fb49375ecf459d9f64aa2eaa8539fc944d53e7d57b9e1faa9197dcefdac";
+  image = "ghcr.io/josevictorferreira/openclaw-debian:2026.5.12-luna-hindsight-lossless-v0.10.0@sha256:ed24cac556242b5f5e0cddec77dfa0407a2d8a0b7b8260367a76a83946d3fce7";
   startupScript = ''
     set -euo pipefail
 
@@ -35,7 +35,21 @@ let
     mkdir -p "$STATE_DIR/logs" "$STATE_DIR/tmp"
 
     echo "Syncing tested plugin bundle into persisted local state..."
+    needs_sync=false
     if [ ! -f "$EXTENSIONS_DIR/.synced" ]; then
+      needs_sync=true
+    else
+      image_ver=$(jq -r '.version' /opt/openclaw-debian/extensions/lossless-claw/package.json 2>/dev/null || echo "unknown")
+      synced_ver=$(jq -r '.version' "$EXTENSIONS_DIR/lossless-claw/package.json" 2>/dev/null || echo "unknown")
+      if [ "$image_ver" != "$synced_ver" ]; then
+        echo "Plugin version mismatch (image: $image_ver, synced: $synced_ver), re-syncing..."
+        needs_sync=true
+      fi
+    fi
+
+    if [ "$needs_sync" = true ]; then
+      rm -rf "$EXTENSIONS_DIR"
+      mkdir -p "$EXTENSIONS_DIR"
       cp -a /opt/openclaw-debian/extensions/. "$EXTENSIONS_DIR/"
       touch "$EXTENSIONS_DIR/.synced"
       echo "Plugin sync complete."

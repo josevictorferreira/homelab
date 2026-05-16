@@ -48,12 +48,19 @@ spec:
               \ \"$LOCAL_DIR/bin\" \"$LOCAL_DIR/lib/node_modules\" \"$STATE_DIR\"\
               \ \"$EXTENSIONS_DIR\" \"$PLUGIN_STAGE_DIR\"\nmkdir -p \"$STATE_DIR/logs\"\
               \ \"$STATE_DIR/tmp\"\n\necho \"Syncing tested plugin bundle into persisted\
-              \ local state...\"\nif [ ! -f \"$EXTENSIONS_DIR/.synced\" ]; then\n\
-              \  cp -a /opt/openclaw-debian/extensions/. \"$EXTENSIONS_DIR/\"\n  touch\
-              \ \"$EXTENSIONS_DIR/.synced\"\n  echo \"Plugin sync complete.\"\nelse\n\
-              \  echo \"Plugins already synced, skipping copy.\"\nfi\n\necho \"Using\
-              \ shared config directly from $SHARED_CONFIG\"\ncd \"$STATE_DIR\"\n\
-              exec node /app/openclaw.mjs gateway --port 18789 --bind lan --allow-unconfigured\
+              \ local state...\"\nneeds_sync=false\nif [ ! -f \"$EXTENSIONS_DIR/.synced\"\
+              \ ]; then\n  needs_sync=true\nelse\n  image_ver=$(jq -r '.version' /opt/openclaw-debian/extensions/lossless-claw/package.json\
+              \ 2>/dev/null || echo \"unknown\")\n  synced_ver=$(jq -r '.version'\
+              \ \"$EXTENSIONS_DIR/lossless-claw/package.json\" 2>/dev/null || echo\
+              \ \"unknown\")\n  if [ \"$image_ver\" != \"$synced_ver\" ]; then\n \
+              \   echo \"Plugin version mismatch (image: $image_ver, synced: $synced_ver),\
+              \ re-syncing...\"\n    needs_sync=true\n  fi\nfi\n\nif [ \"$needs_sync\"\
+              \ = true ]; then\n  rm -rf \"$EXTENSIONS_DIR\"\n  mkdir -p \"$EXTENSIONS_DIR\"\
+              \n  cp -a /opt/openclaw-debian/extensions/. \"$EXTENSIONS_DIR/\"\n \
+              \ touch \"$EXTENSIONS_DIR/.synced\"\n  echo \"Plugin sync complete.\"\
+              \nelse\n  echo \"Plugins already synced, skipping copy.\"\nfi\n\necho\
+              \ \"Using shared config directly from $SHARED_CONFIG\"\ncd \"$STATE_DIR\"\
+              \nexec node /app/openclaw.mjs gateway --port 18789 --bind lan --allow-unconfigured\
               \ --verbose\n"
           env:
             - name: HOME
@@ -85,7 +92,7 @@ spec:
           envFrom:
             - secretRef:
                 name: openclaw-config
-          image: ghcr.io/josevictorferreira/openclaw-debian:2026.5.12-luna-hindsight-lossless-tools@sha256:9ced5fb49375ecf459d9f64aa2eaa8539fc944d53e7d57b9e1faa9197dcefdac
+          image: ghcr.io/josevictorferreira/openclaw-debian:2026.5.12-luna-hindsight-lossless-v0.10.0@sha256:ed24cac556242b5f5e0cddec77dfa0407a2d8a0b7b8260367a76a83946d3fce7
           imagePullPolicy: Always
           livenessProbe:
             failureThreshold: 3

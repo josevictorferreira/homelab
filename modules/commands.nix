@@ -686,7 +686,7 @@ let
   push-openclaw-debian =
     let
       openclawDebianImageName = "openclaw-debian";
-      openclawDebianVersion = "2026.5.12-luna-hindsight-lossless-tools";
+      openclawDebianVersion = "2026.5.12-luna-hindsight-lossless-v0.10.0";
     in
     mkCommand "push-openclaw-debian" "Build and push openclaw-debian image with extra tools to GHCR"
       [
