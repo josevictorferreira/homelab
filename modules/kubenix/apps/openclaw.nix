@@ -211,6 +211,11 @@ in
                   }
                   {
                     name = "openclaw-shared";
+                    mountPath = "/shared/notetaking";
+                    subPath = "notetaking";
+                  }
+                  {
+                    name = "openclaw-shared";
                     mountPath = "/shared/personal-finances";
                     subPath = "personal-finances";
                   }
