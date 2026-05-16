@@ -162,11 +162,16 @@ let
       namespaces = mkOption {
         type = t.attrsOf t.str;
         description = "List of Kubernetes namespaces to create.";
-        default = [
-          "default"
-          "kube-system"
-          "kube-public"
-        ];
+        default = {
+          default = "default";
+          "kube-system" = "kube-system";
+          "kube-public" = "kube-public";
+        };
+      };
+      affinities = mkOption {
+        type = t.attrs;
+        description = "Global affinity rules for Kubernetes deployments.";
+        default = {};
       };
       loadBalancer = mkOption {
         type = loadBalancerType;

@@ -86,4 +86,24 @@
     storage = "rook-ceph";
     backup = "backup";
   };
+
+  affinities = {
+    piNode = {
+      nodeAffinity = {
+        requiredDuringSchedulingIgnoredDuringExecution = {
+          nodeSelectorTerms = [
+            {
+              matchExpressions = [
+                {
+                  key = "kubernetes.io/hostname";
+                  operator = "In";
+                  values = [ "lab-pi-bk" ];
+                }
+              ];
+            }
+          ];
+        };
+      };
+    };
+  };
 }
