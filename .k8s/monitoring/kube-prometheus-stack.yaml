@@ -92895,6 +92895,11 @@ spec:
         runAsUser: 472
       serviceAccountName: kube-prometheus-stack-grafana
       shareProcessNamespace: false
+      tolerations:
+        - effect: NoSchedule
+          key: pi-only
+          operator: Equal
+          value: 'true'
       volumes:
         - configMap:
             name: kube-prometheus-stack-grafana

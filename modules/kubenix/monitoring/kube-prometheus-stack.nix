@@ -58,6 +58,14 @@ in
           };
           ingress = kubenix.lib.ingressDomainFor "grafana";
           affinity = homelab.kubernetes.affinities.piNode;
+          tolerations = [
+            {
+              key = "pi-only";
+              operator = "Equal";
+              value = "true";
+              effect = "NoSchedule";
+            }
+          ];
         };
         prometheusOperator = {
           enabled = true;
