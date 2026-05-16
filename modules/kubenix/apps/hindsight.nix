@@ -45,8 +45,15 @@ in
               HINDSIGHT_API_EMBEDDINGS_LITELLM_SDK_OUTPUT_DIMENSIONS = "384";
               HINDSIGHT_API_RERANKER_PROVIDER = "openrouter";
               HINDSIGHT_API_RERANKER_OPENROUTER_MODEL = "cohere/rerank-v3.5";
-              HINDSIGHT_API_WORKER_MAX_SLOTS = "2";
-              HINDSIGHT_API_WORKER_CONSOLIDATION_MAX_SLOTS = "1";
+              HINDSIGHT_API_WORKER_MAX_SLOTS = "8";
+              HINDSIGHT_API_WORKER_CONSOLIDATION_MAX_SLOTS = "2";
+              HINDSIGHT_API_LLM_TIMEOUT = "30";
+              HINDSIGHT_API_LLM_MAX_RETRIES = "1";
+              HINDSIGHT_API_LLM_MAX_CONCURRENT = "8";
+              HINDSIGHT_API_RETAIN_LLM_TIMEOUT = "30";
+              HINDSIGHT_API_RETAIN_LLM_MAX_RETRIES = "1";
+              HINDSIGHT_API_CONSOLIDATION_LLM_TIMEOUT = "45";
+              HINDSIGHT_API_CONSOLIDATION_LLM_MAX_RETRIES = "1";
             };
             probes = {
               liveness = {
