@@ -128,6 +128,9 @@ spec:
             - mountPath: /home/node/.openclaw
               name: openclaw-shared
               subPath: openclaw
+            - mountPath: /shared/notetaking
+              name: openclaw-shared
+              subPath: notetaking
             - mountPath: /shared/personal-finances
               name: openclaw-shared
               subPath: personal-finances

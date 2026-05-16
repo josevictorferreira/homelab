@@ -81,7 +81,7 @@ kubectl get pv -o custom-columns='NAME:.metadata.name,STORAGE-CLASS:.spec.storag
 | Cluster secrets | `secrets/k8s-secrets.enc.yaml` | Edit via `make secrets` |
 | Storage config | `modules/kubenix/storage/` | Rook-Ceph operator+cluster |
 | Cilium/CNI | `modules/kubenix/system/cilium.nix` | Also handles ingress |
-RV| OpenClaw config | `modules/kubenix/apps/openclaw-config.nix` | MIRROR/FAILBACK ONLY - real config is at `~/Homelab/openclaw/openclaw.json` (CephFS). NEVER expose secrets in Nix configmap - it's a fallback when file isn't found.
+| OpenClaw config | `~/Homelab/openclaw/openclaw.json` | real config is at `~/Homelab/openclaw/openclaw.json` (CephFS). The real openclaw config is mounted on the folder, whenever you need to change openclaw config to debug something, edit it there, it's not managed by this repository. |
 
 ## WORKFLOW
 
