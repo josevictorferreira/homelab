@@ -210,6 +210,16 @@ in
                     subPath = "openclaw";
                   }
                   {
+                    name = "openclaw-shared";
+                    mountPath = "/shared/personal-finances";
+                    subPath = "personal-finances";
+                  }
+                  {
+                    name = "openclaw-shared";
+                    mountPath = "/shared/mel-dynamica";
+                    subPath = "mel-dynamica";
+                  }
+                  {
                     name = "openclaw-local";
                     mountPath = "/home/node/.local";
                   }
