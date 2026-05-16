@@ -553,135 +553,7 @@ let
   # OpenClaw Container Image
   # ============================================================================
 
-  # OpenClaw image configuration
-  openclawImageName = "openclaw-nix";
-  openclawVersion = "2026.5.12-beta.8";
   openclawRegistry = "ghcr.io";
-
-  push-openclaw =
-    mkCommand "push-openclaw" "Build and push openclaw-nix image to GHCR"
-      [
-        pkgs.nix
-        pkgs.podman
-        pkgs.gh
-        pkgs.coreutils
-        pkgs.jq
-        pkgs.skopeo
-        pkgs.gnused
-        pkgs.git
-        pkgs.gnumake
-      ]
-      ''
-        set -e
-
-        IMAGE_NAME="${openclawImageName}"
-        REGISTRY="${openclawRegistry}"
-        GITHUB_USER="${githubUser}"
-        EXPECTED_VERSION="${openclawVersion}"
-
-        echo "[0/6] Cleaning local image cache for ''${IMAGE_NAME} (expected version: ''${EXPECTED_VERSION})..."
-        # Remove any existing local images to prevent tag collision
-        # Use unique to avoid processing same ID multiple times (images with multiple tags)
-        podman images --format json | jq -r "[.[] | select(.Names[]? | contains(\"''${IMAGE_NAME}\")) | .Id] | unique | .[]" | while read -r img_id; do
-          if [ -n "$img_id" ]; then
-            echo "  Removing cached image: $img_id"
-            podman rmi -f "$img_id" 2>/dev/null || true
-          fi
-        done
-        # Also remove any dangling images
-        podman image prune -f 2>/dev/null || true
-
-        # Build
-        echo "[1/6] Building ''${IMAGE_NAME}..."
-        nix build .#''${IMAGE_NAME}-image --show-trace --no-link
-
-        # Get the actual store path and load into podman
-        echo "[2/6] Loading image into podman..."
-        IMAGE_PATH=$(nix build .#''${IMAGE_NAME}-image --print-out-paths --no-link)
-        # streamLayeredImage produces an executable script - run it and pipe to podman load
-        LOAD_OUTPUT=$("''${IMAGE_PATH}" | podman load)
-        echo "''${LOAD_OUTPUT}"
-
-        # Extract the actual tag that was loaded (format: "Loaded image: localhost/...:tag")
-        LOCAL_TAG=$(echo "''${LOAD_OUTPUT}" | grep -oP 'Loaded image:\s*\K\S+' || true)
-        if [ -z "''${LOCAL_TAG}" ]; then
-          # Fallback: find the most recently loaded image
-          LOCAL_TAG=$(podman images --sort created --format "{{.Repository}}:{{.Tag}}" | grep "localhost/''${IMAGE_NAME}" | head -1)
-        fi
-
-        if [ -z "''${LOCAL_TAG}" ]; then
-          echo "Error: Could not determine loaded image tag"
-          exit 1
-        fi
-
-        echo "  Loaded: ''${LOCAL_TAG}"
-
-        # Get the tag portion only
-        TAG="''${LOCAL_TAG##*:}"
-        echo "  Tag: ''${TAG}"
-
-        FULL_TAG="''${REGISTRY}/''${GITHUB_USER}/''${IMAGE_NAME}:latest"
-        VERSION_TAG="''${REGISTRY}/''${GITHUB_USER}/''${IMAGE_NAME}:''${TAG}"
-
-        # Tag for registry (both latest and version)
-        echo "[3/6] Tagging as ''${FULL_TAG} and ''${VERSION_TAG}..."
-        podman tag "''${LOCAL_TAG}" "''${FULL_TAG}"
-        podman tag "''${LOCAL_TAG}" "''${VERSION_TAG}"
-
-        # Verify the image ID before pushing
-        LOCAL_ID=$(podman images --format "{{.Id}}" "''${LOCAL_TAG}")
-        echo "  Local image ID: ''${LOCAL_ID}"
-
-        # Login
-        echo "[4/6] Logging in to ''${REGISTRY}..."
-        if [ -n "''${GITHUB_TOKEN:-}" ]; then
-          echo "$GITHUB_TOKEN" | podman login "''${REGISTRY}" -u "''${GITHUB_USER}" --password-stdin
-        elif command -v gh >/dev/null 2>&1; then
-          GH_TOKEN="$(gh auth token)"
-          if [ -n "$GH_TOKEN" ]; then
-            echo "$GH_TOKEN" | podman login "''${REGISTRY}" -u "''${GITHUB_USER}" --password-stdin
-          else
-            echo "GitHub CLI not authenticated. Run: gh auth login"
-            exit 1
-          fi
-        else
-          echo "Error: Neither gh CLI nor GITHUB_TOKEN available"
-          exit 1
-        fi
-
-        # Push both tags (OCI format to ensure remote manifest is always overwritten)
-        echo "[5/6] Pushing images..."
-        podman push --format=oci "''${FULL_TAG}"
-        podman push --format=oci "''${VERSION_TAG}"
-
-        # Fetch remote digest and pin it in the manifest
-        echo "[6/6] Pinning digest in manifest..."
-        REMOTE_DIGEST=$(skopeo inspect --format "{{.Digest}}" "docker://''${VERSION_TAG}" 2>/dev/null || echo "")
-        if [ -z "''${REMOTE_DIGEST}" ]; then
-          echo "  Warning: could not fetch remote digest; skipping manifest pin"
-        else
-          echo "  Remote digest: ''${REMOTE_DIGEST}"
-          PINNED_TAG="''${TAG}@''${REMOTE_DIGEST}"
-          MANIFEST_FILE="$(git -C "$(dirname "$0")" rev-parse --show-toplevel 2>/dev/null || echo ".")/modules/kubenix/apps/openclaw-nix.nix"
-          if [ -f "''${MANIFEST_FILE}" ]; then
-        # Replace any OpenClaw version tag, including the previous unreproducible v2026.4.27 tag.
-        sed -i "s|tag = \"v[0-9][^\"]*\"|tag = \"''${PINNED_TAG}\"|g" "''${MANIFEST_FILE}"
-            echo "  Updated ''${MANIFEST_FILE}: tag = \"''${PINNED_TAG}\""
-            echo "  Re-generating manifests..."
-            make -C "$(dirname "''${MANIFEST_FILE}")/../../.." manifests
-            echo "  ✓ Manifests regenerated with pinned digest"
-          else
-            echo "  Warning: manifest file not found at ''${MANIFEST_FILE}; skipping auto-pin"
-          fi
-        fi
-
-        echo ""
-        echo "✓ Images pushed:"
-        echo "  - ''${FULL_TAG}"
-        echo "  - ''${VERSION_TAG}"
-        echo "  View at: https://''${REGISTRY}/''${GITHUB_USER}/''${IMAGE_NAME}"
-
-      '';
 
   push-openclaw-debian =
     let
@@ -979,9 +851,8 @@ in
     image-scan
     image-outdated
     image-updater
-    push-openclaw
-    ghcr-size
     push-openclaw-debian
+    ghcr-size
     push-postgresql-vchord
     ;
 }

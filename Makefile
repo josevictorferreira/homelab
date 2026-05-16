@@ -1,4 +1,4 @@
-.PHONY: lgroups check ddeploy deploy gdeploy secrets manifests kubesync wusbiso docker-build docker-login docker-init-repo docker-push lint format backup-postgres restore-postgres reconcile events backup-rgw backup-etcd backup-verify images images-outdated images-check push-openclaw ghcr-size help
+.PHONY: lgroups check ddeploy deploy gdeploy secrets manifests kubesync wusbiso docker-build docker-login docker-init-repo docker-push lint format backup-postgres restore-postgres reconcile events backup-rgw backup-etcd backup-verify images images-outdated images-check push-openclaw-debian ghcr-size help
 
 .DEFAULT_GOAL := help
 
@@ -89,8 +89,8 @@ images-check: ## Check specific image for updates. Usage: make images-check IMAG
 	fi
 	@./scripts/kubenix-image-updater check "$(IMAGE)" --with-digest
 
-push-openclaw: ## Build and push openclaw-nix image to GHCR (manual deploy).
-	@nix run .#push-openclaw
+push-openclaw-debian: ## Build and push openclaw-debian image to GHCR (manual deploy).
+	@nix run .#push-openclaw-debian
 
 ghcr-size: ## Check GHCR image size without downloading. Usage: make ghcr-size IMAGE=user/package:tag
 	@nix run .#ghcr-size -- $(IMAGE)
