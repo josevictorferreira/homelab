@@ -179,9 +179,8 @@
             image-updater
             image-scan
             image-outdated
-            push-openclaw
-            ghcr-size
             push-openclaw-debian
+            ghcr-size
             ;
         }
       );
