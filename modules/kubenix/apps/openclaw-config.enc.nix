@@ -809,6 +809,16 @@ let
           enabled = true;
           config = {
             hindsightApiUrl = "http://hindsight-api.apps.svc.cluster.local:8888";
+            autoRecall = true;
+            autoRetain = true;
+            retainEveryNTurns = 3;
+            retainOverlapTurns = 1;
+            recallTopK = 5;
+            recallTimeoutMs = 5000;
+            recallMaxTokens = 512;
+            recallMaxQueryChars = 600;
+            debug = false;
+            logLevel = "info";
           };
           hooks = {
             allowConversationAccess = true;

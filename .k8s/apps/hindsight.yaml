@@ -34,6 +34,10 @@ spec:
       automountServiceAccountToken: true
       containers:
         - env:
+            - name: HINDSIGHT_API_CONSOLIDATION_LLM_MAX_RETRIES
+              value: '1'
+            - name: HINDSIGHT_API_CONSOLIDATION_LLM_TIMEOUT
+              value: '45'
             - name: HINDSIGHT_API_EMBEDDINGS_LITELLM_SDK_API_BASE
               value: https://openrouter.ai/api/v1
             - name: HINDSIGHT_API_EMBEDDINGS_LITELLM_SDK_MODEL
@@ -44,10 +48,16 @@ spec:
               value: litellm-sdk
             - name: HINDSIGHT_API_HOST
               value: 0.0.0.0
+            - name: HINDSIGHT_API_LLM_MAX_CONCURRENT
+              value: '8'
+            - name: HINDSIGHT_API_LLM_MAX_RETRIES
+              value: '1'
             - name: HINDSIGHT_API_LLM_MODEL
               value: openai/gpt-oss-20b
             - name: HINDSIGHT_API_LLM_PROVIDER
               value: openrouter
+            - name: HINDSIGHT_API_LLM_TIMEOUT
+              value: '30'
             - name: HINDSIGHT_API_PORT
               value: '8888'
             - name: HINDSIGHT_API_REFLECT_LLM_MODEL
@@ -56,14 +66,18 @@ spec:
               value: cohere/rerank-v3.5
             - name: HINDSIGHT_API_RERANKER_PROVIDER
               value: openrouter
+            - name: HINDSIGHT_API_RETAIN_LLM_MAX_RETRIES
+              value: '1'
+            - name: HINDSIGHT_API_RETAIN_LLM_TIMEOUT
+              value: '30'
             - name: HINDSIGHT_API_TEXT_SEARCH_EXTENSION
               value: native
             - name: HINDSIGHT_API_VECTOR_EXTENSION
               value: vchord
             - name: HINDSIGHT_API_WORKER_CONSOLIDATION_MAX_SLOTS
-              value: '1'
-            - name: HINDSIGHT_API_WORKER_MAX_SLOTS
               value: '2'
+            - name: HINDSIGHT_API_WORKER_MAX_SLOTS
+              value: '8'
           envFrom:
             - secretRef:
                 name: hindsight-secrets
