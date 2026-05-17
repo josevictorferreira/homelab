@@ -37,6 +37,12 @@ in
                   {
                     name = "cephfs";
                     mountPath = "/shared";
+                    readOnly = false;
+                  }
+                  {
+                    name = "htpasswd";
+                    mountPath = "/etc/nginx/.htpasswd";
+                    subPath = ".htpasswd";
                     readOnly = true;
                   }
                 ];
@@ -46,6 +52,18 @@ in
               {
                 name = "cephfs";
                 persistentVolumeClaim.claimName = kubenix.lib.sharedStorage.rootPVC;
+              }
+              {
+                name = "htpasswd";
+                secret = {
+                  secretName = "personal-finances-htpasswd";
+                  items = [
+                    {
+                      key = ".htpasswd";
+                      path = ".htpasswd";
+                    }
+                  ];
+                };
               }
             ];
           };
