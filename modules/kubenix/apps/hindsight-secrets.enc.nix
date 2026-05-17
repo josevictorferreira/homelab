@@ -15,7 +15,7 @@ in
       HINDSIGHT_API_LLM_API_KEY = kubenix.lib.secretsFor "openrouter_api_key_hindsight";
       HINDSIGHT_API_EMBEDDINGS_OPENROUTER_API_KEY = kubenix.lib.secretsFor "openrouter_api_key_hindsight";
       HINDSIGHT_API_EMBEDDINGS_LITELLM_SDK_API_KEY = kubenix.lib.secretsFor "openrouter_api_key_hindsight";
-      HINDSIGHT_API_RERANKER_OPENROUTER_API_KEY = kubenix.lib.secretsFor "openrouter_api_key_hindsight";
+      HINDSIGHT_API_RERANKER_LITELLM_SDK_API_KEY = kubenix.lib.secretsFor "nvidia_api_key";
     };
   };
 }
