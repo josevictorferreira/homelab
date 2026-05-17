@@ -146,10 +146,8 @@ in
                     name = "OPENCLAW_DISABLE_BONJOUR";
                     value = "1";
                   }
-                  {
-                    name = "OPENCLAW_NO_RESPAWN";
-                    value = "1";
-                  }
+                  # OPENCLAW_NO_RESPAWN removed — it prevented the health-monitor
+                  # from restarting Matrix channels after startup-disable transient
                   {
                     name = "OPENCLAW_ALLOW_ROOT";
                     value = "1";

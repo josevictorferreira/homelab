@@ -842,6 +842,22 @@ Our cluster is deployed and accessible in the user system kubectl, the context a
 **Lesson:** When OpenClaw logs `[matrix] disabled` shortly after `[matrix] [account] starting provider`, do NOT debug the message source. It is a transient startup artifact. The health-monitor detects the disconnect and restarts the provider, after which Matrix works normally. To verify: send a test message and check for agent response in logs, rather than tracing the log message through upstream dist files.
 **Context:** Spent 60+ min searching for the source of `[matrix] disabled` across upstream JS bundles, comparing configs, and trying plugin fixes — all unnecessary because the channel self-recovers via health-monitor.
 **Verify:** `kubectl logs deploy/<openclaw-deploy> -c <container> --tail=200 | grep -E 'agent_end|embedded run.*done|embedded run.*end'` shows completed agent runs after the `disabled` message.
+
+### OpenClaw Debian Image: Overlay Bundled Plugins, Don't Rebuild Base
+**Lesson:** The `openclaw-debian` image is built by overlaying extra files on top of a pre-built base image (`openclaw-debian-base.tar`). To upgrade a bundled plugin like `lossless-claw`, add a `runCommand` overlay that extracts the new npm tarball into `$out/opt/openclaw-debian/extensions/<plugin>/` and include it in `copyToRoot`. Do NOT attempt to rebuild the base image or modify its nix store path.
+**Context:** The base image already contains OpenClaw runtime, node, and bundled plugins. Rebuilding it from scratch is unnecessary and expensive. The correct pattern is `copyToRoot = [ toolsRoot losslessClawOverlay ]` in `oci-images/openclaw-debian.nix`.
+**Verify:** After `nix build .#openclaw-debian-image`, `podman load` the result and inspect `/opt/openclaw-debian/extensions/<plugin>/package.json` for the expected version.
+
+### npm Tarball `--strip-components=1` Removes the `package/` Prefix
+**Lesson:** When extracting an npm tarball with `tar -xzf <tgz> -C <dest> --strip-components=1`, the `package/` directory component is stripped. Files land at `<dest>/dist/`, `<dest>/package.json`, etc. — NOT `<dest>/package/dist/`.
+**Context:** Writing `cp -r /tmp/lossless-extract/package/dist ...` after `--strip-components=1` fails with "cannot stat ... No such file or directory" because the `package/` prefix no longer exists in the extraction root.
+**Verify:** `tar -tz <tgz> | head` to inspect the tarball structure, then match extraction paths to the stripped layout.
+
+### OpenClaw Debian Node Plugin Sync Must Detect Version Changes
+**Lesson:** The Debian startup script copies bundled plugins from `/opt/openclaw-debian/extensions/` (image) to a PVC-backed local directory on first boot. If the image is upgraded with a newer plugin version, the existing `.synced` marker prevents re-copying. Add version-check logic that compares the image's plugin version against the synced copy, and re-syncs when they differ.
+**Context:** Without this, the pod continues running the old plugin despite the image containing a newer version. The fix: compare `jq -r '.version'` from the image and synced paths, delete the old tree, and re-copy when mismatch is detected.
+**Verify:** `kubectl exec deploy/openclaw -c openclaw -- cat /home/node/.local/openclaw/extensions/<plugin>/package.json | jq -r '.version'` matches the image version.
+
 ## INCIDENT RECORD
 
 ### 2026-01-27: CephFS Data Loss
