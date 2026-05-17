@@ -3,7 +3,7 @@
 let
   name = "hermes-agent";
   namespace = homelab.kubernetes.namespaces.applications;
-  image = "ghcr.io/josevictorferreira/hermes-agent:v0.13.0@sha256:090c3e3e10cbd13210107bbf1512cb3b3ae8c0465f042b9d1e8258e55cefe420";
+  image = "ghcr.io/josevictorferreira/hermes-agent:v2026.5.16@sha256:b6e41c155d6bfce5ad83c5d0fec670086db8a43250e4511c9474134be5482d33";
   envFromSecret = [
     { secretRef.name = "${name}-env"; }
   ];
@@ -80,7 +80,7 @@ in
         };
         spec = {
           terminationGracePeriodSeconds = 60;
-          imagePullSecrets = [{ name = "ghcr-registry-secret"; }];
+          imagePullSecrets = [ { name = "ghcr-registry-secret"; } ];
           containers = [
             {
               name = "gateway";
@@ -209,7 +209,7 @@ in
         };
         spec = {
           terminationGracePeriodSeconds = 30;
-          imagePullSecrets = [{ name = "ghcr-registry-secret"; }];
+          imagePullSecrets = [ { name = "ghcr-registry-secret"; } ];
           containers = [
             {
               name = "dashboard";
