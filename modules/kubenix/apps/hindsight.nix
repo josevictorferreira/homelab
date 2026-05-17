@@ -45,7 +45,7 @@ in
               HINDSIGHT_API_EMBEDDINGS_LITELLM_SDK_OUTPUT_DIMENSIONS = "384";
               HINDSIGHT_API_RERANKER_PROVIDER = "litellm-sdk";
               HINDSIGHT_API_RERANKER_LITELLM_SDK_MODEL = "nvidia_nim/nvidia/llama-3_2-nv-rerankqa-1b-v2";
-              HINDSIGHT_API_RERANKER_LITELLM_SDK_API_BASE = "https://integrate.api.nvidia.com/v1";
+              HINDSIGHT_API_RERANKER_LITELLM_SDK_API_BASE = "https://ai.api.nvidia.com/v1";
               HINDSIGHT_API_WORKER_MAX_SLOTS = "8";
               HINDSIGHT_API_WORKER_CONSOLIDATION_MAX_SLOTS = "2";
               HINDSIGHT_API_LLM_TIMEOUT = "30";
