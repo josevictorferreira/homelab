@@ -17,7 +17,7 @@ spec:
         app: personal-finances
     spec:
       containers:
-        - image: ghcr.io/josevictorferreira/personal-finances@sha256:38db0b80aec3c9c4feda021f452fc49fc78a4f9bb26cc4cb37cf3413f143fc56
+        - image: ghcr.io/josevictorferreira/personal-finances@sha256:d9f8e4df5a6b08dad2daa6bfc2b6b781292b9364c4de4a09582cb07cad14eec2
           imagePullPolicy: IfNotPresent
           name: personal-finances
           ports:
@@ -28,22 +28,12 @@ spec:
             - mountPath: /shared
               name: cephfs
               readOnly: false
-            - mountPath: /etc/nginx/.htpasswd
-              name: htpasswd
-              readOnly: true
-              subPath: .htpasswd
       imagePullSecrets:
         - name: ghcr-registry-secret
       volumes:
         - name: cephfs
           persistentVolumeClaim:
             claimName: cephfs-shared-storage-root
-        - name: htpasswd
-          secret:
-            items:
-              - key: .htpasswd
-                path: .htpasswd
-            secretName: personal-finances-htpasswd
 ---
 apiVersion: v1
 kind: Service

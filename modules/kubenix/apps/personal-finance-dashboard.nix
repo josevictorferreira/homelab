@@ -24,7 +24,7 @@ in
             containers = [
               {
                 inherit name;
-                image = "ghcr.io/josevictorferreira/personal-finances@sha256:38db0b80aec3c9c4feda021f452fc49fc78a4f9bb26cc4cb37cf3413f143fc56";
+                image = "ghcr.io/josevictorferreira/personal-finances@sha256:d9f8e4df5a6b08dad2daa6bfc2b6b781292b9364c4de4a09582cb07cad14eec2";
                 imagePullPolicy = "IfNotPresent";
                 ports = [
                   {
@@ -39,12 +39,6 @@ in
                     mountPath = "/shared";
                     readOnly = false;
                   }
-                  {
-                    name = "htpasswd";
-                    mountPath = "/etc/nginx/.htpasswd";
-                    subPath = ".htpasswd";
-                    readOnly = true;
-                  }
                 ];
               }
             ];
@@ -52,18 +46,6 @@ in
               {
                 name = "cephfs";
                 persistentVolumeClaim.claimName = kubenix.lib.sharedStorage.rootPVC;
-              }
-              {
-                name = "htpasswd";
-                secret = {
-                  secretName = "personal-finances-htpasswd";
-                  items = [
-                    {
-                      key = ".htpasswd";
-                      path = ".htpasswd";
-                    }
-                  ];
-                };
               }
             ];
           };
