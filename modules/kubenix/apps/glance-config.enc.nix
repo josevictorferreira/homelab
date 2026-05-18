@@ -108,6 +108,50 @@ let
     </div>
   '';
 
+  zaiCodeTemplate = ''
+    {{ $total := .JSON.Float "data.total_quota" }}
+    {{ $used := .JSON.Float "data.used_quota" }}
+    {{ $remaining := .JSON.Float "data.remaining_quota" }}
+    {{ $pctUsed := 0.0 }}
+    {{ if gt $total 0.0 }}
+      {{ $pctUsed = mul (div $used $total) 100.0 }}
+    {{ end }}
+    {{ $plan := .JSON.String "data.plan" | default "Unknown" }}
+    {{ $expires := .JSON.String "data.expire_date" }}
+
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <span style="background-color: var(--color-primary); color: var(--color-text-highlight); padding: 2px 10px; border-radius: 4px; font-size: 12px; font-weight: 600;">{{ $plan }}</span>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 4px;">
+        <div style="display: flex; justify-content: space-between; font-size: 11px;">
+          <span class="color-paragraph">Credits Used</span>
+          <span>{{ $used | toInt }}/{{ $total | toInt }}</span>
+        </div>
+        <div style="background-color: var(--color-separator); border-radius: 4px; height: 8px; overflow: hidden;">
+          <div style="background-color: var(--color-primary); height: 100%; width: {{ $pctUsed | toInt }}%; border-radius: 4px; transition: width 0.3s;"></div>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 4px;">
+        <div style="display: flex; justify-content: space-between; font-size: 11px;">
+          <span class="color-paragraph">Remaining</span>
+          <span>{{ $remaining | toInt }}</span>
+        </div>
+        <div style="background-color: var(--color-separator); border-radius: 4px; height: 8px; overflow: hidden;">
+          <div style="background-color: var(--color-positive); height: 100%; width: {{ sub 100.0 $pctUsed | toInt }}%; border-radius: 4px; transition: width 0.3s;"></div>
+        </div>
+      </div>
+
+      {{ if $expires }}
+      <ul class="list-horizontal-text" style="font-size: 11px;">
+        <li>Expires: {{ $expires }}</li>
+      </ul>
+      {{ end }}
+    </div>
+  '';
+
   weatherSevenDayTemplate = ''
     {{/* THESE VALUES CAN BE CHANGED BY ADDING AN ENTRY TO THE OPTIONS SECTION */}}
       {{ $temp_unit := .Options.StringOr "temp_unit" "celsius" }}
@@ -513,6 +557,18 @@ let
                   Authorization = "Bearer ${kubenix.lib.secretsFor "moonshot_api_key"}";
                 };
                 template = kimiCodeTemplate;
+              }
+              {
+                type = "custom-api";
+                title = "Z-AI (GLM)";
+                cache = "30m";
+                timeout = "30s";
+                method = "GET";
+                url = "https://open.bigmodel.cn/api/paas/v4/user/quota";
+                headers = {
+                  Authorization = "Bearer ${kubenix.lib.secretsFor "alibaba_coding_plan_api_key"}";
+                };
+                template = zaiCodeTemplate;
               }
             ];
           }
