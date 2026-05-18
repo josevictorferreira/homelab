@@ -858,6 +858,13 @@ Our cluster is deployed and accessible in the user system kubectl, the context a
 **Context:** Without this, the pod continues running the old plugin despite the image containing a newer version. The fix: compare `jq -r '.version'` from the image and synced paths, delete the old tree, and re-copy when mismatch is detected.
 **Verify:** `kubectl exec deploy/openclaw -c openclaw -- cat /home/node/.local/openclaw/extensions/<plugin>/package.json | jq -r '.version'` matches the image version.
 
+### Glance
+
+#### Glance custom-api Widgets Need Explicit Timeout for External APIs
+**Lesson:** Always add `timeout = "30s"` (or appropriate duration) to Glance custom-api widgets that call external APIs.
+**Context:** Default HTTP timeout (~10s) is often insufficient for slow external APIs (e.g., Kimi Code API), causing "context deadline exceeded" errors in the UI.
+**Verify:** Widget displays data without timeout errors; check Glance logs show successful API responses.
+
 ## INCIDENT RECORD
 
 ### 2026-01-27: CephFS Data Loss
