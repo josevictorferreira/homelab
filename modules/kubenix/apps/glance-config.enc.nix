@@ -116,12 +116,16 @@ let
     {{ if gt $total 0.0 }}
       {{ $pctUsed = mul (div $used $total) 100.0 }}
     {{ end }}
-    {{ $plan := .JSON.String "data.plan" | default "Unknown" }}
+    {{ $plan := .JSON.String "data.plan" }}
     {{ $expires := .JSON.String "data.expire_date" }}
 
     <div style="display: flex; flex-direction: column; gap: 10px;">
       <div style="display: flex; align-items: center; gap: 8px;">
-        <span style="background-color: var(--color-primary); color: var(--color-text-highlight); padding: 2px 10px; border-radius: 4px; font-size: 12px; font-weight: 600;">{{ $plan }}</span>
+        {{ $planLabel := "Z-AI" }}
+        {{ if $plan }}
+          {{ $planLabel = $plan }}
+        {{ end }}
+        <span style="background-color: var(--color-primary); color: var(--color-text-highlight); padding: 2px 10px; border-radius: 4px; font-size: 12px; font-weight: 600;">{{ $planLabel }}</span>
       </div>
 
       <div style="display: flex; flex-direction: column; gap: 4px;">
