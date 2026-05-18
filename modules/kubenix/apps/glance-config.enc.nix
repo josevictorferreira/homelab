@@ -506,6 +506,7 @@ let
                 type = "custom-api";
                 title = "Kimi Code";
                 cache = "30m";
+                timeout = "30s";
                 method = "GET";
                 url = "https://api.kimi.com/coding/v1/usages";
                 headers = {
