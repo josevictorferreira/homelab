@@ -35,6 +35,79 @@ let
     </ul>
   '';
 
+  kimiCodeTemplate = ''
+    {{ $level := .JSON.String "user.membership.level" }}
+    {{ $levelLabel := replaceAll "LEVEL_" "" $level }}
+    {{ $levelColor := "var(--color-positive)" }}
+    {{ if eq $level "LEVEL_BASIC" }}
+      {{ $levelColor = "var(--color-text-subdue)" }}
+    {{ else if eq $level "LEVEL_INTERMEDIATE" }}
+      {{ $levelColor = "var(--color-primary)" }}
+    {{ else if eq $level "LEVEL_ADVANCED" }}
+      {{ $levelColor = "var(--color-positive)" }}
+    {{ end }}
+
+    {{ $weeklyUsed := .JSON.Float "usage.used" }}
+    {{ $weeklyLimit := .JSON.Float "usage.limit" }}
+    {{ $weeklyPct := 0.0 }}
+    {{ if gt $weeklyLimit 0.0 }}
+      {{ $weeklyPct = mul (div $weeklyUsed $weeklyLimit) 100.0 }}
+    {{ end }}
+
+    {{ $windowRemaining := .JSON.Float "limits.0.detail.remaining" }}
+    {{ $windowLimit := .JSON.Float "limits.0.detail.limit" }}
+    {{ $windowDur := .JSON.Int "limits.0.window.duration" }}
+
+    {{ $totalRemaining := .JSON.Float "totalQuota.remaining" }}
+    {{ $totalLimit := .JSON.Float "totalQuota.limit" }}
+
+    {{ $parallel := .JSON.Int "parallel.limit" }}
+
+    {{ $resetRaw := .JSON.String "usage.resetTime" }}
+    {{ $resetTime := $resetRaw | parseTime "2006-01-02T15:04:05Z07:00" }}
+
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <span style="background-color: {{ $levelColor | safeCSS }}; color: var(--color-text-highlight); padding: 2px 10px; border-radius: 4px; font-size: 12px; font-weight: 600;">{{ $levelLabel }}</span>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 4px;">
+        <div style="display: flex; justify-content: space-between; font-size: 11px;">
+          <span class="color-paragraph">Weekly</span>
+          <span>{{ $weeklyUsed | toInt }}/{{ $weeklyLimit | toInt }}</span>
+        </div>
+        <div style="background-color: var(--color-separator); border-radius: 4px; height: 8px; overflow: hidden;">
+          <div style="background-color: var(--color-primary); height: 100%; width: {{ $weeklyPct | toInt }}%; border-radius: 4px; transition: width 0.3s;"></div>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 4px;">
+        <div style="display: flex; justify-content: space-between; font-size: 11px;">
+          <span class="color-paragraph">{{ $windowDur }}m window</span>
+          <span>{{ $windowRemaining | toInt }}/{{ $windowLimit | toInt }}</span>
+        </div>
+        <div style="background-color: var(--color-separator); border-radius: 4px; height: 8px; overflow: hidden;">
+          <div style="background-color: var(--color-positive); height: 100%; width: {{ mul (div $windowRemaining $windowLimit) 100.0 | toInt }}%; border-radius: 4px; transition: width 0.3s;"></div>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 4px;">
+        <div style="display: flex; justify-content: space-between; font-size: 11px;">
+          <span class="color-paragraph">Total quota</span>
+          <span>{{ $totalRemaining | toInt }}/{{ $totalLimit | toInt }}</span>
+        </div>
+        <div style="background-color: var(--color-separator); border-radius: 4px; height: 8px; overflow: hidden;">
+          <div style="background-color: var(--color-text-subdue); height: 100%; width: {{ mul (div $totalRemaining $totalLimit) 100.0 | toInt }}%; border-radius: 4px; transition: width 0.3s;"></div>
+        </div>
+      </div>
+
+      <ul class="list-horizontal-text" style="font-size: 11px;">
+        <li>Resets {{ $resetTime.Format "Mon Jan 2" }}</li>
+        <li>Parallel: {{ $parallel }}</li>
+      </ul>
+    </div>
+  '';
+
   weatherSevenDayTemplate = ''
     {{/* THESE VALUES CAN BE CHANGED BY ADDING AN ENTRY TO THE OPTIONS SECTION */}}
       {{ $temp_unit := .Options.StringOr "temp_unit" "celsius" }}
@@ -418,6 +491,27 @@ let
                   "Opencode-DCP/opencode-dynamic-context-pruning"
                   "NoeFabris/opencode-antigravity-auth"
                 ];
+              }
+            ];
+          }
+        ];
+      }
+      {
+        name = "Agents";
+        columns = [
+          {
+            size = "full";
+            widgets = [
+              {
+                type = "custom-api";
+                title = "Kimi Code";
+                cache = "30m";
+                method = "GET";
+                url = "https://api.kimi.com/coding/v1/usages";
+                headers = {
+                  Authorization = "Bearer ${kubenix.lib.secretsFor "moonshot_api_key"}";
+                };
+                template = kimiCodeTemplate;
               }
             ];
           }
