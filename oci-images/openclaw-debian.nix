@@ -99,27 +99,13 @@ let
     fi
   '';
 
-  losslessClawOverlay = pkgs.runCommand "lossless-claw-overlay" { } ''
-    mkdir -p $out/opt/openclaw-debian/extensions/lossless-claw
-    mkdir -p /tmp/lossless-extract
-    tar -xzf ${losslessClawSource} -C /tmp/lossless-extract --strip-components=1
-    cp -r /tmp/lossless-extract/dist $out/opt/openclaw-debian/extensions/lossless-claw/
-    cp /tmp/lossless-extract/openclaw.plugin.json $out/opt/openclaw-debian/extensions/lossless-claw/
-    cp /tmp/lossless-extract/package.json $out/opt/openclaw-debian/extensions/lossless-claw/
-    if [ -d /tmp/lossless-extract/skills ]; then
-      cp -r /tmp/lossless-extract/skills $out/opt/openclaw-debian/extensions/lossless-claw/
-    fi
-    rm -rf /tmp/lossless-extract
-  '';
-
 in
 pkgs.dockerTools.buildImage {
   name = "localhost/openclaw-debian";
-  tag = "2026.5.18-luna-hindsight-lossless-v0.10.0";
+  tag = "2026.5.18-luna-hindsight";
   fromImage = baseImage;
   copyToRoot = [
     toolsRoot
-    losslessClawOverlay
   ];
   extraCommands = ''
     mkdir -p ./usr/local/share/fonts

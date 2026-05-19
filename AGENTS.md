@@ -844,22 +844,26 @@ Our cluster is deployed and accessible in the user system kubectl, the context a
 **Verify:** `kubectl logs deploy/<openclaw-deploy> -c <container> --tail=200 | grep -E 'agent_end|embedded run.*done|embedded run.*end'` shows completed agent runs after the `disabled` message.
 
 ### OpenClaw Debian Image: Overlay Tools on Upstream Base, Don't Rebuild from Scratch
-**Lesson:** The `openclaw-debian` image is built by overlaying tools (jq, ffmpeg, imagemagick, obsidian, typst, etc.) and the lossless-claw plugin on top of a pre-built base image pulled from `ghcr.io/openclaw/openclaw` via `dockerTools.pullImage`. To upgrade bundled plugins, add a `runCommand` overlay. Do NOT attempt to rebuild the OpenClaw runtime from scratch.
-**Context:** The base image (`ghcr.io/openclaw/openclaw:2026.5.x`) already contains OpenClaw runtime, Node.js, and bundled plugins. Rebuilding it from scratch is unnecessary and expensive. The correct pattern is `dockerTools.pullImage` for the base + `copyToRoot = [ toolsRoot losslessClawOverlay ]` in `oci-images/openclaw-debian.nix`.
+**Lesson:** The `openclaw-debian` image is built by overlaying tools (jq, ffmpeg, imagemagick, obsidian, typst, etc.) on top of a pre-built base image pulled from `ghcr.io/openclaw/openclaw` via `dockerTools.pullImage`. To upgrade bundled plugins, add a `runCommand` overlay. Do NOT attempt to rebuild the OpenClaw runtime from scratch.
+**Context:** The base image (`ghcr.io/openclaw/openclaw:2026.5.x`) already contains OpenClaw runtime, Node.js, and bundled plugins. Rebuilding it from scratch is unnecessary and expensive. The correct pattern is `dockerTools.pullImage` for the base + `copyToRoot = [ toolsRoot ]` in `oci-images/openclaw-debian.nix`.
 **Verify:** After `nix build .#openclaw-debian-image`, `podman load` the result and inspect `/opt/openclaw-debian/extensions/<plugin>/package.json` for the expected version.
 
 ### npm Tarball `--strip-components=1` Removes the `package/` Prefix
 **Lesson:** When extracting an npm tarball with `tar -xzf <tgz> -C <dest> --strip-components=1`, the `package/` directory component is stripped. Files land at `<dest>/dist/`, `<dest>/package.json`, etc. — NOT `<dest>/package/dist/`.
-**Context:** Writing `cp -r /tmp/lossless-extract/package/dist ...` after `--strip-components=1` fails with "cannot stat ... No such file or directory" because the `package/` prefix no longer exists in the extraction root.
+**Context:** Writing `cp -r /tmp/plugin-extract/package/dist ...` after `--strip-components=1` fails with "cannot stat ... No such file or directory" because the `package/` prefix no longer exists in the extraction root.
 **Verify:** `tar -tz <tgz> | head` to inspect the tarball structure, then match extraction paths to the stripped layout.
 
-### OpenClaw Debian Node Plugin Sync Must Detect Version Changes
-**Lesson:** The Debian startup script copies bundled plugins from `/opt/openclaw-debian/extensions/` (image) to a PVC-backed local directory on first boot. If the image is upgraded with a newer plugin version, the existing `.synced` marker prevents re-copying. Add version-check logic that compares the image's plugin version against the synced copy, and re-syncs when they differ.
-**Context:** Without this, the pod continues running the old plugin despite the image containing a newer version. The fix: compare `jq -r '.version'` from the image and synced paths, delete the old tree, and re-copy when mismatch is detected.
-**Verify:** `kubectl exec deploy/openclaw -c openclaw -- cat /home/node/.local/openclaw/extensions/<plugin>/package.json | jq -r '.version'` matches the image version.
+### OpenClaw Debian Node Plugin Sync Uses First-Boot Marker
+**Lesson:** The Debian startup script copies bundled extensions from `/opt/openclaw-debian/extensions/` (image) to a PVC-backed local directory on first boot using a `.synced` marker file. Without bundled plugins (lossless-claw removed), the script creates the marker on first boot and skips subsequent syncs.
+**Context:** The sync was originally added for the lossless-claw plugin. After its removal, no custom extensions need syncing — the `.synced` marker is still created for compatibility.
+**Verify:** `kubectl exec deploy/openclaw -c main -- sh -c 'test -f /home/node/.local/openclaw/extensions/.synced && echo synced || echo not synced'`
 
+### OpenClaw Config Source: CephFS Is Primary, Nix Is Mirror
+**Lesson:** The canonical OpenClaw config lives on CephFS at `~/Homelab/openclaw/openclaw.json`. The Nix source at `modules/kubenix/apps/openclaw-config.enc.nix` is a MIRROR, not the primary. When config changes are needed, **always edit the live CephFS config first**, then mirror structural changes to the Nix source. Never edit the Nix source alone — the CephFS mount controls what the running pod actually reads.
+**Context:** In the v2026.5.18 upgrade, `silentReply`/`silentReplyRewrite` keys were removed from the Nix source but the real CephFS config still had them, causing the gateway to fail on restart. Edits to the Nix source alone are invisible to the running pod.
+**Verify:** `jq 'paths | select(.[-1] == "silentReply")' ~/Homelab/openclaw/openclaw.json` returns empty after cleanup.
 ### OpenClaw Config Key Migration on Version Upgrade
-**Lesson:** When upgrading OpenClaw between versions, the gateway may fail to start with "Invalid config" if the new version removed or renamed config keys. Before deploying, run `openclaw doctor --fix` against the config, and check the new version's changelog for config changes. If startup fails, check pod logs for `Invalid config` — patch both the live CephFS config and the Nix source (`openclaw-config.enc.nix`).
+**Lesson:** When upgrading OpenClaw between versions, the gateway may fail to start with "Invalid config" if the new version removed or renamed config keys. Before deploying, run `openclaw doctor --fix` against the real CephFS config at `~/Homelab/openclaw/openclaw.json`, and check the new version's changelog for config changes. If startup fails, check pod logs for `Invalid config` — **always patch the real CephFS config first** (`~/Homelab/openclaw/openclaw.json`), then mirror non-secret changes to the Nix source (`openclaw-config.enc.nix`).
 **Context:** OpenClaw v2026.5.18 removed `silentReply`/`silentReplyRewrite` keys. The gateway silently fails with "Invalid config" — no clear pointer to which key is invalid.
 **Verify:** `kubectl logs -n apps deploy/openclaw -c main --tail=30 | grep -i 'invalid config'` shows no matches after upgrade.
 

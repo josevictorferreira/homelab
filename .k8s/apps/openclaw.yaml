@@ -49,13 +49,8 @@ spec:
               \ \"$EXTENSIONS_DIR\" \"$PLUGIN_STAGE_DIR\"\nmkdir -p \"$STATE_DIR/logs\"\
               \ \"$STATE_DIR/tmp\"\n\necho \"Syncing tested plugin bundle into persisted\
               \ local state...\"\nneeds_sync=false\nif [ ! -f \"$EXTENSIONS_DIR/.synced\"\
-              \ ]; then\n  needs_sync=true\nelse\n  image_ver=$(jq -r '.version' /opt/openclaw-debian/extensions/lossless-claw/package.json\
-              \ 2>/dev/null || echo \"unknown\")\n  synced_ver=$(jq -r '.version'\
-              \ \"$EXTENSIONS_DIR/lossless-claw/package.json\" 2>/dev/null || echo\
-              \ \"unknown\")\n  if [ \"$image_ver\" != \"$synced_ver\" ]; then\n \
-              \   echo \"Plugin version mismatch (image: $image_ver, synced: $synced_ver),\
-              \ re-syncing...\"\n    needs_sync=true\n  fi\nfi\n\nif [ \"$needs_sync\"\
-              \ = true ]; then\n  rm -rf \"$EXTENSIONS_DIR\"\n  mkdir -p \"$EXTENSIONS_DIR\"\
+              \ ]; then\n  needs_sync=true\nelse\nfi\n\nif [ \"$needs_sync\" = true\
+              \ ]; then\n  rm -rf \"$EXTENSIONS_DIR\"\n  mkdir -p \"$EXTENSIONS_DIR\"\
               \n  cp -a /opt/openclaw-debian/extensions/. \"$EXTENSIONS_DIR/\"\n \
               \ touch \"$EXTENSIONS_DIR/.synced\"\n  echo \"Plugin sync complete.\"\
               \nelse\n  echo \"Plugins already synced, skipping copy.\"\nfi\n\necho\
@@ -90,7 +85,7 @@ spec:
           envFrom:
             - secretRef:
                 name: openclaw-config
-          image: ghcr.io/josevictorferreira/openclaw-debian:2026.5.18-luna-hindsight-lossless-v0.10.0@sha256:f0171b529067fa5f85bbe09b9ff4e032022c45949febb656647ea93f7f710181
+          image: ghcr.io/josevictorferreira/openclaw-debian:2026.5.18-luna-hindsight@sha256:5d65def6cd05a42997d984d853f49d19b90fad4ce4676749b5aabaeef43dda71
           imagePullPolicy: Always
           livenessProbe:
             failureThreshold: 3

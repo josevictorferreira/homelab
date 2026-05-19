@@ -697,7 +697,6 @@ let
         "hindsight-openclaw"
         "kimi"
         "lobster"
-        "lossless-claw"
         "matrix"
         "memory-core"
         "memory-wiki"
@@ -708,7 +707,7 @@ let
       ];
       slots = {
         memory = "hindsight-openclaw";
-        contextEngine = "lossless-claw";
+        contextEngine = null;
       };
       entries = {
         lobster = {
@@ -788,12 +787,6 @@ let
         };
         openai = {
           enabled = true;
-        };
-        lossless-claw = {
-          enabled = true;
-          config = {
-            dbPath = "/home/node/.openclaw/lcm.db";
-          };
         };
         hindsight-openclaw = {
           enabled = true;
