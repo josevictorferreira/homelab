@@ -615,10 +615,10 @@ Our cluster is deployed and accessible in the user system kubectl, the context a
 **Context:** K3s auto-deploys manifests from the init node's filesystem. The controller continuously reconciles these files, overwriting any kubectl changes.
 **Verify:** After NixOS deploy, check init node: `ssh root@lab-alpha-cp 'cat /var/lib/rancher/k3s/server/manifests/resource-quotas.yaml'`
 
-#### `.k8s/` Directory is NOT in Git — K3s Auto-Deploy Only
-**Lesson:** The `.k8s/` directory is `.gitignore`d and generated locally via `make manifests`. Flux/K3s does NOT reconcile from these files for bootstrap resources. Only the source Nix files matter.
-**Context:** Bootstrap manifests are deployed by K3s's auto-deploy mechanism from the init node's filesystem, not by Flux.
-**Verify:** `cat .gitignore | grep "^\.k8s"` — should be ignored
+#### `.k8s/` Directory IS Tracked by Git — Generated via `make manifests`
+**Lesson:** The `.k8s/` directory is generated via `make manifests`, IS tracked by git, and Flux reconciles from `./.k8s`. Never edit `.k8s/*.yaml` files directly — always regenerate via `make manifests`. If you remove a file from `.k8s/`, `git rm` it before committing.
+**Context:** `.k8s/` is the bridge between kubenix Nix config and Flux GitOps. The full `make manifests` pipeline generates, injects secrets, and encrypts files here. Flux applies the full directory as a kustomization.
+**Verify:** `git ls-files .k8s/ | head -5` shows tracked files; `.gitignore` does NOT list `.k8s/`.
 
 ### Kubernetes Rolling Updates for Large Images
 
@@ -843,9 +843,9 @@ Our cluster is deployed and accessible in the user system kubectl, the context a
 **Context:** Spent 60+ min searching for the source of `[matrix] disabled` across upstream JS bundles, comparing configs, and trying plugin fixes — all unnecessary because the channel self-recovers via health-monitor.
 **Verify:** `kubectl logs deploy/<openclaw-deploy> -c <container> --tail=200 | grep -E 'agent_end|embedded run.*done|embedded run.*end'` shows completed agent runs after the `disabled` message.
 
-### OpenClaw Debian Image: Overlay Bundled Plugins, Don't Rebuild Base
-**Lesson:** The `openclaw-debian` image is built by overlaying extra files on top of a pre-built base image (`openclaw-debian-base.tar`). To upgrade a bundled plugin like `lossless-claw`, add a `runCommand` overlay that extracts the new npm tarball into `$out/opt/openclaw-debian/extensions/<plugin>/` and include it in `copyToRoot`. Do NOT attempt to rebuild the base image or modify its nix store path.
-**Context:** The base image already contains OpenClaw runtime, node, and bundled plugins. Rebuilding it from scratch is unnecessary and expensive. The correct pattern is `copyToRoot = [ toolsRoot losslessClawOverlay ]` in `oci-images/openclaw-debian.nix`.
+### OpenClaw Debian Image: Overlay Tools on Upstream Base, Don't Rebuild from Scratch
+**Lesson:** The `openclaw-debian` image is built by overlaying tools (jq, ffmpeg, imagemagick, obsidian, typst, etc.) and the lossless-claw plugin on top of a pre-built base image pulled from `ghcr.io/openclaw/openclaw` via `dockerTools.pullImage`. To upgrade bundled plugins, add a `runCommand` overlay. Do NOT attempt to rebuild the OpenClaw runtime from scratch.
+**Context:** The base image (`ghcr.io/openclaw/openclaw:2026.5.x`) already contains OpenClaw runtime, Node.js, and bundled plugins. Rebuilding it from scratch is unnecessary and expensive. The correct pattern is `dockerTools.pullImage` for the base + `copyToRoot = [ toolsRoot losslessClawOverlay ]` in `oci-images/openclaw-debian.nix`.
 **Verify:** After `nix build .#openclaw-debian-image`, `podman load` the result and inspect `/opt/openclaw-debian/extensions/<plugin>/package.json` for the expected version.
 
 ### npm Tarball `--strip-components=1` Removes the `package/` Prefix
@@ -857,6 +857,11 @@ Our cluster is deployed and accessible in the user system kubectl, the context a
 **Lesson:** The Debian startup script copies bundled plugins from `/opt/openclaw-debian/extensions/` (image) to a PVC-backed local directory on first boot. If the image is upgraded with a newer plugin version, the existing `.synced` marker prevents re-copying. Add version-check logic that compares the image's plugin version against the synced copy, and re-syncs when they differ.
 **Context:** Without this, the pod continues running the old plugin despite the image containing a newer version. The fix: compare `jq -r '.version'` from the image and synced paths, delete the old tree, and re-copy when mismatch is detected.
 **Verify:** `kubectl exec deploy/openclaw -c openclaw -- cat /home/node/.local/openclaw/extensions/<plugin>/package.json | jq -r '.version'` matches the image version.
+
+### OpenClaw Config Key Migration on Version Upgrade
+**Lesson:** When upgrading OpenClaw between versions, the gateway may fail to start with "Invalid config" if the new version removed or renamed config keys. Before deploying, run `openclaw doctor --fix` against the config, and check the new version's changelog for config changes. If startup fails, check pod logs for `Invalid config` — patch both the live CephFS config and the Nix source (`openclaw-config.enc.nix`).
+**Context:** OpenClaw v2026.5.18 removed `silentReply`/`silentReplyRewrite` keys. The gateway silently fails with "Invalid config" — no clear pointer to which key is invalid.
+**Verify:** `kubectl logs -n apps deploy/openclaw -c main --tail=30 | grep -i 'invalid config'` shows no matches after upgrade.
 
 ### Glance
 
