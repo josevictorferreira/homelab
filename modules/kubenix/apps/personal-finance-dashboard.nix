@@ -18,6 +18,7 @@ in
             labels.app = name;
           };
           spec = {
+            securityContext.fsGroup = 100;
             imagePullSecrets = [
               { name = "ghcr-registry-secret"; }
             ];
