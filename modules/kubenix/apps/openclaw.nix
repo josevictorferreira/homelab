@@ -5,7 +5,7 @@ let
   namespace = homelab.kubernetes.namespaces.applications;
   port = 18789;
   host = "openclaw-debian.${homelab.domain}";
-  image = "ghcr.io/josevictorferreira/openclaw-debian:2026.5.18-luna-hindsight-lossless-v0.10.0@sha256:f0171b529067fa5f85bbe09b9ff4e032022c45949febb656647ea93f7f710181";
+  image = "ghcr.io/josevictorferreira/openclaw-debian:2026.5.18-luna-hindsight@sha256:5d65def6cd05a42997d984d853f49d19b90fad4ce4676749b5aabaeef43dda71";
   startupScript = ''
     set -euo pipefail
 
@@ -39,12 +39,6 @@ let
     if [ ! -f "$EXTENSIONS_DIR/.synced" ]; then
       needs_sync=true
     else
-      image_ver=$(jq -r '.version' /opt/openclaw-debian/extensions/lossless-claw/package.json 2>/dev/null || echo "unknown")
-      synced_ver=$(jq -r '.version' "$EXTENSIONS_DIR/lossless-claw/package.json" 2>/dev/null || echo "unknown")
-      if [ "$image_ver" != "$synced_ver" ]; then
-        echo "Plugin version mismatch (image: $image_ver, synced: $synced_ver), re-syncing..."
-        needs_sync=true
-      fi
     fi
 
     if [ "$needs_sync" = true ]; then
