@@ -215,16 +215,6 @@ let
             "kimi-coding/k2p6"
           ];
         };
-        silentReply = {
-          direct = "allow";
-          group = "allow";
-          internal = "allow";
-        };
-        silentReplyRewrite = {
-          direct = true;
-          group = true;
-          internal = true;
-        };
         userTimezone = "America/Sao_Paulo";
         memorySearch = {
           enabled = true;
