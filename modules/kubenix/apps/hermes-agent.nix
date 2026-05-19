@@ -134,6 +134,7 @@ let
       cmdArgs =
         if profileFlag != null then
           [
+            "hermes"
             "-p"
             profileFlag
             "gateway"

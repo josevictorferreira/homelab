@@ -130,6 +130,7 @@ spec:
     spec:
       containers:
         - args:
+            - hermes
             - -p
             - ted
             - gateway
@@ -202,6 +203,7 @@ spec:
               name: cli-wrapper
               subPath: hermes
         - args:
+            - hermes
             - -p
             - kira
             - gateway
@@ -274,6 +276,7 @@ spec:
               name: cli-wrapper
               subPath: hermes
         - args:
+            - hermes
             - -p
             - mel
             - gateway

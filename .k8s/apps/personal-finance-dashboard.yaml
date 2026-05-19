@@ -17,7 +17,7 @@ spec:
         app: personal-finances
     spec:
       containers:
-        - image: ghcr.io/josevictorferreira/personal-finances@latest
+        - image: ghcr.io/josevictorferreira/personal-finances:latest
           imagePullPolicy: IfNotPresent
           name: personal-finances
           ports:
