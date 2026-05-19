@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
         - image: ghcr.io/josevictorferreira/personal-finances:latest
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           name: personal-finances
           ports:
             - containerPort: 80
