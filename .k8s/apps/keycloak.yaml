@@ -1,0 +1,282 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: keycloak
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: keycloak
+    app.kubernetes.io/version: 26.5.2
+    helm.sh/chart: keycloak-0.14.2
+  name: keycloak
+  namespace: apps
+spec:
+  podManagementPolicy: OrderedReady
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: keycloak
+      app.kubernetes.io/name: keycloak
+  serviceName: keycloak-headless
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: keycloak
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: keycloak
+        app.kubernetes.io/version: 26.5.2
+        helm.sh/chart: keycloak-0.14.2
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - args:
+            - start
+            - --http-enabled=true
+            - --hostname=identity.josevictor.me
+            - --hostname-strict=false
+            - --proxy-headers=xforwarded
+            - --http-port=8080
+            - --https-port=8443
+            - --db=postgres
+            - --db-url=jdbc:postgresql://postgresql-18-hl:5432/keycloak
+          command:
+            - /opt/keycloak/bin/kc.sh
+          env:
+            - name: KC_HTTP_RELATIVE_PATH
+              value: /
+            - name: KC_BOOTSTRAP_ADMIN_USERNAME
+              value: admin
+            - name: KC_BOOTSTRAP_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: KEYCLOAK_ADMIN_PASSWORD
+                  name: keycloak-env
+            - name: KC_DB
+              value: postgres
+            - name: KC_DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  key: db-username
+                  name: keycloak-env
+            - name: KC_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: db-password
+                  name: keycloak-env
+          image: docker.io/keycloak/keycloak:26.5.2
+          imagePullPolicy: Always
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /realms/master
+              port: http
+              scheme: HTTP
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            successThreshold: 1
+            timeoutSeconds: 5
+          name: keycloak
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /realms/master
+              port: http
+              scheme: HTTP
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          resources:
+            limits:
+              cpu: 500m
+              memory: 1.5Gi
+            requests:
+              cpu: 200m
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: false
+            runAsGroup: 1001
+            runAsNonRoot: true
+            runAsUser: 1001
+          startupProbe:
+            failureThreshold: 60
+            httpGet:
+              path: /realms/master
+              port: http
+              scheme: HTTP
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          volumeMounts:
+            - mountPath: /opt/keycloak/data
+              name: data
+            - mountPath: /tmp
+              name: tmp
+            - mountPath: /opt/keycloak/work
+              name: keycloak-work
+            - mountPath: /opt/keycloak/lib/quarkus
+              name: keycloak-lib-quarkus
+            - mountPath: /opt/keycloak/themes
+              name: keycloak-themes
+            - mountPath: /opt/keycloak/providers
+              name: keycloak-providers
+      imagePullSecrets:
+        - name: ghcr-registry-secret
+      initContainers:
+        - command:
+            - sh
+            - -c
+            - cp -r /opt/keycloak/lib/quarkus/* /shared-quarkus/
+          image: docker.io/keycloak/keycloak:26.5.2
+          imagePullPolicy: Always
+          name: copy-quarkus-lib
+          resources:
+            limits:
+              cpu: 500m
+              memory: 1.5Gi
+            requests:
+              cpu: 200m
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: false
+            runAsGroup: 1001
+            runAsNonRoot: true
+            runAsUser: 1001
+          volumeMounts:
+            - mountPath: /shared-quarkus
+              name: keycloak-lib-quarkus
+        - command:
+            - sh
+            - -c
+            - cp -r /opt/keycloak/providers/. /shared/
+          image: keycloak/keycloak:26.5.2
+          name: copy-base-providers
+          volumeMounts:
+            - mountPath: /shared
+              name: keycloak-providers
+        - command:
+            - sh
+            - -c
+            - cp /theme.jar /shared/valoris-theme.jar
+          image: ghcr.io/josevictorferreira/valoris-identity:v0.4.0
+          name: add-valoris-theme
+          volumeMounts:
+            - mountPath: /shared
+              name: keycloak-providers
+      securityContext:
+        fsGroup: 1001
+      serviceAccountName: default
+      volumes:
+        - emptyDir: {}
+          name: data
+        - emptyDir: {}
+          name: tmp
+        - emptyDir: {}
+          name: keycloak-work
+        - emptyDir: {}
+          name: keycloak-lib-quarkus
+        - emptyDir: {}
+          name: keycloak-themes
+        - emptyDir: {}
+          name: keycloak-providers
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: keycloak
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: keycloak
+    app.kubernetes.io/version: 26.5.2
+    helm.sh/chart: keycloak-0.14.2
+  name: keycloak
+  namespace: apps
+spec:
+  ports:
+    - name: http
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    app.kubernetes.io/instance: keycloak
+    app.kubernetes.io/name: keycloak
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: keycloak
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: keycloak
+    app.kubernetes.io/version: 26.5.2
+    helm.sh/chart: keycloak-0.14.2
+  name: keycloak-headless
+  namespace: apps
+spec:
+  clusterIP: None
+  ports:
+    - name: http
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+  publishNotReadyAddresses: true
+  selector:
+    app.kubernetes.io/instance: keycloak
+    app.kubernetes.io/name: keycloak
+  type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: cloudflare-issuer
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+    kubernetes.io/ingress.class: cilium
+  labels:
+    app.kubernetes.io/instance: keycloak
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: keycloak
+    app.kubernetes.io/version: 26.5.2
+    helm.sh/chart: keycloak-0.14.2
+  name: keycloak
+  namespace: apps
+spec:
+  ingressClassName: cilium
+  rules:
+    - host: identity.josevictor.me
+      http:
+        paths:
+          - backend:
+              service:
+                name: keycloak
+                port:
+                  number: 8080
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - identity.josevictor.me
+      secretName: wildcard-tls

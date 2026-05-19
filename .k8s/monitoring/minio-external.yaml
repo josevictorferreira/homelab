@@ -1,0 +1,70 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: minio-external
+  name: minio-external
+  namespace: monitoring
+spec:
+  clusterIP: None
+  ports:
+    - name: metrics
+      port: 9000
+      protocol: TCP
+      targetPort: 9000
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Endpoints
+metadata:
+  labels:
+    app: minio-external
+  name: minio-external
+  namespace: monitoring
+subsets:
+  - addresses:
+      - ip: 10.10.10.209
+    ports:
+      - name: metrics
+        port: 9000
+        protocol: TCP
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    app: minio-external
+  name: minio-cluster-metrics
+  namespace: monitoring
+spec:
+  endpoints:
+    - interval: 60s
+      path: /minio/v2/metrics/cluster
+      port: metrics
+      scrapeTimeout: 30s
+  namespaceSelector:
+    matchNames:
+      - monitoring
+  selector:
+    matchLabels:
+      app: minio-external
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    app: minio-external
+  name: minio-node-metrics
+  namespace: monitoring
+spec:
+  endpoints:
+    - interval: 60s
+      path: /minio/v2/metrics/node
+      port: metrics
+      scrapeTimeout: 30s
+  namespaceSelector:
+    matchNames:
+      - monitoring
+  selector:
+    matchLabels:
+      app: minio-external

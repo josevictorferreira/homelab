@@ -1,0 +1,217 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app: openclaw
+  name: openclaw
+  namespace: apps
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: openclaw
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: openclaw
+    spec:
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - preference:
+                matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values:
+                      - lab-delta-cp
+              weight: 100
+      automountServiceAccountToken: false
+      containers:
+        - command:
+            - /bin/bash
+            - -lc
+            - "set -euo pipefail\n\nSHARED_DIR=/home/node/.openclaw\nSHARED_CONFIG=\"\
+              $SHARED_DIR/openclaw.json\"\nLOCAL_DIR=/home/node/.local\nSTATE_DIR=\"\
+              $LOCAL_DIR/openclaw\"\nEXTENSIONS_DIR=\"$STATE_DIR/extensions\"\nPLUGIN_STAGE_DIR=\"\
+              $STATE_DIR/plugin-stage\"\n\necho \"Preparing OpenClaw Debian node...\"\
+              \nfor i in $(seq 1 30); do\n  if [ -f \"$SHARED_CONFIG\" ] && touch\
+              \ \"$SHARED_DIR/.debian-node-mount-check\" 2>/dev/null; then\n    rm\
+              \ -f \"$SHARED_DIR/.debian-node-mount-check\"\n    break\n  fi\n  echo\
+              \ \"Waiting for shared OpenClaw config, attempt $i/30...\"\n  sleep\
+              \ 2\ndone\n\nif [ ! -f \"$SHARED_CONFIG\" ]; then\n  echo \"Shared OpenClaw\
+              \ config not found at $SHARED_CONFIG\" >&2\n  exit 1\nfi\n\nmkdir -p\
+              \ \"$LOCAL_DIR/bin\" \"$LOCAL_DIR/lib/node_modules\" \"$STATE_DIR\"\
+              \ \"$EXTENSIONS_DIR\" \"$PLUGIN_STAGE_DIR\"\nmkdir -p \"$STATE_DIR/logs\"\
+              \ \"$STATE_DIR/tmp\"\n\necho \"Syncing tested plugin bundle into persisted\
+              \ local state...\"\nneeds_sync=false\nif [ ! -f \"$EXTENSIONS_DIR/.synced\"\
+              \ ]; then\n  needs_sync=true\nelse\n  image_ver=$(jq -r '.version' /opt/openclaw-debian/extensions/lossless-claw/package.json\
+              \ 2>/dev/null || echo \"unknown\")\n  synced_ver=$(jq -r '.version'\
+              \ \"$EXTENSIONS_DIR/lossless-claw/package.json\" 2>/dev/null || echo\
+              \ \"unknown\")\n  if [ \"$image_ver\" != \"$synced_ver\" ]; then\n \
+              \   echo \"Plugin version mismatch (image: $image_ver, synced: $synced_ver),\
+              \ re-syncing...\"\n    needs_sync=true\n  fi\nfi\n\nif [ \"$needs_sync\"\
+              \ = true ]; then\n  rm -rf \"$EXTENSIONS_DIR\"\n  mkdir -p \"$EXTENSIONS_DIR\"\
+              \n  cp -a /opt/openclaw-debian/extensions/. \"$EXTENSIONS_DIR/\"\n \
+              \ touch \"$EXTENSIONS_DIR/.synced\"\n  echo \"Plugin sync complete.\"\
+              \nelse\n  echo \"Plugins already synced, skipping copy.\"\nfi\n\necho\
+              \ \"Using shared config directly from $SHARED_CONFIG\"\ncd \"$STATE_DIR\"\
+              \nexec node /app/openclaw.mjs gateway --port 18789 --bind lan --allow-unconfigured\
+              \ --verbose\n"
+          env:
+            - name: HOME
+              value: /home/node
+            - name: OPENCLAW_CONFIG_PATH
+              value: /home/node/.openclaw/openclaw.json
+            - name: OPENCLAW_DATA_DIR
+              value: /home/node/.local/openclaw
+            - name: OPENCLAW_STATE_DIR
+              value: /home/node/.local/openclaw
+            - name: OPENCLAW_PLUGIN_STAGE_DIR
+              value: /home/node/.local/openclaw/plugin-stage
+            - name: OPENCLAW_DISABLE_BONJOUR
+              value: '1'
+            - name: OPENCLAW_ALLOW_ROOT
+              value: '1'
+            - name: NPM_CONFIG_PREFIX
+              value: /home/node/.local
+            - name: NODE_PATH
+              value: /home/node/.local/lib/node_modules:/app/node_modules
+            - name: PATH
+              value: /home/node/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+            - name: NODE_OPTIONS
+              value: --unhandled-rejections=warn
+            - name: TZ
+              value: America/Sao_Paulo
+          envFrom:
+            - secretRef:
+                name: openclaw-config
+          image: ghcr.io/josevictorferreira/openclaw-debian:2026.5.12-luna-hindsight-lossless-v0.10.0@sha256:ed24cac556242b5f5e0cddec77dfa0407a2d8a0b7b8260367a76a83946d3fce7
+          imagePullPolicy: Always
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 300
+            periodSeconds: 60
+            timeoutSeconds: 10
+          name: openclaw
+          ports:
+            - containerPort: 18789
+              name: http
+              protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: http
+            periodSeconds: 30
+            timeoutSeconds: 5
+          resources:
+            limits:
+              cpu: 250m
+              memory: 2Gi
+            requests:
+              cpu: 250m
+              memory: 512Mi
+          securityContext:
+            runAsGroup: 0
+            runAsUser: 0
+          startupProbe:
+            failureThreshold: 60
+            httpGet:
+              path: /health
+              port: http
+            periodSeconds: 5
+            timeoutSeconds: 3
+          volumeMounts:
+            - mountPath: /home/node/.openclaw
+              name: openclaw-shared
+              subPath: openclaw
+            - mountPath: /shared/notetaking
+              name: openclaw-shared
+              subPath: notetaking
+            - mountPath: /shared/personal-finances
+              name: openclaw-shared
+              subPath: personal-finances
+            - mountPath: /shared/mel-dynamica
+              name: openclaw-shared
+              subPath: mel-dynamica
+            - mountPath: /home/node/.local
+              name: openclaw-local
+      imagePullSecrets:
+        - name: ghcr-registry-secret
+      terminationGracePeriodSeconds: 60
+      volumes:
+        - name: openclaw-shared
+          persistentVolumeClaim:
+            claimName: cephfs-shared-storage-root
+        - name: openclaw-local
+          persistentVolumeClaim:
+            claimName: openclaw-local
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: openclaw-local
+  namespace: apps
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: rook-ceph-block
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: openclaw
+  namespace: apps
+spec:
+  ports:
+    - name: http
+      port: 18789
+      protocol: TCP
+      targetPort: http
+  selector:
+    app: openclaw
+  type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: cloudflare-issuer
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: openclaw
+  namespace: apps
+spec:
+  ingressClassName: cilium
+  rules:
+    - host: openclaw-debian.josevictor.me
+      http:
+        paths:
+          - backend:
+              service:
+                name: openclaw
+                port:
+                  number: 18789
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - openclaw-debian.josevictor.me
+      secretName: wildcard-tls

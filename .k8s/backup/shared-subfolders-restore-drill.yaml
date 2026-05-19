@@ -1,0 +1,90 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: shared-subfolders-restore-drill
+  namespace: backup
+spec:
+  concurrencyPolicy: Forbid
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 1800
+      backoffLimit: 1
+      template:
+        spec:
+          containers:
+            - args:
+                - "set -euo pipefail\necho \"=== Shared subfolders restore drill starting\
+                  \ ===\"\n\n# Create rclone config (same as backup script)\nmkdir\
+                  \ -p \"$HOME/.config/rclone\"\nACCESS_KEY=\"$(echo -n \"$AWS_ACCESS_KEY_ID\"\
+                  \ | tr -d '\\n\\r')\"\nSECRET_KEY=\"$(echo -n \"$AWS_SECRET_ACCESS_KEY\"\
+                  \ | tr -d '\\n\\r')\"\n\ncat > \"$HOME/.config/rclone/rclone.conf\"\
+                  \ <<EOF\n[minio]\ntype = s3\nprovider = Minio\nenv_auth = false\n\
+                  access_key_id = $ACCESS_KEY\nsecret_access_key = $SECRET_KEY\nendpoint\
+                  \ = $MINIO_ENDPOINT\nregion = sa-east-1\nforce_path_style = true\n\
+                  EOF\n\necho \"Verifying backup exists in MinIO...\"\n\n# Check that\
+                  \ the current/ folder structure exists\nSMOKE_OK=true\nTOTAL_FILES=0\n\
+                  \nfor folder in notetaking images backups openclaw; do\n  echo \"\
+                  Checking folder: $folder\"\n\n  # Count files in this folder\n \
+                  \ COUNT=$(rclone lsl \"minio:homelab-backup-shared/current/$folder/\"\
+                  \ 2>/dev/null | wc -l || echo \"0\")\n\n  if [ \"$COUNT\" -gt 0\
+                  \ ]; then\n    echo \"OK: folder $folder exists with $COUNT items\"\
+                  \n    TOTAL_FILES=$((TOTAL_FILES + COUNT))\n  else\n    echo \"\
+                  FAIL: folder $folder is empty or missing\"\n    SMOKE_OK=false\n\
+                  \  fi\ndone\n\necho \"Total files in backup: $TOTAL_FILES\"\n\n\
+                  # Verify latest manifest exists\necho \"Checking manifest...\"\n\
+                  LATEST_MANIFEST=$(rclone lsl \"minio:homelab-backup-shared/manifests/\"\
+                  \ 2>/dev/null | sort -k2 | tail -1 || true)\n\nif [ -n \"$LATEST_MANIFEST\"\
+                  \ ]; then\n  echo \"OK: Found manifest - $LATEST_MANIFEST\"\nelse\n\
+                  \  echo \"WARN: No manifest found (backup may not have completed)\"\
+                  \nfi\n\n# Sample verification: download a random file and check\
+                  \ it's not empty\necho \"Sampling verification...\"\nSAMPLE_FILE=$(rclone\
+                  \ lsf \"minio:homelab-backup-shared/current/notetaking/\" 2>/dev/null\
+                  \ | head -1 || true)\n\nif [ -n \"$SAMPLE_FILE\" ]; then\n  echo\
+                  \ \"Downloading sample file: $SAMPLE_FILE\"\n  rclone copy \"minio:homelab-backup-shared/current/notetaking/$SAMPLE_FILE\"\
+                  \ /tmp/sample/ 2>/dev/null || true\n\n  if [ -f \"/tmp/sample/$SAMPLE_FILE\"\
+                  \ ] && [ -s \"/tmp/sample/$SAMPLE_FILE\" ]; then\n    SIZE=$(stat\
+                  \ -c%s \"/tmp/sample/$SAMPLE_FILE\" 2>/dev/null || echo \"unknown\"\
+                  )\n    echo \"OK: Sample file downloaded successfully (size: $SIZE\
+                  \ bytes)\"\n    rm -rf /tmp/sample\n  else\n    echo \"WARN: Could\
+                  \ not verify sample file\"\n  fi\nfi\n\nif [ \"$SMOKE_OK\" = true\
+                  \ ] && [ \"$TOTAL_FILES\" -gt 0 ]; then\n  echo \"smoke OK\"\n \
+                  \ echo \"=== Shared subfolders restore drill complete ===\"\n  exit\
+                  \ 0\nelse\n  echo \"ERROR: Backup verification failed\"\n  exit\
+                  \ 1\nfi\n"
+              command:
+                - bash
+                - -c
+              env:
+                - name: MINIO_ENDPOINT
+                  value: http://10.10.10.209:9000
+                - name: AWS_ACCESS_KEY_ID
+                  valueFrom:
+                    secretKeyRef:
+                      key: AWS_ACCESS_KEY_ID
+                      name: shared-subfolders-backup-s3-credentials
+                - name: AWS_SECRET_ACCESS_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      key: AWS_SECRET_ACCESS_KEY
+                      name: shared-subfolders-backup-s3-credentials
+              image: ghcr.io/josevictorferreira/backup-toolbox@sha256:08bda3ee3383b093cc0ed74d42ed9b167ecb92dd7c01e090a542d0a75dec8abb
+              name: restore
+              resources:
+                limits:
+                  cpu: 500m
+                  ephemeral-storage: 8Gi
+                  memory: 512Mi
+                requests:
+                  cpu: 100m
+                  ephemeral-storage: 4Gi
+                  memory: 256Mi
+          imagePullSecrets:
+            - name: ghcr-registry-secret
+          restartPolicy: Never
+  schedule: 0 4 * * 0
+  successfulJobsHistoryLimit: 3
+  timeZone: America/Sao_Paulo

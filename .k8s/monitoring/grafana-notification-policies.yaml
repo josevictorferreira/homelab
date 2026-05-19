@@ -1,0 +1,15 @@
+apiVersion: v1
+data:
+  notification-policies.yaml: "apiVersion: 1\npolicies:\n- group_by:\n  - alertname\n\
+    \  - namespace\n  - severity\n  group_interval: 5m\n  group_wait: 30s\n  orgId:\
+    \ 1\n  receiver: Matrix\n  repeat_interval: 4h\n  routes:\n  - continue: false\n\
+    \    matchers: []\n    receiver: Matrix\n"
+kind: ConfigMap
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    grafana_alerting_notifications: 'true'
+  name: grafana-alerting-notification-policies
+  namespace: monitoring
