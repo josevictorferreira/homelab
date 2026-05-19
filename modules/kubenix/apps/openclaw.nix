@@ -45,15 +45,6 @@ let
       echo "Plugins already synced, skipping copy."
     fi
 
-    if [ "$needs_sync" = true ]; then
-      rm -rf "$EXTENSIONS_DIR"
-      mkdir -p "$EXTENSIONS_DIR"
-      cp -a /opt/openclaw-debian/extensions/. "$EXTENSIONS_DIR/"
-      touch "$EXTENSIONS_DIR/.synced"
-      echo "Plugin sync complete."
-    else
-      echo "Plugins already synced, skipping copy."
-    fi
 
     echo "Using shared config directly from $SHARED_CONFIG"
     cd "$STATE_DIR"
