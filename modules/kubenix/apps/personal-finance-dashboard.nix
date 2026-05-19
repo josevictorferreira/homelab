@@ -25,7 +25,7 @@ in
               {
                 inherit name;
                 image = "ghcr.io/josevictorferreira/personal-finances:latest";
-                imagePullPolicy = "IfNotPresent";
+                imagePullPolicy = "Always";
                 ports = [
                   {
                     name = "http";
