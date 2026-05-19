@@ -37,6 +37,10 @@ in
       MATRIX_HOME_ROOM = kubenix.lib.secretsFor "hermes_matrix_home_room";
       MATRIX_REQUIRE_MENTION = kubenix.lib.secretsFor "hermes_matrix_require_mention";
       MATRIX_AUTO_THREAD = kubenix.lib.secretsFor "hermes_matrix_auto_thread";
+
+      # Profile-specific Matrix tokens for multi-agent deployment
+      HERMES_KIRA_MATRIX_ACCESS_TOKEN = kubenix.lib.secretsFor "hermes_kira_matrix_access_token";
+      HERMES_MEL_MATRIX_ACCESS_TOKEN = kubenix.lib.secretsFor "hermes_mel_matrix_access_token";
     };
   };
 }
