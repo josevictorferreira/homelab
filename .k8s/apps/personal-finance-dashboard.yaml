@@ -30,6 +30,8 @@ spec:
               readOnly: false
       imagePullSecrets:
         - name: ghcr-registry-secret
+      securityContext:
+        fsGroup: 100
       volumes:
         - name: cephfs
           persistentVolumeClaim:
