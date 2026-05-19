@@ -35,10 +35,14 @@ let
     mkdir -p "$STATE_DIR/logs" "$STATE_DIR/tmp"
 
     echo "Syncing tested plugin bundle into persisted local state..."
-    needs_sync=false
     if [ ! -f "$EXTENSIONS_DIR/.synced" ]; then
-      needs_sync=true
+      rm -rf "$EXTENSIONS_DIR"
+      mkdir -p "$EXTENSIONS_DIR"
+      cp -a /opt/openclaw-debian/extensions/. "$EXTENSIONS_DIR/"
+      touch "$EXTENSIONS_DIR/.synced"
+      echo "Plugin sync complete."
     else
+      echo "Plugins already synced, skipping copy."
     fi
 
     if [ "$needs_sync" = true ]; then

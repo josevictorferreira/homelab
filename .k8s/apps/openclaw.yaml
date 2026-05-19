@@ -48,9 +48,12 @@ spec:
               \ \"$LOCAL_DIR/bin\" \"$LOCAL_DIR/lib/node_modules\" \"$STATE_DIR\"\
               \ \"$EXTENSIONS_DIR\" \"$PLUGIN_STAGE_DIR\"\nmkdir -p \"$STATE_DIR/logs\"\
               \ \"$STATE_DIR/tmp\"\n\necho \"Syncing tested plugin bundle into persisted\
-              \ local state...\"\nneeds_sync=false\nif [ ! -f \"$EXTENSIONS_DIR/.synced\"\
-              \ ]; then\n  needs_sync=true\nelse\nfi\n\nif [ \"$needs_sync\" = true\
-              \ ]; then\n  rm -rf \"$EXTENSIONS_DIR\"\n  mkdir -p \"$EXTENSIONS_DIR\"\
+              \ local state...\"\nif [ ! -f \"$EXTENSIONS_DIR/.synced\" ]; then\n\
+              \  rm -rf \"$EXTENSIONS_DIR\"\n  mkdir -p \"$EXTENSIONS_DIR\"\n  cp\
+              \ -a /opt/openclaw-debian/extensions/. \"$EXTENSIONS_DIR/\"\n  touch\
+              \ \"$EXTENSIONS_DIR/.synced\"\n  echo \"Plugin sync complete.\"\nelse\n\
+              \  echo \"Plugins already synced, skipping copy.\"\nfi\n\nif [ \"$needs_sync\"\
+              \ = true ]; then\n  rm -rf \"$EXTENSIONS_DIR\"\n  mkdir -p \"$EXTENSIONS_DIR\"\
               \n  cp -a /opt/openclaw-debian/extensions/. \"$EXTENSIONS_DIR/\"\n \
               \ touch \"$EXTENSIONS_DIR/.synced\"\n  echo \"Plugin sync complete.\"\
               \nelse\n  echo \"Plugins already synced, skipping copy.\"\nfi\n\necho\
