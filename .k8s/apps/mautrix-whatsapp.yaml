@@ -1,0 +1,100 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: mautrix-whatsapp
+  namespace: apps
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mautrix-whatsapp
+  template:
+    metadata:
+      labels:
+        app: mautrix-whatsapp
+    spec:
+      containers:
+        - image: dock.mau.dev/mautrix/whatsapp:v0.2603.0@sha256:221ccbdc7d811c230fc125ccc1c0707223edab9017608fb2f6110eb5d073b0b7
+          name: mautrix-whatsapp
+          ports:
+            - containerPort: 29318
+              name: http
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 256Mi
+          volumeMounts:
+            - mountPath: /data
+              name: data
+      imagePullSecrets:
+        - name: mau-registry-secret
+      initContainers:
+        - command:
+            - sh
+            - -c
+            - 'cp /config-src/config.yaml /data/config.yaml
+
+              cp /registration-src/registration.yaml /data/registration.yaml
+
+              chmod 644 /data/config.yaml /data/registration.yaml
+
+              '
+          image: busybox:1.37
+          name: copy-config
+          volumeMounts:
+            - mountPath: /data
+              name: data
+            - mountPath: /config-src
+              name: config
+              readOnly: true
+            - mountPath: /registration-src
+              name: registration
+              readOnly: true
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: mautrix-whatsapp
+        - name: config
+          secret:
+            secretName: mautrix-whatsapp-config
+        - name: registration
+          secret:
+            secretName: mautrix-whatsapp-registration
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: mautrix-whatsapp
+  namespace: apps
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: rook-ceph-block
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: mautrix-whatsapp
+  namespace: apps
+spec:
+  ports:
+    - name: http
+      port: 29318
+      targetPort: 29318
+  selector:
+    app: mautrix-whatsapp
