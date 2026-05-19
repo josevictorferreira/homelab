@@ -44,6 +44,145 @@ let
     volumeName = "cli-wrapper";
   };
 
+  # Common env vars shared across all gateway containers.
+  commonEnv = [
+    {
+      name = "HERMES_UID";
+      value = "10000";
+    }
+    {
+      name = "HERMES_GID";
+      value = "2002";
+    }
+    {
+      name = "HERMES_HOME";
+      value = "/opt/data";
+    }
+    {
+      name = "TZ";
+      value = homelab.timeZone;
+    }
+    {
+      name = "AGENT_BROWSER_ENGINE";
+      value = "lightpanda";
+    }
+    {
+      name = "AGENT_BROWSER_ENDPOINT";
+      value = "http://lightpanda.${namespace}.svc.cluster.local:9222";
+    }
+    {
+      name = "HINDSIGHT_MODE";
+      value = "local_external";
+    }
+    {
+      name = "HINDSIGHT_API_URL";
+      value = "http://hindsight-api.${namespace}.svc.cluster.local:8888";
+    }
+    {
+      name = "HINDSIGHT_BANK_ID";
+      value = "hermes";
+    }
+    {
+      name = "HINDSIGHT_BUDGET";
+      value = "mid";
+    }
+    {
+      name = "HINDSIGHT_API_KEY";
+      value = "dummy";
+    }
+    {
+      name = "HINDSIGHT_LLM_API_KEY";
+      value = "dummy";
+    }
+    {
+      name = "PATH";
+      value = "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/hermes/.venv/bin";
+    }
+    {
+      name = "PYTHONPATH";
+      value = "/opt/data/.local/lib/python3.13/site-packages";
+    }
+  ];
+
+  # Per-profile gateway containers.
+  gatewayProfiles = [
+    {
+      profile = "ted";
+      profileFlag = "ted";
+      matrixSecretKey = "MATRIX_ACCESS_TOKEN";
+    }
+    {
+      profile = "kira";
+      profileFlag = "kira";
+      matrixSecretKey = "HERMES_KIRA_MATRIX_ACCESS_TOKEN";
+    }
+    {
+      profile = "mel";
+      profileFlag = "mel";
+      matrixSecretKey = "HERMES_MEL_MATRIX_ACCESS_TOKEN";
+    }
+  ];
+
+  gatewayContainer =
+    {
+      profile,
+      profileFlag,
+      matrixSecretKey,
+    }:
+    let
+      containerName = "gateway-${profile}";
+      cmdArgs =
+        if profileFlag != null then
+          [
+            "-p"
+            profileFlag
+            "gateway"
+            "run"
+          ]
+        else
+          [
+            "gateway"
+            "run"
+          ];
+    in
+    {
+      name = containerName;
+      inherit image;
+      imagePullPolicy = "IfNotPresent";
+      args = cmdArgs;
+      env = commonEnv ++ [
+        {
+          name = "MATRIX_ACCESS_TOKEN";
+          valueFrom.secretKeyRef = {
+            name = "${name}-env";
+            key = matrixSecretKey;
+          };
+        }
+      ];
+      envFrom = envFromSecret;
+      volumeMounts = dataVolumeMounts ++ [
+        {
+          name = cliWrapper.volumeName;
+          mountPath = cliWrapper.mountPath;
+          subPath = "hermes";
+        }
+      ];
+      resources = {
+        requests = {
+          cpu = "100m";
+          memory = "256Mi";
+        };
+        limits = {
+          cpu = "500m";
+        };
+      };
+      securityContext = commonSecurityContext // {
+        runAsUser = 0;
+      };
+    };
+
+  containers = map gatewayContainer gatewayProfiles;
+
 in
 {
   kubernetes.resources.configMaps."${cliWrapper.name}" = {
