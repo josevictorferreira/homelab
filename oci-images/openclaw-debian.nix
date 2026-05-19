@@ -1,7 +1,11 @@
 { pkgs, lib }:
 
 let
-  baseImage = /nix/store/wv99byzkvph4j9m0bqbm0c7wb21kgqyk-openclaw-debian-base.tar;
+  baseImage = pkgs.dockerTools.pullImage {
+    imageName = "ghcr.io/openclaw/openclaw";
+    imageDigest = "sha256:5ea30d02a706c49795ed0a3c1526dec51ed90107a6859e93bf27a663105d1c28";
+    sha256 = "sha256-EPiQ6YZM2ATYqay1uMUBeL/PJP4KwNyGL2U2plPqGG0=";
+  };
 
   losslessClawVersion = "0.10.0";
   losslessClawSource = pkgs.fetchurl {
@@ -49,7 +53,10 @@ let
   toolsEnv = pkgs.buildEnv {
     name = "openclaw-tools-env";
     paths = allPkgs;
-    pathsToLink = [ "/lib" "/share" ];
+    pathsToLink = [
+      "/lib"
+      "/share"
+    ];
   };
 
   toolsRoot = pkgs.runCommand "openclaw-tools-root" { } ''
@@ -108,9 +115,12 @@ let
 in
 pkgs.dockerTools.buildImage {
   name = "localhost/openclaw-debian";
-  tag = "2026.5.12-luna-hindsight-lossless-v0.10.0";
+  tag = "2026.5.18-luna-hindsight-lossless-v0.10.0";
   fromImage = baseImage;
-  copyToRoot = [ toolsRoot losslessClawOverlay ];
+  copyToRoot = [
+    toolsRoot
+    losslessClawOverlay
+  ];
   extraCommands = ''
     mkdir -p ./usr/local/share/fonts
     ${pkgs.fontconfig}/bin/fc-cache -f ./usr/local/share/fonts 2>/dev/null || true
