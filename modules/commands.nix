@@ -1,9 +1,9 @@
 # Nix-based CLI commands for homelab management
 # All logic lives here; Makefile just calls `nix run .#<command>`
-{ pkgs
-, lib
-, deploy-rs-pkg ? null
-,
+{
+  pkgs,
+  lib,
+  deploy-rs-pkg ? null,
 }:
 
 let
@@ -558,7 +558,7 @@ let
   push-openclaw-debian =
     let
       openclawDebianImageName = "openclaw-debian";
-      openclawDebianVersion = "2026.5.12-luna-hindsight-lossless-v0.10.0";
+      openclawDebianVersion = "2026.5.18-luna-hindsight-lossless-v0.10.0";
     in
     mkCommand "push-openclaw-debian" "Build and push openclaw-debian image with extra tools to GHCR"
       [
@@ -706,7 +706,6 @@ let
         print(f"Layers: {len(layers)}")
         '
       '';
-
 
   # ============================================================================
   # PostgreSQL with pgvector + vchord extensions
