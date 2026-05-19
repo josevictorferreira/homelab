@@ -867,6 +867,13 @@ Our cluster is deployed and accessible in the user system kubectl, the context a
 **Context:** OpenClaw v2026.5.18 removed `silentReply`/`silentReplyRewrite` keys. The gateway silently fails with "Invalid config" — no clear pointer to which key is invalid.
 **Verify:** `kubectl logs -n apps deploy/openclaw -c main --tail=30 | grep -i 'invalid config'` shows no matches after upgrade.
 
+### Verify Inline Startup Scripts Locally Before Deploying
+**Lesson:** After editing container startup scripts embedded in kubenix Nix files (in `command` or `args` fields),
+extract the script string and syntax-check it with `bash -n` before committing.
+The deploy > CrashLoopBackOff > fix > re-deploy cycle costs 5-7 min per iteration.
+**Context:** Removing the lossless-claw version check left an empty `else` block (syntax error)
+and an orphaned `$needs_sync` variable (unbound error) both caught only after pod CrashLoopBackOff.
+**Verify:** `bash -n <<< "$script"` on the extracted startup script string before commit.
 ### Glance
 
 #### Glance custom-api Widgets Need Explicit Timeout for External APIs
