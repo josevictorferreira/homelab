@@ -52,12 +52,8 @@ spec:
               \  rm -rf \"$EXTENSIONS_DIR\"\n  mkdir -p \"$EXTENSIONS_DIR\"\n  cp\
               \ -a /opt/openclaw-debian/extensions/. \"$EXTENSIONS_DIR/\"\n  touch\
               \ \"$EXTENSIONS_DIR/.synced\"\n  echo \"Plugin sync complete.\"\nelse\n\
-              \  echo \"Plugins already synced, skipping copy.\"\nfi\n\nif [ \"$needs_sync\"\
-              \ = true ]; then\n  rm -rf \"$EXTENSIONS_DIR\"\n  mkdir -p \"$EXTENSIONS_DIR\"\
-              \n  cp -a /opt/openclaw-debian/extensions/. \"$EXTENSIONS_DIR/\"\n \
-              \ touch \"$EXTENSIONS_DIR/.synced\"\n  echo \"Plugin sync complete.\"\
-              \nelse\n  echo \"Plugins already synced, skipping copy.\"\nfi\n\necho\
-              \ \"Using shared config directly from $SHARED_CONFIG\"\ncd \"$STATE_DIR\"\
+              \  echo \"Plugins already synced, skipping copy.\"\nfi\n\n\necho \"\
+              Using shared config directly from $SHARED_CONFIG\"\ncd \"$STATE_DIR\"\
               \nexec node /app/openclaw.mjs gateway --port 18789 --bind lan --allow-unconfigured\
               \ --verbose\n"
           env:
