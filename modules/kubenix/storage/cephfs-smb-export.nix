@@ -1,4 +1,4 @@
-{ homelab, ... }:
+{ kubenix, homelab, ... }:
 
 let
   namespace = homelab.kubernetes.namespaces.storage;
@@ -60,6 +60,7 @@ in
       metadata = {
         name = appName;
         inherit namespace;
+        annotations = kubenix.lib.serviceAnnotationFor "smb";
         labels = {
           app = appName;
         };
