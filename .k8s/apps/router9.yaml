@@ -6,13 +6,13 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/controller: main
-    app.kubernetes.io/instance: 9router
+    app.kubernetes.io/instance: router9
     app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: 9router
+    app.kubernetes.io/name: router9
     helm.sh/chart: app-template-4.2.0
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
-  name: 9router
+  name: router9
   namespace: apps
 spec:
   replicas: 1
@@ -20,22 +20,22 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/controller: main
-      app.kubernetes.io/instance: 9router
-      app.kubernetes.io/name: 9router
+      app.kubernetes.io/instance: router9
+      app.kubernetes.io/name: router9
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
         app.kubernetes.io/controller: main
-        app.kubernetes.io/instance: 9router
-        app.kubernetes.io/name: 9router
+        app.kubernetes.io/instance: router9
+        app.kubernetes.io/name: router9
     spec:
       automountServiceAccountToken: true
       containers:
         - envFrom:
             - secretRef:
-                name: 9router-env
+                name: router9-env
           image: ghcr.io/decolua/9router:0.4.55@sha256:48e3b553a4c94e7eeb8ff8f6c865f34d368141a5f82adb8539034a6dd3d48029
           imagePullPolicy: IfNotPresent
           name: main
@@ -57,10 +57,10 @@ spec:
       volumes:
         - name: data
           persistentVolumeClaim:
-            claimName: 9router-data
+            claimName: router9-data
         - name: dataHome
           persistentVolumeClaim:
-            claimName: 9router-datahome
+            claimName: router9-datahome
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -69,13 +69,13 @@ metadata:
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   labels:
-    app.kubernetes.io/instance: 9router
+    app.kubernetes.io/instance: router9
     app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: 9router
+    app.kubernetes.io/name: router9
     helm.sh/chart: app-template-4.2.0
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
-  name: 9router-data
+  name: router9-data
   namespace: apps
 spec:
   accessModes:
@@ -92,13 +92,13 @@ metadata:
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   labels:
-    app.kubernetes.io/instance: 9router
+    app.kubernetes.io/instance: router9
     app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: 9router
+    app.kubernetes.io/name: router9
     helm.sh/chart: app-template-4.2.0
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
-  name: 9router-datahome
+  name: router9-datahome
   namespace: apps
 spec:
   accessModes:
@@ -115,16 +115,16 @@ metadata:
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
     lbipam.cilium.io/ips: 10.10.10.147
-    lbipam.cilium.io/sharing-key: 9router
+    lbipam.cilium.io/sharing-key: router9
   labels:
-    app.kubernetes.io/instance: 9router
+    app.kubernetes.io/instance: router9
     app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: 9router
-    app.kubernetes.io/service: 9router
+    app.kubernetes.io/name: router9
+    app.kubernetes.io/service: router9
     helm.sh/chart: app-template-4.2.0
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
-  name: 9router
+  name: router9
   namespace: apps
 spec:
   ports:
@@ -134,8 +134,8 @@ spec:
       targetPort: 20128
   selector:
     app.kubernetes.io/controller: main
-    app.kubernetes.io/instance: 9router
-    app.kubernetes.io/name: 9router
+    app.kubernetes.io/instance: router9
+    app.kubernetes.io/name: router9
   type: LoadBalancer
 ---
 apiVersion: networking.k8s.io/v1
@@ -145,28 +145,28 @@ metadata:
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   labels:
-    app.kubernetes.io/instance: 9router
+    app.kubernetes.io/instance: router9
     app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: 9router
+    app.kubernetes.io/name: router9
     helm.sh/chart: app-template-4.2.0
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
-  name: 9router
+  name: router9
   namespace: apps
 spec:
   ingressClassName: cilium
   rules:
-    - host: 9router.josevictor.me
+    - host: router9.josevictor.me
       http:
         paths:
           - backend:
               service:
-                name: 9router
+                name: router9
                 port:
                   number: 20128
             path: /
             pathType: Prefix
   tls:
     - hosts:
-        - 9router.josevictor.me
+        - router9.josevictor.me
       secretName: wildcard-tls
