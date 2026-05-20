@@ -153,6 +153,10 @@ let
       args = cmdArgs;
       env = commonEnv ++ [
         {
+          name = "HOME";
+          value = "/opt/data/profiles/${profile}";
+        }
+        {
           name = "MATRIX_ACCESS_TOKEN";
           valueFrom.secretKeyRef = {
             name = "${name}-env";

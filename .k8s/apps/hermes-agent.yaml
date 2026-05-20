@@ -164,6 +164,8 @@ spec:
               value: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/hermes/.venv/bin
             - name: PYTHONPATH
               value: /opt/data/.local/lib/python3.13/site-packages
+            - name: HOME
+              value: /opt/data/profiles/ted
             - name: MATRIX_ACCESS_TOKEN
               valueFrom:
                 secretKeyRef:
@@ -237,6 +239,8 @@ spec:
               value: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/hermes/.venv/bin
             - name: PYTHONPATH
               value: /opt/data/.local/lib/python3.13/site-packages
+            - name: HOME
+              value: /opt/data/profiles/kira
             - name: MATRIX_ACCESS_TOKEN
               valueFrom:
                 secretKeyRef:
@@ -310,6 +314,8 @@ spec:
               value: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/hermes/.venv/bin
             - name: PYTHONPATH
               value: /opt/data/.local/lib/python3.13/site-packages
+            - name: HOME
+              value: /opt/data/profiles/mel
             - name: MATRIX_ACCESS_TOKEN
               valueFrom:
                 secretKeyRef:
