@@ -2,7 +2,7 @@
 
 let
   namespace = homelab.kubernetes.namespaces.applications;
-  app = "9router";
+  app = "router9";
 in
 {
   submodules.instances.${app} = {
