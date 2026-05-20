@@ -67,6 +67,15 @@
         spec = {
           externalIPs = true;
           loadBalancerIPs = true;
+          nodeSelector = {
+            matchExpressions = [
+              {
+                key = "kubernetes.io/arch";
+                operator = "In";
+                values = [ "amd64" ];
+              }
+            ];
+          };
         };
       };
     };

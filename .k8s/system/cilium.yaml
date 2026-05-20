@@ -602,6 +602,12 @@ metadata:
 spec:
   externalIPs: true
   loadBalancerIPs: true
+  nodeSelector:
+    matchExpressions:
+      - key: kubernetes.io/arch
+        operator: In
+        values:
+          - amd64
 ---
 apiVersion: cilium.io/v2alpha1
 kind: CiliumLoadBalancerIPPool
