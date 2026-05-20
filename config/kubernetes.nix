@@ -53,6 +53,7 @@
       homelab-bridge = "10.10.10.144";
       hindsight-api = "10.10.10.145";
       hindsight-cp = "10.10.10.146";
+      "9router" = "10.10.10.147";
 
       nfs = "10.10.10.150";
       grafana = "10.10.10.190";
