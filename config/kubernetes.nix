@@ -113,8 +113,8 @@
     "images"
     "backups"
     "openclaw"
+    "hermes"
     "personal-finances"
     "mel-dynamica"
-    "openclaw-home"
   ];
 }
