@@ -47,7 +47,7 @@ spec:
             - mountPath: /app/data
               name: data
             - mountPath: /app/data-home
-              name: dataHome
+              name: data-home
       dnsPolicy: ClusterFirst
       enableServiceLinks: false
       hostIPC: false
@@ -58,9 +58,9 @@ spec:
         - name: data
           persistentVolumeClaim:
             claimName: router9-data
-        - name: dataHome
+        - name: data-home
           persistentVolumeClaim:
-            claimName: router9-datahome
+            claimName: router9-data-home
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -98,7 +98,7 @@ metadata:
     helm.sh/chart: app-template-4.2.0
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
-  name: router9-datahome
+  name: router9-data-home
   namespace: apps
 spec:
   accessModes:

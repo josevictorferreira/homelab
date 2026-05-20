@@ -31,7 +31,7 @@ in
             }
           ];
         };
-        persistence.dataHome = {
+        persistence.data-home = {
           enabled = true;
           type = "persistentVolumeClaim";
           storageClass = kubenix.lib.defaultStorageClass;

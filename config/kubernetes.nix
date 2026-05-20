@@ -107,4 +107,14 @@
       };
     };
   };
+
+  sharedBackupFolders = [
+    "notetaking"
+    "images"
+    "backups"
+    "openclaw"
+    "personal-finances"
+    "mel-dynamica"
+    "openclaw-home"
+  ];
 }
