@@ -73,14 +73,11 @@ spec:
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
-              add:
-                - SETUID
-                - SETGID
-                - CHOWN
-                - FOWNER
               drop:
                 - ALL
-            runAsUser: 0
+            runAsGroup: 2002
+            runAsNonRoot: true
+            runAsUser: 10000
           volumeMounts:
             - mountPath: /opt/data
               name: hermes-data
@@ -186,14 +183,11 @@ spec:
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
-              add:
-                - SETUID
-                - SETGID
-                - CHOWN
-                - FOWNER
               drop:
                 - ALL
-            runAsUser: 0
+            runAsGroup: 2002
+            runAsNonRoot: true
+            runAsUser: 10000
           volumeMounts:
             - mountPath: /opt/data
               name: hermes-data
@@ -261,14 +255,11 @@ spec:
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
-              add:
-                - SETUID
-                - SETGID
-                - CHOWN
-                - FOWNER
               drop:
                 - ALL
-            runAsUser: 0
+            runAsGroup: 2002
+            runAsNonRoot: true
+            runAsUser: 10000
           volumeMounts:
             - mountPath: /opt/data
               name: hermes-data
@@ -336,14 +327,11 @@ spec:
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
-              add:
-                - SETUID
-                - SETGID
-                - CHOWN
-                - FOWNER
               drop:
                 - ALL
-            runAsUser: 0
+            runAsGroup: 2002
+            runAsNonRoot: true
+            runAsUser: 10000
           volumeMounts:
             - mountPath: /opt/data
               name: hermes-data
@@ -368,11 +356,8 @@ spec:
 ---
 apiVersion: v1
 data:
-  hermes: '#!/bin/sh
-
-    exec gosu 10000:10000 /opt/hermes/.venv/bin/hermes "$@"
-
-    '
+  hermes: "#!/bin/sh\nif [ \"$(id -u)\" = \"0\" ]; then\n  exec gosu 10000:2002 /opt/hermes/.venv/bin/hermes\
+    \ \"$@\"\nfi\nexec /opt/hermes/.venv/bin/hermes \"$@\"\n"
 kind: ConfigMap
 metadata:
   annotations:

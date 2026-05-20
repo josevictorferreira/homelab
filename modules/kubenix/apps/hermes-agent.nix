@@ -27,16 +27,10 @@ let
   ];
   commonSecurityContext = {
     allowPrivilegeEscalation = false;
-    # gosu needs SETUID/SETGID to drop from root → UID 10000.
-    capabilities = {
-      drop = [ "ALL" ];
-      add = [
-        "SETUID"
-        "SETGID"
-        "CHOWN"
-        "FOWNER"
-      ];
-    };
+    runAsNonRoot = true;
+    runAsUser = 10000;
+    runAsGroup = 2002;
+    capabilities.drop = [ "ALL" ];
   };
   cliWrapper = {
     name = "${name}-cli-wrapper";
@@ -181,9 +175,7 @@ let
           cpu = "500m";
         };
       };
-      securityContext = commonSecurityContext // {
-        runAsUser = 0;
-      };
+      securityContext = commonSecurityContext;
     };
 
   containers = map gatewayContainer gatewayProfiles;
@@ -194,13 +186,15 @@ in
     metadata.namespace = namespace;
     data.hermes = ''
       #!/bin/sh
-      exec gosu 10000:10000 /opt/hermes/.venv/bin/hermes "$@"
+      if [ "$(id -u)" = "0" ]; then
+        exec gosu 10000:2002 /opt/hermes/.venv/bin/hermes "$@"
+      fi
+      exec /opt/hermes/.venv/bin/hermes "$@"
     '';
   };
 
-  # No init container: CephFS rejects chown from unprivileged-capability containers.
-  # The hermes entrypoint runs as root (UID 0), then gosu-drops to UID 10000.
-  # Its internal chown tolerates failure on CephFS (continues with warning).
+  # Run directly as the hermes runtime user. With per-profile HERMES_HOME on
+  # CephFS, root without DAC capabilities cannot traverse the 0700 profile dirs.
   kubernetes.resources.deployments."${name}-gateway" = {
     metadata = {
       name = "${name}-gateway";
@@ -327,9 +321,7 @@ in
                   memory = "512Mi";
                 };
               };
-              securityContext = commonSecurityContext // {
-                runAsUser = 0;
-              };
+              securityContext = commonSecurityContext;
               readinessProbe = {
                 tcpSocket.port = 9119;
                 initialDelaySeconds = 15;
