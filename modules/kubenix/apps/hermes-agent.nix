@@ -55,10 +55,6 @@ let
       value = "2002";
     }
     {
-      name = "HERMES_HOME";
-      value = "/opt/data";
-    }
-    {
       name = "TZ";
       value = homelab.timeZone;
     }
@@ -154,6 +150,10 @@ let
       env = commonEnv ++ [
         {
           name = "HOME";
+          value = "/opt/data/profiles/${profile}";
+        }
+        {
+          name = "HERMES_HOME";
           value = "/opt/data/profiles/${profile}";
         }
         {
