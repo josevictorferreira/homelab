@@ -156,6 +156,46 @@ let
     </div>
   '';
 
+  openrouterTemplate = ''
+    {{ $totalCredits := .JSON.Float "data.total_credits" }}
+    {{ $totalUsage := .JSON.Float "data.total_usage" }}
+    {{ $remaining := sub $totalCredits $totalUsage }}
+    {{ $pctUsed := 0.0 }}
+    {{ if gt $totalCredits 0.0 }}
+      {{ $pctUsed = mul (div $totalUsage $totalCredits) 100.0 }}
+    {{ end }}
+
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <span style="background-color: var(--color-primary); color: var(--color-text-highlight); padding: 2px 10px; border-radius: 4px; font-size: 12px; font-weight: 600;">OpenRouter</span>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 4px;">
+        <div style="display: flex; justify-content: space-between; font-size: 11px;">
+          <span class="color-paragraph">Credits Used</span>
+          <span>''${{ printf "%.2f" $totalUsage }}/''${{ printf "%.2f" $totalCredits }}</span>
+        </div>
+        <div style="background-color: var(--color-separator); border-radius: 4px; height: 8px; overflow: hidden;">
+          <div style="background-color: var(--color-primary); height: 100%; width: {{ $pctUsed | toInt }}%; border-radius: 4px; transition: width 0.3s;"></div>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 4px;">
+        <div style="display: flex; justify-content: space-between; font-size: 11px;">
+          <span class="color-paragraph">Remaining</span>
+          <span>''${{ printf "%.2f" $remaining }}</span>
+        </div>
+        <div style="background-color: var(--color-separator); border-radius: 4px; height: 8px; overflow: hidden;">
+          <div style="background-color: var(--color-positive); height: 100%; width: {{ sub 100.0 $pctUsed | toInt }}%; border-radius: 4px; transition: width 0.3s;"></div>
+        </div>
+      </div>
+
+      <ul class="list-horizontal-text" style="font-size: 11px;">
+        <li>''${{ printf "%.2f" $totalCredits }} total</li>
+      </ul>
+    </div>
+  '';
+
   weatherSevenDayTemplate = ''
     {{/* THESE VALUES CAN BE CHANGED BY ADDING AN ENTRY TO THE OPTIONS SECTION */}}
       {{ $temp_unit := .Options.StringOr "temp_unit" "celsius" }}
@@ -573,6 +613,18 @@ let
                   Authorization = "Bearer ${kubenix.lib.secretsFor "alibaba_coding_plan_api_key"}";
                 };
                 template = zaiCodeTemplate;
+              }
+              {
+                type = "custom-api";
+                title = "OpenRouter";
+                cache = "30m";
+                timeout = "30s";
+                method = "GET";
+                url = "https://openrouter.ai/api/v1/credits";
+                headers = {
+                  Authorization = "Bearer ${kubenix.lib.secretsFor "openrouter_api_key_openclaw"}";
+                };
+                template = openrouterTemplate;
               }
             ];
           }
