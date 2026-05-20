@@ -62,10 +62,8 @@ spec:
               value: '8888'
             - name: HINDSIGHT_API_REFLECT_LLM_MODEL
               value: openai/gpt-oss-120b
-            - name: HINDSIGHT_API_RERANKER_LITELLM_SDK_API_BASE
-              value: https://ai.api.nvidia.com/v1
             - name: HINDSIGHT_API_RERANKER_LITELLM_SDK_MODEL
-              value: nvidia_nim/nvidia/llama-3_2-nv-rerankqa-1b-v2
+              value: jina_ai/jina-reranker-v2-base-multilingual
             - name: HINDSIGHT_API_RERANKER_PROVIDER
               value: litellm-sdk
             - name: HINDSIGHT_API_RETAIN_LLM_MAX_RETRIES
