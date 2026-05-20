@@ -181,6 +181,11 @@ let
         type = databasesType;
         description = "Options related to databases that needed to be created in the cluster.";
       };
+      sharedBackupFolders = mkOption {
+        type = t.listOf t.str;
+        description = "List of folder names in shared storage that need to be backed up.";
+        default = [];
+      };
     };
   };
 
