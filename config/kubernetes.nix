@@ -109,12 +109,14 @@
   };
 
   sharedBackupFolders = [
-    "notetaking"
-    "images"
+    "3d-models"
     "backups"
-    "openclaw"
+    "books"
+    "images"
     "hermes"
-    "personal-finances"
     "mel-dynamica"
+    "notetaking"
+    "openclaw"
+    "personal-finances"
   ];
 }
