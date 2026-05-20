@@ -140,8 +140,6 @@ spec:
               value: '10000'
             - name: HERMES_GID
               value: '2002'
-            - name: HERMES_HOME
-              value: /opt/data
             - name: TZ
               value: America/Sao_Paulo
             - name: AGENT_BROWSER_ENGINE
@@ -165,6 +163,8 @@ spec:
             - name: PYTHONPATH
               value: /opt/data/.local/lib/python3.13/site-packages
             - name: HOME
+              value: /opt/data/profiles/ted
+            - name: HERMES_HOME
               value: /opt/data/profiles/ted
             - name: MATRIX_ACCESS_TOKEN
               valueFrom:
@@ -215,8 +215,6 @@ spec:
               value: '10000'
             - name: HERMES_GID
               value: '2002'
-            - name: HERMES_HOME
-              value: /opt/data
             - name: TZ
               value: America/Sao_Paulo
             - name: AGENT_BROWSER_ENGINE
@@ -240,6 +238,8 @@ spec:
             - name: PYTHONPATH
               value: /opt/data/.local/lib/python3.13/site-packages
             - name: HOME
+              value: /opt/data/profiles/kira
+            - name: HERMES_HOME
               value: /opt/data/profiles/kira
             - name: MATRIX_ACCESS_TOKEN
               valueFrom:
@@ -290,8 +290,6 @@ spec:
               value: '10000'
             - name: HERMES_GID
               value: '2002'
-            - name: HERMES_HOME
-              value: /opt/data
             - name: TZ
               value: America/Sao_Paulo
             - name: AGENT_BROWSER_ENGINE
@@ -315,6 +313,8 @@ spec:
             - name: PYTHONPATH
               value: /opt/data/.local/lib/python3.13/site-packages
             - name: HOME
+              value: /opt/data/profiles/mel
+            - name: HERMES_HOME
               value: /opt/data/profiles/mel
             - name: MATRIX_ACCESS_TOKEN
               valueFrom:
