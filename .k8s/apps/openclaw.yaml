@@ -91,7 +91,7 @@ spec:
           envFrom:
             - secretRef:
                 name: openclaw-config
-          image: ghcr.io/josevictorferreira/openclaw-debian:2026.5.19@sha256:e0a5f8e795da0ae55e0029b3dce972bbc04fe18d355f064047b51d1770e640b1
+          image: ghcr.io/josevictorferreira/openclaw-debian:2026.5.20@sha256:e0a5f8e795da0ae55e0029b3dce972bbc04fe18d355f064047b51d1770e640b1
           imagePullPolicy: Always
           livenessProbe:
             failureThreshold: 3
