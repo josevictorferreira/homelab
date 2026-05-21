@@ -3,8 +3,8 @@
 let
   baseImage = pkgs.dockerTools.pullImage {
     imageName = "ghcr.io/openclaw/openclaw";
-    imageDigest = "sha256:5ea30d02a706c49795ed0a3c1526dec51ed90107a6859e93bf27a663105d1c28";
-    sha256 = "sha256-EPiQ6YZM2ATYqay1uMUBeL/PJP4KwNyGL2U2plPqGG0=";
+    imageDigest = "sha256:29ae4f057b3a1bdeb71096550ca7f3e09966d4a415b208a287aa6b1ec0a04099";
+    sha256 = "sha256-EdN0IoPUbs7tIwNqonjo1jCFIuohQhA73rUYDEf4q68=";
   };
 
   losslessClawVersion = "0.10.0";
@@ -102,7 +102,7 @@ let
 in
 pkgs.dockerTools.buildImage {
   name = "localhost/openclaw-debian";
-  tag = "2026.5.18-luna-hindsight";
+  tag = "2026.5.19";
   fromImage = baseImage;
   copyToRoot = [
     toolsRoot
