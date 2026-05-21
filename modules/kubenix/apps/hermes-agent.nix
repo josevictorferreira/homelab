@@ -143,26 +143,36 @@ let
     }:
     let
       containerName = "gateway-${profile}";
+      pipBootstrap = ''
+        command -v pip >/dev/null 2>&1 || command -v pip3 >/dev/null 2>&1 || {
+          python3 -c "import urllib.request; exec(urllib.request.urlopen('https://bootstrap.pypa.io/get-pip.py').read())" --user -q 2>/dev/null || true
+        }
+      '';
       cmdArgs =
         if profileFlag != null then
           [
-            "hermes"
-            "-p"
-            profileFlag
-            "gateway"
-            "run"
+            "/bin/sh"
+            "-c"
+            ''
+              ${pipBootstrap}
+              exec hermes -p ${profileFlag} gateway run
+            ''
           ]
         else
           [
-            "gateway"
-            "run"
+            "/bin/sh"
+            "-c"
+            ''
+              ${pipBootstrap}
+              exec gateway run
+            ''
           ];
     in
     {
       name = containerName;
       inherit image;
       imagePullPolicy = "IfNotPresent";
-      args = cmdArgs;
+      command = cmdArgs;
       env = commonEnv ++ [
         {
           name = "HOME";

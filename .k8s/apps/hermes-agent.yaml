@@ -132,12 +132,12 @@ spec:
         component: gateway
     spec:
       containers:
-        - args:
-            - hermes
-            - -p
-            - ted
-            - gateway
-            - run
+        - command:
+            - /bin/sh
+            - -c
+            - "command -v pip >/dev/null 2>&1 || command -v pip3 >/dev/null 2>&1 ||\
+              \ {\n  python3 -c \"import urllib.request; exec(urllib.request.urlopen('https://bootstrap.pypa.io/get-pip.py').read())\"\
+              \ --user -q 2>/dev/null || true\n}\n\nexec hermes -p ted gateway run\n"
           env:
             - name: HERMES_UID
               value: '10000'
@@ -216,12 +216,12 @@ spec:
             - mountPath: /usr/local/bin/hermes
               name: cli-wrapper
               subPath: hermes
-        - args:
-            - hermes
-            - -p
-            - kira
-            - gateway
-            - run
+        - command:
+            - /bin/sh
+            - -c
+            - "command -v pip >/dev/null 2>&1 || command -v pip3 >/dev/null 2>&1 ||\
+              \ {\n  python3 -c \"import urllib.request; exec(urllib.request.urlopen('https://bootstrap.pypa.io/get-pip.py').read())\"\
+              \ --user -q 2>/dev/null || true\n}\n\nexec hermes -p kira gateway run\n"
           env:
             - name: HERMES_UID
               value: '10000'
@@ -300,12 +300,12 @@ spec:
             - mountPath: /usr/local/bin/hermes
               name: cli-wrapper
               subPath: hermes
-        - args:
-            - hermes
-            - -p
-            - mel
-            - gateway
-            - run
+        - command:
+            - /bin/sh
+            - -c
+            - "command -v pip >/dev/null 2>&1 || command -v pip3 >/dev/null 2>&1 ||\
+              \ {\n  python3 -c \"import urllib.request; exec(urllib.request.urlopen('https://bootstrap.pypa.io/get-pip.py').read())\"\
+              \ --user -q 2>/dev/null || true\n}\n\nexec hermes -p mel gateway run\n"
           env:
             - name: HERMES_UID
               value: '10000'
