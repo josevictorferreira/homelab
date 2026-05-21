@@ -96,11 +96,23 @@ let
     }
     {
       name = "PATH";
-      value = "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/hermes/.venv/bin";
+      value = "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/hermes/.venv/bin:/opt/data/.local/bin";
     }
     {
       name = "PYTHONPATH";
       value = "/opt/data/.local/lib/python3.13/site-packages";
+    }
+    {
+      name = "PYTHONUSERBASE";
+      value = "/opt/data/.local";
+    }
+    {
+      name = "PIP_USER";
+      value = "true";
+    }
+    {
+      name = "PIP_REQUIRE_VIRTUALENV";
+      value = "false";
     }
   ];
 
