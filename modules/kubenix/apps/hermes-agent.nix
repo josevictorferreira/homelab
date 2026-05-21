@@ -18,6 +18,16 @@ let
       mountPath = "/shared/notetaking";
       subPath = "notetaking";
     }
+    {
+      name = "hermes-data";
+      mountPath = "/shared/mel-dynamica";
+      subPath = "mel-dynamica";
+    }
+    {
+      name = "hermes-data";
+      mountPath = "/shared/personal-finances";
+      subPath = "personal-finances";
+    }
   ];
   dataVolumes = [
     {
