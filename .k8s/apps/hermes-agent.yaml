@@ -410,6 +410,9 @@ spec:
               subPath: hermes
       imagePullSecrets:
         - name: ghcr-registry-secret
+      securityContext:
+        supplementalGroups:
+          - 100
       terminationGracePeriodSeconds: 60
       volumes:
         - name: hermes-data
