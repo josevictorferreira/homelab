@@ -5,7 +5,7 @@ let
   namespace = homelab.kubernetes.namespaces.applications;
   port = 18789;
   host = "openclaw-debian.${homelab.domain}";
-  image = "ghcr.io/josevictorferreira/openclaw-debian:2026.5.19@sha256:2f6d8e9c1ee0cf27682ed9a889a04ccdcf59c028746707f8d1dcf936876e73c5";
+  image = "ghcr.io/josevictorferreira/openclaw-debian:2026.5.19@sha256:e0a5f8e795da0ae55e0029b3dce972bbc04fe18d355f064047b51d1770e640b1";
   startupScript = ''
     set -euo pipefail
 
@@ -45,6 +45,28 @@ let
       echo "Plugins already synced, skipping copy."
     fi
 
+    # Set up in-cluster kubeconfig for kubectl
+    mkdir -p "$HOME/.kube"
+    cat > "$HOME/.kube/config" <<KUBECONFIG_EOF
+    apiVersion: v1
+    kind: Config
+    clusters:
+    - cluster:
+        certificate-authority: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        server: https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_SERVICE_PORT
+      name: ze-homelab
+    contexts:
+    - context:
+        cluster: ze-homelab
+        namespace: ${namespace}
+        user: openclaw
+      name: default
+    current-context: default
+    users:
+    - name: openclaw
+      user:
+        tokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+    KUBECONFIG_EOF
 
     echo "Using shared config directly from $SHARED_CONFIG"
     cd "$STATE_DIR"
@@ -74,7 +96,8 @@ in
         template = {
           metadata.labels.app = name;
           spec = {
-            automountServiceAccountToken = false;
+            serviceAccountName = name;
+            automountServiceAccountToken = true;
             imagePullSecrets = [
               { name = "ghcr-registry-secret"; }
             ];
@@ -294,6 +317,26 @@ in
           }
         ];
       };
+    };
+
+    serviceAccounts.${name} = {
+      metadata = { inherit namespace; };
+    };
+
+    clusterRoleBindings.${name} = {
+      metadata.labels.app = name;
+      roleRef = {
+        apiGroup = "rbac.authorization.k8s.io";
+        kind = "ClusterRole";
+        name = "cluster-admin";
+      };
+      subjects = [
+        {
+          kind = "ServiceAccount";
+          name = name;
+          inherit namespace;
+        }
+      ];
     };
   };
 }
