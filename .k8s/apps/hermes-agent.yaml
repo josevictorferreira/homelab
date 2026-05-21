@@ -135,9 +135,17 @@ spec:
         - command:
             - /bin/sh
             - -c
-            - "command -v pip >/dev/null 2>&1 || command -v pip3 >/dev/null 2>&1 ||\
-              \ {\n  python3 -c \"import urllib.request; exec(urllib.request.urlopen('https://bootstrap.pypa.io/get-pip.py').read())\"\
-              \ --user -q 2>/dev/null || true\n}\n\nexec hermes -p ted gateway run\n"
+            - "        # Bootstrap pip if not present\n        command -v pip >/dev/null\
+              \ 2>&1 || command -v pip3 >/dev/null 2>&1 || {\n          python3 -c\
+              \ \"import urllib.request; exec(urllib.request.urlopen('https://bootstrap.pypa.io/get-pip.py').read())\"\
+              \ --user -q 2>/dev/null || true\n        }\n        # Bootstrap kubectl\
+              \ if not present\n        command -v kubectl >/dev/null 2>&1 || {\n\
+              \          python3 -c \"\nimport urllib.request, os, stat\nurl = 'https://dl.k8s.io/release/v1.32.6/bin/linux/amd64/kubectl'\n\
+              tmp = '/tmp/kubectl'\ndest = '/opt/data/.local/bin/kubectl'\nos.makedirs('/opt/data/.local/bin',\
+              \ exist_ok=True)\nurllib.request.urlretrieve(url, tmp)\nos.chmod(tmp,\
+              \ stat.S_IRWXU | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH)\n\
+              os.rename(tmp, dest)\n\" 2>/dev/null || true\n        }\n\nexec hermes\
+              \ -p ted gateway run\n"
           env:
             - name: HERMES_UID
               value: '10000'
@@ -219,9 +227,17 @@ spec:
         - command:
             - /bin/sh
             - -c
-            - "command -v pip >/dev/null 2>&1 || command -v pip3 >/dev/null 2>&1 ||\
-              \ {\n  python3 -c \"import urllib.request; exec(urllib.request.urlopen('https://bootstrap.pypa.io/get-pip.py').read())\"\
-              \ --user -q 2>/dev/null || true\n}\n\nexec hermes -p kira gateway run\n"
+            - "        # Bootstrap pip if not present\n        command -v pip >/dev/null\
+              \ 2>&1 || command -v pip3 >/dev/null 2>&1 || {\n          python3 -c\
+              \ \"import urllib.request; exec(urllib.request.urlopen('https://bootstrap.pypa.io/get-pip.py').read())\"\
+              \ --user -q 2>/dev/null || true\n        }\n        # Bootstrap kubectl\
+              \ if not present\n        command -v kubectl >/dev/null 2>&1 || {\n\
+              \          python3 -c \"\nimport urllib.request, os, stat\nurl = 'https://dl.k8s.io/release/v1.32.6/bin/linux/amd64/kubectl'\n\
+              tmp = '/tmp/kubectl'\ndest = '/opt/data/.local/bin/kubectl'\nos.makedirs('/opt/data/.local/bin',\
+              \ exist_ok=True)\nurllib.request.urlretrieve(url, tmp)\nos.chmod(tmp,\
+              \ stat.S_IRWXU | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH)\n\
+              os.rename(tmp, dest)\n\" 2>/dev/null || true\n        }\n\nexec hermes\
+              \ -p kira gateway run\n"
           env:
             - name: HERMES_UID
               value: '10000'
@@ -303,9 +319,17 @@ spec:
         - command:
             - /bin/sh
             - -c
-            - "command -v pip >/dev/null 2>&1 || command -v pip3 >/dev/null 2>&1 ||\
-              \ {\n  python3 -c \"import urllib.request; exec(urllib.request.urlopen('https://bootstrap.pypa.io/get-pip.py').read())\"\
-              \ --user -q 2>/dev/null || true\n}\n\nexec hermes -p mel gateway run\n"
+            - "        # Bootstrap pip if not present\n        command -v pip >/dev/null\
+              \ 2>&1 || command -v pip3 >/dev/null 2>&1 || {\n          python3 -c\
+              \ \"import urllib.request; exec(urllib.request.urlopen('https://bootstrap.pypa.io/get-pip.py').read())\"\
+              \ --user -q 2>/dev/null || true\n        }\n        # Bootstrap kubectl\
+              \ if not present\n        command -v kubectl >/dev/null 2>&1 || {\n\
+              \          python3 -c \"\nimport urllib.request, os, stat\nurl = 'https://dl.k8s.io/release/v1.32.6/bin/linux/amd64/kubectl'\n\
+              tmp = '/tmp/kubectl'\ndest = '/opt/data/.local/bin/kubectl'\nos.makedirs('/opt/data/.local/bin',\
+              \ exist_ok=True)\nurllib.request.urlretrieve(url, tmp)\nos.chmod(tmp,\
+              \ stat.S_IRWXU | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH)\n\
+              os.rename(tmp, dest)\n\" 2>/dev/null || true\n        }\n\nexec hermes\
+              \ -p mel gateway run\n"
           env:
             - name: HERMES_UID
               value: '10000'
@@ -455,3 +479,61 @@ spec:
     - hosts:
         - hermes.josevictor.me
       secretName: wildcard-tls
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app: hermes-agent
+  name: hermes-agent-readonly
+rules:
+  - apiGroups:
+      - ''
+    resources:
+      - pods
+      - pods/log
+      - pods/status
+      - nodes
+      - services
+      - endpoints
+      - configmaps
+      - events
+      - namespaces
+      - persistentvolumes
+      - persistentvolumeclaims
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - apps
+    resources:
+      - deployments
+      - statefulsets
+      - daemonsets
+      - replicasets
+    verbs:
+      - get
+      - list
+      - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app: hermes-agent
+  name: hermes-agent-readonly
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: hermes-agent-readonly
+subjects:
+  - kind: ServiceAccount
+    name: default
+    namespace: apps

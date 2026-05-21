@@ -143,10 +143,24 @@ let
     }:
     let
       containerName = "gateway-${profile}";
-      pipBootstrap = ''
-        command -v pip >/dev/null 2>&1 || command -v pip3 >/dev/null 2>&1 || {
-          python3 -c "import urllib.request; exec(urllib.request.urlopen('https://bootstrap.pypa.io/get-pip.py').read())" --user -q 2>/dev/null || true
-        }
+      bootstrap = ''
+                # Bootstrap pip if not present
+                command -v pip >/dev/null 2>&1 || command -v pip3 >/dev/null 2>&1 || {
+                  python3 -c "import urllib.request; exec(urllib.request.urlopen('https://bootstrap.pypa.io/get-pip.py').read())" --user -q 2>/dev/null || true
+                }
+                # Bootstrap kubectl if not present
+                command -v kubectl >/dev/null 2>&1 || {
+                  python3 -c "
+        import urllib.request, os, stat
+        url = 'https://dl.k8s.io/release/v1.32.6/bin/linux/amd64/kubectl'
+        tmp = '/tmp/kubectl'
+        dest = '/opt/data/.local/bin/kubectl'
+        os.makedirs('/opt/data/.local/bin', exist_ok=True)
+        urllib.request.urlretrieve(url, tmp)
+        os.chmod(tmp, stat.S_IRWXU | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH)
+        os.rename(tmp, dest)
+        " 2>/dev/null || true
+                }
       '';
       cmdArgs =
         if profileFlag != null then
@@ -154,7 +168,7 @@ let
             "/bin/sh"
             "-c"
             ''
-              ${pipBootstrap}
+              ${bootstrap}
               exec hermes -p ${profileFlag} gateway run
             ''
           ]
@@ -163,7 +177,7 @@ let
             "/bin/sh"
             "-c"
             ''
-              ${pipBootstrap}
+              ${bootstrap}
               exec gateway run
             ''
           ];
@@ -435,5 +449,62 @@ in
         }
       ];
     };
+  };
+
+  kubernetes.resources.clusterRoles."${name}-readonly" = {
+    metadata.labels.app = name;
+    rules = [
+      {
+        apiGroups = [ "" ];
+        resources = [
+          "pods"
+          "pods/log"
+          "pods/status"
+          "nodes"
+          "services"
+          "endpoints"
+          "configmaps"
+          "events"
+          "namespaces"
+          "persistentvolumes"
+          "persistentvolumeclaims"
+        ];
+        verbs = [
+          "get"
+          "list"
+          "watch"
+        ];
+      }
+      {
+        apiGroups = [ "apps" ];
+        resources = [
+          "deployments"
+          "statefulsets"
+          "daemonsets"
+          "replicasets"
+        ];
+        verbs = [
+          "get"
+          "list"
+          "watch"
+        ];
+      }
+    ];
+  };
+
+  kubernetes.resources.clusterRoleBindings."${name}-readonly" = {
+    metadata.labels.app = name;
+    roleRef = {
+      apiGroup = "rbac.authorization.k8s.io";
+      kind = "ClusterRole";
+      name = "${name}-readonly";
+    };
+    subjects = [
+      {
+        kind = "ServiceAccount";
+        name = "default";
+        namespace = namespace;
+      }
+    ];
   };
 }
