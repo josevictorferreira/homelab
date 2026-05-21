@@ -30,7 +30,7 @@ spec:
                     values:
                       - lab-delta-cp
               weight: 100
-      automountServiceAccountToken: false
+      automountServiceAccountToken: true
       containers:
         - command:
             - /bin/bash
@@ -52,10 +52,17 @@ spec:
               \  rm -rf \"$EXTENSIONS_DIR\"\n  mkdir -p \"$EXTENSIONS_DIR\"\n  cp\
               \ -a /opt/openclaw-debian/extensions/. \"$EXTENSIONS_DIR/\"\n  touch\
               \ \"$EXTENSIONS_DIR/.synced\"\n  echo \"Plugin sync complete.\"\nelse\n\
-              \  echo \"Plugins already synced, skipping copy.\"\nfi\n\n\necho \"\
-              Using shared config directly from $SHARED_CONFIG\"\ncd \"$STATE_DIR\"\
-              \nexec node /app/openclaw.mjs gateway --port 18789 --bind lan --allow-unconfigured\
-              \ --verbose\n"
+              \  echo \"Plugins already synced, skipping copy.\"\nfi\n\n# Set up in-cluster\
+              \ kubeconfig for kubectl\nmkdir -p \"$HOME/.kube\"\ncat > \"$HOME/.kube/config\"\
+              \ <<KUBECONFIG_EOF\napiVersion: v1\nkind: Config\nclusters:\n- cluster:\n\
+              \    certificate-authority: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt\n\
+              \    server: https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_SERVICE_PORT\n\
+              \  name: ze-homelab\ncontexts:\n- context:\n    cluster: ze-homelab\n\
+              \    namespace: apps\n    user: openclaw\n  name: default\ncurrent-context:\
+              \ default\nusers:\n- name: openclaw\n  user:\n    tokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token\n\
+              KUBECONFIG_EOF\n\necho \"Using shared config directly from $SHARED_CONFIG\"\
+              \ncd \"$STATE_DIR\"\nexec node /app/openclaw.mjs gateway --port 18789\
+              \ --bind lan --allow-unconfigured --verbose\n"
           env:
             - name: HOME
               value: /home/node
@@ -84,7 +91,7 @@ spec:
           envFrom:
             - secretRef:
                 name: openclaw-config
-          image: ghcr.io/josevictorferreira/openclaw-debian:2026.5.19@sha256:2f6d8e9c1ee0cf27682ed9a889a04ccdcf59c028746707f8d1dcf936876e73c5
+          image: ghcr.io/josevictorferreira/openclaw-debian:2026.5.19@sha256:e0a5f8e795da0ae55e0029b3dce972bbc04fe18d355f064047b51d1770e640b1
           imagePullPolicy: Always
           livenessProbe:
             failureThreshold: 3
@@ -140,6 +147,7 @@ spec:
               name: openclaw-local
       imagePullSecrets:
         - name: ghcr-registry-secret
+      serviceAccountName: openclaw
       terminationGracePeriodSeconds: 60
       volumes:
         - name: openclaw-shared
@@ -183,6 +191,15 @@ spec:
     app: openclaw
   type: ClusterIP
 ---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: openclaw
+  namespace: apps
+---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -209,3 +226,21 @@ spec:
     - hosts:
         - openclaw-debian.josevictor.me
       secretName: wildcard-tls
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app: openclaw
+  name: openclaw
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+  - kind: ServiceAccount
+    name: openclaw
+    namespace: apps

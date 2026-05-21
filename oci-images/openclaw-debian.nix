@@ -37,6 +37,7 @@ let
     pkgs.less
     pkgs.gnutar
     pkgs.fontconfig
+    pkgs.kubectl
   ];
 
   fontPkgs = [
