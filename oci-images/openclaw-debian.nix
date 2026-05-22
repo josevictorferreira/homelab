@@ -4,7 +4,7 @@ let
   baseImage = pkgs.dockerTools.pullImage {
     imageName = "ghcr.io/openclaw/openclaw";
     imageDigest = "sha256:a2a5cff3b2540236fc6cdc5222327841c6ff19056beb9e34f889aec0cd29b719";
-    sha256 = "sha256-EdN0IoPUbs7tIwNqonjo1jCFIuohQhA73rUYDEf4q68=";
+    sha256 = "sha256-lEisZ1hFEkj/Guqho+GK5bMPKQcyKY9YdC6Btm/SfG8=";
   };
 
   losslessClawVersion = "0.10.0";
