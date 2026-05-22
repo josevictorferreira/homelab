@@ -152,6 +152,10 @@ let
                         command -v pip >/dev/null 2>&1 || command -v pip3 >/dev/null 2>&1 || {
                           python3 -c "import urllib.request; exec(urllib.request.urlopen('https://bootstrap.pypa.io/get-pip.py').read())" --user -q 2>/dev/null || true
                         }
+                        # Bootstrap faster-whisper for audio transcription
+                        python3 -c "import faster_whisper" 2>/dev/null || {
+                          pip install --user -q faster-whisper 2>/dev/null || true
+                        }
                         # Bootstrap kubectl if not present
                         command -v kubectl >/dev/null 2>&1 || {
                           python3 -c "
