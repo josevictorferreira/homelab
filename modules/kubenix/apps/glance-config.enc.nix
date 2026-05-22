@@ -552,6 +552,8 @@ let
                   "openclaw/openclaw"
                   "nousresearch/hermes-agent"
                   "Martian-Engineering/lossless-claw"
+                  "decolua/9router"
+                  "vectorize-io/hindsight"
                   # Work Apps
                   "kong/kong"
                   "keycloak/keycloak"
