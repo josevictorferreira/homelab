@@ -139,10 +139,14 @@ spec:
               \ -v pip >/dev/null 2>&1 || command -v pip3 >/dev/null 2>&1 || {\n \
               \                 python3 -c \"import urllib.request; exec(urllib.request.urlopen('https://bootstrap.pypa.io/get-pip.py').read())\"\
               \ --user -q 2>/dev/null || true\n                }\n               \
-              \ # Bootstrap kubectl if not present\n                command -v kubectl\
-              \ >/dev/null 2>&1 || {\n                  python3 -c \"\nimport urllib.request,\
-              \ os, stat, shutil\nurl = 'https://dl.k8s.io/release/v1.32.6/bin/linux/amd64/kubectl'\n\
-              tmp = '/tmp/kubectl'\ndest = '/opt/data/.local/bin/kubectl'\nos.makedirs('/opt/data/.local/bin',\
+              \ # Bootstrap faster-whisper for audio transcription\n             \
+              \   python3 -c \"import faster_whisper\" 2>/dev/null || {\n        \
+              \          pip install --user -q faster-whisper 2>/dev/null || true\n\
+              \                }\n                # Bootstrap kubectl if not present\n\
+              \                command -v kubectl >/dev/null 2>&1 || {\n         \
+              \         python3 -c \"\nimport urllib.request, os, stat, shutil\nurl\
+              \ = 'https://dl.k8s.io/release/v1.32.6/bin/linux/amd64/kubectl'\ntmp\
+              \ = '/tmp/kubectl'\ndest = '/opt/data/.local/bin/kubectl'\nos.makedirs('/opt/data/.local/bin',\
               \ exist_ok=True)\nurllib.request.urlretrieve(url, tmp)\nos.chmod(tmp,\
               \ stat.S_IRWXU | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH)\n\
               shutil.move(tmp, dest)\n        \" 2>/dev/null || true\n           \
@@ -232,10 +236,14 @@ spec:
               \ -v pip >/dev/null 2>&1 || command -v pip3 >/dev/null 2>&1 || {\n \
               \                 python3 -c \"import urllib.request; exec(urllib.request.urlopen('https://bootstrap.pypa.io/get-pip.py').read())\"\
               \ --user -q 2>/dev/null || true\n                }\n               \
-              \ # Bootstrap kubectl if not present\n                command -v kubectl\
-              \ >/dev/null 2>&1 || {\n                  python3 -c \"\nimport urllib.request,\
-              \ os, stat, shutil\nurl = 'https://dl.k8s.io/release/v1.32.6/bin/linux/amd64/kubectl'\n\
-              tmp = '/tmp/kubectl'\ndest = '/opt/data/.local/bin/kubectl'\nos.makedirs('/opt/data/.local/bin',\
+              \ # Bootstrap faster-whisper for audio transcription\n             \
+              \   python3 -c \"import faster_whisper\" 2>/dev/null || {\n        \
+              \          pip install --user -q faster-whisper 2>/dev/null || true\n\
+              \                }\n                # Bootstrap kubectl if not present\n\
+              \                command -v kubectl >/dev/null 2>&1 || {\n         \
+              \         python3 -c \"\nimport urllib.request, os, stat, shutil\nurl\
+              \ = 'https://dl.k8s.io/release/v1.32.6/bin/linux/amd64/kubectl'\ntmp\
+              \ = '/tmp/kubectl'\ndest = '/opt/data/.local/bin/kubectl'\nos.makedirs('/opt/data/.local/bin',\
               \ exist_ok=True)\nurllib.request.urlretrieve(url, tmp)\nos.chmod(tmp,\
               \ stat.S_IRWXU | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH)\n\
               shutil.move(tmp, dest)\n        \" 2>/dev/null || true\n           \
@@ -325,10 +333,14 @@ spec:
               \ -v pip >/dev/null 2>&1 || command -v pip3 >/dev/null 2>&1 || {\n \
               \                 python3 -c \"import urllib.request; exec(urllib.request.urlopen('https://bootstrap.pypa.io/get-pip.py').read())\"\
               \ --user -q 2>/dev/null || true\n                }\n               \
-              \ # Bootstrap kubectl if not present\n                command -v kubectl\
-              \ >/dev/null 2>&1 || {\n                  python3 -c \"\nimport urllib.request,\
-              \ os, stat, shutil\nurl = 'https://dl.k8s.io/release/v1.32.6/bin/linux/amd64/kubectl'\n\
-              tmp = '/tmp/kubectl'\ndest = '/opt/data/.local/bin/kubectl'\nos.makedirs('/opt/data/.local/bin',\
+              \ # Bootstrap faster-whisper for audio transcription\n             \
+              \   python3 -c \"import faster_whisper\" 2>/dev/null || {\n        \
+              \          pip install --user -q faster-whisper 2>/dev/null || true\n\
+              \                }\n                # Bootstrap kubectl if not present\n\
+              \                command -v kubectl >/dev/null 2>&1 || {\n         \
+              \         python3 -c \"\nimport urllib.request, os, stat, shutil\nurl\
+              \ = 'https://dl.k8s.io/release/v1.32.6/bin/linux/amd64/kubectl'\ntmp\
+              \ = '/tmp/kubectl'\ndest = '/opt/data/.local/bin/kubectl'\nos.makedirs('/opt/data/.local/bin',\
               \ exist_ok=True)\nurllib.request.urlretrieve(url, tmp)\nos.chmod(tmp,\
               \ stat.S_IRWXU | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH)\n\
               shutil.move(tmp, dest)\n        \" 2>/dev/null || true\n           \

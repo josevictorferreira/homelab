@@ -11,7 +11,7 @@ in
       inherit namespace;
       image = {
         repository = "ghcr.io/decolua/9router";
-        tag = "0.4.55@sha256:48e3b553a4c94e7eeb8ff8f6c865f34d368141a5f82adb8539034a6dd3d48029";
+        tag = "0.4.59@sha256:af88215eba465038a8c9564983790b23242cdf3007ff9c69493232a0b9f3746c";
         pullPolicy = "IfNotPresent";
       };
       secretName = "${app}-env";
