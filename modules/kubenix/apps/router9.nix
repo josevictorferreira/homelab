@@ -18,6 +18,8 @@ in
       port = 20128;
 
       values = {
+        controllers.main.strategy = "Recreate";
+
         persistence.data = {
           enabled = true;
           type = "persistentVolumeClaim";
