@@ -5,7 +5,7 @@ let
   namespace = homelab.kubernetes.namespaces.applications;
   port = 18789;
   host = "openclaw-debian.${homelab.domain}";
-  image = "ghcr.io/josevictorferreira/openclaw-debian:2026.5.20@sha256:e0a5f8e795da0ae55e0029b3dce972bbc04fe18d355f064047b51d1770e640b1";
+  image = "ghcr.io/josevictorferreira/openclaw-debian:2026.5.20@sha256:e102a60fcef77b32d27b7b9c3aaff3bb5686bec0f6312febe30e4f33a153858c";
   startupScript = ''
     set -euo pipefail
 
