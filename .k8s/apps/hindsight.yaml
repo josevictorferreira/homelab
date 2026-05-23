@@ -81,7 +81,7 @@ spec:
           envFrom:
             - secretRef:
                 name: hindsight-secrets
-          image: ghcr.io/vectorize-io/hindsight-api:latest
+          image: ghcr.io/vectorize-io/hindsight-api:0.6.2
           imagePullPolicy: IfNotPresent
           livenessProbe:
             failureThreshold: 3
@@ -237,7 +237,7 @@ spec:
           envFrom:
             - secretRef:
                 name: hindsight-secrets
-          image: ghcr.io/vectorize-io/hindsight-control-plane:latest
+          image: ghcr.io/vectorize-io/hindsight-control-plane:0.6.2
           imagePullPolicy: IfNotPresent
           livenessProbe:
             failureThreshold: 3
