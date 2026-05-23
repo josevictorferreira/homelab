@@ -62,10 +62,10 @@ spec:
               value: '8888'
             - name: HINDSIGHT_API_REFLECT_LLM_MODEL
               value: openai/gpt-oss-120b
-            - name: HINDSIGHT_API_RERANKER_LITELLM_SDK_MODEL
-              value: jina_ai/jina-reranker-v2-base-multilingual
+            - name: HINDSIGHT_API_RERANKER_LOCAL_MODEL
+              value: cross-encoder/ms-marco-MiniLM-L-6-v2
             - name: HINDSIGHT_API_RERANKER_PROVIDER
-              value: litellm-sdk
+              value: local
             - name: HINDSIGHT_API_RETAIN_LLM_MAX_RETRIES
               value: '1'
             - name: HINDSIGHT_API_RETAIN_LLM_TIMEOUT

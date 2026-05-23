@@ -43,8 +43,8 @@ in
               HINDSIGHT_API_EMBEDDINGS_LITELLM_SDK_API_BASE = "https://openrouter.ai/api/v1";
               HINDSIGHT_API_EMBEDDINGS_LITELLM_SDK_MODEL = "openai/text-embedding-3-small";
               HINDSIGHT_API_EMBEDDINGS_LITELLM_SDK_OUTPUT_DIMENSIONS = "384";
-              HINDSIGHT_API_RERANKER_PROVIDER = "litellm-sdk";
-              HINDSIGHT_API_RERANKER_LITELLM_SDK_MODEL = "jina_ai/jina-reranker-v2-base-multilingual";
+              HINDSIGHT_API_RERANKER_PROVIDER = "local";
+              HINDSIGHT_API_RERANKER_LOCAL_MODEL = "cross-encoder/ms-marco-MiniLM-L-6-v2";
               HINDSIGHT_API_WORKER_MAX_SLOTS = "8";
               HINDSIGHT_API_WORKER_CONSOLIDATION_MAX_SLOTS = "2";
               HINDSIGHT_API_LLM_TIMEOUT = "30";
