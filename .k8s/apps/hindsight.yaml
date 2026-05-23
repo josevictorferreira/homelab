@@ -38,30 +38,30 @@ spec:
               value: '1'
             - name: HINDSIGHT_API_CONSOLIDATION_LLM_TIMEOUT
               value: '45'
-            - name: HINDSIGHT_API_EMBEDDINGS_LITELLM_SDK_API_BASE
-              value: https://openrouter.ai/api/v1
-            - name: HINDSIGHT_API_EMBEDDINGS_LITELLM_SDK_MODEL
-              value: openai/text-embedding-3-small
-            - name: HINDSIGHT_API_EMBEDDINGS_LITELLM_SDK_OUTPUT_DIMENSIONS
-              value: '384'
+            - name: HINDSIGHT_API_EMBEDDINGS_OPENAI_BASE_URL
+              value: https://router9.josevictor.me/v1
+            - name: HINDSIGHT_API_EMBEDDINGS_OPENAI_MODEL
+              value: openrouter/nvidia/llama-nemotron-embed-vl-1b-v2:free
             - name: HINDSIGHT_API_EMBEDDINGS_PROVIDER
-              value: litellm-sdk
+              value: openai
             - name: HINDSIGHT_API_HOST
               value: 0.0.0.0
+            - name: HINDSIGHT_API_LLM_BASE_URL
+              value: https://router9.josevictor.me/v1
             - name: HINDSIGHT_API_LLM_MAX_CONCURRENT
               value: '8'
             - name: HINDSIGHT_API_LLM_MAX_RETRIES
               value: '1'
             - name: HINDSIGHT_API_LLM_MODEL
-              value: openai/gpt-oss-20b
+              value: cheap-nitro
             - name: HINDSIGHT_API_LLM_PROVIDER
-              value: openrouter
+              value: openai
             - name: HINDSIGHT_API_LLM_TIMEOUT
               value: '30'
             - name: HINDSIGHT_API_PORT
               value: '8888'
             - name: HINDSIGHT_API_REFLECT_LLM_MODEL
-              value: openai/gpt-oss-120b
+              value: cheap-fast
             - name: HINDSIGHT_API_RERANKER_LOCAL_MODEL
               value: cross-encoder/ms-marco-MiniLM-L-6-v2
             - name: HINDSIGHT_API_RERANKER_PROVIDER
