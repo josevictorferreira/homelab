@@ -176,7 +176,7 @@ let
                         # Bootstrap WhatsApp bridge dependencies if needed
                         if [ "''${WHATSAPP_ENABLED:-false}" = "true" ]; then
                           if [ -d /opt/hermes/scripts/whatsapp-bridge ] && [ ! -f /opt/hermes/scripts/whatsapp-bridge/node_modules/@whiskeysockets/baileys/package.json ]; then
-                            (cd /opt/hermes/scripts/whatsapp-bridge && npm install --production 2>/dev/null) || true
+                            (cd /opt/hermes/scripts/whatsapp-bridge && NODE_OPTIONS=--max-old-space-size=768 npm install --production --no-audit --maxsockets 1 2>/dev/null) || true
                           fi
                         fi
       '';
