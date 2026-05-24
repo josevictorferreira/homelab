@@ -558,7 +558,7 @@ let
   push-openclaw-debian =
     let
       openclawDebianImageName = "openclaw-debian";
-      openclawDebianVersion = "2026.5.20";
+      openclawDebianVersion = "2026.5.22";
     in
     mkCommand "push-openclaw-debian" "Build and push openclaw-debian image with extra tools to GHCR"
       [
