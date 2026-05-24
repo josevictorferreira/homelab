@@ -41,6 +41,7 @@ in
       # Profile-specific Matrix tokens for multi-agent deployment
       HERMES_KIRA_MATRIX_ACCESS_TOKEN = kubenix.lib.secretsFor "hermes_kira_matrix_access_token";
       HERMES_MEL_MATRIX_ACCESS_TOKEN = kubenix.lib.secretsFor "hermes_mel_matrix_access_token";
+      HERMES_KIRA_WHATSAPP_ALLOWED_USERS = kubenix.lib.secretsFor "hermes_kira_whatsapp_allowed_users";
     };
   };
 }
