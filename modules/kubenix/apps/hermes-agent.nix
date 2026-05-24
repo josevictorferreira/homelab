@@ -173,6 +173,12 @@ let
         shutil.move(tmp, dest)
                 " 2>/dev/null || true
                         }
+                        # Bootstrap WhatsApp bridge dependencies if needed
+                        if [ "''${WHATSAPP_ENABLED:-false}" = "true" ]; then
+                          if [ -d /opt/hermes/scripts/whatsapp-bridge ] && [ ! -f /opt/hermes/scripts/whatsapp-bridge/node_modules/@whiskeysockets/baileys/package.json ]; then
+                            (cd /opt/hermes/scripts/whatsapp-bridge && npm install --production 2>/dev/null) || true
+                          fi
+                        fi
       '';
       cmdArgs =
         if profileFlag != null then
