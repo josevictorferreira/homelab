@@ -126,16 +126,19 @@ let
       profile = "ted";
       profileFlag = "ted";
       matrixSecretKey = "MATRIX_ACCESS_TOKEN";
+      whatsapp = false;
     }
     {
       profile = "kira";
       profileFlag = "kira";
       matrixSecretKey = "HERMES_KIRA_MATRIX_ACCESS_TOKEN";
+      whatsapp = true;
     }
     {
       profile = "mel";
       profileFlag = "mel";
       matrixSecretKey = "HERMES_MEL_MATRIX_ACCESS_TOKEN";
+      whatsapp = false;
     }
   ];
 
@@ -144,6 +147,7 @@ let
       profile,
       profileFlag,
       matrixSecretKey,
+      whatsapp,
     }:
     let
       containerName = "gateway-${profile}";
@@ -195,23 +199,47 @@ let
       inherit image;
       imagePullPolicy = "IfNotPresent";
       command = cmdArgs;
-      env = commonEnv ++ [
-        {
-          name = "HOME";
-          value = "/opt/data/profiles/${profile}";
-        }
-        {
-          name = "HERMES_HOME";
-          value = "/opt/data/profiles/${profile}";
-        }
-        {
-          name = "MATRIX_ACCESS_TOKEN";
-          valueFrom.secretKeyRef = {
-            name = "${name}-env";
-            key = matrixSecretKey;
-          };
-        }
-      ];
+      env =
+        commonEnv
+        ++ [
+          {
+            name = "HOME";
+            value = "/opt/data/profiles/${profile}";
+          }
+          {
+            name = "HERMES_HOME";
+            value = "/opt/data/profiles/${profile}";
+          }
+          {
+            name = "MATRIX_ACCESS_TOKEN";
+            valueFrom.secretKeyRef = {
+              name = "${name}-env";
+              key = matrixSecretKey;
+            };
+          }
+        ]
+        ++ (
+          if whatsapp then
+            [
+              {
+                name = "WHATSAPP_ENABLED";
+                value = "true";
+              }
+              {
+                name = "WHATSAPP_MODE";
+                value = "bot";
+              }
+              {
+                name = "WHATSAPP_ALLOWED_USERS";
+                valueFrom.secretKeyRef = {
+                  name = "${name}-env";
+                  key = "HERMES_KIRA_WHATSAPP_ALLOWED_USERS";
+                };
+              }
+            ]
+          else
+            [ ]
+        );
       envFrom = envFromSecret;
       volumeMounts = dataVolumeMounts ++ [
         {
