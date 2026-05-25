@@ -91,6 +91,9 @@ spec:
             - mountPath: /shared/personal-finances
               name: hermes-data
               subPath: personal-finances
+            - mountPath: /opt/hermes/scripts/whatsapp-bridge/node_modules
+              name: hermes-data
+              subPath: whatsapp-bridge-node_modules
             - mountPath: /usr/local/bin/hermes
               name: cli-wrapper
               subPath: hermes
@@ -150,7 +153,23 @@ spec:
               \ exist_ok=True)\nurllib.request.urlretrieve(url, tmp)\nos.chmod(tmp,\
               \ stat.S_IRWXU | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH)\n\
               shutil.move(tmp, dest)\n        \" 2>/dev/null || true\n           \
-              \     }\n\nexec hermes -p ted gateway run\n"
+              \     }\n                # Bootstrap WhatsApp bridge dependencies if\
+              \ needed\n                if [ \"${WHATSAPP_ENABLED:-false}\" = \"true\"\
+              \ ]; then\n                  if [ -d /opt/hermes/scripts/whatsapp-bridge\
+              \ ] && [ ! -f /opt/hermes/scripts/whatsapp-bridge/node_modules/@whiskeysockets/baileys/package.json\
+              \ ]; then\n                    mkdir -p /opt/data/whatsapp-bridge-node_modules\n\
+              \                    if [ ! -f /opt/data/whatsapp-bridge-node_modules/@whiskeysockets/baileys/package.json\
+              \ ]; then\n                      (cd /opt/hermes/scripts/whatsapp-bridge\
+              \ && cp -r node_modules /opt/data/whatsapp-bridge-node_modules 2>/dev/null)\
+              \ || true\n                      (cd /opt/hermes/scripts/whatsapp-bridge\
+              \ && NODE_OPTIONS=\"--max-old-space-size=256\" npm install --production\
+              \ --no-audit --maxsockets 1 --prefer-offline 2>/dev/null) || true\n\
+              \                      (cd /opt/hermes/scripts/whatsapp-bridge && cp\
+              \ -r node_modules /opt/data/whatsapp-bridge-node_modules 2>/dev/null)\
+              \ || true\n                    fi\n                    rm -rf /opt/hermes/scripts/whatsapp-bridge/node_modules\n\
+              \                    ln -s /opt/data/whatsapp-bridge-node_modules /opt/hermes/scripts/whatsapp-bridge/node_modules\n\
+              \                  fi\n                fi\n\nexec hermes -p ted gateway\
+              \ run\n"
           env:
             - name: HERMES_UID
               value: '10000'
@@ -202,9 +221,10 @@ spec:
           resources:
             limits:
               cpu: 500m
+              memory: 1Gi
             requests:
               cpu: 100m
-              memory: 256Mi
+              memory: 512Mi
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
@@ -226,6 +246,9 @@ spec:
             - mountPath: /shared/personal-finances
               name: hermes-data
               subPath: personal-finances
+            - mountPath: /opt/hermes/scripts/whatsapp-bridge/node_modules
+              name: hermes-data
+              subPath: whatsapp-bridge-node_modules
             - mountPath: /usr/local/bin/hermes
               name: cli-wrapper
               subPath: hermes
@@ -247,7 +270,23 @@ spec:
               \ exist_ok=True)\nurllib.request.urlretrieve(url, tmp)\nos.chmod(tmp,\
               \ stat.S_IRWXU | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH)\n\
               shutil.move(tmp, dest)\n        \" 2>/dev/null || true\n           \
-              \     }\n\nexec hermes -p kira gateway run\n"
+              \     }\n                # Bootstrap WhatsApp bridge dependencies if\
+              \ needed\n                if [ \"${WHATSAPP_ENABLED:-false}\" = \"true\"\
+              \ ]; then\n                  if [ -d /opt/hermes/scripts/whatsapp-bridge\
+              \ ] && [ ! -f /opt/hermes/scripts/whatsapp-bridge/node_modules/@whiskeysockets/baileys/package.json\
+              \ ]; then\n                    mkdir -p /opt/data/whatsapp-bridge-node_modules\n\
+              \                    if [ ! -f /opt/data/whatsapp-bridge-node_modules/@whiskeysockets/baileys/package.json\
+              \ ]; then\n                      (cd /opt/hermes/scripts/whatsapp-bridge\
+              \ && cp -r node_modules /opt/data/whatsapp-bridge-node_modules 2>/dev/null)\
+              \ || true\n                      (cd /opt/hermes/scripts/whatsapp-bridge\
+              \ && NODE_OPTIONS=\"--max-old-space-size=256\" npm install --production\
+              \ --no-audit --maxsockets 1 --prefer-offline 2>/dev/null) || true\n\
+              \                      (cd /opt/hermes/scripts/whatsapp-bridge && cp\
+              \ -r node_modules /opt/data/whatsapp-bridge-node_modules 2>/dev/null)\
+              \ || true\n                    fi\n                    rm -rf /opt/hermes/scripts/whatsapp-bridge/node_modules\n\
+              \                    ln -s /opt/data/whatsapp-bridge-node_modules /opt/hermes/scripts/whatsapp-bridge/node_modules\n\
+              \                  fi\n                fi\n\nexec hermes -p kira gateway\
+              \ run\n"
           env:
             - name: HERMES_UID
               value: '10000'
@@ -308,9 +347,10 @@ spec:
           resources:
             limits:
               cpu: 500m
+              memory: 1Gi
             requests:
               cpu: 100m
-              memory: 256Mi
+              memory: 512Mi
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
@@ -332,6 +372,9 @@ spec:
             - mountPath: /shared/personal-finances
               name: hermes-data
               subPath: personal-finances
+            - mountPath: /opt/hermes/scripts/whatsapp-bridge/node_modules
+              name: hermes-data
+              subPath: whatsapp-bridge-node_modules
             - mountPath: /usr/local/bin/hermes
               name: cli-wrapper
               subPath: hermes
@@ -353,7 +396,23 @@ spec:
               \ exist_ok=True)\nurllib.request.urlretrieve(url, tmp)\nos.chmod(tmp,\
               \ stat.S_IRWXU | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH)\n\
               shutil.move(tmp, dest)\n        \" 2>/dev/null || true\n           \
-              \     }\n\nexec hermes -p mel gateway run\n"
+              \     }\n                # Bootstrap WhatsApp bridge dependencies if\
+              \ needed\n                if [ \"${WHATSAPP_ENABLED:-false}\" = \"true\"\
+              \ ]; then\n                  if [ -d /opt/hermes/scripts/whatsapp-bridge\
+              \ ] && [ ! -f /opt/hermes/scripts/whatsapp-bridge/node_modules/@whiskeysockets/baileys/package.json\
+              \ ]; then\n                    mkdir -p /opt/data/whatsapp-bridge-node_modules\n\
+              \                    if [ ! -f /opt/data/whatsapp-bridge-node_modules/@whiskeysockets/baileys/package.json\
+              \ ]; then\n                      (cd /opt/hermes/scripts/whatsapp-bridge\
+              \ && cp -r node_modules /opt/data/whatsapp-bridge-node_modules 2>/dev/null)\
+              \ || true\n                      (cd /opt/hermes/scripts/whatsapp-bridge\
+              \ && NODE_OPTIONS=\"--max-old-space-size=256\" npm install --production\
+              \ --no-audit --maxsockets 1 --prefer-offline 2>/dev/null) || true\n\
+              \                      (cd /opt/hermes/scripts/whatsapp-bridge && cp\
+              \ -r node_modules /opt/data/whatsapp-bridge-node_modules 2>/dev/null)\
+              \ || true\n                    fi\n                    rm -rf /opt/hermes/scripts/whatsapp-bridge/node_modules\n\
+              \                    ln -s /opt/data/whatsapp-bridge-node_modules /opt/hermes/scripts/whatsapp-bridge/node_modules\n\
+              \                  fi\n                fi\n\nexec hermes -p mel gateway\
+              \ run\n"
           env:
             - name: HERMES_UID
               value: '10000'
@@ -405,9 +464,10 @@ spec:
           resources:
             limits:
               cpu: 500m
+              memory: 1Gi
             requests:
               cpu: 100m
-              memory: 256Mi
+              memory: 512Mi
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
@@ -429,6 +489,9 @@ spec:
             - mountPath: /shared/personal-finances
               name: hermes-data
               subPath: personal-finances
+            - mountPath: /opt/hermes/scripts/whatsapp-bridge/node_modules
+              name: hermes-data
+              subPath: whatsapp-bridge-node_modules
             - mountPath: /usr/local/bin/hermes
               name: cli-wrapper
               subPath: hermes

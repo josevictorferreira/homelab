@@ -28,6 +28,11 @@ let
       mountPath = "/shared/personal-finances";
       subPath = "personal-finances";
     }
+    {
+      name = "hermes-data";
+      mountPath = "/opt/hermes/scripts/whatsapp-bridge/node_modules";
+      subPath = "whatsapp-bridge-node_modules";
+    }
   ];
   dataVolumes = [
     {
@@ -176,7 +181,14 @@ let
                         # Bootstrap WhatsApp bridge dependencies if needed
                         if [ "''${WHATSAPP_ENABLED:-false}" = "true" ]; then
                           if [ -d /opt/hermes/scripts/whatsapp-bridge ] && [ ! -f /opt/hermes/scripts/whatsapp-bridge/node_modules/@whiskeysockets/baileys/package.json ]; then
-                            (cd /opt/hermes/scripts/whatsapp-bridge && NODE_OPTIONS=--max-old-space-size=768 npm install --production --no-audit --maxsockets 1 2>/dev/null) || true
+                            mkdir -p /opt/data/whatsapp-bridge-node_modules
+                            if [ ! -f /opt/data/whatsapp-bridge-node_modules/@whiskeysockets/baileys/package.json ]; then
+                              (cd /opt/hermes/scripts/whatsapp-bridge && cp -r node_modules /opt/data/whatsapp-bridge-node_modules 2>/dev/null) || true
+                              (cd /opt/hermes/scripts/whatsapp-bridge && NODE_OPTIONS="--max-old-space-size=256" npm install --production --no-audit --maxsockets 1 --prefer-offline 2>/dev/null) || true
+                              (cd /opt/hermes/scripts/whatsapp-bridge && cp -r node_modules /opt/data/whatsapp-bridge-node_modules 2>/dev/null) || true
+                            fi
+                            rm -rf /opt/hermes/scripts/whatsapp-bridge/node_modules
+                            ln -s /opt/data/whatsapp-bridge-node_modules /opt/hermes/scripts/whatsapp-bridge/node_modules
                           fi
                         fi
       '';
