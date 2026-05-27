@@ -3,8 +3,8 @@
 let
   baseImage = pkgs.dockerTools.pullImage {
     imageName = "ghcr.io/openclaw/openclaw";
-    imageDigest = "sha256:d35b8b681c223a85027502c7a82999aa772d6a09e1b28903951cac7fc27efed5";
-    sha256 = "sha256-h5MBrGiM69jnOEOB4L1JjowdrHRavmotekn9lMgHf/A=";
+    imageDigest = "sha256:ae7ff536446f1bbb57ea51b9b21097d8f299d30d683dcd72644973bc0522f3b3";
+    sha256 = "sha256-xnyS4SXG2OFxzS9VDwb5XsiKo/1fGE8G2+rla+fc+CA=";
   };
 
   losslessClawVersion = "0.10.0";
@@ -103,7 +103,7 @@ let
 in
 pkgs.dockerTools.buildImage {
   name = "localhost/openclaw-debian";
-  tag = "2026.5.22";
+  tag = "2026.5.26";
   fromImage = baseImage;
   copyToRoot = [
     toolsRoot
