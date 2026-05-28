@@ -36,7 +36,7 @@ spec:
         - envFrom:
             - secretRef:
                 name: router9-env
-          image: ghcr.io/decolua/9router:0.4.63@sha256:7d916c3725a833c15abba368d7249774f03fc22f8e98a65855de19593d8a0055
+          image: ghcr.io/josevictorferreira/9router:feat-skip-routing-disabled-providers:feat-skip-routing-disabled-providers
           imagePullPolicy: IfNotPresent
           name: main
           ports:
