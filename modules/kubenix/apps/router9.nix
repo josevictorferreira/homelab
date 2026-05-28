@@ -21,6 +21,10 @@ in
       values = {
         controllers.main.strategy = "Recreate";
 
+        defaultPodOptions.imagePullSecrets = [
+          { name = "ghcr-registry-secret"; }
+        ];
+
         persistence.data = {
           enabled = true;
           type = "persistentVolumeClaim";
