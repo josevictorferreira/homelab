@@ -10,8 +10,9 @@ in
     args = {
       inherit namespace;
       image = {
-        repository = "ghcr.io/decolua/9router";
-        tag = "0.4.63@sha256:7d916c3725a833c15abba368d7249774f03fc22f8e98a65855de19593d8a0055";
+        # repository = "ghcr.io/decolua/9router";
+        repository = "ghcr.io/josevictorferreira/9router:feat-skip-routing-disabled-providers";
+        tag = "feat-skip-routing-disabled-providers";
         pullPolicy = "IfNotPresent";
       };
       secretName = "${app}-env";
