@@ -12,7 +12,7 @@ in
       image = {
         # repository = "ghcr.io/decolua/9router";
         repository = "ghcr.io/josevictorferreira/9router";
-        tag = "feat-skip-routing-disabled-providers";
+        tag = "5f8956f";
         pullPolicy = "IfNotPresent";
       };
       secretName = "${app}-env";
