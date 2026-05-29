@@ -365,14 +365,10 @@ in
               name = "dashboard";
               inherit image;
               imagePullPolicy = "IfNotPresent";
-              args = [
-                "dashboard"
-                "--host"
-                "0.0.0.0"
-                "--port"
-                "9119"
-                "--no-open"
-                "--insecure"
+              command = [
+                "/bin/sh"
+                "-c"
+                "exec /opt/hermes/.venv/bin/hermes dashboard --host 0.0.0.0 --port 9119 --no-open --insecure"
               ];
               ports = [
                 {
