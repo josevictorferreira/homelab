@@ -36,7 +36,7 @@ spec:
         - envFrom:
             - secretRef:
                 name: router9-env
-          image: ghcr.io/josevictorferreira/9router:feat-skip-routing-disabled-providers
+          image: ghcr.io/josevictorferreira/9router:5f8956f
           imagePullPolicy: IfNotPresent
           name: main
           ports:
