@@ -422,7 +422,10 @@ in
               securityContext = {
                 allowPrivilegeEscalation = false;
                 runAsUser = 0;
-                capabilities.drop = [ "ALL" ];
+                capabilities = {
+                  drop = [ "ALL" ];
+                  add = [ "DAC_OVERRIDE" ];
+                };
               };
               readinessProbe = {
                 tcpSocket.port = 9119;
