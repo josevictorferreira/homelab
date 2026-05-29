@@ -70,6 +70,8 @@ spec:
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
+              add:
+                - DAC_OVERRIDE
               drop:
                 - ALL
             runAsUser: 0
