@@ -72,9 +72,7 @@ spec:
             capabilities:
               drop:
                 - ALL
-            runAsGroup: 2002
-            runAsNonRoot: true
-            runAsUser: 10000
+            runAsUser: 0
           volumeMounts:
             - mountPath: /opt/data
               name: hermes-data

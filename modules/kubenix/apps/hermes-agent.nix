@@ -419,7 +419,11 @@ in
                   memory = "512Mi";
                 };
               };
-              securityContext = commonSecurityContext;
+              securityContext = {
+                allowPrivilegeEscalation = false;
+                runAsUser = 0;
+                capabilities.drop = [ "ALL" ];
+              };
               readinessProbe = {
                 tcpSocket.port = 9119;
                 initialDelaySeconds = 15;
