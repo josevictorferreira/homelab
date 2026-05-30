@@ -492,8 +492,311 @@ spec:
             - mountPath: /usr/local/bin/hermes
               name: cli-wrapper
               subPath: hermes
+        - command:
+            - /bin/sh
+            - -c
+            - "                # Bootstrap pip if not present\n                command\
+              \ -v pip >/dev/null 2>&1 || command -v pip3 >/dev/null 2>&1 || {\n \
+              \                 python3 -c \"import urllib.request; exec(urllib.request.urlopen('https://bootstrap.pypa.io/get-pip.py').read())\"\
+              \ --user -q 2>/dev/null || true\n                }\n               \
+              \ # Bootstrap faster-whisper for audio transcription\n             \
+              \   python3 -c \"import faster_whisper\" 2>/dev/null || {\n        \
+              \          pip install --user -q faster-whisper 2>/dev/null || true\n\
+              \                }\n                # Bootstrap kubectl if not present\n\
+              \                command -v kubectl >/dev/null 2>&1 || {\n         \
+              \         python3 -c \"\nimport urllib.request, os, stat, shutil\nurl\
+              \ = 'https://dl.k8s.io/release/v1.32.6/bin/linux/amd64/kubectl'\ntmp\
+              \ = '/tmp/kubectl'\ndest = '/opt/data/.local/bin/kubectl'\nos.makedirs('/opt/data/.local/bin',\
+              \ exist_ok=True)\nurllib.request.urlretrieve(url, tmp)\nos.chmod(tmp,\
+              \ stat.S_IRWXU | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH)\n\
+              shutil.move(tmp, dest)\n        \" 2>/dev/null || true\n           \
+              \     }\n                # Bootstrap WhatsApp bridge dependencies if\
+              \ needed\n                if [ \"${WHATSAPP_ENABLED:-false}\" = \"true\"\
+              \ ]; then\n                  if [ -d /opt/hermes/scripts/whatsapp-bridge\
+              \ ] && [ ! -f /opt/hermes/scripts/whatsapp-bridge/node_modules/@whiskeysockets/baileys/package.json\
+              \ ]; then\n                    mkdir -p /opt/data/whatsapp-bridge-node_modules\n\
+              \                    if [ ! -f /opt/data/whatsapp-bridge-node_modules/@whiskeysockets/baileys/package.json\
+              \ ]; then\n                      (cd /opt/hermes/scripts/whatsapp-bridge\
+              \ && cp -r node_modules /opt/data/whatsapp-bridge-node_modules 2>/dev/null)\
+              \ || true\n                      (cd /opt/hermes/scripts/whatsapp-bridge\
+              \ && NODE_OPTIONS=\"--max-old-space-size=256\" npm install --production\
+              \ --no-audit --maxsockets 1 --prefer-offline 2>/dev/null) || true\n\
+              \                      (cd /opt/hermes/scripts/whatsapp-bridge && cp\
+              \ -r node_modules /opt/data/whatsapp-bridge-node_modules 2>/dev/null)\
+              \ || true\n                    fi\n                    rm -rf /opt/hermes/scripts/whatsapp-bridge/node_modules\n\
+              \                    ln -s /opt/data/whatsapp-bridge-node_modules /opt/hermes/scripts/whatsapp-bridge/node_modules\n\
+              \                  fi\n                fi\n\nexec hermes -p spike gateway\
+              \ run\n"
+          env:
+            - name: HERMES_UID
+              value: '10000'
+            - name: HERMES_GID
+              value: '2002'
+            - name: TZ
+              value: America/Sao_Paulo
+            - name: AGENT_BROWSER_ENGINE
+              value: lightpanda
+            - name: AGENT_BROWSER_ENDPOINT
+              value: http://lightpanda.apps.svc.cluster.local:9222
+            - name: HINDSIGHT_MODE
+              value: local_external
+            - name: HINDSIGHT_API_URL
+              value: http://hindsight-api.apps.svc.cluster.local:8888
+            - name: HINDSIGHT_BANK_ID
+              value: hermes
+            - name: HINDSIGHT_BUDGET
+              value: mid
+            - name: HINDSIGHT_API_KEY
+              value: dummy
+            - name: HINDSIGHT_LLM_API_KEY
+              value: dummy
+            - name: PATH
+              value: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/hermes/.venv/bin:/opt/data/.local/bin
+            - name: PYTHONPATH
+              value: /opt/data/.local/lib/python3.13/site-packages
+            - name: PYTHONUSERBASE
+              value: /opt/data/.local
+            - name: PIP_USER
+              value: 'true'
+            - name: PIP_REQUIRE_VIRTUALENV
+              value: 'false'
+            - name: HOME
+              value: /opt/data/profiles/spike
+            - name: HERMES_HOME
+              value: /opt/data/profiles/spike
+            - name: MATRIX_ACCESS_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  key: HERMES_SPIKE_MATRIX_ACCESS_TOKEN
+                  name: hermes-agent-env
+          envFrom:
+            - secretRef:
+                name: hermes-agent-env
+          image: docker.io/nousresearch/hermes-agent:v2026.5.29.2@sha256:00ec7c4d7ea878dbd10938072781c0127ba13467a18c3b8775adcde60170a0b9
+          imagePullPolicy: IfNotPresent
+          name: gateway-spike
+          resources:
+            limits:
+              cpu: 500m
+              memory: 1Gi
+            requests:
+              cpu: 100m
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsGroup: 2002
+            runAsNonRoot: true
+            runAsUser: 10000
+          volumeMounts:
+            - mountPath: /opt/data
+              name: hermes-data
+              subPath: hermes
+            - mountPath: /shared/notetaking
+              name: hermes-data
+              subPath: notetaking
+            - mountPath: /shared/mel-dynamica
+              name: hermes-data
+              subPath: mel-dynamica
+            - mountPath: /shared/personal-finances
+              name: hermes-data
+              subPath: personal-finances
+            - mountPath: /opt/hermes/scripts/whatsapp-bridge/node_modules
+              name: hermes-data
+              subPath: whatsapp-bridge-node_modules
+            - mountPath: /usr/local/bin/hermes
+              name: cli-wrapper
+              subPath: hermes
+            - mountPath: /workspace
+              name: hermes-data
+              subPath: openclaw/workspace-spike
+        - command:
+            - /bin/sh
+            - -c
+            - "                # Bootstrap pip if not present\n                command\
+              \ -v pip >/dev/null 2>&1 || command -v pip3 >/dev/null 2>&1 || {\n \
+              \                 python3 -c \"import urllib.request; exec(urllib.request.urlopen('https://bootstrap.pypa.io/get-pip.py').read())\"\
+              \ --user -q 2>/dev/null || true\n                }\n               \
+              \ # Bootstrap faster-whisper for audio transcription\n             \
+              \   python3 -c \"import faster_whisper\" 2>/dev/null || {\n        \
+              \          pip install --user -q faster-whisper 2>/dev/null || true\n\
+              \                }\n                # Bootstrap kubectl if not present\n\
+              \                command -v kubectl >/dev/null 2>&1 || {\n         \
+              \         python3 -c \"\nimport urllib.request, os, stat, shutil\nurl\
+              \ = 'https://dl.k8s.io/release/v1.32.6/bin/linux/amd64/kubectl'\ntmp\
+              \ = '/tmp/kubectl'\ndest = '/opt/data/.local/bin/kubectl'\nos.makedirs('/opt/data/.local/bin',\
+              \ exist_ok=True)\nurllib.request.urlretrieve(url, tmp)\nos.chmod(tmp,\
+              \ stat.S_IRWXU | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH)\n\
+              shutil.move(tmp, dest)\n        \" 2>/dev/null || true\n           \
+              \     }\n                # Bootstrap WhatsApp bridge dependencies if\
+              \ needed\n                if [ \"${WHATSAPP_ENABLED:-false}\" = \"true\"\
+              \ ]; then\n                  if [ -d /opt/hermes/scripts/whatsapp-bridge\
+              \ ] && [ ! -f /opt/hermes/scripts/whatsapp-bridge/node_modules/@whiskeysockets/baileys/package.json\
+              \ ]; then\n                    mkdir -p /opt/data/whatsapp-bridge-node_modules\n\
+              \                    if [ ! -f /opt/data/whatsapp-bridge-node_modules/@whiskeysockets/baileys/package.json\
+              \ ]; then\n                      (cd /opt/hermes/scripts/whatsapp-bridge\
+              \ && cp -r node_modules /opt/data/whatsapp-bridge-node_modules 2>/dev/null)\
+              \ || true\n                      (cd /opt/hermes/scripts/whatsapp-bridge\
+              \ && NODE_OPTIONS=\"--max-old-space-size=256\" npm install --production\
+              \ --no-audit --maxsockets 1 --prefer-offline 2>/dev/null) || true\n\
+              \                      (cd /opt/hermes/scripts/whatsapp-bridge && cp\
+              \ -r node_modules /opt/data/whatsapp-bridge-node_modules 2>/dev/null)\
+              \ || true\n                    fi\n                    rm -rf /opt/hermes/scripts/whatsapp-bridge/node_modules\n\
+              \                    ln -s /opt/data/whatsapp-bridge-node_modules /opt/hermes/scripts/whatsapp-bridge/node_modules\n\
+              \                  fi\n                fi\n\nexec hermes -p luna gateway\
+              \ run\n"
+          env:
+            - name: HERMES_UID
+              value: '10000'
+            - name: HERMES_GID
+              value: '2002'
+            - name: TZ
+              value: America/Sao_Paulo
+            - name: AGENT_BROWSER_ENGINE
+              value: lightpanda
+            - name: AGENT_BROWSER_ENDPOINT
+              value: http://lightpanda.apps.svc.cluster.local:9222
+            - name: HINDSIGHT_MODE
+              value: local_external
+            - name: HINDSIGHT_API_URL
+              value: http://hindsight-api.apps.svc.cluster.local:8888
+            - name: HINDSIGHT_BANK_ID
+              value: hermes
+            - name: HINDSIGHT_BUDGET
+              value: mid
+            - name: HINDSIGHT_API_KEY
+              value: dummy
+            - name: HINDSIGHT_LLM_API_KEY
+              value: dummy
+            - name: PATH
+              value: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/hermes/.venv/bin:/opt/data/.local/bin
+            - name: PYTHONPATH
+              value: /opt/data/.local/lib/python3.13/site-packages
+            - name: PYTHONUSERBASE
+              value: /opt/data/.local
+            - name: PIP_USER
+              value: 'true'
+            - name: PIP_REQUIRE_VIRTUALENV
+              value: 'false'
+            - name: HOME
+              value: /opt/data/profiles/luna
+            - name: HERMES_HOME
+              value: /opt/data/profiles/luna
+            - name: MATRIX_ACCESS_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  key: HERMES_LUNA_MATRIX_ACCESS_TOKEN
+                  name: hermes-agent-env
+          envFrom:
+            - secretRef:
+                name: hermes-agent-env
+          image: docker.io/nousresearch/hermes-agent:v2026.5.29.2@sha256:00ec7c4d7ea878dbd10938072781c0127ba13467a18c3b8775adcde60170a0b9
+          imagePullPolicy: IfNotPresent
+          name: gateway-luna
+          resources:
+            limits:
+              cpu: 500m
+              memory: 1Gi
+            requests:
+              cpu: 100m
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsGroup: 2002
+            runAsNonRoot: true
+            runAsUser: 10000
+          volumeMounts:
+            - mountPath: /opt/data
+              name: hermes-data
+              subPath: hermes
+            - mountPath: /shared/notetaking
+              name: hermes-data
+              subPath: notetaking
+            - mountPath: /shared/mel-dynamica
+              name: hermes-data
+              subPath: mel-dynamica
+            - mountPath: /shared/personal-finances
+              name: hermes-data
+              subPath: personal-finances
+            - mountPath: /opt/hermes/scripts/whatsapp-bridge/node_modules
+              name: hermes-data
+              subPath: whatsapp-bridge-node_modules
+            - mountPath: /usr/local/bin/hermes
+              name: cli-wrapper
+              subPath: hermes
+            - mountPath: /workspace
+              name: hermes-data
+              subPath: openclaw/workspace-luna
       imagePullSecrets:
         - name: ghcr-registry-secret
+      initContainers:
+        - command:
+            - /bin/sh
+            - -c
+            - "mkdir -p /opt/data/profiles/spike\n# Copy identity files from workspace\
+              \ if available\nif [ -d /workspace ]; then\n  for f in SOUL.md IDENTITY.md\
+              \ USER.md MEMORY.md; do\n    [ -f /workspace/$f ] && cp /workspace/$f\
+              \ /opt/data/profiles/spike/ 2>/dev/null || true\n  done\nfi\n"
+          image: docker.io/nousresearch/hermes-agent:v2026.5.29.2@sha256:00ec7c4d7ea878dbd10938072781c0127ba13467a18c3b8775adcde60170a0b9
+          name: init-spike-profile
+          securityContext:
+            runAsGroup: 2002
+            runAsUser: 10000
+          volumeMounts:
+            - mountPath: /opt/data
+              name: hermes-data
+              subPath: hermes
+            - mountPath: /shared/notetaking
+              name: hermes-data
+              subPath: notetaking
+            - mountPath: /shared/mel-dynamica
+              name: hermes-data
+              subPath: mel-dynamica
+            - mountPath: /shared/personal-finances
+              name: hermes-data
+              subPath: personal-finances
+            - mountPath: /opt/hermes/scripts/whatsapp-bridge/node_modules
+              name: hermes-data
+              subPath: whatsapp-bridge-node_modules
+            - mountPath: /workspace
+              name: hermes-data
+              subPath: openclaw/workspace-spike
+        - command:
+            - /bin/sh
+            - -c
+            - "mkdir -p /opt/data/profiles/luna\n# Copy identity files from workspace\
+              \ if available\nif [ -d /workspace ]; then\n  for f in SOUL.md IDENTITY.md\
+              \ USER.md MEMORY.md; do\n    [ -f /workspace/$f ] && cp /workspace/$f\
+              \ /opt/data/profiles/luna/ 2>/dev/null || true\n  done\nfi\n"
+          image: docker.io/nousresearch/hermes-agent:v2026.5.29.2@sha256:00ec7c4d7ea878dbd10938072781c0127ba13467a18c3b8775adcde60170a0b9
+          name: init-luna-profile
+          securityContext:
+            runAsGroup: 2002
+            runAsUser: 10000
+          volumeMounts:
+            - mountPath: /opt/data
+              name: hermes-data
+              subPath: hermes
+            - mountPath: /shared/notetaking
+              name: hermes-data
+              subPath: notetaking
+            - mountPath: /shared/mel-dynamica
+              name: hermes-data
+              subPath: mel-dynamica
+            - mountPath: /shared/personal-finances
+              name: hermes-data
+              subPath: personal-finances
+            - mountPath: /opt/hermes/scripts/whatsapp-bridge/node_modules
+              name: hermes-data
+              subPath: whatsapp-bridge-node_modules
+            - mountPath: /workspace
+              name: hermes-data
+              subPath: openclaw/workspace-luna
       securityContext:
         supplementalGroups:
           - 100
