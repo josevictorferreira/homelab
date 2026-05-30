@@ -151,6 +151,7 @@ let
       matrixSecretKey = "HERMES_SPIKE_MATRIX_ACCESS_TOKEN";
       whatsapp = false;
       workspaceSubPath = "openclaw/workspace-spike";
+      cpuLimit = "300m";
     }
     {
       profile = "luna";
@@ -158,6 +159,7 @@ let
       matrixSecretKey = "HERMES_LUNA_MATRIX_ACCESS_TOKEN";
       whatsapp = false;
       workspaceSubPath = "openclaw/workspace-luna";
+      cpuLimit = "300m";
     }
   ];
 
@@ -168,6 +170,7 @@ let
       matrixSecretKey,
       whatsapp,
       workspaceSubPath ? null,
+      cpuLimit ? "500m",
     }:
     let
       containerName = "gateway-${profile}";
@@ -301,7 +304,7 @@ let
           memory = "512Mi";
         };
         limits = {
-          cpu = "500m";
+          cpu = cpuLimit;
           memory = "1Gi";
         };
       };
