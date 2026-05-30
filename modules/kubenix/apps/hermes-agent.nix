@@ -150,7 +150,6 @@ let
       profileFlag = "spike";
       matrixSecretKey = "HERMES_SPIKE_MATRIX_ACCESS_TOKEN";
       whatsapp = false;
-      workspaceSubPath = "openclaw/workspace-spike";
       cpuLimit = "125m";
     }
     {
@@ -158,7 +157,6 @@ let
       profileFlag = "luna";
       matrixSecretKey = "HERMES_LUNA_MATRIX_ACCESS_TOKEN";
       whatsapp = false;
-      workspaceSubPath = "openclaw/workspace-luna";
       cpuLimit = "125m";
     }
   ];
@@ -169,7 +167,6 @@ let
       profileFlag,
       matrixSecretKey,
       whatsapp,
-      workspaceSubPath ? null,
       cpuLimit ? "500m",
     }:
     let
@@ -277,27 +274,13 @@ let
             [ ]
         );
       envFrom = envFromSecret;
-      volumeMounts =
-        dataVolumeMounts
-        ++ [
-          {
-            name = cliWrapper.volumeName;
-            mountPath = cliWrapper.mountPath;
-            subPath = "hermes";
-          }
-        ]
-        ++ (
-          if workspaceSubPath != null then
-            [
-              {
-                name = "hermes-data";
-                mountPath = "/workspace";
-                subPath = workspaceSubPath;
-              }
-            ]
-          else
-            [ ]
-        );
+      volumeMounts = dataVolumeMounts ++ [
+        {
+          name = cliWrapper.volumeName;
+          mountPath = cliWrapper.mountPath;
+          subPath = "hermes";
+        }
+      ];
       resources = {
         requests = {
           cpu = "100m";
@@ -353,84 +336,7 @@ in
           securityContext = gatewayPodSecurityContext;
           terminationGracePeriodSeconds = 60;
           imagePullSecrets = [ { name = "ghcr-registry-secret"; } ];
-          initContainers = [
-            {
-              name = "init-spike-profile";
-              inherit image;
-              command = [
-                "/bin/sh"
-                "-c"
-                ''
-                  mkdir -p /opt/data/profiles/spike
-                  # Copy identity files from workspace if available
-                  if [ -d /workspace ]; then
-                    for f in SOUL.md IDENTITY.md USER.md MEMORY.md; do
-                      [ -f /workspace/$f ] && cp /workspace/$f /opt/data/profiles/spike/ 2>/dev/null || true
-                    done
-                  fi
-                ''
-              ];
-              volumeMounts = dataVolumeMounts ++ [
-                {
-                  name = "hermes-data";
-                  mountPath = "/workspace";
-                  subPath = "openclaw/workspace-spike";
-                }
-              ];
-              securityContext = {
-                runAsUser = 10000;
-                runAsGroup = 2002;
-              };
-              resources = {
-                limits = {
-                  cpu = "50m";
-                  memory = "64Mi";
-                };
-                requests = {
-                  cpu = "50m";
-                  memory = "64Mi";
-                };
-              };
-            }
-            {
-              name = "init-luna-profile";
-              inherit image;
-              command = [
-                "/bin/sh"
-                "-c"
-                ''
-                  mkdir -p /opt/data/profiles/luna
-                  # Copy identity files from workspace if available
-                  if [ -d /workspace ]; then
-                    for f in SOUL.md IDENTITY.md USER.md MEMORY.md; do
-                      [ -f /workspace/$f ] && cp /workspace/$f /opt/data/profiles/luna/ 2>/dev/null || true
-                    done
-                  fi
-                ''
-              ];
-              volumeMounts = dataVolumeMounts ++ [
-                {
-                  name = "hermes-data";
-                  mountPath = "/workspace";
-                  subPath = "openclaw/workspace-luna";
-                }
-              ];
-              securityContext = {
-                runAsUser = 10000;
-                runAsGroup = 2002;
-              };
-              resources = {
-                limits = {
-                  cpu = "50m";
-                  memory = "64Mi";
-                };
-                requests = {
-                  cpu = "50m";
-                  memory = "64Mi";
-                };
-              };
-            }
-          ];
+          initContainers = [ ];
           containers = containers;
           volumes = dataVolumes ++ [
             {
