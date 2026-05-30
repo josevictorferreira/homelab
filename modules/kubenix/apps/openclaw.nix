@@ -90,7 +90,7 @@ in
         labels.app = name;
       };
       spec = {
-        replicas = 1;
+        replicas = 0;
         strategy.type = "Recreate";
         selector.matchLabels.app = name;
         template = {
