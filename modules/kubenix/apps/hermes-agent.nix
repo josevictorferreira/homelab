@@ -180,6 +180,10 @@ let
                         python3 -c "import faster_whisper" 2>/dev/null || {
                           pip install --user -q faster-whisper 2>/dev/null || true
                         }
+                        # Bootstrap Matrix dependencies if not installed
+                        python3 -c "import mautrix" 2>/dev/null || {
+                          pip install -q 'mautrix[encryption]' asyncpg aiosqlite Markdown aiohttp-socks 2>/dev/null || true
+                        }
                         # Bootstrap kubectl if not present
                         command -v kubectl >/dev/null 2>&1 || {
                           python3 -c "
