@@ -34,6 +34,11 @@ in
           { name = "ghcr-registry-secret"; }
         ];
 
+        controllers.main.pod.securityContext = {
+          fsGroup = 1000;
+          runAsUser = 1000;
+          runAsGroup = 1000;
+        };
         persistence.data = {
           enabled = true;
           type = "persistentVolumeClaim";
