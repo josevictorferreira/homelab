@@ -182,7 +182,7 @@ let
                         }
                         # Bootstrap Matrix dependencies if not installed
                         python3 -c "import mautrix" 2>/dev/null || {
-                          pip install -q 'mautrix[encryption]' asyncpg aiosqlite Markdown aiohttp-socks 2>/dev/null || true
+                          uv pip install mautrix asyncpg aiosqlite Markdown aiohttp-socks 2>/dev/null || true
                         }
                         # Bootstrap kubectl if not present
                         command -v kubectl >/dev/null 2>&1 || {
