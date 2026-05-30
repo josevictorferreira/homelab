@@ -145,6 +145,20 @@ let
       matrixSecretKey = "HERMES_MEL_MATRIX_ACCESS_TOKEN";
       whatsapp = false;
     }
+    {
+      profile = "spike";
+      profileFlag = "spike";
+      matrixSecretKey = "HERMES_SPIKE_MATRIX_ACCESS_TOKEN";
+      whatsapp = false;
+      workspaceSubPath = "openclaw/workspace-spike";
+    }
+    {
+      profile = "luna";
+      profileFlag = "luna";
+      matrixSecretKey = "HERMES_LUNA_MATRIX_ACCESS_TOKEN";
+      whatsapp = false;
+      workspaceSubPath = "openclaw/workspace-luna";
+    }
   ];
 
   gatewayContainer =
@@ -153,6 +167,7 @@ let
       profileFlag,
       matrixSecretKey,
       whatsapp,
+      workspaceSubPath ? null,
     }:
     let
       containerName = "gateway-${profile}";
@@ -259,13 +274,27 @@ let
             [ ]
         );
       envFrom = envFromSecret;
-      volumeMounts = dataVolumeMounts ++ [
-        {
-          name = cliWrapper.volumeName;
-          mountPath = cliWrapper.mountPath;
-          subPath = "hermes";
-        }
-      ];
+      volumeMounts =
+        dataVolumeMounts
+        ++ [
+          {
+            name = cliWrapper.volumeName;
+            mountPath = cliWrapper.mountPath;
+            subPath = "hermes";
+          }
+        ]
+        ++ (
+          if workspaceSubPath != null then
+            [
+              {
+                name = "hermes-data";
+                mountPath = "/workspace";
+                subPath = workspaceSubPath;
+              }
+            ]
+          else
+            [ ]
+        );
       resources = {
         requests = {
           cpu = "100m";
@@ -321,6 +350,64 @@ in
           securityContext = gatewayPodSecurityContext;
           terminationGracePeriodSeconds = 60;
           imagePullSecrets = [ { name = "ghcr-registry-secret"; } ];
+          initContainers = [
+            {
+              name = "init-spike-profile";
+              inherit image;
+              command = [
+                "/bin/sh"
+                "-c"
+                ''
+                  mkdir -p /opt/data/profiles/spike
+                  # Copy identity files from workspace if available
+                  if [ -d /workspace ]; then
+                    for f in SOUL.md IDENTITY.md USER.md MEMORY.md; do
+                      [ -f /workspace/$f ] && cp /workspace/$f /opt/data/profiles/spike/ 2>/dev/null || true
+                    done
+                  fi
+                ''
+              ];
+              volumeMounts = dataVolumeMounts ++ [
+                {
+                  name = "hermes-data";
+                  mountPath = "/workspace";
+                  subPath = "openclaw/workspace-spike";
+                }
+              ];
+              securityContext = {
+                runAsUser = 10000;
+                runAsGroup = 2002;
+              };
+            }
+            {
+              name = "init-luna-profile";
+              inherit image;
+              command = [
+                "/bin/sh"
+                "-c"
+                ''
+                  mkdir -p /opt/data/profiles/luna
+                  # Copy identity files from workspace if available
+                  if [ -d /workspace ]; then
+                    for f in SOUL.md IDENTITY.md USER.md MEMORY.md; do
+                      [ -f /workspace/$f ] && cp /workspace/$f /opt/data/profiles/luna/ 2>/dev/null || true
+                    done
+                  fi
+                ''
+              ];
+              volumeMounts = dataVolumeMounts ++ [
+                {
+                  name = "hermes-data";
+                  mountPath = "/workspace";
+                  subPath = "openclaw/workspace-luna";
+                }
+              ];
+              securityContext = {
+                runAsUser = 10000;
+                runAsGroup = 2002;
+              };
+            }
+          ];
           containers = containers;
           volumes = dataVolumes ++ [
             {
