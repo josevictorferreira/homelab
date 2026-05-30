@@ -1,0 +1,181 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/controller: main
+    app.kubernetes.io/instance: omniroute
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: omniroute
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: omniroute
+  namespace: apps
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/controller: main
+      app.kubernetes.io/instance: omniroute
+      app.kubernetes.io/name: omniroute
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/controller: main
+        app.kubernetes.io/instance: omniroute
+        app.kubernetes.io/name: omniroute
+    spec:
+      automountServiceAccountToken: true
+      containers:
+        - envFrom:
+            - secretRef:
+                name: omniroute-env
+          image: ghcr.io/diegosouzapw/omniroute:3.8.7@sha256:ca0ec278681d1ad8d331f6b6f0a45f1ded7773e45bbc102c97f897e8d6ff7e4b
+          imagePullPolicy: IfNotPresent
+          name: main
+          ports:
+            - containerPort: 20128
+              name: http
+              protocol: TCP
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 250m
+              memory: 256Mi
+          volumeMounts:
+            - mountPath: /app/data
+              name: data
+            - mountPath: /app/data-home
+              name: data-home
+      dnsPolicy: ClusterFirst
+      enableServiceLinks: false
+      hostIPC: false
+      hostNetwork: false
+      hostPID: false
+      imagePullSecrets:
+        - name: ghcr-registry-secret
+      serviceAccountName: default
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: omniroute-data
+        - name: data-home
+          persistentVolumeClaim:
+            claimName: omniroute-data-home
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: omniroute
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: omniroute
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: omniroute-data
+  namespace: apps
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: rook-ceph-block
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: omniroute
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: omniroute
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: omniroute-data-home
+  namespace: apps
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: rook-ceph-block
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+    lbipam.cilium.io/ips: 10.10.10.148
+    lbipam.cilium.io/sharing-key: omniroute
+  labels:
+    app.kubernetes.io/instance: omniroute
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: omniroute
+    app.kubernetes.io/service: omniroute
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: omniroute
+  namespace: apps
+spec:
+  ports:
+    - name: http
+      port: 20128
+      protocol: TCP
+      targetPort: 20128
+  selector:
+    app.kubernetes.io/controller: main
+    app.kubernetes.io/instance: omniroute
+    app.kubernetes.io/name: omniroute
+  type: LoadBalancer
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: omniroute
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: omniroute
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: omniroute
+  namespace: apps
+spec:
+  ingressClassName: cilium
+  rules:
+    - host: omniroute.josevictor.me
+      http:
+        paths:
+          - backend:
+              service:
+                name: omniroute
+                port:
+                  number: 20128
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - omniroute.josevictor.me
+      secretName: wildcard-tls
