@@ -381,6 +381,16 @@ in
                 runAsUser = 10000;
                 runAsGroup = 2002;
               };
+              resources = {
+                limits = {
+                  cpu = "50m";
+                  memory = "64Mi";
+                };
+                requests = {
+                  cpu = "50m";
+                  memory = "64Mi";
+                };
+              };
             }
             {
               name = "init-luna-profile";
@@ -408,6 +418,16 @@ in
               securityContext = {
                 runAsUser = 10000;
                 runAsGroup = 2002;
+              };
+              resources = {
+                limits = {
+                  cpu = "50m";
+                  memory = "64Mi";
+                };
+                requests = {
+                  cpu = "50m";
+                  memory = "64Mi";
+                };
               };
             }
           ];

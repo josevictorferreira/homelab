@@ -744,6 +744,13 @@ spec:
               \ /opt/data/profiles/spike/ 2>/dev/null || true\n  done\nfi\n"
           image: docker.io/nousresearch/hermes-agent:v2026.5.29.2@sha256:00ec7c4d7ea878dbd10938072781c0127ba13467a18c3b8775adcde60170a0b9
           name: init-spike-profile
+          resources:
+            limits:
+              cpu: 50m
+              memory: 64Mi
+            requests:
+              cpu: 50m
+              memory: 64Mi
           securityContext:
             runAsGroup: 2002
             runAsUser: 10000
@@ -775,6 +782,13 @@ spec:
               \ /opt/data/profiles/luna/ 2>/dev/null || true\n  done\nfi\n"
           image: docker.io/nousresearch/hermes-agent:v2026.5.29.2@sha256:00ec7c4d7ea878dbd10938072781c0127ba13467a18c3b8775adcde60170a0b9
           name: init-luna-profile
+          resources:
+            limits:
+              cpu: 50m
+              memory: 64Mi
+            requests:
+              cpu: 50m
+              memory: 64Mi
           securityContext:
             runAsGroup: 2002
             runAsUser: 10000
