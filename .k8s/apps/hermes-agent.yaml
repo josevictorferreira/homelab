@@ -609,9 +609,6 @@ spec:
             - mountPath: /usr/local/bin/hermes
               name: cli-wrapper
               subPath: hermes
-            - mountPath: /workspace
-              name: hermes-data
-              subPath: openclaw/workspace-spike
         - command:
             - /bin/sh
             - -c
@@ -729,88 +726,9 @@ spec:
             - mountPath: /usr/local/bin/hermes
               name: cli-wrapper
               subPath: hermes
-            - mountPath: /workspace
-              name: hermes-data
-              subPath: openclaw/workspace-luna
       imagePullSecrets:
         - name: ghcr-registry-secret
-      initContainers:
-        - command:
-            - /bin/sh
-            - -c
-            - "mkdir -p /opt/data/profiles/spike\n# Copy identity files from workspace\
-              \ if available\nif [ -d /workspace ]; then\n  for f in SOUL.md IDENTITY.md\
-              \ USER.md MEMORY.md; do\n    [ -f /workspace/$f ] && cp /workspace/$f\
-              \ /opt/data/profiles/spike/ 2>/dev/null || true\n  done\nfi\n"
-          image: docker.io/nousresearch/hermes-agent:v2026.5.29.2@sha256:00ec7c4d7ea878dbd10938072781c0127ba13467a18c3b8775adcde60170a0b9
-          name: init-spike-profile
-          resources:
-            limits:
-              cpu: 50m
-              memory: 64Mi
-            requests:
-              cpu: 50m
-              memory: 64Mi
-          securityContext:
-            runAsGroup: 2002
-            runAsUser: 10000
-          volumeMounts:
-            - mountPath: /opt/data
-              name: hermes-data
-              subPath: hermes
-            - mountPath: /shared/notetaking
-              name: hermes-data
-              subPath: notetaking
-            - mountPath: /shared/mel-dynamica
-              name: hermes-data
-              subPath: mel-dynamica
-            - mountPath: /shared/personal-finances
-              name: hermes-data
-              subPath: personal-finances
-            - mountPath: /opt/hermes/scripts/whatsapp-bridge/node_modules
-              name: hermes-data
-              subPath: whatsapp-bridge-node_modules
-            - mountPath: /workspace
-              name: hermes-data
-              subPath: openclaw/workspace-spike
-        - command:
-            - /bin/sh
-            - -c
-            - "mkdir -p /opt/data/profiles/luna\n# Copy identity files from workspace\
-              \ if available\nif [ -d /workspace ]; then\n  for f in SOUL.md IDENTITY.md\
-              \ USER.md MEMORY.md; do\n    [ -f /workspace/$f ] && cp /workspace/$f\
-              \ /opt/data/profiles/luna/ 2>/dev/null || true\n  done\nfi\n"
-          image: docker.io/nousresearch/hermes-agent:v2026.5.29.2@sha256:00ec7c4d7ea878dbd10938072781c0127ba13467a18c3b8775adcde60170a0b9
-          name: init-luna-profile
-          resources:
-            limits:
-              cpu: 50m
-              memory: 64Mi
-            requests:
-              cpu: 50m
-              memory: 64Mi
-          securityContext:
-            runAsGroup: 2002
-            runAsUser: 10000
-          volumeMounts:
-            - mountPath: /opt/data
-              name: hermes-data
-              subPath: hermes
-            - mountPath: /shared/notetaking
-              name: hermes-data
-              subPath: notetaking
-            - mountPath: /shared/mel-dynamica
-              name: hermes-data
-              subPath: mel-dynamica
-            - mountPath: /shared/personal-finances
-              name: hermes-data
-              subPath: personal-finances
-            - mountPath: /opt/hermes/scripts/whatsapp-bridge/node_modules
-              name: hermes-data
-              subPath: whatsapp-bridge-node_modules
-            - mountPath: /workspace
-              name: hermes-data
-              subPath: openclaw/workspace-luna
+      initContainers: []
       securityContext:
         supplementalGroups:
           - 100
