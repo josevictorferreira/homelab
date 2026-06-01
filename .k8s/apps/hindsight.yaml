@@ -38,12 +38,12 @@ spec:
               value: '1'
             - name: HINDSIGHT_API_CONSOLIDATION_LLM_TIMEOUT
               value: '45'
-            - name: HINDSIGHT_API_EMBEDDINGS_LOCAL_FORCE_CPU
-              value: 'true'
-            - name: HINDSIGHT_API_EMBEDDINGS_LOCAL_MODEL
-              value: BAAI/bge-small-en-v1.5
+            - name: HINDSIGHT_API_EMBEDDINGS_OPENAI_BASE_URL
+              value: https://omniroute.josevictor.me/v1
+            - name: HINDSIGHT_API_EMBEDDINGS_OPENAI_MODEL
+              value: gemini/gemini-embedding-2
             - name: HINDSIGHT_API_EMBEDDINGS_PROVIDER
-              value: local
+              value: openai
             - name: HINDSIGHT_API_HOST
               value: 0.0.0.0
             - name: HINDSIGHT_API_LLM_BASE_URL
