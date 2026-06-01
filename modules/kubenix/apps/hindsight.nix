@@ -12,7 +12,7 @@ in
         inherit namespace;
         image = {
           repository = "ghcr.io/vectorize-io/hindsight-api";
-          tag = "0.6.2";
+          tag = "0.7.1@sha256:c6160ccc500d15886abf489462d5b0077a33476da294393db8782a4ffb0c5fa1";
           pullPolicy = "IfNotPresent";
         };
         port = 8888;
@@ -111,7 +111,7 @@ in
         inherit namespace;
         image = {
           repository = "ghcr.io/vectorize-io/hindsight-control-plane";
-          tag = "0.6.2";
+          tag = "0.7.1@sha256:29963bd273fa67cba8af87c616079a273c2eeb9e31a9a8aff15544337e09e21b";
           pullPolicy = "IfNotPresent";
         };
         port = 3000;
