@@ -37,9 +37,9 @@ in
               HINDSIGHT_API_PORT = "8888";
               HINDSIGHT_API_HOST = "0.0.0.0";
               HINDSIGHT_API_LLM_PROVIDER = "openai";
-              HINDSIGHT_API_LLM_MODEL = "cheap-nitro";
-              HINDSIGHT_API_LLM_BASE_URL = "https://router9.josevictor.me/v1";
-              HINDSIGHT_API_REFLECT_LLM_MODEL = "cheap-fast";
+              HINDSIGHT_API_LLM_MODEL = "pippin";
+              HINDSIGHT_API_LLM_BASE_URL = "https://omniroute.josevictor.me/v1";
+              HINDSIGHT_API_REFLECT_LLM_MODEL = "haldir";
               HINDSIGHT_API_EMBEDDINGS_PROVIDER = "local";
               HINDSIGHT_API_EMBEDDINGS_LOCAL_MODEL = "BAAI/bge-small-en-v1.5";
               HINDSIGHT_API_EMBEDDINGS_LOCAL_FORCE_CPU = "true";

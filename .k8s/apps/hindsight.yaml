@@ -47,13 +47,13 @@ spec:
             - name: HINDSIGHT_API_HOST
               value: 0.0.0.0
             - name: HINDSIGHT_API_LLM_BASE_URL
-              value: https://router9.josevictor.me/v1
+              value: https://omniroute.josevictor.me/v1
             - name: HINDSIGHT_API_LLM_MAX_CONCURRENT
               value: '8'
             - name: HINDSIGHT_API_LLM_MAX_RETRIES
               value: '1'
             - name: HINDSIGHT_API_LLM_MODEL
-              value: cheap-nitro
+              value: pippin
             - name: HINDSIGHT_API_LLM_PROVIDER
               value: openai
             - name: HINDSIGHT_API_LLM_TIMEOUT
@@ -61,7 +61,7 @@ spec:
             - name: HINDSIGHT_API_PORT
               value: '8888'
             - name: HINDSIGHT_API_REFLECT_LLM_MODEL
-              value: cheap-fast
+              value: haldir
             - name: HINDSIGHT_API_RERANKER_LOCAL_MODEL
               value: cross-encoder/ms-marco-MiniLM-L-6-v2
             - name: HINDSIGHT_API_RERANKER_PROVIDER
