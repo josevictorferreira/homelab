@@ -40,9 +40,8 @@ in
               HINDSIGHT_API_LLM_MODEL = "pippin";
               HINDSIGHT_API_LLM_BASE_URL = "https://omniroute.josevictor.me/v1";
               HINDSIGHT_API_REFLECT_LLM_MODEL = "haldir";
-              HINDSIGHT_API_EMBEDDINGS_PROVIDER = "local";
-              HINDSIGHT_API_EMBEDDINGS_LOCAL_MODEL = "BAAI/bge-small-en-v1.5";
-              HINDSIGHT_API_EMBEDDINGS_LOCAL_FORCE_CPU = "true";
+              HINDSIGHT_API_EMBEDDINGS_PROVIDER = "openrouter";
+              HINDSIGHT_API_EMBEDDINGS_OPENROUTER_MODEL = "nvidia/llama-nemotron-embed-vl-1b-v2";
               HINDSIGHT_API_RERANKER_PROVIDER = "local";
               HINDSIGHT_API_RERANKER_LOCAL_MODEL = "cross-encoder/ms-marco-MiniLM-L-6-v2";
               HINDSIGHT_API_WORKER_MAX_SLOTS = "8";

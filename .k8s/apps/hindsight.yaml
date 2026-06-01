@@ -38,12 +38,10 @@ spec:
               value: '1'
             - name: HINDSIGHT_API_CONSOLIDATION_LLM_TIMEOUT
               value: '45'
-            - name: HINDSIGHT_API_EMBEDDINGS_LOCAL_FORCE_CPU
-              value: 'true'
-            - name: HINDSIGHT_API_EMBEDDINGS_LOCAL_MODEL
-              value: BAAI/bge-small-en-v1.5
+            - name: HINDSIGHT_API_EMBEDDINGS_OPENROUTER_MODEL
+              value: nvidia/llama-nemotron-embed-vl-1b-v2
             - name: HINDSIGHT_API_EMBEDDINGS_PROVIDER
-              value: local
+              value: openrouter
             - name: HINDSIGHT_API_HOST
               value: 0.0.0.0
             - name: HINDSIGHT_API_LLM_BASE_URL
