@@ -44,7 +44,7 @@ in
               HINDSIGHT_API_EMBEDDINGS_OPENAI_MODEL = "voyage/voyage-4-lite";
               HINDSIGHT_API_EMBEDDINGS_OPENAI_BASE_URL = "https://omniroute.josevictor.me/v1";
               HINDSIGHT_API_RERANKER_PROVIDER = "cohere";
-              HINDSIGHT_API_RERANKER_COHERE_MODEL = "voyage/rerank-2-lite";
+              HINDSIGHT_API_RERANKER_COHERE_MODEL = "fireworks/accounts/fireworks/models/qwen3-reranker-8b";
               HINDSIGHT_API_RERANKER_COHERE_BASE_URL = "https://omniroute.josevictor.me/api/v1/rerank";
               HINDSIGHT_API_WORKER_MAX_SLOTS = "8";
               HINDSIGHT_API_WORKER_CONSOLIDATION_MAX_SLOTS = "2";
