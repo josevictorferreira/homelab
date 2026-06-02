@@ -32,7 +32,7 @@ in
           service.main.type = "ClusterIP";
           controllers.main.containers.main = {
             env = {
-              HINDSIGHT_API_VECTOR_EXTENSION = "vchord";
+              HINDSIGHT_API_VECTOR_EXTENSION = "pgvector";
               HINDSIGHT_API_TEXT_SEARCH_EXTENSION = "native";
               HINDSIGHT_API_PORT = "8888";
               HINDSIGHT_API_HOST = "0.0.0.0";
