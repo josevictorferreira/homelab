@@ -39,7 +39,7 @@ spec:
             - name: HINDSIGHT_API_CONSOLIDATION_LLM_TIMEOUT
               value: '45'
             - name: HINDSIGHT_API_EMBEDDINGS_LOCAL_MODEL
-              value: sentence-transformers/all-MiniLM-L6-v2
+              value: BAAI/bge-large-en-v1.5
             - name: HINDSIGHT_API_EMBEDDINGS_PROVIDER
               value: local
             - name: HINDSIGHT_API_HOST
