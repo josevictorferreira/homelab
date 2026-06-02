@@ -110,7 +110,7 @@ spec:
               cpu: 500m
               memory: 1Gi
           startupProbe:
-            failureThreshold: 18
+            failureThreshold: 60
             httpGet:
               path: /health
               port: 8888
