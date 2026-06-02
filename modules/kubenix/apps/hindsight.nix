@@ -94,7 +94,7 @@ in
                   initialDelaySeconds = 10;
                   periodSeconds = 10;
                   timeoutSeconds = 5;
-                  failureThreshold = 18;
+                  failureThreshold = 60;
                 };
               };
             };
