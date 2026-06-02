@@ -38,12 +38,10 @@ spec:
               value: '1'
             - name: HINDSIGHT_API_CONSOLIDATION_LLM_TIMEOUT
               value: '45'
-            - name: HINDSIGHT_API_EMBEDDINGS_OPENAI_BASE_URL
-              value: https://omniroute.josevictor.me/v1
-            - name: HINDSIGHT_API_EMBEDDINGS_OPENAI_MODEL
-              value: voyage/voyage-4-lite
+            - name: HINDSIGHT_API_EMBEDDINGS_LOCAL_MODEL
+              value: sentence-transformers/all-MiniLM-L6-v2
             - name: HINDSIGHT_API_EMBEDDINGS_PROVIDER
-              value: openai
+              value: local
             - name: HINDSIGHT_API_HOST
               value: 0.0.0.0
             - name: HINDSIGHT_API_LLM_BASE_URL
@@ -62,12 +60,10 @@ spec:
               value: '8888'
             - name: HINDSIGHT_API_REFLECT_LLM_MODEL
               value: haldir
-            - name: HINDSIGHT_API_RERANKER_COHERE_BASE_URL
-              value: https://omniroute.josevictor.me/api/v1/rerank
-            - name: HINDSIGHT_API_RERANKER_COHERE_MODEL
-              value: fireworks/accounts/fireworks/models/qwen3-reranker-8b
+            - name: HINDSIGHT_API_RERANKER_LOCAL_MODEL
+              value: cross-encoder/ms-marco-MiniLM-L-6-v2
             - name: HINDSIGHT_API_RERANKER_PROVIDER
-              value: cohere
+              value: local
             - name: HINDSIGHT_API_RETAIN_LLM_MAX_RETRIES
               value: '1'
             - name: HINDSIGHT_API_RETAIN_LLM_TIMEOUT
