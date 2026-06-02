@@ -20,11 +20,11 @@ in
         resources = {
           requests = {
             cpu = "500m";
-            memory = "1Gi";
+            memory = "2Gi";
           };
           limits = {
             cpu = "2000m";
-            memory = "4Gi";
+            memory = "8Gi";
           };
         };
         priorityClassName = "preemptible";
@@ -34,6 +34,7 @@ in
             env = {
               HINDSIGHT_API_VECTOR_EXTENSION = "pgvector";
               HINDSIGHT_API_TEXT_SEARCH_EXTENSION = "native";
+              HINDSIGHT_API_TEXT_SEARCH_EXTENSION_NATIVE_LANGUAGE = "portuguese";
               HINDSIGHT_API_PORT = "8888";
               HINDSIGHT_API_HOST = "0.0.0.0";
               HINDSIGHT_API_LLM_PROVIDER = "openai";
@@ -41,9 +42,9 @@ in
               HINDSIGHT_API_LLM_BASE_URL = "https://omniroute.josevictor.me/v1";
               HINDSIGHT_API_REFLECT_LLM_MODEL = "haldir";
               HINDSIGHT_API_EMBEDDINGS_PROVIDER = "local";
-              HINDSIGHT_API_EMBEDDINGS_LOCAL_MODEL = "BAAI/bge-large-en-v1.5";
+              HINDSIGHT_API_EMBEDDINGS_LOCAL_MODEL = "BAAI/bge-m3";
               HINDSIGHT_API_RERANKER_PROVIDER = "local";
-              HINDSIGHT_API_RERANKER_LOCAL_MODEL = "cross-encoder/ms-marco-MiniLM-L-6-v2";
+              HINDSIGHT_API_RERANKER_LOCAL_MODEL = "BAAI/bge-reranker-v2-m3";
               HINDSIGHT_API_WORKER_MAX_SLOTS = "8";
               HINDSIGHT_API_WORKER_CONSOLIDATION_MAX_SLOTS = "2";
               HINDSIGHT_API_LLM_TIMEOUT = "30";
