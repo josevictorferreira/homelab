@@ -83,7 +83,7 @@ spec:
           envFrom:
             - secretRef:
                 name: hindsight-secrets
-          image: ghcr.io/vectorize-io/hindsight-api:0.7.1@sha256:c6160ccc500d15886abf489462d5b0077a33476da294393db8782a4ffb0c5fa1
+          image: ghcr.io/vectorize-io/hindsight-api:0.7.2@sha256:462bffbe63cad2e451da68db6637a219a51939c40cb8884eaf67589af54b857c
           imagePullPolicy: IfNotPresent
           livenessProbe:
             failureThreshold: 3
@@ -239,7 +239,7 @@ spec:
           envFrom:
             - secretRef:
                 name: hindsight-secrets
-          image: ghcr.io/vectorize-io/hindsight-control-plane:0.7.1@sha256:29963bd273fa67cba8af87c616079a273c2eeb9e31a9a8aff15544337e09e21b
+          image: ghcr.io/vectorize-io/hindsight-control-plane:0.7.2@sha256:453fee1858ef6de1b5cef5ea8c8501a044065d92113e6b819c3e4ff17de05254
           imagePullPolicy: IfNotPresent
           livenessProbe:
             failureThreshold: 3
