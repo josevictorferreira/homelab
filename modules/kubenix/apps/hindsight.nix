@@ -20,11 +20,11 @@ in
         resources = {
           requests = {
             cpu = "500m";
-            memory = "2Gi";
+            memory = "1Gi";
           };
           limits = {
             cpu = "2000m";
-            memory = "8Gi";
+            memory = "4Gi";
           };
         };
         priorityClassName = "preemptible";
@@ -42,9 +42,9 @@ in
               HINDSIGHT_API_LLM_BASE_URL = "https://omniroute.josevictor.me/v1";
               HINDSIGHT_API_REFLECT_LLM_MODEL = "haldir";
               HINDSIGHT_API_EMBEDDINGS_PROVIDER = "local";
-              HINDSIGHT_API_EMBEDDINGS_LOCAL_MODEL = "BAAI/bge-m3";
+              HINDSIGHT_API_EMBEDDINGS_LOCAL_MODEL = "intfloat/multilingual-e5-large";
               HINDSIGHT_API_RERANKER_PROVIDER = "local";
-              HINDSIGHT_API_RERANKER_LOCAL_MODEL = "BAAI/bge-reranker-v2-m3";
+              HINDSIGHT_API_RERANKER_LOCAL_MODEL = "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1";
               HINDSIGHT_API_WORKER_MAX_SLOTS = "8";
               HINDSIGHT_API_WORKER_CONSOLIDATION_MAX_SLOTS = "2";
               HINDSIGHT_API_LLM_TIMEOUT = "30";

@@ -39,7 +39,7 @@ spec:
             - name: HINDSIGHT_API_CONSOLIDATION_LLM_TIMEOUT
               value: '45'
             - name: HINDSIGHT_API_EMBEDDINGS_LOCAL_MODEL
-              value: BAAI/bge-m3
+              value: intfloat/multilingual-e5-large
             - name: HINDSIGHT_API_EMBEDDINGS_PROVIDER
               value: local
             - name: HINDSIGHT_API_HOST
@@ -61,7 +61,7 @@ spec:
             - name: HINDSIGHT_API_REFLECT_LLM_MODEL
               value: haldir
             - name: HINDSIGHT_API_RERANKER_LOCAL_MODEL
-              value: BAAI/bge-reranker-v2-m3
+              value: cross-encoder/mmarco-mMiniLMv2-L12-H384-v1
             - name: HINDSIGHT_API_RERANKER_PROVIDER
               value: local
             - name: HINDSIGHT_API_RETAIN_LLM_MAX_RETRIES
@@ -107,10 +107,10 @@ spec:
           resources:
             limits:
               cpu: 2000m
-              memory: 8Gi
+              memory: 4Gi
             requests:
               cpu: 500m
-              memory: 2Gi
+              memory: 1Gi
           startupProbe:
             failureThreshold: 60
             httpGet:
