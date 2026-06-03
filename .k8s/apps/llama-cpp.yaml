@@ -1,0 +1,193 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/controller: main
+    app.kubernetes.io/instance: llama-cpp
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: llama-cpp
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: llama-cpp
+  namespace: apps
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/controller: main
+      app.kubernetes.io/instance: llama-cpp
+      app.kubernetes.io/name: llama-cpp
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/controller: main
+        app.kubernetes.io/instance: llama-cpp
+        app.kubernetes.io/name: llama-cpp
+    spec:
+      automountServiceAccountToken: true
+      containers:
+        - args:
+            - --model
+            - /models/model.gguf
+            - --host
+            - 0.0.0.0
+            - --port
+            - '8080'
+            - --embedding
+            - --alias
+            - embeddings
+          command:
+            - llama-server
+          image: ghcr.io/ggml-org/llama.cpp:server-rocm
+          imagePullPolicy: Always
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            timeoutSeconds: 5
+          name: main
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            timeoutSeconds: 3
+          resources:
+            limits:
+              amd.com/gpu: '1'
+              cpu: 2000m
+              memory: 4Gi
+            requests:
+              amd.com/gpu: '1'
+              cpu: 100m
+              memory: 512Mi
+          startupProbe:
+            failureThreshold: 60
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+          volumeMounts:
+            - mountPath: /models
+              name: models
+      dnsPolicy: ClusterFirst
+      enableServiceLinks: false
+      hostIPC: false
+      hostNetwork: false
+      hostPID: false
+      nodeSelector:
+        node.kubernetes.io/amd-gpu: 'true'
+      priorityClassName: preemptible
+      serviceAccountName: default
+      tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+          operator: Exists
+      volumes:
+        - name: models
+          persistentVolumeClaim:
+            claimName: llama-cpp
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: llama-cpp
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: llama-cpp
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: llama-cpp
+  namespace: apps
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+  storageClassName: rook-ceph-block
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+    lbipam.cilium.io/ips: 10.10.10.129
+    lbipam.cilium.io/sharing-key: llama-cpp
+  labels:
+    app.kubernetes.io/instance: llama-cpp
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: llama-cpp
+    app.kubernetes.io/service: llama-cpp
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: llama-cpp
+  namespace: apps
+spec:
+  ports:
+    - name: http
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    app.kubernetes.io/controller: main
+    app.kubernetes.io/instance: llama-cpp
+    app.kubernetes.io/name: llama-cpp
+  type: LoadBalancer
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: llama-cpp
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: llama-cpp
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: llama-cpp
+  namespace: apps
+spec:
+  ingressClassName: cilium
+  rules:
+    - host: llama-cpp.josevictor.me
+      http:
+        paths:
+          - backend:
+              service:
+                name: llama-cpp
+                port:
+                  number: 8080
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - llama-cpp.josevictor.me
+      secretName: wildcard-tls
