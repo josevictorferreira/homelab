@@ -20,6 +20,7 @@ in
 
       values = {
         controllers.main.strategy = "Recreate";
+        controllers.main.replicas = 0;
 
         defaultPodOptions.imagePullSecrets = [
           { name = "ghcr-registry-secret"; }
