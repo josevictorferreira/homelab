@@ -71,7 +71,7 @@ spec:
           resources:
             limits:
               amd.com/gpu: '1'
-              cpu: 2000m
+              cpu: 500m
               memory: 4Gi
             requests:
               amd.com/gpu: '1'
@@ -93,6 +93,19 @@ spec:
       hostIPC: false
       hostNetwork: false
       hostPID: false
+      initContainers:
+        - args:
+            - "if [ ! -f /models/model.gguf ]; then\n  echo \"Downloading multilingual-e5-large\
+              \ GGUF model...\"\n  wget -q -O /models/model.gguf \"https://huggingface.co/cstr/multilingual-e5-large-GGUF/resolve/main/multilingual-e5-large-q4_k.gguf\"\
+              \nfi\n"
+          command:
+            - sh
+            - -c
+          image: busybox:1.36.1
+          name: download-model
+          volumeMounts:
+            - mountPath: /models
+              name: models
       nodeSelector:
         node.kubernetes.io/amd-gpu: 'true'
       priorityClassName: preemptible
