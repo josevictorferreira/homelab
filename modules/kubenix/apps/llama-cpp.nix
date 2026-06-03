@@ -21,7 +21,7 @@ in
           "amd.com/gpu" = "1";
         };
         limits = {
-          cpu = "2000m";
+          cpu = "500m";
           memory = "4Gi";
           "amd.com/gpu" = "1";
         };
@@ -96,6 +96,24 @@ in
               };
             };
           };
+        };
+        controllers.main.initContainers.download-model = {
+          image = {
+            repository = "busybox";
+            tag = "1.36.1";
+          };
+          command = [
+            "sh"
+            "-c"
+          ];
+          args = [
+            ''
+              if [ ! -f /models/model.gguf ]; then
+                echo "Downloading multilingual-e5-large GGUF model..."
+                wget -q -O /models/model.gguf "https://huggingface.co/cstr/multilingual-e5-large-GGUF/resolve/main/multilingual-e5-large-q4_k.gguf"
+              fi
+            ''
+          ];
         };
         persistence.models = {
           enabled = true;
