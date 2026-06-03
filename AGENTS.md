@@ -874,6 +874,23 @@ The deploy > CrashLoopBackOff > fix > re-deploy cycle costs 5-7 min per iteratio
 **Context:** Removing the lossless-claw version check left an empty `else` block (syntax error)
 and an orphaned `$needs_sync` variable (unbound error) both caught only after pod CrashLoopBackOff.
 **Verify:** `bash -n <<< "$script"` on the extracted startup script string before commit.
+
+### Hindsight Model and Index Migrations
+
+#### Hindsight Embedding Model Changes Require Full Re-Embedding
+**Lesson:** After changing `HINDSIGHT_API_EMBEDDINGS_LOCAL_MODEL`, re-embed every `memory_units.embedding`, refresh `memory_units_bm25`, and reindex `idx_memory_units_embedding_hnsw`; matching vector dimensions alone are not enough.
+**Context:** BGE and Voyage/BGE/E5 can all produce 1024-dimensional vectors, but cross-model vector spaces are incompatible and semantic recall silently degrades.
+**Verify:** Check logs for recall showing nonzero `semantic=<n>` and verify DB counts: `select count(*), count(embedding), count(*)-count(embedding) from memory_units;`.
+
+#### Hindsight Local Model Size Must Fit Namespace Quotas
+**Lesson:** Before deploying a new local embedding/reranker model, test model load in the live pod or a same-limit scratch pod and check namespace `LimitRange`/quota; do not assume docs-recommended models fit.
+**Context:** `BAAI/bge-m3` + `BAAI/bge-reranker-v2-m3` exceeded the `apps` namespace 4Gi per-container limit and caused a failed rollout.
+**Verify:** `kubectl get limitrange,resourcequota -n apps` and a targeted `SentenceTransformer('<model>')` load succeeds under the intended memory limit.
+
+#### Use pgvector for Hindsight's Small 1024-Dim Dataset
+**Lesson:** Keep Hindsight on `HINDSIGHT_API_VECTOR_EXTENSION=pgvector` for the current small 1024-dimensional memory dataset; avoid `vchord` unless the dataset/model profile justifies it.
+**Context:** `vchord` produced recall 500s with `need 0 probes, but 1 probes provided`; switching to pgvector restored recall without deleting memories.
+**Verify:** Hindsight recall returns HTTP 200 and logs show semantic retrieval instead of VectorChord probe errors.
 ### Glance
 
 #### Glance custom-api Widgets Need Explicit Timeout for External APIs
