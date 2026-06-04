@@ -14,7 +14,7 @@ in
       inherit namespace;
       image = {
         repository = "ghcr.io/0xerr0r/blocky";
-        tag = "v0.29.0@sha256:a3262b2c478d62064346c1d7aa2af99701b1366356955fc9f062e17e3d8c8849";
+        tag = "v0.31.0@sha256:2e5696efe4f920a9c07efa5587650fb94e7c4dc68759a77debde3daaa1e30cdb";
         pullPolicy = "IfNotPresent";
       };
       port = 4000;
