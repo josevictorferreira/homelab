@@ -72,11 +72,11 @@ spec:
             timeoutSeconds: 3
           resources:
             limits:
-              cpu: 1000m
+              cpu: 500m
               memory: 2Gi
             requests:
               cpu: 50m
-              memory: 128Mi
+              memory: 64Mi
           startupProbe:
             failureThreshold: 60
             httpGet:
@@ -134,7 +134,7 @@ spec:
             requests:
               amd.com/gpu: '1'
               cpu: 100m
-              memory: 512Mi
+              memory: 256Mi
           startupProbe:
             failureThreshold: 60
             httpGet:
