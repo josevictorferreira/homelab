@@ -23,7 +23,7 @@ in
             memory = "512Mi";
           };
           limits = {
-            cpu = "2000m";
+            cpu = "1000m";
             memory = "2Gi";
           };
         };
@@ -47,6 +47,8 @@ in
               HINDSIGHT_API_RERANKER_PROVIDER = "cohere";
               HINDSIGHT_API_RERANKER_COHERE_BASE_URL = "http://llama-cpp.apps.svc.cluster.local:8080/v1/rerank";
               HINDSIGHT_API_RERANKER_COHERE_MODEL = "bge-reranker-v2-m3";
+              HINDSIGHT_API_RERANKER_COHERE_TIMEOUT = "120";
+              HINDSIGHT_API_RERANKER_MAX_CANDIDATES = "32";
               HINDSIGHT_API_WORKER_MAX_SLOTS = "8";
               HINDSIGHT_API_WORKER_CONSOLIDATION_MAX_SLOTS = "2";
               HINDSIGHT_API_LLM_TIMEOUT = "30";

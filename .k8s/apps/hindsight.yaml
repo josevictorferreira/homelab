@@ -66,6 +66,10 @@ spec:
               value: http://llama-cpp.apps.svc.cluster.local:8080/v1/rerank
             - name: HINDSIGHT_API_RERANKER_COHERE_MODEL
               value: bge-reranker-v2-m3
+            - name: HINDSIGHT_API_RERANKER_COHERE_TIMEOUT
+              value: '120'
+            - name: HINDSIGHT_API_RERANKER_MAX_CANDIDATES
+              value: '32'
             - name: HINDSIGHT_API_RERANKER_PROVIDER
               value: cohere
             - name: HINDSIGHT_API_RETAIN_LLM_MAX_RETRIES
@@ -110,7 +114,7 @@ spec:
             timeoutSeconds: 3
           resources:
             limits:
-              cpu: 2000m
+              cpu: 1000m
               memory: 2Gi
             requests:
               cpu: 50m
