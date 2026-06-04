@@ -17,7 +17,7 @@ in
       resources = {
         requests = {
           cpu = "100m";
-          memory = "256Mi";
+          memory = "64Mi";
           "amd.com/gpu" = "1";
         };
         limits = {
