@@ -40,7 +40,7 @@ in
           ];
         };
         controllers.main.containers.main = {
-          command = [ "llama-server" ];
+          command = [ "/app/llama-server" ];
           args = [
             "--model"
             "/models/model.gguf"
@@ -106,6 +106,16 @@ in
             "sh"
             "-c"
           ];
+          resources = {
+            requests = {
+              cpu = "50m";
+              memory = "64Mi";
+            };
+            limits = {
+              cpu = "200m";
+              memory = "128Mi";
+            };
+          };
           args = [
             ''
               if [ ! -f /models/model.gguf ]; then
