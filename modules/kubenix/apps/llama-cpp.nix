@@ -69,6 +69,7 @@ in
             "128"
             "--ubatch-size"
             "128"
+            "--no-warmup"
             "--cache-ram"
             "0"
           ];
