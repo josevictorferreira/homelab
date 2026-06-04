@@ -44,7 +44,7 @@ spec:
             - --alias
             - embeddings
           command:
-            - llama-server
+            - /app/llama-server
           image: ghcr.io/ggml-org/llama.cpp:server-rocm
           imagePullPolicy: Always
           livenessProbe:
@@ -103,6 +103,13 @@ spec:
             - -c
           image: busybox:1.36.1
           name: download-model
+          resources:
+            limits:
+              cpu: 200m
+              memory: 128Mi
+            requests:
+              cpu: 50m
+              memory: 64Mi
           volumeMounts:
             - mountPath: /models
               name: models
