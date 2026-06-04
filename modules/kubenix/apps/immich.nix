@@ -48,7 +48,7 @@ in
           enabled = true;
 
           controllers.main = {
-            replicas = 1;
+            replicas = 0;
             containers.main = {
               image = {
                 repository = "ghcr.io/immich-app/immich-machine-learning";
@@ -82,7 +82,7 @@ in
         server = {
           enabled = true;
           controllers.main = {
-            replicas = 1;
+            replicas = 0;
             pod.priorityClassName = "preemptible";
           };
           controllers.main.containers.main = {
