@@ -61,6 +61,10 @@ in
             "--reranking"
             "--alias"
             "bge-reranker-v2-m3"
+            "--parallel"
+            "1"
+            "--cache-ram"
+            "0"
           ];
           probes = {
             liveness = {
@@ -125,6 +129,10 @@ in
             "--alias"
             "intfloat/multilingual-e5-large"
             "--n-gpu-layers"
+            "0"
+            "--parallel"
+            "1"
+            "--cache-ram"
             "0"
           ];
           resources = {
