@@ -43,14 +43,17 @@ in
           command = [ "/app/llama-server" ];
           args = [
             "--model"
-            "/models/model.gguf"
+            "/models/bge-reranker-v2-m3-Q4_K_M.gguf"
             "--host"
             "0.0.0.0"
             "--port"
             "8080"
             "--embedding"
+            "--pooling"
+            "rank"
+            "--reranking"
             "--alias"
-            "embeddings"
+            "bge-reranker-v2-m3"
           ];
           probes = {
             liveness = {
@@ -118,9 +121,9 @@ in
           };
           args = [
             ''
-              if [ ! -f /models/model.gguf ]; then
-                echo "Downloading multilingual-e5-large GGUF model..."
-                wget -q -O /models/model.gguf "https://huggingface.co/cstr/multilingual-e5-large-GGUF/resolve/main/multilingual-e5-large-q4_k.gguf"
+              if [ ! -f /models/bge-reranker-v2-m3-Q4_K_M.gguf ]; then
+                echo "Downloading bge-reranker-v2-m3 GGUF model..."
+                wget -q -O /models/bge-reranker-v2-m3-Q4_K_M.gguf "https://huggingface.co/sinjab/bge-reranker-v2-m3-Q4_K_M-GGUF/resolve/main/bge-reranker-v2-m3-Q4_K_M.gguf"
               fi
             ''
           ];
