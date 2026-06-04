@@ -18,12 +18,10 @@ in
         requests = {
           cpu = "100m";
           memory = "64Mi";
-          "amd.com/gpu" = "1";
         };
         limits = {
           cpu = "500m";
           memory = "4Gi";
-          "amd.com/gpu" = "1";
         };
       };
       priorityClassName = "preemptible";
