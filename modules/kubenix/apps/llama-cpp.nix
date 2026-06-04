@@ -18,10 +18,12 @@ in
         requests = {
           cpu = "100m";
           memory = "64Mi";
+          "amd.com/gpu" = "1";
         };
         limits = {
           cpu = "1500m";
           memory = "4Gi";
+          "amd.com/gpu" = "1";
         };
       };
       priorityClassName = "preemptible";
@@ -136,7 +138,7 @@ in
             "--alias"
             "intfloat/multilingual-e5-large"
             "--n-gpu-layers"
-            "0"
+            "1"
             "--parallel"
             "1"
             "--cache-ram"
