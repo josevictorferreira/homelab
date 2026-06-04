@@ -61,6 +61,8 @@ in
             "--reranking"
             "--alias"
             "bge-reranker-v2-m3"
+            "--n-gpu-layers"
+            "0"
             "--parallel"
             "1"
             "--fit"
