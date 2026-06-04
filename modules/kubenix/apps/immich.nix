@@ -49,26 +49,20 @@ in
 
           controllers.main = {
             replicas = 1;
-            pod = {
-              priorityClassName = "preemptible";
-              nodeSelector."node.kubernetes.io/amd-gpu" = "true";
-            };
             containers.main = {
               image = {
                 repository = "ghcr.io/immich-app/immich-machine-learning";
-                tag = "v2.7.2-rocm@sha256:4b329e8118ab9c6851c60820ad2fee4762a375608f922c0adf9144f29bb39dbc";
+                tag = "v2.7.2";
                 pullPolicy = "IfNotPresent";
               };
               resources = {
                 requests = {
                   cpu = "100m";
                   memory = "256Mi";
-                  "amd.com/gpu" = "1";
                 };
                 limits = {
                   cpu = "500m";
                   memory = "1Gi";
-                  "amd.com/gpu" = "1";
                 };
               };
             };
