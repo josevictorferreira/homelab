@@ -19,12 +19,12 @@ in
         secretName = secretName;
         resources = {
           requests = {
-            cpu = "500m";
-            memory = "1Gi";
+            cpu = "50m";
+            memory = "512Mi";
           };
           limits = {
             cpu = "2000m";
-            memory = "4Gi";
+            memory = "2Gi";
           };
         };
         priorityClassName = "preemptible";
@@ -41,10 +41,12 @@ in
               HINDSIGHT_API_LLM_MODEL = "pippin";
               HINDSIGHT_API_LLM_BASE_URL = "https://omniroute.josevictor.me/v1";
               HINDSIGHT_API_REFLECT_LLM_MODEL = "haldir";
-              HINDSIGHT_API_EMBEDDINGS_PROVIDER = "local";
-              HINDSIGHT_API_EMBEDDINGS_LOCAL_MODEL = "intfloat/multilingual-e5-large";
-              HINDSIGHT_API_RERANKER_PROVIDER = "local";
-              HINDSIGHT_API_RERANKER_LOCAL_MODEL = "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1";
+              HINDSIGHT_API_EMBEDDINGS_PROVIDER = "openai";
+              HINDSIGHT_API_EMBEDDINGS_OPENAI_BASE_URL = "http://llama-cpp.apps.svc.cluster.local:8081/v1";
+              HINDSIGHT_API_EMBEDDINGS_OPENAI_MODEL = "intfloat/multilingual-e5-large";
+              HINDSIGHT_API_RERANKER_PROVIDER = "cohere";
+              HINDSIGHT_API_RERANKER_COHERE_BASE_URL = "http://llama-cpp.apps.svc.cluster.local:8080/v1/rerank";
+              HINDSIGHT_API_RERANKER_COHERE_MODEL = "bge-reranker-v2-m3";
               HINDSIGHT_API_WORKER_MAX_SLOTS = "8";
               HINDSIGHT_API_WORKER_CONSOLIDATION_MAX_SLOTS = "2";
               HINDSIGHT_API_LLM_TIMEOUT = "30";

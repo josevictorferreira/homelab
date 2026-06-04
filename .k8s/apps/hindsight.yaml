@@ -38,10 +38,12 @@ spec:
               value: '1'
             - name: HINDSIGHT_API_CONSOLIDATION_LLM_TIMEOUT
               value: '45'
-            - name: HINDSIGHT_API_EMBEDDINGS_LOCAL_MODEL
+            - name: HINDSIGHT_API_EMBEDDINGS_OPENAI_BASE_URL
+              value: http://llama-cpp.apps.svc.cluster.local:8081/v1
+            - name: HINDSIGHT_API_EMBEDDINGS_OPENAI_MODEL
               value: intfloat/multilingual-e5-large
             - name: HINDSIGHT_API_EMBEDDINGS_PROVIDER
-              value: local
+              value: openai
             - name: HINDSIGHT_API_HOST
               value: 0.0.0.0
             - name: HINDSIGHT_API_LLM_BASE_URL
@@ -60,10 +62,12 @@ spec:
               value: '8888'
             - name: HINDSIGHT_API_REFLECT_LLM_MODEL
               value: haldir
-            - name: HINDSIGHT_API_RERANKER_LOCAL_MODEL
-              value: cross-encoder/mmarco-mMiniLMv2-L12-H384-v1
+            - name: HINDSIGHT_API_RERANKER_COHERE_BASE_URL
+              value: http://llama-cpp.apps.svc.cluster.local:8080/v1/rerank
+            - name: HINDSIGHT_API_RERANKER_COHERE_MODEL
+              value: bge-reranker-v2-m3
             - name: HINDSIGHT_API_RERANKER_PROVIDER
-              value: local
+              value: cohere
             - name: HINDSIGHT_API_RETAIN_LLM_MAX_RETRIES
               value: '1'
             - name: HINDSIGHT_API_RETAIN_LLM_TIMEOUT
@@ -107,10 +111,10 @@ spec:
           resources:
             limits:
               cpu: 2000m
-              memory: 4Gi
+              memory: 2Gi
             requests:
-              cpu: 500m
-              memory: 1Gi
+              cpu: 50m
+              memory: 512Mi
           startupProbe:
             failureThreshold: 60
             httpGet:
