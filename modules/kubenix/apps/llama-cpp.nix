@@ -63,6 +63,12 @@ in
             "bge-reranker-v2-m3"
             "--parallel"
             "1"
+            "--fit"
+            "off"
+            "--batch-size"
+            "128"
+            "--ubatch-size"
+            "128"
             "--cache-ram"
             "0"
           ];
