@@ -35,6 +35,61 @@ spec:
       containers:
         - args:
             - --model
+            - /models/multilingual-e5-large-q4_k_m.gguf
+            - --host
+            - 0.0.0.0
+            - --port
+            - '8081'
+            - --embedding
+            - --alias
+            - intfloat/multilingual-e5-large
+            - --n-gpu-layers
+            - '0'
+          command:
+            - /app/llama-server
+          image: ghcr.io/ggml-org/llama.cpp:server-rocm
+          imagePullPolicy: Always
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 8081
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            timeoutSeconds: 5
+          name: embeddings
+          ports:
+            - containerPort: 8081
+              name: embeddings
+              protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 8081
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            timeoutSeconds: 3
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 2Gi
+            requests:
+              cpu: 50m
+              memory: 128Mi
+          startupProbe:
+            failureThreshold: 60
+            httpGet:
+              path: /health
+              port: 8081
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+          volumeMounts:
+            - mountPath: /models
+              name: models
+        - args:
+            - --model
             - /models/bge-reranker-v2-m3-Q4_K_M.gguf
             - --host
             - 0.0.0.0
@@ -101,6 +156,9 @@ spec:
             - "if [ ! -f /models/bge-reranker-v2-m3-Q4_K_M.gguf ]; then\n  echo \"\
               Downloading bge-reranker-v2-m3 GGUF model...\"\n  wget -q -O /models/bge-reranker-v2-m3-Q4_K_M.gguf\
               \ \"https://huggingface.co/sinjab/bge-reranker-v2-m3-Q4_K_M-GGUF/resolve/main/bge-reranker-v2-m3-Q4_K_M.gguf\"\
+              \nfi\nif [ ! -f /models/multilingual-e5-large-q4_k_m.gguf ]; then\n\
+              \  echo \"Downloading multilingual-e5-large GGUF model...\"\n  wget\
+              \ -q -O /models/multilingual-e5-large-q4_k_m.gguf \"https://huggingface.co/phate334/multilingual-e5-large-gguf/resolve/main/multilingual-e5-large-q4_k_m.gguf\"\
               \nfi\n"
           command:
             - sh
@@ -173,6 +231,10 @@ metadata:
   namespace: apps
 spec:
   ports:
+    - name: embeddings
+      port: 8081
+      protocol: TCP
+      targetPort: 8081
     - name: http
       port: 8080
       protocol: TCP

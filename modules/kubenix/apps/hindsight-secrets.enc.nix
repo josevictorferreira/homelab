@@ -13,6 +13,7 @@ in
     stringData = {
       HINDSIGHT_API_DATABASE_URL = "postgresql://postgres:${kubenix.lib.secretsInlineFor "postgresql_admin_password"}@postgresql-18-hl:5432/hindsight";
       HINDSIGHT_API_LLM_API_KEY = kubenix.lib.secretsFor "omniroute_api_key";
+      HINDSIGHT_API_EMBEDDINGS_OPENAI_API_KEY = kubenix.lib.secretsFor "omniroute_api_key";
       HINDSIGHT_API_RERANKER_COHERE_API_KEY = kubenix.lib.secretsFor "omniroute_api_key";
     };
   };
