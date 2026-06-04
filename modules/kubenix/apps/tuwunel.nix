@@ -35,7 +35,7 @@ in
             containers = [
               {
                 inherit name;
-                image = "ghcr.io/matrix-construct/tuwunel:v1.5.1@sha256:25693407bc059eec7e161418edd02b2b7c010516c855056a7672883b04f71b11";
+                image = "ghcr.io/matrix-construct/tuwunel:v1.7.0@sha256:8acfc755db4956c496e93f3b63693bbea298735835daadf882be791e2317dc0b";
                 imagePullPolicy = "IfNotPresent";
                 ports = [
                   {
