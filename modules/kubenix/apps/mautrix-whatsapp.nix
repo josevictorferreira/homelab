@@ -54,6 +54,16 @@ in
                       chmod 644 /data/config.yaml /data/registration.yaml
                     ''
                   ];
+                  resources = {
+                    limits = {
+                      cpu = "50m";
+                      memory = "64Mi";
+                    };
+                    requests = {
+                      cpu = "50m";
+                      memory = "64Mi";
+                    };
+                  };
                   volumeMounts = [
                     {
                       name = "data";

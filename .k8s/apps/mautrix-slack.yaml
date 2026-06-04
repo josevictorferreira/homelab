@@ -47,6 +47,13 @@ spec:
               '
           image: busybox:1.37
           name: copy-config
+          resources:
+            limits:
+              cpu: 50m
+              memory: 64Mi
+            requests:
+              cpu: 50m
+              memory: 64Mi
           volumeMounts:
             - mountPath: /data
               name: data
