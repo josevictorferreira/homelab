@@ -145,11 +145,9 @@ spec:
             timeoutSeconds: 3
           resources:
             limits:
-              amd.com/gpu: '1'
               cpu: 500m
               memory: 4Gi
             requests:
-              amd.com/gpu: '1'
               cpu: 100m
               memory: 64Mi
           startupProbe:
