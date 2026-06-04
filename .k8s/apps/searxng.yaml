@@ -5,57 +5,65 @@ metadata:
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   labels:
+    app.kubernetes.io/controller: main
     app.kubernetes.io/instance: searxng
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: searxng
-    app.kubernetes.io/version: 2025.8.20-41a4a3e
-    helm.sh/chart: searxng-1.0.0
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
   name: searxng
   namespace: apps
 spec:
   replicas: 1
+  revisionHistoryLimit: 3
   selector:
     matchLabels:
+      app.kubernetes.io/controller: main
       app.kubernetes.io/instance: searxng
       app.kubernetes.io/name: searxng
+  strategy:
+    type: Recreate
   template:
     metadata:
       labels:
+        app.kubernetes.io/controller: main
         app.kubernetes.io/instance: searxng
-        app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: searxng
-        app.kubernetes.io/version: 2025.8.20-41a4a3e
-        helm.sh/chart: searxng-1.0.0
     spec:
+      automountServiceAccountToken: true
       containers:
         - envFrom:
             - secretRef:
                 name: searxng-secret
-          image: ghcr.io/searxng/searxng:2025.8.20-41a4a3e
+          image: ghcr.io/searxng/searxng:2026.6.4-e6559c9ad
           imagePullPolicy: IfNotPresent
-          livenessProbe:
-            httpGet:
-              path: /
-              port: http
-          name: searxng
+          name: main
           ports:
             - containerPort: 8080
               name: http
               protocol: TCP
-          readinessProbe:
-            httpGet:
-              path: /
-              port: http
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 256Mi
           volumeMounts:
             - mountPath: /etc/searxng
               name: settings
+              readOnly: true
+      dnsPolicy: ClusterFirst
+      enableServiceLinks: false
+      hostIPC: false
+      hostNetwork: false
+      hostPID: false
+      securityContext:
+        fsGroup: 1000
+      serviceAccountName: default
       volumes:
         - configMap:
-            items:
-              - key: settings.yml
-                path: settings.yml
-              - key: limiter.toml
-                path: limiter.toml
             name: searxng-config
           name: settings
 ---
@@ -65,38 +73,43 @@ metadata:
   annotations:
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
+    lbipam.cilium.io/ips: 10.10.10.107
+    lbipam.cilium.io/sharing-key: searxng
   labels:
     app.kubernetes.io/instance: searxng
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: searxng
-    app.kubernetes.io/version: 2025.8.20-41a4a3e
-    helm.sh/chart: searxng-1.0.0
+    app.kubernetes.io/service: searxng
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
   name: searxng
   namespace: apps
 spec:
   ports:
     - name: http
-      port: 80
+      port: 8080
       protocol: TCP
-      targetPort: http
+      targetPort: 8080
   selector:
+    app.kubernetes.io/controller: main
     app.kubernetes.io/instance: searxng
     app.kubernetes.io/name: searxng
-  type: ClusterIP
+  type: LoadBalancer
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
-    cert-manager.io/cluster-issuer: cloudflare-issuer
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/instance: searxng
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: searxng
-    app.kubernetes.io/version: 2025.8.20-41a4a3e
-    helm.sh/chart: searxng-1.0.0
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
   name: searxng
   namespace: apps
 spec:
@@ -109,7 +122,7 @@ spec:
               service:
                 name: searxng
                 port:
-                  number: 80
+                  number: 8080
             path: /
             pathType: Prefix
   tls:
