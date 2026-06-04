@@ -20,7 +20,7 @@ in
           memory = "64Mi";
         };
         limits = {
-          cpu = "500m";
+          cpu = "1500m";
           memory = "4Gi";
         };
       };
@@ -66,9 +66,9 @@ in
             "--fit"
             "off"
             "--batch-size"
-            "128"
+            "512"
             "--ubatch-size"
-            "128"
+            "512"
             "--no-warmup"
             "--cache-ram"
             "0"
