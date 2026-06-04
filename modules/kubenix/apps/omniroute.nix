@@ -43,7 +43,7 @@ in
           enabled = true;
           type = "persistentVolumeClaim";
           storageClass = kubenix.lib.defaultStorageClass;
-          size = "1Gi";
+          size = "5Gi";
           accessMode = "ReadWriteOnce";
           globalMounts = [
             {
