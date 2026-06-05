@@ -1,5 +1,5 @@
-{ pkgs ? import <nixpkgs> { }
-,
+{
+  pkgs ? import <nixpkgs> { },
 }:
 let
   inherit (pkgs) dockerTools;
@@ -24,6 +24,7 @@ dockerTools.buildImage {
       pkgs.jq # JSON parsing for mc output
       pkgs.gnutar # tar command
       pkgs.gzip # gzip for tar.gz
+      pkgs.gnupg
     ];
     pathsToLink = [
       "/bin"
