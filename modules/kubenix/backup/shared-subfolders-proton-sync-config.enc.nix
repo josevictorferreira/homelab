@@ -12,6 +12,7 @@ in
     stringData = {
       PROTON_USERNAME = kubenix.lib.secretsFor "proton_drive_username";
       PROTON_PASSWORD = kubenix.lib.secretsFor "proton_drive_password";
+      ENCRYPTION_PASSWORD = kubenix.lib.secretsFor "proton_backup_encryption_password";
     };
   };
 }

@@ -1,11 +1,20 @@
 { kubenix, homelab, ... }:
 let
   namespace = homelab.kubernetes.namespaces.backup;
-  image = "ghcr.io/josevictorferreira/backup-toolbox@sha256:08bda3ee3383b093cc0ed74d42ed9b167ecb92dd7c01e090a542d0a75dec8abb";
+  image = "ghcr.io/josevictorferreira/backup-toolbox@sha256:16a036d070212ef665a4e4f4e8607fde9c6b33f7634ca62f5c8767ed91f67c8e";
   protonDestPath = "homelab/shared-archives";
+  folders = homelab.kubernetes.sharedBackupFolders;
+  foldersStr = builtins.concatStringsSep " " folders;
+  foldersJson = builtins.toJSON folders;
 
   backupScript = ''
         set -euo pipefail
+
+        cleanup() {
+          echo "Cleaning up temp files..."
+          rm -f /tmp/proton-backup-*.tar.gz /tmp/proton-backup-*.tar.gz.gpg
+        }
+        trap cleanup EXIT
 
         DATE="$(date +%Y-%m-%d)"
         TIMESTAMP="$(date +%Y%m%d_%H%M%S)"
@@ -13,10 +22,10 @@ let
 
         SOURCE_ROOT="/shared"
 
-        echo "=== Starting Proton Drive shared subfolders backup (rclone sync) ==="
+        echo "=== Starting Proton Drive shared subfolders backup (tar.gz + gpg + rclone copy) ==="
         echo "Date: $DATE"
         echo "Timestamp: $TIMESTAMP"
-        echo "Folders to backup: notetaking images backups openclaw"
+        echo "Folders to backup: ${foldersStr}"
         echo "Destination: proton:Backups/${protonDestPath}/current/"
 
         # Ensure rclone config directory exists
@@ -34,72 +43,76 @@ let
     RCLONE_EOF
         fi
 
-        # Generate manifest of files
-        echo "Generating manifest..."
-        WORKDIR="/tmp/proton-backup-$TIMESTAMP"
-        mkdir -p "$WORKDIR"
-        cd "$WORKDIR"
-
-        echo "{" > "$MANIFEST_FILE"
-        echo "  \"backup_date\": \"$DATE\"," >> "$MANIFEST_FILE"
-        echo "  \"timestamp\": \"$TIMESTAMP\"," >> "$MANIFEST_FILE"
-        echo "  \"source_root\": \"/shared\"," >> "$MANIFEST_FILE"
-        echo "  \"method\": \"rclone-sync-proton\"," >> "$MANIFEST_FILE"
-        echo "  \"destination\": \"proton:Backups/${protonDestPath}/current/\"," >> "$MANIFEST_FILE"
-        echo "  \"folders\": [\"notetaking\", \"images\", \"backups\", \"openclaw\"]," >> "$MANIFEST_FILE"
-        echo "  \"files\": [" >> "$MANIFEST_FILE"
-
-        FIRST=true
-        for folder in notetaking images backups openclaw; do
-          if [ -d "$SOURCE_ROOT/$folder" ]; then
-            while IFS= read -r -d $'\0' file; do
-              SIZE="$(stat -c%s "$file" 2>/dev/null || echo 0)"
-              MTIME="$(stat -c%Y "$file" 2>/dev/null || echo 0)"
-              RELPATH=$(echo "$file" | sed "s|^$SOURCE_ROOT/||")
-              if [ "$FIRST" = true ]; then
-                FIRST=false
-              else
-                echo "," >> "$MANIFEST_FILE"
-              fi
-              echo -n "        {\"path\": \"$RELPATH\", \"size\": $SIZE, \"mtime\": $MTIME}" >> "$MANIFEST_FILE"
-            done < <(find "$SOURCE_ROOT/$folder" -type f ! -name ".DS_Store" ! -name "Thumbs.db" -print0 2>/dev/null)
-          fi
-        done
-
-        echo "" >> "$MANIFEST_FILE"
-        echo "      ]," >> "$MANIFEST_FILE"
-        echo "      \"exclusions\": [\".DS_Store\", \"Thumbs.db\"]" >> "$MANIFEST_FILE"
-        echo "    }" >> "$MANIFEST_FILE"
-
         # Ensure destination exists
         echo "Ensuring remote directory exists..."
         rclone mkdir "proton:Backups/${protonDestPath}" || true
 
-        # Sync each folder individually with filters
-        echo "Starting rclone sync to Proton Drive..."
-        for folder in notetaking images backups openclaw; do
+        # Generate manifest header
+        echo "Generating manifest..."
+        MANIFEST_JSON="$MANIFEST_FILE.json.tmp"
+        {
+          echo "{"
+          echo "  \"backup_date\": \"$DATE\","
+          echo "  \"timestamp\": \"$TIMESTAMP\","
+          echo "  \"source_root\": \"/shared\","
+          echo "  \"method\": \"tar.gz-gpg-rclone-copy\","
+          echo "  \"destination\": \"proton:Backups/${protonDestPath}/current/\","
+          echo "  \"folders\": ${foldersJson},
+          echo "  \"archives\": ["
+        } > "$MANIFEST_JSON"
+
+        FIRST_ARCHIVE=true
+        for folder in ${foldersStr}; do
           if [ -d "$SOURCE_ROOT/$folder" ]; then
-            echo "Syncing folder: $folder"
-            rclone sync "$SOURCE_ROOT/$folder" "proton:Backups/${protonDestPath}/current/$folder/" \
-              --exclude ".DS_Store" \
-              --exclude "Thumbs.db" \
-              --fast-list \
-              --transfers 4 \
-              --checksum \
-              --stats-one-line \
-              --stats 30s \
-              --log-level INFO
+            echo "Processing folder: $folder"
+            ARCHIVE_BASE="/tmp/proton-backup-$TIMESTAMP-$folder"
+            TAR_FILE="$ARCHIVE_BASE.tar.gz"
+            ENC_FILE="$TAR_FILE.gpg"
+
+            # Create tar.gz archive
+            echo "  Creating archive..."
+            tar czf "$TAR_FILE" -C "$SOURCE_ROOT" "$folder"
+
+            # Encrypt with gpg
+            echo "  Encrypting..."
+            gpg --batch --yes --passphrase "$ENCRYPTION_PASSWORD" --symmetric --cipher-algo AES256 "$TAR_FILE"
+
+            # Upload encrypted archive
+            echo "  Uploading..."
+            rclone copy "$ENC_FILE" "proton:Backups/${protonDestPath}/current/"
+
+            # Record in manifest
+            ARCHIVE_SIZE=$(stat -c%s "$ENC_FILE" 2>/dev/null || echo 0)
+            if [ "$FIRST_ARCHIVE" = true ]; then
+              FIRST_ARCHIVE=false
+              echo "    {\"folder\": \"$folder\", \"archive\": \"$folder.tar.gz.gpg\", \"encrypted_size\": $ARCHIVE_SIZE}" >> "$MANIFEST_JSON"
+            else
+              echo "    ,{\"folder\": \"$folder\", \"archive\": \"$folder.tar.gz.gpg\", \"encrypted_size\": $ARCHIVE_SIZE}" >> "$MANIFEST_JSON"
+            fi
+
+            # Clean up temp files for this folder
+            rm -f "$TAR_FILE" "$ENC_FILE"
+            echo "  Done: $folder"
           else
             echo "Warning: folder $folder not found, skipping"
           fi
         done
 
+        {
+          echo "  ],"
+          echo "  \"encryption\": \"gpg-symmetric-aes256\","
+          echo "  \"exclusions\": [\".DS_Store\", \"Thumbs.db\"]"
+          echo "}"
+        } >> "$MANIFEST_JSON"
+
+        mv "$MANIFEST_JSON" "$MANIFEST_FILE"
+
         # Upload manifest
         echo "Uploading manifest..."
         rclone copy "$MANIFEST_FILE" "proton:Backups/${protonDestPath}/manifests/"
 
-        # Clean up
-        rm -rf "$WORKDIR"
+        # Clean up manifest
+        rm -f "$MANIFEST_FILE"
 
         echo "=== Proton Drive Backup completed successfully ==="
         echo "Destination: proton:Backups/${protonDestPath}/current/"
@@ -124,7 +137,7 @@ in
           activeDeadlineSeconds = 3600; # 1 hour timeout
           template.spec = {
             restartPolicy = "OnFailure";
-            imagePullSecrets = [{ name = "ghcr-registry-secret"; }];
+            imagePullSecrets = [ { name = "ghcr-registry-secret"; } ];
             containers = [
               {
                 name = "proton-sync";
@@ -135,6 +148,10 @@ in
                 ];
                 args = [ backupScript ];
                 env = [
+                  {
+                    name = "HOME";
+                    value = "/root";
+                  }
                   {
                     name = "PROTON_DEST_PATH";
                     value = protonDestPath;
@@ -151,6 +168,13 @@ in
                     valueFrom.secretKeyRef = {
                       name = "shared-subfolders-proton-sync-config";
                       key = "PROTON_PASSWORD";
+                    };
+                  }
+                  {
+                    name = "ENCRYPTION_PASSWORD";
+                    valueFrom.secretKeyRef = {
+                      name = "shared-subfolders-proton-sync-config";
+                      key = "ENCRYPTION_PASSWORD";
                     };
                   }
                 ];
