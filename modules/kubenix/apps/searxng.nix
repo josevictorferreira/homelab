@@ -10,8 +10,8 @@ in
       chart = kubenix.lib.helm.fetch {
         repo = "https://self-hosters-by-night.github.io/helm-charts";
         chart = "searxng";
-        version = "1.0.0";
-        sha256 = "sha256-JJNfXcKol5Ct0dOB2xkIdM3MYbgZh10DIP2x0c3S8XA=";
+        version = "1.1.0";
+        sha256 = "sha256-8DA5H/PRXktku2u430ncar4UWcrHlQQQ1Jm1XnLlvm0=";
       };
       includeCRDs = true;
       noHooks = true;
@@ -22,7 +22,7 @@ in
 
         image = {
           repository = "ghcr.io/searxng/searxng";
-          tag = "latest@sha256:15fbb766a923f2c8472a9524d3bd073363a7936521f613dabaae70b8b55d9bd3";
+          tag = "2026.6.4-e6559c9ad";
           pullPolicy = "IfNotPresent";
         };
 
