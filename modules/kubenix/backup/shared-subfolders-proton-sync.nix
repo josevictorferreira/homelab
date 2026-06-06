@@ -85,6 +85,9 @@ let
 
             FILE_SIZE=$(stat -c %s "$TEMP_GPG" 2>/dev/null || echo "0")
             echo "  Uploading to Proton Drive ($FILE_SIZE bytes)..."
+            # Delete existing file first (Proton Drive rejects overwrites)
+            rclone delete "proton:Backups/${protonDestPath}/current/$folder.tar.gz.gpg" 2>/dev/null || true
+
             if ! rclone copy "$TEMP_GPG" "proton:Backups/${protonDestPath}/current/"; then
               echo "  ERROR: Failed to upload $folder"
               FAILED=$((FAILED + 1))
