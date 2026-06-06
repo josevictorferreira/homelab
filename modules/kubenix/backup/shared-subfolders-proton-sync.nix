@@ -1,7 +1,7 @@
 { kubenix, homelab, ... }:
 let
   namespace = homelab.kubernetes.namespaces.backup;
-  image = "ghcr.io/josevictorferreira/backup-toolbox@sha256:16a036d070212ef665a4e4f4e8607fde9c6b33f7634ca62f5c8767ed91f67c8e";
+  image = "ghcr.io/josevictorferreira/backup-toolbox@sha256:541cc695cd9ab09f5a82b4b85b01f6aa396e3146bdc8bdf1071f1bc3ed00cdda";
   protonDestPath = "homelab/shared-archives";
   folders = homelab.kubernetes.sharedBackupFolders;
   foldersStr = builtins.concatStringsSep " " folders;
