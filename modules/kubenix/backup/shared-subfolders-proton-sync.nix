@@ -27,6 +27,11 @@ let
         echo "Timestamp: $TIMESTAMP"
         echo "Folders to backup: ${foldersStr}"
         echo "Destination: proton:Backups/${protonDestPath}/current/"
+        FOLDERS_JSON='${foldersJson}'
+        echo "Date: $DATE"
+        echo "Timestamp: $TIMESTAMP"
+        echo "Folders to backup: ${foldersStr}"
+        echo "Destination: proton:Backups/${protonDestPath}/current/"
 
         # Ensure rclone config directory exists
         mkdir -p "$HOME/.config/rclone"
@@ -57,7 +62,8 @@ let
           echo "  \"source_root\": \"/shared\","
           echo "  \"method\": \"tar.gz-gpg-rclone-copy\","
           echo "  \"destination\": \"proton:Backups/${protonDestPath}/current/\","
-          echo "  \"folders\": ${foldersJson},
+          echo "  \"folders\": $FOLDERS_JSON,"
+          echo "  \"archives\": ["
           echo "  \"archives\": ["
         } > "$MANIFEST_JSON"
 

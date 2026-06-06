@@ -27,6 +27,12 @@ spec:
                   Timestamp: $TIMESTAMP\"\n    echo \"Folders to backup: 3d-models\
                   \ backups books images hermes mel-dynamica notetaking openclaw personal-finances\"\
                   \n    echo \"Destination: proton:Backups/homelab/shared-archives/current/\"\
+                  \n    FOLDERS_JSON='[\"3d-models\",\"backups\",\"books\",\"images\"\
+                  ,\"hermes\",\"mel-dynamica\",\"notetaking\",\"openclaw\",\"personal-finances\"\
+                  ]'\n    echo \"Date: $DATE\"\n    echo \"Timestamp: $TIMESTAMP\"\
+                  \n    echo \"Folders to backup: 3d-models backups books images hermes\
+                  \ mel-dynamica notetaking openclaw personal-finances\"\n    echo\
+                  \ \"Destination: proton:Backups/homelab/shared-archives/current/\"\
                   \n\n    # Ensure rclone config directory exists\n    mkdir -p \"\
                   $HOME/.config/rclone\"\n\n    # Check if proton configuration exists,\
                   \ if not create it\n    if ! grep -q \"\\[proton\\]\" \"$HOME/.config/rclone/rclone.conf\"\
@@ -44,12 +50,11 @@ spec:
                   \ echo \"  \\\"source_root\\\": \\\"/shared\\\",\"\n      echo \"\
                   \  \\\"method\\\": \\\"tar.gz-gpg-rclone-copy\\\",\"\n      echo\
                   \ \"  \\\"destination\\\": \\\"proton:Backups/homelab/shared-archives/current/\\\
-                  \",\"\n      echo \"  \\\"folders\\\": [\"3d-models\",\"backups\"\
-                  ,\"books\",\"images\",\"hermes\",\"mel-dynamica\",\"notetaking\"\
-                  ,\"openclaw\",\"personal-finances\"],\n      echo \"  \\\"archives\\\
-                  \": [\"\n    } > \"$MANIFEST_JSON\"\n\n    FIRST_ARCHIVE=true\n\
-                  \    for folder in 3d-models backups books images hermes mel-dynamica\
-                  \ notetaking openclaw personal-finances; do\n      if [ -d \"$SOURCE_ROOT/$folder\"\
+                  \",\"\n      echo \"  \\\"folders\\\": $FOLDERS_JSON,\"\n      echo\
+                  \ \"  \\\"archives\\\": [\"\n      echo \"  \\\"archives\\\": [\"\
+                  \n    } > \"$MANIFEST_JSON\"\n\n    FIRST_ARCHIVE=true\n    for\
+                  \ folder in 3d-models backups books images hermes mel-dynamica notetaking\
+                  \ openclaw personal-finances; do\n      if [ -d \"$SOURCE_ROOT/$folder\"\
                   \ ]; then\n        echo \"Processing folder: $folder\"\n       \
                   \ ARCHIVE_BASE=\"/tmp/proton-backup-$TIMESTAMP-$folder\"\n     \
                   \   TAR_FILE=\"$ARCHIVE_BASE.tar.gz\"\n        ENC_FILE=\"$TAR_FILE.gpg\"\
