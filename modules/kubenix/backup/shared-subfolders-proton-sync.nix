@@ -64,6 +64,9 @@ let
 
             # Pipe: tar.gz → gpg encrypt → rclone upload (no temp files on disk)
             echo "  Creating archive, encrypting, and uploading..."
+            # Delete existing file first (Proton Drive rejects overwrites via rcat)
+            rclone delete "proton:Backups/${protonDestPath}/current/$folder.tar.gz.gpg" 2>/dev/null || true
+
             if tar czf - -C "$SOURCE_ROOT" "$folder" \
               | gpg --batch --yes --passphrase "$ENCRYPTION_PASSWORD" --symmetric --cipher-algo AES256 --output - \
               | rclone rcat "proton:Backups/${protonDestPath}/current/$folder.tar.gz.gpg"; then

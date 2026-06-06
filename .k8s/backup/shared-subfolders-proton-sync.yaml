@@ -51,10 +51,13 @@ spec:
                   \      if [ -d \"$SOURCE_ROOT/$folder\" ]; then\n        echo \"\
                   Processing folder: $folder\"\n\n        # Pipe: tar.gz → gpg encrypt\
                   \ → rclone upload (no temp files on disk)\n        echo \"  Creating\
-                  \ archive, encrypting, and uploading...\"\n        if tar czf -\
-                  \ -C \"$SOURCE_ROOT\" \"$folder\" \\\n          | gpg --batch --yes\
-                  \ --passphrase \"$ENCRYPTION_PASSWORD\" --symmetric --cipher-algo\
-                  \ AES256 --output - \\\n          | rclone rcat \"proton:Backups/homelab/shared-archives/current/$folder.tar.gz.gpg\"\
+                  \ archive, encrypting, and uploading...\"\n        # Delete existing\
+                  \ file first (Proton Drive rejects overwrites via rcat)\n      \
+                  \  rclone delete \"proton:Backups/homelab/shared-archives/current/$folder.tar.gz.gpg\"\
+                  \ 2>/dev/null || true\n\n        if tar czf - -C \"$SOURCE_ROOT\"\
+                  \ \"$folder\" \\\n          | gpg --batch --yes --passphrase \"\
+                  $ENCRYPTION_PASSWORD\" --symmetric --cipher-algo AES256 --output\
+                  \ - \\\n          | rclone rcat \"proton:Backups/homelab/shared-archives/current/$folder.tar.gz.gpg\"\
                   ; then\n          echo \"  Done: $folder\"\n        else\n     \
                   \     echo \"  ERROR: Failed to process $folder\"\n          FAILED=$((FAILED\
                   \ + 1))\n          continue\n        fi\n\n        # Record in manifest\
