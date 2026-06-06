@@ -62,26 +62,29 @@ spec:
                   \ $folder\"\n          FAILED=$((FAILED + 1))\n          rm -f \"\
                   $TEMP_GPG\"\n          continue\n        fi\n\n        FILE_SIZE=$(stat\
                   \ -c %s \"$TEMP_GPG\" 2>/dev/null || echo \"0\")\n        echo \"\
-                  \  Uploading to Proton Drive ($FILE_SIZE bytes)...\"\n        if\
-                  \ ! rclone copy \"$TEMP_GPG\" \"proton:Backups/homelab/shared-archives/current/\"\
-                  ; then\n          echo \"  ERROR: Failed to upload $folder\"\n \
-                  \         FAILED=$((FAILED + 1))\n          rm -f \"$TEMP_GPG\"\n\
-                  \          continue\n        fi\n\n        rm -f \"$TEMP_GPG\"\n\
-                  \        echo \"  Done: $folder\"\n\n        # Record in manifest\n\
-                  \        if [ \"$FIRST_ARCHIVE\" = true ]; then\n          FIRST_ARCHIVE=false\n\
-                  \        else\n          echo \",\" >> \"$MANIFEST_JSON\"\n    \
-                  \    fi\n        echo \"    {\\\"folder\\\": \\\"$folder\\\", \\\
-                  \"archive\\\": \\\"$folder.tar.gz.gpg\\\", \\\"encrypted_size\\\"\
-                  : $FILE_SIZE}\" >> \"$MANIFEST_JSON\"\n      else\n        echo\
-                  \ \"Warning: folder $folder not found, skipping\"\n      fi\n  \
-                  \  done\n\n    # Complete manifest\n    {\n      echo \"\"\n   \
-                  \   echo \"  ],\"\n      echo \"  \\\"encryption\\\": \\\"gpg-symmetric-aes256\\\
-                  \",\"\n      echo \"  \\\"exclusions\\\": [\\\".DS_Store\\\", \\\
-                  \"Thumbs.db\\\"]\"\n      echo \"}\"\n    } >> \"$MANIFEST_JSON\"\
-                  \n\n    if [ \"$FAILED\" -gt 0 ]; then\n      echo \"ERROR: $FAILED\
-                  \ folder(s) failed to backup\"\n      exit 1\n    fi\n\n    # Upload\
-                  \ manifest\n    echo \"Uploading manifest...\"\n    rclone copyto\
-                  \ \"$MANIFEST_JSON\" \"proton:Backups/homelab/shared-archives/manifests/$MANIFEST_FILE\"\
+                  \  Uploading to Proton Drive ($FILE_SIZE bytes)...\"\n        #\
+                  \ Delete existing file first (Proton Drive rejects overwrites)\n\
+                  \        rclone delete \"proton:Backups/homelab/shared-archives/current/$folder.tar.gz.gpg\"\
+                  \ 2>/dev/null || true\n\n        if ! rclone copy \"$TEMP_GPG\"\
+                  \ \"proton:Backups/homelab/shared-archives/current/\"; then\n  \
+                  \        echo \"  ERROR: Failed to upload $folder\"\n          FAILED=$((FAILED\
+                  \ + 1))\n          rm -f \"$TEMP_GPG\"\n          continue\n   \
+                  \     fi\n\n        rm -f \"$TEMP_GPG\"\n        echo \"  Done:\
+                  \ $folder\"\n\n        # Record in manifest\n        if [ \"$FIRST_ARCHIVE\"\
+                  \ = true ]; then\n          FIRST_ARCHIVE=false\n        else\n\
+                  \          echo \",\" >> \"$MANIFEST_JSON\"\n        fi\n      \
+                  \  echo \"    {\\\"folder\\\": \\\"$folder\\\", \\\"archive\\\"\
+                  : \\\"$folder.tar.gz.gpg\\\", \\\"encrypted_size\\\": $FILE_SIZE}\"\
+                  \ >> \"$MANIFEST_JSON\"\n      else\n        echo \"Warning: folder\
+                  \ $folder not found, skipping\"\n      fi\n    done\n\n    # Complete\
+                  \ manifest\n    {\n      echo \"\"\n      echo \"  ],\"\n      echo\
+                  \ \"  \\\"encryption\\\": \\\"gpg-symmetric-aes256\\\",\"\n    \
+                  \  echo \"  \\\"exclusions\\\": [\\\".DS_Store\\\", \\\"Thumbs.db\\\
+                  \"]\"\n      echo \"}\"\n    } >> \"$MANIFEST_JSON\"\n\n    if [\
+                  \ \"$FAILED\" -gt 0 ]; then\n      echo \"ERROR: $FAILED folder(s)\
+                  \ failed to backup\"\n      exit 1\n    fi\n\n    # Upload manifest\n\
+                  \    echo \"Uploading manifest...\"\n    rclone copyto \"$MANIFEST_JSON\"\
+                  \ \"proton:Backups/homelab/shared-archives/manifests/$MANIFEST_FILE\"\
                   \ || true\n\n    echo \"=== Backup completed successfully ===\"\n"
               command:
                 - bash
