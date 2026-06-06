@@ -68,6 +68,15 @@ let
         FAILED=0
         for folder in ${foldersStr}; do
           if [ -d "$SOURCE_ROOT/$folder" ]; then
+
+            # Skip folders larger than 10GB (Proton Drive upload unreliable for large files)
+            FOLDER_SIZE_MB=$(du -sm "$SOURCE_ROOT/$folder" 2>/dev/null | awk '{print $1}')
+            if [ -z "$FOLDER_SIZE_MB" ]; then FOLDER_SIZE_MB=0; fi
+            if [ -z "$MAX_FOLDER_SIZE_MB" ]; then MAX_FOLDER_SIZE_MB=10240; fi
+            if [ "$FOLDER_SIZE_MB" -gt "$MAX_FOLDER_SIZE_MB" ]; then
+              echo "  Skipping $folder (''${FOLDER_SIZE_MB}MB exceeds ''${MAX_FOLDER_SIZE_MB}MB limit)"
+              continue
+            fi
             echo "Processing folder: $folder"
 
             TEMP_GPG="$TEMP_DIR/$folder.tar.gz.gpg"
@@ -87,8 +96,10 @@ let
             echo "  Uploading to Proton Drive ($FILE_SIZE bytes)..."
             # Delete existing file first (Proton Drive rejects overwrites)
             rclone delete "proton:Backups/${protonDestPath}/current/$folder.tar.gz.gpg" 2>/dev/null || true
+            # Wait for Proton Drive to propagate the deletion (ghost entry fix)
+            sleep 10
 
-            if ! rclone copy "$TEMP_GPG" "proton:Backups/${protonDestPath}/current/"; then
+            if ! rclone copy "$TEMP_GPG" "proton:Backups/${protonDestPath}/current/" --retries 10 --low-level-retries 10 --retries-sleep 10s; then
               echo "  ERROR: Failed to upload $folder"
               FAILED=$((FAILED + 1))
               rm -f "$TEMP_GPG"
