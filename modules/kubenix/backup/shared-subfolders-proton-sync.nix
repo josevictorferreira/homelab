@@ -134,7 +134,7 @@ in
         failedJobsHistoryLimit = 3;
         jobTemplate.spec = {
           backoffLimit = 2;
-          activeDeadlineSeconds = 3600; # 1 hour timeout
+          activeDeadlineSeconds = 7200; # 2 hour timeout
           template.spec = {
             restartPolicy = "OnFailure";
             imagePullSecrets = [ { name = "ghcr-registry-secret"; } ];
