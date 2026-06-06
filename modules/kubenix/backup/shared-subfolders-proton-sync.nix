@@ -10,11 +10,19 @@ let
   backupScript = ''
         set -euo pipefail
 
+        cleanup() {
+          echo "Cleaning up temp files..."
+          rm -rf /root/.cache/rclone/backup-tmp
+        }
+        trap cleanup EXIT
+
         DATE="$(date +%Y-%m-%d)"
         TIMESTAMP="$(date +%Y%m%d_%H%M%S)"
         MANIFEST_FILE="manifest-$DATE.json"
 
         SOURCE_ROOT="/shared"
+        TEMP_DIR="/root/.cache/rclone/backup-tmp"
+        mkdir -p "$TEMP_DIR"
 
         echo "=== Starting Proton Drive shared subfolders backup (tar.gz + gpg + rclone copy) ==="
         echo "Date: $DATE"
@@ -44,13 +52,13 @@ let
 
         # Generate manifest header
         echo "Generating manifest..."
-        MANIFEST_JSON="$MANIFEST_FILE.json.tmp"
+        MANIFEST_JSON="$TEMP_DIR/$MANIFEST_FILE"
         {
           echo "{"
           echo "  \"backup_date\": \"$DATE\","
           echo "  \"timestamp\": \"$TIMESTAMP\","
           echo "  \"source_root\": \"/shared\","
-          echo "  \"method\": \"tar.gz-gpg-rclone-pipe\","
+          echo "  \"method\": \"tar.gz-gpg-rclone-copy\","
           echo "  \"destination\": \"proton:Backups/${protonDestPath}/current/\","
           echo "  \"folders\": $FOLDERS_JSON,"
           echo "  \"archives\": ["
@@ -62,54 +70,62 @@ let
           if [ -d "$SOURCE_ROOT/$folder" ]; then
             echo "Processing folder: $folder"
 
-            # Pipe: tar.gz → gpg encrypt → rclone upload (no temp files on disk)
-            echo "  Creating archive, encrypting, and uploading..."
-            # Delete existing file first (Proton Drive rejects overwrites via rcat)
-            rclone delete "proton:Backups/${protonDestPath}/current/$folder.tar.gz.gpg" 2>/dev/null || true
+            TEMP_GPG="$TEMP_DIR/$folder.tar.gz.gpg"
+            rm -f "$TEMP_GPG"
 
-            if tar czf - -C "$SOURCE_ROOT" "$folder" \
-              | gpg --batch --yes --passphrase "$ENCRYPTION_PASSWORD" --symmetric --cipher-algo AES256 --output - \
-              | rclone rcat "proton:Backups/${protonDestPath}/current/$folder.tar.gz.gpg"; then
-              echo "  Done: $folder"
-            else
-              echo "  ERROR: Failed to process $folder"
+            # Pipe: tar.gz → gpg encrypt → temp file on PVC
+            echo "  Creating encrypted archive on PVC..."
+            if ! tar czf - -C "$SOURCE_ROOT" "$folder" \
+              | gpg --batch --yes --passphrase "$ENCRYPTION_PASSWORD" --symmetric --cipher-algo AES256 --output "$TEMP_GPG" -; then
+              echo "  ERROR: Failed to create encrypted archive for $folder"
               FAILED=$((FAILED + 1))
+              rm -f "$TEMP_GPG"
               continue
             fi
 
-            # Record in manifest (size unknown with pipe, set to 0)
+            FILE_SIZE=$(stat -c %s "$TEMP_GPG" 2>/dev/null || echo "0")
+            echo "  Uploading to Proton Drive ($FILE_SIZE bytes)..."
+            if ! rclone copy "$TEMP_GPG" "proton:Backups/${protonDestPath}/current/"; then
+              echo "  ERROR: Failed to upload $folder"
+              FAILED=$((FAILED + 1))
+              rm -f "$TEMP_GPG"
+              continue
+            fi
+
+            rm -f "$TEMP_GPG"
+            echo "  Done: $folder"
+
+            # Record in manifest
             if [ "$FIRST_ARCHIVE" = true ]; then
               FIRST_ARCHIVE=false
-              echo "    {\"folder\": \"$folder\", \"archive\": \"$folder.tar.gz.gpg\", \"encrypted_size\": 0}" >> "$MANIFEST_JSON"
             else
-              echo "    ,{\"folder\": \"$folder\", \"archive\": \"$folder.tar.gz.gpg\", \"encrypted_size\": 0}" >> "$MANIFEST_JSON"
+              echo "," >> "$MANIFEST_JSON"
             fi
+            echo "    {\"folder\": \"$folder\", \"archive\": \"$folder.tar.gz.gpg\", \"encrypted_size\": $FILE_SIZE}" >> "$MANIFEST_JSON"
           else
             echo "Warning: folder $folder not found, skipping"
           fi
         done
 
-        if [ "$FAILED" -gt 0 ]; then
-          echo "ERROR: $FAILED folder(s) failed to backup"
-          exit 1
-        fi
-
+        # Complete manifest
         {
+          echo ""
           echo "  ],"
           echo "  \"encryption\": \"gpg-symmetric-aes256\","
           echo "  \"exclusions\": [\".DS_Store\", \"Thumbs.db\"]"
           echo "}"
         } >> "$MANIFEST_JSON"
 
-        mv "$MANIFEST_JSON" "$MANIFEST_FILE"
+        if [ "$FAILED" -gt 0 ]; then
+          echo "ERROR: $FAILED folder(s) failed to backup"
+          exit 1
+        fi
 
         # Upload manifest
         echo "Uploading manifest..."
-        rclone copy "$MANIFEST_FILE" "proton:Backups/${protonDestPath}/manifests/"
+        rclone copyto "$MANIFEST_JSON" "proton:Backups/${protonDestPath}/manifests/$MANIFEST_FILE" || true
 
-        # Clean up manifest
-        rm -f "$MANIFEST_FILE"
-        echo "=== Backup complete ==="
+        echo "=== Backup completed successfully ==="
   '';
 
 in
@@ -176,12 +192,12 @@ in
                   requests = {
                     cpu = "100m";
                     memory = "256Mi";
-                    ephemeral-storage = "1Gi";
+                    ephemeral-storage = "512Mi";
                   };
                   limits = {
                     cpu = "500m";
                     memory = "1Gi";
-                    ephemeral-storage = "5Gi";
+                    ephemeral-storage = "1Gi";
                   };
                 };
                 volumeMounts = [
@@ -241,7 +257,7 @@ in
       };
       spec = {
         accessModes = [ "ReadWriteOnce" ];
-        resources.requests.storage = "5Gi";
+        resources.requests.storage = "100Gi";
         storageClassName = kubenix.lib.defaultStorageClass;
       };
     };

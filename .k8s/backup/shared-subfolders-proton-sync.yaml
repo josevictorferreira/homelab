@@ -17,14 +17,17 @@ spec:
         spec:
           containers:
             - args:
-                - "    set -euo pipefail\n\n    DATE=\"$(date +%Y-%m-%d)\"\n    TIMESTAMP=\"\
-                  $(date +%Y%m%d_%H%M%S)\"\n    MANIFEST_FILE=\"manifest-$DATE.json\"\
-                  \n\n    SOURCE_ROOT=\"/shared\"\n\n    echo \"=== Starting Proton\
-                  \ Drive shared subfolders backup (tar.gz + gpg + rclone copy) ===\"\
-                  \n    echo \"Date: $DATE\"\n    echo \"Timestamp: $TIMESTAMP\"\n\
-                  \    echo \"Folders to backup: 3d-models backups books images hermes\
-                  \ mel-dynamica notetaking openclaw personal-finances\"\n    echo\
-                  \ \"Destination: proton:Backups/homelab/shared-archives/current/\"\
+                - "    set -euo pipefail\n\n    cleanup() {\n      echo \"Cleaning\
+                  \ up temp files...\"\n      rm -rf /root/.cache/rclone/backup-tmp\n\
+                  \    }\n    trap cleanup EXIT\n\n    DATE=\"$(date +%Y-%m-%d)\"\n\
+                  \    TIMESTAMP=\"$(date +%Y%m%d_%H%M%S)\"\n    MANIFEST_FILE=\"\
+                  manifest-$DATE.json\"\n\n    SOURCE_ROOT=\"/shared\"\n    TEMP_DIR=\"\
+                  /root/.cache/rclone/backup-tmp\"\n    mkdir -p \"$TEMP_DIR\"\n\n\
+                  \    echo \"=== Starting Proton Drive shared subfolders backup (tar.gz\
+                  \ + gpg + rclone copy) ===\"\n    echo \"Date: $DATE\"\n    echo\
+                  \ \"Timestamp: $TIMESTAMP\"\n    echo \"Folders to backup: 3d-models\
+                  \ backups books images hermes mel-dynamica notetaking openclaw personal-finances\"\
+                  \n    echo \"Destination: proton:Backups/homelab/shared-archives/current/\"\
                   \n    FOLDERS_JSON='[\"3d-models\",\"backups\",\"books\",\"images\"\
                   ,\"hermes\",\"mel-dynamica\",\"notetaking\",\"openclaw\",\"personal-finances\"\
                   ]'\n\n    # Ensure rclone config directory exists\n    mkdir -p\
@@ -38,47 +41,48 @@ spec:
                   \ exists\n    echo \"Ensuring remote directory exists...\"\n   \
                   \ rclone mkdir \"proton:Backups/homelab/shared-archives\" || true\n\
                   \n    # Generate manifest header\n    echo \"Generating manifest...\"\
-                  \n    MANIFEST_JSON=\"$MANIFEST_FILE.json.tmp\"\n    {\n      echo\
+                  \n    MANIFEST_JSON=\"$TEMP_DIR/$MANIFEST_FILE\"\n    {\n      echo\
                   \ \"{\"\n      echo \"  \\\"backup_date\\\": \\\"$DATE\\\",\"\n\
                   \      echo \"  \\\"timestamp\\\": \\\"$TIMESTAMP\\\",\"\n     \
                   \ echo \"  \\\"source_root\\\": \\\"/shared\\\",\"\n      echo \"\
-                  \  \\\"method\\\": \\\"tar.gz-gpg-rclone-pipe\\\",\"\n      echo\
+                  \  \\\"method\\\": \\\"tar.gz-gpg-rclone-copy\\\",\"\n      echo\
                   \ \"  \\\"destination\\\": \\\"proton:Backups/homelab/shared-archives/current/\\\
                   \",\"\n      echo \"  \\\"folders\\\": $FOLDERS_JSON,\"\n      echo\
                   \ \"  \\\"archives\\\": [\"\n    } > \"$MANIFEST_JSON\"\n\n    FIRST_ARCHIVE=true\n\
                   \    FAILED=0\n    for folder in 3d-models backups books images\
                   \ hermes mel-dynamica notetaking openclaw personal-finances; do\n\
                   \      if [ -d \"$SOURCE_ROOT/$folder\" ]; then\n        echo \"\
-                  Processing folder: $folder\"\n\n        # Pipe: tar.gz → gpg encrypt\
-                  \ → rclone upload (no temp files on disk)\n        echo \"  Creating\
-                  \ archive, encrypting, and uploading...\"\n        # Delete existing\
-                  \ file first (Proton Drive rejects overwrites via rcat)\n      \
-                  \  rclone delete \"proton:Backups/homelab/shared-archives/current/$folder.tar.gz.gpg\"\
-                  \ 2>/dev/null || true\n\n        if tar czf - -C \"$SOURCE_ROOT\"\
-                  \ \"$folder\" \\\n          | gpg --batch --yes --passphrase \"\
-                  $ENCRYPTION_PASSWORD\" --symmetric --cipher-algo AES256 --output\
-                  \ - \\\n          | rclone rcat \"proton:Backups/homelab/shared-archives/current/$folder.tar.gz.gpg\"\
-                  ; then\n          echo \"  Done: $folder\"\n        else\n     \
-                  \     echo \"  ERROR: Failed to process $folder\"\n          FAILED=$((FAILED\
-                  \ + 1))\n          continue\n        fi\n\n        # Record in manifest\
-                  \ (size unknown with pipe, set to 0)\n        if [ \"$FIRST_ARCHIVE\"\
-                  \ = true ]; then\n          FIRST_ARCHIVE=false\n          echo\
-                  \ \"    {\\\"folder\\\": \\\"$folder\\\", \\\"archive\\\": \\\"\
-                  $folder.tar.gz.gpg\\\", \\\"encrypted_size\\\": 0}\" >> \"$MANIFEST_JSON\"\
-                  \n        else\n          echo \"    ,{\\\"folder\\\": \\\"$folder\\\
-                  \", \\\"archive\\\": \\\"$folder.tar.gz.gpg\\\", \\\"encrypted_size\\\
-                  \": 0}\" >> \"$MANIFEST_JSON\"\n        fi\n      else\n       \
-                  \ echo \"Warning: folder $folder not found, skipping\"\n      fi\n\
-                  \    done\n\n    if [ \"$FAILED\" -gt 0 ]; then\n      echo \"ERROR:\
-                  \ $FAILED folder(s) failed to backup\"\n      exit 1\n    fi\n\n\
-                  \    {\n      echo \"  ],\"\n      echo \"  \\\"encryption\\\":\
-                  \ \\\"gpg-symmetric-aes256\\\",\"\n      echo \"  \\\"exclusions\\\
-                  \": [\\\".DS_Store\\\", \\\"Thumbs.db\\\"]\"\n      echo \"}\"\n\
-                  \    } >> \"$MANIFEST_JSON\"\n\n    mv \"$MANIFEST_JSON\" \"$MANIFEST_FILE\"\
-                  \n\n    # Upload manifest\n    echo \"Uploading manifest...\"\n\
-                  \    rclone copy \"$MANIFEST_FILE\" \"proton:Backups/homelab/shared-archives/manifests/\"\
-                  \n\n    # Clean up manifest\n    rm -f \"$MANIFEST_FILE\"\n    echo\
-                  \ \"=== Backup complete ===\"\n"
+                  Processing folder: $folder\"\n\n        TEMP_GPG=\"$TEMP_DIR/$folder.tar.gz.gpg\"\
+                  \n        rm -f \"$TEMP_GPG\"\n\n        # Pipe: tar.gz → gpg encrypt\
+                  \ → temp file on PVC\n        echo \"  Creating encrypted archive\
+                  \ on PVC...\"\n        if ! tar czf - -C \"$SOURCE_ROOT\" \"$folder\"\
+                  \ \\\n          | gpg --batch --yes --passphrase \"$ENCRYPTION_PASSWORD\"\
+                  \ --symmetric --cipher-algo AES256 --output \"$TEMP_GPG\" -; then\n\
+                  \          echo \"  ERROR: Failed to create encrypted archive for\
+                  \ $folder\"\n          FAILED=$((FAILED + 1))\n          rm -f \"\
+                  $TEMP_GPG\"\n          continue\n        fi\n\n        FILE_SIZE=$(stat\
+                  \ -c %s \"$TEMP_GPG\" 2>/dev/null || echo \"0\")\n        echo \"\
+                  \  Uploading to Proton Drive ($FILE_SIZE bytes)...\"\n        if\
+                  \ ! rclone copy \"$TEMP_GPG\" \"proton:Backups/homelab/shared-archives/current/\"\
+                  ; then\n          echo \"  ERROR: Failed to upload $folder\"\n \
+                  \         FAILED=$((FAILED + 1))\n          rm -f \"$TEMP_GPG\"\n\
+                  \          continue\n        fi\n\n        rm -f \"$TEMP_GPG\"\n\
+                  \        echo \"  Done: $folder\"\n\n        # Record in manifest\n\
+                  \        if [ \"$FIRST_ARCHIVE\" = true ]; then\n          FIRST_ARCHIVE=false\n\
+                  \        else\n          echo \",\" >> \"$MANIFEST_JSON\"\n    \
+                  \    fi\n        echo \"    {\\\"folder\\\": \\\"$folder\\\", \\\
+                  \"archive\\\": \\\"$folder.tar.gz.gpg\\\", \\\"encrypted_size\\\"\
+                  : $FILE_SIZE}\" >> \"$MANIFEST_JSON\"\n      else\n        echo\
+                  \ \"Warning: folder $folder not found, skipping\"\n      fi\n  \
+                  \  done\n\n    # Complete manifest\n    {\n      echo \"\"\n   \
+                  \   echo \"  ],\"\n      echo \"  \\\"encryption\\\": \\\"gpg-symmetric-aes256\\\
+                  \",\"\n      echo \"  \\\"exclusions\\\": [\\\".DS_Store\\\", \\\
+                  \"Thumbs.db\\\"]\"\n      echo \"}\"\n    } >> \"$MANIFEST_JSON\"\
+                  \n\n    if [ \"$FAILED\" -gt 0 ]; then\n      echo \"ERROR: $FAILED\
+                  \ folder(s) failed to backup\"\n      exit 1\n    fi\n\n    # Upload\
+                  \ manifest\n    echo \"Uploading manifest...\"\n    rclone copyto\
+                  \ \"$MANIFEST_JSON\" \"proton:Backups/homelab/shared-archives/manifests/$MANIFEST_FILE\"\
+                  \ || true\n\n    echo \"=== Backup completed successfully ===\"\n"
               command:
                 - bash
                 - -c
@@ -107,11 +111,11 @@ spec:
               resources:
                 limits:
                   cpu: 500m
-                  ephemeral-storage: 5Gi
+                  ephemeral-storage: 1Gi
                   memory: 1Gi
                 requests:
                   cpu: 100m
-                  ephemeral-storage: 1Gi
+                  ephemeral-storage: 512Mi
                   memory: 256Mi
               volumeMounts:
                 - mountPath: /shared
@@ -167,5 +171,5 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 5Gi
+      storage: 100Gi
   storageClassName: rook-ceph-block
