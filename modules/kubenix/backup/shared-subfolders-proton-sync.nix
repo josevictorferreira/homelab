@@ -10,12 +10,6 @@ let
   backupScript = ''
         set -euo pipefail
 
-        cleanup() {
-          echo "Cleaning up temp files..."
-          rm -f /tmp/proton-backup-*.tar.gz /tmp/proton-backup-*.tar.gz.gpg
-        }
-        trap cleanup EXIT
-
         DATE="$(date +%Y-%m-%d)"
         TIMESTAMP="$(date +%Y%m%d_%H%M%S)"
         MANIFEST_FILE="manifest-$DATE.json"
@@ -28,10 +22,6 @@ let
         echo "Folders to backup: ${foldersStr}"
         echo "Destination: proton:Backups/${protonDestPath}/current/"
         FOLDERS_JSON='${foldersJson}'
-        echo "Date: $DATE"
-        echo "Timestamp: $TIMESTAMP"
-        echo "Folders to backup: ${foldersStr}"
-        echo "Destination: proton:Backups/${protonDestPath}/current/"
 
         # Ensure rclone config directory exists
         mkdir -p "$HOME/.config/rclone"
@@ -60,49 +50,46 @@ let
           echo "  \"backup_date\": \"$DATE\","
           echo "  \"timestamp\": \"$TIMESTAMP\","
           echo "  \"source_root\": \"/shared\","
-          echo "  \"method\": \"tar.gz-gpg-rclone-copy\","
+          echo "  \"method\": \"tar.gz-gpg-rclone-pipe\","
           echo "  \"destination\": \"proton:Backups/${protonDestPath}/current/\","
           echo "  \"folders\": $FOLDERS_JSON,"
-          echo "  \"archives\": ["
           echo "  \"archives\": ["
         } > "$MANIFEST_JSON"
 
         FIRST_ARCHIVE=true
+        FAILED=0
         for folder in ${foldersStr}; do
           if [ -d "$SOURCE_ROOT/$folder" ]; then
             echo "Processing folder: $folder"
-            ARCHIVE_BASE="/tmp/proton-backup-$TIMESTAMP-$folder"
-            TAR_FILE="$ARCHIVE_BASE.tar.gz"
-            ENC_FILE="$TAR_FILE.gpg"
 
-            # Create tar.gz archive
-            echo "  Creating archive..."
-            tar czf "$TAR_FILE" -C "$SOURCE_ROOT" "$folder"
-
-            # Encrypt with gpg
-            echo "  Encrypting..."
-            gpg --batch --yes --passphrase "$ENCRYPTION_PASSWORD" --symmetric --cipher-algo AES256 "$TAR_FILE"
-
-            # Upload encrypted archive
-            echo "  Uploading..."
-            rclone copy "$ENC_FILE" "proton:Backups/${protonDestPath}/current/"
-
-            # Record in manifest
-            ARCHIVE_SIZE=$(stat -c%s "$ENC_FILE" 2>/dev/null || echo 0)
-            if [ "$FIRST_ARCHIVE" = true ]; then
-              FIRST_ARCHIVE=false
-              echo "    {\"folder\": \"$folder\", \"archive\": \"$folder.tar.gz.gpg\", \"encrypted_size\": $ARCHIVE_SIZE}" >> "$MANIFEST_JSON"
+            # Pipe: tar.gz → gpg encrypt → rclone upload (no temp files on disk)
+            echo "  Creating archive, encrypting, and uploading..."
+            if tar czf - -C "$SOURCE_ROOT" "$folder" \
+              | gpg --batch --yes --passphrase "$ENCRYPTION_PASSWORD" --symmetric --cipher-algo AES256 --output - \
+              | rclone rcat "proton:Backups/${protonDestPath}/current/$folder.tar.gz.gpg"; then
+              echo "  Done: $folder"
             else
-              echo "    ,{\"folder\": \"$folder\", \"archive\": \"$folder.tar.gz.gpg\", \"encrypted_size\": $ARCHIVE_SIZE}" >> "$MANIFEST_JSON"
+              echo "  ERROR: Failed to process $folder"
+              FAILED=$((FAILED + 1))
+              continue
             fi
 
-            # Clean up temp files for this folder
-            rm -f "$TAR_FILE" "$ENC_FILE"
-            echo "  Done: $folder"
+            # Record in manifest (size unknown with pipe, set to 0)
+            if [ "$FIRST_ARCHIVE" = true ]; then
+              FIRST_ARCHIVE=false
+              echo "    {\"folder\": \"$folder\", \"archive\": \"$folder.tar.gz.gpg\", \"encrypted_size\": 0}" >> "$MANIFEST_JSON"
+            else
+              echo "    ,{\"folder\": \"$folder\", \"archive\": \"$folder.tar.gz.gpg\", \"encrypted_size\": 0}" >> "$MANIFEST_JSON"
+            fi
           else
             echo "Warning: folder $folder not found, skipping"
           fi
         done
+
+        if [ "$FAILED" -gt 0 ]; then
+          echo "ERROR: $FAILED folder(s) failed to backup"
+          exit 1
+        fi
 
         {
           echo "  ],"
@@ -119,11 +106,9 @@ let
 
         # Clean up manifest
         rm -f "$MANIFEST_FILE"
-
-        echo "=== Proton Drive Backup completed successfully ==="
-        echo "Destination: proton:Backups/${protonDestPath}/current/"
-        echo "Manifest: proton:Backups/${protonDestPath}/manifests/$MANIFEST_FILE"
+        echo "=== Backup complete ==="
   '';
+
 in
 {
   kubernetes.resources = {
