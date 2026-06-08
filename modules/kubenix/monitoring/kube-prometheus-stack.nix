@@ -1,7 +1,8 @@
-{ lib
-, kubenix
-, homelab
-, ...
+{
+  lib,
+  kubenix,
+  homelab,
+  ...
 }:
 
 let
@@ -26,19 +27,48 @@ in
         grafana = {
           enabled = true;
           sidecar = {
-            dashboards.enabled = true;
-            datasources.enabled = true;
-            alerts.enabled = true;
+            dashboards = {
+              enabled = true;
+              resources = {
+                requests = {
+                  cpu = "50m";
+                  memory = "64Mi";
+                };
+                limits = {
+                  cpu = "100m";
+                  memory = "128Mi";
+                };
+              };
+            };
+            datasources = {
+              enabled = true;
+              resources = {
+                requests = {
+                  cpu = "50m";
+                  memory = "64Mi";
+                };
+                limits = {
+                  cpu = "100m";
+                  memory = "128Mi";
+                };
+              };
+            };
+            alerts = {
+              enabled = true;
+              resources = {
+                requests = {
+                  cpu = "50m";
+                  memory = "64Mi";
+                };
+                limits = {
+                  cpu = "100m";
+                  memory = "128Mi";
+                };
+              };
+            };
           };
           inherit namespace;
-          persistence = {
-            enabled = true;
-            type = "pvc";
-            storageClassName = kubenix.lib.defaultStorageClass;
-            accessModes = [ "ReadWriteOnce" ];
-            size = "10Gi";
-            finalizers = [ "kubernetes.io/pvc-protection" ];
-          };
+          persistence.enabled = false;
           service = kubenix.lib.plainServiceFor "grafana";
           serviceMonitor.enabled = true;
           resources = {
@@ -66,6 +96,17 @@ in
               effect = "NoSchedule";
             }
           ];
+          "grafana.ini".database = {
+            type = "postgres";
+            host = "postgresql-18-hl.apps.svc.cluster.local:5432";
+            name = "grafana";
+            user = "postgres";
+            password = "$__env{GF_DATABASE_PASSWORD}";
+          };
+          envValueFrom.GF_DATABASE_PASSWORD.secretKeyRef = {
+            name = "grafana-admin";
+            key = "GF_DATABASE_PASSWORD";
+          };
         };
         prometheusOperator = {
           enabled = true;

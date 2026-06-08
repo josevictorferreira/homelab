@@ -28,7 +28,10 @@ spec:
         helm.sh/chart: searxng-1.1.0
     spec:
       containers:
-        - envFrom:
+        - env:
+            - name: SEARXNG_PORT
+              value: '8080'
+          envFrom:
             - secretRef:
                 name: searxng-secret
           image: ghcr.io/searxng/searxng:2026.6.4-e6559c9ad
