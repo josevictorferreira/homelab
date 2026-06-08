@@ -42,7 +42,7 @@ in
               HINDSIGHT_API_LLM_BASE_URL = "https://omniroute.josevictor.me/v1";
               HINDSIGHT_API_REFLECT_LLM_MODEL = "haldir";
               HINDSIGHT_API_EMBEDDINGS_PROVIDER = "openai";
-              HINDSIGHT_API_EMBEDDINGS_OPENAI_BASE_URL = "http://llama-cpp.apps.svc.cluster.local:8081/v1";
+              HINDSIGHT_API_EMBEDDINGS_OPENAI_BASE_URL = "https://openrouter.ai/api/v1";
               HINDSIGHT_API_EMBEDDINGS_OPENAI_MODEL = "intfloat/multilingual-e5-large";
               HINDSIGHT_API_RERANKER_PROVIDER = "siliconflow";
               HINDSIGHT_API_RERANKER_SILICONFLOW_MODEL = "Qwen/Qwen3-Reranker-0.6B";
