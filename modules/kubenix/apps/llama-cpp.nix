@@ -136,7 +136,7 @@ in
             "--alias"
             "intfloat/multilingual-e5-large"
             "--n-gpu-layers"
-            "1"
+            "0"
             "--parallel"
             "1"
             "--cache-ram"
@@ -146,12 +146,10 @@ in
             requests = {
               cpu = "50m";
               memory = "64Mi";
-              "amd.com/gpu" = "1";
             };
             limits = {
               cpu = "500m";
               memory = "2Gi";
-              "amd.com/gpu" = "1";
             };
           };
           ports = [

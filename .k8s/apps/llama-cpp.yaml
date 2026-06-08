@@ -44,7 +44,7 @@ spec:
             - --alias
             - intfloat/multilingual-e5-large
             - --n-gpu-layers
-            - '1'
+            - '0'
             - --parallel
             - '1'
             - --cache-ram
@@ -76,11 +76,9 @@ spec:
             timeoutSeconds: 3
           resources:
             limits:
-              amd.com/gpu: '1'
               cpu: 500m
               memory: 2Gi
             requests:
-              amd.com/gpu: '1'
               cpu: 50m
               memory: 64Mi
           startupProbe:
