@@ -3,7 +3,16 @@ let
   namespace = homelab.kubernetes.namespaces.backup;
   image = "ghcr.io/josevictorferreira/backup-toolbox@sha256:541cc695cd9ab09f5a82b4b85b01f6aa396e3146bdc8bdf1071f1bc3ed00cdda";
   protonDestPath = "homelab/shared-archives";
-  folders = homelab.kubernetes.sharedBackupFolders;
+  folders = [
+    "3d-models"
+    "backups"
+    "books"
+    "images"
+    "hermes/profiles"
+    "mel-dynamica"
+    "notetaking"
+    "personal-finances"
+  ];
   foldersStr = builtins.concatStringsSep " " folders;
   foldersJson = builtins.toJSON folders;
 
@@ -80,6 +89,7 @@ let
             echo "Processing folder: $folder"
 
             TEMP_GPG="$TEMP_DIR/$folder.tar.gz.gpg"
+            mkdir -p "$(dirname "$TEMP_GPG")"
             rm -f "$TEMP_GPG"
 
             # Pipe: tar.gz → gpg encrypt → temp file on PVC
