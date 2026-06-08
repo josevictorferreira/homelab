@@ -62,16 +62,14 @@ spec:
               value: '8888'
             - name: HINDSIGHT_API_REFLECT_LLM_MODEL
               value: haldir
-            - name: HINDSIGHT_API_RERANKER_COHERE_BASE_URL
-              value: http://llama-cpp.apps.svc.cluster.local:8080/v1/rerank
-            - name: HINDSIGHT_API_RERANKER_COHERE_MODEL
-              value: bge-reranker-v2-m3
-            - name: HINDSIGHT_API_RERANKER_COHERE_TIMEOUT
-              value: '120'
             - name: HINDSIGHT_API_RERANKER_MAX_CANDIDATES
               value: '32'
             - name: HINDSIGHT_API_RERANKER_PROVIDER
-              value: cohere
+              value: siliconflow
+            - name: HINDSIGHT_API_RERANKER_SILICONFLOW_MODEL
+              value: Qwen/Qwen3-Reranker-0.6B
+            - name: HINDSIGHT_API_RERANKER_SILICONFLOW_TIMEOUT
+              value: '60'
             - name: HINDSIGHT_API_RETAIN_LLM_MAX_RETRIES
               value: '1'
             - name: HINDSIGHT_API_RETAIN_LLM_TIMEOUT
@@ -89,7 +87,7 @@ spec:
           envFrom:
             - secretRef:
                 name: hindsight-secrets
-          image: ghcr.io/vectorize-io/hindsight-api:0.7.2@sha256:462bffbe63cad2e451da68db6637a219a51939c40cb8884eaf67589af54b857c
+          image: ghcr.io/vectorize-io/hindsight-api:0.8.0@sha256:287b5a723e7de2e4878cae6fa54559f63a465bd0fc77a410dc34bc74d2c43245
           imagePullPolicy: IfNotPresent
           livenessProbe:
             failureThreshold: 3

@@ -12,7 +12,7 @@ in
         inherit namespace;
         image = {
           repository = "ghcr.io/vectorize-io/hindsight-api";
-          tag = "0.7.2@sha256:462bffbe63cad2e451da68db6637a219a51939c40cb8884eaf67589af54b857c";
+          tag = "0.8.0@sha256:287b5a723e7de2e4878cae6fa54559f63a465bd0fc77a410dc34bc74d2c43245";
           pullPolicy = "IfNotPresent";
         };
         port = 8888;
@@ -44,10 +44,9 @@ in
               HINDSIGHT_API_EMBEDDINGS_PROVIDER = "openai";
               HINDSIGHT_API_EMBEDDINGS_OPENAI_BASE_URL = "http://llama-cpp.apps.svc.cluster.local:8081/v1";
               HINDSIGHT_API_EMBEDDINGS_OPENAI_MODEL = "intfloat/multilingual-e5-large";
-              HINDSIGHT_API_RERANKER_PROVIDER = "cohere";
-              HINDSIGHT_API_RERANKER_COHERE_BASE_URL = "http://llama-cpp.apps.svc.cluster.local:8080/v1/rerank";
-              HINDSIGHT_API_RERANKER_COHERE_MODEL = "bge-reranker-v2-m3";
-              HINDSIGHT_API_RERANKER_COHERE_TIMEOUT = "120";
+              HINDSIGHT_API_RERANKER_PROVIDER = "siliconflow";
+              HINDSIGHT_API_RERANKER_SILICONFLOW_MODEL = "Qwen/Qwen3-Reranker-0.6B";
+              HINDSIGHT_API_RERANKER_SILICONFLOW_TIMEOUT = "60";
               HINDSIGHT_API_RERANKER_MAX_CANDIDATES = "32";
               HINDSIGHT_API_WORKER_MAX_SLOTS = "8";
               HINDSIGHT_API_WORKER_CONSOLIDATION_MAX_SLOTS = "2";
