@@ -11,7 +11,7 @@ in
       inherit namespace;
       image = {
         repository = "ghcr.io/diegosouzapw/omniroute";
-        tag = "3.8.7@sha256:ca0ec278681d1ad8d331f6b6f0a45f1ded7773e45bbc102c97f897e8d6ff7e4b";
+        tag = "3.8.15@sha256:47ce53a7d936c2e5bd1f26433fd82e30dbc67a3960634551f36af26b4bc98760";
         pullPolicy = "IfNotPresent";
       };
       secretName = "${app}-env";
