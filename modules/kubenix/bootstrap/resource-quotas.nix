@@ -11,7 +11,7 @@ let
       spec.hard = {
         "requests.cpu" = "4";
         "requests.memory" = "8Gi";
-        "limits.cpu" = "8";
+        "limits.cpu" = "10";
         "limits.memory" = "16Gi";
       };
     };
