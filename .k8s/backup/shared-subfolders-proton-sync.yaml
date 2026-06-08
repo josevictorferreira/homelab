@@ -49,17 +49,16 @@ spec:
                   \ \"  \\\"destination\\\": \\\"proton:Backups/homelab/shared-archives/current/\\\
                   \",\"\n      echo \"  \\\"folders\\\": $FOLDERS_JSON,\"\n      echo\
                   \ \"  \\\"archives\\\": [\"\n    } > \"$MANIFEST_JSON\"\n\n    FIRST_ARCHIVE=true\n\
-                  \    FAILED=0\n    for folder in 3d-models backups books images\
-                  \ hermes mel-dynamica notetaking openclaw personal-finances; do\n\
-                  \      if [ -d \"$SOURCE_ROOT/$folder\" ]; then\n\n        # Skip\
-                  \ folders larger than 10GB (Proton Drive upload unreliable for large\
-                  \ files)\n        FOLDER_SIZE_MB=$(du -sm \"$SOURCE_ROOT/$folder\"\
-                  \ 2>/dev/null | awk '{print $1}')\n        if [ -z \"$FOLDER_SIZE_MB\"\
-                  \ ]; then FOLDER_SIZE_MB=0; fi\n        if [ -z \"$MAX_FOLDER_SIZE_MB\"\
-                  \ ]; then MAX_FOLDER_SIZE_MB=10240; fi\n        if [ \"$FOLDER_SIZE_MB\"\
-                  \ -gt \"$MAX_FOLDER_SIZE_MB\" ]; then\n          echo \"  Skipping\
-                  \ $folder (${FOLDER_SIZE_MB}MB exceeds ${MAX_FOLDER_SIZE_MB}MB limit)\"\
-                  \n          continue\n        fi\n        echo \"Processing folder:\
+                  \    FAILED=0\n    MAX_FOLDER_SIZE_MB=10240\n    for folder in 3d-models\
+                  \ backups books images hermes mel-dynamica notetaking openclaw personal-finances;\
+                  \ do\n      if [ -d \"$SOURCE_ROOT/$folder\" ]; then\n\n       \
+                  \ # Skip folders larger than 10GB (Proton Drive upload unreliable\
+                  \ for large files)\n        FOLDER_SIZE_MB=$(du -sm \"$SOURCE_ROOT/$folder\"\
+                  \ 2>/dev/null | cut -f1)\n        if [ -z \"$FOLDER_SIZE_MB\" ];\
+                  \ then FOLDER_SIZE_MB=0; fi\n        if [ \"$FOLDER_SIZE_MB\" -gt\
+                  \ \"$MAX_FOLDER_SIZE_MB\" ]; then\n          echo \"  Skipping $folder\
+                  \ (${FOLDER_SIZE_MB}MB exceeds ${MAX_FOLDER_SIZE_MB}MB limit)\"\n\
+                  \          continue\n        fi\n        echo \"Processing folder:\
                   \ $folder\"\n\n        TEMP_GPG=\"$TEMP_DIR/$folder.tar.gz.gpg\"\
                   \n        rm -f \"$TEMP_GPG\"\n\n        # Pipe: tar.gz → gpg encrypt\
                   \ → temp file on PVC\n        echo \"  Creating encrypted archive\
