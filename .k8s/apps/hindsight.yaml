@@ -39,7 +39,7 @@ spec:
             - name: HINDSIGHT_API_CONSOLIDATION_LLM_TIMEOUT
               value: '45'
             - name: HINDSIGHT_API_EMBEDDINGS_OPENAI_BASE_URL
-              value: http://llama-cpp.apps.svc.cluster.local:8081/v1
+              value: https://openrouter.ai/api/v1
             - name: HINDSIGHT_API_EMBEDDINGS_OPENAI_MODEL
               value: intfloat/multilingual-e5-large
             - name: HINDSIGHT_API_EMBEDDINGS_PROVIDER
