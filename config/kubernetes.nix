@@ -79,6 +79,7 @@
       "mautrix_whatsapp_v2"
       "readeck"
       "hindsight"
+      "grafana"
     ];
   };
 

@@ -92646,7 +92646,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: 3555c8d9331af488d1f285ed2efc09c6c6099b5044e6eeaa893975e5fd760284
+        checksum/config: dc2f96c7a26d9106c937546b8ee88f6d3b477dc68e8f2fb52b760c2ce3e0340c
         checksum/sc-dashboard-provider-config: e70bf6a851099d385178a76de9757bb0bef8299da6d8443602590e44f05fdf24
         kubectl.kubernetes.io/default-container: grafana
       labels:
@@ -92808,6 +92808,11 @@ spec:
                 resourceFieldRef:
                   divisor: '1'
                   resource: limits.memory
+            - name: GF_DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: GF_DATABASE_PASSWORD
+                  name: grafana-admin
           image: docker.io/grafana/grafana:12.1.1
           imagePullPolicy: IfNotPresent
           livenessProbe:
@@ -92865,29 +92870,6 @@ spec:
             - mountPath: /etc/grafana/provisioning/datasources
               name: sc-datasources-volume
       enableServiceLinks: true
-      initContainers:
-        - command:
-            - chown
-            - -R
-            - 472:472
-            - /var/lib/grafana
-          image: docker.io/library/busybox:1.31.1
-          imagePullPolicy: IfNotPresent
-          name: init-chown-data
-          securityContext:
-            capabilities:
-              add:
-                - CHOWN
-              drop:
-                - ALL
-            readOnlyRootFilesystem: false
-            runAsNonRoot: false
-            runAsUser: 0
-            seccompProfile:
-              type: RuntimeDefault
-          volumeMounts:
-            - mountPath: /var/lib/grafana
-              name: storage
       securityContext:
         fsGroup: 472
         runAsGroup: 472
@@ -92904,9 +92886,8 @@ spec:
         - configMap:
             name: kube-prometheus-stack-grafana
           name: config
-        - name: storage
-          persistentVolumeClaim:
-            claimName: kube-prometheus-stack-grafana
+        - emptyDir: {}
+          name: storage
         - emptyDir: {}
           name: sc-alerts-volume
         - emptyDir: {}
@@ -93497,6 +93478,18 @@ data:
   grafana.ini: '[analytics]
 
     check_for_updates = true
+
+    [database]
+
+    host = postgresql-18-hl.apps.svc.cluster.local:5432
+
+    name = grafana
+
+    password = $__env{GF_DATABASE_PASSWORD}
+
+    type = postgres
+
+    user = postgres
 
     [grafana_net]
 
@@ -95735,29 +95728,6 @@ metadata:
     release: kube-prometheus-stack
   name: kube-prometheus-stack-workload-total
   namespace: monitoring
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  annotations:
-    kubenix/k8s-version: '1.32'
-    kubenix/project-name: ze-homelab
-  finalizers:
-    - kubernetes.io/pvc-protection
-  labels:
-    app.kubernetes.io/instance: kube-prometheus-stack
-    app.kubernetes.io/name: grafana
-    app.kubernetes.io/version: 12.1.1
-    helm.sh/chart: grafana-10.0.0
-  name: kube-prometheus-stack-grafana
-  namespace: monitoring
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 10Gi
-  storageClassName: rook-ceph-block
 ---
 apiVersion: v1
 data:

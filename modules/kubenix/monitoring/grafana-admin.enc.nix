@@ -53,6 +53,9 @@ in
           "ADMIN_USER" = kubenix.lib.secretsFor "grafana_admin_username";
           "ADMIN_PASSWORD" = kubenix.lib.secretsFor "grafana_admin_password";
         };
+        stringData = {
+          "GF_DATABASE_PASSWORD" = kubenix.lib.secretsFor "postgresql_admin_password";
+        };
       };
 
       configMaps."grafana-alerting-contactpoints" = {

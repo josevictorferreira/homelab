@@ -62,6 +62,12 @@ in
       deployments.${app} = {
         metadata.namespace = namespace;
         spec.template.spec.containers.${app} = {
+          env = [
+            {
+              name = "SEARXNG_PORT";
+              value = "8080";
+            }
+          ];
           envFrom = [
             {
               secretRef = {
