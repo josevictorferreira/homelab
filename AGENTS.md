@@ -534,6 +534,11 @@ Our cluster is deployed and accessible in the user system kubectl, the context a
 **Context:** Even adding `annotations = {}` or service type override doesn't work — the annotation lookup happens before values merge.
 **Verify:** See `modules/kubenix/apps/flaresolverr.nix` for the correct pattern
 
+#### Helm Chart envValueFrom vs env.X.valueFrom
+**Lesson:** The bjw-s/kube-prometheus-stack Helm chart uses `envValueFrom.X.secretKeyRef` for secret refs, NOT `env.X.valueFrom.secretKeyRef`. Using the wrong key causes Nix to flatten the secret ref into a literal string value, producing errors like `invalid option: "name:grafana-admin]]]"`.
+**Context:** `env.GF_DATABASE_PASSWORD.valueFrom = { secretKeyRef = ... }` produces `map[valueFrom:map[secretKeyRef:map[key:GF_DATABASE_PASSWORD name:grafana-admin]]]` as a string — the entire structure becomes the password value.
+**Verify:** Check generated YAML: `grep -A5 'GF_DATABASE_PASSWORD' .k8s/monitoring/kube-prometheus-stack.yaml` should show `valueFrom.secretKeyRef` at top level, not nested under `env`.
+
 ### OpenClaw Version Upgrade
 
 #### Provide Missing Build Tools via npm Tarball Derivations
@@ -649,6 +654,10 @@ Our cluster is deployed and accessible in the user system kubectl, the context a
 **Context:** OpenClaw pod force-deleted on lab-beta-cp, recreated on lab-gamma-wk. Both PVCs got stuck with "rbd image is still being used" for 6+ minutes.
 **Verify:** `kubectl exec -n rook-ceph deploy/rook-ceph-tools -- rbd status replicapool/csi-vol-<id>` — watcher should be on the NEW node.
 
+#### Kubernetes Service Env Vars Break Integer-Expecting Apps
+**Lesson:** Kubernetes injects `{SERVICE_NAME}_PORT=tcp://IP:PORT` env vars from Service objects. Apps that parse these as integers (e.g., granian, gunicorn) crash with "invalid integer". Always set an explicit env var with the integer value (e.g., `SEARXNG_PORT=8080`) to override the injected `tcp://` value.
+**Context:** Searxng crashed with `Error: Invalid value for '--port': 'tcp://10.43.182.206:8080' is not a valid integer` because K8s injected `SEARXNG_PORT` from the Service.
+**Verify:** `kubectl get deploy <name> -n <ns> -o jsonpath='{.spec.template.spec.containers[0].env[*]}'` includes the explicit integer port override.
 ### Podman OCI Image Management
 
 #### Podman Push Silently Pushes Stale Image Due to GHCR Tag Collision
@@ -672,6 +681,11 @@ Our cluster is deployed and accessible in the user system kubectl, the context a
 **Verify:** After force delete: `kubectl get pods -n <ns> -l app.kubernetes.io/name=<app>` shows new pod in ContainerCreating/Running state.
 
 ### Git History & Secret Scrubbing
+
+#### Strict Secret Scans Must Bypass Repo Allowlist
+**Lesson:** For leak investigations, run both the repo-configured scan and a strict redacted scan that ignores this repo's `.gitleaks.toml` allowlist; the current allowlist excludes `.k8s/*.yaml`, `.enc.*`, and historical manifests.
+**Context:** The default scan can return zero while strict scanning still finds generated-manifest or historical Secret/private-key exposures.
+**Verify:** Use a minimal config (`[extend] useDefault = true`), an empty ignore file, `--log-opts='--all'`, and `--redact=100` for history scans.
 
 #### `git-filter-repo` Replaces Strings in Working Tree Source Files
 **Lesson:** `git-filter-repo --replace-text` rewrites ALL commits including HEAD, modifying source files in the working tree. After scrubbing, check source files for the replacement string and fix them, then re-run `make manifests`.
@@ -897,6 +911,18 @@ and an orphaned `$needs_sync` variable (unbound error) both caught only after po
 **Lesson:** Always add `timeout = "30s"` (or appropriate duration) to Glance custom-api widgets that call external APIs.
 **Context:** Default HTTP timeout (~10s) is often insufficient for slow external APIs (e.g., Kimi Code API), causing "context deadline exceeded" errors in the UI.
 **Verify:** Widget displays data without timeout errors; check Glance logs show successful API responses.
+
+### Nix `''` String Bash Interpolation
+
+**Lesson:** In Nix `''` (indented) strings, bash `${VAR:-default}` syntax is parsed as Nix interpolation and fails with `undefined variable`. Use explicit `if [ -z "$VAR" ]; then VAR=default; fi` instead. Also, `${VAR}` inside double-quoted echo strings must be escaped as `''${VAR}` to prevent Nix interpolation.
+**Context:** Writing shell scripts inside Nix `''` strings is common for CronJob commands and ConfigMaps. The `${}` syntax collision caused multiple failed edits and runtime crashes during proton-sync implementation.
+**Verify:** `nix-instantiate --parse <file>` passes; `bash -n <<< "$(nix eval --raw -f <file> ...)"` passes for extracted scripts.
+
+### Proton Drive rclone Quirks
+
+**Lesson:** Proton Drive rejects `rclone rcat` (requires Content-Length header, buffers entire file to ephemeral storage). Use `rclone copy` from PVC temp file instead. After failed uploads, Proton Drive keeps ghost entries — add `sleep 10` between `rclone delete` and `rclone copy` to avoid 422 "file already exists" errors.
+**Context:** Large file uploads (>5GB) to Proton Drive frequently fail with 502 Bad Gateway. Ghost entries persist even after successful delete, causing subsequent copy to fail with 422. The sleep workaround gives Proton Drive time to propagate the deletion.
+**Verify:** `rclone delete proton:<path> && sleep 10 && rclone copy <local> proton:<path>` succeeds without 422 errors.
 
 ## INCIDENT RECORD
 
