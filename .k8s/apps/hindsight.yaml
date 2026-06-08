@@ -66,6 +66,8 @@ spec:
               value: '32'
             - name: HINDSIGHT_API_RERANKER_PROVIDER
               value: siliconflow
+            - name: HINDSIGHT_API_RERANKER_SILICONFLOW_BASE_URL
+              value: https://api.siliconflow.com/v1
             - name: HINDSIGHT_API_RERANKER_SILICONFLOW_MODEL
               value: Qwen/Qwen3-Reranker-0.6B
             - name: HINDSIGHT_API_RERANKER_SILICONFLOW_TIMEOUT
