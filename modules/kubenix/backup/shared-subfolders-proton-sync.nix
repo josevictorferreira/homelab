@@ -66,13 +66,13 @@ let
 
         FIRST_ARCHIVE=true
         FAILED=0
+        MAX_FOLDER_SIZE_MB=10240
         for folder in ${foldersStr}; do
           if [ -d "$SOURCE_ROOT/$folder" ]; then
 
             # Skip folders larger than 10GB (Proton Drive upload unreliable for large files)
-            FOLDER_SIZE_MB=$(du -sm "$SOURCE_ROOT/$folder" 2>/dev/null | awk '{print $1}')
+            FOLDER_SIZE_MB=$(du -sm "$SOURCE_ROOT/$folder" 2>/dev/null | cut -f1)
             if [ -z "$FOLDER_SIZE_MB" ]; then FOLDER_SIZE_MB=0; fi
-            if [ -z "$MAX_FOLDER_SIZE_MB" ]; then MAX_FOLDER_SIZE_MB=10240; fi
             if [ "$FOLDER_SIZE_MB" -gt "$MAX_FOLDER_SIZE_MB" ]; then
               echo "  Skipping $folder (''${FOLDER_SIZE_MB}MB exceeds ''${MAX_FOLDER_SIZE_MB}MB limit)"
               continue
