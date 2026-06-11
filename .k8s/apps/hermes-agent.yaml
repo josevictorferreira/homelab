@@ -70,11 +70,11 @@ spec:
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
-              add:
-                - DAC_OVERRIDE
               drop:
                 - ALL
-            runAsUser: 0
+            runAsGroup: 2002
+            runAsNonRoot: true
+            runAsUser: 10000
           volumeMounts:
             - mountPath: /opt/data
               name: hermes-data

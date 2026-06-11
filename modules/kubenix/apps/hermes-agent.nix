@@ -439,14 +439,7 @@ in
                   memory = "512Mi";
                 };
               };
-              securityContext = {
-                allowPrivilegeEscalation = false;
-                runAsUser = 0;
-                capabilities = {
-                  drop = [ "ALL" ];
-                  add = [ "DAC_OVERRIDE" ];
-                };
-              };
+              securityContext = commonSecurityContext;
               readinessProbe = {
                 tcpSocket.port = 9119;
                 initialDelaySeconds = 15;
