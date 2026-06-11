@@ -168,8 +168,10 @@ spec:
               \ -r node_modules /opt/data/whatsapp-bridge-node_modules 2>/dev/null)\
               \ || true\n                    fi\n                    rm -rf /opt/hermes/scripts/whatsapp-bridge/node_modules\n\
               \                    ln -s /opt/data/whatsapp-bridge-node_modules /opt/hermes/scripts/whatsapp-bridge/node_modules\n\
-              \                  fi\n                fi\n\nexec hermes -p ted gateway\
-              \ run\n"
+              \                  fi\n                fi\n                  # Fix Baileys\
+              \ 7.x syncFullHistory for incoming messages\n                  sed -i\
+              \ 's/syncFullHistory: false/syncFullHistory: true/' /opt/hermes/scripts/whatsapp-bridge/bridge.js\
+              \ 2>/dev/null || true\n\nexec hermes -p ted gateway run\n"
           env:
             - name: HERMES_UID
               value: '10000'
@@ -288,8 +290,10 @@ spec:
               \ -r node_modules /opt/data/whatsapp-bridge-node_modules 2>/dev/null)\
               \ || true\n                    fi\n                    rm -rf /opt/hermes/scripts/whatsapp-bridge/node_modules\n\
               \                    ln -s /opt/data/whatsapp-bridge-node_modules /opt/hermes/scripts/whatsapp-bridge/node_modules\n\
-              \                  fi\n                fi\n\nexec hermes -p kira gateway\
-              \ run\n"
+              \                  fi\n                fi\n                  # Fix Baileys\
+              \ 7.x syncFullHistory for incoming messages\n                  sed -i\
+              \ 's/syncFullHistory: false/syncFullHistory: true/' /opt/hermes/scripts/whatsapp-bridge/bridge.js\
+              \ 2>/dev/null || true\n\nexec hermes -p kira gateway run\n"
           env:
             - name: HERMES_UID
               value: '10000'
@@ -341,6 +345,8 @@ spec:
                 secretKeyRef:
                   key: HERMES_KIRA_WHATSAPP_ALLOWED_USERS
                   name: hermes-agent-env
+            - name: WHATSAPP_DEBUG
+              value: 'true'
           envFrom:
             - secretRef:
                 name: hermes-agent-env
@@ -417,8 +423,10 @@ spec:
               \ -r node_modules /opt/data/whatsapp-bridge-node_modules 2>/dev/null)\
               \ || true\n                    fi\n                    rm -rf /opt/hermes/scripts/whatsapp-bridge/node_modules\n\
               \                    ln -s /opt/data/whatsapp-bridge-node_modules /opt/hermes/scripts/whatsapp-bridge/node_modules\n\
-              \                  fi\n                fi\n\nexec hermes -p mel gateway\
-              \ run\n"
+              \                  fi\n                fi\n                  # Fix Baileys\
+              \ 7.x syncFullHistory for incoming messages\n                  sed -i\
+              \ 's/syncFullHistory: false/syncFullHistory: true/' /opt/hermes/scripts/whatsapp-bridge/bridge.js\
+              \ 2>/dev/null || true\n\nexec hermes -p mel gateway run\n"
           env:
             - name: HERMES_UID
               value: '10000'
@@ -537,8 +545,10 @@ spec:
               \ -r node_modules /opt/data/whatsapp-bridge-node_modules 2>/dev/null)\
               \ || true\n                    fi\n                    rm -rf /opt/hermes/scripts/whatsapp-bridge/node_modules\n\
               \                    ln -s /opt/data/whatsapp-bridge-node_modules /opt/hermes/scripts/whatsapp-bridge/node_modules\n\
-              \                  fi\n                fi\n\nexec hermes -p spike gateway\
-              \ run\n"
+              \                  fi\n                fi\n                  # Fix Baileys\
+              \ 7.x syncFullHistory for incoming messages\n                  sed -i\
+              \ 's/syncFullHistory: false/syncFullHistory: true/' /opt/hermes/scripts/whatsapp-bridge/bridge.js\
+              \ 2>/dev/null || true\n\nexec hermes -p spike gateway run\n"
           env:
             - name: HERMES_UID
               value: '10000'
@@ -657,8 +667,10 @@ spec:
               \ -r node_modules /opt/data/whatsapp-bridge-node_modules 2>/dev/null)\
               \ || true\n                    fi\n                    rm -rf /opt/hermes/scripts/whatsapp-bridge/node_modules\n\
               \                    ln -s /opt/data/whatsapp-bridge-node_modules /opt/hermes/scripts/whatsapp-bridge/node_modules\n\
-              \                  fi\n                fi\n\nexec hermes -p luna gateway\
-              \ run\n"
+              \                  fi\n                fi\n                  # Fix Baileys\
+              \ 7.x syncFullHistory for incoming messages\n                  sed -i\
+              \ 's/syncFullHistory: false/syncFullHistory: true/' /opt/hermes/scripts/whatsapp-bridge/bridge.js\
+              \ 2>/dev/null || true\n\nexec hermes -p luna gateway run\n"
           env:
             - name: HERMES_UID
               value: '10000'

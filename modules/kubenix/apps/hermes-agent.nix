@@ -210,6 +210,8 @@ let
                             ln -s /opt/data/whatsapp-bridge-node_modules /opt/hermes/scripts/whatsapp-bridge/node_modules
                           fi
                         fi
+                          # Fix Baileys 7.x syncFullHistory for incoming messages
+                          sed -i 's/syncFullHistory: false/syncFullHistory: true/' /opt/hermes/scripts/whatsapp-bridge/bridge.js 2>/dev/null || true
       '';
       cmdArgs =
         if profileFlag != null then
@@ -272,6 +274,10 @@ let
                   name = "${name}-env";
                   key = "HERMES_KIRA_WHATSAPP_ALLOWED_USERS";
                 };
+              }
+              {
+                name = "WHATSAPP_DEBUG";
+                value = "true";
               }
             ]
           else
