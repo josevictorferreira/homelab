@@ -18,7 +18,7 @@ in
           spec = {
             containers.${name} = {
               image = "cloakhq/cloakbrowser:latest";
-              command = [
+              args = [
                 "sh"
                 "-c"
                 "touch /.dockerenv && exec cloakserve"

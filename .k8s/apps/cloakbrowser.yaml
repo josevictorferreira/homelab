@@ -17,7 +17,7 @@ spec:
         app: cloakbrowser
     spec:
       containers:
-        - command:
+        - args:
             - sh
             - -c
             - touch /.dockerenv && exec cloakserve
