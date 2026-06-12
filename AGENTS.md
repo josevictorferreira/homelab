@@ -781,6 +781,10 @@ Our cluster is deployed and accessible in the user system kubectl, the context a
 **Lesson:** Don't put `chown -R` init containers on CephFS-backed `subPath` mounts. CephFS enforces ownership beyond the kernel cap check; even an init container with CAP_CHOWN gets `Permission denied`. Rely on the app entrypoint's chown-with-fallback, or pre-create the subdir with correct ownership via a privileged one-shot.
 **Context:** Wasted ~25 min on an init container that works fine on RBD but always fails on CephFS subPath.
 **Verify:** `kubectl logs <pod> -c <init>` shows `chown: <path>: Permission denied` despite `capabilities.add: [CHOWN]`.
+#### CephFS UID Mismatch: NFS Mount Masks True Ownership
+**Lesson:** When diagnosing permission issues on CephFS-backed data, the host NFS mount may show remapped UIDs (e.g., `2002:2002`) while the Kubernetes CSI mount exposes the true stored UID (e.g., `0` for root-owned files). If `chown` fails on the host without `sudo`, the files are truly root-owned on CephFS and need `sudo chown` from the host to fix.
+**Context:** Luna/spike cron dirs were created by root before `HERMES_UID=10000` was enforced. Host NFS showed correct ownership, but pod couldn't traverse them because CephFS stored UID 0.
+**Verify:** Compare `ls -ln ~/Homelab/hermes/profiles/<name>/cron` (NFS numeric UIDs) with `kubectl exec <pod> -- ls -ln /opt/data/profiles/<name>/cron` (CSI true UIDs).
 
 #### Pod Preemption Looks Like Scheduling Failure
 **Lesson:** When a pod oscillates `Pending` → `Terminating` → `Pending` without restart count climbing, suspect preemption, not resource starvation. Check `kubectl get pod <name> -o jsonpath='{.status.conditions[?(@.type=="DisruptionTarget")]}'` and `kubectl get events --field-selector reason=Preempted -A`.

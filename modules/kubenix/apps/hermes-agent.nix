@@ -346,7 +346,24 @@ in
           securityContext = gatewayPodSecurityContext;
           terminationGracePeriodSeconds = 60;
           imagePullSecrets = [ { name = "ghcr-registry-secret"; } ];
-          initContainers = [ ];
+          initContainers = [
+            {
+              name = "fix-profile-permissions";
+              inherit image;
+              command = [
+                "/bin/sh"
+                "-c"
+                "chown -R 10000:2002 /opt/data/profiles/luna /opt/data/profiles/spike || true"
+              ];
+              volumeMounts = dataVolumeMounts;
+              securityContext = {
+                runAsUser = 0;
+                runAsGroup = 0;
+                capabilities.add = [ "DAC_OVERRIDE" ];
+                capabilities.drop = [ ];
+              };
+            }
+          ];
           containers = containers;
           volumes = dataVolumes ++ [
             {
