@@ -17,12 +17,12 @@ in
       port = 8000;
       resources = {
         requests = {
-          cpu = "100m";
-          memory = "256Mi";
+          cpu = "200m";
+          memory = "512Mi";
         };
         limits = {
-          cpu = "500m";
-          memory = "1Gi";
+          cpu = "1";
+          memory = "2Gi";
         };
       };
       secretName = "readeck-env";

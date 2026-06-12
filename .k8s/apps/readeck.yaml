@@ -54,11 +54,11 @@ spec:
               protocol: TCP
           resources:
             limits:
-              cpu: 500m
-              memory: 1Gi
+              cpu: '1'
+              memory: 2Gi
             requests:
-              cpu: 100m
-              memory: 256Mi
+              cpu: 200m
+              memory: 512Mi
           volumeMounts:
             - mountPath: /readeck
               name: main
