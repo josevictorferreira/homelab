@@ -755,7 +755,37 @@ spec:
               subPath: hermes
       imagePullSecrets:
         - name: ghcr-registry-secret
-      initContainers: []
+      initContainers:
+        - command:
+            - /bin/sh
+            - -c
+            - chown -R 10000:2002 /opt/data/profiles/luna /opt/data/profiles/spike
+              || true
+          image: docker.io/nousresearch/hermes-agent:v2026.6.5@sha256:94da6ebb770200580d37c9f6caca70aa9c19caa252d28ac953b7cb42634728ab
+          name: fix-profile-permissions
+          securityContext:
+            capabilities:
+              add:
+                - DAC_OVERRIDE
+              drop: []
+            runAsGroup: 0
+            runAsUser: 0
+          volumeMounts:
+            - mountPath: /opt/data
+              name: hermes-data
+              subPath: hermes
+            - mountPath: /shared/notetaking
+              name: hermes-data
+              subPath: notetaking
+            - mountPath: /shared/mel-dynamica
+              name: hermes-data
+              subPath: mel-dynamica
+            - mountPath: /shared/personal-finances
+              name: hermes-data
+              subPath: personal-finances
+            - mountPath: /opt/hermes/scripts/whatsapp-bridge/node_modules
+              name: hermes-data
+              subPath: whatsapp-bridge-node_modules
       securityContext:
         supplementalGroups:
           - 100
