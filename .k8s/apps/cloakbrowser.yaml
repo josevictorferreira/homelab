@@ -19,28 +19,44 @@ spec:
       containers:
         - command:
             - cloakserve
+          env:
+            - name: CLOAKBROWSER_NO_SANDBOX
+              value: '1'
           image: cloakhq/cloakbrowser:latest
           livenessProbe:
-            initialDelaySeconds: 15
-            periodSeconds: 30
-            tcpSocket:
+            httpGet:
+              path: /json/version
               port: 9222
+            initialDelaySeconds: 30
+            periodSeconds: 30
           name: cloakbrowser
           ports:
             - containerPort: 9222
               name: cdp
           readinessProbe:
-            initialDelaySeconds: 10
-            periodSeconds: 30
-            tcpSocket:
+            httpGet:
+              path: /json/version
               port: 9222
+            initialDelaySeconds: 15
+            periodSeconds: 30
           resources:
             limits:
-              cpu: '1'
-              memory: 1Gi
+              cpu: '2'
+              memory: 2Gi
             requests:
               cpu: 250m
               memory: 256Mi
+          securityContext:
+            capabilities:
+              add:
+                - SYS_ADMIN
+          volumeMounts:
+            - mountPath: /dev/shm
+              name: devshm
+      volumes:
+        - emptyDir:
+            medium: Memory
+          name: devshm
 ---
 apiVersion: v1
 kind: Service
