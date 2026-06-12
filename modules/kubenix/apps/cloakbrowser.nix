@@ -18,12 +18,10 @@ in
           spec = {
             containers.${name} = {
               image = "cloakhq/cloakbrowser:latest";
-              command = [ "cloakserve" ];
-              env = [
-                {
-                  name = "CLOAKBROWSER_NO_SANDBOX";
-                  value = "1";
-                }
+              command = [
+                "sh"
+                "-c"
+                "touch /.dockerenv && exec cloakserve"
               ];
               ports = [
                 {
@@ -40,8 +38,8 @@ in
               securityContext.capabilities.add = [ "SYS_ADMIN" ];
               resources = {
                 requests = {
-                  memory = "256Mi";
-                  cpu = "250m";
+                  memory = "512Mi";
+                  cpu = "500m";
                 };
                 limits = {
                   memory = "2Gi";
@@ -49,21 +47,11 @@ in
                 };
               };
               readinessProbe = {
-                httpGet = {
-                  path = "/json/version";
-                  port = 9222;
-                };
-                initialDelaySeconds = 15;
-                periodSeconds = 30;
-              };
-              livenessProbe = {
-                httpGet = {
-                  path = "/json/version";
-                  port = 9222;
-                };
+                tcpSocket.port = 9222;
                 initialDelaySeconds = 30;
-                periodSeconds = 30;
+                periodSeconds = 10;
               };
+              # No liveness probe — cloakserve manages its own Chrome lifecycle
             };
             volumes = [
               {
