@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: cloakbrowser
+  namespace: apps
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cloakbrowser
+  template:
+    metadata:
+      labels:
+        app: cloakbrowser
+    spec:
+      containers:
+        - command:
+            - cloakserve
+          image: cloakhq/cloakbrowser:latest
+          livenessProbe:
+            initialDelaySeconds: 15
+            periodSeconds: 30
+            tcpSocket:
+              port: 9222
+          name: cloakbrowser
+          ports:
+            - containerPort: 9222
+              name: cdp
+          readinessProbe:
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            tcpSocket:
+              port: 9222
+          resources:
+            limits:
+              cpu: '1'
+              memory: 1Gi
+            requests:
+              cpu: 250m
+              memory: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: cloakbrowser
+  namespace: apps
+spec:
+  ports:
+    - name: cdp
+      port: 9222
+      targetPort: 9222
+  selector:
+    app: cloakbrowser
