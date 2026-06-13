@@ -47,8 +47,11 @@ let
     runAsGroup = 2002;
     capabilities.drop = [ "ALL" ];
   };
-  gatewayPodSecurityContext = {
-    # Existing Kira skill files are group-owned by users (GID 100).
+  # Profile dirs under /opt/data are setgid + group-owned by users (GID 100) and
+  # private to "other" (o---). Both the gateway and the dashboard run as uid
+  # 10000 (not the dir owner), so they must join GID 100 to traverse profile
+  # dirs and read each profile's config.yaml.
+  podSecurityContext = {
     supplementalGroups = [ 100 ];
   };
   cliWrapper = {
@@ -343,7 +346,7 @@ in
           component = "gateway";
         };
         spec = {
-          securityContext = gatewayPodSecurityContext;
+          securityContext = podSecurityContext;
           terminationGracePeriodSeconds = 60;
           imagePullSecrets = [ { name = "ghcr-registry-secret"; } ];
           initContainers = [
@@ -401,6 +404,7 @@ in
           component = "dashboard";
         };
         spec = {
+          securityContext = podSecurityContext;
           terminationGracePeriodSeconds = 30;
           imagePullSecrets = [ { name = "ghcr-registry-secret"; } ];
           containers = [
