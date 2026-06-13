@@ -1,0 +1,148 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/controller: main
+    app.kubernetes.io/instance: degoog
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: degoog
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: degoog
+  namespace: apps
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/controller: main
+      app.kubernetes.io/instance: degoog
+      app.kubernetes.io/name: degoog
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/controller: main
+        app.kubernetes.io/instance: degoog
+        app.kubernetes.io/name: degoog
+    spec:
+      automountServiceAccountToken: true
+      containers:
+        - image: ghcr.io/degoog-org/degoog:latest@sha256:4b3ba6fe7ab6c5ca76ce8aedbd5d07da7423d1043613fae94ff9f1c8acced479
+          imagePullPolicy: Always
+          name: main
+          ports:
+            - containerPort: 4444
+              name: http
+              protocol: TCP
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          volumeMounts:
+            - mountPath: /app/data
+              name: main
+      dnsPolicy: ClusterFirst
+      enableServiceLinks: false
+      hostIPC: false
+      hostNetwork: false
+      hostPID: false
+      serviceAccountName: default
+      volumes:
+        - name: main
+          persistentVolumeClaim:
+            claimName: degoog
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: degoog
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: degoog
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: degoog
+  namespace: apps
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: rook-ceph-block
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+    lbipam.cilium.io/ips: 10.10.10.151
+    lbipam.cilium.io/sharing-key: degoog
+  labels:
+    app.kubernetes.io/instance: degoog
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: degoog
+    app.kubernetes.io/service: degoog
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: degoog
+  namespace: apps
+spec:
+  ports:
+    - name: http
+      port: 4444
+      protocol: TCP
+      targetPort: 4444
+  selector:
+    app.kubernetes.io/controller: main
+    app.kubernetes.io/instance: degoog
+    app.kubernetes.io/name: degoog
+  type: LoadBalancer
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: degoog
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: degoog
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: degoog
+  namespace: apps
+spec:
+  ingressClassName: cilium
+  rules:
+    - host: degoog.josevictor.me
+      http:
+        paths:
+          - backend:
+              service:
+                name: degoog
+                port:
+                  number: 4444
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - degoog.josevictor.me
+      secretName: wildcard-tls
