@@ -198,6 +198,11 @@ spec:
               value: dummy
             - name: HINDSIGHT_LLM_API_KEY
               value: dummy
+            - name: GITHUB_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  key: GITHUB_TOKEN
+                  name: hermes-agent-env
             - name: PATH
               value: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/hermes/.venv/bin:/opt/data/.local/bin
             - name: PYTHONPATH
@@ -320,6 +325,11 @@ spec:
               value: dummy
             - name: HINDSIGHT_LLM_API_KEY
               value: dummy
+            - name: GITHUB_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  key: GITHUB_TOKEN
+                  name: hermes-agent-env
             - name: PATH
               value: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/hermes/.venv/bin:/opt/data/.local/bin
             - name: PYTHONPATH
@@ -453,6 +463,11 @@ spec:
               value: dummy
             - name: HINDSIGHT_LLM_API_KEY
               value: dummy
+            - name: GITHUB_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  key: GITHUB_TOKEN
+                  name: hermes-agent-env
             - name: PATH
               value: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/hermes/.venv/bin:/opt/data/.local/bin
             - name: PYTHONPATH
@@ -575,6 +590,11 @@ spec:
               value: dummy
             - name: HINDSIGHT_LLM_API_KEY
               value: dummy
+            - name: GITHUB_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  key: GITHUB_TOKEN
+                  name: hermes-agent-env
             - name: PATH
               value: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/hermes/.venv/bin:/opt/data/.local/bin
             - name: PYTHONPATH
@@ -697,6 +717,11 @@ spec:
               value: dummy
             - name: HINDSIGHT_LLM_API_KEY
               value: dummy
+            - name: GITHUB_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  key: GITHUB_TOKEN
+                  name: hermes-agent-env
             - name: PATH
               value: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/hermes/.venv/bin:/opt/data/.local/bin
             - name: PYTHONPATH

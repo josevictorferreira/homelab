@@ -107,6 +107,13 @@ let
       value = "dummy";
     }
     {
+      name = "GITHUB_TOKEN";
+      valueFrom.secretKeyRef = {
+        name = "${name}-env";
+        key = "GITHUB_TOKEN";
+      };
+    }
+    {
       name = "PATH";
       value = "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/hermes/.venv/bin:/opt/data/.local/bin";
     }
