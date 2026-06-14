@@ -81,11 +81,11 @@ let
     }
     {
       name = "AGENT_BROWSER_ENGINE";
-      value = "lightpanda";
+      value = "cdp";
     }
     {
       name = "AGENT_BROWSER_ENDPOINT";
-      value = "http://lightpanda.${namespace}.svc.cluster.local:9222";
+      value = "ws://cloakbrowser.${namespace}.svc.cluster.local:9222";
     }
     {
       name = "HINDSIGHT_MODE";
