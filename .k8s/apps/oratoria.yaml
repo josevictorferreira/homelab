@@ -53,6 +53,10 @@ spec:
           volumeMounts:
             - mountPath: /app/data
               name: main
+            - mountPath: /app/oratoria-web/vite.config.js
+              name: vite-config
+              readOnly: true
+              subPath: vite.config.js
       dnsPolicy: ClusterFirst
       enableServiceLinks: false
       hostIPC: false
@@ -65,6 +69,9 @@ spec:
         - name: main
           persistentVolumeClaim:
             claimName: oratoria
+        - configMap:
+            name: oratoria-vite-config
+          name: vite-config
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -151,3 +158,16 @@ spec:
     - hosts:
         - oratoria.josevictor.me
       secretName: wildcard-tls
+---
+apiVersion: v1
+data:
+  vite.config.js: "const proxy = { '/api': 'http://127.0.0.1:8765' }\nexport default\
+    \ {\n  server: { proxy },\n  preview: { proxy, allowedHosts: [\"oratoria.josevictor.me\"\
+    ] },\n  optimizeDeps: { include: ['oidc-client-ts'] },\n}\n"
+kind: ConfigMap
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: oratoria-vite-config
+  namespace: apps
