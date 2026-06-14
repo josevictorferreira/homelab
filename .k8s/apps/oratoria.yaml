@@ -1,0 +1,155 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/controller: main
+    app.kubernetes.io/instance: oratoria
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: oratoria
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: oratoria
+  namespace: apps
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/controller: main
+      app.kubernetes.io/instance: oratoria
+      app.kubernetes.io/name: oratoria
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/controller: main
+        app.kubernetes.io/instance: oratoria
+        app.kubernetes.io/name: oratoria
+    spec:
+      automountServiceAccountToken: true
+      containers:
+        - image: ghcr.io/josevictorferreira/oratoria:latest@sha256:614f61025b27dce29391cd8e820ca8f1a00304c5076a553ca584d7f84ea9d6f9
+          imagePullPolicy: Always
+          name: main
+          ports:
+            - containerPort: 8765
+              name: http
+              protocol: TCP
+            - containerPort: 5173
+              name: dev
+              protocol: TCP
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          volumeMounts:
+            - mountPath: /app/data
+              name: main
+      dnsPolicy: ClusterFirst
+      enableServiceLinks: false
+      hostIPC: false
+      hostNetwork: false
+      hostPID: false
+      serviceAccountName: default
+      volumes:
+        - name: main
+          persistentVolumeClaim:
+            claimName: oratoria
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: oratoria
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: oratoria
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: oratoria
+  namespace: apps
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: rook-ceph-block
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+    lbipam.cilium.io/ips: 10.10.10.152
+    lbipam.cilium.io/sharing-key: oratoria
+  labels:
+    app.kubernetes.io/instance: oratoria
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: oratoria
+    app.kubernetes.io/service: oratoria
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: oratoria
+  namespace: apps
+spec:
+  ports:
+    - name: dev
+      port: 5173
+      protocol: TCP
+      targetPort: 5173
+    - name: http
+      port: 8765
+      protocol: TCP
+      targetPort: 8765
+  selector:
+    app.kubernetes.io/controller: main
+    app.kubernetes.io/instance: oratoria
+    app.kubernetes.io/name: oratoria
+  type: LoadBalancer
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: oratoria
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: oratoria
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: oratoria
+  namespace: apps
+spec:
+  ingressClassName: cilium
+  rules:
+    - host: oratoria.josevictor.me
+      http:
+        paths:
+          - backend:
+              service:
+                name: oratoria
+                port:
+                  number: 8765
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - oratoria.josevictor.me
+      secretName: wildcard-tls
