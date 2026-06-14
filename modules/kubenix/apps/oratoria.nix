@@ -39,6 +39,9 @@ in
         ];
       };
       values = {
+        defaultPodOptions.imagePullSecrets = [
+          { name = "ghcr-registry-secret"; }
+        ];
         controllers.main.containers.main.ports = [
           {
             name = "http";
