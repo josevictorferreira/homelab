@@ -45,19 +45,15 @@ in
         controllers.main.containers.main.ports = [
           {
             name = "http";
-            containerPort = 8765;
-            protocol = "TCP";
-          }
-          {
-            name = "dev";
             containerPort = 5173;
             protocol = "TCP";
           }
+          {
+            name = "backend";
+            containerPort = 8765;
+            protocol = "TCP";
+          }
         ];
-        service.main.ports.dev = {
-          enabled = true;
-          port = 5173;
-        };
       };
     };
   };

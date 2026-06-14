@@ -37,11 +37,11 @@ spec:
           imagePullPolicy: Always
           name: main
           ports:
-            - containerPort: 8765
+            - containerPort: 5173
               name: http
               protocol: TCP
-            - containerPort: 5173
-              name: dev
+            - containerPort: 8765
+              name: backend
               protocol: TCP
           resources:
             limits:
@@ -109,10 +109,6 @@ metadata:
   namespace: apps
 spec:
   ports:
-    - name: dev
-      port: 5173
-      protocol: TCP
-      targetPort: 5173
     - name: http
       port: 5173
       protocol: TCP
