@@ -114,9 +114,9 @@ spec:
       protocol: TCP
       targetPort: 5173
     - name: http
-      port: 8765
+      port: 5173
       protocol: TCP
-      targetPort: 8765
+      targetPort: 5173
   selector:
     app.kubernetes.io/controller: main
     app.kubernetes.io/instance: oratoria
@@ -148,7 +148,7 @@ spec:
               service:
                 name: oratoria
                 port:
-                  number: 8765
+                  number: 5173
             path: /
             pathType: Prefix
   tls:
