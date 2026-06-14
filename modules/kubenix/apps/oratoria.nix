@@ -54,7 +54,33 @@ in
             protocol = "TCP";
           }
         ];
+        persistence.vite-config = {
+          type = "configMap";
+          name = "${app}-vite-config";
+          advancedMounts.main.main = [
+            {
+              path = "/app/oratoria-web/vite.config.js";
+              subPath = "vite.config.js";
+              readOnly = true;
+            }
+          ];
+        };
       };
     };
+  };
+
+  kubernetes.resources.configMaps."${app}-vite-config" = {
+    metadata = {
+      name = "${app}-vite-config";
+      inherit namespace;
+    };
+    data."vite.config.js" = ''
+      const proxy = { '/api': 'http://127.0.0.1:8765' }
+      export default {
+        server: { proxy },
+        preview: { proxy, allowedHosts: ["oratoria.josevictor.me"] },
+        optimizeDeps: { include: ['oidc-client-ts'] },
+      }
+    '';
   };
 }
