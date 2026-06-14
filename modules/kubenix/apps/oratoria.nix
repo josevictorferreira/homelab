@@ -14,7 +14,7 @@ in
         tag = "latest@sha256:4f7dc284a94e9961b002c0879dc2655551674c262eb46f1f532780f9ad211a75";
         pullPolicy = "Always";
       };
-      port = 8765;
+      port = 5173;
       resources = {
         requests = {
           cpu = "100m";
