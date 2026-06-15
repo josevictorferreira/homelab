@@ -1,6 +1,7 @@
-{ kubenix
-, homelab
-, ...
+{
+  kubenix,
+  homelab,
+  ...
 }:
 
 let
@@ -24,7 +25,7 @@ in
 
       values = {
         global = {
-          imagePullSecrets = [{ name = "ghcr-registry-secret"; }];
+          imagePullSecrets = [ { name = "ghcr-registry-secret"; } ];
         };
 
         image = {
@@ -142,6 +143,21 @@ in
               "sh"
               "-c"
               "cp /theme.jar /shared/valoris-theme.jar"
+            ];
+            volumeMounts = [
+              {
+                name = "keycloak-providers";
+                mountPath = "/shared";
+              }
+            ];
+          }
+          {
+            name = "add-oratoria-theme";
+            image = "ghcr.io/josevictorferreira/oratoria-identity:v0.1.0";
+            command = [
+              "sh"
+              "-c"
+              "cp /theme.jar /shared/oratoria-theme.jar"
             ];
             volumeMounts = [
               {
