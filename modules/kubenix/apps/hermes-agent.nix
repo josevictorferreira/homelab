@@ -584,6 +584,7 @@ in
           "get"
           "list"
           "watch"
+          "delete"
         ];
       }
       {
