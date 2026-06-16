@@ -554,6 +554,7 @@ let
                   "Martian-Engineering/lossless-claw"
                   "decolua/9router"
                   "vectorize-io/hindsight"
+                  "diegosouzapw/OmniRoute"
                   # Work Apps
                   "kong/kong"
                   "keycloak/keycloak"
