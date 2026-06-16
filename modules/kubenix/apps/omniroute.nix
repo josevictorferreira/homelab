@@ -5,13 +5,13 @@ let
   app = "omniroute";
 in
 {
-  submodules.instances.${app} = {
+  submodules.instances."${app}" = {
     submodule = "release";
     args = {
       inherit namespace;
       image = {
         repository = "ghcr.io/diegosouzapw/omniroute";
-        tag "3.8.26@sha256:ae3ab5603172d61fa0598afcea0cf0ad900634f1863b7d01eacb36d14a50e8c7";
+        tag = "3.8.26@sha256:60cbe2f4df921e4bb6b80cd7e73c0b2db7f16859604d74e2001c746c2c756d2c";
         pullPolicy = "IfNotPresent";
       };
       secretName = "${app}-env";
