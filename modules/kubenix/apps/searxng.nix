@@ -22,7 +22,7 @@ in
 
         image = {
           repository = "ghcr.io/searxng/searxng";
-          tag = "2026.6.4-e6559c9ad";
+          tag = "2026.6.19-8b10095e8";
           pullPolicy = "IfNotPresent";
         };
 
