@@ -119,6 +119,13 @@ let
       };
     }
     {
+      name = "GH_TOKEN";
+      valueFrom.secretKeyRef = {
+        name = "${name}-env";
+        key = "GH_TOKEN";
+      };
+    }
+    {
       name = "PATH";
       value = "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/hermes/.venv/bin:/opt/data/.local/bin";
     }
