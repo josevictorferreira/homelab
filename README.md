@@ -2,6 +2,8 @@
 
 My Homelab to self-host services and tools using a hybrid NixOS/Kubernetes architecture. This project combines immutable infrastructure with GitOps deployment to achieve high availability using cost-efficient hardware while maintaining power efficiency.
 
+![ze-homelab architecture](architecture.png)
+
 ## Cluster Architecture
 
 ### Overview
