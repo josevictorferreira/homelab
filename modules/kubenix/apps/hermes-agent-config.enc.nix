@@ -28,6 +28,7 @@ in
       OPENCODE_GO_BASE_URL = "https://opencode.ai/zen/go/v1";
       ELEVENLABS_API_KEY = kubenix.lib.secretsFor "elevenlabs_api_key";
       GITHUB_TOKEN = kubenix.lib.secretsFor "github_token";
+      GH_TOKEN = kubenix.lib.secretsFor "github_token";
       OPENAI_API_KEY = kubenix.lib.secretsFor "openai_api_key";
       OMNIROUTE_API_KEY = kubenix.lib.secretsFor "omniroute_api_key";
       MATRIX_HOMESERVER = kubenix.lib.secretsFor "hermes_matrix_homeserver";
