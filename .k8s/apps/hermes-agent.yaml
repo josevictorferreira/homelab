@@ -886,14 +886,15 @@ spec:
             - /bin/sh
             - -c
             - "chown -R 10000:2002 /opt/data/profiles/luna /opt/data/profiles/spike\
-              \ || true\n# Guarantee agents can always write shared dirs: shared group\
-              \ (GID 100),\n# setgid on dirs so new entries inherit it, and group-writable.\
-              \ Only\n# touches entries that are wrong, so it stays fast on large\
-              \ trees.\nfor d in /shared/*/; do\n  [ -d \"$d\" ] || continue\n  find\
-              \ \"$d\" ! -group 100 -exec chgrp 100 {} + 2>/dev/null || true\n  find\
-              \ \"$d\" -type d ! -perm -2070 -exec chmod g+rwxs {} + 2>/dev/null ||\
-              \ true\n  find \"$d\" -type f ! -perm -060 -exec chmod g+rw {} + 2>/dev/null\
-              \ || true\ndone\n"
+              \ || true\n# Guarantee read/write for everything in the unified \"homelab\"\
+              \ group\n# (GID 2002 — the agents' primary gid and the host user's group,\
+              \ and\n# what other pods join via supplementalGroups). setgid on dirs\
+              \ so new\n# entries inherit the group; group-writable. Only touches\
+              \ wrong\n# entries, so it stays fast on large trees.\nfor d in /shared/*/;\
+              \ do\n  [ -d \"$d\" ] || continue\n  find \"$d\" ! -group 2002 -exec\
+              \ chgrp 2002 {} + 2>/dev/null || true\n  find \"$d\" -type d ! -perm\
+              \ -2070 -exec chmod g+rwxs {} + 2>/dev/null || true\n  find \"$d\" -type\
+              \ f ! -perm -060 -exec chmod g+rw {} + 2>/dev/null || true\ndone\n"
           image: docker.io/nousresearch/hermes-agent:v2026.6.19@sha256:9f367c7756ef087661a361536a89f438d57a122b958dc23d82d456b1433e6e9e
           name: fix-profile-permissions
           securityContext:

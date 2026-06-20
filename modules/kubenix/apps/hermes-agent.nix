@@ -386,12 +386,14 @@ in
                 "-c"
                 ''
                   chown -R 10000:2002 /opt/data/profiles/luna /opt/data/profiles/spike || true
-                  # Guarantee agents can always write shared dirs: shared group (GID 100),
-                  # setgid on dirs so new entries inherit it, and group-writable. Only
-                  # touches entries that are wrong, so it stays fast on large trees.
+                  # Guarantee read/write for everything in the unified "homelab" group
+                  # (GID 2002 — the agents' primary gid and the host user's group, and
+                  # what other pods join via supplementalGroups). setgid on dirs so new
+                  # entries inherit the group; group-writable. Only touches wrong
+                  # entries, so it stays fast on large trees.
                   for d in /shared/*/; do
                     [ -d "$d" ] || continue
-                    find "$d" ! -group 100 -exec chgrp 100 {} + 2>/dev/null || true
+                    find "$d" ! -group 2002 -exec chgrp 2002 {} + 2>/dev/null || true
                     find "$d" -type d ! -perm -2070 -exec chmod g+rwxs {} + 2>/dev/null || true
                     find "$d" -type f ! -perm -060 -exec chmod g+rw {} + 2>/dev/null || true
                   done
