@@ -482,7 +482,7 @@ in
                 };
                 limits = {
                   cpu = "500m";
-                  memory = "512Mi";
+                  memory = "1Gi";
                 };
               };
               securityContext = commonSecurityContext;
