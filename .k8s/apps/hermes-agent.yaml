@@ -27,8 +27,8 @@ spec:
         - command:
             - /bin/sh
             - -c
-            - exec /opt/hermes/.venv/bin/hermes dashboard --host 0.0.0.0 --port 9119
-              --no-open --insecure
+            - umask 0002; exec /opt/hermes/.venv/bin/hermes dashboard --host 0.0.0.0
+              --port 9119 --no-open --insecure
           env:
             - name: HERMES_UID
               value: '10000'
@@ -141,9 +141,12 @@ spec:
         - command:
             - /bin/sh
             - -c
-            - "                # Bootstrap pip if not present\n                command\
-              \ -v pip >/dev/null 2>&1 || command -v pip3 >/dev/null 2>&1 || {\n \
-              \                 python3 -c \"import urllib.request; exec(urllib.request.urlopen('https://bootstrap.pypa.io/get-pip.py').read())\"\
+            - "                # Group-writable by default so any hermes process (and\
+              \ the\n                # host user, all in GID 100) can always overwrite\
+              \ shared files.\n                umask 0002\n                # Bootstrap\
+              \ pip if not present\n                command -v pip >/dev/null 2>&1\
+              \ || command -v pip3 >/dev/null 2>&1 || {\n                  python3\
+              \ -c \"import urllib.request; exec(urllib.request.urlopen('https://bootstrap.pypa.io/get-pip.py').read())\"\
               \ --user -q 2>/dev/null || true\n                }\n               \
               \ # Bootstrap faster-whisper for audio transcription\n             \
               \   python3 -c \"import faster_whisper\" 2>/dev/null || {\n        \
@@ -284,9 +287,12 @@ spec:
         - command:
             - /bin/sh
             - -c
-            - "                # Bootstrap pip if not present\n                command\
-              \ -v pip >/dev/null 2>&1 || command -v pip3 >/dev/null 2>&1 || {\n \
-              \                 python3 -c \"import urllib.request; exec(urllib.request.urlopen('https://bootstrap.pypa.io/get-pip.py').read())\"\
+            - "                # Group-writable by default so any hermes process (and\
+              \ the\n                # host user, all in GID 100) can always overwrite\
+              \ shared files.\n                umask 0002\n                # Bootstrap\
+              \ pip if not present\n                command -v pip >/dev/null 2>&1\
+              \ || command -v pip3 >/dev/null 2>&1 || {\n                  python3\
+              \ -c \"import urllib.request; exec(urllib.request.urlopen('https://bootstrap.pypa.io/get-pip.py').read())\"\
               \ --user -q 2>/dev/null || true\n                }\n               \
               \ # Bootstrap faster-whisper for audio transcription\n             \
               \   python3 -c \"import faster_whisper\" 2>/dev/null || {\n        \
@@ -438,9 +444,12 @@ spec:
         - command:
             - /bin/sh
             - -c
-            - "                # Bootstrap pip if not present\n                command\
-              \ -v pip >/dev/null 2>&1 || command -v pip3 >/dev/null 2>&1 || {\n \
-              \                 python3 -c \"import urllib.request; exec(urllib.request.urlopen('https://bootstrap.pypa.io/get-pip.py').read())\"\
+            - "                # Group-writable by default so any hermes process (and\
+              \ the\n                # host user, all in GID 100) can always overwrite\
+              \ shared files.\n                umask 0002\n                # Bootstrap\
+              \ pip if not present\n                command -v pip >/dev/null 2>&1\
+              \ || command -v pip3 >/dev/null 2>&1 || {\n                  python3\
+              \ -c \"import urllib.request; exec(urllib.request.urlopen('https://bootstrap.pypa.io/get-pip.py').read())\"\
               \ --user -q 2>/dev/null || true\n                }\n               \
               \ # Bootstrap faster-whisper for audio transcription\n             \
               \   python3 -c \"import faster_whisper\" 2>/dev/null || {\n        \
@@ -581,9 +590,12 @@ spec:
         - command:
             - /bin/sh
             - -c
-            - "                # Bootstrap pip if not present\n                command\
-              \ -v pip >/dev/null 2>&1 || command -v pip3 >/dev/null 2>&1 || {\n \
-              \                 python3 -c \"import urllib.request; exec(urllib.request.urlopen('https://bootstrap.pypa.io/get-pip.py').read())\"\
+            - "                # Group-writable by default so any hermes process (and\
+              \ the\n                # host user, all in GID 100) can always overwrite\
+              \ shared files.\n                umask 0002\n                # Bootstrap\
+              \ pip if not present\n                command -v pip >/dev/null 2>&1\
+              \ || command -v pip3 >/dev/null 2>&1 || {\n                  python3\
+              \ -c \"import urllib.request; exec(urllib.request.urlopen('https://bootstrap.pypa.io/get-pip.py').read())\"\
               \ --user -q 2>/dev/null || true\n                }\n               \
               \ # Bootstrap faster-whisper for audio transcription\n             \
               \   python3 -c \"import faster_whisper\" 2>/dev/null || {\n        \
@@ -724,9 +736,12 @@ spec:
         - command:
             - /bin/sh
             - -c
-            - "                # Bootstrap pip if not present\n                command\
-              \ -v pip >/dev/null 2>&1 || command -v pip3 >/dev/null 2>&1 || {\n \
-              \                 python3 -c \"import urllib.request; exec(urllib.request.urlopen('https://bootstrap.pypa.io/get-pip.py').read())\"\
+            - "                # Group-writable by default so any hermes process (and\
+              \ the\n                # host user, all in GID 100) can always overwrite\
+              \ shared files.\n                umask 0002\n                # Bootstrap\
+              \ pip if not present\n                command -v pip >/dev/null 2>&1\
+              \ || command -v pip3 >/dev/null 2>&1 || {\n                  python3\
+              \ -c \"import urllib.request; exec(urllib.request.urlopen('https://bootstrap.pypa.io/get-pip.py').read())\"\
               \ --user -q 2>/dev/null || true\n                }\n               \
               \ # Bootstrap faster-whisper for audio transcription\n             \
               \   python3 -c \"import faster_whisper\" 2>/dev/null || {\n        \
@@ -870,8 +885,15 @@ spec:
         - command:
             - /bin/sh
             - -c
-            - chown -R 10000:2002 /opt/data/profiles/luna /opt/data/profiles/spike
-              || true
+            - "chown -R 10000:2002 /opt/data/profiles/luna /opt/data/profiles/spike\
+              \ || true\n# Guarantee agents can always write shared dirs: shared group\
+              \ (GID 100),\n# setgid on dirs so new entries inherit it, and group-writable.\
+              \ Only\n# touches entries that are wrong, so it stays fast on large\
+              \ trees.\nfor d in /shared/*/; do\n  [ -d \"$d\" ] || continue\n  find\
+              \ \"$d\" ! -group 100 -exec chgrp 100 {} + 2>/dev/null || true\n  find\
+              \ \"$d\" -type d ! -perm -2070 -exec chmod g+rwxs {} + 2>/dev/null ||\
+              \ true\n  find \"$d\" -type f ! -perm -060 -exec chmod g+rw {} + 2>/dev/null\
+              \ || true\ndone\n"
           image: docker.io/nousresearch/hermes-agent:v2026.6.19@sha256:9f367c7756ef087661a361536a89f438d57a122b958dc23d82d456b1433e6e9e
           name: fix-profile-permissions
           securityContext:

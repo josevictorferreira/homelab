@@ -194,6 +194,9 @@ let
     let
       containerName = "gateway-${profile}";
       bootstrap = ''
+                        # Group-writable by default so any hermes process (and the
+                        # host user, all in GID 100) can always overwrite shared files.
+                        umask 0002
                         # Bootstrap pip if not present
                         command -v pip >/dev/null 2>&1 || command -v pip3 >/dev/null 2>&1 || {
                           python3 -c "import urllib.request; exec(urllib.request.urlopen('https://bootstrap.pypa.io/get-pip.py').read())" --user -q 2>/dev/null || true
@@ -381,7 +384,18 @@ in
               command = [
                 "/bin/sh"
                 "-c"
-                "chown -R 10000:2002 /opt/data/profiles/luna /opt/data/profiles/spike || true"
+                ''
+                  chown -R 10000:2002 /opt/data/profiles/luna /opt/data/profiles/spike || true
+                  # Guarantee agents can always write shared dirs: shared group (GID 100),
+                  # setgid on dirs so new entries inherit it, and group-writable. Only
+                  # touches entries that are wrong, so it stays fast on large trees.
+                  for d in /shared/*/; do
+                    [ -d "$d" ] || continue
+                    find "$d" ! -group 100 -exec chgrp 100 {} + 2>/dev/null || true
+                    find "$d" -type d ! -perm -2070 -exec chmod g+rwxs {} + 2>/dev/null || true
+                    find "$d" -type f ! -perm -060 -exec chmod g+rw {} + 2>/dev/null || true
+                  done
+                ''
               ];
               volumeMounts = dataVolumeMounts;
               securityContext = {
@@ -440,7 +454,7 @@ in
               command = [
                 "/bin/sh"
                 "-c"
-                "exec /opt/hermes/.venv/bin/hermes dashboard --host 0.0.0.0 --port 9119 --no-open --insecure"
+                "umask 0002; exec /opt/hermes/.venv/bin/hermes dashboard --host 0.0.0.0 --port 9119 --no-open --insecure"
               ];
               ports = [
                 {
