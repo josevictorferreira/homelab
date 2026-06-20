@@ -79,6 +79,14 @@ let
       name = "TZ";
       value = homelab.timeZone;
     }
+    # The image defaults HERMES_WRITE_SAFE_ROOT=/opt/data, which blocks agent
+    # writes to the sibling /shared/* mounts ("protected system/credential file").
+    # Set it to / so agents can write the whole data+shared tree; the independent
+    # credential denylist (ssh/.env/.aws/.kube/etc.) still protects secrets.
+    {
+      name = "HERMES_WRITE_SAFE_ROOT";
+      value = "/";
+    }
     {
       name = "AGENT_BROWSER_ENGINE";
       value = "cdp";
