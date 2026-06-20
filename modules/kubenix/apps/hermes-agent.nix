@@ -206,6 +206,12 @@ let
                         python3 -c "import mautrix" 2>/dev/null || {
                           uv pip install mautrix asyncpg aiosqlite Markdown aiohttp-socks 2>/dev/null || true
                         }
+                        # Bootstrap hindsight-client at the version the memory plugin pins.
+                        # The image bumps this pin on upgrade; the user-site copy on the PVC
+                        # persists the old version, so install the exact pin when it drifts.
+                        python3 -c "import importlib.metadata as m, sys; sys.exit(0 if m.version('hindsight-client') == '0.6.1' else 1)" 2>/dev/null || {
+                          python3 -m pip install --user --break-system-packages 'hindsight-client==0.6.1' 2>/dev/null || true
+                        }
                         # Bootstrap kubectl if not present
                         command -v kubectl >/dev/null 2>&1 || {
                           python3 -c "
