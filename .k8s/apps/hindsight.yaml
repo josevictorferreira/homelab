@@ -35,9 +35,9 @@ spec:
       containers:
         - env:
             - name: HINDSIGHT_API_CONSOLIDATION_LLM_MAX_RETRIES
-              value: '1'
+              value: '2'
             - name: HINDSIGHT_API_CONSOLIDATION_LLM_TIMEOUT
-              value: '45'
+              value: '120'
             - name: HINDSIGHT_API_EMBEDDINGS_OPENAI_BASE_URL
               value: https://openrouter.ai/api/v1
             - name: HINDSIGHT_API_EMBEDDINGS_OPENAI_MODEL
@@ -51,13 +51,13 @@ spec:
             - name: HINDSIGHT_API_LLM_MAX_CONCURRENT
               value: '8'
             - name: HINDSIGHT_API_LLM_MAX_RETRIES
-              value: '1'
+              value: '2'
             - name: HINDSIGHT_API_LLM_MODEL
               value: pippin
             - name: HINDSIGHT_API_LLM_PROVIDER
               value: openai
             - name: HINDSIGHT_API_LLM_TIMEOUT
-              value: '30'
+              value: '120'
             - name: HINDSIGHT_API_PORT
               value: '8888'
             - name: HINDSIGHT_API_REFLECT_LLM_MODEL
@@ -73,9 +73,9 @@ spec:
             - name: HINDSIGHT_API_RERANKER_SILICONFLOW_TIMEOUT
               value: '60'
             - name: HINDSIGHT_API_RETAIN_LLM_MAX_RETRIES
-              value: '1'
+              value: '2'
             - name: HINDSIGHT_API_RETAIN_LLM_TIMEOUT
-              value: '30'
+              value: '120'
             - name: HINDSIGHT_API_TEXT_SEARCH_EXTENSION
               value: native
             - name: HINDSIGHT_API_TEXT_SEARCH_EXTENSION_NATIVE_LANGUAGE
