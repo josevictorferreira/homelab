@@ -172,6 +172,21 @@ Rules for never hitting permission errors there:
 host user is uid 1000) — always go through gid 2002 + group-write. ACLs are not an
 option (the host bindfs layer rejects `setfacl`).
 
+**Two layers can deny a hermes agent write — don't conflate them:**
+
+1. **Filesystem** (CephFS perms) — fixed by the group-2002 model above.
+2. **App-level write guard** (`agent/file_safety.py:is_write_denied`). The hermes
+   image defaults `ENV HERMES_WRITE_SAFE_ROOT=/opt/data`, which denies writes to
+   ANY path outside that single prefix with the misleading message
+   *"… is a protected system/credential file."* Since `/shared/*` is a sibling of
+   `/opt/data`, agents could not save to notetaking/etc. Fixed by setting
+   `HERMES_WRITE_SAFE_ROOT = ""` (empty) in `commonEnv` — empty makes the guard
+   return `None` and skip the prefix check. **Do not use `/`** — the code checks
+   `startswith(safe_root + "/")`, so `/` becomes `//` and denies everything.
+   A separate credential denylist (ssh/.env/.aws/.kube/`/etc/*`/mcp-tokens/pairing)
+   always applies regardless of this setting. If an agent reports a "permission"
+   error writing under `/shared`, check this guard BEFORE chasing CephFS perms.
+
 ## ANTI-PATTERNS
 
 | Forbidden | Why |
