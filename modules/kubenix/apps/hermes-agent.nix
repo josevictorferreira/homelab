@@ -81,11 +81,13 @@ let
     }
     # The image defaults HERMES_WRITE_SAFE_ROOT=/opt/data, which blocks agent
     # writes to the sibling /shared/* mounts ("protected system/credential file").
-    # Set it to / so agents can write the whole data+shared tree; the independent
-    # credential denylist (ssh/.env/.aws/.kube/etc.) still protects secrets.
+    # Empty disables the single-prefix restriction entirely (the code returns None
+    # for an empty value); "/" does NOT work because it checks startswith("/"+"/")
+    # == "//" and denies everything. The independent credential denylist
+    # (ssh/.env/.aws/.kube/etc.) still protects secrets regardless.
     {
       name = "HERMES_WRITE_SAFE_ROOT";
-      value = "/";
+      value = "";
     }
     {
       name = "AGENT_BROWSER_ENGINE";
