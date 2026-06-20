@@ -145,6 +145,33 @@ make format     # Fix nix formatting
 - `rook-ceph-objectstore` - S3-compatible buckets
 - CephFS static PVs for shared storage
 
+### Shared CephFS Permissions (group 2002 / `homelab`)
+
+The shared CephFS scratch space (`/shared/*` in pods, `~/Homelab/*` on host via
+bindfs) is unified on **GID 2002 (`homelab`)** so the host user, the hermes
+agents, and any opted-in pod can all read/write each other's files.
+
+Rules for never hitting permission errors there:
+
+- **Group**: everything is group `2002`. Host user is in `homelab` (gid 2002, via
+  `~/.config/nix` `modules/services/cephfs.nix`). Hermes agents run with primary
+  `runAsGroup=2002`.
+- **setgid dirs**: all shared dirs are `2775` (setgid) so new entries inherit gid 2002.
+- **umask 0002**: every writer must create group-writable files. Hermes processes
+  set `umask 0002` in their command wrapper; the host bindfs forces it via
+  `create-with-perms=...g=rwXs...` (so host umask is irrelevant there).
+- **Other pods that write shared storage**: add
+  `spec.template.spec.securityContext.supplementalGroups = [ 2002 ];` to the manifest.
+- **Self-healing**: the hermes gateway `fix-profile-permissions` init container
+  re-normalizes `/shared/*` (chgrp 2002, setgid dirs, group-writable) on every pod
+  start — touch only entries that are wrong, so it's fast.
+- Host config (`cephfs.nix` bindfs) needs no changes for this; it already
+  force-maps to 2002 and runs as root.
+
+**Do NOT** rely on per-uid ownership for cross-writer access (agents are uid 10000,
+host user is uid 1000) — always go through gid 2002 + group-write. ACLs are not an
+option (the host bindfs layer rejects `setfacl`).
+
 ## ANTI-PATTERNS
 
 | Forbidden | Why |
