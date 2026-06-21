@@ -180,29 +180,19 @@ spec:
               \    ln -s /opt/data/whatsapp-bridge-node_modules /opt/hermes/scripts/whatsapp-bridge/node_modules\n\
               \  fi\nfi\n# Fix Baileys 7.x syncFullHistory for incoming messages\n\
               sed -i 's/syncFullHistory: false/syncFullHistory: true/' /opt/hermes/scripts/whatsapp-bridge/bridge.js\
-              \ 2>/dev/null || true\n\nupsert_env() {\n  f=\"$1\"; k=\"$2\"; v=\"\
-              $3\"\n  [ -n \"$v\" ] || return 0\n  mkdir -p \"$(dirname \"$f\")\"\n\
-              \  touch \"$f\"\n  grep -v \"^${k}=\" \"$f\" > \"$f.tmp\" 2>/dev/null\
-              \ || true\n  mv \"$f.tmp\" \"$f\"\n  printf '%s=%s\\n' \"$k\" \"$v\"\
-              \ >> \"$f\"\n}\nPB=/opt/data/profiles\nupsert_env \"$PB/ted/.env\" \
-              \  MATRIX_ACCESS_TOKEN \"${TED_MATRIX_TOKEN:-}\"\nupsert_env \"$PB/kira/.env\"\
-              \  MATRIX_ACCESS_TOKEN \"${KIRA_MATRIX_TOKEN:-}\"\nupsert_env \"$PB/mel/.env\"\
-              \   MATRIX_ACCESS_TOKEN \"${MEL_MATRIX_TOKEN:-}\"\nupsert_env \"$PB/spike/.env\"\
-              \ MATRIX_ACCESS_TOKEN \"${SPIKE_MATRIX_TOKEN:-}\"\nupsert_env \"$PB/luna/.env\"\
-              \  MATRIX_ACCESS_TOKEN \"${LUNA_MATRIX_TOKEN:-}\"\n# kira WhatsApp (bot\
-              \ mode)\nupsert_env \"$PB/kira/.env\"  WHATSAPP_ENABLED       \"true\"\
-              \nupsert_env \"$PB/kira/.env\"  WHATSAPP_MODE          \"bot\"\nupsert_env\
-              \ \"$PB/kira/.env\"  WHATSAPP_DEBUG         \"true\"\nupsert_env \"\
-              $PB/kira/.env\"  WHATSAPP_ALLOWED_USERS \"${KIRA_WHATSAPP_ALLOWED_USERS:-}\"\
-              \n\n# Clear all per-profile secrets from the gateway PROCESS env. In\
-              \ multiplex\n# each profile must resolve its token from its own .env\
-              \ (written above);\n# leaving MATRIX_ACCESS_TOKEN in os.environ would\
-              \ leak ted's token to the\n# default profile and collide as a duplicate\
-              \ (platform, token) pair.\nunset MATRIX_ACCESS_TOKEN \\\n      TED_MATRIX_TOKEN\
-              \ KIRA_MATRIX_TOKEN MEL_MATRIX_TOKEN \\\n      SPIKE_MATRIX_TOKEN LUNA_MATRIX_TOKEN\
-              \ KIRA_WHATSAPP_ALLOWED_USERS\n# --no-supervise: run as the container's\
-              \ main process (no s6 redirect);\n# multiplex is read from the default\
-              \ profile config.yaml.\nexec hermes gateway run --no-supervise\n"
+              \ 2>/dev/null || true\n\n# run_gw <profile> <matrix-token> [EXTRA_ENV=val\
+              \ ...]\n# Self-restarting supervisor: if a profile's gateway exits,\
+              \ restart it after\n# a short backoff so one crash doesn't take down\
+              \ the others.\nrun_gw() {\n  prof=\"$1\"; tok=\"$2\"; shift 2\n  while\
+              \ true; do\n    env MATRIX_ACCESS_TOKEN=\"$tok\" HERMES_HOME=\"/opt/data/profiles/$prof\"\
+              \ \"$@\" \\\n      hermes -p \"$prof\" gateway run --no-supervise\n\
+              \    echo \"[launcher] gateway $prof exited ($?); restarting in 5s\"\
+              \ >&2\n    sleep 5\n  done\n}\nrun_gw ted   \"${TED_MATRIX_TOKEN:-}\"\
+              \   &\nrun_gw mel   \"${MEL_MATRIX_TOKEN:-}\"   &\nrun_gw spike \"${SPIKE_MATRIX_TOKEN:-}\"\
+              \ &\nrun_gw luna  \"${LUNA_MATRIX_TOKEN:-}\"  &\nrun_gw kira  \"${KIRA_MATRIX_TOKEN:-}\"\
+              \ \\\n  WHATSAPP_ENABLED=true WHATSAPP_MODE=bot WHATSAPP_DEBUG=true\
+              \ \\\n  WHATSAPP_ALLOWED_USERS=\"${KIRA_WHATSAPP_ALLOWED_USERS:-}\"\
+              \ &\nwait\n\n"
           env:
             - name: HERMES_UID
               value: '10000'
@@ -211,8 +201,6 @@ spec:
             - name: TZ
               value: America/Sao_Paulo
             - name: HOME
-              value: /opt/data
-            - name: HERMES_HOME
               value: /opt/data
             - name: HERMES_MANAGED_DIR
               value: /opt/data/managed
@@ -294,11 +282,11 @@ spec:
           name: gateway
           resources:
             limits:
-              cpu: '2'
-              memory: 3Gi
+              cpu: '3'
+              memory: 5Gi
             requests:
-              cpu: 250m
-              memory: 1Gi
+              cpu: 500m
+              memory: 2560Mi
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
