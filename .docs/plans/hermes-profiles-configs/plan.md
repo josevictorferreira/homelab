@@ -2,93 +2,141 @@
 
 ## Goal
 
-Reduce duplicated Hermes profile configuration across `kira`, `ted`, `mel`, `spike`, and `luna` while keeping per-profile identity and state isolated.
+Run all Hermes profiles (`ted`, `kira`, `mel`, `spike`, `luna`) from a **single
+container** with a **single shared configuration**, where the only per-profile
+differences are:
 
-## Documentation Finding
+- `model.default` (the main model)
+- `skills.disabled` (per-profile disabled skills)
+- `kanban.dispatch_in_gateway: true` on **spike** only
+- the WhatsApp block on **kira** only (WhatsApp is inherently kira-specific)
 
-Hermes does **not** support profile-to-default-profile inheritance. A named profile's `config.yaml` does not fall back to the default profile config at `/opt/data/config.yaml` when a key is omitted.
+Each profile keeps its own `SOUL.md`, `AGENTS.md`, memory, sessions, and state.
 
-The supported mechanism for sharing config across profiles is **Managed Scope**:
+## Mechanisms (verified against the running image + docs)
 
-- A managed directory contains a shared `config.yaml` and optional `.env`.
-- The directory defaults to `/etc/hermes/`, but can be changed with `HERMES_MANAGED_DIR`.
-- Managed config applies to all profiles.
-- Merge behavior is leaf-level: only the exact keys present in managed config are pinned.
-- Managed keys win over profile config and cannot be overridden per profile.
+### 1. Shared config via Managed Scope (`HERMES_MANAGED_DIR`)
 
-## Proposed Approach
+`hermes_cli/managed_scope.py`: when `HERMES_MANAGED_DIR` points at an existing
+directory, its `config.yaml` is overlaid **on top of** each profile's config via
+a leaf-level deep-merge — **managed values win per leaf key** and cannot be
+overridden per profile. `${VAR}` refs in the managed config expand against the
+process env only. Fail-open (a malformed managed file is logged and ignored).
 
-Use Managed Scope for values that are identical across all Hermes profiles.
+We set `HERMES_MANAGED_DIR=/opt/data` so the **existing** default-profile config
+at `/opt/data/config.yaml` *is* the shared overlay. Consequence: any key present
+in `/opt/data/config.yaml` is pinned for every profile. Therefore the keys that
+must vary per profile are **removed** from it:
 
-1. Create a shared managed config file for common settings.
-2. Mount it into the Hermes gateway containers, for example at `/opt/data/managed/config.yaml`.
-3. Set `HERMES_MANAGED_DIR=/opt/data/managed` in the shared gateway environment.
-4. Remove duplicated managed keys from each profile's `config.yaml`.
-5. Keep genuinely per-profile values in each profile config.
+- `model.default`
+- `skills.disabled`
+- `kanban.dispatch_in_gateway`
 
-## What Should Go in Managed Config
+Everything else (providers, toolsets, terminal, web/browser, display, voice,
+platforms baseline, etc.) lives in `/opt/data/config.yaml` and is forced
+identical across all profiles — exactly the intent.
 
-Good candidates:
+### 2. Single container via multiplexing
 
-- Shared model defaults.
-- Shared tool/runtime settings.
-- Shared terminal behavior.
-- Shared gateway or browser integration settings.
-- Any config key that should be identical for every profile.
+`docs/user-guide/multi-profile-gateways` → "one gateway for all profiles
+(multiplexing)". Enable on the default profile:
 
-Keep per-profile:
+```yaml
+gateway:
+  multiplex_profiles: true
+```
 
-- SOUL/personality configuration.
-- Profile-specific model overrides.
-- Profile-specific working directories.
-- Profile-specific tokens or credentials.
-- Anything that may need to differ between agents.
+Then a single `hermes gateway run` (default profile, `HERMES_HOME=/opt/data`)
+enumerates every profile under `/opt/data/profiles/*`, brings up each profile's
+enabled platforms under that profile's own credentials, and routes each inbound
+message to the owning profile. Per turn it resolves the routed profile's config,
+skills, memory, SOUL, **and provider keys** — nothing is shared across profiles
+except the managed overlay.
 
-## Important Tradeoff
+This replaces the 5 per-profile gateway containers with one container.
 
-Managed Scope is not an override-able fallback system.
+### 3. Per-profile secrets must live in each profile's `.env`
 
-If a key is present in managed config, profile config cannot override it. Therefore, only move keys into managed config when they should be globally fixed for every profile.
+In multiplex mode each profile resolves its credentials from its own
+`profiles/<name>/.env` (chmod 600); env vars cannot be per-profile in a single
+process. Today the per-container `MATRIX_ACCESS_TOKEN` env injection does this
+job — that no longer works with one container.
 
-## Homelab Implementation Sketch
+The container boot script materializes each profile's token into its `.env`
+from distinct container env vars (sourced from the existing `hermes-agent-env`
+SOPS secret), idempotently upserting:
 
-In `modules/kubenix/apps/hermes-agent.nix`:
+- `profiles/ted/.env`   ← `MATRIX_ACCESS_TOKEN`
+- `profiles/kira/.env`  ← `HERMES_KIRA_MATRIX_ACCESS_TOKEN` + `WHATSAPP_*`
+- `profiles/mel/.env`   ← `HERMES_MEL_MATRIX_ACCESS_TOKEN`
+- `profiles/spike/.env` ← `HERMES_SPIKE_MATRIX_ACCESS_TOKEN`
+- `profiles/luna/.env`  ← `HERMES_LUNA_MATRIX_ACCESS_TOKEN`
 
-1. Add a managed config source, likely via ConfigMap or a CephFS-backed file.
-2. Mount the managed directory into every profile gateway container.
-3. Add this to `commonEnv`:
+The root/default profile (`/opt/data`) has **no** Matrix token, so as the
+multiplexer host it connects no messaging platform of its own.
 
-   ```yaml
-   HERMES_MANAGED_DIR: /opt/data/managed
-   ```
+## Per-profile config.yaml after the refactor
 
-4. Regenerate manifests with:
+```yaml
+# profiles/ted/config.yaml (and mel, luna — analogous)
+model:
+  default: <profile-model>
+skills:
+  disabled: [ ... ]
 
-   ```bash
-   make manifests
-   ```
+# profiles/kira/config.yaml
+model: { default: <model> }
+skills: { disabled: [ ... ] }
+whatsapp: { ... }            # kira only
+platforms: { whatsapp: { enabled: true } }
 
-5. Commit and push only after explicit user approval so Flux can reconcile.
+# profiles/spike/config.yaml
+model: { default: <model> }
+skills: { disabled: [ ... ] }
+kanban:                      # spike only
+  dispatch_in_gateway: true
+  orchestrator_profile: irenicus
+  default_assignee: valygar
+  max_in_progress_per_profile: 1
+```
 
-## Validation Plan
+## Homelab implementation (`modules/kubenix/apps/hermes-agent.nix`)
 
-1. Inspect current live profile configs under `~/Homelab/hermes/profiles/*/config.yaml`.
-2. Identify keys duplicated across all profiles.
-3. Move only identical global keys into managed config.
-4. Confirm profile configs retain required per-profile differences.
-5. Run `make manifests` successfully.
-6. After deployment, verify inside a profile gateway container:
+1. Replace the 5 `gatewayProfiles` containers with one `gateway` container.
+2. `commonEnv` adds `HERMES_HOME=/opt/data` and `HERMES_MANAGED_DIR=/opt/data`.
+3. Inject every per-profile Matrix token + kira WhatsApp creds as distinct env
+   vars from `hermes-agent-env`.
+4. Boot command: run the shared bootstrap **once**, upsert per-profile `.env`
+   tokens, then `exec hermes gateway run`.
+5. Keep the root `fix-profile-permissions` init container and the separate
+   dashboard deployment.
+6. `make manifests`, then commit/push **only after explicit approval** so Flux
+   reconciles the cutover.
 
-   ```bash
-   echo "$HERMES_MANAGED_DIR"
-   hermes doctor
-   hermes config
-   ```
+## Cutover ordering (important)
 
-7. Confirm managed keys show their managed source and profile-specific keys still resolve from the profile config.
+Trimmed profile configs only work once `HERMES_MANAGED_DIR` is active (new
+container). So the CephFS config edits and the new manifest must land together:
+
+1. Back up all `config.yaml` / `.env`.
+2. Stage `/opt/data/config.yaml` (multiplex flag + remove varying keys) and the
+   trimmed per-profile configs.
+3. Deploy the single-container manifest (commit/push → Flux). The hard cutover
+   (Recreate strategy) brings up the multiplexer with the managed overlay active.
+
+## Validation
+
+1. `make manifests` succeeds.
+2. One gateway pod, single container, `Running`.
+3. `hermes gateway list` / `hermes status` reports the multiplexer + all profiles.
+4. Each profile's Matrix account connects under its own token.
+5. `hermes -p <p> config` shows shared keys resolving from managed and
+   `model.default` / `skills.disabled` from the profile.
+6. spike's kanban dispatch is active; kira's WhatsApp is enabled.
 
 ## Non-Goals
 
-- Do not use gateway multiplexing as a config-sharing mechanism; it does not provide config inheritance.
-- Do not rely on profile cloning; cloning copies config once and does not keep configs shared.
-- Do not put high-sensitivity secrets in managed `.env`, because managed files are intended to be readable by all profiles.
+- Per-profile process isolation / independent crash domains (multiplex trades
+  these for a single supervised process — acceptable here).
+- Putting any secret (e.g. the omniroute `api_key`) into git; secrets stay on
+  CephFS `.env`/`config.yaml` and SOPS as today.
