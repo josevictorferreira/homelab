@@ -284,7 +284,7 @@ let
         ++ [
           {
             name = "HOME";
-            value = "/opt/data/profiles/${profile}";
+            value = "/opt/data";
           }
           {
             name = "HERMES_HOME";
