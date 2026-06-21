@@ -282,11 +282,11 @@ spec:
           name: gateway
           resources:
             limits:
-              cpu: '3'
-              memory: 5Gi
+              cpu: '2'
+              memory: 4Gi
             requests:
               cpu: 500m
-              memory: 2560Mi
+              memory: 2Gi
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:

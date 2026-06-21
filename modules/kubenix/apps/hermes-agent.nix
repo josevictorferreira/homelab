@@ -337,14 +337,16 @@ let
         subPath = "hermes";
       }
     ];
+    # Capped at the apps-namespace LimitRange max (cpu 2 / memory 4Gi per
+    # container). All five profile gateways share this one container's budget.
     resources = {
       requests = {
         cpu = "500m";
-        memory = "2560Mi";
+        memory = "2Gi";
       };
       limits = {
-        cpu = "3";
-        memory = "5Gi";
+        cpu = "2";
+        memory = "4Gi";
       };
     };
     securityContext = commonSecurityContext;
