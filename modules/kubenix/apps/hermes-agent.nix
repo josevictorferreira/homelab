@@ -79,20 +79,17 @@ let
       name = "TZ";
       value = homelab.timeZone;
     }
-    # Default profile home. The multiplexer runs from here and enumerates
-    # every profile under /opt/data/profiles/*.
+    # OS home (shared): external CLI creds + the shared user-site under
+    # /opt/data/.local. HERMES_HOME is set per-profile in the launcher below.
     {
       name = "HOME";
       value = "/opt/data";
     }
-    {
-      name = "HERMES_HOME";
-      value = "/opt/data";
-    }
-    # Managed scope: /opt/data/config.yaml is overlaid (leaf-level, managed
-    # wins) on top of every profile's config. Keys that must vary per profile
-    # (model.default, skills.disabled, kanban.dispatch_in_gateway) are kept OUT
-    # of that file; everything else is forced identical across all profiles.
+    # Managed scope: /opt/data/managed/config.yaml is overlaid (leaf-level,
+    # managed wins) on top of every profile's config. Keys that must vary per
+    # profile (model.default, skills.disabled, kanban.dispatch_in_gateway, and
+    # WhatsApp enablement) are kept OUT of it; everything else is forced
+    # identical across all profiles — the single shared config.
     {
       name = "HERMES_MANAGED_DIR";
       value = "/opt/data/managed";
@@ -287,36 +284,38 @@ let
     sed -i 's/syncFullHistory: false/syncFullHistory: true/' /opt/hermes/scripts/whatsapp-bridge/bridge.js 2>/dev/null || true
   '';
 
-  # Materialize each profile's messaging credentials into its own
-  # profiles/<name>/.env. Idempotent upsert: drop any existing line for the key,
-  # then append the current value. Skips empty values so a missing secret never
-  # writes a blank token.
-  writeProfileSecrets = ''
-    upsert_env() {
-      f="$1"; k="$2"; v="$3"
-      [ -n "$v" ] || return 0
-      mkdir -p "$(dirname "$f")"
-      touch "$f"
-      grep -v "^''${k}=" "$f" > "$f.tmp" 2>/dev/null || true
-      mv "$f.tmp" "$f"
-      printf '%s=%s\n' "$k" "$v" >> "$f"
+  # Launch every profile's gateway as a separate, self-restarting process inside
+  # the SINGLE container. Each profile gets its OWN process env — most importantly
+  # its own MATRIX_ACCESS_TOKEN — so per-profile Matrix accounts stay isolated.
+  # (This Hermes version's gateway.multiplex_profiles cannot do per-profile Matrix
+  # tokens: gateway config resolves MATRIX_ACCESS_TOKEN from the process-global
+  # os.environ, so a single multiplexer process would force one token onto every
+  # profile.) The shared config still comes from HERMES_MANAGED_DIR, so this is
+  # one container with one shared config — only credentials differ per process.
+  launchGateways = ''
+    # run_gw <profile> <matrix-token> [EXTRA_ENV=val ...]
+    # Self-restarting supervisor: if a profile's gateway exits, restart it after
+    # a short backoff so one crash doesn't take down the others.
+    run_gw() {
+      prof="$1"; tok="$2"; shift 2
+      while true; do
+        env MATRIX_ACCESS_TOKEN="$tok" HERMES_HOME="/opt/data/profiles/$prof" "$@" \
+          hermes -p "$prof" gateway run --no-supervise
+        echo "[launcher] gateway $prof exited ($?); restarting in 5s" >&2
+        sleep 5
+      done
     }
-    PB=/opt/data/profiles
-    upsert_env "$PB/ted/.env"   MATRIX_ACCESS_TOKEN "''${TED_MATRIX_TOKEN:-}"
-    upsert_env "$PB/kira/.env"  MATRIX_ACCESS_TOKEN "''${KIRA_MATRIX_TOKEN:-}"
-    upsert_env "$PB/mel/.env"   MATRIX_ACCESS_TOKEN "''${MEL_MATRIX_TOKEN:-}"
-    upsert_env "$PB/spike/.env" MATRIX_ACCESS_TOKEN "''${SPIKE_MATRIX_TOKEN:-}"
-    upsert_env "$PB/luna/.env"  MATRIX_ACCESS_TOKEN "''${LUNA_MATRIX_TOKEN:-}"
-    # kira WhatsApp (bot mode)
-    upsert_env "$PB/kira/.env"  WHATSAPP_ENABLED       "true"
-    upsert_env "$PB/kira/.env"  WHATSAPP_MODE          "bot"
-    upsert_env "$PB/kira/.env"  WHATSAPP_DEBUG         "true"
-    upsert_env "$PB/kira/.env"  WHATSAPP_ALLOWED_USERS "''${KIRA_WHATSAPP_ALLOWED_USERS:-}"
+    run_gw ted   "''${TED_MATRIX_TOKEN:-}"   &
+    run_gw mel   "''${MEL_MATRIX_TOKEN:-}"   &
+    run_gw spike "''${SPIKE_MATRIX_TOKEN:-}" &
+    run_gw luna  "''${LUNA_MATRIX_TOKEN:-}"  &
+    run_gw kira  "''${KIRA_MATRIX_TOKEN:-}" \
+      WHATSAPP_ENABLED=true WHATSAPP_MODE=bot WHATSAPP_DEBUG=true \
+      WHATSAPP_ALLOWED_USERS="''${KIRA_WHATSAPP_ALLOWED_USERS:-}" &
+    wait
   '';
 
-  # Single multiplex gateway container. The default profile (/opt/data) runs one
-  # `hermes gateway run`; with gateway.multiplex_profiles=true it serves every
-  # profile under /opt/data/profiles/* from this one process.
+  # Single container running all five profile gateways.
   gatewayContainer = {
     name = "gateway";
     inherit image;
@@ -326,17 +325,7 @@ let
       "-c"
       ''
         ${bootstrap}
-        ${writeProfileSecrets}
-        # Clear all per-profile secrets from the gateway PROCESS env. In multiplex
-        # each profile must resolve its token from its own .env (written above);
-        # leaving MATRIX_ACCESS_TOKEN in os.environ would leak ted's token to the
-        # default profile and collide as a duplicate (platform, token) pair.
-        unset MATRIX_ACCESS_TOKEN \
-              TED_MATRIX_TOKEN KIRA_MATRIX_TOKEN MEL_MATRIX_TOKEN \
-              SPIKE_MATRIX_TOKEN LUNA_MATRIX_TOKEN KIRA_WHATSAPP_ALLOWED_USERS
-        # --no-supervise: run as the container's main process (no s6 redirect);
-        # multiplex is read from the default profile config.yaml.
-        exec hermes gateway run --no-supervise
+        ${launchGateways}
       ''
     ];
     env = commonEnv ++ profileSecretEnv;
@@ -350,12 +339,12 @@ let
     ];
     resources = {
       requests = {
-        cpu = "250m";
-        memory = "1Gi";
+        cpu = "500m";
+        memory = "2560Mi";
       };
       limits = {
-        cpu = "2";
-        memory = "3Gi";
+        cpu = "3";
+        memory = "5Gi";
       };
     };
     securityContext = commonSecurityContext;
