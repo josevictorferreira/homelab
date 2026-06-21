@@ -8,6 +8,7 @@ in
     submodule = "release";
     args = {
       inherit namespace;
+      replicas = 0;
       image = {
         repository = "ghcr.io/ggml-org/llama.cpp";
         tag = "server-rocm";
