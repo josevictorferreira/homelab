@@ -65,7 +65,7 @@ let
     volumeName = "cli-wrapper";
   };
 
-  # Common env vars shared by the multiplex gateway + dashboard.
+  # Common env vars shared across all gateway containers.
   commonEnv = [
     {
       name = "HERMES_UID";
@@ -79,26 +79,14 @@ let
       name = "TZ";
       value = homelab.timeZone;
     }
-    # OS home (shared): external CLI creds + the shared user-site under
-    # /opt/data/.local. HERMES_HOME is set per-profile in the launcher below.
-    {
-      name = "HOME";
-      value = "/opt/data";
-    }
-    # Managed scope: /opt/data/managed/config.yaml is overlaid (leaf-level,
-    # managed wins) on top of every profile's config. Keys that must vary per
-    # profile (model.default, skills.disabled, kanban.dispatch_in_gateway, and
-    # WhatsApp enablement) are kept OUT of it; everything else is forced
-    # identical across all profiles — the single shared config.
+    # Shared config via Managed Scope: /opt/data/managed/config.yaml is overlaid
+    # (leaf-level, managed wins) on top of every profile's config.yaml, so all 5
+    # profiles share one config. Per-profile config.yaml carries only the keys
+    # that must differ (model.default, skills.disabled; + kira whatsapp, + spike
+    # kanban). Kept out of /opt/data itself so host-only keys aren't pinned.
     {
       name = "HERMES_MANAGED_DIR";
       value = "/opt/data/managed";
-    }
-    # Drives the one-time WhatsApp bridge dependency bootstrap below. Per-profile
-    # WhatsApp enablement comes from kira's own config/.env, not this var.
-    {
-      name = "WHATSAPP_BOOTSTRAP";
-      value = "true";
     }
     # The image defaults HERMES_WRITE_SAFE_ROOT=/opt/data, which blocks agent
     # writes to the sibling /shared/* mounts ("protected system/credential file").
@@ -179,180 +167,194 @@ let
   ];
 
   # Per-profile gateway containers.
-  # Per-profile secrets injected as distinct env vars from the hermes-agent-env
-  # secret. In multiplex mode every profile resolves its credentials from its
-  # OWN profiles/<name>/.env, so the boot script materializes these into the
-  # right .env before the multiplexer starts (a single process env var cannot
-  # be per-profile).
-  profileSecretEnv = [
+  gatewayProfiles = [
     {
-      name = "TED_MATRIX_TOKEN";
-      valueFrom.secretKeyRef = {
-        name = "${name}-env";
-        key = "MATRIX_ACCESS_TOKEN";
-      };
+      profile = "ted";
+      profileFlag = "ted";
+      matrixSecretKey = "MATRIX_ACCESS_TOKEN";
+      whatsapp = false;
     }
     {
-      name = "KIRA_MATRIX_TOKEN";
-      valueFrom.secretKeyRef = {
-        name = "${name}-env";
-        key = "HERMES_KIRA_MATRIX_ACCESS_TOKEN";
-      };
+      profile = "kira";
+      profileFlag = "kira";
+      matrixSecretKey = "HERMES_KIRA_MATRIX_ACCESS_TOKEN";
+      whatsapp = true;
     }
     {
-      name = "MEL_MATRIX_TOKEN";
-      valueFrom.secretKeyRef = {
-        name = "${name}-env";
-        key = "HERMES_MEL_MATRIX_ACCESS_TOKEN";
-      };
+      profile = "mel";
+      profileFlag = "mel";
+      matrixSecretKey = "HERMES_MEL_MATRIX_ACCESS_TOKEN";
+      whatsapp = false;
     }
     {
-      name = "SPIKE_MATRIX_TOKEN";
-      valueFrom.secretKeyRef = {
-        name = "${name}-env";
-        key = "HERMES_SPIKE_MATRIX_ACCESS_TOKEN";
-      };
+      profile = "spike";
+      profileFlag = "spike";
+      matrixSecretKey = "HERMES_SPIKE_MATRIX_ACCESS_TOKEN";
+      whatsapp = false;
+      cpuLimit = "125m";
     }
     {
-      name = "LUNA_MATRIX_TOKEN";
-      valueFrom.secretKeyRef = {
-        name = "${name}-env";
-        key = "HERMES_LUNA_MATRIX_ACCESS_TOKEN";
-      };
-    }
-    {
-      name = "KIRA_WHATSAPP_ALLOWED_USERS";
-      valueFrom.secretKeyRef = {
-        name = "${name}-env";
-        key = "HERMES_KIRA_WHATSAPP_ALLOWED_USERS";
-      };
+      profile = "luna";
+      profileFlag = "luna";
+      matrixSecretKey = "HERMES_LUNA_MATRIX_ACCESS_TOKEN";
+      whatsapp = false;
+      cpuLimit = "125m";
     }
   ];
 
-  # Shared bootstrap. Runs ONCE in the single gateway container (previously once
-  # per profile container). Installs into the shared user-site under /opt/data.
-  bootstrap = ''
-    # Group-writable by default so any hermes process (and the
-    # host user, all in GID 100) can always overwrite shared files.
-    umask 0002
-    # Bootstrap pip if not present
-    command -v pip >/dev/null 2>&1 || command -v pip3 >/dev/null 2>&1 || {
-      python3 -c "import urllib.request; exec(urllib.request.urlopen('https://bootstrap.pypa.io/get-pip.py').read())" --user -q 2>/dev/null || true
-    }
-    # Bootstrap faster-whisper for audio transcription
-    python3 -c "import faster_whisper" 2>/dev/null || {
-      pip install --user -q faster-whisper 2>/dev/null || true
-    }
-    # Bootstrap Matrix dependencies if not installed
-    python3 -c "import mautrix" 2>/dev/null || {
-      uv pip install mautrix asyncpg aiosqlite Markdown aiohttp-socks 2>/dev/null || true
-    }
-    # Bootstrap hindsight-client at the version the memory plugin pins.
-    # The image bumps this pin on upgrade; the user-site copy on the PVC
-    # persists the old version, so install the exact pin when it drifts.
-    python3 -c "import importlib.metadata as m, sys; sys.exit(0 if m.version('hindsight-client') == '0.6.1' else 1)" 2>/dev/null || {
-      python3 -m pip install --user --break-system-packages 'hindsight-client==0.6.1' 2>/dev/null || true
-    }
-    # Bootstrap kubectl if not present
-    command -v kubectl >/dev/null 2>&1 || {
-      python3 -c "
-    import urllib.request, os, stat, shutil
-    url = 'https://dl.k8s.io/release/v1.32.6/bin/linux/amd64/kubectl'
-    tmp = '/tmp/kubectl'
-    dest = '/opt/data/.local/bin/kubectl'
-    os.makedirs('/opt/data/.local/bin', exist_ok=True)
-    urllib.request.urlretrieve(url, tmp)
-    os.chmod(tmp, stat.S_IRWXU | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH)
-    shutil.move(tmp, dest)
-            " 2>/dev/null || true
-    }
-    # Bootstrap WhatsApp bridge dependencies (kira is the only WhatsApp profile;
-    # the bridge script is shared in the image so deps are installed once here).
-    if [ "''${WHATSAPP_BOOTSTRAP:-false}" = "true" ]; then
-      if [ -d /opt/hermes/scripts/whatsapp-bridge ] && [ ! -f /opt/hermes/scripts/whatsapp-bridge/node_modules/@whiskeysockets/baileys/package.json ]; then
-        mkdir -p /opt/data/whatsapp-bridge-node_modules
-        if [ ! -f /opt/data/whatsapp-bridge-node_modules/@whiskeysockets/baileys/package.json ]; then
-          (cd /opt/hermes/scripts/whatsapp-bridge && cp -r node_modules /opt/data/whatsapp-bridge-node_modules 2>/dev/null) || true
-          (cd /opt/hermes/scripts/whatsapp-bridge && NODE_OPTIONS="--max-old-space-size=256" npm install --production --no-audit --maxsockets 1 --prefer-offline 2>/dev/null) || true
-          (cd /opt/hermes/scripts/whatsapp-bridge && cp -r node_modules /opt/data/whatsapp-bridge-node_modules 2>/dev/null) || true
-        fi
-        rm -rf /opt/hermes/scripts/whatsapp-bridge/node_modules
-        ln -s /opt/data/whatsapp-bridge-node_modules /opt/hermes/scripts/whatsapp-bridge/node_modules
-      fi
-    fi
-    # Fix Baileys 7.x syncFullHistory for incoming messages
-    sed -i 's/syncFullHistory: false/syncFullHistory: true/' /opt/hermes/scripts/whatsapp-bridge/bridge.js 2>/dev/null || true
-  '';
-
-  # Launch every profile's gateway as a separate, self-restarting process inside
-  # the SINGLE container. Each profile gets its OWN process env — most importantly
-  # its own MATRIX_ACCESS_TOKEN — so per-profile Matrix accounts stay isolated.
-  # (This Hermes version's gateway.multiplex_profiles cannot do per-profile Matrix
-  # tokens: gateway config resolves MATRIX_ACCESS_TOKEN from the process-global
-  # os.environ, so a single multiplexer process would force one token onto every
-  # profile.) The shared config still comes from HERMES_MANAGED_DIR, so this is
-  # one container with one shared config — only credentials differ per process.
-  launchGateways = ''
-    # run_gw <profile> <matrix-token> [EXTRA_ENV=val ...]
-    # Self-restarting supervisor: if a profile's gateway exits, restart it after
-    # a short backoff so one crash doesn't take down the others.
-    run_gw() {
-      prof="$1"; tok="$2"; shift 2
-      while true; do
-        env MATRIX_ACCESS_TOKEN="$tok" HERMES_HOME="/opt/data/profiles/$prof" "$@" \
-          hermes -p "$prof" gateway run --no-supervise
-        echo "[launcher] gateway $prof exited ($?); restarting in 5s" >&2
-        sleep 5
-      done
-    }
-    run_gw ted   "''${TED_MATRIX_TOKEN:-}"   &
-    run_gw mel   "''${MEL_MATRIX_TOKEN:-}"   &
-    run_gw spike "''${SPIKE_MATRIX_TOKEN:-}" &
-    run_gw luna  "''${LUNA_MATRIX_TOKEN:-}"  &
-    run_gw kira  "''${KIRA_MATRIX_TOKEN:-}" \
-      WHATSAPP_ENABLED=true WHATSAPP_MODE=bot WHATSAPP_DEBUG=true \
-      WHATSAPP_ALLOWED_USERS="''${KIRA_WHATSAPP_ALLOWED_USERS:-}" &
-    wait
-  '';
-
-  # Single container running all five profile gateways.
-  gatewayContainer = {
-    name = "gateway";
-    inherit image;
-    imagePullPolicy = "IfNotPresent";
-    command = [
-      "/bin/sh"
-      "-c"
-      ''
-        ${bootstrap}
-        ${launchGateways}
-      ''
-    ];
-    env = commonEnv ++ profileSecretEnv;
-    envFrom = envFromSecret;
-    volumeMounts = dataVolumeMounts ++ [
-      {
-        name = cliWrapper.volumeName;
-        mountPath = cliWrapper.mountPath;
-        subPath = "hermes";
-      }
-    ];
-    # Capped at the apps-namespace LimitRange max (cpu 2 / memory 4Gi per
-    # container). All five profile gateways share this one container's budget.
-    resources = {
-      requests = {
-        cpu = "500m";
-        memory = "2Gi";
+  gatewayContainer =
+    {
+      profile,
+      profileFlag,
+      matrixSecretKey,
+      whatsapp,
+      cpuLimit ? "500m",
+    }:
+    let
+      containerName = "gateway-${profile}";
+      bootstrap = ''
+                        # Group-writable by default so any hermes process (and the
+                        # host user, all in GID 100) can always overwrite shared files.
+                        umask 0002
+                        # Bootstrap pip if not present
+                        command -v pip >/dev/null 2>&1 || command -v pip3 >/dev/null 2>&1 || {
+                          python3 -c "import urllib.request; exec(urllib.request.urlopen('https://bootstrap.pypa.io/get-pip.py').read())" --user -q 2>/dev/null || true
+                        }
+                        # Bootstrap faster-whisper for audio transcription
+                        python3 -c "import faster_whisper" 2>/dev/null || {
+                          pip install --user -q faster-whisper 2>/dev/null || true
+                        }
+                        # Bootstrap Matrix dependencies if not installed
+                        python3 -c "import mautrix" 2>/dev/null || {
+                          uv pip install mautrix asyncpg aiosqlite Markdown aiohttp-socks 2>/dev/null || true
+                        }
+                        # Bootstrap hindsight-client at the version the memory plugin pins.
+                        # The image bumps this pin on upgrade; the user-site copy on the PVC
+                        # persists the old version, so install the exact pin when it drifts.
+                        python3 -c "import importlib.metadata as m, sys; sys.exit(0 if m.version('hindsight-client') == '0.6.1' else 1)" 2>/dev/null || {
+                          python3 -m pip install --user --break-system-packages 'hindsight-client==0.6.1' 2>/dev/null || true
+                        }
+                        # Bootstrap kubectl if not present
+                        command -v kubectl >/dev/null 2>&1 || {
+                          python3 -c "
+        import urllib.request, os, stat, shutil
+        url = 'https://dl.k8s.io/release/v1.32.6/bin/linux/amd64/kubectl'
+        tmp = '/tmp/kubectl'
+        dest = '/opt/data/.local/bin/kubectl'
+        os.makedirs('/opt/data/.local/bin', exist_ok=True)
+        urllib.request.urlretrieve(url, tmp)
+        os.chmod(tmp, stat.S_IRWXU | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH)
+        shutil.move(tmp, dest)
+                " 2>/dev/null || true
+                        }
+                        # Bootstrap WhatsApp bridge dependencies if needed
+                        if [ "''${WHATSAPP_ENABLED:-false}" = "true" ]; then
+                          if [ -d /opt/hermes/scripts/whatsapp-bridge ] && [ ! -f /opt/hermes/scripts/whatsapp-bridge/node_modules/@whiskeysockets/baileys/package.json ]; then
+                            mkdir -p /opt/data/whatsapp-bridge-node_modules
+                            if [ ! -f /opt/data/whatsapp-bridge-node_modules/@whiskeysockets/baileys/package.json ]; then
+                              (cd /opt/hermes/scripts/whatsapp-bridge && cp -r node_modules /opt/data/whatsapp-bridge-node_modules 2>/dev/null) || true
+                              (cd /opt/hermes/scripts/whatsapp-bridge && NODE_OPTIONS="--max-old-space-size=256" npm install --production --no-audit --maxsockets 1 --prefer-offline 2>/dev/null) || true
+                              (cd /opt/hermes/scripts/whatsapp-bridge && cp -r node_modules /opt/data/whatsapp-bridge-node_modules 2>/dev/null) || true
+                            fi
+                            rm -rf /opt/hermes/scripts/whatsapp-bridge/node_modules
+                            ln -s /opt/data/whatsapp-bridge-node_modules /opt/hermes/scripts/whatsapp-bridge/node_modules
+                          fi
+                        fi
+                          # Fix Baileys 7.x syncFullHistory for incoming messages
+                          sed -i 's/syncFullHistory: false/syncFullHistory: true/' /opt/hermes/scripts/whatsapp-bridge/bridge.js 2>/dev/null || true
+      '';
+      cmdArgs =
+        if profileFlag != null then
+          [
+            "/bin/sh"
+            "-c"
+            ''
+              ${bootstrap}
+              exec hermes -p ${profileFlag} gateway run
+            ''
+          ]
+        else
+          [
+            "/bin/sh"
+            "-c"
+            ''
+              ${bootstrap}
+              exec gateway run
+            ''
+          ];
+    in
+    {
+      name = containerName;
+      inherit image;
+      imagePullPolicy = "IfNotPresent";
+      command = cmdArgs;
+      env =
+        commonEnv
+        ++ [
+          {
+            name = "HOME";
+            value = "/opt/data";
+          }
+          {
+            name = "HERMES_HOME";
+            value = "/opt/data/profiles/${profile}";
+          }
+          {
+            name = "MATRIX_ACCESS_TOKEN";
+            valueFrom.secretKeyRef = {
+              name = "${name}-env";
+              key = matrixSecretKey;
+            };
+          }
+        ]
+        ++ (
+          if whatsapp then
+            [
+              {
+                name = "WHATSAPP_ENABLED";
+                value = "true";
+              }
+              {
+                name = "WHATSAPP_MODE";
+                value = "bot";
+              }
+              {
+                name = "WHATSAPP_ALLOWED_USERS";
+                valueFrom.secretKeyRef = {
+                  name = "${name}-env";
+                  key = "HERMES_KIRA_WHATSAPP_ALLOWED_USERS";
+                };
+              }
+              {
+                name = "WHATSAPP_DEBUG";
+                value = "true";
+              }
+            ]
+          else
+            [ ]
+        );
+      envFrom = envFromSecret;
+      volumeMounts = dataVolumeMounts ++ [
+        {
+          name = cliWrapper.volumeName;
+          mountPath = cliWrapper.mountPath;
+          subPath = "hermes";
+        }
+      ];
+      resources = {
+        requests = {
+          cpu = "100m";
+          memory = "512Mi";
+        };
+        limits = {
+          cpu = cpuLimit;
+          memory = "1Gi";
+        };
       };
-      limits = {
-        cpu = "2";
-        memory = "4Gi";
-      };
+      securityContext = commonSecurityContext;
     };
-    securityContext = commonSecurityContext;
-  };
 
-  containers = [ gatewayContainer ];
+  containers = map gatewayContainer gatewayProfiles;
 
 in
 {
