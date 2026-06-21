@@ -141,54 +141,68 @@ spec:
         - command:
             - /bin/sh
             - -c
-            - "                # Group-writable by default so any hermes process (and\
-              \ the\n                # host user, all in GID 100) can always overwrite\
-              \ shared files.\n                umask 0002\n                # Bootstrap\
-              \ pip if not present\n                command -v pip >/dev/null 2>&1\
-              \ || command -v pip3 >/dev/null 2>&1 || {\n                  python3\
-              \ -c \"import urllib.request; exec(urllib.request.urlopen('https://bootstrap.pypa.io/get-pip.py').read())\"\
-              \ --user -q 2>/dev/null || true\n                }\n               \
-              \ # Bootstrap faster-whisper for audio transcription\n             \
-              \   python3 -c \"import faster_whisper\" 2>/dev/null || {\n        \
-              \          pip install --user -q faster-whisper 2>/dev/null || true\n\
-              \                }\n                # Bootstrap Matrix dependencies\
-              \ if not installed\n                python3 -c \"import mautrix\" 2>/dev/null\
-              \ || {\n                  uv pip install mautrix asyncpg aiosqlite Markdown\
-              \ aiohttp-socks 2>/dev/null || true\n                }\n           \
-              \     # Bootstrap hindsight-client at the version the memory plugin\
-              \ pins.\n                # The image bumps this pin on upgrade; the\
-              \ user-site copy on the PVC\n                # persists the old version,\
-              \ so install the exact pin when it drifts.\n                python3\
-              \ -c \"import importlib.metadata as m, sys; sys.exit(0 if m.version('hindsight-client')\
-              \ == '0.6.1' else 1)\" 2>/dev/null || {\n                  python3 -m\
-              \ pip install --user --break-system-packages 'hindsight-client==0.6.1'\
-              \ 2>/dev/null || true\n                }\n                # Bootstrap\
-              \ kubectl if not present\n                command -v kubectl >/dev/null\
-              \ 2>&1 || {\n                  python3 -c \"\nimport urllib.request,\
-              \ os, stat, shutil\nurl = 'https://dl.k8s.io/release/v1.32.6/bin/linux/amd64/kubectl'\n\
+            - "# Group-writable by default so any hermes process (and the\n# host\
+              \ user, all in GID 100) can always overwrite shared files.\numask 0002\n\
+              # Bootstrap pip if not present\ncommand -v pip >/dev/null 2>&1 || command\
+              \ -v pip3 >/dev/null 2>&1 || {\n  python3 -c \"import urllib.request;\
+              \ exec(urllib.request.urlopen('https://bootstrap.pypa.io/get-pip.py').read())\"\
+              \ --user -q 2>/dev/null || true\n}\n# Bootstrap faster-whisper for audio\
+              \ transcription\npython3 -c \"import faster_whisper\" 2>/dev/null ||\
+              \ {\n  pip install --user -q faster-whisper 2>/dev/null || true\n}\n\
+              # Bootstrap Matrix dependencies if not installed\npython3 -c \"import\
+              \ mautrix\" 2>/dev/null || {\n  uv pip install mautrix asyncpg aiosqlite\
+              \ Markdown aiohttp-socks 2>/dev/null || true\n}\n# Bootstrap hindsight-client\
+              \ at the version the memory plugin pins.\n# The image bumps this pin\
+              \ on upgrade; the user-site copy on the PVC\n# persists the old version,\
+              \ so install the exact pin when it drifts.\npython3 -c \"import importlib.metadata\
+              \ as m, sys; sys.exit(0 if m.version('hindsight-client') == '0.6.1'\
+              \ else 1)\" 2>/dev/null || {\n  python3 -m pip install --user --break-system-packages\
+              \ 'hindsight-client==0.6.1' 2>/dev/null || true\n}\n# Bootstrap kubectl\
+              \ if not present\ncommand -v kubectl >/dev/null 2>&1 || {\n  python3\
+              \ -c \"\nimport urllib.request, os, stat, shutil\nurl = 'https://dl.k8s.io/release/v1.32.6/bin/linux/amd64/kubectl'\n\
               tmp = '/tmp/kubectl'\ndest = '/opt/data/.local/bin/kubectl'\nos.makedirs('/opt/data/.local/bin',\
               \ exist_ok=True)\nurllib.request.urlretrieve(url, tmp)\nos.chmod(tmp,\
               \ stat.S_IRWXU | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH)\n\
-              shutil.move(tmp, dest)\n        \" 2>/dev/null || true\n           \
-              \     }\n                # Bootstrap WhatsApp bridge dependencies if\
-              \ needed\n                if [ \"${WHATSAPP_ENABLED:-false}\" = \"true\"\
-              \ ]; then\n                  if [ -d /opt/hermes/scripts/whatsapp-bridge\
-              \ ] && [ ! -f /opt/hermes/scripts/whatsapp-bridge/node_modules/@whiskeysockets/baileys/package.json\
-              \ ]; then\n                    mkdir -p /opt/data/whatsapp-bridge-node_modules\n\
-              \                    if [ ! -f /opt/data/whatsapp-bridge-node_modules/@whiskeysockets/baileys/package.json\
-              \ ]; then\n                      (cd /opt/hermes/scripts/whatsapp-bridge\
+              shutil.move(tmp, dest)\n        \" 2>/dev/null || true\n}\n# Bootstrap\
+              \ WhatsApp bridge dependencies (kira is the only WhatsApp profile;\n\
+              # the bridge script is shared in the image so deps are installed once\
+              \ here).\nif [ \"${WHATSAPP_BOOTSTRAP:-false}\" = \"true\" ]; then\n\
+              \  if [ -d /opt/hermes/scripts/whatsapp-bridge ] && [ ! -f /opt/hermes/scripts/whatsapp-bridge/node_modules/@whiskeysockets/baileys/package.json\
+              \ ]; then\n    mkdir -p /opt/data/whatsapp-bridge-node_modules\n   \
+              \ if [ ! -f /opt/data/whatsapp-bridge-node_modules/@whiskeysockets/baileys/package.json\
+              \ ]; then\n      (cd /opt/hermes/scripts/whatsapp-bridge && cp -r node_modules\
+              \ /opt/data/whatsapp-bridge-node_modules 2>/dev/null) || true\n    \
+              \  (cd /opt/hermes/scripts/whatsapp-bridge && NODE_OPTIONS=\"--max-old-space-size=256\"\
+              \ npm install --production --no-audit --maxsockets 1 --prefer-offline\
+              \ 2>/dev/null) || true\n      (cd /opt/hermes/scripts/whatsapp-bridge\
               \ && cp -r node_modules /opt/data/whatsapp-bridge-node_modules 2>/dev/null)\
-              \ || true\n                      (cd /opt/hermes/scripts/whatsapp-bridge\
-              \ && NODE_OPTIONS=\"--max-old-space-size=256\" npm install --production\
-              \ --no-audit --maxsockets 1 --prefer-offline 2>/dev/null) || true\n\
-              \                      (cd /opt/hermes/scripts/whatsapp-bridge && cp\
-              \ -r node_modules /opt/data/whatsapp-bridge-node_modules 2>/dev/null)\
-              \ || true\n                    fi\n                    rm -rf /opt/hermes/scripts/whatsapp-bridge/node_modules\n\
-              \                    ln -s /opt/data/whatsapp-bridge-node_modules /opt/hermes/scripts/whatsapp-bridge/node_modules\n\
-              \                  fi\n                fi\n                  # Fix Baileys\
-              \ 7.x syncFullHistory for incoming messages\n                  sed -i\
-              \ 's/syncFullHistory: false/syncFullHistory: true/' /opt/hermes/scripts/whatsapp-bridge/bridge.js\
-              \ 2>/dev/null || true\n\nexec hermes -p ted gateway run\n"
+              \ || true\n    fi\n    rm -rf /opt/hermes/scripts/whatsapp-bridge/node_modules\n\
+              \    ln -s /opt/data/whatsapp-bridge-node_modules /opt/hermes/scripts/whatsapp-bridge/node_modules\n\
+              \  fi\nfi\n# Fix Baileys 7.x syncFullHistory for incoming messages\n\
+              sed -i 's/syncFullHistory: false/syncFullHistory: true/' /opt/hermes/scripts/whatsapp-bridge/bridge.js\
+              \ 2>/dev/null || true\n\nupsert_env() {\n  f=\"$1\"; k=\"$2\"; v=\"\
+              $3\"\n  [ -n \"$v\" ] || return 0\n  mkdir -p \"$(dirname \"$f\")\"\n\
+              \  touch \"$f\"\n  grep -v \"^${k}=\" \"$f\" > \"$f.tmp\" 2>/dev/null\
+              \ || true\n  mv \"$f.tmp\" \"$f\"\n  printf '%s=%s\\n' \"$k\" \"$v\"\
+              \ >> \"$f\"\n}\nPB=/opt/data/profiles\nupsert_env \"$PB/ted/.env\" \
+              \  MATRIX_ACCESS_TOKEN \"${TED_MATRIX_TOKEN:-}\"\nupsert_env \"$PB/kira/.env\"\
+              \  MATRIX_ACCESS_TOKEN \"${KIRA_MATRIX_TOKEN:-}\"\nupsert_env \"$PB/mel/.env\"\
+              \   MATRIX_ACCESS_TOKEN \"${MEL_MATRIX_TOKEN:-}\"\nupsert_env \"$PB/spike/.env\"\
+              \ MATRIX_ACCESS_TOKEN \"${SPIKE_MATRIX_TOKEN:-}\"\nupsert_env \"$PB/luna/.env\"\
+              \  MATRIX_ACCESS_TOKEN \"${LUNA_MATRIX_TOKEN:-}\"\n# kira WhatsApp (bot\
+              \ mode)\nupsert_env \"$PB/kira/.env\"  WHATSAPP_ENABLED       \"true\"\
+              \nupsert_env \"$PB/kira/.env\"  WHATSAPP_MODE          \"bot\"\nupsert_env\
+              \ \"$PB/kira/.env\"  WHATSAPP_DEBUG         \"true\"\nupsert_env \"\
+              $PB/kira/.env\"  WHATSAPP_ALLOWED_USERS \"${KIRA_WHATSAPP_ALLOWED_USERS:-}\"\
+              \n\n# Clear all per-profile secrets from the gateway PROCESS env. In\
+              \ multiplex\n# each profile must resolve its token from its own .env\
+              \ (written above);\n# leaving MATRIX_ACCESS_TOKEN in os.environ would\
+              \ leak ted's token to the\n# default profile and collide as a duplicate\
+              \ (platform, token) pair.\nunset MATRIX_ACCESS_TOKEN \\\n      TED_MATRIX_TOKEN\
+              \ KIRA_MATRIX_TOKEN MEL_MATRIX_TOKEN \\\n      SPIKE_MATRIX_TOKEN LUNA_MATRIX_TOKEN\
+              \ KIRA_WHATSAPP_ALLOWED_USERS\n# --no-supervise: run as the container's\
+              \ main process (no s6 redirect);\n# multiplex is read from the default\
+              \ profile config.yaml.\nexec hermes gateway run --no-supervise\n"
           env:
             - name: HERMES_UID
               value: '10000'
@@ -196,6 +210,14 @@ spec:
               value: '2002'
             - name: TZ
               value: America/Sao_Paulo
+            - name: HOME
+              value: /opt/data
+            - name: HERMES_HOME
+              value: /opt/data
+            - name: HERMES_MANAGED_DIR
+              value: /opt/data/managed
+            - name: WHATSAPP_BOOTSTRAP
+              value: 'true'
             - name: HERMES_WRITE_SAFE_ROOT
               value: ''
             - name: AGENT_BROWSER_ENGINE
@@ -234,631 +256,49 @@ spec:
               value: 'true'
             - name: PIP_REQUIRE_VIRTUALENV
               value: 'false'
-            - name: HOME
-              value: /opt/data
-            - name: HERMES_HOME
-              value: /opt/data/profiles/ted
-            - name: MATRIX_ACCESS_TOKEN
+            - name: TED_MATRIX_TOKEN
               valueFrom:
                 secretKeyRef:
                   key: MATRIX_ACCESS_TOKEN
                   name: hermes-agent-env
-          envFrom:
-            - secretRef:
-                name: hermes-agent-env
-          image: docker.io/nousresearch/hermes-agent:v2026.6.19@sha256:9f367c7756ef087661a361536a89f438d57a122b958dc23d82d456b1433e6e9e
-          imagePullPolicy: IfNotPresent
-          name: gateway-ted
-          resources:
-            limits:
-              cpu: 500m
-              memory: 1Gi
-            requests:
-              cpu: 100m
-              memory: 512Mi
-          securityContext:
-            allowPrivilegeEscalation: false
-            capabilities:
-              drop:
-                - ALL
-            runAsGroup: 2002
-            runAsNonRoot: true
-            runAsUser: 10000
-          volumeMounts:
-            - mountPath: /opt/data
-              name: hermes-data
-              subPath: hermes
-            - mountPath: /shared/notetaking
-              name: hermes-data
-              subPath: notetaking
-            - mountPath: /shared/mel-dynamica
-              name: hermes-data
-              subPath: mel-dynamica
-            - mountPath: /shared/personal-finances
-              name: hermes-data
-              subPath: personal-finances
-            - mountPath: /shared/images
-              name: hermes-data
-              subPath: images
-            - mountPath: /opt/hermes/scripts/whatsapp-bridge/node_modules
-              name: hermes-data
-              subPath: whatsapp-bridge-node_modules
-            - mountPath: /usr/local/bin/hermes
-              name: cli-wrapper
-              subPath: hermes
-        - command:
-            - /bin/sh
-            - -c
-            - "                # Group-writable by default so any hermes process (and\
-              \ the\n                # host user, all in GID 100) can always overwrite\
-              \ shared files.\n                umask 0002\n                # Bootstrap\
-              \ pip if not present\n                command -v pip >/dev/null 2>&1\
-              \ || command -v pip3 >/dev/null 2>&1 || {\n                  python3\
-              \ -c \"import urllib.request; exec(urllib.request.urlopen('https://bootstrap.pypa.io/get-pip.py').read())\"\
-              \ --user -q 2>/dev/null || true\n                }\n               \
-              \ # Bootstrap faster-whisper for audio transcription\n             \
-              \   python3 -c \"import faster_whisper\" 2>/dev/null || {\n        \
-              \          pip install --user -q faster-whisper 2>/dev/null || true\n\
-              \                }\n                # Bootstrap Matrix dependencies\
-              \ if not installed\n                python3 -c \"import mautrix\" 2>/dev/null\
-              \ || {\n                  uv pip install mautrix asyncpg aiosqlite Markdown\
-              \ aiohttp-socks 2>/dev/null || true\n                }\n           \
-              \     # Bootstrap hindsight-client at the version the memory plugin\
-              \ pins.\n                # The image bumps this pin on upgrade; the\
-              \ user-site copy on the PVC\n                # persists the old version,\
-              \ so install the exact pin when it drifts.\n                python3\
-              \ -c \"import importlib.metadata as m, sys; sys.exit(0 if m.version('hindsight-client')\
-              \ == '0.6.1' else 1)\" 2>/dev/null || {\n                  python3 -m\
-              \ pip install --user --break-system-packages 'hindsight-client==0.6.1'\
-              \ 2>/dev/null || true\n                }\n                # Bootstrap\
-              \ kubectl if not present\n                command -v kubectl >/dev/null\
-              \ 2>&1 || {\n                  python3 -c \"\nimport urllib.request,\
-              \ os, stat, shutil\nurl = 'https://dl.k8s.io/release/v1.32.6/bin/linux/amd64/kubectl'\n\
-              tmp = '/tmp/kubectl'\ndest = '/opt/data/.local/bin/kubectl'\nos.makedirs('/opt/data/.local/bin',\
-              \ exist_ok=True)\nurllib.request.urlretrieve(url, tmp)\nos.chmod(tmp,\
-              \ stat.S_IRWXU | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH)\n\
-              shutil.move(tmp, dest)\n        \" 2>/dev/null || true\n           \
-              \     }\n                # Bootstrap WhatsApp bridge dependencies if\
-              \ needed\n                if [ \"${WHATSAPP_ENABLED:-false}\" = \"true\"\
-              \ ]; then\n                  if [ -d /opt/hermes/scripts/whatsapp-bridge\
-              \ ] && [ ! -f /opt/hermes/scripts/whatsapp-bridge/node_modules/@whiskeysockets/baileys/package.json\
-              \ ]; then\n                    mkdir -p /opt/data/whatsapp-bridge-node_modules\n\
-              \                    if [ ! -f /opt/data/whatsapp-bridge-node_modules/@whiskeysockets/baileys/package.json\
-              \ ]; then\n                      (cd /opt/hermes/scripts/whatsapp-bridge\
-              \ && cp -r node_modules /opt/data/whatsapp-bridge-node_modules 2>/dev/null)\
-              \ || true\n                      (cd /opt/hermes/scripts/whatsapp-bridge\
-              \ && NODE_OPTIONS=\"--max-old-space-size=256\" npm install --production\
-              \ --no-audit --maxsockets 1 --prefer-offline 2>/dev/null) || true\n\
-              \                      (cd /opt/hermes/scripts/whatsapp-bridge && cp\
-              \ -r node_modules /opt/data/whatsapp-bridge-node_modules 2>/dev/null)\
-              \ || true\n                    fi\n                    rm -rf /opt/hermes/scripts/whatsapp-bridge/node_modules\n\
-              \                    ln -s /opt/data/whatsapp-bridge-node_modules /opt/hermes/scripts/whatsapp-bridge/node_modules\n\
-              \                  fi\n                fi\n                  # Fix Baileys\
-              \ 7.x syncFullHistory for incoming messages\n                  sed -i\
-              \ 's/syncFullHistory: false/syncFullHistory: true/' /opt/hermes/scripts/whatsapp-bridge/bridge.js\
-              \ 2>/dev/null || true\n\nexec hermes -p kira gateway run\n"
-          env:
-            - name: HERMES_UID
-              value: '10000'
-            - name: HERMES_GID
-              value: '2002'
-            - name: TZ
-              value: America/Sao_Paulo
-            - name: HERMES_WRITE_SAFE_ROOT
-              value: ''
-            - name: AGENT_BROWSER_ENGINE
-              value: cdp
-            - name: AGENT_BROWSER_ENDPOINT
-              value: ws://cloakbrowser.apps.svc.cluster.local:9222
-            - name: HINDSIGHT_MODE
-              value: local_external
-            - name: HINDSIGHT_API_URL
-              value: http://hindsight-api.apps.svc.cluster.local:8888
-            - name: HINDSIGHT_BANK_ID
-              value: hermes
-            - name: HINDSIGHT_BUDGET
-              value: mid
-            - name: HINDSIGHT_API_KEY
-              value: dummy
-            - name: HINDSIGHT_LLM_API_KEY
-              value: dummy
-            - name: GITHUB_TOKEN
-              valueFrom:
-                secretKeyRef:
-                  key: GITHUB_TOKEN
-                  name: hermes-agent-env
-            - name: GH_TOKEN
-              valueFrom:
-                secretKeyRef:
-                  key: GH_TOKEN
-                  name: hermes-agent-env
-            - name: PATH
-              value: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/hermes/.venv/bin:/opt/data/.local/bin
-            - name: PYTHONPATH
-              value: /opt/data/.local/lib/python3.13/site-packages
-            - name: PYTHONUSERBASE
-              value: /opt/data/.local
-            - name: PIP_USER
-              value: 'true'
-            - name: PIP_REQUIRE_VIRTUALENV
-              value: 'false'
-            - name: HOME
-              value: /opt/data
-            - name: HERMES_HOME
-              value: /opt/data/profiles/kira
-            - name: MATRIX_ACCESS_TOKEN
+            - name: KIRA_MATRIX_TOKEN
               valueFrom:
                 secretKeyRef:
                   key: HERMES_KIRA_MATRIX_ACCESS_TOKEN
                   name: hermes-agent-env
-            - name: WHATSAPP_ENABLED
-              value: 'true'
-            - name: WHATSAPP_MODE
-              value: bot
-            - name: WHATSAPP_ALLOWED_USERS
-              valueFrom:
-                secretKeyRef:
-                  key: HERMES_KIRA_WHATSAPP_ALLOWED_USERS
-                  name: hermes-agent-env
-            - name: WHATSAPP_DEBUG
-              value: 'true'
-          envFrom:
-            - secretRef:
-                name: hermes-agent-env
-          image: docker.io/nousresearch/hermes-agent:v2026.6.19@sha256:9f367c7756ef087661a361536a89f438d57a122b958dc23d82d456b1433e6e9e
-          imagePullPolicy: IfNotPresent
-          name: gateway-kira
-          resources:
-            limits:
-              cpu: 500m
-              memory: 1Gi
-            requests:
-              cpu: 100m
-              memory: 512Mi
-          securityContext:
-            allowPrivilegeEscalation: false
-            capabilities:
-              drop:
-                - ALL
-            runAsGroup: 2002
-            runAsNonRoot: true
-            runAsUser: 10000
-          volumeMounts:
-            - mountPath: /opt/data
-              name: hermes-data
-              subPath: hermes
-            - mountPath: /shared/notetaking
-              name: hermes-data
-              subPath: notetaking
-            - mountPath: /shared/mel-dynamica
-              name: hermes-data
-              subPath: mel-dynamica
-            - mountPath: /shared/personal-finances
-              name: hermes-data
-              subPath: personal-finances
-            - mountPath: /shared/images
-              name: hermes-data
-              subPath: images
-            - mountPath: /opt/hermes/scripts/whatsapp-bridge/node_modules
-              name: hermes-data
-              subPath: whatsapp-bridge-node_modules
-            - mountPath: /usr/local/bin/hermes
-              name: cli-wrapper
-              subPath: hermes
-        - command:
-            - /bin/sh
-            - -c
-            - "                # Group-writable by default so any hermes process (and\
-              \ the\n                # host user, all in GID 100) can always overwrite\
-              \ shared files.\n                umask 0002\n                # Bootstrap\
-              \ pip if not present\n                command -v pip >/dev/null 2>&1\
-              \ || command -v pip3 >/dev/null 2>&1 || {\n                  python3\
-              \ -c \"import urllib.request; exec(urllib.request.urlopen('https://bootstrap.pypa.io/get-pip.py').read())\"\
-              \ --user -q 2>/dev/null || true\n                }\n               \
-              \ # Bootstrap faster-whisper for audio transcription\n             \
-              \   python3 -c \"import faster_whisper\" 2>/dev/null || {\n        \
-              \          pip install --user -q faster-whisper 2>/dev/null || true\n\
-              \                }\n                # Bootstrap Matrix dependencies\
-              \ if not installed\n                python3 -c \"import mautrix\" 2>/dev/null\
-              \ || {\n                  uv pip install mautrix asyncpg aiosqlite Markdown\
-              \ aiohttp-socks 2>/dev/null || true\n                }\n           \
-              \     # Bootstrap hindsight-client at the version the memory plugin\
-              \ pins.\n                # The image bumps this pin on upgrade; the\
-              \ user-site copy on the PVC\n                # persists the old version,\
-              \ so install the exact pin when it drifts.\n                python3\
-              \ -c \"import importlib.metadata as m, sys; sys.exit(0 if m.version('hindsight-client')\
-              \ == '0.6.1' else 1)\" 2>/dev/null || {\n                  python3 -m\
-              \ pip install --user --break-system-packages 'hindsight-client==0.6.1'\
-              \ 2>/dev/null || true\n                }\n                # Bootstrap\
-              \ kubectl if not present\n                command -v kubectl >/dev/null\
-              \ 2>&1 || {\n                  python3 -c \"\nimport urllib.request,\
-              \ os, stat, shutil\nurl = 'https://dl.k8s.io/release/v1.32.6/bin/linux/amd64/kubectl'\n\
-              tmp = '/tmp/kubectl'\ndest = '/opt/data/.local/bin/kubectl'\nos.makedirs('/opt/data/.local/bin',\
-              \ exist_ok=True)\nurllib.request.urlretrieve(url, tmp)\nos.chmod(tmp,\
-              \ stat.S_IRWXU | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH)\n\
-              shutil.move(tmp, dest)\n        \" 2>/dev/null || true\n           \
-              \     }\n                # Bootstrap WhatsApp bridge dependencies if\
-              \ needed\n                if [ \"${WHATSAPP_ENABLED:-false}\" = \"true\"\
-              \ ]; then\n                  if [ -d /opt/hermes/scripts/whatsapp-bridge\
-              \ ] && [ ! -f /opt/hermes/scripts/whatsapp-bridge/node_modules/@whiskeysockets/baileys/package.json\
-              \ ]; then\n                    mkdir -p /opt/data/whatsapp-bridge-node_modules\n\
-              \                    if [ ! -f /opt/data/whatsapp-bridge-node_modules/@whiskeysockets/baileys/package.json\
-              \ ]; then\n                      (cd /opt/hermes/scripts/whatsapp-bridge\
-              \ && cp -r node_modules /opt/data/whatsapp-bridge-node_modules 2>/dev/null)\
-              \ || true\n                      (cd /opt/hermes/scripts/whatsapp-bridge\
-              \ && NODE_OPTIONS=\"--max-old-space-size=256\" npm install --production\
-              \ --no-audit --maxsockets 1 --prefer-offline 2>/dev/null) || true\n\
-              \                      (cd /opt/hermes/scripts/whatsapp-bridge && cp\
-              \ -r node_modules /opt/data/whatsapp-bridge-node_modules 2>/dev/null)\
-              \ || true\n                    fi\n                    rm -rf /opt/hermes/scripts/whatsapp-bridge/node_modules\n\
-              \                    ln -s /opt/data/whatsapp-bridge-node_modules /opt/hermes/scripts/whatsapp-bridge/node_modules\n\
-              \                  fi\n                fi\n                  # Fix Baileys\
-              \ 7.x syncFullHistory for incoming messages\n                  sed -i\
-              \ 's/syncFullHistory: false/syncFullHistory: true/' /opt/hermes/scripts/whatsapp-bridge/bridge.js\
-              \ 2>/dev/null || true\n\nexec hermes -p mel gateway run\n"
-          env:
-            - name: HERMES_UID
-              value: '10000'
-            - name: HERMES_GID
-              value: '2002'
-            - name: TZ
-              value: America/Sao_Paulo
-            - name: HERMES_WRITE_SAFE_ROOT
-              value: ''
-            - name: AGENT_BROWSER_ENGINE
-              value: cdp
-            - name: AGENT_BROWSER_ENDPOINT
-              value: ws://cloakbrowser.apps.svc.cluster.local:9222
-            - name: HINDSIGHT_MODE
-              value: local_external
-            - name: HINDSIGHT_API_URL
-              value: http://hindsight-api.apps.svc.cluster.local:8888
-            - name: HINDSIGHT_BANK_ID
-              value: hermes
-            - name: HINDSIGHT_BUDGET
-              value: mid
-            - name: HINDSIGHT_API_KEY
-              value: dummy
-            - name: HINDSIGHT_LLM_API_KEY
-              value: dummy
-            - name: GITHUB_TOKEN
-              valueFrom:
-                secretKeyRef:
-                  key: GITHUB_TOKEN
-                  name: hermes-agent-env
-            - name: GH_TOKEN
-              valueFrom:
-                secretKeyRef:
-                  key: GH_TOKEN
-                  name: hermes-agent-env
-            - name: PATH
-              value: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/hermes/.venv/bin:/opt/data/.local/bin
-            - name: PYTHONPATH
-              value: /opt/data/.local/lib/python3.13/site-packages
-            - name: PYTHONUSERBASE
-              value: /opt/data/.local
-            - name: PIP_USER
-              value: 'true'
-            - name: PIP_REQUIRE_VIRTUALENV
-              value: 'false'
-            - name: HOME
-              value: /opt/data
-            - name: HERMES_HOME
-              value: /opt/data/profiles/mel
-            - name: MATRIX_ACCESS_TOKEN
+            - name: MEL_MATRIX_TOKEN
               valueFrom:
                 secretKeyRef:
                   key: HERMES_MEL_MATRIX_ACCESS_TOKEN
                   name: hermes-agent-env
-          envFrom:
-            - secretRef:
-                name: hermes-agent-env
-          image: docker.io/nousresearch/hermes-agent:v2026.6.19@sha256:9f367c7756ef087661a361536a89f438d57a122b958dc23d82d456b1433e6e9e
-          imagePullPolicy: IfNotPresent
-          name: gateway-mel
-          resources:
-            limits:
-              cpu: 500m
-              memory: 1Gi
-            requests:
-              cpu: 100m
-              memory: 512Mi
-          securityContext:
-            allowPrivilegeEscalation: false
-            capabilities:
-              drop:
-                - ALL
-            runAsGroup: 2002
-            runAsNonRoot: true
-            runAsUser: 10000
-          volumeMounts:
-            - mountPath: /opt/data
-              name: hermes-data
-              subPath: hermes
-            - mountPath: /shared/notetaking
-              name: hermes-data
-              subPath: notetaking
-            - mountPath: /shared/mel-dynamica
-              name: hermes-data
-              subPath: mel-dynamica
-            - mountPath: /shared/personal-finances
-              name: hermes-data
-              subPath: personal-finances
-            - mountPath: /shared/images
-              name: hermes-data
-              subPath: images
-            - mountPath: /opt/hermes/scripts/whatsapp-bridge/node_modules
-              name: hermes-data
-              subPath: whatsapp-bridge-node_modules
-            - mountPath: /usr/local/bin/hermes
-              name: cli-wrapper
-              subPath: hermes
-        - command:
-            - /bin/sh
-            - -c
-            - "                # Group-writable by default so any hermes process (and\
-              \ the\n                # host user, all in GID 100) can always overwrite\
-              \ shared files.\n                umask 0002\n                # Bootstrap\
-              \ pip if not present\n                command -v pip >/dev/null 2>&1\
-              \ || command -v pip3 >/dev/null 2>&1 || {\n                  python3\
-              \ -c \"import urllib.request; exec(urllib.request.urlopen('https://bootstrap.pypa.io/get-pip.py').read())\"\
-              \ --user -q 2>/dev/null || true\n                }\n               \
-              \ # Bootstrap faster-whisper for audio transcription\n             \
-              \   python3 -c \"import faster_whisper\" 2>/dev/null || {\n        \
-              \          pip install --user -q faster-whisper 2>/dev/null || true\n\
-              \                }\n                # Bootstrap Matrix dependencies\
-              \ if not installed\n                python3 -c \"import mautrix\" 2>/dev/null\
-              \ || {\n                  uv pip install mautrix asyncpg aiosqlite Markdown\
-              \ aiohttp-socks 2>/dev/null || true\n                }\n           \
-              \     # Bootstrap hindsight-client at the version the memory plugin\
-              \ pins.\n                # The image bumps this pin on upgrade; the\
-              \ user-site copy on the PVC\n                # persists the old version,\
-              \ so install the exact pin when it drifts.\n                python3\
-              \ -c \"import importlib.metadata as m, sys; sys.exit(0 if m.version('hindsight-client')\
-              \ == '0.6.1' else 1)\" 2>/dev/null || {\n                  python3 -m\
-              \ pip install --user --break-system-packages 'hindsight-client==0.6.1'\
-              \ 2>/dev/null || true\n                }\n                # Bootstrap\
-              \ kubectl if not present\n                command -v kubectl >/dev/null\
-              \ 2>&1 || {\n                  python3 -c \"\nimport urllib.request,\
-              \ os, stat, shutil\nurl = 'https://dl.k8s.io/release/v1.32.6/bin/linux/amd64/kubectl'\n\
-              tmp = '/tmp/kubectl'\ndest = '/opt/data/.local/bin/kubectl'\nos.makedirs('/opt/data/.local/bin',\
-              \ exist_ok=True)\nurllib.request.urlretrieve(url, tmp)\nos.chmod(tmp,\
-              \ stat.S_IRWXU | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH)\n\
-              shutil.move(tmp, dest)\n        \" 2>/dev/null || true\n           \
-              \     }\n                # Bootstrap WhatsApp bridge dependencies if\
-              \ needed\n                if [ \"${WHATSAPP_ENABLED:-false}\" = \"true\"\
-              \ ]; then\n                  if [ -d /opt/hermes/scripts/whatsapp-bridge\
-              \ ] && [ ! -f /opt/hermes/scripts/whatsapp-bridge/node_modules/@whiskeysockets/baileys/package.json\
-              \ ]; then\n                    mkdir -p /opt/data/whatsapp-bridge-node_modules\n\
-              \                    if [ ! -f /opt/data/whatsapp-bridge-node_modules/@whiskeysockets/baileys/package.json\
-              \ ]; then\n                      (cd /opt/hermes/scripts/whatsapp-bridge\
-              \ && cp -r node_modules /opt/data/whatsapp-bridge-node_modules 2>/dev/null)\
-              \ || true\n                      (cd /opt/hermes/scripts/whatsapp-bridge\
-              \ && NODE_OPTIONS=\"--max-old-space-size=256\" npm install --production\
-              \ --no-audit --maxsockets 1 --prefer-offline 2>/dev/null) || true\n\
-              \                      (cd /opt/hermes/scripts/whatsapp-bridge && cp\
-              \ -r node_modules /opt/data/whatsapp-bridge-node_modules 2>/dev/null)\
-              \ || true\n                    fi\n                    rm -rf /opt/hermes/scripts/whatsapp-bridge/node_modules\n\
-              \                    ln -s /opt/data/whatsapp-bridge-node_modules /opt/hermes/scripts/whatsapp-bridge/node_modules\n\
-              \                  fi\n                fi\n                  # Fix Baileys\
-              \ 7.x syncFullHistory for incoming messages\n                  sed -i\
-              \ 's/syncFullHistory: false/syncFullHistory: true/' /opt/hermes/scripts/whatsapp-bridge/bridge.js\
-              \ 2>/dev/null || true\n\nexec hermes -p spike gateway run\n"
-          env:
-            - name: HERMES_UID
-              value: '10000'
-            - name: HERMES_GID
-              value: '2002'
-            - name: TZ
-              value: America/Sao_Paulo
-            - name: HERMES_WRITE_SAFE_ROOT
-              value: ''
-            - name: AGENT_BROWSER_ENGINE
-              value: cdp
-            - name: AGENT_BROWSER_ENDPOINT
-              value: ws://cloakbrowser.apps.svc.cluster.local:9222
-            - name: HINDSIGHT_MODE
-              value: local_external
-            - name: HINDSIGHT_API_URL
-              value: http://hindsight-api.apps.svc.cluster.local:8888
-            - name: HINDSIGHT_BANK_ID
-              value: hermes
-            - name: HINDSIGHT_BUDGET
-              value: mid
-            - name: HINDSIGHT_API_KEY
-              value: dummy
-            - name: HINDSIGHT_LLM_API_KEY
-              value: dummy
-            - name: GITHUB_TOKEN
-              valueFrom:
-                secretKeyRef:
-                  key: GITHUB_TOKEN
-                  name: hermes-agent-env
-            - name: GH_TOKEN
-              valueFrom:
-                secretKeyRef:
-                  key: GH_TOKEN
-                  name: hermes-agent-env
-            - name: PATH
-              value: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/hermes/.venv/bin:/opt/data/.local/bin
-            - name: PYTHONPATH
-              value: /opt/data/.local/lib/python3.13/site-packages
-            - name: PYTHONUSERBASE
-              value: /opt/data/.local
-            - name: PIP_USER
-              value: 'true'
-            - name: PIP_REQUIRE_VIRTUALENV
-              value: 'false'
-            - name: HOME
-              value: /opt/data
-            - name: HERMES_HOME
-              value: /opt/data/profiles/spike
-            - name: MATRIX_ACCESS_TOKEN
+            - name: SPIKE_MATRIX_TOKEN
               valueFrom:
                 secretKeyRef:
                   key: HERMES_SPIKE_MATRIX_ACCESS_TOKEN
                   name: hermes-agent-env
-          envFrom:
-            - secretRef:
-                name: hermes-agent-env
-          image: docker.io/nousresearch/hermes-agent:v2026.6.19@sha256:9f367c7756ef087661a361536a89f438d57a122b958dc23d82d456b1433e6e9e
-          imagePullPolicy: IfNotPresent
-          name: gateway-spike
-          resources:
-            limits:
-              cpu: 125m
-              memory: 1Gi
-            requests:
-              cpu: 100m
-              memory: 512Mi
-          securityContext:
-            allowPrivilegeEscalation: false
-            capabilities:
-              drop:
-                - ALL
-            runAsGroup: 2002
-            runAsNonRoot: true
-            runAsUser: 10000
-          volumeMounts:
-            - mountPath: /opt/data
-              name: hermes-data
-              subPath: hermes
-            - mountPath: /shared/notetaking
-              name: hermes-data
-              subPath: notetaking
-            - mountPath: /shared/mel-dynamica
-              name: hermes-data
-              subPath: mel-dynamica
-            - mountPath: /shared/personal-finances
-              name: hermes-data
-              subPath: personal-finances
-            - mountPath: /shared/images
-              name: hermes-data
-              subPath: images
-            - mountPath: /opt/hermes/scripts/whatsapp-bridge/node_modules
-              name: hermes-data
-              subPath: whatsapp-bridge-node_modules
-            - mountPath: /usr/local/bin/hermes
-              name: cli-wrapper
-              subPath: hermes
-        - command:
-            - /bin/sh
-            - -c
-            - "                # Group-writable by default so any hermes process (and\
-              \ the\n                # host user, all in GID 100) can always overwrite\
-              \ shared files.\n                umask 0002\n                # Bootstrap\
-              \ pip if not present\n                command -v pip >/dev/null 2>&1\
-              \ || command -v pip3 >/dev/null 2>&1 || {\n                  python3\
-              \ -c \"import urllib.request; exec(urllib.request.urlopen('https://bootstrap.pypa.io/get-pip.py').read())\"\
-              \ --user -q 2>/dev/null || true\n                }\n               \
-              \ # Bootstrap faster-whisper for audio transcription\n             \
-              \   python3 -c \"import faster_whisper\" 2>/dev/null || {\n        \
-              \          pip install --user -q faster-whisper 2>/dev/null || true\n\
-              \                }\n                # Bootstrap Matrix dependencies\
-              \ if not installed\n                python3 -c \"import mautrix\" 2>/dev/null\
-              \ || {\n                  uv pip install mautrix asyncpg aiosqlite Markdown\
-              \ aiohttp-socks 2>/dev/null || true\n                }\n           \
-              \     # Bootstrap hindsight-client at the version the memory plugin\
-              \ pins.\n                # The image bumps this pin on upgrade; the\
-              \ user-site copy on the PVC\n                # persists the old version,\
-              \ so install the exact pin when it drifts.\n                python3\
-              \ -c \"import importlib.metadata as m, sys; sys.exit(0 if m.version('hindsight-client')\
-              \ == '0.6.1' else 1)\" 2>/dev/null || {\n                  python3 -m\
-              \ pip install --user --break-system-packages 'hindsight-client==0.6.1'\
-              \ 2>/dev/null || true\n                }\n                # Bootstrap\
-              \ kubectl if not present\n                command -v kubectl >/dev/null\
-              \ 2>&1 || {\n                  python3 -c \"\nimport urllib.request,\
-              \ os, stat, shutil\nurl = 'https://dl.k8s.io/release/v1.32.6/bin/linux/amd64/kubectl'\n\
-              tmp = '/tmp/kubectl'\ndest = '/opt/data/.local/bin/kubectl'\nos.makedirs('/opt/data/.local/bin',\
-              \ exist_ok=True)\nurllib.request.urlretrieve(url, tmp)\nos.chmod(tmp,\
-              \ stat.S_IRWXU | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH)\n\
-              shutil.move(tmp, dest)\n        \" 2>/dev/null || true\n           \
-              \     }\n                # Bootstrap WhatsApp bridge dependencies if\
-              \ needed\n                if [ \"${WHATSAPP_ENABLED:-false}\" = \"true\"\
-              \ ]; then\n                  if [ -d /opt/hermes/scripts/whatsapp-bridge\
-              \ ] && [ ! -f /opt/hermes/scripts/whatsapp-bridge/node_modules/@whiskeysockets/baileys/package.json\
-              \ ]; then\n                    mkdir -p /opt/data/whatsapp-bridge-node_modules\n\
-              \                    if [ ! -f /opt/data/whatsapp-bridge-node_modules/@whiskeysockets/baileys/package.json\
-              \ ]; then\n                      (cd /opt/hermes/scripts/whatsapp-bridge\
-              \ && cp -r node_modules /opt/data/whatsapp-bridge-node_modules 2>/dev/null)\
-              \ || true\n                      (cd /opt/hermes/scripts/whatsapp-bridge\
-              \ && NODE_OPTIONS=\"--max-old-space-size=256\" npm install --production\
-              \ --no-audit --maxsockets 1 --prefer-offline 2>/dev/null) || true\n\
-              \                      (cd /opt/hermes/scripts/whatsapp-bridge && cp\
-              \ -r node_modules /opt/data/whatsapp-bridge-node_modules 2>/dev/null)\
-              \ || true\n                    fi\n                    rm -rf /opt/hermes/scripts/whatsapp-bridge/node_modules\n\
-              \                    ln -s /opt/data/whatsapp-bridge-node_modules /opt/hermes/scripts/whatsapp-bridge/node_modules\n\
-              \                  fi\n                fi\n                  # Fix Baileys\
-              \ 7.x syncFullHistory for incoming messages\n                  sed -i\
-              \ 's/syncFullHistory: false/syncFullHistory: true/' /opt/hermes/scripts/whatsapp-bridge/bridge.js\
-              \ 2>/dev/null || true\n\nexec hermes -p luna gateway run\n"
-          env:
-            - name: HERMES_UID
-              value: '10000'
-            - name: HERMES_GID
-              value: '2002'
-            - name: TZ
-              value: America/Sao_Paulo
-            - name: HERMES_WRITE_SAFE_ROOT
-              value: ''
-            - name: AGENT_BROWSER_ENGINE
-              value: cdp
-            - name: AGENT_BROWSER_ENDPOINT
-              value: ws://cloakbrowser.apps.svc.cluster.local:9222
-            - name: HINDSIGHT_MODE
-              value: local_external
-            - name: HINDSIGHT_API_URL
-              value: http://hindsight-api.apps.svc.cluster.local:8888
-            - name: HINDSIGHT_BANK_ID
-              value: hermes
-            - name: HINDSIGHT_BUDGET
-              value: mid
-            - name: HINDSIGHT_API_KEY
-              value: dummy
-            - name: HINDSIGHT_LLM_API_KEY
-              value: dummy
-            - name: GITHUB_TOKEN
-              valueFrom:
-                secretKeyRef:
-                  key: GITHUB_TOKEN
-                  name: hermes-agent-env
-            - name: GH_TOKEN
-              valueFrom:
-                secretKeyRef:
-                  key: GH_TOKEN
-                  name: hermes-agent-env
-            - name: PATH
-              value: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/hermes/.venv/bin:/opt/data/.local/bin
-            - name: PYTHONPATH
-              value: /opt/data/.local/lib/python3.13/site-packages
-            - name: PYTHONUSERBASE
-              value: /opt/data/.local
-            - name: PIP_USER
-              value: 'true'
-            - name: PIP_REQUIRE_VIRTUALENV
-              value: 'false'
-            - name: HOME
-              value: /opt/data
-            - name: HERMES_HOME
-              value: /opt/data/profiles/luna
-            - name: MATRIX_ACCESS_TOKEN
+            - name: LUNA_MATRIX_TOKEN
               valueFrom:
                 secretKeyRef:
                   key: HERMES_LUNA_MATRIX_ACCESS_TOKEN
                   name: hermes-agent-env
+            - name: KIRA_WHATSAPP_ALLOWED_USERS
+              valueFrom:
+                secretKeyRef:
+                  key: HERMES_KIRA_WHATSAPP_ALLOWED_USERS
+                  name: hermes-agent-env
           envFrom:
             - secretRef:
                 name: hermes-agent-env
           image: docker.io/nousresearch/hermes-agent:v2026.6.19@sha256:9f367c7756ef087661a361536a89f438d57a122b958dc23d82d456b1433e6e9e
           imagePullPolicy: IfNotPresent
-          name: gateway-luna
+          name: gateway
           resources:
             limits:
-              cpu: 125m
-              memory: 1Gi
+              cpu: '2'
+              memory: 3Gi
             requests:
-              cpu: 100m
-              memory: 512Mi
+              cpu: 250m
+              memory: 1Gi
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
