@@ -895,16 +895,26 @@ spec:
         - command:
             - /bin/sh
             - -c
-            - "chown -R 10000:2002 /opt/data/profiles/luna /opt/data/profiles/spike\
-              \ || true\n# Guarantee read/write for everything in the unified \"homelab\"\
-              \ group\n# (GID 2002 — the agents' primary gid and the host user's group,\
-              \ and\n# what other pods join via supplementalGroups). setgid on dirs\
-              \ so new\n# entries inherit the group; group-writable. Only touches\
-              \ wrong\n# entries, so it stays fast on large trees.\nfor d in /shared/*/;\
-              \ do\n  [ -d \"$d\" ] || continue\n  find \"$d\" ! -group 2002 -exec\
+            - "# Profile HOMEs: hermes creates each /opt/data/profiles/<p>\n# as 0700\
+              \ owned by the runtime uid, which locks the SMB client\n# (authenticated\
+              \ as GID 2002, not the dir owner) out of that\n# profile's folder —\
+              \ the cause of \"sometimes I lose access\".\n# Normalize ownership +\
+              \ group access so every profile is\n# reachable. Only touches wrong\
+              \ entries, so it stays fast.\nfor d in /opt/data/profiles/*/; do\n \
+              \ [ -d \"$d\" ] || continue\n  find \"$d\" ! -user 10000 -exec chown\
+              \ 10000 {} + 2>/dev/null || true\n  find \"$d\" ! -group 2002 -exec\
               \ chgrp 2002 {} + 2>/dev/null || true\n  find \"$d\" -type d ! -perm\
               \ -2070 -exec chmod g+rwxs {} + 2>/dev/null || true\n  find \"$d\" -type\
-              \ f ! -perm -060 -exec chmod g+rw {} + 2>/dev/null || true\ndone\n"
+              \ f ! -perm -060 -exec chmod g+rw {} + 2>/dev/null || true\ndone\n#\
+              \ Guarantee read/write for everything in the unified \"homelab\" group\n\
+              # (GID 2002 — the agents' primary gid and the host user's group, and\n\
+              # what other pods join via supplementalGroups). setgid on dirs so new\n\
+              # entries inherit the group; group-writable. Only touches wrong\n# entries,\
+              \ so it stays fast on large trees.\nfor d in /shared/*/; do\n  [ -d\
+              \ \"$d\" ] || continue\n  find \"$d\" ! -group 2002 -exec chgrp 2002\
+              \ {} + 2>/dev/null || true\n  find \"$d\" -type d ! -perm -2070 -exec\
+              \ chmod g+rwxs {} + 2>/dev/null || true\n  find \"$d\" -type f ! -perm\
+              \ -060 -exec chmod g+rw {} + 2>/dev/null || true\ndone\n"
           image: docker.io/nousresearch/hermes-agent:v2026.6.19@sha256:9f367c7756ef087661a361536a89f438d57a122b958dc23d82d456b1433e6e9e
           name: fix-profile-permissions
           securityContext:

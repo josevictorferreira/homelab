@@ -395,7 +395,19 @@ in
                 "/bin/sh"
                 "-c"
                 ''
-                  chown -R 10000:2002 /opt/data/profiles/luna /opt/data/profiles/spike || true
+                  # Profile HOMEs: hermes creates each /opt/data/profiles/<p>
+                  # as 0700 owned by the runtime uid, which locks the SMB client
+                  # (authenticated as GID 2002, not the dir owner) out of that
+                  # profile's folder — the cause of "sometimes I lose access".
+                  # Normalize ownership + group access so every profile is
+                  # reachable. Only touches wrong entries, so it stays fast.
+                  for d in /opt/data/profiles/*/; do
+                    [ -d "$d" ] || continue
+                    find "$d" ! -user 10000 -exec chown 10000 {} + 2>/dev/null || true
+                    find "$d" ! -group 2002 -exec chgrp 2002 {} + 2>/dev/null || true
+                    find "$d" -type d ! -perm -2070 -exec chmod g+rwxs {} + 2>/dev/null || true
+                    find "$d" -type f ! -perm -060 -exec chmod g+rw {} + 2>/dev/null || true
+                  done
                   # Guarantee read/write for everything in the unified "homelab" group
                   # (GID 2002 — the agents' primary gid and the host user's group, and
                   # what other pods join via supplementalGroups). setgid on dirs so new
