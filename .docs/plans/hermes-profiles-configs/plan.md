@@ -23,59 +23,49 @@ a leaf-level deep-merge — **managed values win per leaf key** and cannot be
 overridden per profile. `${VAR}` refs in the managed config expand against the
 process env only. Fail-open (a malformed managed file is logged and ignored).
 
-We set `HERMES_MANAGED_DIR=/opt/data` so the **existing** default-profile config
-at `/opt/data/config.yaml` *is* the shared overlay. Consequence: any key present
-in `/opt/data/config.yaml` is pinned for every profile. Therefore the keys that
-must vary per profile are **removed** from it:
+We set `HERMES_MANAGED_DIR=/opt/data/managed` (a **dedicated** file, not
+`/opt/data/config.yaml` itself — that would pin host-only keys like
+platforms/whatsapp onto every profile). `/opt/data/managed/config.yaml` holds all
+keys that must be identical across profiles. The keys that vary per profile are
+**absent** from it (so they aren't pinned):
 
 - `model.default`
 - `skills.disabled`
-- `kanban.dispatch_in_gateway`
+- `kanban.dispatch_in_gateway` (spike), WhatsApp enablement (kira)
 
 Everything else (providers, toolsets, terminal, web/browser, display, voice,
-platforms baseline, etc.) lives in `/opt/data/config.yaml` and is forced
-identical across all profiles — exactly the intent.
+matrix settings, etc.) lives in the managed file and is forced identical across
+all profiles — exactly the intent.
 
-### 2. Single container: per-process, NOT multiplex
+### 2. Topology: 5 per-profile gateway containers (one pod)
 
-**Multiplex (`gateway.multiplex_profiles`) was evaluated and rejected** for this
-Hermes version (v2026.6.19). Although it serves all profiles from one process,
-it cannot give each profile its own Matrix token: `gateway/config.py`
-`_apply_env_overrides` resolves `MATRIX_ACCESS_TOKEN` from the **process-global**
-`os.environ` and overrides any per-profile `platforms.matrix.token`; the
-multiplexer never overlays a profile's `.env` into `os.environ` at adapter
-startup. Result: one token is forced onto every profile, so only one Matrix
-account connects. (Also: only the **top-level** `multiplex_profiles` key is
-honored — the documented nested `gateway.multiplex_profiles` is a no-op in
-`load_gateway_config`.)
+**FINAL decision** — keep the proven model: the `hermes-agent-gateway`
+Deployment runs **5 containers in one pod**, `gateway-<profile>` each, via
+`gatewayProfiles` + `gatewayContainer`. Each container runs
+`hermes -p <profile> gateway run` with its own `MATRIX_ACCESS_TOKEN` (per-profile
+SOPS key) and `HERMES_HOME=/opt/data/profiles/<p>`, so every profile connects its
+own Matrix account — true per-account isolation, independent crash domains.
 
-Instead, the single container's command launches **one gateway process per
-profile**, each self-restarting:
+**Single-container alternatives were tried and rolled back:**
 
-```sh
-run_gw() {                       # prof, matrix-token, [EXTRA_ENV=val ...]
-  while true; do
-    env MATRIX_ACCESS_TOKEN="$tok" HERMES_HOME="/opt/data/profiles/$prof" "$@" \
-      hermes -p "$prof" gateway run --no-supervise
-    sleep 5                      # restart on crash; one crash ≠ all down
-  done
-}
-run_gw ted "$TED_MATRIX_TOKEN" & ... & run_gw kira "$KIRA_MATRIX_TOKEN" WHATSAPP_*=... &
-wait
-```
+- **Multiplex (`gateway.multiplex_profiles`)** can't give each profile its own
+  Matrix token in v2026.6.19: `gateway/config.py` `_apply_env_overrides` resolves
+  `MATRIX_ACCESS_TOKEN` from the **process-global** `os.environ` (overriding any
+  per-profile `platforms.matrix.token`), and `matrix.py` `check_matrix_requirements`
+  gates on `os.getenv` too — neither uses the scope-aware `get_secret`. One token
+  is forced onto every profile. (Also only the top-level `multiplex_profiles` key
+  is honored; the nested form is a no-op.) Fixing it needs a custom image patch or
+  upstream PR.
+- **One container, 5 processes** (a `run_gw` launcher backgrounding each gateway):
+  works, but offers no advantage over 5 containers while losing per-process
+  resource limits and independent restart — rolled back.
 
-This is the proven per-profile credential isolation, collapsed into one pod —
-one container, one shared config, only credentials differ per process.
+### 3. Per-profile secrets (unchanged from the proven setup)
 
-### 3. Per-profile secrets via per-process env
-
-Each profile gateway process gets its **own** `MATRIX_ACCESS_TOKEN` (and kira its
-`WHATSAPP_*`) in its process env, sourced from distinct `hermes-agent-env` SOPS
-keys exposed as `TED_MATRIX_TOKEN`, `KIRA_MATRIX_TOKEN`, … The launcher passes
-them per `run_gw` invocation, so profiles never share a token. Shared Matrix
-settings (`MATRIX_HOMESERVER`, etc.) come from the container `envFrom` and are
-identical across processes. The default profile (`/opt/data`) gateway is never
-launched, so it connects no platform.
+Each `gateway-<profile>` container injects its own `MATRIX_ACCESS_TOKEN` from the
+matching `hermes-agent-env` SOPS key (`MATRIX_ACCESS_TOKEN`,
+`HERMES_KIRA_MATRIX_ACCESS_TOKEN`, …); kira also gets `WHATSAPP_*`. Shared Matrix
+settings (`MATRIX_HOMESERVER`, etc.) come from `envFrom`.
 
 ## Per-profile config.yaml after the refactor
 
@@ -104,45 +94,34 @@ kanban:                      # spike only
 
 ## Homelab implementation (`modules/kubenix/apps/hermes-agent.nix`)
 
-1. Replace the 5 `gatewayProfiles` containers with one `gateway` container.
-2. `commonEnv` sets shared `HOME=/opt/data` and `HERMES_MANAGED_DIR=/opt/data/managed`
-   (`HERMES_HOME` is set per-process in the launcher, not in `commonEnv`).
-3. Inject every per-profile Matrix token + kira WhatsApp creds as distinct env
-   vars from `hermes-agent-env` (`TED_MATRIX_TOKEN`, `KIRA_MATRIX_TOKEN`, …).
-4. Boot command: run the shared bootstrap **once**, then `run_gw <profile> <token>`
-   for each of the 5 profiles in the background + `wait`.
-5. Container resources capped at the apps-namespace LimitRange max
-   (**cpu 2 / memory 4Gi** per container) — all 5 processes share that budget.
-6. Keep the root `fix-profile-permissions` init container and the separate
-   dashboard deployment.
-7. `make manifests`, then commit/push **only after explicit approval** so Flux
-   reconciles the cutover.
+The only change vs. the original 5-container setup: add
+`HERMES_MANAGED_DIR=/opt/data/managed` to `commonEnv`. Everything else
+(`gatewayProfiles`, `gatewayContainer` with per-profile `MATRIX_ACCESS_TOKEN` +
+`HERMES_HOME`, the `fix-profile-permissions` init container, dashboard) is the
+proven config, unchanged.
 
-## Cutover ordering (important)
+1. Add `HERMES_MANAGED_DIR=/opt/data/managed` to `commonEnv` (shared by all 5).
+2. `make manifests`, then commit/push **only after explicit approval** so Flux
+   reconciles.
 
-Trimmed profile configs only work once `HERMES_MANAGED_DIR` is active (new
-container). So the CephFS config edits and the new manifest must land together:
+## CephFS config edits (one-time, already applied)
 
-1. Back up all `config.yaml` / `.env` (script writes `~/Homelab/hermes/.refactor-backup-*`).
-2. `prep`: create `/opt/data/managed/config.yaml` (shared keys); the default
-   profile config needs no platform edits (its gateway is never launched).
-3. Deploy the single-container manifest (commit/push → Flux). Recreate strategy
-   brings up the 5 per-process gateways with the managed overlay active.
-4. `trim`: reduce each `profiles/<p>/config.yaml` to deltas, then restart to
-   confirm the trimmed configs still produce 5 working gateways.
+1. Backups written to `~/Homelab/hermes/.refactor-backup-*`.
+2. `prep`: build `/opt/data/managed/config.yaml` (shared keys; per-profile/host
+   keys excluded). Group-readable (gid 2002).
+3. `trim`: reduce each `profiles/<p>/config.yaml` to deltas (`model.default` +
+   `skills.disabled`; + kira whatsapp, + spike kanban).
 
 ## Validation (all passed 2026-06-21)
 
 1. `make manifests` succeeds.
-2. One gateway pod, single container, `Running` (restart count 0, no launcher
-   restart messages).
-3. `ps` shows 5 `hermes -p <profile> gateway run` processes.
-4. Each profile's Matrix account connects under its own token — verified distinct
-   identities `@ted/@kira/@mel/@spike/@luna:josevictor.me`.
-5. Per-profile `model.default` differs (e.g. ted `deepseek-v4-flash`, spike
+2. Gateway pod `5/5 Running`, all container restart counts 0.
+3. Each profile's Matrix account connects under its own token — verified distinct
+   identities `@ted/@kira/@mel/@spike/@luna:josevictor.me` on the live boot.
+4. Per-profile `model.default` differs (e.g. ted `deepseek-v4-flash`, spike
    `kimi-k2.6`) while shared keys (`timezone`, `model.provider`) resolve from
-   the managed overlay.
-6. spike's kanban dispatcher is embedded + dispatching; kira's WhatsApp enabled.
+   the managed overlay — confirmed inside `gateway-ted`.
+5. spike's kanban dispatch intact; kira's WhatsApp enabled.
 
 ## Non-Goals
 
