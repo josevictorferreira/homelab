@@ -43,6 +43,12 @@ in
             - "directory mask = 0775"
             - "force user = homelab"
             - "force group = homelab"
+            # hermes re-locks its profile HOMEs to 0700 (owned by uid
+            # 10000) at runtime, which a forced uid-2002 session cannot
+            # traverse. admin users bypasses Unix perm checks for this
+            # login so every profile folder stays reachable. Must live in
+            # global: the crazy-max/samba image ignores per-share extra:.
+            - "admin users = homelab"
 
           share:
             - name: homelab-smb
@@ -56,11 +62,6 @@ in
                 - "force group = homelab"
                 - "create mask = 0664"
                 - "directory mask = 0775"
-                # hermes re-locks its profile HOMEs to 0700 (owned by
-                # uid 10000) at runtime, which a forced uid-2002 session
-                # cannot traverse. admin users bypasses Unix perm checks
-                # for this login so every profile folder stays reachable.
-                - "admin users = homelab"
         '';
       };
     };
