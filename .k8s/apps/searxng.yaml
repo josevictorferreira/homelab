@@ -34,7 +34,7 @@ spec:
           envFrom:
             - secretRef:
                 name: searxng-secret
-          image: ghcr.io/searxng/searxng:2026.6.19-8b10095e8
+          image: ghcr.io/searxng/searxng:2026.6.20-fd42d4fda
           imagePullPolicy: IfNotPresent
           livenessProbe:
             httpGet:
