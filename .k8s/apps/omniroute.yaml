@@ -31,6 +31,15 @@ spec:
         app.kubernetes.io/instance: omniroute
         app.kubernetes.io/name: omniroute
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: NotIn
+                    values:
+                      - lab-gamma-wk
       automountServiceAccountToken: true
       containers:
         - envFrom:
