@@ -34,6 +34,19 @@ in
           { name = "ghcr-registry-secret"; }
         ];
 
+        defaultPodOptions.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms =
+          [
+            {
+              matchExpressions = [
+                {
+                  key = "kubernetes.io/hostname";
+                  operator = "NotIn";
+                  values = [ "lab-gamma-wk" ];
+                }
+              ];
+            }
+          ];
+
         controllers.main.pod.securityContext = {
           fsGroup = 1000;
           runAsUser = 1000;
