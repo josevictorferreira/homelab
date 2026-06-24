@@ -31,6 +31,15 @@ spec:
         app.kubernetes.io/instance: glance
         app.kubernetes.io/name: glance
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values:
+                      - lab-pi-bk
       automountServiceAccountToken: true
       containers:
         - image: glanceapp/glance:v0.8.5@sha256:32ab73d80f2b8b5fb0735b0431deb36b93fbb6b2fb43592449b0178c8b83e350
@@ -58,6 +67,11 @@ spec:
       hostNetwork: false
       hostPID: false
       serviceAccountName: default
+      tolerations:
+        - effect: NoSchedule
+          key: pi-only
+          operator: Equal
+          value: 'true'
       volumes:
         - configMap:
             items:

@@ -1,6 +1,7 @@
-{ kubenix
-, homelab
-, ...
+{
+  kubenix,
+  homelab,
+  ...
 }:
 
 let
@@ -28,6 +29,16 @@ in
           pullPolicy = "IfNotPresent";
           tag = "2.2.1@sha256:7337368a77873f159435de9ef09567f68c31285ed5f951dec36256c4b267ee44";
         };
+
+        tolerations = [
+          {
+            key = "pi-only";
+            operator = "Equal";
+            value = "true";
+            effect = "NoSchedule";
+          }
+        ];
+        affinity = homelab.kubernetes.affinities.piNode;
 
         volume = {
           storageClassName = kubenix.lib.defaultStorageClass;

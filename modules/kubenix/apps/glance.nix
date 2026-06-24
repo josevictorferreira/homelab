@@ -25,6 +25,18 @@
         filename = "glance.yml";
         mountPath = "/app/config";
       };
+
+      values = {
+        defaultPodOptions.affinity = homelab.kubernetes.affinities.piNode;
+        defaultPodOptions.tolerations = [
+          {
+            key = "pi-only";
+            operator = "Equal";
+            value = "true";
+            effect = "NoSchedule";
+          }
+        ];
+      };
     };
   };
 }
