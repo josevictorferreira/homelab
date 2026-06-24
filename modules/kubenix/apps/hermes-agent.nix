@@ -144,6 +144,27 @@ let
         key = "GH_TOKEN";
       };
     }
+    # Pin git commit identity. GIT_AUTHOR_*/GIT_COMMITTER_* env take precedence
+    # over any per-workspace `git config user.email`, so agents can't improvise
+    # author emails (which previously leaked attribution to unrelated GitHub
+    # accounts that happened to own those emails, e.g. hermes@nousresearch.com).
+    # Uses the owner's GitHub no-reply address so commits attribute correctly.
+    {
+      name = "GIT_AUTHOR_NAME";
+      value = "José Victor Ferreira";
+    }
+    {
+      name = "GIT_AUTHOR_EMAIL";
+      value = "4625612+josevictorferreira@users.noreply.github.com";
+    }
+    {
+      name = "GIT_COMMITTER_NAME";
+      value = "José Victor Ferreira";
+    }
+    {
+      name = "GIT_COMMITTER_EMAIL";
+      value = "4625612+josevictorferreira@users.noreply.github.com";
+    }
     {
       name = "PATH";
       value = "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/hermes/.venv/bin:/opt/data/.local/bin";
