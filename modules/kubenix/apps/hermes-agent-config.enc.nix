@@ -11,17 +11,10 @@ in
       inherit namespace;
     };
     stringData = {
-      ALIBABA_CODING_PLAN_API_KEY = kubenix.lib.secretsFor "alibaba_coding_plan_api_key";
-      KIMI_API_KEY = kubenix.lib.secretsFor "moonshot_api_key";
-      KIMI_BASE_URL = "https://api.kimi.com/coding/v1";
-      GLM_API_KEY = kubenix.lib.secretsFor "z_ai_api_key";
-      GLM_BASE_URL = "https://api.z.ai/api/coding/paas/v4";
       GEMINI_API_KEY = kubenix.lib.secretsFor "gemini_api_key";
       OPENROUTER_API_KEY = kubenix.lib.secretsFor "openrouter_api_key_openclaw";
       OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1";
       MINIMAX_API_KEY = kubenix.lib.secretsFor "minimax_api_key";
-      HF_TOKEN = kubenix.lib.secretsFor "huggingface_hub_token";
-      HF_BASE_URL = "https://router.huggingface.co/v1";
       NVIDIA_API_KEY = kubenix.lib.secretsFor "nvidia_api_key";
       NVIDIA_BASE_URL = "https://integrate.api.nvidia.com/v1";
       OPENCODE_GO_API_KEY = kubenix.lib.secretsFor "opencode_go_api_key";
@@ -31,6 +24,7 @@ in
       GH_TOKEN = kubenix.lib.secretsFor "github_token";
       OPENAI_API_KEY = kubenix.lib.secretsFor "openai_api_key";
       OMNIROUTE_API_KEY = kubenix.lib.secretsFor "omniroute_api_key";
+      OMNIROUTE_BASE_URL = "https://omniroute.josevictor.me/api/v1";
       MATRIX_HOMESERVER = kubenix.lib.secretsFor "hermes_matrix_homeserver";
       MATRIX_ACCESS_TOKEN = kubenix.lib.secretsFor "hermes_matrix_access_token";
       MATRIX_ALLOWED_USERS = kubenix.lib.secretsFor "hermes_matrix_allowed_users";
