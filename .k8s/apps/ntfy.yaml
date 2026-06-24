@@ -33,6 +33,15 @@ spec:
         app.kubernetes.io/instance: ntfy
         app.kubernetes.io/name: ntfy
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values:
+                      - lab-pi-bk
       automountServiceAccountToken: true
       containers:
         - command:
@@ -70,6 +79,11 @@ spec:
       hostNetwork: false
       hostPID: false
       serviceAccountName: default
+      tolerations:
+        - effect: NoSchedule
+          key: pi-only
+          operator: Equal
+          value: 'true'
       volumes:
         - configMap:
             items:

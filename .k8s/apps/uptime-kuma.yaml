@@ -26,6 +26,15 @@ spec:
         app.kubernetes.io/instance: uptimekuma
         app.kubernetes.io/name: uptime-kuma
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values:
+                      - lab-pi-bk
       automountServiceAccountToken: false
       containers:
         - image: louislam/uptime-kuma:2.2.1@sha256:7337368a77873f159435de9ef09567f68c31285ed5f951dec36256c4b267ee44
@@ -62,6 +71,11 @@ spec:
       priorityClassName: preemptible
       securityContext: {}
       serviceAccountName: default
+      tolerations:
+        - effect: NoSchedule
+          key: pi-only
+          operator: Equal
+          value: 'true'
       volumes:
         - name: storage
           persistentVolumeClaim:

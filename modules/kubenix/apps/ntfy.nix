@@ -76,6 +76,18 @@ in
           log-format = "text";
         };
       };
+
+      values = {
+        defaultPodOptions.affinity = homelab.kubernetes.affinities.piNode;
+        defaultPodOptions.tolerations = [
+          {
+            key = "pi-only";
+            operator = "Equal";
+            value = "true";
+            effect = "NoSchedule";
+          }
+        ];
+      };
     };
   };
 }
