@@ -21,7 +21,7 @@ in
       noHooks = true;
       inherit namespace;
       values = {
-        replicaCount = 1;
+        replicaCount = 0;
         priorityClassName = "preemptible";
         image = {
           repository = "ghcr.io/open-webui/open-webui";

@@ -18,6 +18,7 @@ in
         pullPolicy = "IfNotPresent";
       };
       port = 7476;
+      replicas = 0;
 
       # Mount the same downloads path as qBittorrent for Local Filesystem Access
       # IMPORTANT: Path must match exactly what qBittorrent uses (/downloads)
