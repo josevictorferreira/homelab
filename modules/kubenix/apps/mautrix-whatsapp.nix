@@ -85,7 +85,7 @@ in
               containers = [
                 {
                   name = app;
-                  image = "dock.mau.dev/mautrix/whatsapp:v0.2605.0@sha256:d126438cc0eb989c31ff32ab66a95a16d1fc47198eaabcba0fb4f4672e7a3412";
+                  image = "dock.mau.dev/mautrix/whatsapp:v0.2606.0@sha256:3ecf348ac3451199fe1e7b894469bd8cf9b2abe58699f3b9a8029172c4356877";
                   ports = [
                     {
                       name = "http";
