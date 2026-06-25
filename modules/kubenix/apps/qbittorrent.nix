@@ -161,6 +161,7 @@ in
         portal.open.enabled = true;
 
         workload = {
+          main.replicas = 0;
           main.podSpec = {
             initContainers = {
               "install-vuetorrent" = {
