@@ -344,3 +344,133 @@ spec:
     - hosts:
         - hindsight.josevictor.me
       secretName: wildcard-tls
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: hindsight-reaper
+  namespace: apps
+spec:
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - command:
+                - python3
+                - -c
+                - "import json\nimport os\nimport ssl\nimport sys\nimport urllib.request\n\
+                  from datetime import datetime, timedelta, timezone\n\nimport sqlalchemy\
+                  \ as sa\nfrom sqlalchemy import text\n\nTOKEN_PATH = '/var/run/secrets/kubernetes.io/serviceaccount/token'\n\
+                  CA_PATH = '/var/run/secrets/kubernetes.io/serviceaccount/ca.crt'\n\
+                  NAMESPACE_PATH = '/var/run/secrets/kubernetes.io/serviceaccount/namespace'\n\
+                  \nSTALE_MINUTES = int(os.environ.get('HINDSIGHT_REAPER_STALE_MINUTES',\
+                  \ '5'))\nDB_URL = os.environ['HINDSIGHT_API_DATABASE_URL']\n\n\n\
+                  def live_hindsight_api_pods():\n    host = os.environ['KUBERNETES_SERVICE_HOST']\n\
+                  \    port = os.environ['KUBERNETES_SERVICE_PORT']\n    namespace\
+                  \ = open(NAMESPACE_PATH).read().strip()\n    token = open(TOKEN_PATH).read().strip()\n\
+                  \    url = (\n        f'https://{host}:{port}/api/v1/namespaces/{namespace}/pods'\n\
+                  \        '?labelSelector=app.kubernetes.io%2Fname%3Dhindsight-api'\n\
+                  \    )\n    req = urllib.request.Request(url, headers={'Authorization':\
+                  \ f'Bearer {token}'})\n    ctx = ssl.create_default_context(cafile=CA_PATH)\n\
+                  \    with urllib.request.urlopen(req, context=ctx, timeout=30) as\
+                  \ resp:\n        data = json.loads(resp.read().decode())\n    return\
+                  \ {item['metadata']['name'] for item in data.get('items', [])}\n\
+                  \n\ndef main():\n    live = live_hindsight_api_pods()\n    print(f'live\
+                  \ hindsight-api pods: {sorted(live)}')\n\n    if not live:\n   \
+                  \     print('no live hindsight-api pods; skipping reset')\n    \
+                  \    return\n\n    engine = sa.create_engine(DB_URL)\n    with engine.begin()\
+                  \ as conn:\n        result = conn.execute(\n            text(''\n\
+                  \                SELECT operation_id, bank_id, operation_type, worker_id,\
+                  \ updated_at\n                FROM async_operations\n          \
+                  \      WHERE status = 'processing'\n                  AND worker_id\
+                  \ LIKE 'hindsight-api-%'\n                  AND worker_id NOT IN\
+                  \ :live\n                  AND updated_at < now() - interval '1\
+                  \ minute' * :stale\n                ORDER BY updated_at\n      \
+                  \      ''),\n            {\n                'live': tuple(live),\n\
+                  \                'stale': STALE_MINUTES,\n            },\n     \
+                  \   )\n        rows = result.mappings().fetchall()\n\n        if\
+                  \ not rows:\n            print('no stale processing operations found')\n\
+                  \            return\n\n        print(f'resetting {len(rows)} stale\
+                  \ operation(s):')\n        for row in rows:\n            print(\n\
+                  \                f'  {row[\\\"operation_id\\\"]} {row[\\\"bank_id\\\
+                  \"]}'\n                f' {row[\\\"operation_type\\\"]} {row[\\\"\
+                  worker_id\\\"]}'\n                f' {row[\\\"updated_at\\\"]}'\n\
+                  \            )\n\n        ids = [row['operation_id'] for row in\
+                  \ rows]\n        update = conn.execute(\n            text(''\n \
+                  \               UPDATE async_operations\n                SET status\
+                  \ = 'pending',\n                    worker_id = NULL,\n        \
+                  \            claimed_at = NULL,\n                    retry_count\
+                  \ = 0,\n                    next_retry_at = NULL,\n            \
+                  \        updated_at = now()\n                WHERE operation_id\
+                  \ = ANY(:ids)\n                  AND status = 'processing'\n   \
+                  \         ''),\n            {'ids': ids},\n        )\n        print(f'reset\
+                  \ {update.rowcount} operation(s) to pending')\n\n\nif __name__ ==\
+                  \ '__main__':\n    try:\n        main()\n    except Exception as\
+                  \ e:\n        print(f'error: {e}', file=sys.stderr)\n        sys.exit(1)\n"
+              env:
+                - name: HINDSIGHT_REAPER_STALE_MINUTES
+                  value: '5'
+              envFrom:
+                - secretRef:
+                    name: hindsight-secrets
+              image: ghcr.io/vectorize-io/hindsight-api:0.8.3@sha256:dbf686c87ce8d541eb668c49184549fe94bf928c15c31cedba005c86a425d147
+              imagePullPolicy: IfNotPresent
+              name: hindsight-reaper
+              resources:
+                limits:
+                  cpu: 100m
+                  memory: 128Mi
+                requests:
+                  cpu: 10m
+                  memory: 64Mi
+          restartPolicy: OnFailure
+          serviceAccountName: hindsight-reaper
+  schedule: '*/10 * * * *'
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: hindsight-reaper
+  namespace: apps
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: hindsight-reaper
+  namespace: apps
+rules:
+  - apiGroups:
+      - ''
+    resources:
+      - pods
+    verbs:
+      - get
+      - list
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: hindsight-reaper
+  namespace: apps
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: hindsight-reaper
+subjects:
+  - kind: ServiceAccount
+    name: hindsight-reaper
+    namespace: apps

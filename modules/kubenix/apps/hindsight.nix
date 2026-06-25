@@ -3,6 +3,12 @@
 let
   namespace = homelab.kubernetes.namespaces.applications;
   secretName = "hindsight-secrets";
+  apiImage = {
+    repository = "ghcr.io/vectorize-io/hindsight-api";
+    tag = "0.8.3@sha256:dbf686c87ce8d541eb668c49184549fe94bf928c15c31cedba005c86a425d147";
+    pullPolicy = "IfNotPresent";
+  };
+  apiImageRef = "${apiImage.repository}:${apiImage.tag}";
 in
 {
   submodules.instances = {
@@ -10,11 +16,7 @@ in
       submodule = "release";
       args = {
         inherit namespace;
-        image = {
-          repository = "ghcr.io/vectorize-io/hindsight-api";
-          tag = "0.8.3@sha256:dbf686c87ce8d541eb668c49184549fe94bf928c15c31cedba005c86a425d147";
-          pullPolicy = "IfNotPresent";
-        };
+        image = apiImage;
         port = 8888;
         secretName = secretName;
         resources = {
@@ -194,6 +196,194 @@ in
             ];
           };
         };
+      };
+    };
+  };
+
+  # Reaper: reset async_operations stuck in "processing" because their
+  # hindsight-api worker pod no longer exists. The poller serialises
+  # consolidation per bank, so a dead worker can permanently block a bank.
+  kubernetes.resources.serviceAccounts."hindsight-reaper" = {
+    metadata = {
+      name = "hindsight-reaper";
+      inherit namespace;
+    };
+  };
+
+  kubernetes.resources.roles."hindsight-reaper" = {
+    metadata = {
+      name = "hindsight-reaper";
+      inherit namespace;
+    };
+    rules = [
+      {
+        apiGroups = [ "" ];
+        resources = [ "pods" ];
+        verbs = [
+          "get"
+          "list"
+        ];
+      }
+    ];
+  };
+
+  kubernetes.resources.roleBindings."hindsight-reaper" = {
+    metadata = {
+      name = "hindsight-reaper";
+      inherit namespace;
+    };
+    subjects = [
+      {
+        kind = "ServiceAccount";
+        name = "hindsight-reaper";
+        inherit namespace;
+      }
+    ];
+    roleRef = {
+      kind = "Role";
+      name = "hindsight-reaper";
+      apiGroup = "rbac.authorization.k8s.io";
+    };
+  };
+
+  kubernetes.resources.cronJobs."hindsight-reaper" = {
+    metadata = {
+      name = "hindsight-reaper";
+      inherit namespace;
+    };
+    spec = {
+      schedule = "*/10 * * * *";
+      concurrencyPolicy = "Forbid";
+      jobTemplate.spec.template.spec = {
+        serviceAccountName = "hindsight-reaper";
+        restartPolicy = "OnFailure";
+        containers = [
+          {
+            name = "hindsight-reaper";
+            image = apiImageRef;
+            imagePullPolicy = "IfNotPresent";
+            envFrom = [ { secretRef.name = "hindsight-secrets"; } ];
+            env = [
+              {
+                name = "HINDSIGHT_REAPER_STALE_MINUTES";
+                value = "5";
+              }
+            ];
+            command = [
+              "python3"
+              "-c"
+              ''
+                import json
+                import os
+                import ssl
+                import sys
+                import urllib.request
+                from datetime import datetime, timedelta, timezone
+
+                import sqlalchemy as sa
+                from sqlalchemy import text
+
+                TOKEN_PATH = '/var/run/secrets/kubernetes.io/serviceaccount/token'
+                CA_PATH = '/var/run/secrets/kubernetes.io/serviceaccount/ca.crt'
+                NAMESPACE_PATH = '/var/run/secrets/kubernetes.io/serviceaccount/namespace'
+
+                STALE_MINUTES = int(os.environ.get('HINDSIGHT_REAPER_STALE_MINUTES', '5'))
+                DB_URL = os.environ['HINDSIGHT_API_DATABASE_URL']
+
+
+                def live_hindsight_api_pods():
+                    host = os.environ['KUBERNETES_SERVICE_HOST']
+                    port = os.environ['KUBERNETES_SERVICE_PORT']
+                    namespace = open(NAMESPACE_PATH).read().strip()
+                    token = open(TOKEN_PATH).read().strip()
+                    url = (
+                        f'https://{host}:{port}/api/v1/namespaces/{namespace}/pods'
+                        '?labelSelector=app.kubernetes.io%2Fname%3Dhindsight-api'
+                    )
+                    req = urllib.request.Request(url, headers={'Authorization': f'Bearer {token}'})
+                    ctx = ssl.create_default_context(cafile=CA_PATH)
+                    with urllib.request.urlopen(req, context=ctx, timeout=30) as resp:
+                        data = json.loads(resp.read().decode())
+                    return {item['metadata']['name'] for item in data.get('items', [])}
+
+
+                def main():
+                    live = live_hindsight_api_pods()
+                    print(f'live hindsight-api pods: {sorted(live)}')
+
+                    if not live:
+                        print('no live hindsight-api pods; skipping reset')
+                        return
+
+                    engine = sa.create_engine(DB_URL)
+                    with engine.begin() as conn:
+                        result = conn.execute(
+                            text('''
+                                SELECT operation_id, bank_id, operation_type, worker_id, updated_at
+                                FROM async_operations
+                                WHERE status = 'processing'
+                                  AND worker_id LIKE 'hindsight-api-%'
+                                  AND worker_id NOT IN :live
+                                  AND updated_at < now() - interval '1 minute' * :stale
+                                ORDER BY updated_at
+                            '''),
+                            {
+                                'live': tuple(live),
+                                'stale': STALE_MINUTES,
+                            },
+                        )
+                        rows = result.mappings().fetchall()
+
+                        if not rows:
+                            print('no stale processing operations found')
+                            return
+
+                        print(f'resetting {len(rows)} stale operation(s):')
+                        for row in rows:
+                            print(
+                                f'  {row[\"operation_id\"]} {row[\"bank_id\"]}'
+                                f' {row[\"operation_type\"]} {row[\"worker_id\"]}'
+                                f' {row[\"updated_at\"]}'
+                            )
+
+                        ids = [row['operation_id'] for row in rows]
+                        update = conn.execute(
+                            text('''
+                                UPDATE async_operations
+                                SET status = 'pending',
+                                    worker_id = NULL,
+                                    claimed_at = NULL,
+                                    retry_count = 0,
+                                    next_retry_at = NULL,
+                                    updated_at = now()
+                                WHERE operation_id = ANY(:ids)
+                                  AND status = 'processing'
+                            '''),
+                            {'ids': ids},
+                        )
+                        print(f'reset {update.rowcount} operation(s) to pending')
+
+
+                if __name__ == '__main__':
+                    try:
+                        main()
+                    except Exception as e:
+                        print(f'error: {e}', file=sys.stderr)
+                        sys.exit(1)
+              ''
+            ];
+            resources = {
+              requests = {
+                cpu = "10m";
+                memory = "64Mi";
+              };
+              limits = {
+                cpu = "100m";
+                memory = "128Mi";
+              };
+            };
+          }
+        ];
       };
     };
   };
