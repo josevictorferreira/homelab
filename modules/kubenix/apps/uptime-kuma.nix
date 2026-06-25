@@ -1,28 +1,39 @@
 {
   kubenix,
   homelab,
+  pkgs,
   ...
 }:
 
 let
   app = "uptimekuma";
   namespace = homelab.kubernetes.namespaces.applications;
+  chartVersion = "2.22.0";
+  upstreamChart = kubenix.lib.helm.fetch {
+    repo = "https://helm.irsigler.cloud/";
+    chart = "uptime-kuma";
+    version = chartVersion;
+    sha256 = "sha256-eh42cO0bFiMNYIpXJSHkGQVnGsn4cmv6ju8VjYu8YYU=";
+  };
+  patchedChart = pkgs.runCommand "uptime-kuma-${chartVersion}-replicas-chart" { } ''
+    cp -R ${upstreamChart} "$out"
+    chmod -R u+w "$out"
+    substituteInPlace "$out/templates/deployment.yaml" \
+      --replace-fail "replicas: 1" "replicas: {{ if hasKey .Values \"replicas\" }}{{ .Values.replicas }}{{ else }}1{{ end }}"
+    substituteInPlace "$out/templates/statefulset.yaml" \
+      --replace-fail "replicas: 1" "replicas: {{ if hasKey .Values \"replicas\" }}{{ .Values.replicas }}{{ else }}1{{ end }}"
+  '';
 in
 {
   kubernetes = {
     helm.releases.${app} = {
-      chart = kubenix.lib.helm.fetch {
-        repo = "https://helm.irsigler.cloud/";
-        chart = "uptime-kuma";
-        version = "2.22.0";
-        sha256 = "sha256-eh42cO0bFiMNYIpXJSHkGQVnGsn4cmv6ju8VjYu8YYU=";
-      };
+      chart = patchedChart;
       includeCRDs = true;
       noHooks = true;
       inherit namespace;
 
       values = {
-        replicas = 1;
+        replicas = 0;
         priorityClassName = "preemptible";
         image = {
           repository = "louislam/uptime-kuma";

@@ -425,6 +425,22 @@ in
                 "/bin/sh"
                 "-c"
                 ''
+                  # Plugins installed via the dashboard land in /opt/data/plugins
+                  # (its HERMES_HOME is /opt/data), but per-profile agents scan
+                  # $HERMES_HOME/plugins = /opt/data/profiles/<p>/plugins. Link the
+                  # shared plugins into every profile so dashboard-installed
+                  # backends (e.g. omniroute) are discovered by each agent.
+                  # (config still gates which ones actually load via plugins.enabled.)
+                  if [ -d /opt/data/plugins ]; then
+                    for d in /opt/data/profiles/*/; do
+                      [ -d "$d" ] || continue
+                      mkdir -p "$d/plugins"
+                      for p in /opt/data/plugins/*/; do
+                        [ -d "$p" ] || continue
+                        ln -sfn "$p" "$d/plugins/$(basename "$p")"
+                      done
+                    done
+                  fi
                   # Profile HOMEs: hermes creates each /opt/data/profiles/<p>
                   # as 0700 owned by the runtime uid, which locks the SMB client
                   # (authenticated as GID 2002, not the dir owner) out of that

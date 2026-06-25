@@ -15,6 +15,7 @@ in
         pullPolicy = "Always";
       };
       port = 4444;
+      replicas = 0;
       resources = {
         requests = {
           cpu = "100m";
