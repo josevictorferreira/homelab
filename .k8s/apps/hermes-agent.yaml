@@ -201,8 +201,8 @@ spec:
             - name: HERMES_WRITE_SAFE_ROOT
               value: ''
             - name: AGENT_BROWSER_ENGINE
-              value: cdp
-            - name: AGENT_BROWSER_ENDPOINT
+              value: chrome
+            - name: BROWSER_CDP_URL
               value: ws://cloakbrowser.apps.svc.cluster.local:9222
             - name: HINDSIGHT_MODE
               value: local_external
@@ -359,8 +359,8 @@ spec:
             - name: HERMES_WRITE_SAFE_ROOT
               value: ''
             - name: AGENT_BROWSER_ENGINE
-              value: cdp
-            - name: AGENT_BROWSER_ENDPOINT
+              value: chrome
+            - name: BROWSER_CDP_URL
               value: ws://cloakbrowser.apps.svc.cluster.local:9222
             - name: HINDSIGHT_MODE
               value: local_external
@@ -528,8 +528,8 @@ spec:
             - name: HERMES_WRITE_SAFE_ROOT
               value: ''
             - name: AGENT_BROWSER_ENGINE
-              value: cdp
-            - name: AGENT_BROWSER_ENDPOINT
+              value: chrome
+            - name: BROWSER_CDP_URL
               value: ws://cloakbrowser.apps.svc.cluster.local:9222
             - name: HINDSIGHT_MODE
               value: local_external
@@ -686,8 +686,8 @@ spec:
             - name: HERMES_WRITE_SAFE_ROOT
               value: ''
             - name: AGENT_BROWSER_ENGINE
-              value: cdp
-            - name: AGENT_BROWSER_ENDPOINT
+              value: chrome
+            - name: BROWSER_CDP_URL
               value: ws://cloakbrowser.apps.svc.cluster.local:9222
             - name: HINDSIGHT_MODE
               value: local_external
@@ -844,8 +844,8 @@ spec:
             - name: HERMES_WRITE_SAFE_ROOT
               value: ''
             - name: AGENT_BROWSER_ENGINE
-              value: cdp
-            - name: AGENT_BROWSER_ENDPOINT
+              value: chrome
+            - name: BROWSER_CDP_URL
               value: ws://cloakbrowser.apps.svc.cluster.local:9222
             - name: HINDSIGHT_MODE
               value: local_external

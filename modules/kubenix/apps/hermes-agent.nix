@@ -100,10 +100,10 @@ let
     }
     {
       name = "AGENT_BROWSER_ENGINE";
-      value = "cdp";
+      value = "chrome";
     }
     {
-      name = "AGENT_BROWSER_ENDPOINT";
+      name = "BROWSER_CDP_URL";
       value = "ws://cloakbrowser.${namespace}.svc.cluster.local:9222";
     }
     {
