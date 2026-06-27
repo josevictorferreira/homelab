@@ -200,6 +200,13 @@ spec:
               value: /opt/data/managed
             - name: HERMES_WRITE_SAFE_ROOT
               value: ''
+            - name: XAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: OPENROUTER_API_KEY
+                  name: hermes-agent-env
+            - name: XAI_BASE_URL
+              value: https://openrouter.ai/api/v1
             - name: AGENT_BROWSER_ENGINE
               value: chrome
             - name: BROWSER_CDP_URL
@@ -358,6 +365,13 @@ spec:
               value: /opt/data/managed
             - name: HERMES_WRITE_SAFE_ROOT
               value: ''
+            - name: XAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: OPENROUTER_API_KEY
+                  name: hermes-agent-env
+            - name: XAI_BASE_URL
+              value: https://openrouter.ai/api/v1
             - name: AGENT_BROWSER_ENGINE
               value: chrome
             - name: BROWSER_CDP_URL
@@ -527,6 +541,13 @@ spec:
               value: /opt/data/managed
             - name: HERMES_WRITE_SAFE_ROOT
               value: ''
+            - name: XAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: OPENROUTER_API_KEY
+                  name: hermes-agent-env
+            - name: XAI_BASE_URL
+              value: https://openrouter.ai/api/v1
             - name: AGENT_BROWSER_ENGINE
               value: chrome
             - name: BROWSER_CDP_URL
@@ -685,6 +706,13 @@ spec:
               value: /opt/data/managed
             - name: HERMES_WRITE_SAFE_ROOT
               value: ''
+            - name: XAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: OPENROUTER_API_KEY
+                  name: hermes-agent-env
+            - name: XAI_BASE_URL
+              value: https://openrouter.ai/api/v1
             - name: AGENT_BROWSER_ENGINE
               value: chrome
             - name: BROWSER_CDP_URL
@@ -843,6 +871,13 @@ spec:
               value: /opt/data/managed
             - name: HERMES_WRITE_SAFE_ROOT
               value: ''
+            - name: XAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: OPENROUTER_API_KEY
+                  name: hermes-agent-env
+            - name: XAI_BASE_URL
+              value: https://openrouter.ai/api/v1
             - name: AGENT_BROWSER_ENGINE
               value: chrome
             - name: BROWSER_CDP_URL
