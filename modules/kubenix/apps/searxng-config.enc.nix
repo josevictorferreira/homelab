@@ -15,8 +15,8 @@ let
     };
     search = {
       safe_search = 0;
-      default_lang = "";
-      autocomplete = "";
+      default_lang = "en";
+      autocomplete = "swisscows";
       formats = [
         "html"
         "json"
@@ -25,6 +25,7 @@ let
     ui = {
       default_locale = "en";
       hotkeys = "vim";
+      infinite_scroll = true;
     };
     redis = {
       url = "redis://:${kubenix.lib.secretsInlineFor "redis_password"}@redis-headless:6379/2";
@@ -39,7 +40,243 @@ let
         api_key = kubenix.lib.secretsFor "tavily_api_key";
         inactive = false;
       }
+      {
+        name = "annas archive";
+        disabled = false;
+      }
+      {
+        name = "apple app store";
+        disabled = false;
+      }
+      {
+        name = "nixos wiki";
+        disabled = false;
+      }
+      {
+        name = "bing";
+        disabled = false;
+      }
+      {
+        name = "boardreader";
+        disabled = false;
+      }
+      {
+        name = "btdigg";
+        disabled = false;
+      }
+      {
+        name = "crossref";
+        disabled = false;
+      }
+      {
+        name = "crowdview";
+        disabled = false;
+      }
+      {
+        name = "encyclosearch";
+        disabled = false;
+      }
+      {
+        name = "apple maps";
+        disabled = false;
+      }
+      {
+        name = "fynd";
+        disabled = false;
+      }
+      {
+        name = "codeberg";
+        disabled = false;
+      }
+      {
+        name = "gitea.com";
+        disabled = false;
+      }
+      {
+        name = "gmx";
+        disabled = false;
+      }
+      {
+        name = "goodreads";
+        disabled = false;
+      }
+      {
+        name = "google play apps";
+        disabled = false;
+      }
+      {
+        name = "material icons";
+        disabled = false;
+      }
+      {
+        name = "hackernews";
+        disabled = false;
+      }
+      {
+        name = "imdb";
+        disabled = false;
+      }
+      {
+        name = "imgur";
+        disabled = false;
+      }
+      {
+        name = "library genesis";
+        disabled = false;
+      }
+      {
+        name = "lobste.rs";
+        disabled = false;
+      }
+      {
+        name = "nyaa";
+        disabled = false;
+      }
+      {
+        name = "openlibrary";
+        disabled = false;
+      }
+      {
+        name = "openrepos";
+        disabled = false;
+      }
+      {
+        name = "qwant";
+        disabled = false;
+      }
+      {
+        name = "qwant images";
+        disabled = false;
+      }
+      {
+        name = "reddit";
+        disabled = false;
+      }
+      {
+        name = "rottentomatoes";
+        disabled = false;
+      }
+      {
+        name = "searchmysite";
+        disabled = false;
+      }
+      {
+        name = "selfhst icons";
+        disabled = false;
+      }
+      {
+        name = "steam";
+        disabled = false;
+      }
+      {
+        name = "tokyotoshokan";
+        disabled = false;
+      }
+      {
+        name = "tmdb";
+        disabled = false;
+      }
+      {
+        name = "wikispecies";
+        disabled = false;
+      }
+      {
+        name = "1337x";
+        disabled = false;
+      }
+      {
+        name = "artic";
+        disabled = true;
+      }
+      {
+        name = "bandcamp";
+        disabled = true;
+      }
+      {
+        name = "wikipedia";
+        disabled = true;
+      }
+      {
+        name = "bing news";
+        disabled = true;
+      }
+      {
+        name = "openverse";
+        disabled = true;
+      }
+      {
+        name = "chefkoch";
+        disabled = true;
+      }
+      {
+        name = "wikidata";
+        disabled = true;
+      }
+      {
+        name = "gentoo";
+        disabled = true;
+      }
+      {
+        name = "hoogle";
+        disabled = true;
+      }
+      {
+        name = "lingva";
+        disabled = true;
+      }
+      {
+        name = "mdn";
+        disabled = true;
+      }
+      {
+        name = "mixcloud";
+        disabled = true;
+      }
+      {
+        name = "pypi";
+        disabled = true;
+      }
+      {
+        name = "soundcloud";
+        disabled = true;
+      }
+      {
+        name = "stackoverflow";
+        disabled = true;
+      }
+      {
+        name = "askubuntu";
+        disabled = true;
+      }
+      {
+        name = "superuser";
+        disabled = true;
+      }
+      {
+        name = "startpage";
+        disabled = true;
+      }
+      {
+        name = "startpage images";
+        disabled = true;
+      }
+      {
+        name = "wikicommons.audio";
+        disabled = true;
+      }
+      {
+        name = "mymemory translated";
+        disabled = true;
+      }
+      {
+        name = "brave";
+        disabled = true;
+      }
     ];
+    default_doi_resolver = "oadoi.org";
+    plugins = {
+      "searx.plugins.oa_doi_rewrite.SXNGPlugin".active = true;
+    };
   };
   limiter = ''
     [botdetection]
