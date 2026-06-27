@@ -41,6 +41,16 @@ let
         inactive = false;
       }
       {
+        name = "github";
+        disabled = false;
+        weight = 3.0;
+      }
+      {
+        name = "github code";
+        disabled = false;
+        weight = 3.0;
+      }
+      {
         name = "annas archive";
         disabled = false;
       }
@@ -151,6 +161,7 @@ let
       {
         name = "reddit";
         disabled = false;
+        weight = 3.0;
       }
       {
         name = "rottentomatoes";

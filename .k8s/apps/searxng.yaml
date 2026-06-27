@@ -49,7 +49,25 @@ spec:
             httpGet:
               path: /
               port: http
+          volumeMounts:
+            - mountPath: /etc/searxng/settings.yml
+              name: settings
+              readOnly: true
+              subPath: settings.yml
+            - mountPath: /etc/searxng/limiter.toml
+              name: settings
+              readOnly: true
+              subPath: limiter.toml
       imagePullSecrets: []
+      volumes:
+        - configMap:
+            items:
+              - key: settings.yml
+                path: settings.yml
+              - key: limiter.toml
+                path: limiter.toml
+            name: searxng-config
+          name: settings
 ---
 apiVersion: v1
 kind: Service

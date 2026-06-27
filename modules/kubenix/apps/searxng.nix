@@ -30,14 +30,22 @@ in
 
         limiter = "";
 
-        volumeMounts = [
+        extraVolumeMounts = [
           {
             name = "settings";
-            mountPath = "/etc/searxng";
+            mountPath = "/etc/searxng/settings.yml";
+            subPath = "settings.yml";
+            readOnly = true;
+          }
+          {
+            name = "settings";
+            mountPath = "/etc/searxng/limiter.toml";
+            subPath = "limiter.toml";
+            readOnly = true;
           }
         ];
 
-        volumes = [
+        extraVolumes = [
           {
             name = "settings";
             configMap = {
