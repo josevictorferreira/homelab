@@ -98,6 +98,21 @@ let
       name = "HERMES_WRITE_SAFE_ROOT";
       value = "";
     }
+    # Route x_search (Hermes built-in X/Twitter search) through OpenRouter
+    # instead of xAI directly. OpenRouter proxies xAI's /responses endpoint and
+    # forwards the x_search tool type to xAI's server, so the agent gets real
+    # X firehose citations without needing a separate XAI_API_KEY.
+    {
+      name = "XAI_API_KEY";
+      valueFrom.secretKeyRef = {
+        name = "${name}-env";
+        key = "OPENROUTER_API_KEY";
+      };
+    }
+    {
+      name = "XAI_BASE_URL";
+      value = "https://openrouter.ai/api/v1";
+    }
     {
       name = "AGENT_BROWSER_ENGINE";
       value = "chrome";
