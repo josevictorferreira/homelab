@@ -24,6 +24,7 @@ in
       OBSERVABILITY_ENABLED = "true";
       AUTH_COOKIE_SECURE = "true";
       REQUIRE_API_KEY = "false";
+      OMNIROUTE_MEMORY_MB = "3072";
       NODE_OPTIONS = "--max-old-space-size=3072";
     };
   };
