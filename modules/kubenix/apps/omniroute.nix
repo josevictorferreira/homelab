@@ -29,6 +29,7 @@ in
 
       values = {
         controllers.main.strategy = "Recreate";
+        controllers.main.pod.annotations."omniroute.josevictor.me/memory-mb" = "3072";
 
         defaultPodOptions.imagePullSecrets = [
           { name = "ghcr-registry-secret"; }
