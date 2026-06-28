@@ -19,11 +19,11 @@ in
       resources = {
         limits = {
           cpu = "500m";
-          memory = "1536Mi";
+          memory = "4Gi";
         };
         requests = {
           cpu = "250m";
-          memory = "512Mi";
+          memory = "1Gi";
         };
       };
 
