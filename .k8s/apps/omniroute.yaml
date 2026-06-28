@@ -44,7 +44,75 @@ spec:
                       - lab-gamma-wk
       automountServiceAccountToken: true
       containers:
-        - envFrom:
+        - command:
+            - sh
+            - -ec
+            - "cd /app\n\nnode --input-type=module <<'NODE'\nimport fs from \"node:fs\"\
+              ;\nimport path from \"node:path\";\nimport Database from \"better-sqlite3\"\
+              ;\n\nconst chunksDir = \"/app/.build/next/server/chunks\";\nconst dbPath\
+              \ = \"/app/data/storage.sqlite\";\n\nfunction walk(dir) {\n  if (!fs.existsSync(dir))\
+              \ return [];\n  const entries = fs.readdirSync(dir, { withFileTypes:\
+              \ true });\n  const files = [];\n  for (const entry of entries) {\n\
+              \    const file = path.join(dir, entry.name);\n    if (entry.isDirectory())\
+              \ files.push(...walk(file));\n    else if (entry.isFile() && file.endsWith(\"\
+              .js\")) files.push(file);\n  }\n  return files;\n}\n\nconst responseBufferNeedle\
+              \ = 'let j=\"\";await this.pipeSSE(i,b,a=>{j+=a.toString()});let k=this.now()-e;this.hookBufferUpdate(f,{status:i.status,responseHeaders:Object.fromEntries(i.headers.entries()),responseBody:j,responseSize:Buffer.byteLength(j),proxyLatencyMs:h-e,upstreamLatencyMs:k-(h-e)})';\n\
+              const responseBufferReplacement = 'await this.pipeSSE(i,b);let k=this.now()-e;this.hookBufferUpdate(f,{status:i.status,responseHeaders:Object.fromEntries(i.headers.entries()),responseBody:null,responseSize:0,proxyLatencyMs:h-e,upstreamLatencyMs:k-(h-e)})';\n\
+              const captureNeedle = 'shouldCaptureBody(){return!0}';\nconst captureReplacement\
+              \ = 'shouldCaptureBody(){return!1}';\n\nlet responseBufferPatches =\
+              \ 0;\nlet capturePatches = 0;\nlet remainingResponseBuffers = 0;\n\n\
+              for (const file of walk(chunksDir)) {\n  const before = fs.readFileSync(file,\
+              \ \"utf8\");\n  let after = before;\n\n  const responseOccurrences =\
+              \ after.split(responseBufferNeedle).length - 1;\n  if (responseOccurrences\
+              \ > 0) {\n    after = after.split(responseBufferNeedle).join(responseBufferReplacement);\n\
+              \    responseBufferPatches += responseOccurrences;\n  }\n\n  const captureOccurrences\
+              \ = after.split(captureNeedle).length - 1;\n  if (captureOccurrences\
+              \ > 0) {\n    after = after.split(captureNeedle).join(captureReplacement);\n\
+              \    capturePatches += captureOccurrences;\n  }\n\n  remainingResponseBuffers\
+              \ += after.split(responseBufferNeedle).length - 1;\n  if (after !==\
+              \ before) fs.writeFileSync(file, after);\n}\n\nif (remainingResponseBuffers\
+              \ > 0) {\n  throw new Error(\"OmniRoute AgentBridge response buffering\
+              \ patch left unpatched call sites\");\n}\n\nconsole.log(\"[omniroute-startup]\
+              \ response buffer patches=\" + responseBufferPatches + \" body capture\
+              \ patches=\" + capturePatches);\n\nconst comboNames = [\"radagast\"\
+              , \"mimo-v2.5\", \"pippin\", \"gandalf\"];\nconst logSettings = [\n\
+              \  [\"databaseSettings\", \"logs.detailedLogsEnabled\", false],\n  [\"\
+              databaseSettings\", \"logs.callLogPipelineEnabled\", false],\n  [\"\
+              databaseSettings\", \"logs.maxDetailSizeKb\", 10],\n  [\"databaseSettings\"\
+              , \"logs.ringBufferSize\", 100],\n  [\"databaseSettings\", \"detailedLogsEnabled\"\
+              , false],\n  [\"databaseSettings\", \"callLogPipelineEnabled\", false],\n\
+              \  [\"databaseSettings\", \"maxDetailSizeKb\", 10],\n  [\"databaseSettings\"\
+              , \"ringBufferSize\", 100],\n  [\"settings\", \"detailed_logs_enabled\"\
+              , false],\n  [\"settings\", \"call_log_pipeline_enabled\", false],\n\
+              ];\n\nfunction enforceDatabaseSettings() {\n  if (!fs.existsSync(dbPath))\
+              \ {\n    console.log(\"[omniroute-startup] sqlite database not found;\
+              \ skipping config enforcement\");\n    return;\n  }\n\n  const db =\
+              \ new Database(dbPath);\n  const deleteKey = db.prepare(\"DELETE FROM\
+              \ key_value WHERE namespace = ? AND key = ?\");\n  const insertKey =\
+              \ db.prepare(\"INSERT INTO key_value (namespace, key, value) VALUES\
+              \ (?, ?, ?)\");\n  const updateProviderConcurrency = db.prepare(\"UPDATE\
+              \ provider_connections SET max_concurrent = 1 WHERE is_active = 1 AND\
+              \ (max_concurrent IS NULL OR max_concurrent > 1)\");\n  const selectCombos\
+              \ = db.prepare(\"SELECT id, name, data FROM combos WHERE name IN (\"\
+              \ + comboNames.map(() => \"?\").join(\",\") + \")\");\n  const updateCombo\
+              \ = db.prepare(\"UPDATE combos SET data = ?, updated_at = datetime('now')\
+              \ WHERE id = ?\");\n\n  const tx = db.transaction(() => {\n    for (const\
+              \ [namespace, key, value] of logSettings) {\n      deleteKey.run(namespace,\
+              \ key);\n      insertKey.run(namespace, key, JSON.stringify(value));\n\
+              \    }\n\n    const providerChanges = updateProviderConcurrency.run().changes;\n\
+              \    let comboChanges = 0;\n\n    for (const row of selectCombos.all(...comboNames))\
+              \ {\n      let data = {};\n      try {\n        data = JSON.parse(row.data\
+              \ || \"{}\");\n      } catch {\n        data = {};\n      }\n\n    \
+              \  if (!data.config || typeof data.config !== \"object\" || Array.isArray(data.config))\
+              \ {\n        data.config = {};\n      }\n\n      data.config.concurrencyPerModel\
+              \ = 1;\n      data.config.queueDepth = 1;\n      data.config.queueTimeoutMs\
+              \ = 10000;\n      data.config.maxRetries = 0;\n\n      updateCombo.run(JSON.stringify(data),\
+              \ row.id);\n      comboChanges += 1;\n    }\n\n    console.log(\"[omniroute-startup]\
+              \ provider concurrency rows=\" + providerChanges + \" combo rows=\"\
+              \ + comboChanges + \" log settings=\" + logSettings.length);\n  });\n\
+              \n  tx();\n  db.close();\n}\n\nenforceDatabaseSettings();\nNODE\n\n\
+              exec node dev/run-standalone.mjs\n"
+          envFrom:
             - secretRef:
                 name: omniroute-env
           image: ghcr.io/diegosouzapw/omniroute:3.8.39@sha256:1f756fd6d98234cb5dd8cb39a417bfd570548509af959a3f425151af749e8fb0
