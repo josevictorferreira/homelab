@@ -24,7 +24,7 @@ in
       OBSERVABILITY_ENABLED = "true";
       AUTH_COOKIE_SECURE = "true";
       REQUIRE_API_KEY = "false";
-      NODE_OPTIONS = "--max-old-space-size=1024";
+      NODE_OPTIONS = "--max-old-space-size=3072";
     };
   };
 }
