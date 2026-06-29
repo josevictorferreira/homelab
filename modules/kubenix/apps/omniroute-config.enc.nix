@@ -21,6 +21,7 @@ in
       BASE_URL = "https://omniroute.josevictor.me";
       NEXT_PUBLIC_BASE_URL = "https://omniroute.josevictor.me";
       ENABLE_REQUEST_LOGS = "false";
+      INPUT_SANITIZER_ENABLED = "false";
       OBSERVABILITY_ENABLED = "true";
       AUTH_COOKIE_SECURE = "true";
       REQUIRE_API_KEY = "false";
