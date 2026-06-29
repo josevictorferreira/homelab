@@ -27,6 +27,7 @@ spec:
   template:
     metadata:
       annotations:
+        omniroute.josevictor.me/input-sanitizer: disabled
         omniroute.josevictor.me/memory-mb: '3072'
       labels:
         app.kubernetes.io/controller: main
