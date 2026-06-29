@@ -116,7 +116,7 @@ spec:
           envFrom:
             - secretRef:
                 name: omniroute-env
-          image: ghcr.io/diegosouzapw/omniroute:3.8.40@sha256:0120724ea2052a7bb42782a396b75f494938ac6595c897f706e50c5ca2eda1d0
+          image: ghcr.io/josevictorferreira/omniroute:3.8.41-oomfix@sha256:277e54636aff858a6084097e7795f99b96598d55db81a15246ed7c60a32aadbc
           imagePullPolicy: IfNotPresent
           name: main
           ports:
