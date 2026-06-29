@@ -10,8 +10,11 @@ in
     args = {
       inherit namespace;
       image = {
-        repository = "ghcr.io/diegosouzapw/omniroute";
-        tag = "3.8.40@sha256:0120724ea2052a7bb42782a396b75f494938ac6595c897f706e50c5ca2eda1d0";
+        # OOM fix test build: release/v3.8.41 + heap-pressure chat admission + bounded
+        # non-streaming response buffering (josevictorferreira/OmniRoute#1, OmniRoute #5152).
+        # Revert to ghcr.io/diegosouzapw/omniroute once the fix lands upstream.
+        repository = "ghcr.io/josevictorferreira/omniroute";
+        tag = "3.8.41-oomfix@sha256:277e54636aff858a6084097e7795f99b96598d55db81a15246ed7c60a32aadbc";
         pullPolicy = "IfNotPresent";
       };
       secretName = "${app}-env";
