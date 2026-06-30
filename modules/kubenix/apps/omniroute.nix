@@ -168,6 +168,11 @@ in
         controllers.main.pod.annotations."omniroute.josevictor.me/memory-mb" = "3072";
         controllers.main.pod.annotations."omniroute.josevictor.me/input-sanitizer" = "disabled";
 
+        # Disable SQLite auto-backups (#5152): write-heavy Hindsight workload on a 4.9Gi PVC,
+        # the pre-write VACUUM/backup churn fills the disk within ~a day then fails and
+        # cascades into the heap OOM. Backups are covered by GitOps + the PVC itself.
+        controllers.main.containers.main.env.DISABLE_SQLITE_AUTO_BACKUP = "true";
+
         defaultPodOptions.imagePullSecrets = [
           { name = "ghcr-registry-secret"; }
         ];
