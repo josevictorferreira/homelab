@@ -113,6 +113,13 @@ spec:
               \ + comboChanges + \" log settings=\" + logSettings.length);\n  });\n\
               \n  tx();\n  db.close();\n}\n\nenforceDatabaseSettings();\nNODE\n\n\
               exec node dev/run-standalone.mjs\n"
+          env:
+            # EMERGENCY OOM stopgap (#5152): override the secret's OMNIROUTE_MEMORY_MB=3072 so
+            # V8 can use the raised pod limit below. A 500K-token session turn amplifies to
+            # ~2.7 GB on the pre-combo compression path; this buys headroom while the source
+            # amplifier is fixed. Remove once the real fix ships.
+            - name: OMNIROUTE_MEMORY_MB
+              value: "6144"
           envFrom:
             - secretRef:
                 name: omniroute-env
@@ -126,10 +133,10 @@ spec:
           resources:
             limits:
               cpu: 500m
-              memory: 4Gi
+              memory: 8Gi
             requests:
               cpu: 250m
-              memory: 1Gi
+              memory: 2Gi
           volumeMounts:
             - mountPath: /app/data
               name: data
