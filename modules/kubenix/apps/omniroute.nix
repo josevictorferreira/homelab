@@ -150,20 +150,24 @@ in
           exec node dev/run-standalone.mjs
         ''
       ];
+      # EMERGENCY OOM stopgap (#5152): raised from 4Gi/1Gi. A 500K-token session turn
+      # amplifies to ~2.7 GB on the pre-combo compression path and OOM-crashed the 3 GB
+      # heap. Paired with the OMNIROUTE_MEMORY_MB=6144 env override in the rendered
+      # Deployment so V8 can actually use this headroom. Revert once the source fix ships.
       resources = {
         limits = {
           cpu = "500m";
-          memory = "4Gi";
+          memory = "8Gi";
         };
         requests = {
           cpu = "250m";
-          memory = "1Gi";
+          memory = "2Gi";
         };
       };
 
       values = {
         controllers.main.strategy = "Recreate";
-        controllers.main.pod.annotations."omniroute.josevictor.me/memory-mb" = "3072";
+        controllers.main.pod.annotations."omniroute.josevictor.me/memory-mb" = "6144";
         controllers.main.pod.annotations."omniroute.josevictor.me/input-sanitizer" = "disabled";
 
         defaultPodOptions.imagePullSecrets = [
