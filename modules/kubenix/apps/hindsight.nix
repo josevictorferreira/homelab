@@ -55,7 +55,10 @@ in
               HINDSIGHT_API_WORKER_CONSOLIDATION_MAX_SLOTS = "2";
               HINDSIGHT_API_LLM_TIMEOUT = "120";
               HINDSIGHT_API_LLM_MAX_RETRIES = "2";
-              HINDSIGHT_API_LLM_MAX_CONCURRENT = "8";
+              # Cap concurrent LLM calls to omniroute (#5152): 8 parallel large bodies
+              # through pippin stacked enough compression-pipeline heap to OOM omniroute.
+              # Defense-in-depth alongside omniroute's compression concurrency gate.
+              HINDSIGHT_API_LLM_MAX_CONCURRENT = "2";
               HINDSIGHT_API_RETAIN_LLM_TIMEOUT = "120";
               HINDSIGHT_API_RETAIN_LLM_MAX_RETRIES = "2";
               HINDSIGHT_API_CONSOLIDATION_LLM_TIMEOUT = "120";
