@@ -539,7 +539,7 @@ in
               command = [
                 "/bin/sh"
                 "-c"
-                "umask 0002; exec /opt/hermes/.venv/bin/hermes dashboard --host 127.0.0.1 --port 9119 --no-open --insecure --skip-build"
+                "umask 0002; exec /opt/hermes/.venv/bin/hermes dashboard --host 0.0.0.0 --port 9119 --no-open --insecure --skip-build"
               ];
               ports = [
                 {

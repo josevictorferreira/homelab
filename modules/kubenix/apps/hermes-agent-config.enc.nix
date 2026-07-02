@@ -46,6 +46,11 @@ in
       EXA_API_KEY = kubenix.lib.secretsFor "exa_api_key";
       SEARXNG_URL = kubenix.lib.secretsFor "searxng_url";
       FIRECRAWL_API_KEY = kubenix.lib.secretsFor "firecrawl_api_key";
+      # Dashboard OIDC auth
+      HERMES_DASHBOARD_OIDC_ISSUER = kubenix.lib.secretsFor "hermes_dashboard_oidc_issuer";
+      HERMES_DASHBOARD_OIDC_CLIENT_ID = kubenix.lib.secretsFor "hermes_dashboard_oidc_client_id";
+      HERMES_DASHBOARD_OIDC_CLIENT_SECRET = kubenix.lib.secretsFor "hermes_dashboard_oidc_client_secret";
+      HERMES_DASHBOARD_PUBLIC_URL = "https://hermes.josevictor.me";
     };
   };
 }
