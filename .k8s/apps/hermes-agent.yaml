@@ -28,7 +28,7 @@ spec:
             - /bin/sh
             - -c
             - umask 0002; exec /opt/hermes/.venv/bin/hermes dashboard --host 127.0.0.1
-              --port 9119 --no-open --insecure
+              --port 9119 --no-open --insecure --skip-build
           env:
             - name: HERMES_UID
               value: '10000'
@@ -46,24 +46,30 @@ spec:
           image: docker.io/nousresearch/hermes-agent:v2026.7.1@sha256:5fc62636d9f88dd1edde26aabfdcbac3060af559104d8cbbf5736b579828becf
           imagePullPolicy: IfNotPresent
           livenessProbe:
-            httpGet:
-              host: 127.0.0.1
-              path: /
-              port: 9119
-            initialDelaySeconds: 60
+            exec:
+              command:
+                - /opt/hermes/.venv/bin/python3
+                - -c
+                - import urllib.request; urllib.request.urlopen("http://127.0.0.1:9119/",
+                  timeout=3)
+            initialDelaySeconds: 300
             periodSeconds: 30
+            timeoutSeconds: 5
           name: dashboard
           ports:
             - containerPort: 9119
               name: http
               protocol: TCP
           readinessProbe:
-            httpGet:
-              host: 127.0.0.1
-              path: /
-              port: 9119
-            initialDelaySeconds: 15
+            exec:
+              command:
+                - /opt/hermes/.venv/bin/python3
+                - -c
+                - import urllib.request; urllib.request.urlopen("http://127.0.0.1:9119/",
+                  timeout=3)
+            initialDelaySeconds: 120
             periodSeconds: 10
+            timeoutSeconds: 5
           resources:
             limits:
               cpu: 500m
@@ -157,19 +163,20 @@ spec:
               \          pip install --user -q faster-whisper 2>/dev/null || true\n\
               \                }\n                # Bootstrap Matrix dependencies\
               \ if not installed\n                python3 -c \"import mautrix\" 2>/dev/null\
-              \ || {\n                  uv pip install mautrix asyncpg aiosqlite Markdown\
-              \ aiohttp-socks 2>/dev/null || true\n                }\n           \
-              \     # Bootstrap hindsight-client at the version the memory plugin\
-              \ pins.\n                # The image bumps this pin on upgrade; the\
-              \ user-site copy on the PVC\n                # persists the old version,\
-              \ so install the exact pin when it drifts.\n                python3\
-              \ -c \"import importlib.metadata as m, sys; sys.exit(0 if m.version('hindsight-client')\
-              \ == '0.6.1' else 1)\" 2>/dev/null || {\n                  python3 -m\
-              \ pip install --user --break-system-packages 'hindsight-client==0.6.1'\
+              \ || {\n                  python3 -m pip install --user --break-system-packages\
+              \ 'mautrix[encryption]' aiohttp==3.14.1 asyncpg aiosqlite Markdown aiohttp-socks\
               \ 2>/dev/null || true\n                }\n                # Bootstrap\
-              \ kubectl if not present\n                command -v kubectl >/dev/null\
-              \ 2>&1 || {\n                  python3 -c \"\nimport urllib.request,\
-              \ os, stat, shutil\nurl = 'https://dl.k8s.io/release/v1.32.6/bin/linux/amd64/kubectl'\n\
+              \ hindsight-client at the version the memory plugin pins.\n        \
+              \        # The image bumps this pin on upgrade; the user-site copy on\
+              \ the PVC\n                # persists the old version, so install the\
+              \ exact pin when it drifts.\n                python3 -c \"import importlib.metadata\
+              \ as m, sys; sys.exit(0 if m.version('hindsight-client') == '0.6.1'\
+              \ else 1)\" 2>/dev/null || {\n                  python3 -m pip install\
+              \ --user --break-system-packages 'hindsight-client==0.6.1' 2>/dev/null\
+              \ || true\n                }\n                # Bootstrap kubectl if\
+              \ not present\n                command -v kubectl >/dev/null 2>&1 ||\
+              \ {\n                  python3 -c \"\nimport urllib.request, os, stat,\
+              \ shutil\nurl = 'https://dl.k8s.io/release/v1.32.6/bin/linux/amd64/kubectl'\n\
               tmp = '/tmp/kubectl'\ndest = '/opt/data/.local/bin/kubectl'\nos.makedirs('/opt/data/.local/bin',\
               \ exist_ok=True)\nurllib.request.urlretrieve(url, tmp)\nos.chmod(tmp,\
               \ stat.S_IRWXU | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH)\n\
@@ -322,19 +329,20 @@ spec:
               \          pip install --user -q faster-whisper 2>/dev/null || true\n\
               \                }\n                # Bootstrap Matrix dependencies\
               \ if not installed\n                python3 -c \"import mautrix\" 2>/dev/null\
-              \ || {\n                  uv pip install mautrix asyncpg aiosqlite Markdown\
-              \ aiohttp-socks 2>/dev/null || true\n                }\n           \
-              \     # Bootstrap hindsight-client at the version the memory plugin\
-              \ pins.\n                # The image bumps this pin on upgrade; the\
-              \ user-site copy on the PVC\n                # persists the old version,\
-              \ so install the exact pin when it drifts.\n                python3\
-              \ -c \"import importlib.metadata as m, sys; sys.exit(0 if m.version('hindsight-client')\
-              \ == '0.6.1' else 1)\" 2>/dev/null || {\n                  python3 -m\
-              \ pip install --user --break-system-packages 'hindsight-client==0.6.1'\
+              \ || {\n                  python3 -m pip install --user --break-system-packages\
+              \ 'mautrix[encryption]' aiohttp==3.14.1 asyncpg aiosqlite Markdown aiohttp-socks\
               \ 2>/dev/null || true\n                }\n                # Bootstrap\
-              \ kubectl if not present\n                command -v kubectl >/dev/null\
-              \ 2>&1 || {\n                  python3 -c \"\nimport urllib.request,\
-              \ os, stat, shutil\nurl = 'https://dl.k8s.io/release/v1.32.6/bin/linux/amd64/kubectl'\n\
+              \ hindsight-client at the version the memory plugin pins.\n        \
+              \        # The image bumps this pin on upgrade; the user-site copy on\
+              \ the PVC\n                # persists the old version, so install the\
+              \ exact pin when it drifts.\n                python3 -c \"import importlib.metadata\
+              \ as m, sys; sys.exit(0 if m.version('hindsight-client') == '0.6.1'\
+              \ else 1)\" 2>/dev/null || {\n                  python3 -m pip install\
+              \ --user --break-system-packages 'hindsight-client==0.6.1' 2>/dev/null\
+              \ || true\n                }\n                # Bootstrap kubectl if\
+              \ not present\n                command -v kubectl >/dev/null 2>&1 ||\
+              \ {\n                  python3 -c \"\nimport urllib.request, os, stat,\
+              \ shutil\nurl = 'https://dl.k8s.io/release/v1.32.6/bin/linux/amd64/kubectl'\n\
               tmp = '/tmp/kubectl'\ndest = '/opt/data/.local/bin/kubectl'\nos.makedirs('/opt/data/.local/bin',\
               \ exist_ok=True)\nurllib.request.urlretrieve(url, tmp)\nos.chmod(tmp,\
               \ stat.S_IRWXU | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH)\n\
@@ -498,19 +506,20 @@ spec:
               \          pip install --user -q faster-whisper 2>/dev/null || true\n\
               \                }\n                # Bootstrap Matrix dependencies\
               \ if not installed\n                python3 -c \"import mautrix\" 2>/dev/null\
-              \ || {\n                  uv pip install mautrix asyncpg aiosqlite Markdown\
-              \ aiohttp-socks 2>/dev/null || true\n                }\n           \
-              \     # Bootstrap hindsight-client at the version the memory plugin\
-              \ pins.\n                # The image bumps this pin on upgrade; the\
-              \ user-site copy on the PVC\n                # persists the old version,\
-              \ so install the exact pin when it drifts.\n                python3\
-              \ -c \"import importlib.metadata as m, sys; sys.exit(0 if m.version('hindsight-client')\
-              \ == '0.6.1' else 1)\" 2>/dev/null || {\n                  python3 -m\
-              \ pip install --user --break-system-packages 'hindsight-client==0.6.1'\
+              \ || {\n                  python3 -m pip install --user --break-system-packages\
+              \ 'mautrix[encryption]' aiohttp==3.14.1 asyncpg aiosqlite Markdown aiohttp-socks\
               \ 2>/dev/null || true\n                }\n                # Bootstrap\
-              \ kubectl if not present\n                command -v kubectl >/dev/null\
-              \ 2>&1 || {\n                  python3 -c \"\nimport urllib.request,\
-              \ os, stat, shutil\nurl = 'https://dl.k8s.io/release/v1.32.6/bin/linux/amd64/kubectl'\n\
+              \ hindsight-client at the version the memory plugin pins.\n        \
+              \        # The image bumps this pin on upgrade; the user-site copy on\
+              \ the PVC\n                # persists the old version, so install the\
+              \ exact pin when it drifts.\n                python3 -c \"import importlib.metadata\
+              \ as m, sys; sys.exit(0 if m.version('hindsight-client') == '0.6.1'\
+              \ else 1)\" 2>/dev/null || {\n                  python3 -m pip install\
+              \ --user --break-system-packages 'hindsight-client==0.6.1' 2>/dev/null\
+              \ || true\n                }\n                # Bootstrap kubectl if\
+              \ not present\n                command -v kubectl >/dev/null 2>&1 ||\
+              \ {\n                  python3 -c \"\nimport urllib.request, os, stat,\
+              \ shutil\nurl = 'https://dl.k8s.io/release/v1.32.6/bin/linux/amd64/kubectl'\n\
               tmp = '/tmp/kubectl'\ndest = '/opt/data/.local/bin/kubectl'\nos.makedirs('/opt/data/.local/bin',\
               \ exist_ok=True)\nurllib.request.urlretrieve(url, tmp)\nos.chmod(tmp,\
               \ stat.S_IRWXU | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH)\n\
@@ -663,19 +672,20 @@ spec:
               \          pip install --user -q faster-whisper 2>/dev/null || true\n\
               \                }\n                # Bootstrap Matrix dependencies\
               \ if not installed\n                python3 -c \"import mautrix\" 2>/dev/null\
-              \ || {\n                  uv pip install mautrix asyncpg aiosqlite Markdown\
-              \ aiohttp-socks 2>/dev/null || true\n                }\n           \
-              \     # Bootstrap hindsight-client at the version the memory plugin\
-              \ pins.\n                # The image bumps this pin on upgrade; the\
-              \ user-site copy on the PVC\n                # persists the old version,\
-              \ so install the exact pin when it drifts.\n                python3\
-              \ -c \"import importlib.metadata as m, sys; sys.exit(0 if m.version('hindsight-client')\
-              \ == '0.6.1' else 1)\" 2>/dev/null || {\n                  python3 -m\
-              \ pip install --user --break-system-packages 'hindsight-client==0.6.1'\
+              \ || {\n                  python3 -m pip install --user --break-system-packages\
+              \ 'mautrix[encryption]' aiohttp==3.14.1 asyncpg aiosqlite Markdown aiohttp-socks\
               \ 2>/dev/null || true\n                }\n                # Bootstrap\
-              \ kubectl if not present\n                command -v kubectl >/dev/null\
-              \ 2>&1 || {\n                  python3 -c \"\nimport urllib.request,\
-              \ os, stat, shutil\nurl = 'https://dl.k8s.io/release/v1.32.6/bin/linux/amd64/kubectl'\n\
+              \ hindsight-client at the version the memory plugin pins.\n        \
+              \        # The image bumps this pin on upgrade; the user-site copy on\
+              \ the PVC\n                # persists the old version, so install the\
+              \ exact pin when it drifts.\n                python3 -c \"import importlib.metadata\
+              \ as m, sys; sys.exit(0 if m.version('hindsight-client') == '0.6.1'\
+              \ else 1)\" 2>/dev/null || {\n                  python3 -m pip install\
+              \ --user --break-system-packages 'hindsight-client==0.6.1' 2>/dev/null\
+              \ || true\n                }\n                # Bootstrap kubectl if\
+              \ not present\n                command -v kubectl >/dev/null 2>&1 ||\
+              \ {\n                  python3 -c \"\nimport urllib.request, os, stat,\
+              \ shutil\nurl = 'https://dl.k8s.io/release/v1.32.6/bin/linux/amd64/kubectl'\n\
               tmp = '/tmp/kubectl'\ndest = '/opt/data/.local/bin/kubectl'\nos.makedirs('/opt/data/.local/bin',\
               \ exist_ok=True)\nurllib.request.urlretrieve(url, tmp)\nos.chmod(tmp,\
               \ stat.S_IRWXU | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH)\n\
@@ -828,19 +838,20 @@ spec:
               \          pip install --user -q faster-whisper 2>/dev/null || true\n\
               \                }\n                # Bootstrap Matrix dependencies\
               \ if not installed\n                python3 -c \"import mautrix\" 2>/dev/null\
-              \ || {\n                  uv pip install mautrix asyncpg aiosqlite Markdown\
-              \ aiohttp-socks 2>/dev/null || true\n                }\n           \
-              \     # Bootstrap hindsight-client at the version the memory plugin\
-              \ pins.\n                # The image bumps this pin on upgrade; the\
-              \ user-site copy on the PVC\n                # persists the old version,\
-              \ so install the exact pin when it drifts.\n                python3\
-              \ -c \"import importlib.metadata as m, sys; sys.exit(0 if m.version('hindsight-client')\
-              \ == '0.6.1' else 1)\" 2>/dev/null || {\n                  python3 -m\
-              \ pip install --user --break-system-packages 'hindsight-client==0.6.1'\
+              \ || {\n                  python3 -m pip install --user --break-system-packages\
+              \ 'mautrix[encryption]' aiohttp==3.14.1 asyncpg aiosqlite Markdown aiohttp-socks\
               \ 2>/dev/null || true\n                }\n                # Bootstrap\
-              \ kubectl if not present\n                command -v kubectl >/dev/null\
-              \ 2>&1 || {\n                  python3 -c \"\nimport urllib.request,\
-              \ os, stat, shutil\nurl = 'https://dl.k8s.io/release/v1.32.6/bin/linux/amd64/kubectl'\n\
+              \ hindsight-client at the version the memory plugin pins.\n        \
+              \        # The image bumps this pin on upgrade; the user-site copy on\
+              \ the PVC\n                # persists the old version, so install the\
+              \ exact pin when it drifts.\n                python3 -c \"import importlib.metadata\
+              \ as m, sys; sys.exit(0 if m.version('hindsight-client') == '0.6.1'\
+              \ else 1)\" 2>/dev/null || {\n                  python3 -m pip install\
+              \ --user --break-system-packages 'hindsight-client==0.6.1' 2>/dev/null\
+              \ || true\n                }\n                # Bootstrap kubectl if\
+              \ not present\n                command -v kubectl >/dev/null 2>&1 ||\
+              \ {\n                  python3 -c \"\nimport urllib.request, os, stat,\
+              \ shutil\nurl = 'https://dl.k8s.io/release/v1.32.6/bin/linux/amd64/kubectl'\n\
               tmp = '/tmp/kubectl'\ndest = '/opt/data/.local/bin/kubectl'\nos.makedirs('/opt/data/.local/bin',\
               \ exist_ok=True)\nurllib.request.urlretrieve(url, tmp)\nos.chmod(tmp,\
               \ stat.S_IRWXU | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH)\n\

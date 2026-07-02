@@ -262,7 +262,7 @@ let
                         }
                         # Bootstrap Matrix dependencies if not installed
                         python3 -c "import mautrix" 2>/dev/null || {
-                          uv pip install mautrix asyncpg aiosqlite Markdown aiohttp-socks 2>/dev/null || true
+                          python3 -m pip install --user --break-system-packages 'mautrix[encryption]' aiohttp==3.14.1 asyncpg aiosqlite Markdown aiohttp-socks 2>/dev/null || true
                         }
                         # Bootstrap hindsight-client at the version the memory plugin pins.
                         # The image bumps this pin on upgrade; the user-site copy on the PVC
@@ -539,7 +539,7 @@ in
               command = [
                 "/bin/sh"
                 "-c"
-                "umask 0002; exec /opt/hermes/.venv/bin/hermes dashboard --host 127.0.0.1 --port 9119 --no-open --insecure"
+                "umask 0002; exec /opt/hermes/.venv/bin/hermes dashboard --host 127.0.0.1 --port 9119 --no-open --insecure --skip-build"
               ];
               ports = [
                 {
@@ -592,21 +592,27 @@ in
               };
               securityContext = commonSecurityContext;
               readinessProbe = {
-                httpGet = {
-                  host = "127.0.0.1";
-                  port = 9119;
-                  path = "/";
+                exec = {
+                  command = [
+                    "/opt/hermes/.venv/bin/python3"
+                    "-c"
+                    ''import urllib.request; urllib.request.urlopen("http://127.0.0.1:9119/", timeout=3)''
+                  ];
                 };
-                initialDelaySeconds = 15;
+                initialDelaySeconds = 120;
+                timeoutSeconds = 5;
                 periodSeconds = 10;
               };
               livenessProbe = {
-                httpGet = {
-                  host = "127.0.0.1";
-                  port = 9119;
-                  path = "/";
+                exec = {
+                  command = [
+                    "/opt/hermes/.venv/bin/python3"
+                    "-c"
+                    ''import urllib.request; urllib.request.urlopen("http://127.0.0.1:9119/", timeout=3)''
+                  ];
                 };
-                initialDelaySeconds = 60;
+                initialDelaySeconds = 300;
+                timeoutSeconds = 5;
                 periodSeconds = 30;
               };
             }
