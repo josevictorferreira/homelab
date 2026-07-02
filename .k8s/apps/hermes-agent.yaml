@@ -46,20 +46,24 @@ spec:
           image: docker.io/nousresearch/hermes-agent:v2026.7.1@sha256:5fc62636d9f88dd1edde26aabfdcbac3060af559104d8cbbf5736b579828becf
           imagePullPolicy: IfNotPresent
           livenessProbe:
+            httpGet:
+              host: 127.0.0.1
+              path: /
+              port: 9119
             initialDelaySeconds: 60
             periodSeconds: 30
-            tcpSocket:
-              port: 9119
           name: dashboard
           ports:
             - containerPort: 9119
               name: http
               protocol: TCP
           readinessProbe:
+            httpGet:
+              host: 127.0.0.1
+              path: /
+              port: 9119
             initialDelaySeconds: 15
             periodSeconds: 10
-            tcpSocket:
-              port: 9119
           resources:
             limits:
               cpu: 500m

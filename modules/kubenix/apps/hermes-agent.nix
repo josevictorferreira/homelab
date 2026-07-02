@@ -592,12 +592,20 @@ in
               };
               securityContext = commonSecurityContext;
               readinessProbe = {
-                tcpSocket.port = 9119;
+                httpGet = {
+                  host = "127.0.0.1";
+                  port = 9119;
+                  path = "/";
+                };
                 initialDelaySeconds = 15;
                 periodSeconds = 10;
               };
               livenessProbe = {
-                tcpSocket.port = 9119;
+                httpGet = {
+                  host = "127.0.0.1";
+                  port = 9119;
+                  path = "/";
+                };
                 initialDelaySeconds = 60;
                 periodSeconds = 30;
               };
