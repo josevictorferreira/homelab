@@ -10,13 +10,9 @@ in
     args = {
       inherit namespace;
       image = {
-        # OOM fix test build (#5152): release/v3.8.41 + heap-pressure chat admission +
-        # bounded non-streaming response buffering + compression concurrency gate (the real
-        # fix: Hindsight's parallel LLM calls through pippin stacked the stacked-compression
-        # pipeline's heap; the gate caps concurrent compressions to 2).
-        # Revert to ghcr.io/diegosouzapw/omniroute once the fix lands upstream.
-        repository = "ghcr.io/josevictorferreira/omniroute";
-        tag = "3.8.41-oomfix3@sha256:1291357ee08f7208bfac6e5232f5d1e0c5be0bbfd7adc3e33c8745286de4a948";
+        # Upstream OmniRoute image.
+        repository = "ghcr.io/diegosouzapw/omniroute";
+        tag = "3.8.43@sha256:517c160643c56ad72e3e305458d961c9a4c87f711393c13020450f9f088d1570";
         pullPolicy = "IfNotPresent";
       };
       secretName = "${app}-env";
