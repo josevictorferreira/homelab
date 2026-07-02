@@ -114,16 +114,12 @@ spec:
               \n  tx();\n  db.close();\n}\n\nenforceDatabaseSettings();\nNODE\n\n\
               exec node dev/run-standalone.mjs\n"
           env:
-            # Disable SQLite auto-backups (#5152). This is a write-heavy memory-provider
-            # workload (Hindsight) on a 4.9Gi PVC; the pre-write VACUUM/backup churn fills
-            # the PVC with ~hourly 217MB backups within ~a day, then fails ("disk full")
-            # and cascades into the heap OOM. GitOps + the PVC itself are the backup story.
             - name: DISABLE_SQLITE_AUTO_BACKUP
-              value: "true"
+              value: 'true'
           envFrom:
             - secretRef:
                 name: omniroute-env
-          image: ghcr.io/josevictorferreira/omniroute:3.8.41-oomfix3@sha256:1291357ee08f7208bfac6e5232f5d1e0c5be0bbfd7adc3e33c8745286de4a948
+          image: ghcr.io/diegosouzapw/omniroute:3.8.43@sha256:517c160643c56ad72e3e305458d961c9a4c87f711393c13020450f9f088d1570
           imagePullPolicy: IfNotPresent
           name: main
           ports:
