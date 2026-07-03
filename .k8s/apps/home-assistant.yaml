@@ -32,7 +32,10 @@ spec:
         helm.sh/chart: home-assistant-0.3.68
     spec:
       containers:
-        - image: ghcr.io/home-assistant/home-assistant:2026.7.0
+        - envFrom:
+            - secretRef:
+                name: home-assistant-secret
+          image: ghcr.io/home-assistant/home-assistant:2026.7.0
           imagePullPolicy: IfNotPresent
           livenessProbe:
             failureThreshold: 3
@@ -62,6 +65,20 @@ spec:
             - mountPath: /config
               name: home-assistant
       initContainers:
+        - command:
+            - sh
+            - -c
+            - "set -e\nmkdir -p /config/custom_components\nif [ ! -d /config/custom_components/hacs\
+              \ ]; then\n  echo \"Installing HACS 2.0.5...\"\n  wget -q https://github.com/hacs/integration/releases/download/2.0.5/hacs.zip\
+              \ -O /tmp/hacs.zip\n  unzip -q /tmp/hacs.zip -d /config/custom_components/hacs\n\
+              \  echo \"HACS installed\"\nelse\n  echo \"HACS already present, skipping\"\
+              \nfi\n"
+          image: busybox:1.37
+          imagePullPolicy: IfNotPresent
+          name: install-hacs
+          volumeMounts:
+            - mountPath: /config
+              name: home-assistant
         - args:
             - /bin/sh /mnt/init/init.sh
           command:

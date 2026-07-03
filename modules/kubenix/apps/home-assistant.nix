@@ -1,9 +1,13 @@
-{ kubenix, homelab, ... }:
+{ kubenix, homelab, pkgs, ... }:
 
 let
   namespace = homelab.kubernetes.namespaces.applications;
   app = "home-assistant";
   domain = "hass.${homelab.domain}";
+
+  hacsVersion = "2.0.5";
+  hacsZipUrl = "https://github.com/hacs/integration/releases/download/${hacsVersion}/hacs.zip";
+  hacsZipHash = "sha256-iMomioxH7Iydy+bzJDbZxt6BX31UkCvqhXrxYFQV8Gw=";
 in
 {
   kubernetes = {
@@ -29,6 +33,44 @@ in
         controller = {
           type = "StatefulSet";
         };
+
+        envFrom = [
+          {
+            secretRef = {
+              name = "home-assistant-secret";
+            };
+          }
+        ];
+
+        initContainers = [
+          {
+            name = "install-hacs";
+            image = "busybox:1.37";
+            imagePullPolicy = "IfNotPresent";
+            command = [
+              "sh"
+              "-c"
+              ''
+                set -e
+                mkdir -p /config/custom_components
+                if [ ! -d /config/custom_components/hacs ]; then
+                  echo "Installing HACS ${hacsVersion}..."
+                  wget -q ${hacsZipUrl} -O /tmp/hacs.zip
+                  unzip -q /tmp/hacs.zip -d /config/custom_components/hacs
+                  echo "HACS installed"
+                else
+                  echo "HACS already present, skipping"
+                fi
+              ''
+            ];
+            volumeMounts = [
+              {
+                name = "home-assistant";
+                mountPath = "/config";
+              }
+            ];
+          }
+        ];
 
         service = {
           type = "ClusterIP";
