@@ -1,0 +1,238 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: home-assistant
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: home-assistant
+    app.kubernetes.io/version: 2026.7.0
+    helm.sh/chart: home-assistant-0.3.68
+  name: home-assistant
+  namespace: apps
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: home-assistant
+      app.kubernetes.io/name: home-assistant
+  serviceName: home-assistant
+  template:
+    metadata:
+      annotations:
+        checksum/hass-configuration: 70701f04ad8ec5f90944932442f97ff724a95df1b5b83fccc828c424c9427b49
+        checksum/init-script: 5db12a3aea2dc0cbe20647aadfcb96449b3ea23fd8f41c3bc43a3da8aa2eced3
+      labels:
+        app.kubernetes.io/instance: home-assistant
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: home-assistant
+        app.kubernetes.io/version: 2026.7.0
+        helm.sh/chart: home-assistant-0.3.68
+    spec:
+      containers:
+        - image: ghcr.io/home-assistant/home-assistant:2026.7.0
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /
+              port: http
+              scheme: HTTP
+            periodSeconds: 20
+            successThreshold: 1
+            timeoutSeconds: 2
+          name: home-assistant
+          ports:
+            - containerPort: 8123
+              name: http
+              protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /
+              port: http
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          securityContext: {}
+          volumeMounts:
+            - mountPath: /config
+              name: home-assistant
+      initContainers:
+        - args:
+            - /bin/sh /mnt/init/init.sh
+          command:
+            - /bin/sh
+            - -c
+          image: mikefarah/yq:4
+          name: setup-config
+          securityContext:
+            runAsUser: 0
+          volumeMounts:
+            - mountPath: /mnt/init/init.sh
+              name: init-volume
+              subPath: init.sh
+            - mountPath: /config-templates
+              name: config-volume
+            - mountPath: /config
+              name: home-assistant
+      securityContext: {}
+      serviceAccountName: home-assistant
+      volumes:
+        - configMap:
+            name: init-script
+          name: init-volume
+        - configMap:
+            name: hass-configuration
+          name: config-volume
+  volumeClaimTemplates:
+    - metadata:
+        name: home-assistant
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 10Gi
+        storageClassName: rook-ceph-block
+---
+apiVersion: v1
+data:
+  configuration.yaml: "# Loads default set of integrations. Do not remove.\ndefault_config:\n\
+    http:\n  use_x_forwarded_for: true\n  trusted_proxies:\n    - 10.0.0.0/8\n   \
+    \ - 172.16.0.0/12\n    - 192.168.0.0/16\n    - 127.0.0.0/8\n# Load frontend themes\
+    \ from the themes folder\nfrontend:\n  themes: !include_dir_merge_named themes\n\
+    \nautomation: !include automations.yaml\nscript: !include scripts.yaml\nscene:\
+    \ !include scenes.yaml\n"
+kind: ConfigMap
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: home-assistant
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: home-assistant
+    app.kubernetes.io/version: 2026.7.0
+    helm.sh/chart: home-assistant-0.3.68
+  name: hass-configuration
+  namespace: apps
+---
+apiVersion: v1
+data:
+  init.sh: "#!/bin/bash\nset -e\n\n# Check if the configuration file exists\nif [\
+    \ ! -f /config/configuration.yaml ]; then\n  echo \"Configuration file not found,\
+    \ creating a new one\"\n  cp /config-templates/configuration.yaml /config/configuration.yaml\n\
+    fi\n\n# Check if the force init is enabled\nforceInit=\"false\"\nif [ \"$forceInit\"\
+    \ = \"true\" ]; then\n  echo \"Force init is enabled, overwriting the configuration\
+    \ file\"\n  current_time=$(date +%Y%m%d_%H%M%S)\n  echo \"Backup the current configuration\
+    \ file to configuration.yaml.$current_time\"\n  cp /config/configuration.yaml\
+    \ /config/configuration.yaml.$current_time\n  echo \"Before cleanup - all backup\
+    \ files:\"\n  ls -l /config/configuration.yaml.*\n  echo \"Cleaning up - keeping\
+    \ only 10 most recent backups...\"\n  ls -t /config/configuration.yaml.* 2>/dev/null\
+    \ | tail -n +11 | xargs -r rm\n  echo \"After cleanup - remaining backup files:\"\
+    \n  ls -l /config/configuration.yaml.*\n  echo \"The current configuration file\
+    \ will be merged with the default configuration file with this content:\"\n  cat\
+    \ /config-templates/configuration.yaml\n  if [[ ! -s /config/configuration.yaml\
+    \ ]]; then\n    # If /config/configuration.yaml is empty, use the content of /config-templates/configuration.yaml\n\
+    \    cat /config-templates/configuration.yaml > /config/configuration.yaml\n \
+    \ else\n    # Perform the merge operation if /config/configuration.yaml is not\
+    \ empty\n    yq eval-all --inplace 'select(fileIndex == 0) *d select(fileIndex\
+    \ == 1)' /config/configuration.yaml /config-templates/configuration.yaml\n  fi\n\
+    fi\n\n# Check if the automations file exists\nif [ ! -f /config/automations.yaml\
+    \ ]; then\n  echo \"Automations file not found, creating a new one\"\n  touch\
+    \ /config/automations.yaml\n  echo \"[]\" >> /config/automations.yaml\nfi\n\n\
+    # Check if the scripts file exists\nif [ ! -f /config/scripts.yaml ]; then\n \
+    \ echo \"Scripts file not found, creating a new one\"\n  touch /config/scripts.yaml\n\
+    fi\n\n# Check if the scenes file exists\nif [ ! -f /config/scenes.yaml ]; then\n\
+    \  echo \"Scenes file not found, creating a new one\"\n  touch /config/scenes.yaml\n\
+    fi\n"
+kind: ConfigMap
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: home-assistant
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: home-assistant
+    app.kubernetes.io/version: 2026.7.0
+    helm.sh/chart: home-assistant-0.3.68
+  name: init-script
+  namespace: apps
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: home-assistant
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: home-assistant
+    app.kubernetes.io/version: 2026.7.0
+    helm.sh/chart: home-assistant-0.3.68
+  name: home-assistant
+  namespace: apps
+spec:
+  ports:
+    - name: http
+      port: 8080
+      protocol: TCP
+      targetPort: http
+  selector:
+    app.kubernetes.io/instance: home-assistant
+    app.kubernetes.io/name: home-assistant
+  type: ClusterIP
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: home-assistant
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: home-assistant
+    app.kubernetes.io/version: 2026.7.0
+    helm.sh/chart: home-assistant-0.3.68
+  name: home-assistant
+  namespace: apps
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: cloudflare-issuer
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: home-assistant
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: home-assistant
+    app.kubernetes.io/version: 2026.7.0
+    helm.sh/chart: home-assistant-0.3.68
+  name: home-assistant
+  namespace: apps
+spec:
+  ingressClassName: cilium
+  rules:
+    - host: hass.josevictor.me
+      http:
+        paths:
+          - backend:
+              service:
+                name: home-assistant
+                port:
+                  number: 8080
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - hass.josevictor.me
+      secretName: wildcard-tls
