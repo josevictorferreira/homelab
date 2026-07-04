@@ -8,6 +8,10 @@ let
   hacsVersion = "2.0.5";
   hacsZipUrl = "https://github.com/hacs/integration/releases/download/${hacsVersion}/hacs.zip";
   hacsZipHash = "sha256-iMomioxH7Iydy+bzJDbZxt6BX31UkCvqhXrxYFQV8Gw=";
+
+  oidcVersion = "1.1.1";
+  oidcZipUrl = "https://github.com/christiaangoossens/hass-oidc-auth/releases/download/v${oidcVersion}/hass-oidc-auth.zip";
+  oidcZipHash = "sha256-nOnmFT+Ax4HjYLk+CX/32H0JI1Qw/Ejnpn2X3aX8MyI=";
 in
 {
   kubernetes = {
@@ -70,6 +74,34 @@ in
               }
             ];
           }
+          {
+            name = "install-oidc";
+            image = "busybox:1.37";
+            imagePullPolicy = "IfNotPresent";
+            command = [
+              "sh"
+              "-c"
+              ''
+                set -e
+                mkdir -p /config/custom_components
+                if [ ! -d /config/custom_components/auth_oidc ]; then
+                  echo "Installing hass-oidc-auth ${oidcVersion}..."
+                  wget -q ${oidcZipUrl} -O /tmp/auth_oidc.zip
+                  mkdir -p /config/custom_components/auth_oidc
+                  unzip -q /tmp/auth_oidc.zip -d /config/custom_components/auth_oidc
+                  echo "hass-oidc-auth installed"
+                else
+                  echo "hass-oidc-auth already present, skipping"
+                fi
+              ''
+            ];
+            volumeMounts = [
+              {
+                name = "home-assistant";
+                mountPath = "/config";
+              }
+            ];
+          }
         ];
 
         service = {
@@ -110,14 +142,25 @@ in
         };
 
         configuration = {
-          enabled = true;
-          trusted_proxies = [
-            "10.0.0.0/8"
-            "172.16.0.0/12"
-            "192.168.0.0/16"
-            "127.0.0.0/8"
-          ];
+          enabled = false;
         };
+
+        additionalVolumes = [
+          {
+            name = "home-assistant-config";
+            configMap = {
+              name = "home-assistant-config";
+            };
+          }
+        ];
+
+        additionalMounts = [
+          {
+            name = "home-assistant-config";
+            mountPath = "/config/configuration.yaml";
+            subPath = "configuration.yaml";
+          }
+        ];
       };
     };
   };

@@ -1,0 +1,5 @@
+FROM alpine:3.20
+
+COPY dist_keycloak/keycloak-theme-for-kc-all-other-versions.jar /theme.jar
+
+CMD ["sh", "-c", "ls -la /theme.jar && cat /dev/null"]

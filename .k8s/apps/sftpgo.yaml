@@ -8,12 +8,13 @@ metadata:
     app.kubernetes.io/instance: sftpgo
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sftpgo
-    app.kubernetes.io/version: 2.7.1
-    helm.sh/chart: sftpgo-0.41.0
+    app.kubernetes.io/version: 2.7.4
+    helm.sh/chart: sftpgo-0.47.0
   name: sftpgo
   namespace: apps
 spec:
   replicas: 1
+  revisionHistoryLimit: 10
   selector:
     matchLabels:
       app.kubernetes.io/instance: sftpgo
@@ -21,7 +22,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: 622203fd62d6f2d0bcb0a4b25d66399315bc3708a11f81325cd1cdc595e18cd8
+        checksum/config: ac5a1dbefc70364f206f0a8ec6728a1393aeeeb26afad988a0daba3db694437e
       labels:
         app.kubernetes.io/instance: sftpgo
         app.kubernetes.io/name: sftpgo
@@ -50,7 +51,7 @@ spec:
           envFrom:
             - secretRef:
                 name: sftpgo-config
-          image: ghcr.io/drakkan/sftpgo:v2.7.1
+          image: ghcr.io/drakkan/sftpgo:v2.7.4
           imagePullPolicy: IfNotPresent
           livenessProbe:
             httpGet:
@@ -120,8 +121,8 @@ metadata:
     app.kubernetes.io/instance: sftpgo
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sftpgo
-    app.kubernetes.io/version: 2.7.1
-    helm.sh/chart: sftpgo-0.41.0
+    app.kubernetes.io/version: 2.7.4
+    helm.sh/chart: sftpgo-0.47.0
   name: sftpgo
   namespace: apps
 ---
@@ -137,8 +138,8 @@ metadata:
     app.kubernetes.io/instance: sftpgo
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sftpgo
-    app.kubernetes.io/version: 2.7.1
-    helm.sh/chart: sftpgo-0.41.0
+    app.kubernetes.io/version: 2.7.4
+    helm.sh/chart: sftpgo-0.47.0
   name: sftpgo
   namespace: apps
 spec:
@@ -161,8 +162,8 @@ metadata:
     app.kubernetes.io/instance: sftpgo
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sftpgo
-    app.kubernetes.io/version: 2.7.1
-    helm.sh/chart: sftpgo-0.41.0
+    app.kubernetes.io/version: 2.7.4
+    helm.sh/chart: sftpgo-0.47.0
   name: sftpgo
   namespace: apps
 spec:
@@ -249,6 +250,7 @@ spec:
   type: LoadBalancer
 ---
 apiVersion: v1
+automountServiceAccountToken: true
 kind: ServiceAccount
 metadata:
   annotations:
@@ -258,8 +260,8 @@ metadata:
     app.kubernetes.io/instance: sftpgo
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sftpgo
-    app.kubernetes.io/version: 2.7.1
-    helm.sh/chart: sftpgo-0.41.0
+    app.kubernetes.io/version: 2.7.4
+    helm.sh/chart: sftpgo-0.47.0
   name: sftpgo
   namespace: apps
 ---
@@ -274,8 +276,8 @@ metadata:
     app.kubernetes.io/instance: sftpgo
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sftpgo
-    app.kubernetes.io/version: 2.7.1
-    helm.sh/chart: sftpgo-0.41.0
+    app.kubernetes.io/version: 2.7.4
+    helm.sh/chart: sftpgo-0.47.0
   name: sftpgo-api
   namespace: apps
 spec:
@@ -307,8 +309,8 @@ metadata:
     app.kubernetes.io/instance: sftpgo
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sftpgo
-    app.kubernetes.io/version: 2.7.1
-    helm.sh/chart: sftpgo-0.41.0
+    app.kubernetes.io/version: 2.7.4
+    helm.sh/chart: sftpgo-0.47.0
   name: sftpgo-ui
   namespace: apps
 spec:
