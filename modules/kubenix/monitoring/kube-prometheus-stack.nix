@@ -7,6 +7,7 @@
 
 let
   namespace = homelab.kubernetes.namespaces.monitoring;
+  keycloakOidc = "https://identity.${homelab.domain}/realms/homelab/protocol/openid-connect";
 in
 {
   kubernetes = {
@@ -106,6 +107,23 @@ in
           envValueFrom.GF_DATABASE_PASSWORD.secretKeyRef = {
             name = "grafana-admin";
             key = "GF_DATABASE_PASSWORD";
+          };
+          "grafana.ini"."auth.generic_oauth" = {
+            enabled = true;
+            name = "Keycloak";
+            allow_sign_up = true;
+            client_id = "grafana";
+            client_secret = "$__env{GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET}";
+            scopes = "openid profile email";
+            auth_url = "${keycloakOidc}/auth";
+            token_url = "${keycloakOidc}/token";
+            api_url = "${keycloakOidc}/userinfo";
+            role_attribute_path = "contains(realm_access.roles[*], 'grafana-admin') && 'Admin' || 'Viewer'";
+            oauth_auto_login = true;
+          };
+          envValueFrom.GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET.secretKeyRef = {
+            name = "grafana-admin";
+            key = "GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET";
           };
         };
         prometheusOperator = {
