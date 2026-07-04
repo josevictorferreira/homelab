@@ -42,18 +42,23 @@ in
         defaultPodOptions.imagePullSecrets = [
           { name = "ghcr-registry-secret"; }
         ];
-        controllers.main.containers.main.ports = [
-          {
-            name = "http";
-            containerPort = 5173;
-            protocol = "TCP";
-          }
-          {
-            name = "backend";
-            containerPort = 8765;
-            protocol = "TCP";
-          }
-        ];
+        controllers.main.containers.main = {
+          envFrom = [
+            { secretRef.name = "${app}-config"; }
+          ];
+          ports = [
+            {
+              name = "http";
+              containerPort = 5173;
+              protocol = "TCP";
+            }
+            {
+              name = "backend";
+              containerPort = 8765;
+              protocol = "TCP";
+            }
+          ];
+        };
         persistence.vite-config = {
           type = "configMap";
           name = "${app}-vite-config";
