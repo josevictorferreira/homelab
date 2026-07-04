@@ -153,11 +153,26 @@ in
           }
           {
             name = "add-oratoria-theme";
-            image = "ghcr.io/josevictorferreira/oratoria-identity:v0.1.0";
+            image = "ghcr.io/josevictorferreira/oratoria-identity:v0.2.0";
             command = [
               "sh"
               "-c"
               "cp /theme.jar /shared/oratoria-theme.jar"
+            ];
+            volumeMounts = [
+              {
+                name = "keycloak-providers";
+                mountPath = "/shared";
+              }
+            ];
+          }
+          {
+            name = "add-homelab-theme";
+            image = "ghcr.io/josevictorferreira/homelab-identity:v0.1.0";
+            command = [
+              "sh"
+              "-c"
+              "cp /theme.jar /shared/homelab-theme.jar"
             ];
             volumeMounts = [
               {
