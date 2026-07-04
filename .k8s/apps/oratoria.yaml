@@ -33,7 +33,10 @@ spec:
     spec:
       automountServiceAccountToken: true
       containers:
-        - image: ghcr.io/josevictorferreira/oratoria:latest@sha256:441d7820f739f24296ff35da0b5bfdc424acfd4c356adac8d82f2afe2968568e
+        - envFrom:
+            - secretRef:
+                name: oratoria-config
+          image: ghcr.io/josevictorferreira/oratoria:latest@sha256:441d7820f739f24296ff35da0b5bfdc424acfd4c356adac8d82f2afe2968568e
           imagePullPolicy: Always
           name: main
           ports:
