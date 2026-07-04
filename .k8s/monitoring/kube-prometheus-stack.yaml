@@ -92646,7 +92646,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: dc2f96c7a26d9106c937546b8ee88f6d3b477dc68e8f2fb52b760c2ce3e0340c
+        checksum/config: 7eaab9ec55cabd3e8bedb3639d2d9c524a4d21f1b64c4317b693e383c0327897
         checksum/sc-dashboard-provider-config: e70bf6a851099d385178a76de9757bb0bef8299da6d8443602590e44f05fdf24
         kubectl.kubernetes.io/default-container: grafana
       labels:
@@ -92808,6 +92808,11 @@ spec:
                 resourceFieldRef:
                   divisor: '1'
                   resource: limits.memory
+            - name: GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  key: GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET
+                  name: grafana-admin
             - name: GF_DATABASE_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -93478,6 +93483,31 @@ data:
   grafana.ini: '[analytics]
 
     check_for_updates = true
+
+    [auth.generic_oauth]
+
+    allow_sign_up = true
+
+    api_url = https://identity.josevictor.me/realms/homelab/protocol/openid-connect/userinfo
+
+    auth_url = https://identity.josevictor.me/realms/homelab/protocol/openid-connect/auth
+
+    client_id = grafana
+
+    client_secret = $__env{GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET}
+
+    enabled = true
+
+    name = Keycloak
+
+    oauth_auto_login = true
+
+    role_attribute_path = contains(realm_access.roles[*], ''grafana-admin'') && ''Admin''
+    || ''Viewer''
+
+    scopes = openid profile email
+
+    token_url = https://identity.josevictor.me/realms/homelab/protocol/openid-connect/token
 
     [database]
 

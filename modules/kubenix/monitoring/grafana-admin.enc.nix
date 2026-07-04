@@ -55,6 +55,7 @@ in
         };
         stringData = {
           "GF_DATABASE_PASSWORD" = kubenix.lib.secretsFor "postgresql_admin_password";
+          "GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET" = kubenix.lib.secretsFor "grafana_oidc_client_secret";
         };
       };
 
