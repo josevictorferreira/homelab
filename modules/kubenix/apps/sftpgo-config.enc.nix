@@ -19,7 +19,7 @@ in
           "SFTPGO_HTTPD__BINDINGS__0__OIDC__CONFIG_URL" = "https://identity.${homelab.domain}/realms/homelab";
           "SFTPGO_HTTPD__BINDINGS__0__OIDC__REDIRECT_BASE_URL" = "https://sftpgo.${homelab.domain}";
           "SFTPGO_HTTPD__BINDINGS__0__OIDC__USERNAME_FIELD" = "preferred_username";
-          "SFTPGO_HTTPD__BINDINGS__0__OIDC__SCOPES" = "openid profile email";
+          "SFTPGO_HTTPD__BINDINGS__0__OIDC__SCOPES" = "openid,profile,email";
         };
       };
     };
