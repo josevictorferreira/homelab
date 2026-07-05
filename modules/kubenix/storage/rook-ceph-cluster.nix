@@ -41,6 +41,17 @@ in
             requests.memory = "64Mi";
           };
         };
+        # Ceph 19.2.3's "multiple bdev label" feature (copies at 1/10/100/1000 GiB
+        # offsets) makes bluefs-bdev-expand abort when an OSD partition is large
+        # enough to cross a label-copy offset (crashes the expand-bluefs init
+        # container, so the OSD never starts). Disable multi-label and don't
+        # require all label copies to match so OSDs use a single label and the
+        # expand step is a safe no-op. Mirrors the live `ceph config set osd ...`.
+        configOverride = ''
+          [global]
+          bluestore_bdev_label_multi = false
+          bluestore_bdev_label_require_all = false
+        '';
         cephClusterSpec = {
           mon.count = builtins.length monitorHostNames;
           mon.allowMultiplePerNode = false;
