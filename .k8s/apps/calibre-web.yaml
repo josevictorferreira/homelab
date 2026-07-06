@@ -1,0 +1,161 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/controller: main
+    app.kubernetes.io/instance: calibre-web
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: calibre-web
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: calibre-web
+  namespace: apps
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/controller: main
+      app.kubernetes.io/instance: calibre-web
+      app.kubernetes.io/name: calibre-web
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/controller: main
+        app.kubernetes.io/instance: calibre-web
+        app.kubernetes.io/name: calibre-web
+    spec:
+      automountServiceAccountToken: true
+      containers:
+        - env:
+            - name: PGID
+              value: '1000'
+            - name: PUID
+              value: '1000'
+            - name: TZ
+              value: America/Sao_Paulo
+          image: lscr.io/linuxserver/calibre-web:latest@sha256:18cd5d1d5c13b133fdf25506df8db415aee675ecf3ea01d086f01296a39666c4
+          imagePullPolicy: IfNotPresent
+          name: main
+          ports:
+            - containerPort: 8083
+              name: http
+              protocol: TCP
+          resources:
+            limits:
+              cpu: '1'
+              memory: 1Gi
+            requests:
+              cpu: 100m
+              memory: 256Mi
+          volumeMounts:
+            - mountPath: /books
+              name: books
+              subPath: books
+            - mountPath: /config
+              name: main
+      dnsPolicy: ClusterFirst
+      enableServiceLinks: false
+      hostIPC: false
+      hostNetwork: false
+      hostPID: false
+      serviceAccountName: default
+      volumes:
+        - name: books
+          persistentVolumeClaim:
+            claimName: cephfs-shared-storage-root
+        - name: main
+          persistentVolumeClaim:
+            claimName: calibre-web
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: calibre-web
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: calibre-web
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: calibre-web
+  namespace: apps
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: rook-ceph-block
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+    lbipam.cilium.io/ips: 10.10.10.153
+    lbipam.cilium.io/sharing-key: calibre-web
+  labels:
+    app.kubernetes.io/instance: calibre-web
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: calibre-web
+    app.kubernetes.io/service: calibre-web
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: calibre-web
+  namespace: apps
+spec:
+  ports:
+    - name: http
+      port: 8083
+      protocol: TCP
+      targetPort: 8083
+  selector:
+    app.kubernetes.io/controller: main
+    app.kubernetes.io/instance: calibre-web
+    app.kubernetes.io/name: calibre-web
+  type: LoadBalancer
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: calibre-web
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: calibre-web
+    helm.sh/chart: app-template-4.2.0
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: calibre-web
+  namespace: apps
+spec:
+  ingressClassName: cilium
+  rules:
+    - host: calibre-web.josevictor.me
+      http:
+        paths:
+          - backend:
+              service:
+                name: calibre-web
+                port:
+                  number: 8083
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - calibre-web.josevictor.me
+      secretName: wildcard-tls
