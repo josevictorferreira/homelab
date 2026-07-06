@@ -38,6 +38,24 @@ in
         ];
       };
       values = {
+        ingress.main.hosts = [
+          {
+            host = "calibre.${homelab.domain}";
+            paths = [
+              {
+                path = "/";
+                service.name = app;
+                service.port = 8083;
+              }
+            ];
+          }
+        ];
+        ingress.main.tls = [
+          {
+            secretName = kubenix.lib.defaultTLSSecret;
+            hosts = [ "calibre.${homelab.domain}" ];
+          }
+        ];
         controllers.main.containers.main.env = {
           PUID = "1000";
           PGID = "1000";

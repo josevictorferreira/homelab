@@ -145,7 +145,7 @@ metadata:
 spec:
   ingressClassName: cilium
   rules:
-    - host: calibre-web.josevictor.me
+    - host: calibre.josevictor.me
       http:
         paths:
           - backend:
@@ -157,5 +157,5 @@ spec:
             pathType: Prefix
   tls:
     - hosts:
-        - calibre-web.josevictor.me
+        - calibre.josevictor.me
       secretName: wildcard-tls
