@@ -92,8 +92,8 @@ spec:
               \ key_value WHERE namespace = ? AND key = ?\");\n  const insertKey =\
               \ db.prepare(\"INSERT INTO key_value (namespace, key, value) VALUES\
               \ (?, ?, ?)\");\n  const updateProviderConcurrency = db.prepare(\"UPDATE\
-              \ provider_connections SET max_concurrent = 1 WHERE is_active = 1 AND\
-              \ (max_concurrent IS NULL OR max_concurrent > 1)\");\n  const selectCombos\
+              \ provider_connections SET max_concurrent = 2 WHERE is_active = 1 AND\
+              \ (max_concurrent IS NULL OR max_concurrent <> 2)\");\n  const selectCombos\
               \ = db.prepare(\"SELECT id, name, data FROM combos WHERE name IN (\"\
               \ + comboNames.map(() => \"?\").join(\",\") + \")\");\n  const updateCombo\
               \ = db.prepare(\"UPDATE combos SET data = ?, updated_at = datetime('now')\
@@ -106,7 +106,7 @@ spec:
               \ || \"{}\");\n      } catch {\n        data = {};\n      }\n\n    \
               \  if (!data.config || typeof data.config !== \"object\" || Array.isArray(data.config))\
               \ {\n        data.config = {};\n      }\n\n      data.config.concurrencyPerModel\
-              \ = 1;\n      data.config.queueDepth = 1;\n      data.config.queueTimeoutMs\
+              \ = 2;\n      data.config.queueDepth = 2;\n      data.config.queueTimeoutMs\
               \ = 10000;\n      data.config.maxRetries = 0;\n\n      updateCombo.run(JSON.stringify(data),\
               \ row.id);\n      comboChanges += 1;\n    }\n\n    console.log(\"[omniroute-startup]\
               \ provider concurrency rows=\" + providerChanges + \" combo rows=\"\
