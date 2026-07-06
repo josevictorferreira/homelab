@@ -12,7 +12,7 @@ in
       image = {
         # Upstream OmniRoute image.
         repository = "ghcr.io/diegosouzapw/omniroute";
-        tag = "3.8.44@sha256:8f9edab240d05c966bf2ef88b458f58fcf824ea9b454ac78d23231467acbbd1e";
+        tag = "3.8.45@sha256:189d5c06a0ac196cb01ea7db23249bca1890287da448e892c1121b4eae16b9c9";
         pullPolicy = "IfNotPresent";
       };
       secretName = "${app}-env";
