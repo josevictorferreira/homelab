@@ -101,7 +101,7 @@ in
             const db = new Database(dbPath);
             const deleteKey = db.prepare("DELETE FROM key_value WHERE namespace = ? AND key = ?");
             const insertKey = db.prepare("INSERT INTO key_value (namespace, key, value) VALUES (?, ?, ?)");
-            const updateProviderConcurrency = db.prepare("UPDATE provider_connections SET max_concurrent = 1 WHERE is_active = 1 AND (max_concurrent IS NULL OR max_concurrent > 1)");
+            const updateProviderConcurrency = db.prepare("UPDATE provider_connections SET max_concurrent = 2 WHERE is_active = 1 AND (max_concurrent IS NULL OR max_concurrent <> 2)");
             const selectCombos = db.prepare("SELECT id, name, data FROM combos WHERE name IN (" + comboNames.map(() => "?").join(",") + ")");
             const updateCombo = db.prepare("UPDATE combos SET data = ?, updated_at = datetime('now') WHERE id = ?");
 
@@ -126,8 +126,8 @@ in
                   data.config = {};
                 }
 
-                data.config.concurrencyPerModel = 1;
-                data.config.queueDepth = 1;
+                data.config.concurrencyPerModel = 2;
+                data.config.queueDepth = 2;
                 data.config.queueTimeoutMs = 10000;
                 data.config.maxRetries = 0;
 
