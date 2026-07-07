@@ -168,7 +168,7 @@ in
           }
           {
             name = "add-homelab-theme";
-            image = "ghcr.io/josevictorferreira/homelab-identity:v0.1.0";
+            image = "ghcr.io/josevictorferreira/homelab-identity:v0.1.1";
             command = [
               "sh"
               "-c"
