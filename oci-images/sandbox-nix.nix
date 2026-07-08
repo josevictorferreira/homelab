@@ -100,6 +100,22 @@ let
       groupadd -g 10000 hermes-agent
       useradd -u 10000 -g hermes-agent -d /workspace -s ${pkgs.bash}/bin/bash -m hermes-agent
     fi
+    # useradd creates a locked shadow entry (`!`), and OpenSSH rejects locked
+    # accounts before checking public keys.  Keep password login disabled in
+    # sshd_config, but mark the account as non-password-authenticatable (`*`) so
+    # public-key auth can proceed.
+    if grep -q '^hermes-agent:!' /etc/shadow; then
+      tmp="$(mktemp)"
+      while IFS= read -r line; do
+        case "$line" in
+          hermes-agent:!*) printf 'hermes-agent:*%s\n' "''${line#hermes-agent:!}" ;;
+          *) printf '%s\n' "$line" ;;
+        esac
+      done < /etc/shadow > "$tmp"
+      cat "$tmp" > /etc/shadow
+      rm -f "$tmp"
+      chmod 600 /etc/shadow
+    fi
 
     # sshd requires a privilege-separation user 'sshd' and its empty chroot dir.
     if ! id sshd >/dev/null 2>&1; then
