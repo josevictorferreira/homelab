@@ -91,17 +91,6 @@ spec:
         storageClassName: rook-ceph-block
 ---
 apiVersion: v1
-kind: Secret
-metadata:
-  annotations:
-    kubenix/k8s-version: '1.32'
-    kubenix/project-name: ze-homelab
-  name: sandbox-nix-ssh
-  namespace: apps
-stringData:
-  authorized_keys: ref+sops://secrets/k8s-secrets.enc.yaml#sandbox_nix_ssh_public_key
----
-apiVersion: v1
 kind: Service
 metadata:
   annotations:
