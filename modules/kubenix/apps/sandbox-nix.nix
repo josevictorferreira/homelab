@@ -3,7 +3,7 @@
 let
   name = "sandbox-nix";
   namespace = homelab.kubernetes.namespaces.applications;
-  image = "ghcr.io/josevictorferreira/sandbox-nix:0.1.0@sha256:97c4f00c87a8013871cdc27ead9d22e42f2271e922af8b9f2cbf3283819c89a8";
+  image = "ghcr.io/josevictorferreira/sandbox-nix:0.1.0@sha256:0158928e91630131c724b8b66a4756f4ef3485041a025dedf07e905e6382eb75";
 
   # CephFS-backed workspace where project repos and task workspaces live, so
   # state (checkouts, generated files) persists across sessions.
