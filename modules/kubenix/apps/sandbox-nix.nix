@@ -3,7 +3,7 @@
 let
   name = "sandbox-nix";
   namespace = homelab.kubernetes.namespaces.applications;
-  image = "ghcr.io/josevictorferreira/sandbox-nix:0.1.0@sha256:71ee80899882236104ebdfbe4aadcf7d047c69941e522acdbbf2190880b4dd1b";
+  image = "ghcr.io/josevictorferreira/sandbox-nix:0.1.0@sha256:97c4f00c87a8013871cdc27ead9d22e42f2271e922af8b9f2cbf3283819c89a8";
 
   # CephFS-backed workspace where project repos and task workspaces live, so
   # state (checkouts, generated files) persists across sessions.
@@ -116,7 +116,7 @@ in
               name = "ssh-authorized-keys";
               secret = {
                 secretName = "${name}-ssh";
-                defaultMode = 384;
+                defaultMode = 292;
               };
             }
           ];
