@@ -814,6 +814,11 @@ Our cluster is deployed and accessible in the user system kubectl, the context a
 
 ### Hermes Agent Deployment
 
+#### Run Project Tests Through sandbox-nix Over SSH
+**Lesson:** Hermes gateway containers intentionally stay lightweight. For project-specific toolchains (Ruby/Rails/RSpec, etc.), agents should SSH to `sandbox-nix.apps.svc.cluster.local` and run the project's own flake with `nix develop`.
+**Context:** Hermes agents do not include Ruby or Nix. The persistent `sandbox-nix` StatefulSet provides SSH access as `hermes-agent`, a persistent `/nix` store, and the shared CephFS workspace at `/workspace`.
+**Verify:** From a gateway container: `ssh -i /etc/hermes/sandbox-nix-ssh/ssh-private-key -o StrictHostKeyChecking=no hermes-agent@sandbox-nix.apps.svc.cluster.local -- nix develop /workspace/<project> --command <test-command>`.
+
 #### Setuid Binaries Need SETUID/SETGID Caps Even With runAsUser=0
 **Lesson:** When a container runs as root and uses `gosu`/`su-exec`/`setpriv` to drop privileges, dropping `ALL` capabilities breaks the privilege drop with `operation not permitted`. Add `["SETUID" "SETGID"]` to `capabilities.add` (also `CHOWN`/`FOWNER` if entrypoint chowns paths).
 **Context:** Hermes/openclaw-style images use `tini → entrypoint → gosu → app`. `runAsUser=0` puts you in root namespace but cap-drop strips the kernel privileges gosu needs.
