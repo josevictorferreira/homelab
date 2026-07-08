@@ -57,7 +57,7 @@ let
       name = "sandbox-nix-ssh";
       secret = {
         secretName = "${name}-sandbox-nix-ssh";
-        defaultMode = 256;
+        defaultMode = 288;
       };
     }
   ];
@@ -73,6 +73,7 @@ let
   # 10000 (not the dir owner), so they must join GID 100 to traverse profile
   # dirs and read each profile's config.yaml.
   podSecurityContext = {
+    fsGroup = 2002;
     supplementalGroups = [ 100 ];
   };
   cliWrapper = {
