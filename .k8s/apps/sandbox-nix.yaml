@@ -1,0 +1,124 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  labels:
+    app: sandbox-nix
+  name: sandbox-nix
+  namespace: apps
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sandbox-nix
+  serviceName: sandbox-nix
+  template:
+    metadata:
+      labels:
+        app: sandbox-nix
+    spec:
+      containers:
+        - command:
+            - /entrypoint.sh
+          env:
+            - name: NIX_CONFIG
+              value: 'experimental-features = nix-command flakes
+
+                sandbox = false'
+          image: ghcr.io/josevictorferreira/sandbox-nix:0.1.0@sha256:71ee80899882236104ebdfbe4aadcf7d047c69941e522acdbbf2190880b4dd1b
+          imagePullPolicy: IfNotPresent
+          name: sandbox-nix
+          ports:
+            - containerPort: 22
+              name: ssh
+              protocol: TCP
+          resources:
+            limits:
+              cpu: 2000m
+              memory: 4Gi
+            requests:
+              cpu: 100m
+              memory: 1Gi
+          volumeMounts:
+            - mountPath: /workspace
+              name: workspace
+            - mountPath: /nix
+              name: nix-store
+            - mountPath: /etc/ssh/authorized_keys
+              name: ssh-authorized-keys
+              readOnly: true
+              subPath: authorized_keys
+      imagePullSecrets:
+        - name: ghcr-registry-secret
+      initContainers:
+        - command:
+            - /bin/sh
+            - -c
+            - if [ ! -f /mnt/nix/.seeded ]; then rm -rf /mnt/nix/* /mnt/nix/.[!.]*
+              2>/dev/null || true; cp -a /nix/. /mnt/nix/ && touch /mnt/nix/.seeded;
+              fi
+          image: ghcr.io/josevictorferreira/sandbox-nix:0.1.0@sha256:71ee80899882236104ebdfbe4aadcf7d047c69941e522acdbbf2190880b4dd1b
+          imagePullPolicy: IfNotPresent
+          name: seed-nix-store
+          volumeMounts:
+            - mountPath: /mnt/nix
+              name: nix-store
+      securityContext:
+        runAsGroup: 0
+        runAsNonRoot: false
+        runAsUser: 0
+      volumes:
+        - name: workspace
+          persistentVolumeClaim:
+            claimName: cephfs-shared-storage-root
+        - name: ssh-authorized-keys
+          secret:
+            defaultMode: 384
+            secretName: sandbox-nix-ssh
+  volumeClaimTemplates:
+    - metadata:
+        labels:
+          app: sandbox-nix
+        name: nix-store
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 100Gi
+        storageClassName: rook-ceph-block
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+  name: sandbox-nix-ssh
+  namespace: apps
+stringData:
+  authorized_keys: ref+sops://secrets/k8s-secrets.enc.yaml#sandbox_nix_ssh_public_key
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: '1.32'
+    kubenix/project-name: ze-homelab
+    lbipam.cilium.io/ips: 10.10.10.137
+    lbipam.cilium.io/sharing-key: sandbox-nix
+  labels:
+    app: sandbox-nix
+  name: sandbox-nix
+  namespace: apps
+spec:
+  ports:
+    - name: ssh
+      port: 22
+      protocol: TCP
+      targetPort: 22
+  selector:
+    app: sandbox-nix
+  type: LoadBalancer

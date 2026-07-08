@@ -45,6 +45,22 @@ let
       persistentVolumeClaim.claimName = kubenix.lib.sharedStorage.rootPVC;
     }
   ];
+  sshKeyVolumeMounts = [
+    {
+      name = "sandbox-nix-ssh";
+      mountPath = "/etc/hermes/sandbox-nix-ssh";
+      readOnly = true;
+    }
+  ];
+  sshKeyVolumes = [
+    {
+      name = "sandbox-nix-ssh";
+      secret = {
+        secretName = "${name}-sandbox-nix-ssh";
+        defaultMode = 256;
+      };
+    }
+  ];
   commonSecurityContext = {
     allowPrivilegeEscalation = false;
     runAsNonRoot = true;
@@ -199,6 +215,22 @@ let
     {
       name = "PIP_REQUIRE_VIRTUALENV";
       value = "false";
+    }
+    {
+      name = "SANDBOX_NIX_HOST";
+      value = "sandbox-nix.apps.svc.cluster.local";
+    }
+    {
+      name = "SANDBOX_NIX_USER";
+      value = "hermes-agent";
+    }
+    {
+      name = "SANDBOX_NIX_SSH_KEY";
+      value = "/etc/hermes/sandbox-nix-ssh/ssh-private-key";
+    }
+    {
+      name = "SANDBOX_NIX_WORKSPACE";
+      value = "/workspace";
     }
   ];
 
@@ -370,13 +402,16 @@ let
             [ ]
         );
       envFrom = envFromSecret;
-      volumeMounts = dataVolumeMounts ++ [
-        {
-          name = cliWrapper.volumeName;
-          mountPath = cliWrapper.mountPath;
-          subPath = "hermes";
-        }
-      ];
+      volumeMounts =
+        dataVolumeMounts
+        ++ sshKeyVolumeMounts
+        ++ [
+          {
+            name = cliWrapper.volumeName;
+            mountPath = cliWrapper.mountPath;
+            subPath = "hermes";
+          }
+        ];
       resources = {
         requests = {
           cpu = "100m";
@@ -492,15 +527,18 @@ in
             }
           ];
           containers = containers;
-          volumes = dataVolumes ++ [
-            {
-              name = cliWrapper.volumeName;
-              configMap = {
-                name = cliWrapper.name;
-                defaultMode = 493;
-              };
-            }
-          ];
+          volumes =
+            dataVolumes
+            ++ sshKeyVolumes
+            ++ [
+              {
+                name = cliWrapper.volumeName;
+                configMap = {
+                  name = cliWrapper.name;
+                  defaultMode = 493;
+                };
+              }
+            ];
         };
       };
     };

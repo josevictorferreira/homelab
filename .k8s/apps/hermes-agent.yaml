@@ -262,6 +262,14 @@ spec:
               value: 'true'
             - name: PIP_REQUIRE_VIRTUALENV
               value: 'false'
+            - name: SANDBOX_NIX_HOST
+              value: sandbox-nix.apps.svc.cluster.local
+            - name: SANDBOX_NIX_USER
+              value: hermes-agent
+            - name: SANDBOX_NIX_SSH_KEY
+              value: /etc/hermes/sandbox-nix-ssh/ssh-private-key
+            - name: SANDBOX_NIX_WORKSPACE
+              value: /workspace
             - name: HOME
               value: /opt/data
             - name: HERMES_HOME
@@ -311,6 +319,9 @@ spec:
             - mountPath: /opt/hermes/scripts/whatsapp-bridge/node_modules
               name: hermes-data
               subPath: whatsapp-bridge-node_modules
+            - mountPath: /etc/hermes/sandbox-nix-ssh
+              name: sandbox-nix-ssh
+              readOnly: true
             - mountPath: /usr/local/bin/hermes
               name: cli-wrapper
               subPath: hermes
@@ -428,6 +439,14 @@ spec:
               value: 'true'
             - name: PIP_REQUIRE_VIRTUALENV
               value: 'false'
+            - name: SANDBOX_NIX_HOST
+              value: sandbox-nix.apps.svc.cluster.local
+            - name: SANDBOX_NIX_USER
+              value: hermes-agent
+            - name: SANDBOX_NIX_SSH_KEY
+              value: /etc/hermes/sandbox-nix-ssh/ssh-private-key
+            - name: SANDBOX_NIX_WORKSPACE
+              value: /workspace
             - name: HOME
               value: /opt/data
             - name: HERMES_HOME
@@ -488,6 +507,9 @@ spec:
             - mountPath: /opt/hermes/scripts/whatsapp-bridge/node_modules
               name: hermes-data
               subPath: whatsapp-bridge-node_modules
+            - mountPath: /etc/hermes/sandbox-nix-ssh
+              name: sandbox-nix-ssh
+              readOnly: true
             - mountPath: /usr/local/bin/hermes
               name: cli-wrapper
               subPath: hermes
@@ -605,6 +627,14 @@ spec:
               value: 'true'
             - name: PIP_REQUIRE_VIRTUALENV
               value: 'false'
+            - name: SANDBOX_NIX_HOST
+              value: sandbox-nix.apps.svc.cluster.local
+            - name: SANDBOX_NIX_USER
+              value: hermes-agent
+            - name: SANDBOX_NIX_SSH_KEY
+              value: /etc/hermes/sandbox-nix-ssh/ssh-private-key
+            - name: SANDBOX_NIX_WORKSPACE
+              value: /workspace
             - name: HOME
               value: /opt/data
             - name: HERMES_HOME
@@ -654,6 +684,9 @@ spec:
             - mountPath: /opt/hermes/scripts/whatsapp-bridge/node_modules
               name: hermes-data
               subPath: whatsapp-bridge-node_modules
+            - mountPath: /etc/hermes/sandbox-nix-ssh
+              name: sandbox-nix-ssh
+              readOnly: true
             - mountPath: /usr/local/bin/hermes
               name: cli-wrapper
               subPath: hermes
@@ -771,6 +804,14 @@ spec:
               value: 'true'
             - name: PIP_REQUIRE_VIRTUALENV
               value: 'false'
+            - name: SANDBOX_NIX_HOST
+              value: sandbox-nix.apps.svc.cluster.local
+            - name: SANDBOX_NIX_USER
+              value: hermes-agent
+            - name: SANDBOX_NIX_SSH_KEY
+              value: /etc/hermes/sandbox-nix-ssh/ssh-private-key
+            - name: SANDBOX_NIX_WORKSPACE
+              value: /workspace
             - name: HOME
               value: /opt/data
             - name: HERMES_HOME
@@ -820,6 +861,9 @@ spec:
             - mountPath: /opt/hermes/scripts/whatsapp-bridge/node_modules
               name: hermes-data
               subPath: whatsapp-bridge-node_modules
+            - mountPath: /etc/hermes/sandbox-nix-ssh
+              name: sandbox-nix-ssh
+              readOnly: true
             - mountPath: /usr/local/bin/hermes
               name: cli-wrapper
               subPath: hermes
@@ -937,6 +981,14 @@ spec:
               value: 'true'
             - name: PIP_REQUIRE_VIRTUALENV
               value: 'false'
+            - name: SANDBOX_NIX_HOST
+              value: sandbox-nix.apps.svc.cluster.local
+            - name: SANDBOX_NIX_USER
+              value: hermes-agent
+            - name: SANDBOX_NIX_SSH_KEY
+              value: /etc/hermes/sandbox-nix-ssh/ssh-private-key
+            - name: SANDBOX_NIX_WORKSPACE
+              value: /workspace
             - name: HOME
               value: /opt/data
             - name: HERMES_HOME
@@ -986,6 +1038,9 @@ spec:
             - mountPath: /opt/hermes/scripts/whatsapp-bridge/node_modules
               name: hermes-data
               subPath: whatsapp-bridge-node_modules
+            - mountPath: /etc/hermes/sandbox-nix-ssh
+              name: sandbox-nix-ssh
+              readOnly: true
             - mountPath: /usr/local/bin/hermes
               name: cli-wrapper
               subPath: hermes
@@ -1061,6 +1116,10 @@ spec:
         - name: hermes-data
           persistentVolumeClaim:
             claimName: cephfs-shared-storage-root
+        - name: sandbox-nix-ssh
+          secret:
+            defaultMode: 256
+            secretName: hermes-agent-sandbox-nix-ssh
         - configMap:
             defaultMode: 493
             name: hermes-agent-cli-wrapper
