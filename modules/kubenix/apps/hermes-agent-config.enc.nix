@@ -53,4 +53,13 @@ in
       HERMES_DASHBOARD_PUBLIC_URL = "https://hermes.josevictor.me";
     };
   };
+  kubernetes.resources.secrets."${name}-sandbox-nix-ssh" = {
+    metadata = {
+      name = "${name}-sandbox-nix-ssh";
+      inherit namespace;
+    };
+    stringData = {
+      "ssh-private-key" = kubenix.lib.secretsFor "sandbox_nix_ssh_private_key";
+    };
+  };
 }
