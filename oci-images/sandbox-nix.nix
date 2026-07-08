@@ -57,6 +57,7 @@ let
 
     UsePAM no
     PidFile /run/sshd.pid
+    SetEnv PATH=/nix/var/nix/profiles/default/bin:/usr/bin:/bin:/usr/sbin:/sbin
 
     # Lock the worker down to a single non-root user and workspace.
     Match User hermes-agent
