@@ -65,7 +65,7 @@ spec:
                 secretKeyRef:
                   key: db-password
                   name: keycloak-env
-          image: docker.io/keycloak/keycloak:26.5.2
+          image: docker.io/keycloak/keycloak:26.7.0@sha256:1362a9d9f13ab325231ea133610cc905e12805804abc7acbef552dd613720aa6
           imagePullPolicy: Always
           livenessProbe:
             failureThreshold: 3
@@ -138,7 +138,7 @@ spec:
             - sh
             - -c
             - cp -r /opt/keycloak/lib/quarkus/* /shared-quarkus/
-          image: docker.io/keycloak/keycloak:26.5.2
+          image: docker.io/keycloak/keycloak:26.7.0@sha256:1362a9d9f13ab325231ea133610cc905e12805804abc7acbef552dd613720aa6
           imagePullPolicy: Always
           name: copy-quarkus-lib
           resources:
@@ -164,7 +164,7 @@ spec:
             - sh
             - -c
             - cp -r /opt/keycloak/providers/. /shared/
-          image: keycloak/keycloak:26.5.2
+          image: keycloak/keycloak:26.7.0@sha256:1362a9d9f13ab325231ea133610cc905e12805804abc7acbef552dd613720aa6
           name: copy-base-providers
           volumeMounts:
             - mountPath: /shared
