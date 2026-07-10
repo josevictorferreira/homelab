@@ -12,8 +12,10 @@ in
         repository = "lscr.io/linuxserver/calibre-web";
         tag = "latest@sha256:18cd5d1d5c13b133fdf25506df8db415aee675ecf3ea01d086f01296a39666c4";
         pullPolicy = "IfNotPresent";
+
       };
       port = 8083;
+      replicas = 0;
       resources = {
         requests = {
           cpu = "100m";

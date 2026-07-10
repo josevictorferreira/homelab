@@ -75,6 +75,7 @@ in
 
         main = {
           forceToUseStatefulset = false;
+          count = 0;
 
           persistence = {
             enabled = true;
