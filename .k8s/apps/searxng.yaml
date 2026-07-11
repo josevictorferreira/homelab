@@ -27,6 +27,15 @@ spec:
         app.kubernetes.io/version: 1.1.0
         helm.sh/chart: searxng-1.1.0
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values:
+                      - lab-pi-bk
       containers:
         - env:
             - name: SEARXNG_PORT
@@ -49,6 +58,13 @@ spec:
             httpGet:
               path: /
               port: http
+          resources:
+            limits:
+              cpu: 500m
+              memory: 256Mi
+            requests:
+              cpu: 50m
+              memory: 128Mi
           volumeMounts:
             - mountPath: /etc/searxng/settings.yml
               name: settings
@@ -59,6 +75,11 @@ spec:
               readOnly: true
               subPath: limiter.toml
       imagePullSecrets: []
+      tolerations:
+        - effect: NoSchedule
+          key: pi-only
+          operator: Equal
+          value: 'true'
       volumes:
         - configMap:
             items:

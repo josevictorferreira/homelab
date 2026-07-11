@@ -63,6 +63,27 @@ in
               }
             ];
           };
+          deployment = {
+            affinity = homelab.kubernetes.affinities.piNode;
+            tolerations = [
+              {
+                key = "pi-only";
+                operator = "Equal";
+                value = "true";
+                effect = "NoSchedule";
+              }
+            ];
+            resources = {
+              requests = {
+                cpu = "50m";
+                memory = "128Mi";
+              };
+              limits = {
+                cpu = "500m";
+                memory = "256Mi";
+              };
+            };
+          };
         };
       };
     };
