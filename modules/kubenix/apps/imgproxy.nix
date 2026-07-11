@@ -64,15 +64,6 @@ in
             ];
           };
           deployment = {
-            affinity = homelab.kubernetes.affinities.piNode;
-            tolerations = [
-              {
-                key = "pi-only";
-                operator = "Equal";
-                value = "true";
-                effect = "NoSchedule";
-              }
-            ];
             resources = {
               requests = {
                 cpu = "50m";
