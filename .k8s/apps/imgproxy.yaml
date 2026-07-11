@@ -30,7 +30,15 @@ spec:
         imgproxy: 'true'
         release: imgproxy
     spec:
-      affinity: {}
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values:
+                      - lab-pi-bk
       containers:
         - envFrom:
             - secretRef:
@@ -67,9 +75,19 @@ spec:
             initialDelaySeconds: 10
             successThreshold: 1
             timeoutSeconds: 5
-          resources: {}
+          resources:
+            limits:
+              cpu: 500m
+              memory: 256Mi
+            requests:
+              cpu: 50m
+              memory: 128Mi
       nodeSelector: {}
-      tolerations: []
+      tolerations:
+        - effect: NoSchedule
+          key: pi-only
+          operator: Equal
+          value: 'true'
 ---
 apiVersion: v1
 data:
