@@ -428,6 +428,7 @@ in
     metadata = {
       name = "${name}-gateway";
       inherit namespace;
+      annotations."kustomize.toolkit.fluxcd.io/force" = "enabled";
       labels = {
         app = name;
         component = "gateway";
