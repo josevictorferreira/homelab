@@ -238,29 +238,10 @@ let
   # Per-profile gateway containers.
   gatewayProfiles = [
     {
-      profile = "ted";
-      profileFlag = "ted";
-      matrixSecretKey = "MATRIX_ACCESS_TOKEN";
-      whatsapp = false;
-    }
-    {
-      profile = "kira";
-      profileFlag = "kira";
-      matrixSecretKey = "HERMES_KIRA_MATRIX_ACCESS_TOKEN";
-      whatsapp = true;
-    }
-    {
       profile = "mel";
       profileFlag = "mel";
       matrixSecretKey = "HERMES_MEL_MATRIX_ACCESS_TOKEN";
-      whatsapp = false;
-    }
-    {
-      profile = "spike";
-      profileFlag = "spike";
-      matrixSecretKey = "HERMES_SPIKE_MATRIX_ACCESS_TOKEN";
-      whatsapp = false;
-      cpuLimit = "125m";
+      whatsapp = true;
     }
     {
       profile = "luna";
