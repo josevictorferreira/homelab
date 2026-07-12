@@ -32,7 +32,7 @@ in
         # OpenID Connect authentication via Keycloak homelab realm
         auth_oidc:
           client_id: "homeassistant"
-          discovery_url: "https://identity.${homelab.domain}/realms/homelab/.well-known/openid-configuration"
+          discovery_url: https://identity.${homelab.domain}/realms/homelab/.well-known/openid-configuration
           display_name: "Keycloak"
           groups_scope: "homeassistant-groups"
           roles:
