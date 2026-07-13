@@ -1,8 +1,7 @@
 apiVersion: v1
 data:
-  blocky.override: 'forward . 10.10.10.100
-
-    '
+  josevictor-me.server: "josevictor.me:53 {\n  errors\n  cache 30\n  forward . 10.10.10.100\n\
+    }\n"
 kind: ConfigMap
 metadata:
   annotations:
