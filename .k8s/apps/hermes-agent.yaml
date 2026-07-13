@@ -46,13 +46,11 @@ spec:
           image: docker.io/nousresearch/hermes-agent:v2026.7.7.2@sha256:3db34ce19adfa080736a2a3feb0316dbcccc588faa9afe7fd8ae1c03b4f1a53a
           imagePullPolicy: IfNotPresent
           livenessProbe:
-            exec:
-              command:
-                - /opt/hermes/.venv/bin/python3
-                - -c
-                - import urllib.request; urllib.request.urlopen("http://127.0.0.1:9119/")
-            initialDelaySeconds: 300
+            failureThreshold: 3
+            initialDelaySeconds: 30
             periodSeconds: 30
+            tcpSocket:
+              port: 9119
             timeoutSeconds: 5
           name: dashboard
           ports:
@@ -60,13 +58,11 @@ spec:
               name: http
               protocol: TCP
           readinessProbe:
-            exec:
-              command:
-                - /opt/hermes/.venv/bin/python3
-                - -c
-                - import urllib.request; urllib.request.urlopen("http://127.0.0.1:9119/")
-            initialDelaySeconds: 120
+            failureThreshold: 3
+            initialDelaySeconds: 5
             periodSeconds: 10
+            tcpSocket:
+              port: 9119
             timeoutSeconds: 5
           resources:
             limits:

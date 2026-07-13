@@ -612,28 +612,22 @@ in
               };
               securityContext = commonSecurityContext;
               readinessProbe = {
-                exec = {
-                  command = [
-                    "/opt/hermes/.venv/bin/python3"
-                    "-c"
-                    ''import urllib.request; urllib.request.urlopen("http://127.0.0.1:9119/")''
-                  ];
+                tcpSocket = {
+                  port = 9119;
                 };
-                initialDelaySeconds = 120;
+                initialDelaySeconds = 5;
                 timeoutSeconds = 5;
                 periodSeconds = 10;
+                failureThreshold = 3;
               };
               livenessProbe = {
-                exec = {
-                  command = [
-                    "/opt/hermes/.venv/bin/python3"
-                    "-c"
-                    ''import urllib.request; urllib.request.urlopen("http://127.0.0.1:9119/")''
-                  ];
+                tcpSocket = {
+                  port = 9119;
                 };
-                initialDelaySeconds = 300;
+                initialDelaySeconds = 30;
                 timeoutSeconds = 5;
                 periodSeconds = 30;
+                failureThreshold = 3;
               };
             }
           ];
