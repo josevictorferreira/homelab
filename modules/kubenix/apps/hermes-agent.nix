@@ -616,7 +616,7 @@ in
                   command = [
                     "/opt/hermes/.venv/bin/python3"
                     "-c"
-                    ''import urllib.request; urllib.request.urlopen("http://127.0.0.1:9119/", timeout=3)''
+                    ''import urllib.request; urllib.request.urlopen("http://127.0.0.1:9119/")''
                   ];
                 };
                 initialDelaySeconds = 120;
@@ -628,7 +628,7 @@ in
                   command = [
                     "/opt/hermes/.venv/bin/python3"
                     "-c"
-                    ''import urllib.request; urllib.request.urlopen("http://127.0.0.1:9119/", timeout=3)''
+                    ''import urllib.request; urllib.request.urlopen("http://127.0.0.1:9119/")''
                   ];
                 };
                 initialDelaySeconds = 300;
