@@ -16,6 +16,7 @@ in
       ELEVENLABS_API_KEY = kubenix.lib.secretsFor "elevenlabs_api_key";
       ELEVENLABS_MODEL = "eleven_v3";
       SUPERTONIC_BASE_URL = "http://10.10.10.10:7788";
+      GEPARD_BASE_URL = "http://10.10.10.10:8000";
     };
   };
 }
