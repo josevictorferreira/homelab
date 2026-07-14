@@ -28,9 +28,20 @@ in
         };
         priorityClassName = "preemptible";
         values = {
-          defaultPodOptions.imagePullSecrets = [
-            { name = "ghcr-registry-secret"; }
-          ];
+          defaultPodOptions = {
+            affinity = homelab.kubernetes.affinities.piNode;
+            tolerations = [
+              {
+                key = "pi-only";
+                operator = "Equal";
+                value = "true";
+                effect = "NoSchedule";
+              }
+            ];
+            imagePullSecrets = [
+              { name = "ghcr-registry-secret"; }
+            ];
+          };
           controllers.main.containers.main = {
             envFrom = [
               { secretRef.name = secretName; }
@@ -72,9 +83,20 @@ in
         };
         priorityClassName = "preemptible";
         values = {
-          defaultPodOptions.imagePullSecrets = [
-            { name = "ghcr-registry-secret"; }
-          ];
+          defaultPodOptions = {
+            affinity = homelab.kubernetes.affinities.piNode;
+            tolerations = [
+              {
+                key = "pi-only";
+                operator = "Equal";
+                value = "true";
+                effect = "NoSchedule";
+              }
+            ];
+            imagePullSecrets = [
+              { name = "ghcr-registry-secret"; }
+            ];
+          };
           controllers.main.containers.main = {
             envFrom = [
               { secretRef.name = secretName; }
@@ -107,9 +129,20 @@ in
         ];
         priorityClassName = "preemptible";
         values = {
-          defaultPodOptions.imagePullSecrets = [
-            { name = "ghcr-registry-secret"; }
-          ];
+          defaultPodOptions = {
+            affinity = homelab.kubernetes.affinities.piNode;
+            tolerations = [
+              {
+                key = "pi-only";
+                operator = "Equal";
+                value = "true";
+                effect = "NoSchedule";
+              }
+            ];
+            imagePullSecrets = [
+              { name = "ghcr-registry-secret"; }
+            ];
+          };
           controllers.main.containers.main = {
             envFrom = [
               { secretRef.name = secretName; }
