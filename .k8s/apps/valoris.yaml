@@ -31,6 +31,15 @@ spec:
         app.kubernetes.io/instance: valoris
         app.kubernetes.io/name: valoris
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values:
+                      - lab-pi-bk
       automountServiceAccountToken: true
       containers:
         - env:
@@ -64,6 +73,11 @@ spec:
         - name: ghcr-registry-secret
       priorityClassName: preemptible
       serviceAccountName: default
+      tolerations:
+        - effect: NoSchedule
+          key: pi-only
+          operator: Equal
+          value: 'true'
 ---
 apiVersion: v1
 kind: Service
@@ -161,6 +175,15 @@ spec:
         app.kubernetes.io/instance: valoris-backend
         app.kubernetes.io/name: valoris-backend
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values:
+                      - lab-pi-bk
       automountServiceAccountToken: true
       containers:
         - command:
@@ -203,6 +226,11 @@ spec:
         - name: ghcr-registry-secret
       priorityClassName: preemptible
       serviceAccountName: default
+      tolerations:
+        - effect: NoSchedule
+          key: pi-only
+          operator: Equal
+          value: 'true'
 ---
 apiVersion: v1
 kind: Service
@@ -300,6 +328,15 @@ spec:
         app.kubernetes.io/instance: valoris-worker
         app.kubernetes.io/name: valoris-worker
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values:
+                      - lab-pi-bk
       automountServiceAccountToken: true
       containers:
         - command:
@@ -328,6 +365,11 @@ spec:
         - name: ghcr-registry-secret
       priorityClassName: preemptible
       serviceAccountName: default
+      tolerations:
+        - effect: NoSchedule
+          key: pi-only
+          operator: Equal
+          value: 'true'
 ---
 apiVersion: v1
 kind: Service
