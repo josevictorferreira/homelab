@@ -17,6 +17,7 @@ in
       ELEVENLABS_MODEL = "eleven_v3";
       SUPERTONIC_BASE_URL = "http://10.10.10.10:7788";
       GEPARD_BASE_URL = "http://10.10.10.10:8000";
+      OMNIVOICE_BASE_URL = "http://10.10.10.10:8001";
     };
   };
 }
