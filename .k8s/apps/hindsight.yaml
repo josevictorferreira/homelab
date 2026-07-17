@@ -384,34 +384,34 @@ spec:
                   \ hindsight-api pods: {sorted(live)}')\n\n    if not live:\n   \
                   \     print('no live hindsight-api pods; skipping reset')\n    \
                   \    return\n\n    engine = sa.create_engine(DB_URL)\n    with engine.begin()\
-                  \ as conn:\n        result = conn.execute(\n            text(''\n\
-                  \                SELECT operation_id, bank_id, operation_type, worker_id,\
-                  \ updated_at\n                FROM async_operations\n          \
-                  \      WHERE status = 'processing'\n                  AND worker_id\
-                  \ LIKE 'hindsight-api-%'\n                  AND worker_id NOT IN\
-                  \ :live\n                  AND updated_at < now() - interval '1\
-                  \ minute' * :stale\n                ORDER BY updated_at\n      \
-                  \      ''),\n            {\n                'live': tuple(live),\n\
+                  \ as conn:\n        result = conn.execute(\n            text(\"\"\
+                  \"\n                SELECT operation_id, bank_id, operation_type,\
+                  \ worker_id, updated_at\n                FROM async_operations\n\
+                  \                WHERE status = 'processing'\n                 \
+                  \ AND worker_id LIKE 'hindsight-api-%'\n                  AND worker_id\
+                  \ NOT IN :live\n                  AND updated_at < now() - interval\
+                  \ '1 minute' * :stale\n                ORDER BY updated_at\n   \
+                  \         \"\"\"),\n            {\n                'live': tuple(live),\n\
                   \                'stale': STALE_MINUTES,\n            },\n     \
                   \   )\n        rows = result.mappings().fetchall()\n\n        if\
                   \ not rows:\n            print('no stale processing operations found')\n\
                   \            return\n\n        print(f'resetting {len(rows)} stale\
                   \ operation(s):')\n        for row in rows:\n            print(\n\
-                  \                f'  {row[\\\"operation_id\\\"]} {row[\\\"bank_id\\\
-                  \"]}'\n                f' {row[\\\"operation_type\\\"]} {row[\\\"\
-                  worker_id\\\"]}'\n                f' {row[\\\"updated_at\\\"]}'\n\
-                  \            )\n\n        ids = [row['operation_id'] for row in\
-                  \ rows]\n        update = conn.execute(\n            text(''\n \
-                  \               UPDATE async_operations\n                SET status\
-                  \ = 'pending',\n                    worker_id = NULL,\n        \
-                  \            claimed_at = NULL,\n                    retry_count\
-                  \ = 0,\n                    next_retry_at = NULL,\n            \
-                  \        updated_at = now()\n                WHERE operation_id\
-                  \ = ANY(:ids)\n                  AND status = 'processing'\n   \
-                  \         ''),\n            {'ids': ids},\n        )\n        print(f'reset\
-                  \ {update.rowcount} operation(s) to pending')\n\n\nif __name__ ==\
-                  \ '__main__':\n    try:\n        main()\n    except Exception as\
-                  \ e:\n        print(f'error: {e}', file=sys.stderr)\n        sys.exit(1)\n"
+                  \                f\"  {row['operation_id']} {row['bank_id']}\"\n\
+                  \                f\" {row['operation_type']} {row['worker_id']}\"\
+                  \n                f\" {row['updated_at']}\"\n            )\n\n \
+                  \       ids = [row['operation_id'] for row in rows]\n        update\
+                  \ = conn.execute(\n            text(\"\"\"\n                UPDATE\
+                  \ async_operations\n                SET status = 'pending',\n  \
+                  \                  worker_id = NULL,\n                    claimed_at\
+                  \ = NULL,\n                    retry_count = 0,\n              \
+                  \      next_retry_at = NULL,\n                    updated_at = now()\n\
+                  \                WHERE operation_id = ANY(:ids)\n              \
+                  \    AND status = 'processing'\n            \"\"\"),\n         \
+                  \   {'ids': ids},\n        )\n        print(f'reset {update.rowcount}\
+                  \ operation(s) to pending')\n\n\nif __name__ == '__main__':\n  \
+                  \  try:\n        main()\n    except Exception as e:\n        print(f'error:\
+                  \ {e}', file=sys.stderr)\n        sys.exit(1)\n"
               env:
                 - name: HINDSIGHT_REAPER_STALE_MINUTES
                   value: '5'
@@ -426,7 +426,7 @@ spec:
                   cpu: 100m
                   memory: 128Mi
                 requests:
-                  cpu: 10m
+                  cpu: 50m
                   memory: 64Mi
           restartPolicy: OnFailure
           serviceAccountName: hindsight-reaper
