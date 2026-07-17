@@ -356,6 +356,11 @@ spec:
             - containerPort: 3000
               name: http
               protocol: TCP
+          resources:
+            limits:
+              memory: 1Gi
+            requests:
+              memory: 256Mi
       dnsPolicy: ClusterFirst
       enableServiceLinks: false
       hostIPC: false
