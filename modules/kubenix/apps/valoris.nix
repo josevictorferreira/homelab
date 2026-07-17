@@ -127,6 +127,14 @@ in
           "bin/jobs"
           "start"
         ];
+        resources = {
+          limits = {
+            memory = "1Gi";
+          };
+          requests = {
+            memory = "256Mi";
+          };
+        };
         priorityClassName = "preemptible";
         values = {
           defaultPodOptions = {
