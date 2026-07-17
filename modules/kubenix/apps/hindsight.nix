@@ -321,7 +321,7 @@ in
                     engine = sa.create_engine(DB_URL)
                     with engine.begin() as conn:
                         result = conn.execute(
-                            text('''
+                            text("""
                                 SELECT operation_id, bank_id, operation_type, worker_id, updated_at
                                 FROM async_operations
                                 WHERE status = 'processing'
@@ -329,7 +329,7 @@ in
                                   AND worker_id NOT IN :live
                                   AND updated_at < now() - interval '1 minute' * :stale
                                 ORDER BY updated_at
-                            '''),
+                            """),
                             {
                                 'live': tuple(live),
                                 'stale': STALE_MINUTES,
@@ -344,14 +344,14 @@ in
                         print(f'resetting {len(rows)} stale operation(s):')
                         for row in rows:
                             print(
-                                f'  {row[\"operation_id\"]} {row[\"bank_id\"]}'
-                                f' {row[\"operation_type\"]} {row[\"worker_id\"]}'
-                                f' {row[\"updated_at\"]}'
+                                f"  {row['operation_id']} {row['bank_id']}"
+                                f" {row['operation_type']} {row['worker_id']}"
+                                f" {row['updated_at']}"
                             )
 
                         ids = [row['operation_id'] for row in rows]
                         update = conn.execute(
-                            text('''
+                            text("""
                                 UPDATE async_operations
                                 SET status = 'pending',
                                     worker_id = NULL,
@@ -361,7 +361,7 @@ in
                                     updated_at = now()
                                 WHERE operation_id = ANY(:ids)
                                   AND status = 'processing'
-                            '''),
+                            """),
                             {'ids': ids},
                         )
                         print(f'reset {update.rowcount} operation(s) to pending')
@@ -377,7 +377,9 @@ in
             ];
             resources = {
               requests = {
-                cpu = "10m";
+                # apps namespace LimitRange enforces min 50m CPU/container;
+                # 10m was silently rejected (FailedCreate), so the reaper never ran.
+                cpu = "50m";
                 memory = "64Mi";
               };
               limits = {
