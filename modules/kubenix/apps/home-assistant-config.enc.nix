@@ -20,25 +20,25 @@ in
     };
     data = {
       "configuration.yaml" = ''
-                  # Configure HTTP proxy settings so Home Assistant trusts the cluster ingress
-                  http:
-                    use_x_forwarded_for: true
-                    trusted_proxies:
-                      - 10.0.0.0/8
-                      - 172.16.0.0/12
-                      - 192.168.0.0/16
-                      - 127.0.0.0/8
+        # Configure HTTP proxy settings so Home Assistant trusts the cluster ingress
+        http:
+          use_x_forwarded_for: true
+          trusted_proxies:
+            - 10.0.0.0/8
+            - 172.16.0.0/12
+            - 192.168.0.0/16
+            - 127.0.0.0/8
 
-                  # OpenID Connect authentication via Keycloak homelab realm
-                  auth_oidc:
-                    client_id: "homeassistant"
-        discovery_url: https://identity.${homelab.domain}/realms/homelab/.well-known/openid-configuration
-                    display_name: "Keycloak"
-            features:
-              include_groups_scope: false
-            roles:
-                      user: homeassistant
-                      admin: homeassistantadmin
+        # OpenID Connect authentication via Keycloak homelab realm
+        auth_oidc:
+          client_id: "homeassistant"
+          discovery_url: https://identity.${homelab.domain}/realms/homelab/.well-known/openid-configuration
+          display_name: "Keycloak"
+          features:
+            include_groups_scope: false
+          roles:
+            user: homeassistant
+            admin: homeassistantadmin
       '';
     };
   };

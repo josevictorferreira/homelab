@@ -11,7 +11,7 @@ in
       inherit namespace;
       image = {
         repository = "ghcr.io/josevictorferreira/oratoria";
-        tag = "latest@sha256:6845c73ac52e54e3acb08fb94c83ee9f06393d315faaca549430c1abd3a93dc3";
+        tag = "latest@sha256:63144777f415dd7428df1123bd75e0833bfaec248e2e3c286d089b0f67292572";
         pullPolicy = "Always";
       };
       port = 5173;

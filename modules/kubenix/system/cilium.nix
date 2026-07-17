@@ -67,6 +67,10 @@
         spec = {
           externalIPs = true;
           loadBalancerIPs = true;
+          # Restrict L2/ARP announcements to the physical LAN NIC. Without this
+          # Cilium may pick tailscale0 (NOARP, no MAC) and crash-loop the agent
+          # with "failed to craft ARP reply packet: invalid hardware address".
+          interfaces = [ "^enp1s0$" ];
           nodeSelector = {
             matchExpressions = [
               {

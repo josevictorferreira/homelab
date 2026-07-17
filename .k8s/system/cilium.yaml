@@ -601,6 +601,8 @@ metadata:
   namespace: kube-system
 spec:
   externalIPs: true
+  interfaces:
+    - ^enp1s0$
   loadBalancerIPs: true
   nodeSelector:
     matchExpressions:
