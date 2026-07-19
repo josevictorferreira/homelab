@@ -127,6 +127,18 @@ in
               requests.memory = "64Mi";
             };
           };
+          # lab-gamma-wk is an 8Gi node hosting two OSDs. At Ceph's default
+          # osd_memory_target (4Gi) the two OSDs alone target ~8Gi, so the node
+          # runs into memory-pressure evictions that repeatedly kill low-priority
+          # pods (rook-ceph-exporter, node-exporter) and leave evicted husks.
+          # Cap the per-host target to 1.5Gi (2 OSDs -> ~3.6Gi actual) so the node
+          # keeps ~3Gi of headroom. Only masks gamma's OSDs; the 12-16Gi nodes
+          # keep the 4Gi default. Rook reconciles this via `ceph config set`.
+          cephConfig = {
+            "osd/host:lab-gamma-wk" = {
+              osd_memory_target = "1610612736";
+            };
+          };
           storage = {
             useAllNodes = false;
             useAllDevices = false;

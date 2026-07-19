@@ -137,6 +137,9 @@ metadata:
   name: rook-ceph
   namespace: rook-ceph
 spec:
+  cephConfig:
+    osd/host:lab-gamma-wk:
+      osd_memory_target: '1610612736'
   cephVersion:
     allowUnsupported: false
     image: quay.io/ceph/ceph:v19.2.3
