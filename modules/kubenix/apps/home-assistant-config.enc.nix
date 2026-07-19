@@ -34,6 +34,9 @@ in
           client_id: "homeassistant"
           discovery_url: https://identity.${homelab.domain}/realms/homelab/.well-known/openid-configuration
           display_name: "Keycloak"
+          groups_scope: "homeassistant-groups"
+          roles:
+            admin: "homeassistantadmin"
       '';
     };
   };
