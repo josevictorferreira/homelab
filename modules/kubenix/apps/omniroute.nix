@@ -5,6 +5,27 @@ let
   app = "omniroute";
 in
 {
+  # NVMe-backed PVCs for omniroute's SQLite, migrated off the failing BX500
+  # (osd.1) that stalls the synchronous DB and freezes the event loop.
+  kubernetes.resources.persistentVolumeClaims = {
+    "${app}-data-nvme" = {
+      metadata = { inherit namespace; };
+      spec = {
+        accessModes = [ "ReadWriteOnce" ];
+        storageClassName = "rook-ceph-block-nvme";
+        resources.requests.storage = "5Gi";
+      };
+    };
+    "${app}-data-home-nvme" = {
+      metadata = { inherit namespace; };
+      spec = {
+        accessModes = [ "ReadWriteOnce" ];
+        storageClassName = "rook-ceph-block-nvme";
+        resources.requests.storage = "1Gi";
+      };
+    };
+  };
+
   submodules.instances."${app}" = {
     submodule = "release";
     args = {

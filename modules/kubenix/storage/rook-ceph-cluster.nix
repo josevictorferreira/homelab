@@ -219,6 +219,41 @@ in
               };
             };
           }
+          {
+            # Dedicated NVMe-only pool for omniroute's synchronous SQLite.
+            # replicapool's live crush rule spans all device classes (incl. the
+            # failing BX500 osd.1), which stalls omniroute's event loop in D-state.
+            # Only 2 nvme OSDs exist (osd.0 lab-delta, osd.4 lab-beta) -> size=2.
+            name = "omniroute-nvme";
+            spec = {
+              failureDomain = "host";
+              deviceClass = "nvme";
+              replicated = {
+                size = 2;
+                requireSafeReplicaSize = false;
+              };
+            };
+            storageClass = {
+              enabled = true;
+              name = "rook-ceph-block-nvme";
+              isDefault = false;
+              allowVolumeExpansion = true;
+              # Retain: protect the migrated DB volume from accidental PVC deletion.
+              reclaimPolicy = "Retain";
+              parameters = {
+                imageFormat = "2";
+                imageFeatures = "layering";
+                "csi.storage.k8s.io/provisioner-secret-name" = "rook-csi-rbd-provisioner";
+                "csi.storage.k8s.io/provisioner-secret-namespace" = namespace;
+                "csi.storage.k8s.io/controller-expand-secret-name" = "rook-csi-rbd-provisioner";
+                "csi.storage.k8s.io/controller-expand-secret-namespace" = namespace;
+                "csi.storage.k8s.io/controller-publish-secret-name" = "rook-csi-rbd-provisioner";
+                "csi.storage.k8s.io/controller-publish-secret-namespace" = namespace;
+                "csi.storage.k8s.io/node-stage-secret-name" = "rook-csi-rbd-node";
+                "csi.storage.k8s.io/node-stage-secret-namespace" = namespace;
+              };
+            };
+          }
         ];
 
         cephFileSystems = [
