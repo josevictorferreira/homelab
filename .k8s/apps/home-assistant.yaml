@@ -170,7 +170,7 @@ metadata:
 spec:
   ingressClassName: cilium
   rules:
-    - host: hass.josevictor.me
+    - host: home.josevictor.me
       http:
         paths:
           - backend:
@@ -182,5 +182,5 @@ spec:
             pathType: Prefix
   tls:
     - hosts:
-        - hass.josevictor.me
+        - home.josevictor.me
       secretName: wildcard-tls

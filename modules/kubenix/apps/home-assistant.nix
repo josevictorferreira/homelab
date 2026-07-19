@@ -3,7 +3,7 @@
 let
   namespace = homelab.kubernetes.namespaces.applications;
   app = "home-assistant";
-  domain = "hass.${homelab.domain}";
+  domain = "home.${homelab.domain}";
 
   hacsVersion = "2.0.5";
   hacsZipUrl = "https://github.com/hacs/integration/releases/download/${hacsVersion}/hacs.zip";
