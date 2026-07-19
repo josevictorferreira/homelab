@@ -2,7 +2,7 @@
 
 let
   namespace = homelab.kubernetes.namespaces.applications;
-  domain = "hass.${homelab.domain}";
+  domain = "home.${homelab.domain}";
 in
 {
   kubernetes.resources.secrets."home-assistant-secret" = {
