@@ -153,56 +153,10 @@ spec:
       volumes:
         - name: data
           persistentVolumeClaim:
-            claimName: omniroute-data
+            claimName: omniroute-data-nvme
         - name: data-home
           persistentVolumeClaim:
-            claimName: omniroute-data-home
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  annotations:
-    kubenix/k8s-version: '1.32'
-    kubenix/project-name: ze-homelab
-  labels:
-    app.kubernetes.io/instance: omniroute
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: omniroute
-    helm.sh/chart: app-template-4.2.0
-    kubenix/module-name: release
-    kubenix/module-version: 1.0.0
-  name: omniroute-data
-  namespace: apps
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 5Gi
-  storageClassName: rook-ceph-block
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  annotations:
-    kubenix/k8s-version: '1.32'
-    kubenix/project-name: ze-homelab
-  labels:
-    app.kubernetes.io/instance: omniroute
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: omniroute
-    helm.sh/chart: app-template-4.2.0
-    kubenix/module-name: release
-    kubenix/module-version: 1.0.0
-  name: omniroute-data-home
-  namespace: apps
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 1Gi
-  storageClassName: rook-ceph-block
+            claimName: omniroute-data-home-nvme
 ---
 apiVersion: v1
 kind: Service

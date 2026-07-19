@@ -215,9 +215,7 @@ in
         persistence.data = {
           enabled = true;
           type = "persistentVolumeClaim";
-          storageClass = kubenix.lib.defaultStorageClass;
-          size = "5Gi";
-          accessMode = "ReadWriteOnce";
+          existingClaim = "${app}-data-nvme";
           globalMounts = [
             {
               path = "/app/data";
@@ -228,9 +226,7 @@ in
         persistence.data-home = {
           enabled = true;
           type = "persistentVolumeClaim";
-          storageClass = kubenix.lib.defaultStorageClass;
-          size = "1Gi";
-          accessMode = "ReadWriteOnce";
+          existingClaim = "${app}-data-home-nvme";
           globalMounts = [
             {
               path = "/app/data-home";
