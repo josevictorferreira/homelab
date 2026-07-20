@@ -43,7 +43,7 @@ spec:
           envFrom:
             - secretRef:
                 name: hermes-agent-env
-          image: docker.io/nousresearch/hermes-agent:v2026.7.7.2@sha256:3db34ce19adfa080736a2a3feb0316dbcccc588faa9afe7fd8ae1c03b4f1a53a
+          image: docker.io/nousresearch/hermes-agent:v2026.7.20@sha256:a6ce64e2038867885c2c90f6602425e6e70293d5e6d952a0e603a99265e01c40
           imagePullPolicy: IfNotPresent
           livenessProbe:
             failureThreshold: 3
@@ -288,7 +288,7 @@ spec:
           envFrom:
             - secretRef:
                 name: hermes-agent-env
-          image: docker.io/nousresearch/hermes-agent:v2026.7.7.2@sha256:3db34ce19adfa080736a2a3feb0316dbcccc588faa9afe7fd8ae1c03b4f1a53a
+          image: docker.io/nousresearch/hermes-agent:v2026.7.20@sha256:a6ce64e2038867885c2c90f6602425e6e70293d5e6d952a0e603a99265e01c40
           imagePullPolicy: IfNotPresent
           name: gateway-mel
           resources:
@@ -465,7 +465,7 @@ spec:
           envFrom:
             - secretRef:
                 name: hermes-agent-env
-          image: docker.io/nousresearch/hermes-agent:v2026.7.7.2@sha256:3db34ce19adfa080736a2a3feb0316dbcccc588faa9afe7fd8ae1c03b4f1a53a
+          image: docker.io/nousresearch/hermes-agent:v2026.7.20@sha256:a6ce64e2038867885c2c90f6602425e6e70293d5e6d952a0e603a99265e01c40
           imagePullPolicy: IfNotPresent
           name: gateway-luna
           resources:
@@ -544,7 +544,7 @@ spec:
               $d\" -type d ! -perm -2070 -exec chmod g+rwxs {} + 2>/dev/null || true\n\
               \  find \"$d\" -type f ! -perm -060 -exec chmod g+rw {} + 2>/dev/null\
               \ || true\ndone\n"
-          image: docker.io/nousresearch/hermes-agent:v2026.7.7.2@sha256:3db34ce19adfa080736a2a3feb0316dbcccc588faa9afe7fd8ae1c03b4f1a53a
+          image: docker.io/nousresearch/hermes-agent:v2026.7.20@sha256:a6ce64e2038867885c2c90f6602425e6e70293d5e6d952a0e603a99265e01c40
           name: fix-profile-permissions
           securityContext:
             capabilities:
