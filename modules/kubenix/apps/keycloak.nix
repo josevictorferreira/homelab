@@ -153,7 +153,7 @@ in
           }
           {
             name = "add-oratoria-theme";
-            image = "ghcr.io/josevictorferreira/oratoria-identity:v0.2.0";
+            image = "ghcr.io/josevictorferreira/oratoria-identity:v0.3.0";
             command = [
               "sh"
               "-c"
