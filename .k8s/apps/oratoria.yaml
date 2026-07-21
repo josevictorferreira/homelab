@@ -36,7 +36,7 @@ spec:
         - envFrom:
             - secretRef:
                 name: oratoria-config
-          image: ghcr.io/josevictorferreira/oratoria:latest@sha256:5c3afe37278dfca08f4d6af2da2b40ac4ab4042fd18551040004f9fa6b151738
+          image: ghcr.io/josevictorferreira/oratoria:latest
           imagePullPolicy: Always
           name: main
           ports:
