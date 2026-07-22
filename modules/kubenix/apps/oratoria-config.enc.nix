@@ -18,6 +18,7 @@ in
       SUPERTONIC_BASE_URL = "http://10.10.10.10:7788";
       GEPARD_BASE_URL = "http://10.10.10.10:8000";
       QWEN3_TTS_BASE_URL = "http://10.10.10.10:8000";
+      HIGGS_BASE_URL = "http://10.10.10.10:8095";
       OMNIVOICE_BASE_URL = "http://10.10.10.10:8001";
       FISH_SPEECH_BASE_URL = "http://10.10.10.10:8080";
     };
