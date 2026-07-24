@@ -504,6 +504,30 @@ let
                 template = weatherSevenDayTemplate;
               }
               {
+                type = "custom-api";
+                title = "Recent GitHub Repositories";
+                cache = "1h";
+                timeout = "30s";
+                method = "GET";
+                url = "https://api.github.com/search/commits?q=author:josevictorferreira&sort=author-date&order=desc&per_page=100";
+                headers = {
+                  Accept = "application/vnd.github+json";
+                  Authorization = "Bearer ${kubenix.lib.secretsFor "github_token"}";
+                };
+                template = ''
+                  {{ range $index, $commit := unique "repository.full_name" (.JSON.Array "items") }}
+                    {{ if lt $index 10 }}
+                      <div class="flex items-center gap-10">
+                        <div class="size-title-dynamic color-primary">{{ $commit.String "repository.full_name" }}</div>
+                        <div class="flex-1"></div>
+                        <a class="color-highlight text-compact" href="{{ $commit.String "repository.html_url" }}" target="_blank" rel="noreferrer">Open</a>
+                        <div class="color-subdue text-compact" {{ $commit.String "commit.author.date" | parseTime "rfc3339" | toRelativeTime }}></div>
+                      </div>
+                    {{ end }}
+                  {{ end }}
+                '';
+              }
+              {
                 type = "markets";
                 cache = "1h";
                 markets = [
