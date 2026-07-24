@@ -105,6 +105,7 @@ spec:
         - name: ghcr-registry-secret
       securityContext:
         fsGroup: 2002
+        fsGroupChangePolicy: OnRootMismatch
         supplementalGroups:
           - 100
       terminationGracePeriodSeconds: 30
@@ -574,6 +575,7 @@ spec:
               subPath: whatsapp-bridge-node_modules
       securityContext:
         fsGroup: 2002
+        fsGroupChangePolicy: OnRootMismatch
         supplementalGroups:
           - 100
       terminationGracePeriodSeconds: 60

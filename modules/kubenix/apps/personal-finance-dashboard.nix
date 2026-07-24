@@ -18,7 +18,11 @@ in
             labels.app = name;
           };
           spec = {
-            securityContext.fsGroup = 100;
+            securityContext = {
+              fsGroup = 100;
+              # Avoid a recursive chown of the whole CephFS volume on each mount.
+              fsGroupChangePolicy = "OnRootMismatch";
+            };
             imagePullSecrets = [
               { name = "ghcr-registry-secret"; }
             ];
