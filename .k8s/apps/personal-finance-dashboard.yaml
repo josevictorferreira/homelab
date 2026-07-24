@@ -32,6 +32,7 @@ spec:
         - name: ghcr-registry-secret
       securityContext:
         fsGroup: 100
+        fsGroupChangePolicy: OnRootMismatch
       volumes:
         - name: cephfs
           persistentVolumeClaim:

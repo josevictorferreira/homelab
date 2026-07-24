@@ -72,8 +72,12 @@ let
   # private to "other" (o---). Both the gateway and the dashboard run as uid
   # 10000 (not the dir owner), so they must join GID 100 to traverse profile
   # dirs and read each profile's config.yaml.
+  # OnRootMismatch: the default (Always) makes kubelet recursively chown every
+  # inode on the shared CephFS volume on each mount, which exceeds kubelet's
+  # 2min mount timeout and retries forever, saturating the MDS.
   podSecurityContext = {
     fsGroup = 2002;
+    fsGroupChangePolicy = "OnRootMismatch";
     supplementalGroups = [ 100 ];
   };
   cliWrapper = {
