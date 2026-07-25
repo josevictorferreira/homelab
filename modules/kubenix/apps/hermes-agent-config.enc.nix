@@ -25,6 +25,7 @@ in
       OPENAI_API_KEY = kubenix.lib.secretsFor "openai_api_key";
       OMNIROUTE_API_KEY = kubenix.lib.secretsFor "omniroute_api_key";
       OMNIROUTE_BASE_URL = "https://omniroute.josevictor.me/api/v1";
+      MATRIX_HOMESERVER = kubenix.lib.secretsFor "hermes_matrix_homeserver";
       MATRIX_ALLOWED_USERS = kubenix.lib.secretsFor "hermes_matrix_allowed_users";
       MATRIX_ENCRYPTION = kubenix.lib.secretsFor "hermes_matrix_encryption";
       MATRIX_RECOVERY_KEY = kubenix.lib.secretsFor "hermes_matrix_recovery_key";
