@@ -195,7 +195,7 @@ spec:
               \                  fi\n                fi\n                  # Fix Baileys\
               \ 7.x syncFullHistory for incoming messages\n                  sed -i\
               \ 's/syncFullHistory: false/syncFullHistory: true/' /opt/hermes/scripts/whatsapp-bridge/bridge.js\
-              \ 2>/dev/null || true\n\nexec hermes multiplex-gateway start\n"
+              \ 2>/dev/null || true\n\nexec hermes gateway run\n"
           env:
             - name: HERMES_UID
               value: '10000'

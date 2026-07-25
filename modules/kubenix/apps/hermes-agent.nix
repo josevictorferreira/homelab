@@ -308,7 +308,7 @@ let
         "-c"
         ''
           ${bootstrap}
-          exec hermes multiplex-gateway start
+          exec hermes gateway run
         ''
       ];
       env =
