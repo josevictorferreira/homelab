@@ -308,7 +308,7 @@ let
         "-c"
         ''
           ${bootstrap}
-          exec hermes gateway run -vv
+          exec hermes gateway run
         ''
       ];
       env =
