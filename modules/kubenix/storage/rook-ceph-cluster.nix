@@ -134,9 +134,18 @@ in
           # Cap the per-host target to 1.5Gi (2 OSDs -> ~3.6Gi actual) so the node
           # keeps ~3Gi of headroom. Only masks gamma's OSDs; the 12-16Gi nodes
           # keep the 4Gi default. Rook reconciles this via `ceph config set`.
+          # lab-delta-cp is ~11.6Gi (not the 12-16Gi assumed above) and also hosts
+          # mon+mgr plus omniroute/java/tuwunel and ~40 controller pods. Its single
+          # OSD sat at 3.8Gi on the 4Gi default, leaving ~430Mi available, and a
+          # global OOM killed ceph-mds there. The osd container requests only 64Mi
+          # against a 6Gi limit, so the scheduler never sees this; capping the
+          # target is what actually bounds it. 2Gi -> ~2.2Gi actual, ~1.7Gi freed.
           cephConfig = {
             "osd/host:lab-gamma-wk" = {
               osd_memory_target = "1610612736";
+            };
+            "osd/host:lab-delta-cp" = {
+              osd_memory_target = "2147483648";
             };
           };
           storage = {
