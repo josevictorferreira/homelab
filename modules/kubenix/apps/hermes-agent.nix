@@ -322,13 +322,6 @@ let
             name = "HERMES_HOME";
             value = "/opt/data";
           }
-          {
-            name = "MATRIX_ACCESS_TOKEN";
-            valueFrom.secretKeyRef = {
-              name = "${name}-env";
-              key = "HERMES_MEL_MATRIX_ACCESS_TOKEN";
-            };
-          }
         ];
       envFrom = envFromSecret;
       volumeMounts =
