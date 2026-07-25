@@ -548,6 +548,7 @@ let
               {
                 type = "releases";
                 cache = "1d";
+                token = kubenix.lib.secretsFor "github_token";
                 show-source-icon = true;
                 repositories = [
                   # Homelab Apps

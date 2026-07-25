@@ -94,6 +94,19 @@ For apps needing shared CephFS:
 volumes = [{ name = "shared"; persistentVolumeClaim.claimName = "shared-storage"; }];
 ```
 
+## CONFIG CHANGES DO NOT AUTO-ROLLOUT
+
+`_submodules/release.nix` mounts config with `subPath` and sets no checksum annotation.
+Kubelet never refreshes a `subPath` file, and a ConfigMap-only change leaves the Deployment
+spec untouched — Flux applies the new ConfigMap while the running pod keeps its old config
+indefinitely (glance ran a 30-day-stale config this way).
+
+After any `*-config.enc.nix` change, restart and confirm the pod actually has the new file:
+```bash
+kubectl rollout restart deploy/<app> -n apps
+kubectl exec -n apps deploy/<app> -- grep <marker> <mountPath>/<filename>
+```
+
 ## CHECKLIST: Adding New App
 
 1. Create `apps/myapp.nix` with Helm release or raw resources
@@ -101,3 +114,4 @@ volumes = [{ name = "shared"; persistentVolumeClaim.claimName = "shared-storage"
 3. Add secrets to `secrets/k8s-secrets.enc.yaml` via `make secrets`
 4. Run `make manifests`
 5. Commit and push → Flux deploys
+6. Config-only change? Also `kubectl rollout restart deploy/myapp -n apps` (see above)
