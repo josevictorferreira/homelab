@@ -242,33 +242,11 @@ let
     }
   ];
 
-  # Per-profile gateway containers.
-  gatewayProfiles = [
-    {
-      profile = "mel";
-      profileFlag = "mel";
-      matrixSecretKey = "HERMES_MEL_MATRIX_ACCESS_TOKEN";
-      whatsapp = true;
-    }
-    {
-      profile = "luna";
-      profileFlag = "luna";
-      matrixSecretKey = "HERMES_LUNA_MATRIX_ACCESS_TOKEN";
-      whatsapp = false;
-      cpuLimit = "125m";
-    }
-  ];
-
-  gatewayContainer =
-    {
-      profile,
-      profileFlag,
-      matrixSecretKey,
-      whatsapp,
-      cpuLimit ? "500m",
-    }:
+  # Single multiplexed gateway container.  gateway.multiplex_profiles is enabled
+  # in the default profile's config.yaml so this one process serves messages
+  # for every profile (mel, luna, etc.) using each profile's own credentials.
+  multiplexGatewayContainer =
     let
-      containerName = "gateway-${profile}";
       bootstrap = ''
                         # Group-writable by default so any hermes process (and the
                         # host user, all in GID 100) can always overwrite shared files.
@@ -320,31 +298,19 @@ let
                           # Fix Baileys 7.x syncFullHistory for incoming messages
                           sed -i 's/syncFullHistory: false/syncFullHistory: true/' /opt/hermes/scripts/whatsapp-bridge/bridge.js 2>/dev/null || true
       '';
-      cmdArgs =
-        if profileFlag != null then
-          [
-            "/bin/sh"
-            "-c"
-            ''
-              ${bootstrap}
-              exec hermes -p ${profileFlag} gateway run
-            ''
-          ]
-        else
-          [
-            "/bin/sh"
-            "-c"
-            ''
-              ${bootstrap}
-              exec gateway run
-            ''
-          ];
     in
     {
-      name = containerName;
+      name = "gateway-multiplex";
       inherit image;
       imagePullPolicy = "IfNotPresent";
-      command = cmdArgs;
+      command = [
+        "/bin/sh"
+        "-c"
+        ''
+          ${bootstrap}
+          exec gateway run
+        ''
+      ];
       env =
         commonEnv
         ++ [
@@ -354,42 +320,35 @@ let
           }
           {
             name = "HERMES_HOME";
-            value = "/opt/data/profiles/${profile}";
+            value = "/opt/data";
           }
           {
             name = "MATRIX_ACCESS_TOKEN";
             valueFrom.secretKeyRef = {
               name = "${name}-env";
-              key = matrixSecretKey;
+              key = "HERMES_MEL_MATRIX_ACCESS_TOKEN";
             };
           }
-        ]
-        ++ (
-          if whatsapp then
-            [
-              {
-                name = "WHATSAPP_ENABLED";
-                value = "true";
-              }
-              {
-                name = "WHATSAPP_MODE";
-                value = "bot";
-              }
-              {
-                name = "WHATSAPP_ALLOWED_USERS";
-                valueFrom.secretKeyRef = {
-                  name = "${name}-env";
-                  key = "HERMES_KIRA_WHATSAPP_ALLOWED_USERS";
-                };
-              }
-              {
-                name = "WHATSAPP_DEBUG";
-                value = "true";
-              }
-            ]
-          else
-            [ ]
-        );
+          {
+            name = "WHATSAPP_ENABLED";
+            value = "true";
+          }
+          {
+            name = "WHATSAPP_MODE";
+            value = "bot";
+          }
+          {
+            name = "WHATSAPP_ALLOWED_USERS";
+            valueFrom.secretKeyRef = {
+              name = "${name}-env";
+              key = "HERMES_KIRA_WHATSAPP_ALLOWED_USERS";
+            };
+          }
+          {
+            name = "WHATSAPP_DEBUG";
+            value = "true";
+          }
+        ];
       envFrom = envFromSecret;
       volumeMounts =
         dataVolumeMounts
@@ -407,14 +366,14 @@ let
           memory = "512Mi";
         };
         limits = {
-          cpu = cpuLimit;
+          cpu = "500m";
           memory = "1Gi";
         };
       };
       securityContext = commonSecurityContext;
     };
 
-  containers = map gatewayContainer gatewayProfiles;
+  containers = [ multiplexGatewayContainer ];
 
 in
 {
@@ -515,7 +474,7 @@ in
               };
             }
           ];
-          containers = containers;
+          containers = [ multiplexGatewayContainer ];
           volumes =
             dataVolumes
             ++ sshKeyVolumes
