@@ -329,25 +329,6 @@ let
               key = "HERMES_MEL_MATRIX_ACCESS_TOKEN";
             };
           }
-          {
-            name = "WHATSAPP_ENABLED";
-            value = "true";
-          }
-          {
-            name = "WHATSAPP_MODE";
-            value = "bot";
-          }
-          {
-            name = "WHATSAPP_ALLOWED_USERS";
-            valueFrom.secretKeyRef = {
-              name = "${name}-env";
-              key = "HERMES_KIRA_WHATSAPP_ALLOWED_USERS";
-            };
-          }
-          {
-            name = "WHATSAPP_DEBUG";
-            value = "true";
-          }
         ];
       envFrom = envFromSecret;
       volumeMounts =

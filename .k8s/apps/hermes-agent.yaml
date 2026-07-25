@@ -275,17 +275,6 @@ spec:
                 secretKeyRef:
                   key: HERMES_MEL_MATRIX_ACCESS_TOKEN
                   name: hermes-agent-env
-            - name: WHATSAPP_ENABLED
-              value: 'true'
-            - name: WHATSAPP_MODE
-              value: bot
-            - name: WHATSAPP_ALLOWED_USERS
-              valueFrom:
-                secretKeyRef:
-                  key: HERMES_KIRA_WHATSAPP_ALLOWED_USERS
-                  name: hermes-agent-env
-            - name: WHATSAPP_DEBUG
-              value: 'true'
           envFrom:
             - secretRef:
                 name: hermes-agent-env
