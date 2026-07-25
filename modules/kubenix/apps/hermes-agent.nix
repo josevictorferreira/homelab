@@ -72,11 +72,14 @@ let
   # private to "other" (o---). Both the gateway and the dashboard run as uid
   # 10000 (not the dir owner), so they must join GID 100 to traverse profile
   # dirs and read each profile's config.yaml.
-  # OnRootMismatch: the default (Always) makes kubelet recursively chown every
-  # inode on the shared CephFS volume on each mount, which exceeds kubelet's
-  # 2min mount timeout and retries forever, saturating the MDS.
+  # fsGroup must be 100 (users) to match the shared CephFS volume root, which is
+  # uid 10000 / gid 100. With OnRootMismatch, a differing fsGroup (e.g. 2002)
+  # makes kubelet recursively chown every inode on the whole shared volume on
+  # each mount; that exceeds kubelet's 2min mount timeout, retries forever and
+  # saturates the MDS. 100 also keeps the 0440 ssh-key secret readable, since
+  # the process joins GID 100 below.
   podSecurityContext = {
-    fsGroup = 2002;
+    fsGroup = 100;
     fsGroupChangePolicy = "OnRootMismatch";
     supplementalGroups = [ 100 ];
   };
