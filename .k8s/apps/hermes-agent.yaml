@@ -270,11 +270,6 @@ spec:
               value: /opt/data
             - name: HERMES_HOME
               value: /opt/data
-            - name: MATRIX_ACCESS_TOKEN
-              valueFrom:
-                secretKeyRef:
-                  key: HERMES_MEL_MATRIX_ACCESS_TOKEN
-                  name: hermes-agent-env
           envFrom:
             - secretRef:
                 name: hermes-agent-env
