@@ -510,7 +510,7 @@ let
                 type = "custom-api";
                 title = "Recent GitHub Repositories";
                 cache = "1h";
-                timeout = "30s";
+                timeout = "60s";
                 method = "GET";
                 url = "https://api.github.com/search/commits?q=author:josevictorferreira&sort=author-date&order=desc&per_page=100";
                 headers = {
