@@ -7,37 +7,37 @@ metadata:
     name: sandbox-nix-ssh
     namespace: apps
 stringData:
-    authorized_keys: ENC[AES256_GCM,data:v4tGsJ5ogiowiAsP5fSpFogUYVHYLro9LtPh1VEKoPZtN9teozH6jhLvQrfIahZFluqYsYdPtuVIQIyujg4+UyEDD62Ydpkcu+D6mnEX34IcG7MJ96TQWCB0Xe+bJkD1aENHVCfWjgiZl3c=,iv:61rkk6M4muhRIpwhGhyDEtTSDERO767ZkqE7Tv5nEQ8=,tag:eyiScSmOyMFZ2LnZyDlHbg==,type:str]
+    authorized_keys: ENC[AES256_GCM,data:GZX2cdmeK0qOW2zV/NvRJhDnXrD56Uml+lmDRVpM/H0hS7cSeB7wx/a4xWv9Zjp+5j/kGg2gZ314wsPeoW/tLaXj,iv:aNy4hTE5dEN2ggrgW/UGvVGlPsNoJdOh9e7/COEXuc4=,tag:78PHMSBN6rBuRzhg5/aTEA==,type:str]
 sops:
     age:
         - recipient: age16yrhmz8fytj7j9ns80zl40zjcdfd3pdxh48ld7ys7veea774udtqfn9jyx
           enc: |
             -----BEGIN AGE ENCRYPTED FILE-----
-            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBNc24xcWNvaFhFOCs0azd1
-            ek1HVlNxcjF0K1VBRmdlTWpsM2RYUExwSzJjCitPQjY2WTdGMGRyNWJpTXBicW53
-            ZFI4cDBCV1NIcUYxYUdsWGZnZ3U1emsKLS0tIDZFN2U4aEk5bU9ZbzdhWHhDcWRF
-            SFVRdEhWakJoQlpwYVdZeEE4Yk1KaDgK1txPXc+jO46ygma9EH3ZpadKiKA9X/Rt
-            urueFkSvRk4cSdB3UepmaDQXM2EAQXMXok88wlqNG3lGK0r4w5g+Jw==
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBxKzFVRDk3Q3lZcDVmZUJs
+            TDRGR0IvRkFWblpRdWJMVGd0R2hyRHlsNUR3Cmg5SWY4TGFXVklQbGZMQllSOVFo
+            WXd6enRqZzgwbjNMUDJWcmxWUWVzSDAKLS0tICttenBQZE1sWDNxUTd0Kyt5WGpv
+            Q0hUNHJ0bnNUYjFGN09PWk1TSVdOdEkKN/kA5q+g60B7J+TsdniOwVkXNcFQRgLx
+            PXHcBX5vpzCKRxHGPno1S/R6wj4vnnsPaGqTleoCyRdAqxicftaPOg==
             -----END AGE ENCRYPTED FILE-----
         - recipient: age1jx9qu5p0ycvymrl2gykd9z3w8x8n67jxnatxs49j7qzspjr6asqqf8u35h
           enc: |
             -----BEGIN AGE ENCRYPTED FILE-----
-            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBlWjNKMXFRZWMwcUVJQXBE
-            T2xJSXQ2T2JyeWNpa1FlSk1SNnhlTm1rYUNNCktPNG1aanhoOXUzeXltbTRYbGxx
-            U0tDTE9PLzlHK2hiMnlWT3FqU01CcE0KLS0tIHBTQ3A3Y2Y5MEkxY0xYUGJEak5y
-            NFhkZ3h5dEFKNHN4ZGtwam9ZYXNqMVkKWg+UJ+eWvoyGeGk7qwrHuoYLxznlEA/n
-            e+j1cA4ewZ6MMlckCez/CHzt83qogPRCg6+EpXykhFK5bGm8szvhqw==
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBsYVNvVjZ2KzJERTFqU04w
+            VDdVSFgvN0VYZ3d3dS82S01JZTBNYkEzTEMwCmQrSzdVMHEvMHZlTGJPQ0ZXaWFu
+            RTlwc21XWkxXWnVwRXlIeEUwNVh5MTgKLS0tIHBVRjRaZDJPZThkUUtFbCtXTitq
+            bnhMSnpvYktjMWl5QTVTU2hmbWNnSGcKfNCV0vQui70Klx8PxhgADIsDecnTsD2m
+            x/BYM7QC01YHjROw9fCgQUw8MSclzjbjsgrB6ZJi8hY0v7Ni17WpDg==
             -----END AGE ENCRYPTED FILE-----
         - recipient: age1myzhwq67gu5zrfk8fvs0p7mh5fk67d20ltwqf9325ya83lm06ytsyax3j2
           enc: |
             -----BEGIN AGE ENCRYPTED FILE-----
-            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBmWkY2d2xseWxmTmloRnRk
-            bFExQ2lFNDgyTkVWaEtpVHdDaEppeVc2QmpJCmpBSWkrNSszYXdsYUpZZVpleUdW
-            bU81aWlKTXliMEtxOGQwTEhqWERpWkkKLS0tIDNoZXN4c2Y0bDBxSG50TXNEelQ2
-            NE9HalkvbTZzQnBzdW43S1NvU1c0NFUKyrpm3eciWVeBWMBXz72B0QzoQ8ldboNC
-            c9JMmIcWhvd/yYvmbOJYHs/CSTCqCUx3PzbtomtwRGwtfM5wFzu3/w==
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBoYjA5RmFIajM2NjE4dWZQ
+            b1dJVlhkMTRxcFlTUm9ZSHo2elZWczkvOWdNCmhhZDczQ1k1T3hKK2dkL082SDMz
+            ellCWldpaUNMUnZNbW5XSEtsb3diSW8KLS0tIEFONDM0WE93cnYwa0RCVVlXQ0tx
+            N2pqSEdiRU54ZmVkQ1dVVlZOeVB0OEUKijES0qzse8Qx+g2DV3sTuuDio1aOrQlG
+            W8DIoGizifYxxSiQpPqlzHIJiNc9JslxYMP63HDKbVcYXVxkYSzxFA==
             -----END AGE ENCRYPTED FILE-----
-    lastmodified: "2026-07-08T23:15:10Z"
-    mac: ENC[AES256_GCM,data:4z5TDWYDxqWmB1I9aL4iATEWtQy90082eQCih8FjnUeBVja1IHuIkX0PA5ZaLwvZUeNlAo3zXcWPMGeCoxKPzkgs4bVSsfmrmqvVITx68bGoUE+DvC7IRkO8OuCBT1dmhdK68sqabFesL7u1TyuRToVmjqCjN1z/tA5qKWkRXIM=,iv:wKfj5RZAsch+r2JG9Ec/uWf8eUANbwqay/WLtHuVMX4=,tag:cx6LLMtscqtVcppLijqsYw==,type:str]
+    lastmodified: "2026-07-25T19:58:01Z"
+    mac: ENC[AES256_GCM,data:Ujf0XcrIo8avsiw0/6HcvsXNabqFkQZfUpTL4Bk+0efEDygqbvxK5qMNGMO3VByVK1d4c/egBgN/FmshBfJcW/q1lxldGSZK7t7LXmMti51SS6E5eKgY7+AXYH/o91MvMKXQBZ9LE6Lu/zkHDAZoBzqxAAhZb7FdXqiIZ//mPjc=,iv:KNe0QuSazV8q6Cwaod6EYM3hYq4UG9Q6FGHhWkDng8M=,tag:/OPnokmCgcugI5ekz5gLOg==,type:str]
     encrypted_regex: ^(data|stringData)$
     version: 3.10.2
