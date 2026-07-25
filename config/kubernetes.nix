@@ -62,8 +62,6 @@
       degoog = "10.10.10.151";
       oratoria = "10.10.10.152";
       calibre-web = "10.10.10.153";
-      grimmory = "10.10.10.154";
-      grimmory-mariadb = "10.10.10.155";
       grafana = "10.10.10.190";
     };
   };

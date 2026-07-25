@@ -15,7 +15,7 @@ metadata:
   name: calibre-web
   namespace: apps
 spec:
-  replicas: 0
+  replicas: 1
   revisionHistoryLimit: 3
   selector:
     matchLabels:
@@ -34,13 +34,17 @@ spec:
       automountServiceAccountToken: true
       containers:
         - env:
+            - name: CWA_PORT_OVERRIDE
+              value: '8083'
+            - name: NETWORK_SHARE_MODE
+              value: 'true'
             - name: PGID
               value: '1000'
             - name: PUID
               value: '1000'
             - name: TZ
               value: America/Sao_Paulo
-          image: lscr.io/linuxserver/calibre-web:latest@sha256:18cd5d1d5c13b133fdf25506df8db415aee675ecf3ea01d086f01296a39666c4
+          image: crocodilestick/calibre-web-automated:latest@sha256:c31a738b6d5ec6982c050063dd3f063b6943eb1051fc81144789f840d9093a8d
           imagePullPolicy: IfNotPresent
           name: main
           ports:
@@ -55,9 +59,12 @@ spec:
               cpu: 100m
               memory: 256Mi
           volumeMounts:
-            - mountPath: /books
-              name: books
+            - mountPath: /calibre-library
+              name: calibreLibrary
               subPath: books
+            - mountPath: /cwa-book-ingest
+              name: ingest
+              subPath: book-ingest
             - mountPath: /config
               name: main
       dnsPolicy: ClusterFirst
@@ -67,7 +74,10 @@ spec:
       hostPID: false
       serviceAccountName: default
       volumes:
-        - name: books
+        - name: calibreLibrary
+          persistentVolumeClaim:
+            claimName: cephfs-shared-storage-root
+        - name: ingest
           persistentVolumeClaim:
             claimName: cephfs-shared-storage-root
         - name: main

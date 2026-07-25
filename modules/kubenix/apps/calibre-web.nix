@@ -9,13 +9,12 @@ in
     args = {
       inherit namespace;
       image = {
-        repository = "lscr.io/linuxserver/calibre-web";
-        tag = "latest@sha256:18cd5d1d5c13b133fdf25506df8db415aee675ecf3ea01d086f01296a39666c4";
+        repository = "crocodilestick/calibre-web-automated";
+        tag = "latest@sha256:c31a738b6d5ec6982c050063dd3f063b6943eb1051fc81144789f840d9093a8d";
         pullPolicy = "IfNotPresent";
-
       };
       port = 8083;
-      replicas = 0;
+      replicas = 1;
       resources = {
         requests = {
           cpu = "100m";
@@ -62,15 +61,29 @@ in
           PUID = "1000";
           PGID = "1000";
           TZ = homelab.timeZone;
+          NETWORK_SHARE_MODE = "true";
+          CWA_PORT_OVERRIDE = "8083";
         };
-        persistence.books = {
+        persistence.calibreLibrary = {
           enabled = true;
           type = "persistentVolumeClaim";
           existingClaim = kubenix.lib.sharedStorage.rootPVC;
           globalMounts = [
             {
-              path = "/books";
+              path = "/calibre-library";
               subPath = "books";
+              readOnly = false;
+            }
+          ];
+        };
+        persistence.ingest = {
+          enabled = true;
+          type = "persistentVolumeClaim";
+          existingClaim = kubenix.lib.sharedStorage.rootPVC;
+          globalMounts = [
+            {
+              path = "/cwa-book-ingest";
+              subPath = "book-ingest";
               readOnly = false;
             }
           ];
