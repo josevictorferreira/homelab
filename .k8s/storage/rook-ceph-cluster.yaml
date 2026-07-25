@@ -153,6 +153,8 @@ metadata:
   namespace: rook-ceph
 spec:
   cephConfig:
+    osd/host:lab-delta-cp:
+      osd_memory_target: '2147483648'
     osd/host:lab-gamma-wk:
       osd_memory_target: '1610612736'
   cephVersion:
