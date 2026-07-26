@@ -80,6 +80,8 @@ in
           "/bin/sh"
           "-c"
           ''
+            # Replace CWA-created dirs with symlinks to our CephFS subdirs
+            rm -rf /calibre-library /cwa-book-ingest
             ln -sf /shared/books /calibre-library
             ln -sf /shared/book-ingest /cwa-book-ingest
             exec /init
