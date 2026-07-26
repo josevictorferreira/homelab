@@ -57,7 +57,7 @@ in
             hosts = [ "calibre.${homelab.domain}" ];
           }
         ];
-        controllers.main.affinity.nodeAffinity.preferredDuringSchedulingIgnoredDuringExecution = [
+        defaultPodOptions.affinity.nodeAffinity.preferredDuringSchedulingIgnoredDuringExecution = [
           {
             weight = 100;
             preference.matchExpressions = [
@@ -76,26 +76,22 @@ in
           NETWORK_SHARE_MODE = "true";
           CWA_PORT_OVERRIDE = "8083";
         };
-        persistence.calibre-library = {
+        controllers.main.containers.main.command = [
+          "/bin/sh"
+          "-c"
+          ''
+            ln -sf /shared/books /calibre-library
+            ln -sf /shared/book-ingest /cwa-book-ingest
+            exec /init
+          ''
+        ];
+        persistence.shared = {
           enabled = true;
           type = "persistentVolumeClaim";
           existingClaim = kubenix.lib.sharedStorage.rootPVC;
           globalMounts = [
             {
-              path = "/calibre-library";
-              subPath = "books";
-              readOnly = false;
-            }
-          ];
-        };
-        persistence.ingest = {
-          enabled = true;
-          type = "persistentVolumeClaim";
-          existingClaim = kubenix.lib.sharedStorage.rootPVC;
-          globalMounts = [
-            {
-              path = "/cwa-book-ingest";
-              subPath = "book-ingest";
+              path = "/shared";
               readOnly = false;
             }
           ];
