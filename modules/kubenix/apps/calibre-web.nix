@@ -57,6 +57,18 @@ in
             hosts = [ "calibre.${homelab.domain}" ];
           }
         ];
+        controllers.main.affinity.nodeAffinity.preferredDuringSchedulingIgnoredDuringExecution = [
+          {
+            weight = 100;
+            preference.matchExpressions = [
+              {
+                key = "kubernetes.io/hostname";
+                operator = "In";
+                values = [ "lab-delta-cp" ];
+              }
+            ];
+          }
+        ];
         controllers.main.containers.main.env = {
           PUID = "1000";
           PGID = "1000";
