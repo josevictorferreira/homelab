@@ -21,6 +21,7 @@ in
       HIGGS_BASE_URL = "http://10.10.10.10:8095";
       OMNIVOICE_BASE_URL = "http://10.10.10.10:8001";
       FISH_SPEECH_BASE_URL = "http://10.10.10.10:8080";
+      LOG_LEVEL = "DEBUG";
     };
   };
 }

@@ -64,26 +64,16 @@ in
           NETWORK_SHARE_MODE = "true";
           CWA_PORT_OVERRIDE = "8083";
         };
-        # Single subPath mount for ingest (works!) + root mount for books browsing
-        persistence.ingest = {
+        # Single subPath: your existing Calibre library from CephFS
+        # CWA auto-detects metadata.db here
+        persistence.calibre-library = {
           enabled = true;
           type = "persistentVolumeClaim";
           existingClaim = kubenix.lib.sharedStorage.rootPVC;
           advancedMounts.main.main = [
             {
-              path = "/cwa-book-ingest";
-              subPath = "book-ingest";
-              readOnly = false;
-            }
-          ];
-        };
-        persistence.shared = {
-          enabled = true;
-          type = "persistentVolumeClaim";
-          existingClaim = kubenix.lib.sharedStorage.rootPVC;
-          advancedMounts.main.main = [
-            {
-              path = "/shared";
+              path = "/calibre-library";
+              subPath = "books";
               readOnly = false;
             }
           ];
