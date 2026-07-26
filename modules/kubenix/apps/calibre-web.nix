@@ -64,7 +64,7 @@ in
           NETWORK_SHARE_MODE = "true";
           CWA_PORT_OVERRIDE = "8083";
         };
-        persistence.calibreLibrary = {
+        persistence.calibre-library = {
           enabled = true;
           type = "persistentVolumeClaim";
           existingClaim = kubenix.lib.sharedStorage.rootPVC;
