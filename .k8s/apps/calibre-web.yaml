@@ -31,33 +31,9 @@ spec:
         app.kubernetes.io/instance: calibre-web
         app.kubernetes.io/name: calibre-web
     spec:
-      affinity:
-        nodeAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-            - preference:
-                matchExpressions:
-                  - key: kubernetes.io/hostname
-                    operator: In
-                    values:
-                      - lab-delta-cp
-              weight: 100
       automountServiceAccountToken: true
       containers:
-        - command:
-            - /bin/sh
-            - -c
-            - '# Replace CWA-created dirs with symlinks to our CephFS subdirs
-
-              rm -rf /calibre-library /cwa-book-ingest
-
-              ln -sf /shared/books /calibre-library
-
-              ln -sf /shared/book-ingest /cwa-book-ingest
-
-              exec /init
-
-              '
-          env:
+        - env:
             - name: CWA_PORT_OVERRIDE
               value: '8083'
             - name: NETWORK_SHARE_MODE
@@ -83,10 +59,14 @@ spec:
               cpu: 100m
               memory: 256Mi
           volumeMounts:
+            - mountPath: /calibre-library
+              name: calibre-library
+              subPath: books
+            - mountPath: /cwa-book-ingest
+              name: ingest
+              subPath: book-ingest
             - mountPath: /config
               name: main
-            - mountPath: /shared
-              name: shared
       dnsPolicy: ClusterFirst
       enableServiceLinks: false
       hostIPC: false
@@ -94,12 +74,15 @@ spec:
       hostPID: false
       serviceAccountName: default
       volumes:
+        - name: calibre-library
+          persistentVolumeClaim:
+            claimName: cephfs-shared-storage-root
+        - name: ingest
+          persistentVolumeClaim:
+            claimName: cephfs-shared-storage-root
         - name: main
           persistentVolumeClaim:
             claimName: calibre-web
-        - name: shared
-          persistentVolumeClaim:
-            claimName: cephfs-shared-storage-root
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim

@@ -57,18 +57,6 @@ in
             hosts = [ "calibre.${homelab.domain}" ];
           }
         ];
-        defaultPodOptions.affinity.nodeAffinity.preferredDuringSchedulingIgnoredDuringExecution = [
-          {
-            weight = 100;
-            preference.matchExpressions = [
-              {
-                key = "kubernetes.io/hostname";
-                operator = "In";
-                values = [ "lab-delta-cp" ];
-              }
-            ];
-          }
-        ];
         controllers.main.containers.main.env = {
           PUID = "1000";
           PGID = "1000";
@@ -76,24 +64,26 @@ in
           NETWORK_SHARE_MODE = "true";
           CWA_PORT_OVERRIDE = "8083";
         };
-        controllers.main.containers.main.command = [
-          "/bin/sh"
-          "-c"
-          ''
-            # Replace CWA-created dirs with symlinks to our CephFS subdirs
-            rm -rf /calibre-library /cwa-book-ingest
-            ln -sf /shared/books /calibre-library
-            ln -sf /shared/book-ingest /cwa-book-ingest
-            exec /init
-          ''
-        ];
-        persistence.shared = {
+        persistence.calibre-library = {
           enabled = true;
           type = "persistentVolumeClaim";
           existingClaim = kubenix.lib.sharedStorage.rootPVC;
           globalMounts = [
             {
-              path = "/shared";
+              path = "/calibre-library";
+              subPath = "books";
+              readOnly = false;
+            }
+          ];
+        };
+        persistence.ingest = {
+          enabled = true;
+          type = "persistentVolumeClaim";
+          existingClaim = kubenix.lib.sharedStorage.rootPVC;
+          globalMounts = [
+            {
+              path = "/cwa-book-ingest";
+              subPath = "book-ingest";
               readOnly = false;
             }
           ];
