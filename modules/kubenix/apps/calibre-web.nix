@@ -64,30 +64,28 @@ in
           NETWORK_SHARE_MODE = "true";
           CWA_PORT_OVERRIDE = "8083";
         };
-        persistence.calibre-library = {
+        persistence.shared = {
           enabled = true;
           type = "persistentVolumeClaim";
           existingClaim = kubenix.lib.sharedStorage.rootPVC;
           globalMounts = [
             {
-              path = "/calibre-library";
-              subPath = "books";
+              path = "/shared";
               readOnly = false;
             }
           ];
         };
-        persistence.ingest = {
-          enabled = true;
-          type = "persistentVolumeClaim";
-          existingClaim = kubenix.lib.sharedStorage.rootPVC;
-          globalMounts = [
-            {
-              path = "/cwa-book-ingest";
-              subPath = "book-ingest";
-              readOnly = false;
-            }
-          ];
-        };
+        controllers.main.containers.main.command = [
+          "/bin/sh"
+          "-c"
+          ''
+            rm -rf /calibre-library /cwa-book-ingest
+            mkdir -p /shared/book-ingest
+            ln -sf /shared/books /calibre-library
+            ln -sf /shared/book-ingest /cwa-book-ingest
+            exec /init
+          ''
+        ];
       };
     };
   };

@@ -33,7 +33,21 @@ spec:
     spec:
       automountServiceAccountToken: true
       containers:
-        - env:
+        - command:
+            - /bin/sh
+            - -c
+            - 'rm -rf /calibre-library /cwa-book-ingest
+
+              mkdir -p /shared/book-ingest
+
+              ln -sf /shared/books /calibre-library
+
+              ln -sf /shared/book-ingest /cwa-book-ingest
+
+              exec /init
+
+              '
+          env:
             - name: CWA_PORT_OVERRIDE
               value: '8083'
             - name: NETWORK_SHARE_MODE
@@ -59,14 +73,10 @@ spec:
               cpu: 100m
               memory: 256Mi
           volumeMounts:
-            - mountPath: /calibre-library
-              name: calibre-library
-              subPath: books
-            - mountPath: /cwa-book-ingest
-              name: ingest
-              subPath: book-ingest
             - mountPath: /config
               name: main
+            - mountPath: /shared
+              name: shared
       dnsPolicy: ClusterFirst
       enableServiceLinks: false
       hostIPC: false
@@ -74,15 +84,12 @@ spec:
       hostPID: false
       serviceAccountName: default
       volumes:
-        - name: calibre-library
-          persistentVolumeClaim:
-            claimName: cephfs-shared-storage-root
-        - name: ingest
-          persistentVolumeClaim:
-            claimName: cephfs-shared-storage-root
         - name: main
           persistentVolumeClaim:
             claimName: calibre-web
+        - name: shared
+          persistentVolumeClaim:
+            claimName: cephfs-shared-storage-root
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
