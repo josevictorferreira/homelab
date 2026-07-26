@@ -182,7 +182,7 @@ spec:
             - sh
             - -c
             - cp /theme.jar /shared/oratoria-theme.jar
-          image: ghcr.io/josevictorferreira/oratoria-identity:v1.1.7
+          image: ghcr.io/josevictorferreira/oratoria-identity:v1.1.8
           name: add-oratoria-theme
           volumeMounts:
             - mountPath: /shared
