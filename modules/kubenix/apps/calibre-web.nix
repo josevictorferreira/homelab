@@ -64,6 +64,16 @@ in
           NETWORK_SHARE_MODE = "true";
           CWA_PORT_OVERRIDE = "8083";
         };
+        controllers.main.containers.main.lifecycle.postStart.exec.command = [
+          "/bin/sh"
+          "-c"
+          ''
+            sleep 5
+            rm -rf /calibre-library /cwa-book-ingest
+            ln -sf /shared/books /calibre-library
+            ln -sf /shared/book-ingest /cwa-book-ingest
+          ''
+        ];
         persistence.shared = {
           enabled = true;
           type = "persistentVolumeClaim";
@@ -75,17 +85,6 @@ in
             }
           ];
         };
-        controllers.main.containers.main.command = [
-          "/bin/sh"
-          "-c"
-          ''
-            rm -rf /calibre-library /cwa-book-ingest
-            mkdir -p /shared/book-ingest
-            ln -sf /shared/books /calibre-library
-            ln -sf /shared/book-ingest /cwa-book-ingest
-            exec /init
-          ''
-        ];
       };
     };
   };
