@@ -64,21 +64,24 @@ in
           NETWORK_SHARE_MODE = "true";
           CWA_PORT_OVERRIDE = "8083";
         };
-        controllers.main.containers.main.lifecycle.postStart.exec.command = [
-          "/bin/sh"
-          "-c"
-          ''
-            sleep 5
-            rm -rf /calibre-library /cwa-book-ingest
-            ln -sf /shared/books /calibre-library
-            ln -sf /shared/book-ingest /cwa-book-ingest
-          ''
-        ];
+        # Single subPath mount for ingest (works!) + root mount for books browsing
+        persistence.ingest = {
+          enabled = true;
+          type = "persistentVolumeClaim";
+          existingClaim = kubenix.lib.sharedStorage.rootPVC;
+          advancedMounts.main.main = [
+            {
+              path = "/cwa-book-ingest";
+              subPath = "book-ingest";
+              readOnly = false;
+            }
+          ];
+        };
         persistence.shared = {
           enabled = true;
           type = "persistentVolumeClaim";
           existingClaim = kubenix.lib.sharedStorage.rootPVC;
-          globalMounts = [
+          advancedMounts.main.main = [
             {
               path = "/shared";
               readOnly = false;
