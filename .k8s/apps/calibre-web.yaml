@@ -59,13 +59,11 @@ spec:
               cpu: 100m
               memory: 256Mi
           volumeMounts:
-            - mountPath: /cwa-book-ingest
-              name: ingest
-              subPath: book-ingest
+            - mountPath: /calibre-library
+              name: calibre-library
+              subPath: books
             - mountPath: /config
               name: main
-            - mountPath: /shared
-              name: shared
       dnsPolicy: ClusterFirst
       enableServiceLinks: false
       hostIPC: false
@@ -73,15 +71,12 @@ spec:
       hostPID: false
       serviceAccountName: default
       volumes:
-        - name: ingest
+        - name: calibre-library
           persistentVolumeClaim:
             claimName: cephfs-shared-storage-root
         - name: main
           persistentVolumeClaim:
             claimName: calibre-web
-        - name: shared
-          persistentVolumeClaim:
-            claimName: cephfs-shared-storage-root
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
