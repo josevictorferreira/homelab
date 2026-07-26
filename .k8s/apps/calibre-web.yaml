@@ -60,7 +60,7 @@ spec:
               memory: 256Mi
           volumeMounts:
             - mountPath: /calibre-library
-              name: calibreLibrary
+              name: calibre-library
               subPath: books
             - mountPath: /cwa-book-ingest
               name: ingest
@@ -74,7 +74,7 @@ spec:
       hostPID: false
       serviceAccountName: default
       volumes:
-        - name: calibreLibrary
+        - name: calibre-library
           persistentVolumeClaim:
             claimName: cephfs-shared-storage-root
         - name: ingest
