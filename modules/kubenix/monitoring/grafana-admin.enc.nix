@@ -49,7 +49,7 @@ in
         metadata = {
           inherit namespace;
         };
-        data = {
+        stringData = {
           "ADMIN_USER" = kubenix.lib.secretsFor "grafana_admin_username";
           "ADMIN_PASSWORD" = kubenix.lib.secretsFor "grafana_admin_password";
         };

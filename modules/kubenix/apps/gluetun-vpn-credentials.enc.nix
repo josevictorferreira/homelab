@@ -11,7 +11,7 @@ in
           name = "gluetun-vpn-credentials";
           inherit namespace;
         };
-        data = {
+        stringData = {
           "VPN_SERVICE_PROVIDER" = kubenix.lib.secretsFor "vpn_service_provider";
           "VPN_TYPE" = kubenix.lib.secretsFor "vpn_type";
           "SERVER_COUNTRIES" = kubenix.lib.secretsFor "vpn_server_countries";

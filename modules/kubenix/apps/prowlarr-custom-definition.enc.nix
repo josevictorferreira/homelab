@@ -11,7 +11,7 @@ in
         metadata = {
           inherit namespace;
         };
-        data = {
+        stringData = {
           "custom-indexer" = kubenix.lib.secretsFor "prowlarr_custom_indexer";
         };
       };

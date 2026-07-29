@@ -11,7 +11,7 @@ in
           name = "imgproxy-config";
           inherit namespace;
         };
-        data = {
+        stringData = {
           "IMGPROXY_KEY" = kubenix.lib.secretsFor "imgproxy_key";
           "IMGPROXY_SALT" = kubenix.lib.secretsFor "imgproxy_salt";
         };

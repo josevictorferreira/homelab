@@ -11,7 +11,7 @@ in
         metadata = {
           namespace = certificate;
         };
-        data = {
+        stringData = {
           "cloudflare-api-token" = kubenix.lib.secretsFor "cloudflare_api_token";
         };
       };
