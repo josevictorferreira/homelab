@@ -10,7 +10,7 @@ in
           inherit namespace;
         };
         type = "kubernetes.io/dockerconfigjson";
-        stringData = {
+        data = {
           ".dockerconfigjson" = kubenix.lib.secretsFor "ghcr_registry_secret";
         };
       };
