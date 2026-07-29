@@ -347,7 +347,60 @@ let
       securityContext = commonSecurityContext;
     };
 
-  containers = [ multiplexGatewayContainer ];
+  cronMultiplexContainer = {
+    name = "cron-multiplex";
+    inherit image;
+    imagePullPolicy = "IfNotPresent";
+    command = [
+      "/bin/sh"
+      "-c"
+      ''
+        umask 0002
+        while true; do
+          for profile in /opt/data/profiles/*; do
+            [ -f "$profile/cron/jobs.json" ] || continue
+            HERMES_HOME="$profile" hermes cron tick --accept-hooks || true
+          done
+          sleep 60
+        done
+      ''
+    ];
+    env =
+      commonEnv
+      ++ [
+        {
+          name = "HOME";
+          value = "/opt/data";
+        }
+      ];
+    envFrom = envFromSecret;
+    volumeMounts =
+      dataVolumeMounts
+      ++ sshKeyVolumeMounts
+      ++ [
+        {
+          name = cliWrapper.volumeName;
+          mountPath = cliWrapper.mountPath;
+          subPath = "hermes";
+        }
+      ];
+    resources = {
+      requests = {
+        cpu = "100m";
+        memory = "512Mi";
+      };
+      limits = {
+        cpu = "500m";
+        memory = "1Gi";
+      };
+    };
+    securityContext = commonSecurityContext;
+  };
+
+  containers = [
+    multiplexGatewayContainer
+    cronMultiplexContainer
+  ];
 
 in
 {
@@ -448,7 +501,7 @@ in
               };
             }
           ];
-          containers = [ multiplexGatewayContainer ];
+          inherit containers;
           volumes =
             dataVolumes
             ++ sshKeyVolumes
