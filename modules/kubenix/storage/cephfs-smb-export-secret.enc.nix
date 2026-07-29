@@ -11,7 +11,7 @@ in
         metadata = {
           inherit namespace;
         };
-        data = {
+        stringData = {
           "userID" = kubenix.lib.secretsFor "cephfs_user_id";
           "userKey" = kubenix.lib.secretsFor "cephfs_user_key";
         };
