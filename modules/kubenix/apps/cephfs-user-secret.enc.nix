@@ -8,7 +8,7 @@ in
     resources = {
       secrets."cephfs-user-secret" = {
         metadata = { inherit namespace; };
-        stringData = {
+        data = {
           "userID" = kubenix.lib.secretsFor "cephfs_user_id";
           "userKey" = kubenix.lib.secretsFor "cephfs_user_key";
         };
