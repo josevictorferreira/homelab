@@ -11,7 +11,7 @@ in
         };
         type = "kubernetes.io/dockerconfigjson";
         data = {
-          ".dockerconfigjson" = kubenix.lib.secretsFor "mau_registry_secret";
+          ".dockerconfigjson" = kubenix.lib.secretsInlineFor "mau_registry_secret";
         };
       };
     };
