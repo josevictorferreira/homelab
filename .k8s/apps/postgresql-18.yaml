@@ -198,13 +198,13 @@ metadata:
   annotations:
     kubenix/k8s-version: '1.32'
     kubenix/project-name: ze-homelab
-  name: postgresql-18-bootstrap-dfa93c45
+  name: postgresql-18-bootstrap-feb35008
   namespace: apps
 spec:
   template:
     metadata:
       annotations:
-        checksum/config: dfa93c450498e9b7629dc00840781fdd8848f0ae816e0dde8bc1033c9f2f5159
+        checksum/config: feb35008aa6eabeacdaaafa95775f55f18fb0e21732db74dac1146505587341c
     spec:
       containers:
         - args:
@@ -359,7 +359,16 @@ spec:
               \ extension in database 'grafana'...\"\n    psql -h postgresql-18 -U\
               \ postgres -d grafana -c \"DROP EXTENSION IF EXISTS vectors;CREATE EXTENSION\
               \ IF NOT EXISTS vchord CASCADE;\" || echo \"Extension installation completed\
-              \ for grafana\"\n\n"
+              \ for grafana\"\n\n\t\tpsql -h postgresql-18 -U postgres -c 'ALTER SYSTEM\
+              \ SET shared_preload_libraries = \"vchord.so\"'\n    echo \"Ensuring\
+              \ database 'dramaturge' exists...\"\n    psql -h postgresql-18 -U postgres\
+              \ -d postgres -tAc \"SELECT 1 FROM pg_database WHERE datname='dramaturge'\"\
+              \ | grep -q 1 \\\n      || psql -h postgresql-18 -U postgres -d postgres\
+              \ -c \"CREATE DATABASE \\\"dramaturge\\\";\"\n\n    echo \"Installing\
+              \ pgvecto.rs extension in database 'dramaturge'...\"\n    psql -h postgresql-18\
+              \ -U postgres -d dramaturge -c \"DROP EXTENSION IF EXISTS vectors;CREATE\
+              \ EXTENSION IF NOT EXISTS vchord CASCADE;\" || echo \"Extension installation\
+              \ completed for dramaturge\"\n\n"
           command:
             - sh
             - -c
@@ -512,7 +521,15 @@ data:
     \ pgvecto.rs extension in database 'grafana'...\"\n    psql -h postgresql-18 -U\
     \ postgres -d grafana -c \"DROP EXTENSION IF EXISTS vectors;CREATE EXTENSION IF\
     \ NOT EXISTS vchord CASCADE;\" || echo \"Extension installation completed for\
-    \ grafana\"\n"
+    \ grafana\"\n\n\t\tpsql -h postgresql-18 -U postgres -c 'ALTER SYSTEM SET shared_preload_libraries\
+    \ = \"vchord.so\"'\n    echo \"Ensuring database 'dramaturge' exists...\"\n  \
+    \  psql -h postgresql-18 -U postgres -d postgres -tAc \"SELECT 1 FROM pg_database\
+    \ WHERE datname='dramaturge'\" | grep -q 1 \\\n      || psql -h postgresql-18\
+    \ -U postgres -d postgres -c \"CREATE DATABASE \\\"dramaturge\\\";\"\n\n    echo\
+    \ \"Installing pgvecto.rs extension in database 'dramaturge'...\"\n    psql -h\
+    \ postgresql-18 -U postgres -d dramaturge -c \"DROP EXTENSION IF EXISTS vectors;CREATE\
+    \ EXTENSION IF NOT EXISTS vchord CASCADE;\" || echo \"Extension installation completed\
+    \ for dramaturge\"\n"
 kind: ConfigMap
 metadata:
   annotations:
