@@ -2,8 +2,10 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 29133f01669ba366c6ab799e24e8c4a17b244224
   name: shared-subfolders-proton-sync
   namespace: backup
 spec:
@@ -17,85 +19,140 @@ spec:
         spec:
           containers:
             - args:
-                - "    set -euo pipefail\n\n    cleanup() {\n      echo \"Cleaning\
-                  \ up temp files...\"\n      rm -rf /root/.cache/rclone/backup-tmp\n\
-                  \    }\n    trap cleanup EXIT\n\n    DATE=\"$(date +%Y-%m-%d)\"\n\
-                  \    TIMESTAMP=\"$(date +%Y%m%d_%H%M%S)\"\n    MANIFEST_FILE=\"\
-                  manifest-$DATE.json\"\n\n    SOURCE_ROOT=\"/shared\"\n    TEMP_DIR=\"\
-                  /root/.cache/rclone/backup-tmp\"\n    mkdir -p \"$TEMP_DIR\"\n\n\
-                  \    echo \"=== Starting Proton Drive shared subfolders backup (tar.gz\
-                  \ + gpg + rclone copy) ===\"\n    echo \"Date: $DATE\"\n    echo\
-                  \ \"Timestamp: $TIMESTAMP\"\n    echo \"Folders to backup: 3d-models\
-                  \ backups books images hermes/profiles mel-dynamica notetaking personal-finances\"\
-                  \n    echo \"Destination: proton:Backups/homelab/shared-archives/current/\"\
-                  \n    FOLDERS_JSON='[\"3d-models\",\"backups\",\"books\",\"images\"\
-                  ,\"hermes/profiles\",\"mel-dynamica\",\"notetaking\",\"personal-finances\"\
-                  ]'\n\n    # Ensure rclone config directory exists\n    mkdir -p\
-                  \ \"$HOME/.config/rclone\"\n\n    # Check if proton configuration\
-                  \ exists, if not create it\n    if ! grep -q \"\\[proton\\]\" \"\
-                  $HOME/.config/rclone/rclone.conf\" 2>/dev/null; then\n      echo\
-                  \ \"Setting up initial Proton Drive rclone config...\"\n      OBSCURED_PASS=\"\
-                  $(rclone obscure \"$PROTON_PASSWORD\")\"\n      cat >> \"$HOME/.config/rclone/rclone.conf\"\
-                  \ <<RCLONE_EOF\n[proton]\ntype = protondrive\nusername = $PROTON_USERNAME\n\
-                  password = $OBSCURED_PASS\nRCLONE_EOF\n    fi\n\n    # Ensure destination\
-                  \ exists\n    echo \"Ensuring remote directory exists...\"\n   \
-                  \ rclone mkdir \"proton:Backups/homelab/shared-archives\" || true\n\
-                  \n    # Generate manifest header\n    echo \"Generating manifest...\"\
-                  \n    MANIFEST_JSON=\"$TEMP_DIR/$MANIFEST_FILE\"\n    {\n      echo\
-                  \ \"{\"\n      echo \"  \\\"backup_date\\\": \\\"$DATE\\\",\"\n\
-                  \      echo \"  \\\"timestamp\\\": \\\"$TIMESTAMP\\\",\"\n     \
-                  \ echo \"  \\\"source_root\\\": \\\"/shared\\\",\"\n      echo \"\
-                  \  \\\"method\\\": \\\"tar.gz-gpg-rclone-copy\\\",\"\n      echo\
-                  \ \"  \\\"destination\\\": \\\"proton:Backups/homelab/shared-archives/current/\\\
-                  \",\"\n      echo \"  \\\"folders\\\": $FOLDERS_JSON,\"\n      echo\
-                  \ \"  \\\"archives\\\": [\"\n    } > \"$MANIFEST_JSON\"\n\n    FIRST_ARCHIVE=true\n\
-                  \    FAILED=0\n    MAX_FOLDER_SIZE_MB=10240\n    for folder in 3d-models\
-                  \ backups books images hermes/profiles mel-dynamica notetaking personal-finances;\
-                  \ do\n      if [ -d \"$SOURCE_ROOT/$folder\" ]; then\n\n       \
-                  \ # Skip folders larger than 10GB (Proton Drive upload unreliable\
-                  \ for large files)\n        FOLDER_SIZE_MB=$(du -sm \"$SOURCE_ROOT/$folder\"\
-                  \ 2>/dev/null | cut -f1)\n        if [ -z \"$FOLDER_SIZE_MB\" ];\
-                  \ then FOLDER_SIZE_MB=0; fi\n        if [ \"$FOLDER_SIZE_MB\" -gt\
-                  \ \"$MAX_FOLDER_SIZE_MB\" ]; then\n          echo \"  Skipping $folder\
-                  \ (${FOLDER_SIZE_MB}MB exceeds ${MAX_FOLDER_SIZE_MB}MB limit)\"\n\
-                  \          continue\n        fi\n        echo \"Processing folder:\
-                  \ $folder\"\n\n        TEMP_GPG=\"$TEMP_DIR/$folder.tar.gz.gpg\"\
-                  \n        mkdir -p \"$(dirname \"$TEMP_GPG\")\"\n        rm -f \"\
-                  $TEMP_GPG\"\n\n        # Pipe: tar.gz → gpg encrypt → temp file\
-                  \ on PVC\n        echo \"  Creating encrypted archive on PVC...\"\
-                  \n        if ! tar czf - -C \"$SOURCE_ROOT\" \"$folder\" \\\n  \
-                  \        | gpg --batch --yes --passphrase \"$ENCRYPTION_PASSWORD\"\
-                  \ --symmetric --cipher-algo AES256 --output \"$TEMP_GPG\" -; then\n\
-                  \          echo \"  ERROR: Failed to create encrypted archive for\
-                  \ $folder\"\n          FAILED=$((FAILED + 1))\n          rm -f \"\
-                  $TEMP_GPG\"\n          continue\n        fi\n\n        FILE_SIZE=$(stat\
-                  \ -c %s \"$TEMP_GPG\" 2>/dev/null || echo \"0\")\n        echo \"\
-                  \  Uploading to Proton Drive ($FILE_SIZE bytes)...\"\n        #\
-                  \ Delete existing file first (Proton Drive rejects overwrites)\n\
-                  \        rclone delete \"proton:Backups/homelab/shared-archives/current/$folder.tar.gz.gpg\"\
-                  \ 2>/dev/null || true\n        # Wait for Proton Drive to propagate\
-                  \ the deletion (ghost entry fix)\n        sleep 10\n\n        if\
-                  \ ! rclone copy \"$TEMP_GPG\" \"proton:Backups/homelab/shared-archives/current/\"\
-                  \ --retries 10 --low-level-retries 10 --retries-sleep 10s; then\n\
-                  \          echo \"  ERROR: Failed to upload $folder\"\n        \
-                  \  FAILED=$((FAILED + 1))\n          rm -f \"$TEMP_GPG\"\n     \
-                  \     continue\n        fi\n\n        rm -f \"$TEMP_GPG\"\n    \
-                  \    echo \"  Done: $folder\"\n\n        # Record in manifest\n\
-                  \        if [ \"$FIRST_ARCHIVE\" = true ]; then\n          FIRST_ARCHIVE=false\n\
-                  \        else\n          echo \",\" >> \"$MANIFEST_JSON\"\n    \
-                  \    fi\n        echo \"    {\\\"folder\\\": \\\"$folder\\\", \\\
-                  \"archive\\\": \\\"$folder.tar.gz.gpg\\\", \\\"encrypted_size\\\"\
-                  : $FILE_SIZE}\" >> \"$MANIFEST_JSON\"\n      else\n        echo\
-                  \ \"Warning: folder $folder not found, skipping\"\n      fi\n  \
-                  \  done\n\n    # Complete manifest\n    {\n      echo \"\"\n   \
-                  \   echo \"  ],\"\n      echo \"  \\\"encryption\\\": \\\"gpg-symmetric-aes256\\\
-                  \",\"\n      echo \"  \\\"exclusions\\\": [\\\".DS_Store\\\", \\\
-                  \"Thumbs.db\\\"]\"\n      echo \"}\"\n    } >> \"$MANIFEST_JSON\"\
-                  \n\n    if [ \"$FAILED\" -gt 0 ]; then\n      echo \"ERROR: $FAILED\
-                  \ folder(s) failed to backup\"\n      exit 1\n    fi\n\n    # Upload\
-                  \ manifest\n    echo \"Uploading manifest...\"\n    rclone copyto\
-                  \ \"$MANIFEST_JSON\" \"proton:Backups/homelab/shared-archives/manifests/$MANIFEST_FILE\"\
-                  \ || true\n\n    echo \"=== Backup completed successfully ===\"\n"
+                - |2
+                      set -euo pipefail
+
+                      cleanup() {
+                        echo "Cleaning up temp files..."
+                        rm -rf /root/.cache/rclone/backup-tmp
+                      }
+                      trap cleanup EXIT
+
+                      DATE="$(date +%Y-%m-%d)"
+                      TIMESTAMP="$(date +%Y%m%d_%H%M%S)"
+                      MANIFEST_FILE="manifest-$DATE.json"
+
+                      SOURCE_ROOT="/shared"
+                      TEMP_DIR="/root/.cache/rclone/backup-tmp"
+                      mkdir -p "$TEMP_DIR"
+
+                      echo "=== Starting Proton Drive shared subfolders backup (tar.gz + gpg + rclone copy) ==="
+                      echo "Date: $DATE"
+                      echo "Timestamp: $TIMESTAMP"
+                      echo "Folders to backup: 3d-models backups books images hermes/profiles mel-dynamica notetaking personal-finances"
+                      echo "Destination: proton:Backups/homelab/shared-archives/current/"
+                      FOLDERS_JSON='["3d-models","backups","books","images","hermes/profiles","mel-dynamica","notetaking","personal-finances"]'
+
+                      # Ensure rclone config directory exists
+                      mkdir -p "$HOME/.config/rclone"
+
+                      # Check if proton configuration exists, if not create it
+                      if ! grep -q "\[proton\]" "$HOME/.config/rclone/rclone.conf" 2>/dev/null; then
+                        echo "Setting up initial Proton Drive rclone config..."
+                        OBSCURED_PASS="$(rclone obscure "$PROTON_PASSWORD")"
+                        cat >> "$HOME/.config/rclone/rclone.conf" <<RCLONE_EOF
+                  [proton]
+                  type = protondrive
+                  username = $PROTON_USERNAME
+                  password = $OBSCURED_PASS
+                  RCLONE_EOF
+                      fi
+
+                      # Ensure destination exists
+                      echo "Ensuring remote directory exists..."
+                      rclone mkdir "proton:Backups/homelab/shared-archives" || true
+
+                      # Generate manifest header
+                      echo "Generating manifest..."
+                      MANIFEST_JSON="$TEMP_DIR/$MANIFEST_FILE"
+                      {
+                        echo "{"
+                        echo "  \"backup_date\": \"$DATE\","
+                        echo "  \"timestamp\": \"$TIMESTAMP\","
+                        echo "  \"source_root\": \"/shared\","
+                        echo "  \"method\": \"tar.gz-gpg-rclone-copy\","
+                        echo "  \"destination\": \"proton:Backups/homelab/shared-archives/current/\","
+                        echo "  \"folders\": $FOLDERS_JSON,"
+                        echo "  \"archives\": ["
+                      } > "$MANIFEST_JSON"
+
+                      FIRST_ARCHIVE=true
+                      FAILED=0
+                      MAX_FOLDER_SIZE_MB=10240
+                      for folder in 3d-models backups books images hermes/profiles mel-dynamica notetaking personal-finances; do
+                        if [ -d "$SOURCE_ROOT/$folder" ]; then
+
+                          # Skip folders larger than 10GB (Proton Drive upload unreliable for large files)
+                          FOLDER_SIZE_MB=$(du -sm "$SOURCE_ROOT/$folder" 2>/dev/null | cut -f1)
+                          if [ -z "$FOLDER_SIZE_MB" ]; then FOLDER_SIZE_MB=0; fi
+                          if [ "$FOLDER_SIZE_MB" -gt "$MAX_FOLDER_SIZE_MB" ]; then
+                            echo "  Skipping $folder (${FOLDER_SIZE_MB}MB exceeds ${MAX_FOLDER_SIZE_MB}MB limit)"
+                            continue
+                          fi
+                          echo "Processing folder: $folder"
+
+                          TEMP_GPG="$TEMP_DIR/$folder.tar.gz.gpg"
+                          mkdir -p "$(dirname "$TEMP_GPG")"
+                          rm -f "$TEMP_GPG"
+
+                          # Pipe: tar.gz → gpg encrypt → temp file on PVC
+                          echo "  Creating encrypted archive on PVC..."
+                          if ! tar czf - -C "$SOURCE_ROOT" "$folder" \
+                            | gpg --batch --yes --passphrase "$ENCRYPTION_PASSWORD" --symmetric --cipher-algo AES256 --output "$TEMP_GPG" -; then
+                            echo "  ERROR: Failed to create encrypted archive for $folder"
+                            FAILED=$((FAILED + 1))
+                            rm -f "$TEMP_GPG"
+                            continue
+                          fi
+
+                          FILE_SIZE=$(stat -c %s "$TEMP_GPG" 2>/dev/null || echo "0")
+                          echo "  Uploading to Proton Drive ($FILE_SIZE bytes)..."
+                          # Delete existing file first (Proton Drive rejects overwrites)
+                          rclone delete "proton:Backups/homelab/shared-archives/current/$folder.tar.gz.gpg" 2>/dev/null || true
+                          # Wait for Proton Drive to propagate the deletion (ghost entry fix)
+                          sleep 10
+
+                          if ! rclone copy "$TEMP_GPG" "proton:Backups/homelab/shared-archives/current/" --retries 10 --low-level-retries 10 --retries-sleep 10s; then
+                            echo "  ERROR: Failed to upload $folder"
+                            FAILED=$((FAILED + 1))
+                            rm -f "$TEMP_GPG"
+                            continue
+                          fi
+
+                          rm -f "$TEMP_GPG"
+                          echo "  Done: $folder"
+
+                          # Record in manifest
+                          if [ "$FIRST_ARCHIVE" = true ]; then
+                            FIRST_ARCHIVE=false
+                          else
+                            echo "," >> "$MANIFEST_JSON"
+                          fi
+                          echo "    {\"folder\": \"$folder\", \"archive\": \"$folder.tar.gz.gpg\", \"encrypted_size\": $FILE_SIZE}" >> "$MANIFEST_JSON"
+                        else
+                          echo "Warning: folder $folder not found, skipping"
+                        fi
+                      done
+
+                      # Complete manifest
+                      {
+                        echo ""
+                        echo "  ],"
+                        echo "  \"encryption\": \"gpg-symmetric-aes256\","
+                        echo "  \"exclusions\": [\".DS_Store\", \"Thumbs.db\"]"
+                        echo "}"
+                      } >> "$MANIFEST_JSON"
+
+                      if [ "$FAILED" -gt 0 ]; then
+                        echo "ERROR: $FAILED folder(s) failed to backup"
+                        exit 1
+                      fi
+
+                      # Upload manifest
+                      echo "Uploading manifest..."
+                      rclone copyto "$MANIFEST_JSON" "proton:Backups/homelab/shared-archives/manifests/$MANIFEST_FILE" || true
+
+                      echo "=== Backup completed successfully ==="
               command:
                 - bash
                 - -c
@@ -159,8 +216,10 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 29133f01669ba366c6ab799e24e8c4a17b244224
   name: shared-subfolders-proton-sync-config
   namespace: backup
 spec:
@@ -175,8 +234,10 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 29133f01669ba366c6ab799e24e8c4a17b244224
   name: shared-subfolders-proton-sync-state
   namespace: backup
 spec:

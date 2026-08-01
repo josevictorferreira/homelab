@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/controller: main
@@ -10,6 +10,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: blocky
     helm.sh/chart: app-template-4.2.0
+    kubenix/hash: 467e5a6327bb149ed506de4ebe1f71c084e4949f
+    kubenix/module-instance: blocky
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
   name: blocky
@@ -70,7 +72,7 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
     lbipam.cilium.io/ips: 10.10.10.100
     lbipam.cilium.io/sharing-key: blocky
@@ -80,6 +82,8 @@ metadata:
     app.kubernetes.io/name: blocky
     app.kubernetes.io/service: blocky-dns
     helm.sh/chart: app-template-4.2.0
+    kubenix/hash: 467e5a6327bb149ed506de4ebe1f71c084e4949f
+    kubenix/module-instance: blocky
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
   name: blocky-dns
@@ -104,7 +108,7 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
     lbipam.cilium.io/ips: 10.10.10.100
     lbipam.cilium.io/sharing-key: blocky
@@ -114,6 +118,8 @@ metadata:
     app.kubernetes.io/name: blocky
     app.kubernetes.io/service: blocky-dot
     helm.sh/chart: app-template-4.2.0
+    kubenix/hash: 467e5a6327bb149ed506de4ebe1f71c084e4949f
+    kubenix/module-instance: blocky
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
   name: blocky-dot
@@ -134,7 +140,7 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
     lbipam.cilium.io/ips: 10.10.10.100
     lbipam.cilium.io/sharing-key: blocky
@@ -144,6 +150,8 @@ metadata:
     app.kubernetes.io/name: blocky
     app.kubernetes.io/service: blocky-main
     helm.sh/chart: app-template-4.2.0
+    kubenix/hash: 467e5a6327bb149ed506de4ebe1f71c084e4949f
+    kubenix/module-instance: blocky
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
   name: blocky-main
@@ -164,13 +172,15 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/instance: blocky
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: blocky
     helm.sh/chart: app-template-4.2.0
+    kubenix/hash: 467e5a6327bb149ed506de4ebe1f71c084e4949f
+    kubenix/module-instance: blocky
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
   name: blocky

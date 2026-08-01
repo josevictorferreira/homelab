@@ -2,8 +2,10 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 3ce69ae3e69be27dd9fc387d001112ab1a6401ad
   name: mautrix-discord
   namespace: apps
 spec:
@@ -38,13 +40,10 @@ spec:
         - command:
             - sh
             - -c
-            - 'cp /config-src/config.yaml /data/config.yaml
-
+            - |
+              cp /config-src/config.yaml /data/config.yaml
               cp /registration-src/registration.yaml /data/registration.yaml
-
               chmod 644 /data/config.yaml /data/registration.yaml
-
-              '
           image: busybox:1.37
           name: copy-config
           volumeMounts:
@@ -71,8 +70,10 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 3ce69ae3e69be27dd9fc387d001112ab1a6401ad
   name: mautrix-discord-v2
   namespace: apps
 spec:
@@ -87,8 +88,10 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 3ce69ae3e69be27dd9fc387d001112ab1a6401ad
   name: mautrix-discord
   namespace: apps
 spec:

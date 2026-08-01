@@ -2,8 +2,10 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: b70f1263638f672a45ccb390c53c792daac2f8f2
   name: postgres-backup
   namespace: backup
 spec:
@@ -16,63 +18,38 @@ spec:
         spec:
           containers:
             - args:
-                - 'set -euo pipefail
-
+                - |
+                  set -euo pipefail
                   echo "=== Postgres backup starting ==="
-
                   DATE_PREFIX=$(date +%Y/%m/%d)
-
                   OBJ_PREFIX="postgresql-18/$DATE_PREFIX"
 
-
                   echo "Setting up mc alias..."
-
                   mc alias set backup "$MINIO_ENDPOINT" "$AWS_ACCESS_KEY_ID" "$AWS_SECRET_ACCESS_KEY"
 
-
                   echo "Running pg_dumpall..."
-
                   pg_dumpall -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" > /tmp/full.sql
 
-
                   echo "Compressing with zstd..."
-
                   zstd -T0 /tmp/full.sql -o /tmp/full.sql.zst
-
                   rm /tmp/full.sql
 
-
                   echo "Computing sha256..."
-
                   sha256sum /tmp/full.sql.zst > /tmp/full.sql.zst.sha256
 
-
                   echo "Uploading to MinIO (tmp)..."
-
                   mc cp /tmp/full.sql.zst "backup/homelab-backup-postgres/$OBJ_PREFIX/full.sql.zst.tmp"
-
                   mc cp /tmp/full.sql.zst.sha256 "backup/homelab-backup-postgres/$OBJ_PREFIX/full.sql.zst.sha256.tmp"
 
-
                   echo "Renaming to final (atomic)..."
-
-                  mc mv "backup/homelab-backup-postgres/$OBJ_PREFIX/full.sql.zst.tmp"
-                  "backup/homelab-backup-postgres/$OBJ_PREFIX/full.sql.zst"
-
-                  mc mv "backup/homelab-backup-postgres/$OBJ_PREFIX/full.sql.zst.sha256.tmp"
-                  "backup/homelab-backup-postgres/$OBJ_PREFIX/full.sql.zst.sha256"
-
+                  mc mv "backup/homelab-backup-postgres/$OBJ_PREFIX/full.sql.zst.tmp" "backup/homelab-backup-postgres/$OBJ_PREFIX/full.sql.zst"
+                  mc mv "backup/homelab-backup-postgres/$OBJ_PREFIX/full.sql.zst.sha256.tmp" "backup/homelab-backup-postgres/$OBJ_PREFIX/full.sql.zst.sha256"
 
                   echo "Cleanup..."
-
                   rm -f /tmp/full.sql.zst /tmp/full.sql.zst.sha256
 
-
                   echo "=== Postgres backup complete ==="
-
                   mc ls "backup/homelab-backup-postgres/$OBJ_PREFIX/"
-
-                  '
               command:
                 - bash
                 - -c
@@ -80,7 +57,7 @@ spec:
                 - name: PGHOST
                   value: postgresql-18-hl.apps.svc.cluster.local
                 - name: PGPORT
-                  value: '5432'
+                  value: "5432"
                 - name: PGUSER
                   value: postgres
                 - name: MINIO_ENDPOINT

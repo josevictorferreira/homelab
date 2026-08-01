@@ -1,0 +1,141 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/controller: main
+    app.kubernetes.io/instance: wealtho
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: wealtho
+    helm.sh/chart: app-template-4.2.0
+    kubenix/hash: 289eab5d388af0e131449c9ff36c1a6c9ba188a2
+    kubenix/module-instance: wealtho
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: wealtho
+  namespace: apps
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/controller: main
+      app.kubernetes.io/instance: wealtho
+      app.kubernetes.io/name: wealtho
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/controller: main
+        app.kubernetes.io/instance: wealtho
+        app.kubernetes.io/name: wealtho
+    spec:
+      automountServiceAccountToken: true
+      containers:
+        - envFrom:
+            - secretRef:
+                name: wealtho-config
+          image: ghcr.io/josevictorferreira/wealtho:latest
+          imagePullPolicy: Always
+          livenessProbe:
+            httpGet:
+              path: /up
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          name: main
+          ports:
+            - containerPort: 3000
+              name: http
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /up
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+      dnsPolicy: ClusterFirst
+      enableServiceLinks: false
+      hostIPC: false
+      hostNetwork: false
+      hostPID: false
+      imagePullSecrets:
+        - name: ghcr-registry-secret
+      serviceAccountName: default
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+    lbipam.cilium.io/ips: 10.10.10.156
+    lbipam.cilium.io/sharing-key: wealtho
+  labels:
+    app.kubernetes.io/instance: wealtho
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: wealtho
+    app.kubernetes.io/service: wealtho
+    helm.sh/chart: app-template-4.2.0
+    kubenix/hash: 289eab5d388af0e131449c9ff36c1a6c9ba188a2
+    kubenix/module-instance: wealtho
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: wealtho
+  namespace: apps
+spec:
+  ports:
+    - name: http
+      port: 3000
+      protocol: TCP
+      targetPort: 3000
+  selector:
+    app.kubernetes.io/controller: main
+    app.kubernetes.io/instance: wealtho
+    app.kubernetes.io/name: wealtho
+  type: LoadBalancer
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: wealtho
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: wealtho
+    helm.sh/chart: app-template-4.2.0
+    kubenix/hash: 289eab5d388af0e131449c9ff36c1a6c9ba188a2
+    kubenix/module-instance: wealtho
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: wealtho
+  namespace: apps
+spec:
+  ingressClassName: cilium
+  rules:
+    - host: wealtho.josevictor.me
+      http:
+        paths:
+          - backend:
+              service:
+                name: wealtho
+                port:
+                  number: 3000
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - wealtho.josevictor.me
+      secretName: wildcard-tls

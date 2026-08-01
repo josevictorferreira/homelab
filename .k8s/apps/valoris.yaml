@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/controller: main
@@ -10,6 +10,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: valoris
     helm.sh/chart: app-template-4.2.0
+    kubenix/hash: a2745126d43a41d23baf21d99a768b5c352c1be3
+    kubenix/module-instance: valoris
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
   name: valoris
@@ -77,13 +79,13 @@ spec:
         - effect: NoSchedule
           key: pi-only
           operator: Equal
-          value: 'true'
+          value: "true"
 ---
 apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
     lbipam.cilium.io/ips: 10.10.10.134
     lbipam.cilium.io/sharing-key: valoris
@@ -93,6 +95,8 @@ metadata:
     app.kubernetes.io/name: valoris
     app.kubernetes.io/service: valoris
     helm.sh/chart: app-template-4.2.0
+    kubenix/hash: a2745126d43a41d23baf21d99a768b5c352c1be3
+    kubenix/module-instance: valoris
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
   name: valoris
@@ -113,13 +117,15 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/instance: valoris
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: valoris
     helm.sh/chart: app-template-4.2.0
+    kubenix/hash: a2745126d43a41d23baf21d99a768b5c352c1be3
+    kubenix/module-instance: valoris
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
   name: valoris
@@ -146,7 +152,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/controller: main
@@ -154,6 +160,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: valoris-backend
     helm.sh/chart: app-template-4.2.0
+    kubenix/hash: a2745126d43a41d23baf21d99a768b5c352c1be3
+    kubenix/module-instance: valoris-backend
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
   name: valoris-backend
@@ -192,7 +200,7 @@ spec:
             - rails
             - server
             - -p
-            - '80'
+            - "80"
           env:
             - name: KEYCLOAK_AZP
               value: valoris-frontend
@@ -230,13 +238,13 @@ spec:
         - effect: NoSchedule
           key: pi-only
           operator: Equal
-          value: 'true'
+          value: "true"
 ---
 apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
     lbipam.cilium.io/ips: 10.10.10.131
     lbipam.cilium.io/sharing-key: valoris-backend
@@ -246,6 +254,8 @@ metadata:
     app.kubernetes.io/name: valoris-backend
     app.kubernetes.io/service: valoris-backend
     helm.sh/chart: app-template-4.2.0
+    kubenix/hash: a2745126d43a41d23baf21d99a768b5c352c1be3
+    kubenix/module-instance: valoris-backend
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
   name: valoris-backend
@@ -266,13 +276,15 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/instance: valoris-backend
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: valoris-backend
     helm.sh/chart: app-template-4.2.0
+    kubenix/hash: a2745126d43a41d23baf21d99a768b5c352c1be3
+    kubenix/module-instance: valoris-backend
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
   name: valoris-backend
@@ -299,7 +311,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/controller: main
@@ -307,6 +319,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: valoris-worker
     helm.sh/chart: app-template-4.2.0
+    kubenix/hash: a2745126d43a41d23baf21d99a768b5c352c1be3
+    kubenix/module-instance: valoris-worker
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
   name: valoris-worker
@@ -374,13 +388,13 @@ spec:
         - effect: NoSchedule
           key: pi-only
           operator: Equal
-          value: 'true'
+          value: "true"
 ---
 apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
     lbipam.cilium.io/ips: 10.10.10.132
     lbipam.cilium.io/sharing-key: valoris-worker
@@ -390,6 +404,8 @@ metadata:
     app.kubernetes.io/name: valoris-worker
     app.kubernetes.io/service: valoris-worker
     helm.sh/chart: app-template-4.2.0
+    kubenix/hash: a2745126d43a41d23baf21d99a768b5c352c1be3
+    kubenix/module-instance: valoris-worker
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
   name: valoris-worker
@@ -410,13 +426,15 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/instance: valoris-worker
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: valoris-worker
     helm.sh/chart: app-template-4.2.0
+    kubenix/hash: a2745126d43a41d23baf21d99a768b5c352c1be3
+    kubenix/module-instance: valoris-worker
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
   name: valoris-worker
@@ -443,8 +461,10 @@ apiVersion: objectbucket.io/v1alpha1
 kind: ObjectBucketClaim
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: a2745126d43a41d23baf21d99a768b5c352c1be3
   name: valoris-s3
   namespace: apps
 spec:

@@ -2,10 +2,11 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/name: etcd-snapshot-offload
+    kubenix/hash: fcbb635ef4e38284301e9ff7fa8a6240130872a7
   name: etcd-snapshot-offload
   namespace: backup
 spec:
@@ -21,19 +22,41 @@ spec:
             - command:
                 - /bin/sh
                 - -c
-                - "#!/bin/sh\nset -euo pipefail\n\necho \"=== etcd snapshot offload:\
-                  \ $(date -Iseconds) ===\"\n\n# Configure mc alias\nmc alias set\
-                  \ backup http://10.10.10.209:9000 \"$AWS_ACCESS_KEY_ID\" \"$AWS_SECRET_ACCESS_KEY\"\
-                  \n\n# Get hostname for path partitioning\nNODE=$(cat /etc/hostname\
-                  \ 2>/dev/null || hostname)\n\necho \"Node: $NODE\"\necho \"Scanning\
-                  \ snapshots in /snapshots/ ...\"\n\nUPLOADED=0\nSKIPPED=0\n\nfor\
-                  \ snap in /snapshots/etcd-snapshot-*; do\n  [ -f \"$snap\" ] ||\
-                  \ continue\n  FILENAME=$(basename \"$snap\")\n  REMOTE_PATH=\"backup/homelab-backup-etcd/$NODE/$FILENAME\"\
-                  \n\n  # Skip if already uploaded (idempotent)\n  if mc stat \"$REMOTE_PATH\"\
-                  \ >/dev/null 2>&1; then\n    SKIPPED=$((SKIPPED + 1))\n    continue\n\
-                  \  fi\n\n  echo \"Uploading: $FILENAME\"\n  mc cp \"$snap\" \"$REMOTE_PATH\"\
-                  \n  UPLOADED=$((UPLOADED + 1))\ndone\n\necho \"=== Done: uploaded=$UPLOADED\
-                  \ skipped=$SKIPPED ===\"\n"
+                - |
+                  #!/bin/sh
+                  set -euo pipefail
+
+                  echo "=== etcd snapshot offload: $(date -Iseconds) ==="
+
+                  # Configure mc alias
+                  mc alias set backup http://10.10.10.209:9000 "$AWS_ACCESS_KEY_ID" "$AWS_SECRET_ACCESS_KEY"
+
+                  # Get hostname for path partitioning
+                  NODE=$(cat /etc/hostname 2>/dev/null || hostname)
+
+                  echo "Node: $NODE"
+                  echo "Scanning snapshots in /snapshots/ ..."
+
+                  UPLOADED=0
+                  SKIPPED=0
+
+                  for snap in /snapshots/etcd-snapshot-*; do
+                    [ -f "$snap" ] || continue
+                    FILENAME=$(basename "$snap")
+                    REMOTE_PATH="backup/homelab-backup-etcd/$NODE/$FILENAME"
+
+                    # Skip if already uploaded (idempotent)
+                    if mc stat "$REMOTE_PATH" >/dev/null 2>&1; then
+                      SKIPPED=$((SKIPPED + 1))
+                      continue
+                    fi
+
+                    echo "Uploading: $FILENAME"
+                    mc cp "$snap" "$REMOTE_PATH"
+                    UPLOADED=$((UPLOADED + 1))
+                  done
+
+                  echo "=== Done: uploaded=$UPLOADED skipped=$SKIPPED ==="
               envFrom:
                 - secretRef:
                     name: etcd-snapshot-offload-s3-credentials
@@ -51,7 +74,7 @@ spec:
                   name: etcd-snapshots
                   readOnly: true
           nodeSelector:
-            node-role.kubernetes.io/master: 'true'
+            node-role.kubernetes.io/master: "true"
           restartPolicy: Never
           tolerations:
             - effect: NoSchedule

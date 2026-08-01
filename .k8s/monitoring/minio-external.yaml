@@ -3,6 +3,7 @@ kind: Service
 metadata:
   labels:
     app: minio-external
+    kubenix/hash: 738b965c870942267c065903936864fe5bc0a0be
   name: minio-external
   namespace: monitoring
 spec:
@@ -19,6 +20,7 @@ kind: Endpoints
 metadata:
   labels:
     app: minio-external
+    kubenix/hash: 738b965c870942267c065903936864fe5bc0a0be
   name: minio-external
   namespace: monitoring
 subsets:
@@ -34,6 +36,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: minio-external
+    kubenix/hash: 738b965c870942267c065903936864fe5bc0a0be
   name: minio-cluster-metrics
   namespace: monitoring
 spec:
@@ -54,6 +57,7 @@ kind: ServiceMonitor
 metadata:
   labels:
     app: minio-external
+    kubenix/hash: 738b965c870942267c065903936864fe5bc0a0be
   name: minio-node-metrics
   namespace: monitoring
 spec:

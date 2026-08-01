@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/instance: searxng
@@ -10,6 +10,7 @@ metadata:
     app.kubernetes.io/name: searxng
     app.kubernetes.io/version: 1.1.0
     helm.sh/chart: searxng-1.1.0
+    kubenix/hash: f1db231114cc42839c91376e862a8ee77caf5d5d
   name: searxng
   namespace: apps
 spec:
@@ -39,7 +40,7 @@ spec:
       containers:
         - env:
             - name: SEARXNG_PORT
-              value: '8080'
+              value: "8080"
           envFrom:
             - secretRef:
                 name: searxng-secret
@@ -79,7 +80,7 @@ spec:
         - effect: NoSchedule
           key: pi-only
           operator: Equal
-          value: 'true'
+          value: "true"
       volumes:
         - configMap:
             items:
@@ -94,7 +95,7 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/instance: searxng
@@ -102,6 +103,7 @@ metadata:
     app.kubernetes.io/name: searxng
     app.kubernetes.io/version: 1.1.0
     helm.sh/chart: searxng-1.1.0
+    kubenix/hash: f1db231114cc42839c91376e862a8ee77caf5d5d
   name: searxng
   namespace: apps
 spec:
@@ -120,7 +122,7 @@ kind: Ingress
 metadata:
   annotations:
     cert-manager.io/cluster-issuer: cloudflare-issuer
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/instance: searxng
@@ -128,6 +130,7 @@ metadata:
     app.kubernetes.io/name: searxng
     app.kubernetes.io/version: 1.1.0
     helm.sh/chart: searxng-1.1.0
+    kubenix/hash: f1db231114cc42839c91376e862a8ee77caf5d5d
   name: searxng
   namespace: apps
 spec:

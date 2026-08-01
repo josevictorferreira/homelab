@@ -2,10 +2,11 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
     app: sandbox-nix
+    kubenix/hash: cbe8231586e6a37e6d54316505c7778a1d3b26ad
   name: sandbox-nix
   namespace: apps
 spec:
@@ -24,9 +25,9 @@ spec:
             - /entrypoint.sh
           env:
             - name: NIX_CONFIG
-              value: 'experimental-features = nix-command flakes
-
-                sandbox = false'
+              value: |-
+                experimental-features = nix-command flakes
+                sandbox = false
           image: ghcr.io/josevictorferreira/sandbox-nix:0.1.0@sha256:0158928e91630131c724b8b66a4756f4ef3485041a025dedf07e905e6382eb75
           imagePullPolicy: IfNotPresent
           name: sandbox-nix
@@ -56,9 +57,7 @@ spec:
         - command:
             - /bin/sh
             - -c
-            - if [ ! -f /mnt/nix/.seeded ]; then rm -rf /mnt/nix/* /mnt/nix/.[!.]*
-              2>/dev/null || true; cp -a /nix/. /mnt/nix/ && touch /mnt/nix/.seeded;
-              fi
+            - if [ ! -f /mnt/nix/.seeded ]; then rm -rf /mnt/nix/* /mnt/nix/.[!.]* 2>/dev/null || true; cp -a /nix/. /mnt/nix/ && touch /mnt/nix/.seeded; fi
           image: ghcr.io/josevictorferreira/sandbox-nix:0.1.0@sha256:0158928e91630131c724b8b66a4756f4ef3485041a025dedf07e905e6382eb75
           imagePullPolicy: IfNotPresent
           name: seed-nix-store
@@ -94,12 +93,13 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
     lbipam.cilium.io/ips: 10.10.10.137
     lbipam.cilium.io/sharing-key: sandbox-nix
   labels:
     app: sandbox-nix
+    kubenix/hash: cbe8231586e6a37e6d54316505c7778a1d3b26ad
   name: sandbox-nix
   namespace: apps
 spec:

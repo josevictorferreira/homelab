@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/component: open-webui
@@ -11,6 +11,7 @@ metadata:
     app.kubernetes.io/name: open-webui
     app.kubernetes.io/version: 0.6.26
     helm.sh/chart: open-webui-8.1.0
+    kubenix/hash: 91ae0256c158941c6aa99c3fd894a656d75b7068
   name: open-webui
   namespace: apps
 spec:
@@ -36,7 +37,7 @@ spec:
             - name: WEBUI_URL
               value: https://openwebui.josevictor.me
             - name: ENABLE_OLLAMA_API
-              value: 'False'
+              value: "False"
             - name: OPENAI_API_BASE_URL
               value: https://openrouter.ai/api/v1
             - name: STORAGE_PROVIDER
@@ -105,7 +106,7 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/component: open-webui
@@ -114,6 +115,7 @@ metadata:
     app.kubernetes.io/name: open-webui
     app.kubernetes.io/version: 0.6.26
     helm.sh/chart: open-webui-8.1.0
+    kubenix/hash: 91ae0256c158941c6aa99c3fd894a656d75b7068
   name: open-webui
   namespace: apps
 spec:
@@ -132,7 +134,7 @@ automountServiceAccountToken: false
 kind: ServiceAccount
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/component: open-webui
@@ -141,6 +143,7 @@ metadata:
     app.kubernetes.io/name: open-webui
     app.kubernetes.io/version: 0.6.26
     helm.sh/chart: open-webui-8.1.0
+    kubenix/hash: 91ae0256c158941c6aa99c3fd894a656d75b7068
   name: open-webui
   namespace: apps
 ---
@@ -148,7 +151,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/component: open-webui
@@ -157,6 +160,7 @@ metadata:
     app.kubernetes.io/name: open-webui
     app.kubernetes.io/version: 0.6.26
     helm.sh/chart: open-webui-8.1.0
+    kubenix/hash: 91ae0256c158941c6aa99c3fd894a656d75b7068
   name: open-webui
   namespace: apps
 spec:
@@ -181,8 +185,10 @@ apiVersion: objectbucket.io/v1alpha1
 kind: ObjectBucketClaim
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 91ae0256c158941c6aa99c3fd894a656d75b7068
   name: open-webui-s3
   namespace: apps
 spec:

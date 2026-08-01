@@ -2,8 +2,10 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: a91b4792bf4b68cf894fcc668203ba625e3bca2f
   name: tuwunel
   namespace: apps
 spec:
@@ -31,11 +33,11 @@ spec:
             - name: TUWUNEL_ADDRESS
               value: 0.0.0.0
             - name: TUWUNEL_PORT
-              value: '8008'
+              value: "8008"
             - name: TUWUNEL_ALLOW_FEDERATION
-              value: 'false'
+              value: "false"
             - name: TUWUNEL_ALLOW_REGISTRATION
-              value: 'true'
+              value: "true"
             - name: TUWUNEL_REGISTRATION_TOKEN
               valueFrom:
                 secretKeyRef:
@@ -51,9 +53,9 @@ spec:
                   key: TUWUNEL_EMERGENCY_PASSWORD
                   name: tuwunel-env
             - name: TUWUNEL_DB_POOL_AFFINITY
-              value: 'false'
+              value: "false"
             - name: TUWUNEL_DB_POOL_WORKERS
-              value: '16'
+              value: "16"
           image: ghcr.io/matrix-construct/tuwunel:v1.7.0@sha256:8acfc755db4956c496e93f3b63693bbea298735835daadf882be791e2317dc0b
           imagePullPolicy: IfNotPresent
           livenessProbe:
@@ -117,8 +119,10 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: a91b4792bf4b68cf894fcc668203ba625e3bca2f
   name: tuwunel-data-v2
   namespace: apps
 spec:
@@ -133,8 +137,10 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: a91b4792bf4b68cf894fcc668203ba625e3bca2f
   name: tuwunel
   namespace: apps
 spec:
@@ -150,8 +156,10 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: a91b4792bf4b68cf894fcc668203ba625e3bca2f
   name: tuwunel
   namespace: apps
 spec:
