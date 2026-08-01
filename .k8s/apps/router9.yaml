@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/controller: main
@@ -10,6 +10,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: router9
     helm.sh/chart: app-template-4.2.0
+    kubenix/hash: b0bbea69b8539e8bbc73bbf915af9a70649935af
+    kubenix/module-instance: router9
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
   name: router9
@@ -68,13 +70,15 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/instance: router9
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: router9
     helm.sh/chart: app-template-4.2.0
+    kubenix/hash: b0bbea69b8539e8bbc73bbf915af9a70649935af
+    kubenix/module-instance: router9
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
   name: router9-data
@@ -91,13 +95,15 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/instance: router9
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: router9
     helm.sh/chart: app-template-4.2.0
+    kubenix/hash: b0bbea69b8539e8bbc73bbf915af9a70649935af
+    kubenix/module-instance: router9
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
   name: router9-data-home
@@ -114,7 +120,7 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
     lbipam.cilium.io/ips: 10.10.10.147
     lbipam.cilium.io/sharing-key: router9
@@ -124,6 +130,8 @@ metadata:
     app.kubernetes.io/name: router9
     app.kubernetes.io/service: router9
     helm.sh/chart: app-template-4.2.0
+    kubenix/hash: b0bbea69b8539e8bbc73bbf915af9a70649935af
+    kubenix/module-instance: router9
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
   name: router9
@@ -144,13 +152,15 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/instance: router9
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: router9
     helm.sh/chart: app-template-4.2.0
+    kubenix/hash: b0bbea69b8539e8bbc73bbf915af9a70649935af
+    kubenix/module-instance: router9
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
   name: router9

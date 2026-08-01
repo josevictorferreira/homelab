@@ -2,11 +2,12 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
     app: hermes-kanban-kubernetes
     component: controller
+    kubenix/hash: 802ed68b271f3e6572d04d28dadd2875847a1986
   name: hermes-kanban-kubernetes-controller
   namespace: apps
 spec:
@@ -27,11 +28,14 @@ spec:
         - command:
             - /bin/sh
             - -c
-            - "umask 0002\nif ! ls /opt/data/.plugins/hermes-kanban-kubernetes/*.whl\
-              \ >/dev/null 2>&1; then\n  echo \"FATAL: no plugin wheel in /opt/data/.plugins/hermes-kanban-kubernetes;\
-              \ build+copy it before scaling up\" >&2\n  exit 78\nfi\npip install\
-              \ --user --no-warn-script-location /opt/data/.plugins/hermes-kanban-kubernetes/*.whl\
-              \ >&2\nexec /opt/hermes/.venv/bin/python -m hermes_kanban_kubernetes.controller\n"
+            - |
+              umask 0002
+              if ! ls /opt/data/.plugins/hermes-kanban-kubernetes/*.whl >/dev/null 2>&1; then
+                echo "FATAL: no plugin wheel in /opt/data/.plugins/hermes-kanban-kubernetes; build+copy it before scaling up" >&2
+                exit 78
+              fi
+              pip install --user --no-warn-script-location /opt/data/.plugins/hermes-kanban-kubernetes/*.whl >&2
+              exec /opt/hermes/.venv/bin/python -m hermes_kanban_kubernetes.controller
           env:
             - name: HOME
               value: /opt/data
@@ -52,9 +56,9 @@ spec:
             - name: PYTHONPATH
               value: /opt/data/.local/lib/python3.13/site-packages
             - name: PIP_USER
-              value: 'true'
+              value: "true"
             - name: PIP_REQUIRE_VIRTUALENV
-              value: 'false'
+              value: "false"
             - name: PATH
               value: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/hermes/.venv/bin:/opt/data/.local/bin
           image: docker.io/nousresearch/hermes-agent:v2026.6.19@sha256:9f367c7756ef087661a361536a89f438d57a122b958dc23d82d456b1433e6e9e
@@ -101,40 +105,87 @@ spec:
 ---
 apiVersion: v1
 data:
-  config.yaml: "apiVersion: hermes-kanban-kubernetes/v1alpha1\nkind: LauncherConfig\n\
-    controller:\n  namespace: apps\n  jobNamePrefix: hk\n  dispatchIntervalSeconds:\
-    \ 60\n  reconcileIntervalSeconds: 30\n  maxActiveJobs: 1\n  maxActiveJobsPerProfile:\
-    \ 1\n  claimTtlSeconds: 900\n  handleStore: file\ncompatibility:\n  hermesVersion:\
-    \ \"2026.6.19\"\n  failOnUnknownHermesVersion: true\n  requireRemoteLifecycleContract:\
-    \ true\njob:\n  image: docker.io/nousresearch/hermes-agent:v2026.6.19@sha256:9f367c7756ef087661a361536a89f438d57a122b958dc23d82d456b1433e6e9e\n\
-    \  serviceAccountName: hermes-kanban-worker\n  backoffLimit: 0\n  activeDeadlineSeconds:\
-    \ 7200\n  ttlSecondsAfterFinished: 86400\n  resources:\n    default:\n      requests:\
-    \ { cpu: 500m, memory: 1Gi, ephemeral-storage: 5Gi }\n      limits:   { cpu: \"\
-    2\",  memory: 4Gi, ephemeral-storage: 20Gi }\n  securityContext:\n    runAsUser:\
-    \ 10000\n    runAsGroup: 2002\n    fsGroup: 2002\n    seccompProfile: RuntimeDefault\n\
-    \    readOnlyRootFilesystem: false\n  # Worker imports Hermes (venv) + the plugin\
-    \ (shared user-site + PYTHONPATH).\n  workerCommand:\n    - /opt/hermes/.venv/bin/python\n\
-    \    - -m\n    - hermes_kanban_kubernetes.worker\n  extraEnv:\n    PYTHONPATH:\
-    \ /opt/data/.local/lib/python3.13/site-packages\n    PYTHONUSERBASE: /opt/data/.local\n\
-    storage:\n  mode: split\n  pvcName: cephfs-shared-storage-root\n  profileSubPathTemplate:\
-    \ hermes/profiles/{profile}\n  profileMountPathTemplate: /opt/data/profiles/{profile}\n\
-    \  kanbanStateSubPathTemplate: hermes/kanban/boards/{board}\n  kanbanStateMountPath:\
-    \ /opt/data/kanban/boards/{board}\n  workspacesSubPath: hermes/kanban/workspaces\n\
-    \  workspacesMountPath: /opt/data/kanban/workspaces\n  launchSubPathTemplate:\
-    \ hermes/kanban/.launches/{run_hash}\n  launchMountPath: /run/hermes-kanban\n\
-    \  managedConfigFileSubPath: hermes/managed/config.yaml\n  managedConfigMountPath:\
-    \ /opt/data/managed\n  extraMounts:\n    - name: user-site\n      subPath: hermes/.local\n\
-    \      mountPath: /opt/data/.local\n      readOnly: true\n  allowBroadDataRootMount:\
-    \ false\nprofiles:\n  allowed:\n    - valygar\n  secretEnv:\n    valygar:\n  \
-    \    - envName: GITHUB_TOKEN\n        secretName: hermes-agent-env\n        secretKey:\
-    \ GITHUB_TOKEN\n      - envName: GH_TOKEN\n        secretName: hermes-agent-env\n\
-    \        secretKey: GH_TOKEN\nobservability:\n  logFormat: json\n  emitKubernetesEvents:\
-    \ true\n  includeTaskText: false\n"
+  config.yaml: |
+    apiVersion: hermes-kanban-kubernetes/v1alpha1
+    kind: LauncherConfig
+    controller:
+      namespace: apps
+      jobNamePrefix: hk
+      dispatchIntervalSeconds: 60
+      reconcileIntervalSeconds: 30
+      maxActiveJobs: 1
+      maxActiveJobsPerProfile: 1
+      claimTtlSeconds: 900
+      handleStore: file
+    compatibility:
+      hermesVersion: "2026.6.19"
+      failOnUnknownHermesVersion: true
+      requireRemoteLifecycleContract: true
+    job:
+      image: docker.io/nousresearch/hermes-agent:v2026.6.19@sha256:9f367c7756ef087661a361536a89f438d57a122b958dc23d82d456b1433e6e9e
+      serviceAccountName: hermes-kanban-worker
+      backoffLimit: 0
+      activeDeadlineSeconds: 7200
+      ttlSecondsAfterFinished: 86400
+      resources:
+        default:
+          requests: { cpu: 500m, memory: 1Gi, ephemeral-storage: 5Gi }
+          limits:   { cpu: "2",  memory: 4Gi, ephemeral-storage: 20Gi }
+      securityContext:
+        runAsUser: 10000
+        runAsGroup: 2002
+        fsGroup: 2002
+        seccompProfile: RuntimeDefault
+        readOnlyRootFilesystem: false
+      # Worker imports Hermes (venv) + the plugin (shared user-site + PYTHONPATH).
+      workerCommand:
+        - /opt/hermes/.venv/bin/python
+        - -m
+        - hermes_kanban_kubernetes.worker
+      extraEnv:
+        PYTHONPATH: /opt/data/.local/lib/python3.13/site-packages
+        PYTHONUSERBASE: /opt/data/.local
+    storage:
+      mode: split
+      pvcName: cephfs-shared-storage-root
+      profileSubPathTemplate: hermes/profiles/{profile}
+      profileMountPathTemplate: /opt/data/profiles/{profile}
+      kanbanStateSubPathTemplate: hermes/kanban/boards/{board}
+      kanbanStateMountPath: /opt/data/kanban/boards/{board}
+      workspacesSubPath: hermes/kanban/workspaces
+      workspacesMountPath: /opt/data/kanban/workspaces
+      launchSubPathTemplate: hermes/kanban/.launches/{run_hash}
+      launchMountPath: /run/hermes-kanban
+      managedConfigFileSubPath: hermes/managed/config.yaml
+      managedConfigMountPath: /opt/data/managed
+      extraMounts:
+        - name: user-site
+          subPath: hermes/.local
+          mountPath: /opt/data/.local
+          readOnly: true
+      allowBroadDataRootMount: false
+    profiles:
+      allowed:
+        - valygar
+      secretEnv:
+        valygar:
+          - envName: GITHUB_TOKEN
+            secretName: hermes-agent-env
+            secretKey: GITHUB_TOKEN
+          - envName: GH_TOKEN
+            secretName: hermes-agent-env
+            secretKey: GH_TOKEN
+    observability:
+      logFormat: json
+      emitKubernetesEvents: true
+      includeTaskText: false
 kind: ConfigMap
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 802ed68b271f3e6572d04d28dadd2875847a1986
   name: hermes-kanban-kubernetes-config
   namespace: apps
 ---
@@ -142,8 +193,10 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 802ed68b271f3e6572d04d28dadd2875847a1986
   name: hermes-kanban-controller
   namespace: apps
 ---
@@ -152,8 +205,10 @@ automountServiceAccountToken: false
 kind: ServiceAccount
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 802ed68b271f3e6572d04d28dadd2875847a1986
   name: hermes-kanban-worker
   namespace: apps
 ---
@@ -161,8 +216,10 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 802ed68b271f3e6572d04d28dadd2875847a1986
   name: hermes-kanban-controller
   namespace: apps
 rules:
@@ -177,7 +234,7 @@ rules:
       - watch
       - delete
   - apiGroups:
-      - ''
+      - ""
     resources:
       - pods
     verbs:
@@ -185,13 +242,13 @@ rules:
       - list
       - watch
   - apiGroups:
-      - ''
+      - ""
     resources:
       - pods/log
     verbs:
       - get
   - apiGroups:
-      - ''
+      - ""
     resources:
       - events
     verbs:
@@ -202,8 +259,10 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 802ed68b271f3e6572d04d28dadd2875847a1986
   name: hermes-kanban-controller
   namespace: apps
 roleRef:

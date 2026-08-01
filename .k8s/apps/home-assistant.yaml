@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/instance: home-assistant
@@ -10,6 +10,7 @@ metadata:
     app.kubernetes.io/name: home-assistant
     app.kubernetes.io/version: 2026.7.0
     helm.sh/chart: home-assistant-0.3.68
+    kubenix/hash: d8adf3f47e3403f087d90faf893fb1ad8d04df40
   name: home-assistant
   namespace: apps
 spec:
@@ -68,11 +69,17 @@ spec:
         - command:
             - sh
             - -c
-            - "set -e\nmkdir -p /config/custom_components\nif [ ! -d /config/custom_components/hacs\
-              \ ]; then\n  echo \"Installing HACS 2.0.5...\"\n  wget -q https://github.com/hacs/integration/releases/download/2.0.5/hacs.zip\
-              \ -O /tmp/hacs.zip\n  unzip -q /tmp/hacs.zip -d /config/custom_components/hacs\n\
-              \  echo \"HACS installed\"\nelse\n  echo \"HACS already present, skipping\"\
-              \nfi\n"
+            - |
+              set -e
+              mkdir -p /config/custom_components
+              if [ ! -d /config/custom_components/hacs ]; then
+                echo "Installing HACS 2.0.5..."
+                wget -q https://github.com/hacs/integration/releases/download/2.0.5/hacs.zip -O /tmp/hacs.zip
+                unzip -q /tmp/hacs.zip -d /config/custom_components/hacs
+                echo "HACS installed"
+              else
+                echo "HACS already present, skipping"
+              fi
           image: busybox:1.37
           imagePullPolicy: IfNotPresent
           name: install-hacs
@@ -82,13 +89,18 @@ spec:
         - command:
             - sh
             - -c
-            - "set -e\nmkdir -p /config/custom_components\nif [ ! -d /config/custom_components/auth_oidc\
-              \ ]; then\n  echo \"Installing hass-oidc-auth 1.1.1...\"\n  wget -q\
-              \ https://github.com/christiaangoossens/hass-oidc-auth/releases/download/v1.1.1/hass-oidc-auth.zip\
-              \ -O /tmp/auth_oidc.zip\n  mkdir -p /config/custom_components/auth_oidc\n\
-              \  unzip -q /tmp/auth_oidc.zip -d /config/custom_components/auth_oidc\n\
-              \  echo \"hass-oidc-auth installed\"\nelse\n  echo \"hass-oidc-auth\
-              \ already present, skipping\"\nfi\n"
+            - |
+              set -e
+              mkdir -p /config/custom_components
+              if [ ! -d /config/custom_components/auth_oidc ]; then
+                echo "Installing hass-oidc-auth 1.1.1..."
+                wget -q https://github.com/christiaangoossens/hass-oidc-auth/releases/download/v1.1.1/hass-oidc-auth.zip -O /tmp/auth_oidc.zip
+                mkdir -p /config/custom_components/auth_oidc
+                unzip -q /tmp/auth_oidc.zip -d /config/custom_components/auth_oidc
+                echo "hass-oidc-auth installed"
+              else
+                echo "hass-oidc-auth already present, skipping"
+              fi
           image: busybox:1.37
           imagePullPolicy: IfNotPresent
           name: install-oidc
@@ -116,7 +128,7 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/instance: home-assistant
@@ -124,6 +136,7 @@ metadata:
     app.kubernetes.io/name: home-assistant
     app.kubernetes.io/version: 2026.7.0
     helm.sh/chart: home-assistant-0.3.68
+    kubenix/hash: d8adf3f47e3403f087d90faf893fb1ad8d04df40
   name: home-assistant
   namespace: apps
 spec:
@@ -141,7 +154,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/instance: home-assistant
@@ -149,6 +162,7 @@ metadata:
     app.kubernetes.io/name: home-assistant
     app.kubernetes.io/version: 2026.7.0
     helm.sh/chart: home-assistant-0.3.68
+    kubenix/hash: d8adf3f47e3403f087d90faf893fb1ad8d04df40
   name: home-assistant
   namespace: apps
 ---
@@ -157,7 +171,7 @@ kind: Ingress
 metadata:
   annotations:
     cert-manager.io/cluster-issuer: cloudflare-issuer
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/instance: home-assistant
@@ -165,6 +179,7 @@ metadata:
     app.kubernetes.io/name: home-assistant
     app.kubernetes.io/version: 2026.7.0
     helm.sh/chart: home-assistant-0.3.68
+    kubenix/hash: d8adf3f47e3403f087d90faf893fb1ad8d04df40
   name: home-assistant
   namespace: apps
 spec:

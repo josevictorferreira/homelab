@@ -2,8 +2,10 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: cc6705444b4e903ad5ca1ef6fb320dbbce7dd4de
   name: lightpanda
   namespace: apps
 spec:
@@ -23,9 +25,9 @@ spec:
             - --host
             - 0.0.0.0
             - --port
-            - '9222'
+            - "9222"
             - --timeout
-            - '0'
+            - "0"
           image: lightpanda/browser:nightly
           livenessProbe:
             httpGet:
@@ -62,8 +64,10 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: cc6705444b4e903ad5ca1ef6fb320dbbce7dd4de
   name: lightpanda
   namespace: apps
 spec:

@@ -4,8 +4,10 @@ globalDefault: false
 kind: PriorityClass
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 84ad5db3a6caeff0de175a47823291094b436375
   name: high-priority
 value: 1000000
 ---
@@ -15,8 +17,10 @@ globalDefault: false
 kind: PriorityClass
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 84ad5db3a6caeff0de175a47823291094b436375
   name: low-priority
 value: 10000
 ---
@@ -26,19 +30,22 @@ globalDefault: true
 kind: PriorityClass
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 84ad5db3a6caeff0de175a47823291094b436375
   name: medium-priority
 value: 100000
 ---
 apiVersion: scheduling.k8s.io/v1
-description: Nice-to-have services that yield to higher-priority workloads when capacity
-  is constrained
+description: Nice-to-have services that yield to higher-priority workloads when capacity is constrained
 globalDefault: false
 kind: PriorityClass
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 84ad5db3a6caeff0de175a47823291094b436375
   name: preemptible
 value: 100

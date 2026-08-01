@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/controller: main
@@ -10,6 +10,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: dramaturge
     helm.sh/chart: app-template-4.2.0
+    kubenix/hash: d4b78bb76595175aa7ce1588faff99a682155965
+    kubenix/module-instance: dramaturge
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
   name: dramaturge
@@ -75,7 +77,7 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
     lbipam.cilium.io/ips: 10.10.10.154
     lbipam.cilium.io/sharing-key: dramaturge
@@ -85,6 +87,8 @@ metadata:
     app.kubernetes.io/name: dramaturge
     app.kubernetes.io/service: dramaturge
     helm.sh/chart: app-template-4.2.0
+    kubenix/hash: d4b78bb76595175aa7ce1588faff99a682155965
+    kubenix/module-instance: dramaturge
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
   name: dramaturge
@@ -105,13 +109,15 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/instance: dramaturge
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: dramaturge
     helm.sh/chart: app-template-4.2.0
+    kubenix/hash: d4b78bb76595175aa7ce1588faff99a682155965
+    kubenix/module-instance: dramaturge
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
   name: dramaturge
@@ -138,7 +144,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/controller: main
@@ -146,6 +152,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: dramaturge-worker
     helm.sh/chart: app-template-4.2.0
+    kubenix/hash: d4b78bb76595175aa7ce1588faff99a682155965
+    kubenix/module-instance: dramaturge-worker
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
   name: dramaturge-worker
@@ -202,7 +210,7 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
     lbipam.cilium.io/ips: 10.10.10.155
     lbipam.cilium.io/sharing-key: dramaturge-worker
@@ -212,6 +220,8 @@ metadata:
     app.kubernetes.io/name: dramaturge-worker
     app.kubernetes.io/service: dramaturge-worker
     helm.sh/chart: app-template-4.2.0
+    kubenix/hash: d4b78bb76595175aa7ce1588faff99a682155965
+    kubenix/module-instance: dramaturge-worker
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
   name: dramaturge-worker

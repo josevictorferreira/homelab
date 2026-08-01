@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/controller: main
@@ -10,6 +10,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: omniroute
     helm.sh/chart: app-template-4.2.0
+    kubenix/hash: a428de25a35d23ea78038445dc327faafe9d05a0
+    kubenix/module-instance: omniroute
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
   name: omniroute
@@ -28,7 +30,7 @@ spec:
     metadata:
       annotations:
         omniroute.josevictor.me/input-sanitizer: disabled
-        omniroute.josevictor.me/memory-mb: '3072'
+        omniroute.josevictor.me/memory-mb: "3072"
       labels:
         app.kubernetes.io/controller: main
         app.kubernetes.io/instance: omniroute
@@ -48,74 +50,135 @@ spec:
         - command:
             - sh
             - -ec
-            - "cd /app\n\nnode --input-type=module <<'NODE'\nimport fs from \"node:fs\"\
-              ;\nimport path from \"node:path\";\nimport Database from \"better-sqlite3\"\
-              ;\n\nconst chunksDir = \"/app/.build/next/server/chunks\";\nconst dbPath\
-              \ = \"/app/data/storage.sqlite\";\n\nfunction walk(dir) {\n  if (!fs.existsSync(dir))\
-              \ return [];\n  const entries = fs.readdirSync(dir, { withFileTypes:\
-              \ true });\n  const files = [];\n  for (const entry of entries) {\n\
-              \    const file = path.join(dir, entry.name);\n    if (entry.isDirectory())\
-              \ files.push(...walk(file));\n    else if (entry.isFile() && file.endsWith(\"\
-              .js\")) files.push(file);\n  }\n  return files;\n}\n\nconst responseBufferNeedle\
-              \ = 'let j=\"\";await this.pipeSSE(i,b,a=>{j+=a.toString()});let k=this.now()-e;this.hookBufferUpdate(f,{status:i.status,responseHeaders:Object.fromEntries(i.headers.entries()),responseBody:j,responseSize:Buffer.byteLength(j),proxyLatencyMs:h-e,upstreamLatencyMs:k-(h-e)})';\n\
-              const responseBufferReplacement = 'await this.pipeSSE(i,b);let k=this.now()-e;this.hookBufferUpdate(f,{status:i.status,responseHeaders:Object.fromEntries(i.headers.entries()),responseBody:null,responseSize:0,proxyLatencyMs:h-e,upstreamLatencyMs:k-(h-e)})';\n\
-              const captureNeedle = 'shouldCaptureBody(){return!0}';\nconst captureReplacement\
-              \ = 'shouldCaptureBody(){return!1}';\n\nlet responseBufferPatches =\
-              \ 0;\nlet capturePatches = 0;\nlet remainingResponseBuffers = 0;\n\n\
-              for (const file of walk(chunksDir)) {\n  const before = fs.readFileSync(file,\
-              \ \"utf8\");\n  let after = before;\n\n  const responseOccurrences =\
-              \ after.split(responseBufferNeedle).length - 1;\n  if (responseOccurrences\
-              \ > 0) {\n    after = after.split(responseBufferNeedle).join(responseBufferReplacement);\n\
-              \    responseBufferPatches += responseOccurrences;\n  }\n\n  const captureOccurrences\
-              \ = after.split(captureNeedle).length - 1;\n  if (captureOccurrences\
-              \ > 0) {\n    after = after.split(captureNeedle).join(captureReplacement);\n\
-              \    capturePatches += captureOccurrences;\n  }\n\n  remainingResponseBuffers\
-              \ += after.split(responseBufferNeedle).length - 1;\n  if (after !==\
-              \ before) fs.writeFileSync(file, after);\n}\n\nif (remainingResponseBuffers\
-              \ > 0) {\n  throw new Error(\"OmniRoute AgentBridge response buffering\
-              \ patch left unpatched call sites\");\n}\n\nconsole.log(\"[omniroute-startup]\
-              \ response buffer patches=\" + responseBufferPatches + \" body capture\
-              \ patches=\" + capturePatches);\n\nconst comboNames = [\"radagast\"\
-              , \"mimo-v2.5\", \"pippin\", \"gandalf\"];\nconst logSettings = [\n\
-              \  [\"databaseSettings\", \"logs.detailedLogsEnabled\", false],\n  [\"\
-              databaseSettings\", \"logs.callLogPipelineEnabled\", false],\n  [\"\
-              databaseSettings\", \"logs.maxDetailSizeKb\", 10],\n  [\"databaseSettings\"\
-              , \"logs.ringBufferSize\", 100],\n  [\"databaseSettings\", \"detailedLogsEnabled\"\
-              , false],\n  [\"databaseSettings\", \"callLogPipelineEnabled\", false],\n\
-              \  [\"databaseSettings\", \"maxDetailSizeKb\", 10],\n  [\"databaseSettings\"\
-              , \"ringBufferSize\", 100],\n  [\"settings\", \"detailed_logs_enabled\"\
-              , false],\n  [\"settings\", \"call_log_pipeline_enabled\", false],\n\
-              ];\n\nfunction enforceDatabaseSettings() {\n  if (!fs.existsSync(dbPath))\
-              \ {\n    console.log(\"[omniroute-startup] sqlite database not found;\
-              \ skipping config enforcement\");\n    return;\n  }\n\n  const db =\
-              \ new Database(dbPath);\n  const deleteKey = db.prepare(\"DELETE FROM\
-              \ key_value WHERE namespace = ? AND key = ?\");\n  const insertKey =\
-              \ db.prepare(\"INSERT INTO key_value (namespace, key, value) VALUES\
-              \ (?, ?, ?)\");\n  const updateProviderConcurrency = db.prepare(\"UPDATE\
-              \ provider_connections SET max_concurrent = 2 WHERE is_active = 1 AND\
-              \ (max_concurrent IS NULL OR max_concurrent <> 2)\");\n  const selectCombos\
-              \ = db.prepare(\"SELECT id, name, data FROM combos WHERE name IN (\"\
-              \ + comboNames.map(() => \"?\").join(\",\") + \")\");\n  const updateCombo\
-              \ = db.prepare(\"UPDATE combos SET data = ?, updated_at = datetime('now')\
-              \ WHERE id = ?\");\n\n  const tx = db.transaction(() => {\n    for (const\
-              \ [namespace, key, value] of logSettings) {\n      deleteKey.run(namespace,\
-              \ key);\n      insertKey.run(namespace, key, JSON.stringify(value));\n\
-              \    }\n\n    const providerChanges = updateProviderConcurrency.run().changes;\n\
-              \    let comboChanges = 0;\n\n    for (const row of selectCombos.all(...comboNames))\
-              \ {\n      let data = {};\n      try {\n        data = JSON.parse(row.data\
-              \ || \"{}\");\n      } catch {\n        data = {};\n      }\n\n    \
-              \  if (!data.config || typeof data.config !== \"object\" || Array.isArray(data.config))\
-              \ {\n        data.config = {};\n      }\n\n      data.config.concurrencyPerModel\
-              \ = 2;\n      data.config.queueDepth = 2;\n      data.config.queueTimeoutMs\
-              \ = 10000;\n      data.config.maxRetries = 0;\n\n      updateCombo.run(JSON.stringify(data),\
-              \ row.id);\n      comboChanges += 1;\n    }\n\n    console.log(\"[omniroute-startup]\
-              \ provider concurrency rows=\" + providerChanges + \" combo rows=\"\
-              \ + comboChanges + \" log settings=\" + logSettings.length);\n  });\n\
-              \n  tx();\n  db.close();\n}\n\nenforceDatabaseSettings();\nNODE\n\n\
-              exec node dev/run-standalone.mjs\n"
+            - |
+              cd /app
+
+              node --input-type=module <<'NODE'
+              import fs from "node:fs";
+              import path from "node:path";
+              import Database from "better-sqlite3";
+
+              const chunksDir = "/app/.build/next/server/chunks";
+              const dbPath = "/app/data/storage.sqlite";
+
+              function walk(dir) {
+                if (!fs.existsSync(dir)) return [];
+                const entries = fs.readdirSync(dir, { withFileTypes: true });
+                const files = [];
+                for (const entry of entries) {
+                  const file = path.join(dir, entry.name);
+                  if (entry.isDirectory()) files.push(...walk(file));
+                  else if (entry.isFile() && file.endsWith(".js")) files.push(file);
+                }
+                return files;
+              }
+
+              const responseBufferNeedle = 'let j="";await this.pipeSSE(i,b,a=>{j+=a.toString()});let k=this.now()-e;this.hookBufferUpdate(f,{status:i.status,responseHeaders:Object.fromEntries(i.headers.entries()),responseBody:j,responseSize:Buffer.byteLength(j),proxyLatencyMs:h-e,upstreamLatencyMs:k-(h-e)})';
+              const responseBufferReplacement = 'await this.pipeSSE(i,b);let k=this.now()-e;this.hookBufferUpdate(f,{status:i.status,responseHeaders:Object.fromEntries(i.headers.entries()),responseBody:null,responseSize:0,proxyLatencyMs:h-e,upstreamLatencyMs:k-(h-e)})';
+              const captureNeedle = 'shouldCaptureBody(){return!0}';
+              const captureReplacement = 'shouldCaptureBody(){return!1}';
+
+              let responseBufferPatches = 0;
+              let capturePatches = 0;
+              let remainingResponseBuffers = 0;
+
+              for (const file of walk(chunksDir)) {
+                const before = fs.readFileSync(file, "utf8");
+                let after = before;
+
+                const responseOccurrences = after.split(responseBufferNeedle).length - 1;
+                if (responseOccurrences > 0) {
+                  after = after.split(responseBufferNeedle).join(responseBufferReplacement);
+                  responseBufferPatches += responseOccurrences;
+                }
+
+                const captureOccurrences = after.split(captureNeedle).length - 1;
+                if (captureOccurrences > 0) {
+                  after = after.split(captureNeedle).join(captureReplacement);
+                  capturePatches += captureOccurrences;
+                }
+
+                remainingResponseBuffers += after.split(responseBufferNeedle).length - 1;
+                if (after !== before) fs.writeFileSync(file, after);
+              }
+
+              if (remainingResponseBuffers > 0) {
+                throw new Error("OmniRoute AgentBridge response buffering patch left unpatched call sites");
+              }
+
+              console.log("[omniroute-startup] response buffer patches=" + responseBufferPatches + " body capture patches=" + capturePatches);
+
+              const comboNames = ["radagast", "mimo-v2.5", "pippin", "gandalf"];
+              const logSettings = [
+                ["databaseSettings", "logs.detailedLogsEnabled", false],
+                ["databaseSettings", "logs.callLogPipelineEnabled", false],
+                ["databaseSettings", "logs.maxDetailSizeKb", 10],
+                ["databaseSettings", "logs.ringBufferSize", 100],
+                ["databaseSettings", "detailedLogsEnabled", false],
+                ["databaseSettings", "callLogPipelineEnabled", false],
+                ["databaseSettings", "maxDetailSizeKb", 10],
+                ["databaseSettings", "ringBufferSize", 100],
+                ["settings", "detailed_logs_enabled", false],
+                ["settings", "call_log_pipeline_enabled", false],
+              ];
+
+              function enforceDatabaseSettings() {
+                if (!fs.existsSync(dbPath)) {
+                  console.log("[omniroute-startup] sqlite database not found; skipping config enforcement");
+                  return;
+                }
+
+                const db = new Database(dbPath);
+                const deleteKey = db.prepare("DELETE FROM key_value WHERE namespace = ? AND key = ?");
+                const insertKey = db.prepare("INSERT INTO key_value (namespace, key, value) VALUES (?, ?, ?)");
+                const updateProviderConcurrency = db.prepare("UPDATE provider_connections SET max_concurrent = 2 WHERE is_active = 1 AND (max_concurrent IS NULL OR max_concurrent <> 2)");
+                const selectCombos = db.prepare("SELECT id, name, data FROM combos WHERE name IN (" + comboNames.map(() => "?").join(",") + ")");
+                const updateCombo = db.prepare("UPDATE combos SET data = ?, updated_at = datetime('now') WHERE id = ?");
+
+                const tx = db.transaction(() => {
+                  for (const [namespace, key, value] of logSettings) {
+                    deleteKey.run(namespace, key);
+                    insertKey.run(namespace, key, JSON.stringify(value));
+                  }
+
+                  const providerChanges = updateProviderConcurrency.run().changes;
+                  let comboChanges = 0;
+
+                  for (const row of selectCombos.all(...comboNames)) {
+                    let data = {};
+                    try {
+                      data = JSON.parse(row.data || "{}");
+                    } catch {
+                      data = {};
+                    }
+
+                    if (!data.config || typeof data.config !== "object" || Array.isArray(data.config)) {
+                      data.config = {};
+                    }
+
+                    data.config.concurrencyPerModel = 2;
+                    data.config.queueDepth = 2;
+                    data.config.queueTimeoutMs = 10000;
+                    data.config.maxRetries = 0;
+
+                    updateCombo.run(JSON.stringify(data), row.id);
+                    comboChanges += 1;
+                  }
+
+                  console.log("[omniroute-startup] provider concurrency rows=" + providerChanges + " combo rows=" + comboChanges + " log settings=" + logSettings.length);
+                });
+
+                tx();
+                db.close();
+              }
+
+              enforceDatabaseSettings();
+              NODE
+
+              exec node dev/run-standalone.mjs
           env:
             - name: DISABLE_SQLITE_AUTO_BACKUP
-              value: 'true'
+              value: "true"
           envFrom:
             - secretRef:
                 name: omniroute-env
@@ -162,7 +225,7 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
     lbipam.cilium.io/ips: 10.10.10.148
     lbipam.cilium.io/sharing-key: omniroute
@@ -172,6 +235,8 @@ metadata:
     app.kubernetes.io/name: omniroute
     app.kubernetes.io/service: omniroute
     helm.sh/chart: app-template-4.2.0
+    kubenix/hash: a428de25a35d23ea78038445dc327faafe9d05a0
+    kubenix/module-instance: omniroute
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
   name: omniroute
@@ -192,13 +257,15 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/instance: omniroute
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: omniroute
     helm.sh/chart: app-template-4.2.0
+    kubenix/hash: a428de25a35d23ea78038445dc327faafe9d05a0
+    kubenix/module-instance: omniroute
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
   name: omniroute
@@ -225,8 +292,10 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: a428de25a35d23ea78038445dc327faafe9d05a0
   name: omniroute-data-home-nvme
   namespace: apps
 spec:
@@ -241,8 +310,10 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: a428de25a35d23ea78038445dc327faafe9d05a0
   name: omniroute-data-nvme
   namespace: apps
 spec:

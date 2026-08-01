@@ -1,119 +1,338 @@
 apiVersion: v1
 data:
-  cluster-health-rules.yaml: "apiVersion: 1\ngroups:\n- folder: Cluster Health Alerts\n\
-    \  interval: 1m\n  name: Cluster Health\n  orgId: 1\n  rules:\n  - annotations:\n\
-    \      description: KubeAPI server has been unreachable for more than 2 minutes.\n\
-    \      summary: Kubernetes API server is down\n    condition: C\n    data:\n \
-    \   - datasourceUid: prometheus\n      model:\n        expr: up{job=\"apiserver\"\
-    } == 0\n        intervalMs: 1000\n        maxDataPoints: 43200\n        refId:\
-    \ A\n      refId: A\n      relativeTimeRange:\n        from: 600\n        to:\
-    \ 0\n    - datasourceUid: __expr__\n      model:\n        conditions:\n      \
-    \  - evaluator:\n            params:\n            - 0\n            type: gt\n\
-    \        expression: A\n        refId: C\n        type: threshold\n      refId:\
-    \ C\n      relativeTimeRange:\n        from: 600\n        to: 0\n    for: 2m\n\
-    \    labels:\n      severity: critical\n    title: KubeAPIServer Down\n    uid:\
-    \ cluster-kube-apiserver-down\n  - annotations:\n      description: Kubelet has\
-    \ been unreachable on node {{ $labels.node }} for more\n        than 10 minutes.\n\
-    \      summary: Kubelet is down on {{ $labels.node }}\n    condition: C\n    data:\n\
-    \    - datasourceUid: prometheus\n      model:\n        expr: sum by (node)(up{job=\"\
-    kubelet\"}) == 0\n        intervalMs: 1000\n        maxDataPoints: 43200\n   \
-    \     refId: A\n      refId: A\n      relativeTimeRange:\n        from: 600\n\
-    \        to: 0\n    - datasourceUid: __expr__\n      model:\n        conditions:\n\
-    \        - evaluator:\n            params:\n            - 0\n            type:\
-    \ gt\n        expression: A\n        refId: C\n        type: threshold\n     \
-    \ refId: C\n      relativeTimeRange:\n        from: 600\n        to: 0\n    for:\
-    \ 10m\n    labels:\n      severity: critical\n    title: Kubelet Down\n    uid:\
-    \ cluster-kubelet-down\n  - annotations:\n      description: Node {{ $labels.node\
-    \ }} has been NotReady for more than 5 minutes.\n      summary: Node {{ $labels.node\
-    \ }} is not Ready\n    condition: C\n    data:\n    - datasourceUid: prometheus\n\
-    \      model:\n        expr: kube_node_status_condition{condition=\"Ready\",status=\"\
-    true\"} == 0\n        intervalMs: 1000\n        maxDataPoints: 43200\n       \
-    \ refId: A\n      refId: A\n      relativeTimeRange:\n        from: 600\n    \
-    \    to: 0\n    - datasourceUid: __expr__\n      model:\n        conditions:\n\
-    \        - evaluator:\n            params:\n            - 0\n            type:\
-    \ gt\n        expression: A\n        refId: C\n        type: threshold\n     \
-    \ refId: C\n      relativeTimeRange:\n        from: 600\n        to: 0\n    for:\
-    \ 5m\n    labels:\n      severity: critical\n    title: Node NotReady\n    uid:\
-    \ cluster-node-not-ready\n  - annotations:\n      description: Node {{ $labels.node\
-    \ }} is under memory pressure. Risk of OOM kills.\n      summary: Node {{ $labels.node\
-    \ }} has MemoryPressure\n    condition: C\n    data:\n    - datasourceUid: prometheus\n\
-    \      model:\n        expr: kube_node_status_condition{condition=\"MemoryPressure\"\
-    ,status=\"true\"}\n          == 1\n        intervalMs: 1000\n        maxDataPoints:\
-    \ 43200\n        refId: A\n      refId: A\n      relativeTimeRange:\n        from:\
-    \ 600\n        to: 0\n    - datasourceUid: __expr__\n      model:\n        conditions:\n\
-    \        - evaluator:\n            params:\n            - 0\n            type:\
-    \ gt\n        expression: A\n        refId: C\n        type: threshold\n     \
-    \ refId: C\n      relativeTimeRange:\n        from: 600\n        to: 0\n    for:\
-    \ 5m\n    labels:\n      severity: warning\n    title: Node MemoryPressure\n \
-    \   uid: cluster-node-memory-pressure\n  - annotations:\n      description: Node\
-    \ {{ $labels.node }} is under disk pressure.\n      summary: Node {{ $labels.node\
-    \ }} has DiskPressure\n    condition: C\n    data:\n    - datasourceUid: prometheus\n\
-    \      model:\n        expr: kube_node_status_condition{condition=\"DiskPressure\"\
-    ,status=\"true\"} ==\n          1\n        intervalMs: 1000\n        maxDataPoints:\
-    \ 43200\n        refId: A\n      refId: A\n      relativeTimeRange:\n        from:\
-    \ 600\n        to: 0\n    - datasourceUid: __expr__\n      model:\n        conditions:\n\
-    \        - evaluator:\n            params:\n            - 0\n            type:\
-    \ gt\n        expression: A\n        refId: C\n        type: threshold\n     \
-    \ refId: C\n      relativeTimeRange:\n        from: 600\n        to: 0\n    for:\
-    \ 5m\n    labels:\n      severity: warning\n    title: Node DiskPressure\n   \
-    \ uid: cluster-node-disk-pressure\n  - annotations:\n      description: Deployment\
-    \ {{ $labels.namespace }}/{{ $labels.deployment }} has\n        {{ $value }} available\
-    \ replicas but desired is {{ $labels.expected_replicas\n        }}.\n      summary:\
-    \ Deployment {{ $labels.namespace }}/{{ $labels.deployment }} has replicas\n \
-    \       mismatch\n    condition: C\n    data:\n    - datasourceUid: prometheus\n\
-    \      model:\n        expr: kube_deployment_status_replicas_available{namespace=~\"\
-    apps|rook-ceph|kube-system\"}\n          != kube_deployment_spec_replicas{namespace=~\"\
-    apps|rook-ceph|kube-system\"}\n        intervalMs: 1000\n        maxDataPoints:\
-    \ 43200\n        refId: A\n      refId: A\n      relativeTimeRange:\n        from:\
-    \ 600\n        to: 0\n    - datasourceUid: __expr__\n      model:\n        conditions:\n\
-    \        - evaluator:\n            params:\n            - 0\n            type:\
-    \ gt\n        expression: A\n        refId: C\n        type: threshold\n     \
-    \ refId: C\n      relativeTimeRange:\n        from: 600\n        to: 0\n    for:\
-    \ 10m\n    labels:\n      severity: critical\n    title: Deployment Replicas Mismatch\n\
-    \    uid: cluster-deployment-replicas-mismatch\n  - annotations:\n      description:\
-    \ StatefulSet {{ $labels.namespace }}/{{ $labels.statefulset }} has\n        {{\
-    \ $value }} ready replicas but desired is {{ $labels.replicas }}.\n      summary:\
-    \ StatefulSet {{ $labels.namespace }}/{{ $labels.statefulset }} replicas\n   \
-    \     mismatch\n    condition: C\n    data:\n    - datasourceUid: prometheus\n\
-    \      model:\n        expr: kube_statefulset_status_replicas_ready{namespace=~\"\
-    apps|rook-ceph\"}\n          != kube_statefulset_status_replicas{namespace=~\"\
-    apps|rook-ceph\"}\n        intervalMs: 1000\n        maxDataPoints: 43200\n  \
-    \      refId: A\n      refId: A\n      relativeTimeRange:\n        from: 600\n\
-    \        to: 0\n    - datasourceUid: __expr__\n      model:\n        conditions:\n\
-    \        - evaluator:\n            params:\n            - 0\n            type:\
-    \ gt\n        expression: A\n        refId: C\n        type: threshold\n     \
-    \ refId: C\n      relativeTimeRange:\n        from: 600\n        to: 0\n    for:\
-    \ 10m\n    labels:\n      severity: critical\n    title: StatefulSet Replicas\
-    \ Mismatch\n    uid: cluster-statefulset-replicas-mismatch\n  - annotations:\n\
-    \      description: Pod {{ $labels.namespace }}/{{ $labels.pod }} has restarted\
-    \ {{\n        $value }} times in the last hour.\n      summary: Pod {{ $labels.namespace\
-    \ }}/{{ $labels.pod }} is crash looping\n    condition: C\n    data:\n    - datasourceUid:\
-    \ prometheus\n      model:\n        expr: increase(kube_pod_container_status_restarts_total[1h])\
-    \ > 5\n        intervalMs: 1000\n        maxDataPoints: 43200\n        refId:\
-    \ A\n      refId: A\n      relativeTimeRange:\n        from: 600\n        to:\
-    \ 0\n    - datasourceUid: __expr__\n      model:\n        conditions:\n      \
-    \  - evaluator:\n            params:\n            - 0\n            type: gt\n\
-    \        expression: A\n        refId: C\n        type: threshold\n      refId:\
-    \ C\n      relativeTimeRange:\n        from: 600\n        to: 0\n    for: 5m\n\
-    \    labels:\n      severity: warning\n    title: Pod Crash Looping\n    uid:\
-    \ cluster-pod-crash-looping\n  - annotations:\n      description: PersistentVolumeClaim\
-    \ {{ $labels.persistentvolume }} has been Pending\n        for more than 10 minutes.\n\
-    \      summary: PVC {{ $labels.persistentvolume }} is Pending\n    condition:\
-    \ C\n    data:\n    - datasourceUid: prometheus\n      model:\n        expr: kube_persistentvolume_status_phase{phase=\"\
-    Pending\"} == 1\n        intervalMs: 1000\n        maxDataPoints: 43200\n    \
-    \    refId: A\n      refId: A\n      relativeTimeRange:\n        from: 600\n \
-    \       to: 0\n    - datasourceUid: __expr__\n      model:\n        conditions:\n\
-    \        - evaluator:\n            params:\n            - 0\n            type:\
-    \ gt\n        expression: A\n        refId: C\n        type: threshold\n     \
-    \ refId: C\n      relativeTimeRange:\n        from: 600\n        to: 0\n    for:\
-    \ 10m\n    labels:\n      severity: warning\n    title: PVC Pending\n    uid:\
-    \ cluster-pvcs-pending\n"
+  cluster-health-rules.yaml: |
+    apiVersion: 1
+    groups:
+    - folder: Cluster Health Alerts
+      interval: 1m
+      name: Cluster Health
+      orgId: 1
+      rules:
+      - annotations:
+          description: KubeAPI server has been unreachable for more than 2 minutes.
+          summary: Kubernetes API server is down
+        condition: C
+        data:
+        - datasourceUid: prometheus
+          model:
+            expr: up{job="apiserver"} == 0
+            intervalMs: 1000
+            maxDataPoints: 43200
+            refId: A
+          refId: A
+          relativeTimeRange:
+            from: 600
+            to: 0
+        - datasourceUid: __expr__
+          model:
+            conditions:
+            - evaluator:
+                params:
+                - 0
+                type: gt
+            expression: A
+            refId: C
+            type: threshold
+          refId: C
+          relativeTimeRange:
+            from: 600
+            to: 0
+        for: 2m
+        labels:
+          severity: critical
+        title: KubeAPIServer Down
+        uid: cluster-kube-apiserver-down
+      - annotations:
+          description: Kubelet has been unreachable on node {{ $labels.node }} for more
+            than 10 minutes.
+          summary: Kubelet is down on {{ $labels.node }}
+        condition: C
+        data:
+        - datasourceUid: prometheus
+          model:
+            expr: sum by (node)(up{job="kubelet"}) == 0
+            intervalMs: 1000
+            maxDataPoints: 43200
+            refId: A
+          refId: A
+          relativeTimeRange:
+            from: 600
+            to: 0
+        - datasourceUid: __expr__
+          model:
+            conditions:
+            - evaluator:
+                params:
+                - 0
+                type: gt
+            expression: A
+            refId: C
+            type: threshold
+          refId: C
+          relativeTimeRange:
+            from: 600
+            to: 0
+        for: 10m
+        labels:
+          severity: critical
+        title: Kubelet Down
+        uid: cluster-kubelet-down
+      - annotations:
+          description: Node {{ $labels.node }} has been NotReady for more than 5 minutes.
+          summary: Node {{ $labels.node }} is not Ready
+        condition: C
+        data:
+        - datasourceUid: prometheus
+          model:
+            expr: kube_node_status_condition{condition="Ready",status="true"} == 0
+            intervalMs: 1000
+            maxDataPoints: 43200
+            refId: A
+          refId: A
+          relativeTimeRange:
+            from: 600
+            to: 0
+        - datasourceUid: __expr__
+          model:
+            conditions:
+            - evaluator:
+                params:
+                - 0
+                type: gt
+            expression: A
+            refId: C
+            type: threshold
+          refId: C
+          relativeTimeRange:
+            from: 600
+            to: 0
+        for: 5m
+        labels:
+          severity: critical
+        title: Node NotReady
+        uid: cluster-node-not-ready
+      - annotations:
+          description: Node {{ $labels.node }} is under memory pressure. Risk of OOM kills.
+          summary: Node {{ $labels.node }} has MemoryPressure
+        condition: C
+        data:
+        - datasourceUid: prometheus
+          model:
+            expr: kube_node_status_condition{condition="MemoryPressure",status="true"}
+              == 1
+            intervalMs: 1000
+            maxDataPoints: 43200
+            refId: A
+          refId: A
+          relativeTimeRange:
+            from: 600
+            to: 0
+        - datasourceUid: __expr__
+          model:
+            conditions:
+            - evaluator:
+                params:
+                - 0
+                type: gt
+            expression: A
+            refId: C
+            type: threshold
+          refId: C
+          relativeTimeRange:
+            from: 600
+            to: 0
+        for: 5m
+        labels:
+          severity: warning
+        title: Node MemoryPressure
+        uid: cluster-node-memory-pressure
+      - annotations:
+          description: Node {{ $labels.node }} is under disk pressure.
+          summary: Node {{ $labels.node }} has DiskPressure
+        condition: C
+        data:
+        - datasourceUid: prometheus
+          model:
+            expr: kube_node_status_condition{condition="DiskPressure",status="true"} ==
+              1
+            intervalMs: 1000
+            maxDataPoints: 43200
+            refId: A
+          refId: A
+          relativeTimeRange:
+            from: 600
+            to: 0
+        - datasourceUid: __expr__
+          model:
+            conditions:
+            - evaluator:
+                params:
+                - 0
+                type: gt
+            expression: A
+            refId: C
+            type: threshold
+          refId: C
+          relativeTimeRange:
+            from: 600
+            to: 0
+        for: 5m
+        labels:
+          severity: warning
+        title: Node DiskPressure
+        uid: cluster-node-disk-pressure
+      - annotations:
+          description: Deployment {{ $labels.namespace }}/{{ $labels.deployment }} has
+            {{ $value }} available replicas but desired is {{ $labels.expected_replicas
+            }}.
+          summary: Deployment {{ $labels.namespace }}/{{ $labels.deployment }} has replicas
+            mismatch
+        condition: C
+        data:
+        - datasourceUid: prometheus
+          model:
+            expr: kube_deployment_status_replicas_available{namespace=~"apps|rook-ceph|kube-system"}
+              != kube_deployment_spec_replicas{namespace=~"apps|rook-ceph|kube-system"}
+            intervalMs: 1000
+            maxDataPoints: 43200
+            refId: A
+          refId: A
+          relativeTimeRange:
+            from: 600
+            to: 0
+        - datasourceUid: __expr__
+          model:
+            conditions:
+            - evaluator:
+                params:
+                - 0
+                type: gt
+            expression: A
+            refId: C
+            type: threshold
+          refId: C
+          relativeTimeRange:
+            from: 600
+            to: 0
+        for: 10m
+        labels:
+          severity: critical
+        title: Deployment Replicas Mismatch
+        uid: cluster-deployment-replicas-mismatch
+      - annotations:
+          description: StatefulSet {{ $labels.namespace }}/{{ $labels.statefulset }} has
+            {{ $value }} ready replicas but desired is {{ $labels.replicas }}.
+          summary: StatefulSet {{ $labels.namespace }}/{{ $labels.statefulset }} replicas
+            mismatch
+        condition: C
+        data:
+        - datasourceUid: prometheus
+          model:
+            expr: kube_statefulset_status_replicas_ready{namespace=~"apps|rook-ceph"}
+              != kube_statefulset_status_replicas{namespace=~"apps|rook-ceph"}
+            intervalMs: 1000
+            maxDataPoints: 43200
+            refId: A
+          refId: A
+          relativeTimeRange:
+            from: 600
+            to: 0
+        - datasourceUid: __expr__
+          model:
+            conditions:
+            - evaluator:
+                params:
+                - 0
+                type: gt
+            expression: A
+            refId: C
+            type: threshold
+          refId: C
+          relativeTimeRange:
+            from: 600
+            to: 0
+        for: 10m
+        labels:
+          severity: critical
+        title: StatefulSet Replicas Mismatch
+        uid: cluster-statefulset-replicas-mismatch
+      - annotations:
+          description: Pod {{ $labels.namespace }}/{{ $labels.pod }} has restarted {{
+            $value }} times in the last hour.
+          summary: Pod {{ $labels.namespace }}/{{ $labels.pod }} is crash looping
+        condition: C
+        data:
+        - datasourceUid: prometheus
+          model:
+            expr: increase(kube_pod_container_status_restarts_total[1h]) > 5
+            intervalMs: 1000
+            maxDataPoints: 43200
+            refId: A
+          refId: A
+          relativeTimeRange:
+            from: 600
+            to: 0
+        - datasourceUid: __expr__
+          model:
+            conditions:
+            - evaluator:
+                params:
+                - 0
+                type: gt
+            expression: A
+            refId: C
+            type: threshold
+          refId: C
+          relativeTimeRange:
+            from: 600
+            to: 0
+        for: 5m
+        labels:
+          severity: warning
+        title: Pod Crash Looping
+        uid: cluster-pod-crash-looping
+      - annotations:
+          description: PersistentVolumeClaim {{ $labels.persistentvolume }} has been Pending
+            for more than 10 minutes.
+          summary: PVC {{ $labels.persistentvolume }} is Pending
+        condition: C
+        data:
+        - datasourceUid: prometheus
+          model:
+            expr: kube_persistentvolume_status_phase{phase="Pending"} == 1
+            intervalMs: 1000
+            maxDataPoints: 43200
+            refId: A
+          refId: A
+          relativeTimeRange:
+            from: 600
+            to: 0
+        - datasourceUid: __expr__
+          model:
+            conditions:
+            - evaluator:
+                params:
+                - 0
+                type: gt
+            expression: A
+            refId: C
+            type: threshold
+          refId: C
+          relativeTimeRange:
+            from: 600
+            to: 0
+        for: 10m
+        labels:
+          severity: warning
+        title: PVC Pending
+        uid: cluster-pvcs-pending
 kind: ConfigMap
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    grafana_alert: '1'
+    grafana_alert: "1"
+    kubenix/hash: 5ee0a43361005cf11eba93fc1e2e9fa426376079
   name: grafana-alerting-cluster-health-rules
   namespace: monitoring

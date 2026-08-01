@@ -2,8 +2,10 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: ef7ae396285030620d56761bef3f5a31fa7c5042
   name: flaresolverr
   namespace: apps
 spec:
@@ -19,7 +21,7 @@ spec:
       containers:
         - env:
             - name: PORT
-              value: '8191'
+              value: "8191"
             - name: LOG_LEVEL
               value: info
             - name: TZ
@@ -59,8 +61,10 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: ef7ae396285030620d56761bef3f5a31fa7c5042
   name: flaresolverr
   namespace: apps
 spec:

@@ -3,6 +3,7 @@ kind: PrometheusRule
 metadata:
   labels:
     app.kubernetes.io/part-of: cluster-health
+    kubenix/hash: 4562ec1bdae1c577cac4b9d3b98abb7fc2d10a47
     release: kube-prometheus-stack
   name: cluster-health-alerts
   namespace: monitoring
@@ -20,8 +21,7 @@ spec:
             severity: critical
         - alert: KubeletDown
           annotations:
-            description: Kubelet has been unreachable on node {{ $labels.node }} for
-              more than 10 minutes.
+            description: Kubelet has been unreachable on node {{ $labels.node }} for more than 10 minutes.
             summary: Kubelet is down on {{ $labels.node }}
           expr: sum by (node)(up{job="kubelet"}) == 0
           for: 10m
@@ -29,8 +29,7 @@ spec:
             severity: critical
         - alert: NodeNotReady
           annotations:
-            description: Node {{ $labels.node }} has been NotReady for more than 5
-              minutes.
+            description: Node {{ $labels.node }} has been NotReady for more than 5 minutes.
             summary: Node {{ $labels.node }} is not Ready
           expr: kube_node_status_condition{condition="Ready",status="true"} == 0
           for: 5m
@@ -40,8 +39,7 @@ spec:
           annotations:
             description: Node {{ $labels.node }} is under memory pressure.
             summary: Node {{ $labels.node }} has MemoryPressure
-          expr: kube_node_status_condition{condition="MemoryPressure",status="true"}
-            == 1
+          expr: kube_node_status_condition{condition="MemoryPressure",status="true"} == 1
           for: 5m
           labels:
             severity: warning
@@ -49,39 +47,29 @@ spec:
           annotations:
             description: Node {{ $labels.node }} is under disk pressure.
             summary: Node {{ $labels.node }} has DiskPressure
-          expr: kube_node_status_condition{condition="DiskPressure",status="true"}
-            == 1
+          expr: kube_node_status_condition{condition="DiskPressure",status="true"} == 1
           for: 5m
           labels:
             severity: warning
         - alert: KubeDeploymentReplicasMismatch
           annotations:
-            description: Deployment {{ $labels.namespace }}/{{ $labels.deployment
-              }} has {{ $value }} available replicas but desired is {{ $labels.expected_replicas
-              }}.
-            summary: Deployment {{ $labels.namespace }}/{{ $labels.deployment }} has
-              replicas mismatch
-          expr: kube_deployment_status_replicas_available{namespace=~"apps|rook-ceph|kube-system"}
-            != kube_deployment_spec_replicas{namespace=~"apps|rook-ceph|kube-system"}
+            description: Deployment {{ $labels.namespace }}/{{ $labels.deployment }} has {{ $value }} available replicas but desired is {{ $labels.expected_replicas }}.
+            summary: Deployment {{ $labels.namespace }}/{{ $labels.deployment }} has replicas mismatch
+          expr: kube_deployment_status_replicas_available{namespace=~"apps|rook-ceph|kube-system"} != kube_deployment_spec_replicas{namespace=~"apps|rook-ceph|kube-system"}
           for: 10m
           labels:
             severity: critical
         - alert: KubeStatefulSetReplicasMismatch
           annotations:
-            description: StatefulSet {{ $labels.namespace }}/{{ $labels.statefulset
-              }} has {{ $value }} ready replicas but desired is {{ $labels.replicas
-              }}.
-            summary: StatefulSet {{ $labels.namespace }}/{{ $labels.statefulset }}
-              replicas mismatch
-          expr: kube_statefulset_status_replicas_ready{namespace=~"apps|rook-ceph"}
-            != kube_statefulset_status_replicas{namespace=~"apps|rook-ceph"}
+            description: StatefulSet {{ $labels.namespace }}/{{ $labels.statefulset }} has {{ $value }} ready replicas but desired is {{ $labels.replicas }}.
+            summary: StatefulSet {{ $labels.namespace }}/{{ $labels.statefulset }} replicas mismatch
+          expr: kube_statefulset_status_replicas_ready{namespace=~"apps|rook-ceph"} != kube_statefulset_status_replicas{namespace=~"apps|rook-ceph"}
           for: 10m
           labels:
             severity: critical
         - alert: PodCrashLooping
           annotations:
-            description: Pod {{ $labels.namespace }}/{{ $labels.pod }} has restarted
-              {{ $value }} times in the last hour.
+            description: Pod {{ $labels.namespace }}/{{ $labels.pod }} has restarted {{ $value }} times in the last hour.
             summary: Pod {{ $labels.namespace }}/{{ $labels.pod }} is crash looping
           expr: increase(kube_pod_container_status_restarts_total[1h]) > 5
           for: 5m
@@ -89,21 +77,17 @@ spec:
             severity: warning
         - alert: PodTerminatingTooLong
           annotations:
-            description: Pod {{ $labels.namespace }}/{{ $labels.pod }} has been terminating
-              for more than 10 minutes.
-            summary: Pod {{ $labels.namespace }}/{{ $labels.pod }} is terminating
-              too long
+            description: Pod {{ $labels.namespace }}/{{ $labels.pod }} has been terminating for more than 10 minutes.
+            summary: Pod {{ $labels.namespace }}/{{ $labels.pod }} is terminating too long
           expr: kube_pod_deletion_timestamp > 0
           for: 10m
           labels:
             severity: warning
         - alert: EtcdHighRequestLatency
           annotations:
-            description: Etcd request latency at 99th percentile is {{ $value }}s,
-              above 0.5s threshold.
+            description: Etcd request latency at 99th percentile is {{ $value }}s, above 0.5s threshold.
             summary: Etcd high request latency
-          expr: histogram_quantile(0.99, rate(etcd_request_duration_seconds_bucket[5m]))
-            > 0.5
+          expr: histogram_quantile(0.99, rate(etcd_request_duration_seconds_bucket[5m])) > 0.5
           for: 5m
           labels:
             severity: critical
@@ -115,8 +99,7 @@ spec:
           for: 5m
         - alert: PVCPending
           annotations:
-            description: PersistentVolumeClaim {{ $labels.persistentvolume }} has
-              been Pending for more than 10 minutes.
+            description: PersistentVolumeClaim {{ $labels.persistentvolume }} has been Pending for more than 10 minutes.
             summary: PVC {{ $labels.persistentvolume }} is Pending
           expr: kube_persistentvolume_status_phase{phase="Pending"} == 1
           for: 10m

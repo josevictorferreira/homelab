@@ -2,38 +2,48 @@ apiVersion: v1
 kind: Namespace
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 3fb1562015fb2c6c16db44b82c16cb3193254d17
   name: apps
 ---
 apiVersion: v1
 kind: Namespace
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 3fb1562015fb2c6c16db44b82c16cb3193254d17
   name: backup
 ---
 apiVersion: v1
 kind: Namespace
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 3fb1562015fb2c6c16db44b82c16cb3193254d17
   name: cert-manager
 ---
 apiVersion: v1
 kind: Namespace
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 3fb1562015fb2c6c16db44b82c16cb3193254d17
   name: monitoring
 ---
 apiVersion: v1
 kind: Namespace
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 3fb1562015fb2c6c16db44b82c16cb3193254d17
   name: rook-ceph

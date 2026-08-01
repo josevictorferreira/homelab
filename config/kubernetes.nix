@@ -64,6 +64,7 @@
       calibre-web = "10.10.10.153";
       dramaturge = "10.10.10.154";
       dramaturge-worker = "10.10.10.155";
+      wealtho = "10.10.10.156";
       grafana = "10.10.10.190";
     };
   };
@@ -87,6 +88,7 @@
       "hindsight"
       "grafana"
       "dramaturge"
+      "wealtho"
     ];
   };
 

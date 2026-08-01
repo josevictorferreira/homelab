@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
     app: prowlarr-21.3.7
@@ -10,8 +10,9 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: prowlarr
     app.kubernetes.io/version: 2.3.0.5236
-    helm-revision: '1'
+    helm-revision: "1"
     helm.sh/chart: prowlarr-21.3.7
+    kubenix/hash: cd2adf295cd4aa464d36d11f9a1b3a911b80f6ee
     release: prowlarr
   name: prowlarr
   namespace: apps
@@ -43,7 +44,7 @@ spec:
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: prowlarr
         app.kubernetes.io/version: 2.3.0.5236
-        helm-revision: '1'
+        helm-revision: "1"
         helm.sh/chart: prowlarr-21.3.7
         pod.lifecycle: permanent
         pod.name: main
@@ -68,19 +69,19 @@ spec:
             - name: TZ
               value: UTC
             - name: UMASK
-              value: '0022'
+              value: "0022"
             - name: UMASK_SET
-              value: '0022'
+              value: "0022"
             - name: NVIDIA_VISIBLE_DEVICES
               value: void
             - name: S6_READ_ONLY_ROOT
-              value: '1'
+              value: "1"
             - name: CONFIG
               value: /config/config.xml
             - name: INTERFACE
               value: 0.0.0.0
             - name: PORT
-              value: '9697'
+              value: "9697"
             - name: URL
               value: http://localhost:9696
           image: ghcr.io/onedr0p/exportarr:v2.2.0@sha256:320b0ea7399f4b9af4741dcdddd7d40c05c36b0359679305d8a54df4e97065df
@@ -164,25 +165,25 @@ spec:
             - name: TZ
               value: UTC
             - name: UMASK
-              value: '0022'
+              value: "0022"
             - name: UMASK_SET
-              value: '0022'
+              value: "0022"
             - name: NVIDIA_VISIBLE_DEVICES
               value: void
             - name: S6_READ_ONLY_ROOT
-              value: '1'
+              value: "1"
             - name: PROWLARR__APP__INSTANCENAME
               value: Prowlarr
             - name: PROWLARR__APP__THEME
               value: dark
             - name: PROWLARR__AUTH__METHOD
-              value: ''
+              value: ""
             - name: PROWLARR__AUTH__REQUIRED
               value: DisabledForLocalAddresses
             - name: PROWLARR__LOG__LEVEL
               value: info
             - name: PROWLARR__SERVER__PORT
-              value: '9696'
+              value: "9696"
             - name: PROWLARR__UPDATE__BRANCH
               value: develop
           image: ghcr.io/home-operations/prowlarr:2.3.4.5307@sha256:029b2b52134a689bd528f466664d06f1d61dd80a83acd18ad8fd5eda9a65de10
@@ -270,7 +271,7 @@ spec:
       dnsConfig:
         options:
           - name: ndots
-            value: '1'
+            value: "1"
       dnsPolicy: ClusterFirst
       enableServiceLinks: false
       hostIPC: false
@@ -334,274 +335,11 @@ spec:
 ---
 apiVersion: v1
 data:
-  prowlarr.json: '        { "annotations": { "list": [ { "builtIn": 1, "datasource":
-    { "type": "grafana", "uid": "-- Grafana --" }, "enable": true, "hide": true, "iconColor":
-    "rgba(0, 211, 255, 1)", "name": "Annotations & Alerts", "target": { "limit": 100,
-    "matchAny": false, "tags": [], "type": "dashboard" }, "type": "dashboard" } ]
-    }, "editable": true, "fiscalYearStartMonth": 0, "graphTooltip": 0, "id": 267,
-    "links": [], "liveNow": false, "panels": [ { "datasource": { "type": "prometheus",
-    "uid": "prometheus" }, "fieldConfig": { "defaults": { "color": { "mode": "thresholds"
-    }, "mappings": [ { "options": { "0": { "color": "red", "index": 1, "text": "Down"
-    }, "1": { "color": "green", "index": 0, "text": "Up" } }, "type": "value" } ],
-    "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null
-    }, { "color": "red", "value": 80 } ] }, "unitScale": true }, "overrides": [] },
-    "gridPos": { "h": 4, "w": 3, "x": 0, "y": 0 }, "id": 34, "options": { "colorMode":
-    "background", "graphMode": "area", "justifyMode": "auto", "orientation": "auto",
-    "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
-    "showPercentChange": false, "text": {}, "textMode": "auto", "wideLayout": true
-    }, "pluginVersion": "10.3.3", "targets": [ { "datasource": { "type": "prometheus",
-    "uid": "prometheus" }, "editorMode": "code", "exemplar": false, "expr": "prowlarr_system_status{instance=~\"${prowlarr_instance}\"}",
-    "instant": true, "legendFormat": "Status", "range": false, "refId": "A" } ], "type":
-    "stat" }, { "datasource": { "type": "prometheus", "uid": "prometheus" }, "fieldConfig":
-    { "defaults": { "color": { "mode": "thresholds" }, "mappings": [ { "options":
-    { "0": { "color": "red", "index": 1, "text": "Down" }, "1": { "color": "green",
-    "index": 0, "text": "Up" } }, "type": "value" } ], "thresholds": { "mode": "absolute",
-    "steps": [ { "color": "red", "value": null }, { "color": "semi-dark-orange", "value":
-    600 }, { "color": "yellow", "value": 3600 }, { "color": "green", "value": 86400
-    } ] }, "unit": "s", "unitScale": true }, "overrides": [] }, "gridPos": { "h":
-    4, "w": 3, "x": 3, "y": 0 }, "id": 35, "options": { "colorMode": "background",
-    "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions":
-    { "calcs": ["lastNotNull"], "fields": "", "values": false }, "showPercentChange":
-    false, "text": {}, "textMode": "auto", "wideLayout": true }, "pluginVersion":
-    "10.3.3", "targets": [ { "datasource": { "type": "prometheus", "uid": "prometheus"
-    }, "editorMode": "code", "exemplar": false, "expr": "time() - container_start_time_seconds{container=\"prowlarr\"}",
-    "instant": true, "legendFormat": "Uptime", "range": false, "refId": "A" } ], "type":
-    "stat" }, { "datasource": { "type": "prometheus", "uid": "prometheus" }, "fieldConfig":
-    { "defaults": { "color": { "mode": "continuous-BlPu" }, "mappings": [], "thresholds":
-    { "mode": "absolute", "steps": [ { "color": "green", "value": null }, { "color":
-    "red", "value": 80 } ] }, "unit": "none", "unitScale": true }, "overrides": [
-    { "matcher": { "id": "byName", "options": "Health Issues" }, "properties": [ {
-    "id": "thresholds", "value": { "mode": "absolute", "steps": [ { "color": "green",
-    "value": null }, { "color": "yellow", "value": 1 }, { "color": "red", "value":
-    2 } ] } }, { "id": "color" } ] }, { "matcher": { "id": "byName", "options": "Disabled
-    Indexers" }, "properties": [ { "id": "thresholds", "value": { "mode": "absolute",
-    "steps": [ { "color": "green", "value": null }, { "color": "red", "value": 1 }
-    ] } }, { "id": "color" } ] } ] }, "gridPos": { "h": 4, "w": 5, "x": 6, "y": 0
-    }, "id": 37, "options": { "colorMode": "value", "graphMode": "none", "justifyMode":
-    "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields":
-    "", "values": false }, "showPercentChange": false, "text": { "valueSize": 60 },
-    "textMode": "auto", "wideLayout": true }, "pluginVersion": "10.3.3", "targets":
-    [ { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode":
-    "code", "expr": "max(prowlarr_system_health_issues{instance=~\"${prowlarr_instance}\"})",
-    "hide": false, "legendFormat": "Health Issues", "range": true, "refId": "A" },
-    { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code",
-    "expr": "max(prowlarr_indexer_enabled_total{instance=~\"${prowlarr_instance}\"})",
-    "hide": false, "legendFormat": "Enabled Indexers", "range": true, "refId": "B"
-    }, { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode":
-    "code", "expr": "max(prowlarr_indexer_total{instance=~\"${prowlarr_instance}\"}
-    - prowlarr_indexer_enabled_total{instance=~\"${prowlarr_instance}\"})", "hide":
-    false, "legendFormat": "Disabled Indexers", "range": true, "refId": "D" } ], "type":
-    "stat" }, { "datasource": { "type": "prometheus", "uid": "prometheus" }, "fieldConfig":
-    { "defaults": { "color": { "mode": "continuous-BlPu" }, "mappings": [], "thresholds":
-    { "mode": "absolute", "steps": [ { "color": "green", "value": null }, { "color":
-    "red", "value": 80 } ] }, "unit": "none", "unitScale": true }, "overrides": [
-    { "matcher": { "id": "byName", "options": "Query Failures" }, "properties": [
-    { "id": "thresholds", "value": { "mode": "absolute", "steps": [ { "color": "green",
-    "value": null }, { "color": "yellow", "value": 15 }, { "color": "red", "value":
-    100 } ] } }, { "id": "color" } ] } ] }, "gridPos": { "h": 4, "w": 6, "x": 11,
-    "y": 0 }, "id": 36, "options": { "colorMode": "value", "graphMode": "none", "justifyMode":
-    "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields":
-    "", "values": false }, "showPercentChange": false, "text": {}, "textMode": "auto",
-    "wideLayout": true }, "pluginVersion": "10.3.3", "targets": [ { "datasource":
-    { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "exemplar":
-    false, "expr": "sum(increase(prowlarr_indexer_queries_total{instance=~\"${prowlarr_instance}\"}[$__range]))",
-    "hide": false, "instant": true, "legendFormat": "Queries", "range": false, "refId":
-    "B" }, { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode":
-    "code", "exemplar": false, "expr": "sum(increase(prowlarr_indexer_grabs_total{instance=~\"${prowlarr_instance}\"}[$__range]))",
-    "hide": false, "instant": true, "legendFormat": "Grabs", "range": false, "refId":
-    "C" }, { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode":
-    "code", "exemplar": false, "expr": "sum(increase(prowlarr_indexer_failed_queries_total{instance=~\"${prowlarr_instance}\"}[$__range]))",
-    "hide": false, "instant": true, "legendFormat": "Query Failures", "range": false,
-    "refId": "D" } ], "type": "stat" }, { "datasource": { "type": "prometheus", "uid":
-    "prometheus" }, "fieldConfig": { "defaults": { "color": { "mode": "continuous-BlPu"
-    }, "mappings": [], "thresholds": { "mode": "absolute", "steps": [ { "color": "green",
-    "value": null }, { "color": "red", "value": 80 } ] }, "unit": "none", "unitScale":
-    true }, "overrides": [ { "matcher": { "id": "byName", "options": "Response Time"
-    }, "properties": [ { "id": "unit", "value": "ms" } ] }, { "matcher": { "id": "byName",
-    "options": "Failed Queries" }, "properties": [ { "id": "unit", "value": "percentunit"
-    }, { "id": "thresholds", "value": { "mode": "absolute", "steps": [ { "color":
-    "green", "value": null }, { "color": "yellow", "value": 0.1 }, { "color": "red",
-    "value": 0.2 } ] } }, { "id": "color" } ] } ] }, "gridPos": { "h": 4, "w": 4,
-    "x": 17, "y": 0 }, "id": 38, "options": { "colorMode": "value", "graphMode": "none",
-    "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"],
-    "fields": "", "values": false }, "showPercentChange": false, "text": {}, "textMode":
-    "auto", "wideLayout": true }, "pluginVersion": "10.3.3", "targets": [ { "datasource":
-    { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "exemplar":
-    false, "expr": "avg(prowlarr_indexer_average_response_time_ms{instance=~\"${prowlarr_instance}\"})",
-    "hide": false, "instant": true, "legendFormat": "Response Time", "range": false,
-    "refId": "B" }, { "datasource": { "type": "prometheus", "uid": "promtheus" },
-    "editorMode": "code", "exemplar": false, "expr": "sum(increase(prowlarr_indexer_failed_queries_total{instance=~\"${prowlarr_instance}\"}[$__range]))
-    / sum(prowlarr_indexer_queries_total{instance=~\"${prowlarr_instance}\"})", "hide":
-    false, "instant": true, "legendFormat": "Failed Queries", "range": false, "refId":
-    "D" } ], "type": "stat" }, { "datasource": { "type": "prometheus", "uid": "prometheus"
-    }, "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "mappings":
-    [], "thresholds": { "mode": "absolute", "steps": [ { "color": "red", "value":
-    null }, { "color": "yellow", "value": 604800 }, { "color": "green", "value": 2592000
-    } ] }, "unit": "none", "unitScale": true }, "overrides": [ { "matcher": { "id":
-    "byName", "options": "Nearest VIP Expiration" }, "properties": [ { "id": "unit",
-    "value": "s" } ] }, { "matcher": { "id": "byName", "options": "Disk Used" }, "properties":
-    [ { "id": "unit", "value": "bytes" } ] } ] }, "gridPos": { "h": 4, "w": 3, "x":
-    21, "y": 0 }, "id": 39, "options": { "colorMode": "value", "graphMode": "none",
-    "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"],
-    "fields": "", "values": false }, "showPercentChange": false, "text": {}, "textMode":
-    "auto", "wideLayout": true }, "pluginVersion": "10.3.3", "targets": [ { "datasource":
-    { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "min(prowlarr_indexer_vip_expires_in_seconds)",
-    "hide": false, "legendFormat": "Nearest VIP Expiration", "range": true, "refId":
-    "D" } ], "type": "stat" }, { "datasource": { "type": "prometheus", "uid": "prometheus"
-    }, "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "custom":
-    { "axisBorderShow": false, "axisCenteredZero": false, "axisColorMode": "text",
-    "axisLabel": "", "axisPlacement": "auto", "barAlignment": 0, "drawStyle": "line",
-    "fillOpacity": 0, "gradientMode": "none", "hideFrom": { "legend": false, "tooltip":
-    false, "viz": false }, "insertNulls": false, "lineInterpolation": "linear", "lineWidth":
-    1, "pointSize": 5, "scaleDistribution": { "type": "linear" }, "showPoints": "auto",
-    "spanNulls": false, "stacking": { "group": "A", "mode": "none" }, "thresholdsStyle":
-    { "mode": "off" } }, "mappings": [], "thresholds": { "mode": "absolute", "steps":
-    [ { "color": "green", "value": null }, { "color": "red", "value": 80 } ] }, "unit":
-    "ms", "unitScale": true }, "overrides": [] }, "gridPos": { "h": 9, "w": 12, "x":
-    0, "y": 4 }, "id": 44, "options": { "legend": { "calcs": [], "displayMode": "list",
-    "placement": "right", "showLegend": true }, "tooltip": { "mode": "single", "sort":
-    "none" } }, "targets": [ { "datasource": { "type": "prometheus", "uid": "prometheus"
-    }, "editorMode": "code", "expr": "max(prowlarr_indexer_average_response_time_ms{instance=~\"${prowlarr_instance}\"})
-    by (indexer)", "legendFormat": "__auto", "range": true, "refId": "A" } ], "title":
-    "Indexer Latency", "type": "timeseries" }, { "datasource": { "type": "prometheus",
-    "uid": "prometheus" }, "fieldConfig": { "defaults": { "color": { "mode": "palette-classic"
-    }, "custom": { "axisBorderShow": false, "axisCenteredZero": false, "axisColorMode":
-    "text", "axisLabel": "", "axisPlacement": "auto", "barAlignment": 0, "drawStyle":
-    "line", "fillOpacity": 0, "gradientMode": "none", "hideFrom": { "legend": false,
-    "tooltip": false, "viz": false }, "insertNulls": false, "lineInterpolation": "linear",
-    "lineWidth": 1, "pointSize": 5, "scaleDistribution": { "type": "linear" }, "showPoints":
-    "auto", "spanNulls": false, "stacking": { "group": "A", "mode": "none" }, "thresholdsStyle":
-    { "mode": "off" } }, "mappings": [], "thresholds": { "mode": "absolute", "steps":
-    [ { "color": "green", "value": null }, { "color": "red", "value": 80 } ] }, "unit":
-    "ms", "unitScale": true }, "overrides": [] }, "gridPos": { "h": 9, "w": 12, "x":
-    12, "y": 4 }, "id": 45, "options": { "legend": { "calcs": [], "displayMode": "list",
-    "placement": "right", "showLegend": true }, "tooltip": { "mode": "single", "sort":
-    "none" } }, "targets": [ { "datasource": { "type": "prometheus", "uid": "prometheus"
-    }, "editorMode": "code", "expr": "max(increase(prowlarr_user_agent_queries_total{instance=~\"${prowlarr_instance}\"}[$__rate_interval]))
-    by (user_agent)", "legendFormat": "__auto", "range": true, "refId": "A" } ], "title":
-    "User Agent Queries", "type": "timeseries" }, { "datasource": { "type": "prometheus",
-    "uid": "prometheus" }, "fieldConfig": { "defaults": { "color": { "mode": "palette-classic"
-    }, "custom": { "hideFrom": { "legend": false, "tooltip": false, "viz": false }
-    }, "mappings": [], "unitScale": true }, "overrides": [] }, "gridPos": { "h": 9,
-    "w": 6, "x": 0, "y": 13 }, "id": 29, "options": { "legend": { "displayMode": "table",
-    "placement": "right", "showLegend": true, "values": ["percent"] }, "pieType":
-    "donut", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values":
-    false }, "tooltip": { "mode": "single", "sort": "none" } }, "pluginVersion": "9.3.6",
-    "targets": [ { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode":
-    "code", "exemplar": false, "expr": "sum(increase(prowlarr_indexer_queries_total{instance=~\"${prowlarr_instance}\"}[$__range]))
-    by (indexer)\n", "instant": false, "legendFormat": "__auto", "range": true, "refId":
-    "A" } ], "title": "Queries by Indexer", "type": "piechart" }, { "datasource":
-    { "type": "prometheus", "uid": "prometheus" }, "fieldConfig": { "defaults": {
-    "color": { "mode": "palette-classic" }, "custom": { "hideFrom": { "legend": false,
-    "tooltip": false, "viz": false } }, "mappings": [], "unitScale": true }, "overrides":
-    [] }, "gridPos": { "h": 9, "w": 6, "x": 6, "y": 13 }, "id": 33, "options": { "legend":
-    { "displayMode": "table", "placement": "right", "showLegend": true }, "pieType":
-    "donut", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values":
-    false }, "tooltip": { "mode": "single", "sort": "none" } }, "targets": [ { "datasource":
-    { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "exemplar":
-    false, "expr": "sum(increase(prowlarr_indexer_grabs_total{instance=~\"${prowlarr_instance}\"}[$__range]))
-    by (indexer)", "instant": true, "legendFormat": "__auto", "range": false, "refId":
-    "A" } ], "title": "Grabs by Indexer", "type": "piechart" }, { "datasource": {
-    "type": "prometheus", "uid": "prometheus" }, "fieldConfig": { "defaults": { "color":
-    { "mode": "palette-classic" }, "custom": { "hideFrom": { "legend": false, "tooltip":
-    false, "viz": false } }, "mappings": [], "unitScale": true }, "overrides": []
-    }, "gridPos": { "h": 9, "w": 6, "x": 12, "y": 13 }, "id": 30, "options": { "legend":
-    { "displayMode": "table", "placement": "right", "showLegend": true, "values":
-    ["percent"] }, "pieType": "donut", "reduceOptions": { "calcs": ["lastNotNull"],
-    "fields": "", "values": false }, "tooltip": { "mode": "single", "sort": "none"
-    } }, "pluginVersion": "9.3.6", "targets": [ { "datasource": { "type": "prometheus",
-    "uid": "prometheus" }, "editorMode": "code", "exemplar": false, "expr": "sum(increase(prowlarr_user_agent_queries_total{instance=~\"${prowlarr_instance}\"}[$__range]))
-    by (user_agent)\n", "instant": false, "legendFormat": "__auto", "range": true,
-    "refId": "A" } ], "title": "Queries by User Agent", "type": "piechart" }, { "datasource":
-    { "type": "prometheus", "uid": "prometheus" }, "fieldConfig": { "defaults": {
-    "color": { "mode": "palette-classic" }, "custom": { "hideFrom": { "legend": false,
-    "tooltip": false, "viz": false } }, "mappings": [], "unitScale": true }, "overrides":
-    [] }, "gridPos": { "h": 9, "w": 6, "x": 18, "y": 13 }, "id": 32, "options": {
-    "legend": { "displayMode": "table", "placement": "right", "showLegend": true },
-    "pieType": "donut", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "",
-    "values": false }, "tooltip": { "mode": "single", "sort": "none" } }, "targets":
-    [ { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode":
-    "code", "exemplar": false, "expr": "sum(increase(prowlarr_user_agent_grabs_total{instance=~\"${prowlarr_instance}\"}[$__range]))
-    by (user_agent)", "instant": true, "legendFormat": "__auto", "range": false, "refId":
-    "A" } ], "title": "Grabs by User Agent", "type": "piechart" }, { "datasource":
-    { "type": "prometheus", "uid": "prometheus" }, "fieldConfig": { "defaults": {
-    "color": { "mode": "thresholds" }, "custom": { "align": "auto", "cellOptions":
-    { "type": "auto" }, "inspect": false }, "mappings": [], "thresholds": { "mode":
-    "absolute", "steps": [ { "color": "green", "value": null }, { "color": "red",
-    "value": 80 } ] }, "unitScale": true }, "overrides": [ { "matcher": { "id": "byName",
-    "options": "Expires In" }, "properties": [ { "id": "unit", "value": "s" }, { "id":
-    "thresholds", "value": { "mode": "absolute", "steps": [ { "color": "red", "value":
-    null }, { "color": "yellow", "value": 604800 }, { "color": "green", "value": 2592000
-    } ] } }, { "id": "custom.cellOptions", "value": { "type": "color-text" } }, {
-    "id": "custom.width", "value": 150 } ] }, { "matcher": { "id": "byName", "options":
-    "Expiration Date" }, "properties": [ { "id": "unit", "value": "dateTimeAsLocal"
-    }, { "id": "custom.width", "value": 250 } ] } ] }, "gridPos": { "h": 7, "w": 12,
-    "x": 0, "y": 22 }, "id": 41, "options": { "cellHeight": "sm", "footer": { "countRows":
-    false, "fields": "", "reducer": ["sum"], "show": false }, "frameIndex": 1, "showHeader":
-    true, "sortBy": [ { "desc": false, "displayName": "indexer" } ] }, "pluginVersion":
-    "10.3.3", "targets": [ { "datasource": { "type": "prometheus", "uid": "prometheus"
-    }, "editorMode": "code", "exemplar": false, "expr": "prowlarr_indexer_vip_expires_in_seconds{instance=~\"${prowlarr_instance}\"}",
-    "format": "table", "hide": false, "instant": true, "legendFormat": "__auto", "range":
-    false, "refId": "A" }, { "datasource": { "type": "prometheus", "uid": "prometheus"
-    }, "editorMode": "code", "exemplar": false, "expr": "(time() * 1000) + (prowlarr_indexer_vip_expires_in_seconds{instance=~\"${prowlarr_instance}\"}
-    * 1000)", "format": "table", "hide": false, "instant": true, "legendFormat": "__auto",
-    "range": false, "refId": "B" } ], "title": "VIP Expiration", "transformations":
-    [ { "id": "concatenate", "options": {} }, { "id": "organize", "options": { "excludeByName":
-    { "Time": true, "__name__": true, "cluster": true, "cluster 1": true, "cluster
-    2": true, "endpoint": true, "endpoint 1": true, "endpoint 2": true, "indexer 2":
-    true, "instance": true, "instance 1": true, "instance 2": true, "job": true, "job
-    1": true, "job 2": true, "namespace": true, "namespace 1": true, "namespace 2":
-    true, "pod": true, "pod 1": true, "pod 2": true, "prometheus": true, "prometheus
-    1": true, "prometheus 2": true, "service": true, "service 1": true, "service 2":
-    true, "url": true, "url 1": true, "url 2": true }, "indexByName": { "Time": 0,
-    "Value #A": 12, "Value #B": 13, "__name__": 1, "cluster 1": 2, "cluster 2": 14,
-    "endpoint 1": 3, "endpoint 2": 15, "indexer 1": 4, "indexer 2": 16, "instance
-    1": 5, "instance 2": 17, "job 1": 6, "job 2": 18, "namespace 1": 7, "namespace
-    2": 19, "pod 1": 8, "pod 2": 20, "prometheus 1": 9, "prometheus 2": 21, "service
-    1": 10, "service 2": 22, "url 1": 11, "url 2": 23 }, "renameByName": { "Value":
-    "Expires In", "Value #A": "Expires In", "Value #B": "Expiration Date" } } } ],
-    "type": "table" }, { "datasource": { "type": "prometheus", "uid": "prometheus"
-    }, "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "custom":
-    { "align": "auto", "cellOptions": { "type": "auto" }, "inspect": false }, "mappings":
-    [], "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value":
-    null }, { "color": "red", "value": 80 } ] }, "unitScale": true }, "overrides":
-    [ { "matcher": { "id": "byName", "options": "Expires In" }, "properties": [ {
-    "id": "unit", "value": "s" } ] }, { "matcher": { "id": "byName", "options": "Expiration
-    Date" }, "properties": [ { "id": "unit", "value": "dateTimeAsUS" } ] } ] }, "gridPos":
-    { "h": 7, "w": 12, "x": 12, "y": 22 }, "id": 42, "options": { "cellHeight": "sm",
-    "footer": { "countRows": false, "fields": "", "reducer": ["sum"], "show": false
-    }, "frameIndex": 1, "showHeader": true }, "pluginVersion": "10.3.3", "targets":
-    [ { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode":
-    "code", "exemplar": false, "expr": "prowlarr_system_health_issues{instance=~\"${prowlarr_instance}\"}",
-    "format": "table", "hide": false, "instant": true, "legendFormat": "__auto", "range":
-    false, "refId": "A" } ], "title": "System Health Issues", "transformations": [
-    { "id": "organize", "options": { "excludeByName": { "Time": true, "Value": true,
-    "__name__": true, "cluster": true, "cluster 1": true, "cluster 2": true, "endpoint":
-    true, "endpoint 1": true, "endpoint 2": true, "indexer 2": true, "instance": true,
-    "instance 1": true, "instance 2": true, "job": true, "job 1": true, "job 2": true,
-    "namespace": true, "namespace 1": true, "namespace 2": true, "pod": true, "pod
-    1": true, "pod 2": true, "prometheus": true, "prometheus 1": true, "prometheus
-    2": true, "service": true, "service 1": true, "service 2": true, "source": true,
-    "type": true, "url": true, "url 1": true, "url 2": true }, "indexByName": {},
-    "renameByName": { "Value": "", "Value #A": "Expires In", "Value #B": "Expiration
-    Date" } } } ], "type": "table" } ], "refresh": "30s", "revision": 1, "schemaVersion":
-    39, "tags": ["prowlarr", "music", "movies", "tv", "media"], "templating": { "list":
-    [ { "current": { "selected": false, "text": "Prometheus", "value": "prom" }, "hide":
-    0, "includeAll": false, "label": "Datasource", "multi": false, "name": "DS_PROMETHEUS",
-    "options": [], "query": "prometheus", "queryValue": "", "refresh": 1, "regex":
-    "", "skipUrlSync": false, "type": "datasource" }, { "current": { "selected": false,
-    "text": "All", "value": "$__all" }, "datasource": { "type": "prometheus", "uid":
-    "prometheus" }, "definition": "label_values({__name__=~\"prowlarr_.*\"},instance)",
-    "hide": 0, "includeAll": true, "label": "Prowlarr Instance", "multi": true, "name":
-    "prowlarr_instance", "options": [], "query": { "query": "label_values({__name__=~\"prowlarr_.*\"},instance)",
-    "refId": "PrometheusVariableQueryEditor-VariableQuery" }, "refresh": 2, "regex":
-    "", "skipUrlSync": false, "sort": 0, "type": "query" } ] }, "time": { "from":
-    "now-24h", "to": "now" }, "timepicker": {}, "timezone": "browser", "title": "Prowlarr",
-    "uid": "WURH98Y4k1", "version": 3, "weekStart": "" } '
+  prowlarr.json: '        { "annotations": { "list": [ { "builtIn": 1, "datasource": { "type": "grafana", "uid": "-- Grafana --" }, "enable": true, "hide": true, "iconColor": "rgba(0, 211, 255, 1)", "name": "Annotations & Alerts", "target": { "limit": 100, "matchAny": false, "tags": [], "type": "dashboard" }, "type": "dashboard" } ] }, "editable": true, "fiscalYearStartMonth": 0, "graphTooltip": 0, "id": 267, "links": [], "liveNow": false, "panels": [ { "datasource": { "type": "prometheus", "uid": "prometheus" }, "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "mappings": [ { "options": { "0": { "color": "red", "index": 1, "text": "Down" }, "1": { "color": "green", "index": 0, "text": "Up" } }, "type": "value" } ], "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null }, { "color": "red", "value": 80 } ] }, "unitScale": true }, "overrides": [] }, "gridPos": { "h": 4, "w": 3, "x": 0, "y": 0 }, "id": 34, "options": { "colorMode": "background", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "showPercentChange": false, "text": {}, "textMode": "auto", "wideLayout": true }, "pluginVersion": "10.3.3", "targets": [ { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "exemplar": false, "expr": "prowlarr_system_status{instance=~\"${prowlarr_instance}\"}", "instant": true, "legendFormat": "Status", "range": false, "refId": "A" } ], "type": "stat" }, { "datasource": { "type": "prometheus", "uid": "prometheus" }, "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "mappings": [ { "options": { "0": { "color": "red", "index": 1, "text": "Down" }, "1": { "color": "green", "index": 0, "text": "Up" } }, "type": "value" } ], "thresholds": { "mode": "absolute", "steps": [ { "color": "red", "value": null }, { "color": "semi-dark-orange", "value": 600 }, { "color": "yellow", "value": 3600 }, { "color": "green", "value": 86400 } ] }, "unit": "s", "unitScale": true }, "overrides": [] }, "gridPos": { "h": 4, "w": 3, "x": 3, "y": 0 }, "id": 35, "options": { "colorMode": "background", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "showPercentChange": false, "text": {}, "textMode": "auto", "wideLayout": true }, "pluginVersion": "10.3.3", "targets": [ { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "exemplar": false, "expr": "time() - container_start_time_seconds{container=\"prowlarr\"}", "instant": true, "legendFormat": "Uptime", "range": false, "refId": "A" } ], "type": "stat" }, { "datasource": { "type": "prometheus", "uid": "prometheus" }, "fieldConfig": { "defaults": { "color": { "mode": "continuous-BlPu" }, "mappings": [], "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null }, { "color": "red", "value": 80 } ] }, "unit": "none", "unitScale": true }, "overrides": [ { "matcher": { "id": "byName", "options": "Health Issues" }, "properties": [ { "id": "thresholds", "value": { "mode": "absolute", "steps": [ { "color": "green", "value": null }, { "color": "yellow", "value": 1 }, { "color": "red", "value": 2 } ] } }, { "id": "color" } ] }, { "matcher": { "id": "byName", "options": "Disabled Indexers" }, "properties": [ { "id": "thresholds", "value": { "mode": "absolute", "steps": [ { "color": "green", "value": null }, { "color": "red", "value": 1 } ] } }, { "id": "color" } ] } ] }, "gridPos": { "h": 4, "w": 5, "x": 6, "y": 0 }, "id": 37, "options": { "colorMode": "value", "graphMode": "none", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "showPercentChange": false, "text": { "valueSize": 60 }, "textMode": "auto", "wideLayout": true }, "pluginVersion": "10.3.3", "targets": [ { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "max(prowlarr_system_health_issues{instance=~\"${prowlarr_instance}\"})", "hide": false, "legendFormat": "Health Issues", "range": true, "refId": "A" }, { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "max(prowlarr_indexer_enabled_total{instance=~\"${prowlarr_instance}\"})", "hide": false, "legendFormat": "Enabled Indexers", "range": true, "refId": "B" }, { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "max(prowlarr_indexer_total{instance=~\"${prowlarr_instance}\"} - prowlarr_indexer_enabled_total{instance=~\"${prowlarr_instance}\"})", "hide": false, "legendFormat": "Disabled Indexers", "range": true, "refId": "D" } ], "type": "stat" }, { "datasource": { "type": "prometheus", "uid": "prometheus" }, "fieldConfig": { "defaults": { "color": { "mode": "continuous-BlPu" }, "mappings": [], "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null }, { "color": "red", "value": 80 } ] }, "unit": "none", "unitScale": true }, "overrides": [ { "matcher": { "id": "byName", "options": "Query Failures" }, "properties": [ { "id": "thresholds", "value": { "mode": "absolute", "steps": [ { "color": "green", "value": null }, { "color": "yellow", "value": 15 }, { "color": "red", "value": 100 } ] } }, { "id": "color" } ] } ] }, "gridPos": { "h": 4, "w": 6, "x": 11, "y": 0 }, "id": 36, "options": { "colorMode": "value", "graphMode": "none", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "showPercentChange": false, "text": {}, "textMode": "auto", "wideLayout": true }, "pluginVersion": "10.3.3", "targets": [ { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "exemplar": false, "expr": "sum(increase(prowlarr_indexer_queries_total{instance=~\"${prowlarr_instance}\"}[$__range]))", "hide": false, "instant": true, "legendFormat": "Queries", "range": false, "refId": "B" }, { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "exemplar": false, "expr": "sum(increase(prowlarr_indexer_grabs_total{instance=~\"${prowlarr_instance}\"}[$__range]))", "hide": false, "instant": true, "legendFormat": "Grabs", "range": false, "refId": "C" }, { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "exemplar": false, "expr": "sum(increase(prowlarr_indexer_failed_queries_total{instance=~\"${prowlarr_instance}\"}[$__range]))", "hide": false, "instant": true, "legendFormat": "Query Failures", "range": false, "refId": "D" } ], "type": "stat" }, { "datasource": { "type": "prometheus", "uid": "prometheus" }, "fieldConfig": { "defaults": { "color": { "mode": "continuous-BlPu" }, "mappings": [], "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null }, { "color": "red", "value": 80 } ] }, "unit": "none", "unitScale": true }, "overrides": [ { "matcher": { "id": "byName", "options": "Response Time" }, "properties": [ { "id": "unit", "value": "ms" } ] }, { "matcher": { "id": "byName", "options": "Failed Queries" }, "properties": [ { "id": "unit", "value": "percentunit" }, { "id": "thresholds", "value": { "mode": "absolute", "steps": [ { "color": "green", "value": null }, { "color": "yellow", "value": 0.1 }, { "color": "red", "value": 0.2 } ] } }, { "id": "color" } ] } ] }, "gridPos": { "h": 4, "w": 4, "x": 17, "y": 0 }, "id": 38, "options": { "colorMode": "value", "graphMode": "none", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "showPercentChange": false, "text": {}, "textMode": "auto", "wideLayout": true }, "pluginVersion": "10.3.3", "targets": [ { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "exemplar": false, "expr": "avg(prowlarr_indexer_average_response_time_ms{instance=~\"${prowlarr_instance}\"})", "hide": false, "instant": true, "legendFormat": "Response Time", "range": false, "refId": "B" }, { "datasource": { "type": "prometheus", "uid": "promtheus" }, "editorMode": "code", "exemplar": false, "expr": "sum(increase(prowlarr_indexer_failed_queries_total{instance=~\"${prowlarr_instance}\"}[$__range])) / sum(prowlarr_indexer_queries_total{instance=~\"${prowlarr_instance}\"})", "hide": false, "instant": true, "legendFormat": "Failed Queries", "range": false, "refId": "D" } ], "type": "stat" }, { "datasource": { "type": "prometheus", "uid": "prometheus" }, "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "mappings": [], "thresholds": { "mode": "absolute", "steps": [ { "color": "red", "value": null }, { "color": "yellow", "value": 604800 }, { "color": "green", "value": 2592000 } ] }, "unit": "none", "unitScale": true }, "overrides": [ { "matcher": { "id": "byName", "options": "Nearest VIP Expiration" }, "properties": [ { "id": "unit", "value": "s" } ] }, { "matcher": { "id": "byName", "options": "Disk Used" }, "properties": [ { "id": "unit", "value": "bytes" } ] } ] }, "gridPos": { "h": 4, "w": 3, "x": 21, "y": 0 }, "id": 39, "options": { "colorMode": "value", "graphMode": "none", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "showPercentChange": false, "text": {}, "textMode": "auto", "wideLayout": true }, "pluginVersion": "10.3.3", "targets": [ { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "min(prowlarr_indexer_vip_expires_in_seconds)", "hide": false, "legendFormat": "Nearest VIP Expiration", "range": true, "refId": "D" } ], "type": "stat" }, { "datasource": { "type": "prometheus", "uid": "prometheus" }, "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "custom": { "axisBorderShow": false, "axisCenteredZero": false, "axisColorMode": "text", "axisLabel": "", "axisPlacement": "auto", "barAlignment": 0, "drawStyle": "line", "fillOpacity": 0, "gradientMode": "none", "hideFrom": { "legend": false, "tooltip": false, "viz": false }, "insertNulls": false, "lineInterpolation": "linear", "lineWidth": 1, "pointSize": 5, "scaleDistribution": { "type": "linear" }, "showPoints": "auto", "spanNulls": false, "stacking": { "group": "A", "mode": "none" }, "thresholdsStyle": { "mode": "off" } }, "mappings": [], "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null }, { "color": "red", "value": 80 } ] }, "unit": "ms", "unitScale": true }, "overrides": [] }, "gridPos": { "h": 9, "w": 12, "x": 0, "y": 4 }, "id": 44, "options": { "legend": { "calcs": [], "displayMode": "list", "placement": "right", "showLegend": true }, "tooltip": { "mode": "single", "sort": "none" } }, "targets": [ { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "max(prowlarr_indexer_average_response_time_ms{instance=~\"${prowlarr_instance}\"}) by (indexer)", "legendFormat": "__auto", "range": true, "refId": "A" } ], "title": "Indexer Latency", "type": "timeseries" }, { "datasource": { "type": "prometheus", "uid": "prometheus" }, "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "custom": { "axisBorderShow": false, "axisCenteredZero": false, "axisColorMode": "text", "axisLabel": "", "axisPlacement": "auto", "barAlignment": 0, "drawStyle": "line", "fillOpacity": 0, "gradientMode": "none", "hideFrom": { "legend": false, "tooltip": false, "viz": false }, "insertNulls": false, "lineInterpolation": "linear", "lineWidth": 1, "pointSize": 5, "scaleDistribution": { "type": "linear" }, "showPoints": "auto", "spanNulls": false, "stacking": { "group": "A", "mode": "none" }, "thresholdsStyle": { "mode": "off" } }, "mappings": [], "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null }, { "color": "red", "value": 80 } ] }, "unit": "ms", "unitScale": true }, "overrides": [] }, "gridPos": { "h": 9, "w": 12, "x": 12, "y": 4 }, "id": 45, "options": { "legend": { "calcs": [], "displayMode": "list", "placement": "right", "showLegend": true }, "tooltip": { "mode": "single", "sort": "none" } }, "targets": [ { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "expr": "max(increase(prowlarr_user_agent_queries_total{instance=~\"${prowlarr_instance}\"}[$__rate_interval])) by (user_agent)", "legendFormat": "__auto", "range": true, "refId": "A" } ], "title": "User Agent Queries", "type": "timeseries" }, { "datasource": { "type": "prometheus", "uid": "prometheus" }, "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "custom": { "hideFrom": { "legend": false, "tooltip": false, "viz": false } }, "mappings": [], "unitScale": true }, "overrides": [] }, "gridPos": { "h": 9, "w": 6, "x": 0, "y": 13 }, "id": 29, "options": { "legend": { "displayMode": "table", "placement": "right", "showLegend": true, "values": ["percent"] }, "pieType": "donut", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "tooltip": { "mode": "single", "sort": "none" } }, "pluginVersion": "9.3.6", "targets": [ { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "exemplar": false, "expr": "sum(increase(prowlarr_indexer_queries_total{instance=~\"${prowlarr_instance}\"}[$__range])) by (indexer)\n", "instant": false, "legendFormat": "__auto", "range": true, "refId": "A" } ], "title": "Queries by Indexer", "type": "piechart" }, { "datasource": { "type": "prometheus", "uid": "prometheus" }, "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "custom": { "hideFrom": { "legend": false, "tooltip": false, "viz": false } }, "mappings": [], "unitScale": true }, "overrides": [] }, "gridPos": { "h": 9, "w": 6, "x": 6, "y": 13 }, "id": 33, "options": { "legend": { "displayMode": "table", "placement": "right", "showLegend": true }, "pieType": "donut", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "tooltip": { "mode": "single", "sort": "none" } }, "targets": [ { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "exemplar": false, "expr": "sum(increase(prowlarr_indexer_grabs_total{instance=~\"${prowlarr_instance}\"}[$__range])) by (indexer)", "instant": true, "legendFormat": "__auto", "range": false, "refId": "A" } ], "title": "Grabs by Indexer", "type": "piechart" }, { "datasource": { "type": "prometheus", "uid": "prometheus" }, "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "custom": { "hideFrom": { "legend": false, "tooltip": false, "viz": false } }, "mappings": [], "unitScale": true }, "overrides": [] }, "gridPos": { "h": 9, "w": 6, "x": 12, "y": 13 }, "id": 30, "options": { "legend": { "displayMode": "table", "placement": "right", "showLegend": true, "values": ["percent"] }, "pieType": "donut", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "tooltip": { "mode": "single", "sort": "none" } }, "pluginVersion": "9.3.6", "targets": [ { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "exemplar": false, "expr": "sum(increase(prowlarr_user_agent_queries_total{instance=~\"${prowlarr_instance}\"}[$__range])) by (user_agent)\n", "instant": false, "legendFormat": "__auto", "range": true, "refId": "A" } ], "title": "Queries by User Agent", "type": "piechart" }, { "datasource": { "type": "prometheus", "uid": "prometheus" }, "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "custom": { "hideFrom": { "legend": false, "tooltip": false, "viz": false } }, "mappings": [], "unitScale": true }, "overrides": [] }, "gridPos": { "h": 9, "w": 6, "x": 18, "y": 13 }, "id": 32, "options": { "legend": { "displayMode": "table", "placement": "right", "showLegend": true }, "pieType": "donut", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "tooltip": { "mode": "single", "sort": "none" } }, "targets": [ { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "exemplar": false, "expr": "sum(increase(prowlarr_user_agent_grabs_total{instance=~\"${prowlarr_instance}\"}[$__range])) by (user_agent)", "instant": true, "legendFormat": "__auto", "range": false, "refId": "A" } ], "title": "Grabs by User Agent", "type": "piechart" }, { "datasource": { "type": "prometheus", "uid": "prometheus" }, "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "custom": { "align": "auto", "cellOptions": { "type": "auto" }, "inspect": false }, "mappings": [], "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null }, { "color": "red", "value": 80 } ] }, "unitScale": true }, "overrides": [ { "matcher": { "id": "byName", "options": "Expires In" }, "properties": [ { "id": "unit", "value": "s" }, { "id": "thresholds", "value": { "mode": "absolute", "steps": [ { "color": "red", "value": null }, { "color": "yellow", "value": 604800 }, { "color": "green", "value": 2592000 } ] } }, { "id": "custom.cellOptions", "value": { "type": "color-text" } }, { "id": "custom.width", "value": 150 } ] }, { "matcher": { "id": "byName", "options": "Expiration Date" }, "properties": [ { "id": "unit", "value": "dateTimeAsLocal" }, { "id": "custom.width", "value": 250 } ] } ] }, "gridPos": { "h": 7, "w": 12, "x": 0, "y": 22 }, "id": 41, "options": { "cellHeight": "sm", "footer": { "countRows": false, "fields": "", "reducer": ["sum"], "show": false }, "frameIndex": 1, "showHeader": true, "sortBy": [ { "desc": false, "displayName": "indexer" } ] }, "pluginVersion": "10.3.3", "targets": [ { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "exemplar": false, "expr": "prowlarr_indexer_vip_expires_in_seconds{instance=~\"${prowlarr_instance}\"}", "format": "table", "hide": false, "instant": true, "legendFormat": "__auto", "range": false, "refId": "A" }, { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "exemplar": false, "expr": "(time() * 1000) + (prowlarr_indexer_vip_expires_in_seconds{instance=~\"${prowlarr_instance}\"} * 1000)", "format": "table", "hide": false, "instant": true, "legendFormat": "__auto", "range": false, "refId": "B" } ], "title": "VIP Expiration", "transformations": [ { "id": "concatenate", "options": {} }, { "id": "organize", "options": { "excludeByName": { "Time": true, "__name__": true, "cluster": true, "cluster 1": true, "cluster 2": true, "endpoint": true, "endpoint 1": true, "endpoint 2": true, "indexer 2": true, "instance": true, "instance 1": true, "instance 2": true, "job": true, "job 1": true, "job 2": true, "namespace": true, "namespace 1": true, "namespace 2": true, "pod": true, "pod 1": true, "pod 2": true, "prometheus": true, "prometheus 1": true, "prometheus 2": true, "service": true, "service 1": true, "service 2": true, "url": true, "url 1": true, "url 2": true }, "indexByName": { "Time": 0, "Value #A": 12, "Value #B": 13, "__name__": 1, "cluster 1": 2, "cluster 2": 14, "endpoint 1": 3, "endpoint 2": 15, "indexer 1": 4, "indexer 2": 16, "instance 1": 5, "instance 2": 17, "job 1": 6, "job 2": 18, "namespace 1": 7, "namespace 2": 19, "pod 1": 8, "pod 2": 20, "prometheus 1": 9, "prometheus 2": 21, "service 1": 10, "service 2": 22, "url 1": 11, "url 2": 23 }, "renameByName": { "Value": "Expires In", "Value #A": "Expires In", "Value #B": "Expiration Date" } } } ], "type": "table" }, { "datasource": { "type": "prometheus", "uid": "prometheus" }, "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "custom": { "align": "auto", "cellOptions": { "type": "auto" }, "inspect": false }, "mappings": [], "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null }, { "color": "red", "value": 80 } ] }, "unitScale": true }, "overrides": [ { "matcher": { "id": "byName", "options": "Expires In" }, "properties": [ { "id": "unit", "value": "s" } ] }, { "matcher": { "id": "byName", "options": "Expiration Date" }, "properties": [ { "id": "unit", "value": "dateTimeAsUS" } ] } ] }, "gridPos": { "h": 7, "w": 12, "x": 12, "y": 22 }, "id": 42, "options": { "cellHeight": "sm", "footer": { "countRows": false, "fields": "", "reducer": ["sum"], "show": false }, "frameIndex": 1, "showHeader": true }, "pluginVersion": "10.3.3", "targets": [ { "datasource": { "type": "prometheus", "uid": "prometheus" }, "editorMode": "code", "exemplar": false, "expr": "prowlarr_system_health_issues{instance=~\"${prowlarr_instance}\"}", "format": "table", "hide": false, "instant": true, "legendFormat": "__auto", "range": false, "refId": "A" } ], "title": "System Health Issues", "transformations": [ { "id": "organize", "options": { "excludeByName": { "Time": true, "Value": true, "__name__": true, "cluster": true, "cluster 1": true, "cluster 2": true, "endpoint": true, "endpoint 1": true, "endpoint 2": true, "indexer 2": true, "instance": true, "instance 1": true, "instance 2": true, "job": true, "job 1": true, "job 2": true, "namespace": true, "namespace 1": true, "namespace 2": true, "pod": true, "pod 1": true, "pod 2": true, "prometheus": true, "prometheus 1": true, "prometheus 2": true, "service": true, "service 1": true, "service 2": true, "source": true, "type": true, "url": true, "url 1": true, "url 2": true }, "indexByName": {}, "renameByName": { "Value": "", "Value #A": "Expires In", "Value #B": "Expiration Date" } } } ], "type": "table" } ], "refresh": "30s", "revision": 1, "schemaVersion": 39, "tags": ["prowlarr", "music", "movies", "tv", "media"], "templating": { "list": [ { "current": { "selected": false, "text": "Prometheus", "value": "prom" }, "hide": 0, "includeAll": false, "label": "Datasource", "multi": false, "name": "DS_PROMETHEUS", "options": [], "query": "prometheus", "queryValue": "", "refresh": 1, "regex": "", "skipUrlSync": false, "type": "datasource" }, { "current": { "selected": false, "text": "All", "value": "$__all" }, "datasource": { "type": "prometheus", "uid": "prometheus" }, "definition": "label_values({__name__=~\"prowlarr_.*\"},instance)", "hide": 0, "includeAll": true, "label": "Prowlarr Instance", "multi": true, "name": "prowlarr_instance", "options": [], "query": { "query": "label_values({__name__=~\"prowlarr_.*\"},instance)", "refId": "PrometheusVariableQueryEditor-VariableQuery" }, "refresh": 2, "regex": "", "skipUrlSync": false, "sort": 0, "type": "query" } ] }, "time": { "from": "now-24h", "to": "now" }, "timepicker": {}, "timezone": "browser", "title": "Prowlarr", "uid": "WURH98Y4k1", "version": 3, "weekStart": "" } '
 kind: ConfigMap
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
     app: prowlarr-21.3.7
@@ -609,9 +347,10 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: prowlarr
     app.kubernetes.io/version: 2.3.0.5236
-    grafana_dashboard: '1'
-    helm-revision: '1'
+    grafana_dashboard: "1"
+    helm-revision: "1"
     helm.sh/chart: prowlarr-21.3.7
+    kubenix/hash: cd2adf295cd4aa464d36d11f9a1b3a911b80f6ee
     release: prowlarr
   name: prowlarr-dashboard
   namespace: apps
@@ -620,7 +359,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
     app: prowlarr-21.3.7
@@ -628,8 +367,9 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: prowlarr
     app.kubernetes.io/version: 2.3.0.5236
-    helm-revision: '1'
+    helm-revision: "1"
     helm.sh/chart: prowlarr-21.3.7
+    kubenix/hash: cd2adf295cd4aa464d36d11f9a1b3a911b80f6ee
     release: prowlarr
   name: prowlarr-config
   namespace: apps
@@ -645,7 +385,7 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
     app: prowlarr-21.3.7
@@ -653,8 +393,9 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: prowlarr
     app.kubernetes.io/version: 2.3.0.5236
-    helm-revision: '1'
+    helm-revision: "1"
     helm.sh/chart: prowlarr-21.3.7
+    kubenix/hash: cd2adf295cd4aa464d36d11f9a1b3a911b80f6ee
     release: prowlarr
     service.name: main
   name: prowlarr
@@ -676,7 +417,7 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
     app: prowlarr-21.3.7
@@ -684,8 +425,9 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: prowlarr
     app.kubernetes.io/version: 2.3.0.5236
-    helm-revision: '1'
+    helm-revision: "1"
     helm.sh/chart: prowlarr-21.3.7
+    kubenix/hash: cd2adf295cd4aa464d36d11f9a1b3a911b80f6ee
     release: prowlarr
     service.name: metrics
   name: prowlarr-metrics
@@ -707,7 +449,7 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
     app: prowlarr-21.3.7
@@ -715,8 +457,9 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: prowlarr
     app.kubernetes.io/version: 2.3.0.5236
-    helm-revision: '1'
+    helm-revision: "1"
     helm.sh/chart: prowlarr-21.3.7
+    kubenix/hash: cd2adf295cd4aa464d36d11f9a1b3a911b80f6ee
     release: prowlarr
   name: prowlarr
   namespace: apps
@@ -738,7 +481,7 @@ metadata:
     cert-manager.io/cluster-issuer: cloudflare-issuer
     checksum/secrets: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
     checksum/services: 1bab3c0185734412b7cf8b95e94233dc2edecc29461be0136cf4a3db5d7a97db
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
     app: prowlarr-21.3.7
@@ -746,8 +489,9 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: prowlarr
     app.kubernetes.io/version: 2.3.0.5236
-    helm-revision: '1'
+    helm-revision: "1"
     helm.sh/chart: prowlarr-21.3.7
+    kubenix/hash: cd2adf295cd4aa464d36d11f9a1b3a911b80f6ee
     release: prowlarr
   name: prowlarr
   namespace: apps

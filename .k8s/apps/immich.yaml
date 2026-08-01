@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/controller: main
@@ -11,6 +11,7 @@ metadata:
     app.kubernetes.io/name: machine-learning
     app.kubernetes.io/version: v2.0.0
     helm.sh/chart: immich-0.10.3
+    kubenix/hash: dfb3eda37f9e5d47786fe78ad569e1e7d6c2f360
   name: immich-machine-learning
   namespace: apps
 spec:
@@ -102,7 +103,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/controller: main
@@ -111,6 +112,7 @@ metadata:
     app.kubernetes.io/name: server
     app.kubernetes.io/version: v2.0.0
     helm.sh/chart: immich-0.10.3
+    kubenix/hash: dfb3eda37f9e5d47786fe78ad569e1e7d6c2f360
   name: immich-server
   namespace: apps
 spec:
@@ -212,11 +214,14 @@ spec:
 ---
 apiVersion: v1
 data:
-  immich-config.yaml: "trash:\n  days: 30\n  enabled: true\n"
+  immich-config.yaml: |
+    trash:
+      days: 30
+      enabled: true
 kind: ConfigMap
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/instance: immich
@@ -224,6 +229,7 @@ metadata:
     app.kubernetes.io/name: immich
     app.kubernetes.io/version: v2.0.0
     helm.sh/chart: immich-0.10.3
+    kubenix/hash: dfb3eda37f9e5d47786fe78ad569e1e7d6c2f360
   name: immich-immich-config
   namespace: apps
 ---
@@ -231,7 +237,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/instance: immich
@@ -239,6 +245,7 @@ metadata:
     app.kubernetes.io/name: machine-learning
     app.kubernetes.io/version: v2.0.0
     helm.sh/chart: immich-0.10.3
+    kubenix/hash: dfb3eda37f9e5d47786fe78ad569e1e7d6c2f360
   name: immich-machine-learning
   namespace: apps
 spec:
@@ -253,7 +260,7 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/instance: immich
@@ -262,6 +269,7 @@ metadata:
     app.kubernetes.io/service: immich-machine-learning
     app.kubernetes.io/version: v2.0.0
     helm.sh/chart: immich-0.10.3
+    kubenix/hash: dfb3eda37f9e5d47786fe78ad569e1e7d6c2f360
   name: immich-machine-learning
   namespace: apps
 spec:
@@ -280,7 +288,7 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
     lbipam.cilium.io/ips: 10.10.10.108
     lbipam.cilium.io/sharing-key: immich
@@ -291,6 +299,7 @@ metadata:
     app.kubernetes.io/service: immich-server
     app.kubernetes.io/version: v2.0.0
     helm.sh/chart: immich-0.10.3
+    kubenix/hash: dfb3eda37f9e5d47786fe78ad569e1e7d6c2f360
   name: immich-server
   namespace: apps
 spec:
@@ -317,7 +326,7 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/instance: immich
@@ -325,6 +334,7 @@ metadata:
     app.kubernetes.io/name: server
     app.kubernetes.io/version: v2.0.0
     helm.sh/chart: immich-0.10.3
+    kubenix/hash: dfb3eda37f9e5d47786fe78ad569e1e7d6c2f360
   name: immich-server
   namespace: apps
 spec:
@@ -347,15 +357,16 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
-    nginx.ingress.kubernetes.io/proxy-body-size: '0'
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
   labels:
     app.kubernetes.io/instance: immich
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: server
     app.kubernetes.io/version: v2.0.0
     helm.sh/chart: immich-0.10.3
+    kubenix/hash: dfb3eda37f9e5d47786fe78ad569e1e7d6c2f360
   name: immich-server
   namespace: apps
 spec:

@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/controller: main
@@ -10,6 +10,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: homelab-bridge
     helm.sh/chart: app-template-4.2.0
+    kubenix/hash: f0344f33520447d27d12699352da93fc0dfb1881
+    kubenix/module-instance: homelab-bridge
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
   name: homelab-bridge
@@ -43,7 +45,7 @@ spec:
             - name: MATRIX_USER
               value: '@homelab-bridge:josevictor.me'
             - name: PORT
-              value: '8080'
+              value: "8080"
           envFrom:
             - secretRef:
                 name: homelab-bridge-env
@@ -63,24 +65,24 @@ spec:
               memory: 64Mi
         - env:
             - name: TS_ACCEPT_DNS
-              value: 'false'
+              value: "false"
             - name: TS_AUTHKEY
               valueFrom:
                 secretKeyRef:
                   key: TS_AUTHKEY
                   name: homelab-bridge-env
             - name: TS_AUTH_ONCE
-              value: 'true'
+              value: "true"
             - name: TS_HOSTNAME
               value: homelab-bridge
             - name: TS_KUBE_SECRET
-              value: ''
+              value: ""
             - name: TS_SERVE_CONFIG
               value: /etc/tailscale/serve.json
             - name: TS_STATE_DIR
               value: /var/lib/tailscale
             - name: TS_USERSPACE
-              value: 'false'
+              value: "false"
           image: tailscale/tailscale:latest
           name: tailscale
           securityContext:
@@ -121,13 +123,15 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/instance: homelab-bridge
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: homelab-bridge
     helm.sh/chart: app-template-4.2.0
+    kubenix/hash: f0344f33520447d27d12699352da93fc0dfb1881
+    kubenix/module-instance: homelab-bridge
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
   name: homelab-bridge
@@ -144,7 +148,7 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
     lbipam.cilium.io/ips: 10.10.10.144
     lbipam.cilium.io/sharing-key: homelab-bridge
@@ -154,6 +158,8 @@ metadata:
     app.kubernetes.io/name: homelab-bridge
     app.kubernetes.io/service: homelab-bridge
     helm.sh/chart: app-template-4.2.0
+    kubenix/hash: f0344f33520447d27d12699352da93fc0dfb1881
+    kubenix/module-instance: homelab-bridge
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
   name: homelab-bridge
@@ -174,13 +180,15 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/instance: homelab-bridge
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: homelab-bridge
     helm.sh/chart: app-template-4.2.0
+    kubenix/hash: f0344f33520447d27d12699352da93fc0dfb1881
+    kubenix/module-instance: homelab-bridge
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
   name: homelab-bridge
@@ -205,14 +213,26 @@ spec:
 ---
 apiVersion: v1
 data:
-  serve.json: "{\n  \"TCP\": { \"443\": { \"HTTPS\": true } },\n  \"Web\": {\n   \
-    \ \"${TS_CERT_DOMAIN}:443\": {\n      \"Handlers\": {\n        \"/\": { \"Proxy\"\
-    : \"http://127.0.0.1:8080\" }\n      }\n    }\n  },\n  \"AllowFunnel\": {\n  \
-    \  \"${TS_CERT_DOMAIN}:443\": true\n  }\n}\n"
+  serve.json: |
+    {
+      "TCP": { "443": { "HTTPS": true } },
+      "Web": {
+        "${TS_CERT_DOMAIN}:443": {
+          "Handlers": {
+            "/": { "Proxy": "http://127.0.0.1:8080" }
+          }
+        }
+      },
+      "AllowFunnel": {
+        "${TS_CERT_DOMAIN}:443": true
+      }
+    }
 kind: ConfigMap
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: f0344f33520447d27d12699352da93fc0dfb1881
   name: homelab-bridge-serve-config
   namespace: apps

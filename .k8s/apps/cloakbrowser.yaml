@@ -2,8 +2,10 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: adea86321cc8085ebf7d65f955fb6101649e9729
   name: cloakbrowser
   namespace: apps
 spec:
@@ -33,7 +35,7 @@ spec:
               port: 9222
           resources:
             limits:
-              cpu: '2'
+              cpu: "2"
               memory: 2Gi
             requests:
               cpu: 500m
@@ -54,8 +56,10 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: adea86321cc8085ebf7d65f955fb6101649e9729
   name: cloakbrowser
   namespace: apps
 spec:

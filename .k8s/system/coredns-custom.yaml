@@ -1,11 +1,17 @@
 apiVersion: v1
 data:
-  josevictor-me.server: "josevictor.me:53 {\n  errors\n  cache 30\n  forward . 10.10.10.100\n\
-    }\n"
+  josevictor-me.server: |
+    josevictor.me:53 {
+      errors
+      cache 30
+      forward . 10.10.10.100
+    }
 kind: ConfigMap
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 5c720d57e28e3f30ad1b0e077abc97f5c0409530
   name: coredns-custom
   namespace: kube-system

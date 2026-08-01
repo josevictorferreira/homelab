@@ -2,11 +2,12 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
     app: hermes-agent
     component: dashboard
+    kubenix/hash: 0b6e0e6e9b2e3f7ba0f0460229a75659a1443e33
   name: hermes-agent-dashboard
   namespace: apps
 spec:
@@ -27,13 +28,12 @@ spec:
         - command:
             - /bin/sh
             - -c
-            - umask 0002; exec /opt/hermes/.venv/bin/hermes dashboard --host 0.0.0.0
-              --port 9119 --no-open --insecure --skip-build
+            - umask 0002; exec /opt/hermes/.venv/bin/hermes dashboard --host 0.0.0.0 --port 9119 --no-open --insecure --skip-build
           env:
             - name: HERMES_UID
-              value: '10000'
+              value: "10000"
             - name: HERMES_GID
-              value: '2002'
+              value: "2002"
             - name: HERMES_HOME
               value: /opt/data
             - name: TZ
@@ -122,11 +122,12 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
     app: hermes-agent
     component: gateway
+    kubenix/hash: 0b6e0e6e9b2e3f7ba0f0460229a75659a1443e33
   name: hermes-agent-gateway
   namespace: apps
 spec:
@@ -147,66 +148,69 @@ spec:
         - command:
             - /bin/sh
             - -c
-            - "                # Group-writable by default so any hermes process (and\
-              \ the\n                # host user, all in GID 100) can always overwrite\
-              \ shared files.\n                umask 0002\n                # Bootstrap\
-              \ pip if not present\n                command -v pip >/dev/null 2>&1\
-              \ || command -v pip3 >/dev/null 2>&1 || {\n                  python3\
-              \ -c \"import urllib.request; exec(urllib.request.urlopen('https://bootstrap.pypa.io/get-pip.py').read())\"\
-              \ --user -q 2>/dev/null || true\n                }\n               \
-              \ # Bootstrap faster-whisper for audio transcription\n             \
-              \   python3 -c \"import faster_whisper\" 2>/dev/null || {\n        \
-              \          pip install --user -q faster-whisper 2>/dev/null || true\n\
-              \                }\n                # Bootstrap Matrix dependencies\
-              \ if not installed\n                python3 -c \"import mautrix\" 2>/dev/null\
-              \ || {\n                  python3 -m pip install --user --break-system-packages\
-              \ 'mautrix[encryption]' aiohttp==3.14.1 asyncpg aiosqlite Markdown aiohttp-socks\
-              \ 2>/dev/null || true\n                }\n                # Bootstrap\
-              \ hindsight-client at the version the memory plugin pins.\n        \
-              \        # The image bumps this pin on upgrade; the user-site copy on\
-              \ the PVC\n                # persists the old version, so install the\
-              \ exact pin when it drifts.\n                python3 -c \"import importlib.metadata\
-              \ as m, sys; sys.exit(0 if m.version('hindsight-client') == '0.6.1'\
-              \ else 1)\" 2>/dev/null || {\n                  python3 -m pip install\
-              \ --user --break-system-packages 'hindsight-client==0.6.1' 2>/dev/null\
-              \ || true\n                }\n                # Bootstrap kubectl if\
-              \ not present\n                command -v kubectl >/dev/null 2>&1 ||\
-              \ {\n                  python3 -c \"\nimport urllib.request, os, stat,\
-              \ shutil\nurl = 'https://dl.k8s.io/release/v1.32.6/bin/linux/amd64/kubectl'\n\
-              tmp = '/tmp/kubectl'\ndest = '/opt/data/.local/bin/kubectl'\nos.makedirs('/opt/data/.local/bin',\
-              \ exist_ok=True)\nurllib.request.urlretrieve(url, tmp)\nos.chmod(tmp,\
-              \ stat.S_IRWXU | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH)\n\
-              shutil.move(tmp, dest)\n        \" 2>/dev/null || true\n           \
-              \     }\n                # Bootstrap WhatsApp bridge dependencies if\
-              \ needed\n                if [ \"${WHATSAPP_ENABLED:-false}\" = \"true\"\
-              \ ]; then\n                  if [ -d /opt/hermes/scripts/whatsapp-bridge\
-              \ ] && [ ! -f /opt/hermes/scripts/whatsapp-bridge/node_modules/@whiskeysockets/baileys/package.json\
-              \ ]; then\n                    mkdir -p /opt/data/whatsapp-bridge-node_modules\n\
-              \                    if [ ! -f /opt/data/whatsapp-bridge-node_modules/@whiskeysockets/baileys/package.json\
-              \ ]; then\n                      (cd /opt/hermes/scripts/whatsapp-bridge\
-              \ && cp -r node_modules /opt/data/whatsapp-bridge-node_modules 2>/dev/null)\
-              \ || true\n                      (cd /opt/hermes/scripts/whatsapp-bridge\
-              \ && NODE_OPTIONS=\"--max-old-space-size=256\" npm install --production\
-              \ --no-audit --maxsockets 1 --prefer-offline 2>/dev/null) || true\n\
-              \                      (cd /opt/hermes/scripts/whatsapp-bridge && cp\
-              \ -r node_modules /opt/data/whatsapp-bridge-node_modules 2>/dev/null)\
-              \ || true\n                    fi\n                    rm -rf /opt/hermes/scripts/whatsapp-bridge/node_modules\n\
-              \                    ln -s /opt/data/whatsapp-bridge-node_modules /opt/hermes/scripts/whatsapp-bridge/node_modules\n\
-              \                  fi\n                fi\n                  # Fix Baileys\
-              \ 7.x syncFullHistory for incoming messages\n                  sed -i\
-              \ 's/syncFullHistory: false/syncFullHistory: true/' /opt/hermes/scripts/whatsapp-bridge/bridge.js\
-              \ 2>/dev/null || true\n\nexec hermes gateway run\n"
+            - |2
+                              # Group-writable by default so any hermes process (and the
+                              # host user, all in GID 100) can always overwrite shared files.
+                              umask 0002
+                              # Bootstrap pip if not present
+                              command -v pip >/dev/null 2>&1 || command -v pip3 >/dev/null 2>&1 || {
+                                python3 -c "import urllib.request; exec(urllib.request.urlopen('https://bootstrap.pypa.io/get-pip.py').read())" --user -q 2>/dev/null || true
+                              }
+                              # Bootstrap faster-whisper for audio transcription
+                              python3 -c "import faster_whisper" 2>/dev/null || {
+                                pip install --user -q faster-whisper 2>/dev/null || true
+                              }
+                              # Bootstrap Matrix dependencies if not installed
+                              python3 -c "import mautrix" 2>/dev/null || {
+                                python3 -m pip install --user --break-system-packages 'mautrix[encryption]' aiohttp==3.14.1 asyncpg aiosqlite Markdown aiohttp-socks 2>/dev/null || true
+                              }
+                              # Bootstrap hindsight-client at the version the memory plugin pins.
+                              # The image bumps this pin on upgrade; the user-site copy on the PVC
+                              # persists the old version, so install the exact pin when it drifts.
+                              python3 -c "import importlib.metadata as m, sys; sys.exit(0 if m.version('hindsight-client') == '0.6.1' else 1)" 2>/dev/null || {
+                                python3 -m pip install --user --break-system-packages 'hindsight-client==0.6.1' 2>/dev/null || true
+                              }
+                              # Bootstrap kubectl if not present
+                              command -v kubectl >/dev/null 2>&1 || {
+                                python3 -c "
+              import urllib.request, os, stat, shutil
+              url = 'https://dl.k8s.io/release/v1.32.6/bin/linux/amd64/kubectl'
+              tmp = '/tmp/kubectl'
+              dest = '/opt/data/.local/bin/kubectl'
+              os.makedirs('/opt/data/.local/bin', exist_ok=True)
+              urllib.request.urlretrieve(url, tmp)
+              os.chmod(tmp, stat.S_IRWXU | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH)
+              shutil.move(tmp, dest)
+                      " 2>/dev/null || true
+                              }
+                              # Bootstrap WhatsApp bridge dependencies if needed
+                              if [ "${WHATSAPP_ENABLED:-false}" = "true" ]; then
+                                if [ -d /opt/hermes/scripts/whatsapp-bridge ] && [ ! -f /opt/hermes/scripts/whatsapp-bridge/node_modules/@whiskeysockets/baileys/package.json ]; then
+                                  mkdir -p /opt/data/whatsapp-bridge-node_modules
+                                  if [ ! -f /opt/data/whatsapp-bridge-node_modules/@whiskeysockets/baileys/package.json ]; then
+                                    (cd /opt/hermes/scripts/whatsapp-bridge && cp -r node_modules /opt/data/whatsapp-bridge-node_modules 2>/dev/null) || true
+                                    (cd /opt/hermes/scripts/whatsapp-bridge && NODE_OPTIONS="--max-old-space-size=256" npm install --production --no-audit --maxsockets 1 --prefer-offline 2>/dev/null) || true
+                                    (cd /opt/hermes/scripts/whatsapp-bridge && cp -r node_modules /opt/data/whatsapp-bridge-node_modules 2>/dev/null) || true
+                                  fi
+                                  rm -rf /opt/hermes/scripts/whatsapp-bridge/node_modules
+                                  ln -s /opt/data/whatsapp-bridge-node_modules /opt/hermes/scripts/whatsapp-bridge/node_modules
+                                fi
+                              fi
+                                # Fix Baileys 7.x syncFullHistory for incoming messages
+                                sed -i 's/syncFullHistory: false/syncFullHistory: true/' /opt/hermes/scripts/whatsapp-bridge/bridge.js 2>/dev/null || true
+
+              exec hermes gateway run
           env:
             - name: HERMES_UID
-              value: '10000'
+              value: "10000"
             - name: HERMES_GID
-              value: '2002'
+              value: "2002"
             - name: TZ
               value: America/Sao_Paulo
             - name: HERMES_MANAGED_DIR
               value: /opt/data/managed
             - name: HERMES_WRITE_SAFE_ROOT
-              value: ''
+              value: ""
             - name: XAI_API_KEY
               valueFrom:
                 secretKeyRef:
@@ -255,9 +259,9 @@ spec:
             - name: PYTHONUSERBASE
               value: /opt/data/.local
             - name: PIP_USER
-              value: 'true'
+              value: "true"
             - name: PIP_REQUIRE_VIRTUALENV
-              value: 'false'
+              value: "false"
             - name: SANDBOX_NIX_HOST
               value: sandbox-nix.apps.svc.cluster.local
             - name: SANDBOX_NIX_USER
@@ -319,21 +323,26 @@ spec:
         - command:
             - /bin/sh
             - -c
-            - "umask 0002\nwhile true; do\n  for profile in /opt/data/profiles/*;\
-              \ do\n    [ -f \"$profile/cron/jobs.json\" ] || continue\n    HERMES_HOME=\"\
-              $profile\" hermes cron tick --accept-hooks || true\n  done\n  sleep\
-              \ 60\ndone\n"
+            - |
+              umask 0002
+              while true; do
+                for profile in /opt/data/profiles/*; do
+                  [ -f "$profile/cron/jobs.json" ] || continue
+                  HERMES_HOME="$profile" hermes cron tick --accept-hooks || true
+                done
+                sleep 60
+              done
           env:
             - name: HERMES_UID
-              value: '10000'
+              value: "10000"
             - name: HERMES_GID
-              value: '2002'
+              value: "2002"
             - name: TZ
               value: America/Sao_Paulo
             - name: HERMES_MANAGED_DIR
               value: /opt/data/managed
             - name: HERMES_WRITE_SAFE_ROOT
-              value: ''
+              value: ""
             - name: XAI_API_KEY
               valueFrom:
                 secretKeyRef:
@@ -382,9 +391,9 @@ spec:
             - name: PYTHONUSERBASE
               value: /opt/data/.local
             - name: PIP_USER
-              value: 'true'
+              value: "true"
             - name: PIP_REQUIRE_VIRTUALENV
-              value: 'false'
+              value: "false"
             - name: SANDBOX_NIX_HOST
               value: sandbox-nix.apps.svc.cluster.local
             - name: SANDBOX_NIX_USER
@@ -447,36 +456,47 @@ spec:
         - command:
             - /bin/sh
             - -c
-            - "# Plugins installed via the dashboard land in /opt/data/plugins\n#\
-              \ (its HERMES_HOME is /opt/data), but per-profile agents scan\n# $HERMES_HOME/plugins\
-              \ = /opt/data/profiles/<p>/plugins. Link the\n# shared plugins into\
-              \ every profile so dashboard-installed\n# backends (e.g. omniroute)\
-              \ are discovered by each agent.\n# (config still gates which ones actually\
-              \ load via plugins.enabled.)\nif [ -d /opt/data/plugins ]; then\n  for\
-              \ d in /opt/data/profiles/*/; do\n    [ -d \"$d\" ] || continue\n  \
-              \  mkdir -p \"$d/plugins\"\n    for p in /opt/data/plugins/*/; do\n\
-              \      [ -d \"$p\" ] || continue\n      ln -sfn \"$p\" \"$d/plugins/$(basename\
-              \ \"$p\")\"\n    done\n  done\nfi\n# Profile HOMEs: hermes creates each\
-              \ /opt/data/profiles/<p>\n# as 0700 owned by the runtime uid, which\
-              \ locks the SMB client\n# (authenticated as GID 2002, not the dir owner)\
-              \ out of that\n# profile's folder — the cause of \"sometimes I lose\
-              \ access\".\n# Normalize ownership + group access so every profile is\n\
-              # reachable. Only touches wrong entries, so it stays fast.\nfor d in\
-              \ /opt/data/profiles/*/; do\n  [ -d \"$d\" ] || continue\n  find \"\
-              $d\" ! -user 10000 -exec chown 10000 {} + 2>/dev/null || true\n  find\
-              \ \"$d\" ! -group 2002 -exec chgrp 2002 {} + 2>/dev/null || true\n \
-              \ find \"$d\" -type d ! -perm -2070 -exec chmod g+rwxs {} + 2>/dev/null\
-              \ || true\n  find \"$d\" -type f ! -perm -060 -exec chmod g+rw {} +\
-              \ 2>/dev/null || true\ndone\n# Guarantee read/write for everything in\
-              \ the unified \"homelab\" group\n# (GID 2002 — the agents' primary gid\
-              \ and the host user's group, and\n# what other pods join via supplementalGroups).\
-              \ setgid on dirs so new\n# entries inherit the group; group-writable.\
-              \ Only touches wrong\n# entries, so it stays fast on large trees.\n\
-              for d in /shared/*/; do\n  [ -d \"$d\" ] || continue\n  find \"$d\"\
-              \ ! -group 2002 -exec chgrp 2002 {} + 2>/dev/null || true\n  find \"\
-              $d\" -type d ! -perm -2070 -exec chmod g+rwxs {} + 2>/dev/null || true\n\
-              \  find \"$d\" -type f ! -perm -060 -exec chmod g+rw {} + 2>/dev/null\
-              \ || true\ndone\n"
+            - |
+              # Plugins installed via the dashboard land in /opt/data/plugins
+              # (its HERMES_HOME is /opt/data), but per-profile agents scan
+              # $HERMES_HOME/plugins = /opt/data/profiles/<p>/plugins. Link the
+              # shared plugins into every profile so dashboard-installed
+              # backends (e.g. omniroute) are discovered by each agent.
+              # (config still gates which ones actually load via plugins.enabled.)
+              if [ -d /opt/data/plugins ]; then
+                for d in /opt/data/profiles/*/; do
+                  [ -d "$d" ] || continue
+                  mkdir -p "$d/plugins"
+                  for p in /opt/data/plugins/*/; do
+                    [ -d "$p" ] || continue
+                    ln -sfn "$p" "$d/plugins/$(basename "$p")"
+                  done
+                done
+              fi
+              # Profile HOMEs: hermes creates each /opt/data/profiles/<p>
+              # as 0700 owned by the runtime uid, which locks the SMB client
+              # (authenticated as GID 2002, not the dir owner) out of that
+              # profile's folder — the cause of "sometimes I lose access".
+              # Normalize ownership + group access so every profile is
+              # reachable. Only touches wrong entries, so it stays fast.
+              for d in /opt/data/profiles/*/; do
+                [ -d "$d" ] || continue
+                find "$d" ! -user 10000 -exec chown 10000 {} + 2>/dev/null || true
+                find "$d" ! -group 2002 -exec chgrp 2002 {} + 2>/dev/null || true
+                find "$d" -type d ! -perm -2070 -exec chmod g+rwxs {} + 2>/dev/null || true
+                find "$d" -type f ! -perm -060 -exec chmod g+rw {} + 2>/dev/null || true
+              done
+              # Guarantee read/write for everything in the unified "homelab" group
+              # (GID 2002 — the agents' primary gid and the host user's group, and
+              # what other pods join via supplementalGroups). setgid on dirs so new
+              # entries inherit the group; group-writable. Only touches wrong
+              # entries, so it stays fast on large trees.
+              for d in /shared/*/; do
+                [ -d "$d" ] || continue
+                find "$d" ! -group 2002 -exec chgrp 2002 {} + 2>/dev/null || true
+                find "$d" -type d ! -perm -2070 -exec chmod g+rwxs {} + 2>/dev/null || true
+                find "$d" -type f ! -perm -060 -exec chmod g+rw {} + 2>/dev/null || true
+              done
           image: docker.io/nousresearch/hermes-agent:v2026.7.20@sha256:a6ce64e2038867885c2c90f6602425e6e70293d5e6d952a0e603a99265e01c40
           name: fix-profile-permissions
           securityContext:
@@ -526,13 +546,19 @@ spec:
 ---
 apiVersion: v1
 data:
-  hermes: "#!/bin/sh\nif [ \"$(id -u)\" = \"0\" ]; then\n  exec gosu 10000:2002 /opt/hermes/.venv/bin/hermes\
-    \ \"$@\"\nfi\nexec /opt/hermes/.venv/bin/hermes \"$@\"\n"
+  hermes: |
+    #!/bin/sh
+    if [ "$(id -u)" = "0" ]; then
+      exec gosu 10000:2002 /opt/hermes/.venv/bin/hermes "$@"
+    fi
+    exec /opt/hermes/.venv/bin/hermes "$@"
 kind: ConfigMap
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 0b6e0e6e9b2e3f7ba0f0460229a75659a1443e33
   name: hermes-agent-cli-wrapper
   namespace: apps
 ---
@@ -540,10 +566,11 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
     app: hermes-agent
+    kubenix/hash: 0b6e0e6e9b2e3f7ba0f0460229a75659a1443e33
   name: hermes-agent-dashboard
   namespace: apps
 spec:
@@ -562,8 +589,10 @@ kind: Ingress
 metadata:
   annotations:
     cert-manager.io/cluster-issuer: cloudflare-issuer
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 0b6e0e6e9b2e3f7ba0f0460229a75659a1443e33
   name: hermes-agent-dashboard
   namespace: apps
 spec:
@@ -588,14 +617,15 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
     app: hermes-agent
+    kubenix/hash: 0b6e0e6e9b2e3f7ba0f0460229a75659a1443e33
   name: hermes-agent-readonly
 rules:
   - apiGroups:
-      - ''
+      - ""
     resources:
       - pods
       - pods/log
@@ -629,10 +659,11 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   annotations:
-    kubenix/k8s-version: '1.32'
+    kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
     app: hermes-agent
+    kubenix/hash: 0b6e0e6e9b2e3f7ba0f0460229a75659a1443e33
   name: hermes-agent-readonly
 roleRef:
   apiGroup: rbac.authorization.k8s.io
