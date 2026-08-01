@@ -7,38 +7,38 @@ metadata:
     name: cloudflare-api-token
     namespace: cert-manager
 stringData:
-    cloudflare-api-token: ENC[AES256_GCM,data:2IaFDOISj4s4U+aPEz7j71lMHMAJTgO8XhKyecgNo2SvJpiL3xombb4ZO5Q8yCuiCXfX0DCoteQ=,iv:EjrUMdmJG6sx4N5s0SQ9jYta4t8qTXa2Hzz8tpG5N2Q=,tag:4Ej760Bi7VlOT49gu0mSzg==,type:str]
+    cloudflare-api-token: ENC[AES256_GCM,data:nR+6duEvBqoMU3zePPRfvgaoCGTowDIKyJllMf1M4uXZOJ+5OJmE339Mbuaqdgbaw+inR37VAv0=,iv:vdRSd/fIo+9sd8uUpz8cgPhQZj/MFXEY9PebTz/rXlo=,tag:YkfeBIms0PCsxciqU7n5Tg==,type:str]
 type: Opaque
 sops:
     age:
         - recipient: age16yrhmz8fytj7j9ns80zl40zjcdfd3pdxh48ld7ys7veea774udtqfn9jyx
           enc: |
             -----BEGIN AGE ENCRYPTED FILE-----
-            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSB1dmhyTENONHJCTEhDendF
-            MEtjVHRwUklWWG0vd3l1V3Q2N09CSlhIKzE4CkFCdmpVWEFyd1hhbVNOQ1ZMWm9r
-            RFBucUZWWTUxWG9xSldqYVJ1UFF6ZEkKLS0tIDE5R3IwaEtYNFhvNUhRWldUY3Fl
-            K3VuVmV3RTI3QWhRb1luaFk2VkNqTkkKAVt1quAP4SkhfLeoopcBkoePw2dySxEv
-            jVuVr7/5b4L1t2MreHmXJJEELB98bAnkL5NGhk19pqPIE+Crao5BEw==
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBaYmUrSGtWV25xL3VrMTU5
+            VlNXcjduMFEzc1N1US9xWWpTSjkyY0xGbXp3CjJqQjFkUjJOQVpZUXVYb3hRNzlD
+            Z1F3UUZKbDZra3lwVE9oY0ZZMEZ2VzgKLS0tIFVFbnJSTTQ4L2tES1V1dTBicnVh
+            aHZTcEVXNFhnN2o2UmdWdkwwdDIyZmMKEzHiijMtExfbopW5prfQJed3bbBtj/uA
+            hVRSO8V0Xf5Jgbo/+pOdPdwyZx8AZwgE/QUfUMxOXgne2MjKPQFRiQ==
             -----END AGE ENCRYPTED FILE-----
         - recipient: age1jx9qu5p0ycvymrl2gykd9z3w8x8n67jxnatxs49j7qzspjr6asqqf8u35h
           enc: |
             -----BEGIN AGE ENCRYPTED FILE-----
-            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBOeFdjSGc3ZlkwQzU3R01z
-            VFFJVnAwVE5oM2lNek54NCt0L1I2Mys4dm1RCis4czMra1NVdWdGSkw5aGlESXA3
-            WEFXa1czcGlHTHc4WVc5Skc0RlJqSk0KLS0tIEJzMmFpTFBYOFFPMWJZWkdlcGg0
-            MEdrTlgxbWExU1k2WjlJdWpyRXJrTHMKOFM+41GOfZexyMu1uFdD6KC5MyGIT5dX
-            Vt+XRk6Wy7u6/YmpUPeMEC59P/wnroiirMEGv74SnAtJtYkKSa8Q2g==
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSA4M2U0VXhGVUNpWjZGQnpa
+            Uk8vKzJPcyt0OFRVenNIZG1oOWU1Wm5VRzA4Cmd2V0M1dTVVSTFhMzJxZW5BUkIy
+            dkZlbkYxZzYyeTArMytWQjRrWjRZNnMKLS0tIG94WHZJalV2NWJUTnJ4NlVhcUlJ
+            eG5EWGU3eEJ3anFQZWFhUzd1WWJKQ0UKNn32w3FTAROE7oauyF4F7PDQCoHlqPZP
+            bDLrSxJgYIV9a34pvfh+wrWVtPn1CfIzB62gKBYvcPAN9wxYP3npqQ==
             -----END AGE ENCRYPTED FILE-----
         - recipient: age1myzhwq67gu5zrfk8fvs0p7mh5fk67d20ltwqf9325ya83lm06ytsyax3j2
           enc: |
             -----BEGIN AGE ENCRYPTED FILE-----
-            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBoVzV4NmUzWHR0NjZPSXpq
-            ZmNab1JuZUZhY2ZPNjV1cVJYWDQrQXZPQTI0ClBvUmFLMVNkSXJUTVo4c0VKMHZz
-            WFNIM3VGc0dYTll4TktjZXAreURoSGsKLS0tIFRJa2VDSVU4UE43cTVhVkxTc1E5
-            QmZaUXVQTHRCVC8vMGU3Ti9Xa0Y1dWcKUo1Qrzl9avCI3kVl0wno3jSCnu0JFtOl
-            vmlZtd2zwtNi5UrBdfFG1Wpcl8wvsqZ9q8mMZws3fevFCR+Jkc+g6Q==
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBCc29DSVpFNS9DNGFOaDhO
+            OGxudU9XbDAxb1VnMmcrK05VSlV3MlV4aG5rClpXVndLM1grRGF1VzFzMTVKdXZn
+            OFFoWTgvWm00R1JxK21YWnBURmpON0kKLS0tIHQ5Q1VENDNWN0kwZXhXME04SERL
+            cUM5K1UrSWNCZDFKQ2JSZXJrMWNDamcK35w4mi2knCM4LNw3sHhOGAljrCjKIo3D
+            cwERHvsDjpmlv6Mh9oENPcesQKzZztbtWVJ/4ct5/5QHLHXXlB2Gcg==
             -----END AGE ENCRYPTED FILE-----
-    lastmodified: "2026-07-29T14:44:47Z"
-    mac: ENC[AES256_GCM,data:+gIdovaMj1QzesuUolfmTLSp0sBrx8pRMOf7Lzgfy0ZCwS2y1Txilj7G2qfmWDdipJHwWULIl3jpoKSHRXIEhSKp31+qHE1Elj3NTrw1iQi60is50Cy85CunV8UW7x4bltWnKao3f4vsprXwz+kr+IDH5xvJMhTguwX4LiDwEeQ=,iv:36E0JH0bP7QI4QZYzrBjcicwsmiAzvhibt6rJt5Dyu8=,tag:r7IrHEBIyd0nFz0q8Evnjg==,type:str]
+    lastmodified: "2026-08-01T16:25:01Z"
+    mac: ENC[AES256_GCM,data:kRf2XJfLEQK/4jYsf7M1opjf/GCNo31AKbqL4WnSdLb/6DCPoy/XoWVICYAy4o31H/7Zn+L4OJPXdz/i7YA9aStPUHDjC2OqzSVy+nzl0dXMRy+jRpnSepsRkH57xNv9ZG/5+QwWyRXJb5iY7iStivvYNAo4UNvK+ep6ZBG7CTo=,iv:olQ5NDE0BcYGiTY1Y1deoNEP5IpKhBgKzrwc8hRMrKk=,tag:nrw/4ifpSD8xN/ccxi6HTw==,type:str]
     encrypted_regex: ^(data|stringData)$
     version: 3.10.2
