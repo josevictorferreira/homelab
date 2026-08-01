@@ -14,7 +14,7 @@ let
   namespace = homelab.kubernetes.namespaces.applications;
   bootstrapDatabases = homelab.kubernetes.databases.postgres;
   mkCreateDb = db: ''
-    		psql -h postgresql-18 -U postgres -c 'ALTER SYSTEM SET shared_preload_libraries = "vchord.so"'
+        psql -h postgresql-18 -U postgres -c 'ALTER SYSTEM SET shared_preload_libraries = "vchord.so"'
         echo "Ensuring database '${db}' exists..."
         psql -h postgresql-18 -U postgres -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname='${db}'" | grep -q 1 \
           || psql -h postgresql-18 -U postgres -d postgres -c "CREATE DATABASE \"${db}\";"
