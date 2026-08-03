@@ -7,7 +7,7 @@ metadata:
   labels:
     app: hermes-agent
     component: dashboard
-    kubenix/hash: 0b6e0e6e9b2e3f7ba0f0460229a75659a1443e33
+    kubenix/hash: 722c1b5e1564be166b67b8e8eb60dd2751e3de91
   name: hermes-agent-dashboard
   namespace: apps
 spec:
@@ -43,7 +43,7 @@ spec:
           envFrom:
             - secretRef:
                 name: hermes-agent-env
-          image: docker.io/nousresearch/hermes-agent:v2026.7.20@sha256:a6ce64e2038867885c2c90f6602425e6e70293d5e6d952a0e603a99265e01c40
+          image: docker.io/nousresearch/hermes-agent:v2026.8.3@sha256:c0cab4e3711bcb27a312be1b3776254fc06fd50d5f7a6b8017915fc7171cb39e
           imagePullPolicy: IfNotPresent
           livenessProbe:
             failureThreshold: 3
@@ -127,7 +127,7 @@ metadata:
   labels:
     app: hermes-agent
     component: gateway
-    kubenix/hash: 0b6e0e6e9b2e3f7ba0f0460229a75659a1443e33
+    kubenix/hash: 722c1b5e1564be166b67b8e8eb60dd2751e3de91
   name: hermes-agent-gateway
   namespace: apps
 spec:
@@ -277,7 +277,7 @@ spec:
           envFrom:
             - secretRef:
                 name: hermes-agent-env
-          image: docker.io/nousresearch/hermes-agent:v2026.7.20@sha256:a6ce64e2038867885c2c90f6602425e6e70293d5e6d952a0e603a99265e01c40
+          image: docker.io/nousresearch/hermes-agent:v2026.8.3@sha256:c0cab4e3711bcb27a312be1b3776254fc06fd50d5f7a6b8017915fc7171cb39e
           imagePullPolicy: IfNotPresent
           name: gateway-multiplex
           resources:
@@ -407,7 +407,7 @@ spec:
           envFrom:
             - secretRef:
                 name: hermes-agent-env
-          image: docker.io/nousresearch/hermes-agent:v2026.7.20@sha256:a6ce64e2038867885c2c90f6602425e6e70293d5e6d952a0e603a99265e01c40
+          image: docker.io/nousresearch/hermes-agent:v2026.8.3@sha256:c0cab4e3711bcb27a312be1b3776254fc06fd50d5f7a6b8017915fc7171cb39e
           imagePullPolicy: IfNotPresent
           name: cron-multiplex
           resources:
@@ -497,7 +497,7 @@ spec:
                 find "$d" -type d ! -perm -2070 -exec chmod g+rwxs {} + 2>/dev/null || true
                 find "$d" -type f ! -perm -060 -exec chmod g+rw {} + 2>/dev/null || true
               done
-          image: docker.io/nousresearch/hermes-agent:v2026.7.20@sha256:a6ce64e2038867885c2c90f6602425e6e70293d5e6d952a0e603a99265e01c40
+          image: docker.io/nousresearch/hermes-agent:v2026.8.3@sha256:c0cab4e3711bcb27a312be1b3776254fc06fd50d5f7a6b8017915fc7171cb39e
           name: fix-profile-permissions
           securityContext:
             capabilities:
@@ -558,7 +558,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 0b6e0e6e9b2e3f7ba0f0460229a75659a1443e33
+    kubenix/hash: 722c1b5e1564be166b67b8e8eb60dd2751e3de91
   name: hermes-agent-cli-wrapper
   namespace: apps
 ---
@@ -570,7 +570,7 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     app: hermes-agent
-    kubenix/hash: 0b6e0e6e9b2e3f7ba0f0460229a75659a1443e33
+    kubenix/hash: 722c1b5e1564be166b67b8e8eb60dd2751e3de91
   name: hermes-agent-dashboard
   namespace: apps
 spec:
@@ -592,7 +592,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 0b6e0e6e9b2e3f7ba0f0460229a75659a1443e33
+    kubenix/hash: 722c1b5e1564be166b67b8e8eb60dd2751e3de91
   name: hermes-agent-dashboard
   namespace: apps
 spec:
@@ -621,7 +621,7 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     app: hermes-agent
-    kubenix/hash: 0b6e0e6e9b2e3f7ba0f0460229a75659a1443e33
+    kubenix/hash: 722c1b5e1564be166b67b8e8eb60dd2751e3de91
   name: hermes-agent-readonly
 rules:
   - apiGroups:
@@ -663,7 +663,7 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     app: hermes-agent
-    kubenix/hash: 0b6e0e6e9b2e3f7ba0f0460229a75659a1443e33
+    kubenix/hash: 722c1b5e1564be166b67b8e8eb60dd2751e3de91
   name: hermes-agent-readonly
 roleRef:
   apiGroup: rbac.authorization.k8s.io

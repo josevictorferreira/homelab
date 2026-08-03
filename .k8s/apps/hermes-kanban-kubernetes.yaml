@@ -7,7 +7,7 @@ metadata:
   labels:
     app: hermes-kanban-kubernetes
     component: controller
-    kubenix/hash: 802ed68b271f3e6572d04d28dadd2875847a1986
+    kubenix/hash: 52498c0959a512dc6ff66581ae396f9fe45fb5d7
   name: hermes-kanban-kubernetes-controller
   namespace: apps
 spec:
@@ -61,7 +61,7 @@ spec:
               value: "false"
             - name: PATH
               value: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/hermes/.venv/bin:/opt/data/.local/bin
-          image: docker.io/nousresearch/hermes-agent:v2026.6.19@sha256:9f367c7756ef087661a361536a89f438d57a122b958dc23d82d456b1433e6e9e
+          image: docker.io/nousresearch/hermes-agent:v2026.8.3@sha256:c0cab4e3711bcb27a312be1b3776254fc06fd50d5f7a6b8017915fc7171cb39e
           imagePullPolicy: IfNotPresent
           name: controller
           resources:
@@ -118,11 +118,11 @@ data:
       claimTtlSeconds: 900
       handleStore: file
     compatibility:
-      hermesVersion: "2026.6.19"
+      hermesVersion: "2026.8.3"
       failOnUnknownHermesVersion: true
       requireRemoteLifecycleContract: true
     job:
-      image: docker.io/nousresearch/hermes-agent:v2026.6.19@sha256:9f367c7756ef087661a361536a89f438d57a122b958dc23d82d456b1433e6e9e
+      image: docker.io/nousresearch/hermes-agent:v2026.8.3@sha256:c0cab4e3711bcb27a312be1b3776254fc06fd50d5f7a6b8017915fc7171cb39e
       serviceAccountName: hermes-kanban-worker
       backoffLimit: 0
       activeDeadlineSeconds: 7200
@@ -185,7 +185,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 802ed68b271f3e6572d04d28dadd2875847a1986
+    kubenix/hash: 52498c0959a512dc6ff66581ae396f9fe45fb5d7
   name: hermes-kanban-kubernetes-config
   namespace: apps
 ---
@@ -196,7 +196,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 802ed68b271f3e6572d04d28dadd2875847a1986
+    kubenix/hash: 52498c0959a512dc6ff66581ae396f9fe45fb5d7
   name: hermes-kanban-controller
   namespace: apps
 ---
@@ -208,7 +208,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 802ed68b271f3e6572d04d28dadd2875847a1986
+    kubenix/hash: 52498c0959a512dc6ff66581ae396f9fe45fb5d7
   name: hermes-kanban-worker
   namespace: apps
 ---
@@ -219,7 +219,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 802ed68b271f3e6572d04d28dadd2875847a1986
+    kubenix/hash: 52498c0959a512dc6ff66581ae396f9fe45fb5d7
   name: hermes-kanban-controller
   namespace: apps
 rules:
@@ -262,7 +262,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 802ed68b271f3e6572d04d28dadd2875847a1986
+    kubenix/hash: 52498c0959a512dc6ff66581ae396f9fe45fb5d7
   name: hermes-kanban-controller
   namespace: apps
 roleRef:
