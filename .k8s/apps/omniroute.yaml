@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: omniroute
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: a428de25a35d23ea78038445dc327faafe9d05a0
+    kubenix/hash: b370661234cef869f478a0386eaeb86d55652f3f
     kubenix/module-instance: omniroute
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -182,7 +182,7 @@ spec:
           envFrom:
             - secretRef:
                 name: omniroute-env
-          image: ghcr.io/diegosouzapw/omniroute:3.8.48@sha256:4e476aff49afcea258f63ae27138807d4e0e5a37b7da1a008ac1ad99632f52ed
+          image: ghcr.io/diegosouzapw/omniroute:3.8.49@sha256:2bf79cf167478bf283c633ffef2e1e26ba746882e7267fab9320c09df56e8b57
           imagePullPolicy: IfNotPresent
           name: main
           ports:
@@ -235,7 +235,7 @@ metadata:
     app.kubernetes.io/name: omniroute
     app.kubernetes.io/service: omniroute
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: a428de25a35d23ea78038445dc327faafe9d05a0
+    kubenix/hash: b370661234cef869f478a0386eaeb86d55652f3f
     kubenix/module-instance: omniroute
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -264,7 +264,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: omniroute
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: a428de25a35d23ea78038445dc327faafe9d05a0
+    kubenix/hash: b370661234cef869f478a0386eaeb86d55652f3f
     kubenix/module-instance: omniroute
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -295,7 +295,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: a428de25a35d23ea78038445dc327faafe9d05a0
+    kubenix/hash: b370661234cef869f478a0386eaeb86d55652f3f
   name: omniroute-data-home-nvme
   namespace: apps
 spec:
@@ -313,7 +313,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: a428de25a35d23ea78038445dc327faafe9d05a0
+    kubenix/hash: b370661234cef869f478a0386eaeb86d55652f3f
   name: omniroute-data-nvme
   namespace: apps
 spec:
