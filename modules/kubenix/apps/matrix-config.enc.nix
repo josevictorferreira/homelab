@@ -302,8 +302,8 @@ in
                 username_template = "slack_{{.}}";
               };
 
-              # Slack connector settings (bridgev2 format)
-              connector = {
+              # Slack network settings (bridgev2 format; section is "network", not "connector")
+              network = {
                 displayname_template = "{{or .Profile.DisplayName .Profile.RealName .Name}}{{if .IsBot}} (bot){{end}} (SL)";
                 channel_name_template = "{{if and .IsChannel (not .IsPrivate)}}#{{end}}{{.Name}}{{if .IsNoteToSelf}} (you){{end}} (SL)";
                 team_name_template = "{{.Name}} (SL)";
