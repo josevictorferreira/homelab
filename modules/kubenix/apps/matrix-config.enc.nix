@@ -305,7 +305,7 @@ in
               # Slack connector settings (bridgev2 format)
               connector = {
                 displayname_template = "{{or .Profile.DisplayName .Profile.RealName .Name}}{{if .IsBot}} (bot){{end}} (SL)";
-                channel_name_template = "slack/{{.Team.Name}}/{{.Name}} (SL)";
+                channel_name_template = "{{if and .IsChannel (not .IsPrivate)}}#{{end}}{{.Name}}{{if .IsNoteToSelf}} (you){{end}} (SL)";
                 team_name_template = "{{.Name}} (SL)";
               };
 
