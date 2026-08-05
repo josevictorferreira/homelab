@@ -305,7 +305,9 @@ in
               # Slack network settings (bridgev2 format; section is "network", not "connector")
               network = {
                 displayname_template = "{{or .Profile.DisplayName .Profile.RealName .Name}}{{if .IsBot}} (bot){{end}} (SL)";
-                channel_name_template = "{{if and .IsChannel (not .IsPrivate)}}#{{end}}{{.Name}}{{if .IsNoteToSelf}} (you){{end}} (SL)";
+                # Suffix only channels: for DMs, .Name is the ghost displayname, which
+                # displayname_template already tagged — appending here double-tags it.
+                channel_name_template = "{{if and .IsChannel (not .IsPrivate)}}#{{end}}{{.Name}}{{if .IsNoteToSelf}} (you){{end}}{{if .IsChannel}} (SL){{end}}";
                 team_name_template = "{{.Name}} (SL)";
               };
 
