@@ -49,6 +49,7 @@
       rabbitmq = "10.10.10.139";
       openclaw = "10.10.10.140";
       openclaw-nix = "10.10.10.141";
+      tuwunel = "10.10.10.157";
       personal-finances = "10.10.10.142";
       readeck = "10.10.10.143";
       homelab-bridge = "10.10.10.144";
