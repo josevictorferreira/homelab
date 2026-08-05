@@ -184,9 +184,10 @@ in
     services.${name} = {
       metadata = {
         inherit name namespace;
+        annotations = kubenix.lib.serviceAnnotationFor name;
       };
       spec = {
-        type = "ClusterIP";
+        type = "LoadBalancer";
         selector.app = name;
         ports = [
           {
