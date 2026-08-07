@@ -1,0 +1,431 @@
+# Velox configuration ported from OmniRoute/9router.
+#
+# Scope: only providers that authenticate with a static API key and speak either
+# the OpenAI chat-completions or the Anthropic Messages protocol. OAuth
+# subscription providers (Claude Pro, ChatGPT/Codex, Antigravity, Gemini CLI,
+# Kiro, Kimi-coding OAuth) and bespoke protocols (CommandCode, Vertex, Ollama)
+# are not represented; combos that depended solely on them are absent rather
+# than present-but-degraded.
+#
+# Endpoints come from 9router's open-sse/config/providers.js. Velox's `base_url`
+# names the API root, so the `/chat/completions` and `/messages` suffixes that
+# appear there are stripped here.
+
+[server]
+bind = "0.0.0.0:8080"
+api_keys_env = "VELOX_API_KEYS"
+log_level = "info"
+log_format = "json"
+
+[limits]
+max_body_bytes = 4194304
+shutdown_drain_ms = 10000
+shutdown_grace_ms = 30000
+
+# ---------------------------------------------------------------------------
+# Providers
+# ---------------------------------------------------------------------------
+
+# OpenCode Zen "go" plan. Serves most models over OpenAI chat-completions.
+[providers.opencode-go]
+kind = "openai-compatible"
+base_url = "https://opencode.ai/zen/go/v1"
+api_key_env = "OPENCODE_GO_API_KEY"
+
+# The same host also exposes /messages, which 9router uses for the MiniMax
+# models specifically. Velox binds one wire format per provider, so the
+# Anthropic-speaking half is declared separately against the same credential.
+[providers.opencode-go-anthropic]
+kind = "anthropic"
+base_url = "https://opencode.ai/zen/go/v1"
+api_key_env = "OPENCODE_GO_API_KEY"
+
+[providers.openrouter]
+kind = "openai-compatible"
+base_url = "https://openrouter.ai/api/v1"
+api_key_env = "OPENROUTER_API_KEY"
+
+# Z.AI / GLM. API key, but the endpoint is Anthropic-shaped.
+[providers.glm]
+kind = "anthropic"
+base_url = "https://api.z.ai/api/anthropic/v1"
+api_key_env = "GLM_API_KEY"
+
+# Alibaba Model Studio token plan (OmniRoute: openai-compatible-chat-dbe58ac9).
+[providers.alibaba-token-plan]
+kind = "openai-compatible"
+base_url = "https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1"
+api_key_env = "ALIBABA_TOKEN_PLAN_API_KEY"
+
+# OmniRoute: openai-compatible-chat-4eea86d8. pippin's primary target.
+[providers.yoloauto]
+kind = "openai-compatible"
+base_url = "https://yolo-auto.com/v1"
+api_key_env = "YOLOAUTO_API_KEY"
+
+# OmniRoute: openai-compatible-chat-06a1719a.
+[providers.neuralwatt]
+kind = "openai-compatible"
+base_url = "https://api.neuralwatt.com/v1"
+api_key_env = "NEURALWATT_API_KEY"
+
+[providers.xiaomi-mimo]
+kind = "openai-compatible"
+base_url = "https://token-plan-sgp.xiaomimimo.com/v1"
+api_key_env = "XIAOMI_MIMO_API_KEY"
+
+[providers.cerebras]
+kind = "openai-compatible"
+base_url = "https://api.cerebras.ai/v1"
+api_key_env = "CEREBRAS_API_KEY"
+
+[providers.nvidia]
+kind = "openai-compatible"
+base_url = "https://integrate.api.nvidia.com/v1"
+api_key_env = "NVIDIA_API_KEY"
+
+[providers.mistral]
+kind = "openai-compatible"
+base_url = "https://api.mistral.ai/v1"
+api_key_env = "MISTRAL_API_KEY"
+
+[providers.bazaarlink]
+kind = "openai-compatible"
+base_url = "https://bazaarlink.ai/api/v1"
+api_key_env = "BAZAARLINK_API_KEY"
+
+[providers.puter]
+kind = "openai-compatible"
+base_url = "https://api.puter.com/puterai/openai/v1"
+api_key_env = "PUTER_API_KEY"
+
+[providers.nanogpt]
+kind = "openai-compatible"
+base_url = "https://nano-gpt.com/api/v1"
+api_key_env = "NANOGPT_API_KEY"
+
+# ---------------------------------------------------------------------------
+# Models
+#
+# One alias per (provider, upstream model) pair a combo needs. Aliases are
+# prefixed with the provider so the same upstream model reached through two
+# providers stays addressable.
+# ---------------------------------------------------------------------------
+
+[models.glm-5-2-zai]
+provider = "glm"
+upstream_model = "glm-5.2"
+
+[models.glm-5-2-max-zai]
+provider = "glm"
+upstream_model = "glm-5.2-max"
+
+[models.glm-5-1-zai]
+provider = "glm"
+upstream_model = "glm-5.1"
+
+[models.glm-4-5-air-zai]
+provider = "glm"
+upstream_model = "glm-4.5-air"
+
+[models.glm-5-2-ocgo]
+provider = "opencode-go"
+upstream_model = "glm-5.2"
+
+[models.glm-5-1-ocgo]
+provider = "opencode-go"
+upstream_model = "glm-5.1"
+
+[models.glm-5-2-alibaba]
+provider = "alibaba-token-plan"
+upstream_model = "glm-5.2"
+
+[models.glm-5-2-short-neuralwatt]
+provider = "neuralwatt"
+upstream_model = "glm-5.2-short"
+
+[models.glm-5-2-nanogpt]
+provider = "nanogpt"
+upstream_model = "glm-5.2"
+
+[models.qwen3-6-35b-yoloauto]
+provider = "yoloauto"
+upstream_model = "qwen3.6-35b-a3b"
+
+[models.qwen3-7-plus-alibaba]
+provider = "alibaba-token-plan"
+upstream_model = "qwen3.7-plus"
+
+[models.qwen3-7-max-alibaba]
+provider = "alibaba-token-plan"
+upstream_model = "qwen3.7-max"
+
+[models.qwen3-7-max-ocgo]
+provider = "opencode-go"
+upstream_model = "qwen3.7-max"
+
+[models.qwen3-8-max-alibaba]
+provider = "alibaba-token-plan"
+upstream_model = "alibaba-token-plan/qwen3.8-max"
+
+[models.qwen3-8-max-openrouter]
+provider = "openrouter"
+upstream_model = "qwen/qwen3.8-max"
+
+[models.qwen3-6-plus-alibaba]
+provider = "alibaba-token-plan"
+upstream_model = "qwen3.6-plus"
+
+[models.qwen3-6-plus-ocgo]
+provider = "opencode-go"
+upstream_model = "qwen3.6-plus"
+
+[models.deepseek-v4-flash-openrouter]
+provider = "openrouter"
+upstream_model = "deepseek/deepseek-v4-flash-0731"
+
+[models.deepseek-v4-flash-alibaba]
+provider = "alibaba-token-plan"
+upstream_model = "alibaba-token-plan/deepseek-v4-flash-0731"
+
+[models.deepseek-v4-pro-ocgo]
+provider = "opencode-go"
+upstream_model = "deepseek-v4-pro"
+
+[models.kimi-k2-5-alibaba]
+provider = "alibaba-token-plan"
+upstream_model = "kimi-k2.5"
+
+[models.kimi-k2-5-ocgo]
+provider = "opencode-go"
+upstream_model = "kimi-k2.5"
+
+[models.kimi-k2-6-ocgo]
+provider = "opencode-go"
+upstream_model = "kimi-k2.6"
+
+[models.kimi-k2-7-code-ocgo]
+provider = "opencode-go"
+upstream_model = "kimi-k2.7-code"
+
+[models.kimi-k2-7-code-neuralwatt]
+provider = "neuralwatt"
+upstream_model = "kimi-k2.7-code"
+
+[models.kimi-k2-7-code-nanogpt]
+provider = "nanogpt"
+upstream_model = "kimi-k2.7-code"
+
+[models.kimi-k3-ocgo]
+provider = "opencode-go"
+upstream_model = "kimi-k3-max"
+
+[models.kimi-k3-openrouter]
+provider = "openrouter"
+upstream_model = "moonshotai/kimi-k3"
+
+[models.minimax-m2-5-ocgo]
+provider = "opencode-go-anthropic"
+upstream_model = "minimax-m2.5"
+
+[models.minimax-m2-5-alibaba]
+provider = "alibaba-token-plan"
+upstream_model = "MiniMax-M2.5"
+
+[models.minimax-m2-7-ocgo]
+provider = "opencode-go-anthropic"
+upstream_model = "minimax-m2.7"
+
+[models.minimax-m2-7-nvidia]
+provider = "nvidia"
+upstream_model = "minimaxai/minimax-m2.7"
+
+[models.minimax-m3-ocgo]
+provider = "opencode-go"
+upstream_model = "minimax-m3"
+
+[models.mimo-v2-5-ocgo]
+provider = "opencode-go"
+upstream_model = "mimo-v2.5"
+
+[models.mimo-v2-5-pro-ocgo]
+provider = "opencode-go"
+upstream_model = "mimo-v2.5-pro"
+
+[models.mimo-v2-5-pro-xiaomi]
+provider = "xiaomi-mimo"
+upstream_model = "mimo-v2.5-pro"
+
+[models.gpt-oss-120b-openrouter]
+provider = "openrouter"
+upstream_model = "openai/gpt-oss-120b:free"
+
+[models.gpt-oss-120b-cerebras]
+provider = "cerebras"
+upstream_model = "gpt-oss-120b"
+
+[models.nemotron-super-nvidia]
+provider = "nvidia"
+upstream_model = "nvidia/nemotron-3-super-120b-a12b"
+
+[models.mistral-medium]
+provider = "mistral"
+upstream_model = "mistral-medium-3-5"
+
+[models.gemma-4-bazaarlink]
+provider = "bazaarlink"
+upstream_model = "gemma-4-26b-a4b-it"
+
+[models.gemini-flash-lite-puter]
+provider = "puter"
+upstream_model = "google/gemini-3.1-flash-lite-preview"
+
+# ---------------------------------------------------------------------------
+# Combos
+#
+# Strategy is carried over from OmniRoute: `round-robin` spreads first attempts
+# across per-provider free quotas, `priority` prefers a specific target. Under
+# every strategy the remaining targets stay in the list as fallbacks.
+# ---------------------------------------------------------------------------
+
+[combos.pippin]
+targets = [
+  { model = "qwen3-6-35b-yoloauto" },
+  { model = "glm-4-5-air-zai" },
+]
+
+[combos.glm-5-2]
+targets = [
+  { model = "glm-5-2-zai" },
+  { model = "glm-5-2-short-neuralwatt" },
+  { model = "glm-5-2-alibaba" },
+  { model = "glm-5-2-nanogpt" },
+]
+
+[combos.glm-5-2-max]
+targets = [
+  { model = "glm-5-2-max-zai" },
+  { model = "glm-5-2-ocgo" },
+  { model = "glm-5-2-alibaba" },
+]
+
+[combos.glm-5-1]
+strategy = "round-robin"
+targets = [
+  { model = "glm-5-1-zai" },
+  { model = "glm-5-1-ocgo" },
+]
+
+[combos.glm-5-1-thinking]
+targets = [{ model = "glm-5-1-zai" }]
+
+[combos.qwen3-7-plus]
+targets = [{ model = "qwen3-7-plus-alibaba" }]
+
+[combos.qwen3-7-max]
+targets = [
+  { model = "qwen3-7-max-alibaba" },
+  { model = "qwen3-7-max-ocgo" },
+]
+
+[combos.qwen3-8-max]
+targets = [
+  { model = "qwen3-8-max-alibaba" },
+  { model = "qwen3-8-max-openrouter" },
+]
+
+[combos.qwen3-6-plus]
+strategy = "round-robin"
+targets = [
+  { model = "qwen3-6-plus-alibaba" },
+  { model = "qwen3-6-plus-ocgo" },
+]
+
+[combos.deepseek-v4-flash]
+strategy = "round-robin"
+targets = [
+  { model = "deepseek-v4-flash-openrouter" },
+  { model = "deepseek-v4-flash-alibaba" },
+]
+
+[combos.deepseek-v4-pro]
+targets = [{ model = "deepseek-v4-pro-ocgo" }]
+
+[combos.kimi-k2-5]
+strategy = "round-robin"
+targets = [
+  { model = "kimi-k2-5-alibaba" },
+  { model = "kimi-k2-5-ocgo" },
+]
+
+[combos.kimi-k2-6]
+targets = [{ model = "kimi-k2-6-ocgo" }]
+
+[combos.kimi-k2-7-code]
+targets = [
+  { model = "kimi-k2-7-code-neuralwatt" },
+  { model = "kimi-k2-7-code-ocgo" },
+  { model = "kimi-k2-7-code-nanogpt" },
+]
+
+[combos.kimi-k3]
+targets = [
+  { model = "kimi-k3-ocgo" },
+  { model = "kimi-k3-openrouter" },
+]
+
+[combos.minimax-m2-5]
+strategy = "round-robin"
+targets = [
+  { model = "minimax-m2-5-ocgo" },
+  { model = "minimax-m2-5-alibaba" },
+]
+
+[combos.minimax-m2-7]
+strategy = "round-robin"
+targets = [
+  { model = "minimax-m2-7-ocgo" },
+  { model = "minimax-m2-7-nvidia" },
+]
+
+[combos.minimax-m3]
+targets = [{ model = "minimax-m3-ocgo" }]
+
+[combos.mimo-v2-5]
+targets = [{ model = "mimo-v2-5-ocgo" }]
+
+[combos.mimo-v2-5-pro]
+targets = [
+  { model = "mimo-v2-5-pro-xiaomi" },
+  { model = "mimo-v2-5-pro-ocgo" },
+]
+
+# OmniRoute's broad free-tier spread. Round-robin is what keeps any single
+# free quota from carrying the whole load.
+[combos.haldir]
+strategy = "round-robin"
+targets = [
+  { model = "qwen3-6-35b-yoloauto" },
+  { model = "gpt-oss-120b-cerebras" },
+  { model = "gpt-oss-120b-openrouter" },
+  { model = "nemotron-super-nvidia" },
+  { model = "mistral-medium" },
+  { model = "glm-4-5-air-zai" },
+  { model = "gemma-4-bazaarlink" },
+  { model = "gemini-flash-lite-puter" },
+]
+
+[combos.legolas]
+strategy = "round-robin"
+targets = [
+  { model = "gpt-oss-120b-openrouter" },
+  { model = "gemini-flash-lite-puter" },
+]
+
+[combos.samwise]
+strategy = "random"
+targets = [
+  { model = "glm-5-2-zai" },
+  { model = "mimo-v2-5-pro-xiaomi" },
+  { model = "qwen3-7-plus-alibaba" },
+]
