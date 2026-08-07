@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: omniroute
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: b370661234cef869f478a0386eaeb86d55652f3f
+    kubenix/hash: e0369b933ed5a912966a4971bb7c7439c30928ff
     kubenix/module-instance: omniroute
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -179,6 +179,8 @@ spec:
           env:
             - name: DISABLE_SQLITE_AUTO_BACKUP
               value: "true"
+            - name: OMNIROUTE_CHAT_MAX_HEAVY_IN_FLIGHT
+              value: "6"
           envFrom:
             - secretRef:
                 name: omniroute-env
@@ -235,7 +237,7 @@ metadata:
     app.kubernetes.io/name: omniroute
     app.kubernetes.io/service: omniroute
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: b370661234cef869f478a0386eaeb86d55652f3f
+    kubenix/hash: e0369b933ed5a912966a4971bb7c7439c30928ff
     kubenix/module-instance: omniroute
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -264,7 +266,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: omniroute
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: b370661234cef869f478a0386eaeb86d55652f3f
+    kubenix/hash: e0369b933ed5a912966a4971bb7c7439c30928ff
     kubenix/module-instance: omniroute
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -295,7 +297,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: b370661234cef869f478a0386eaeb86d55652f3f
+    kubenix/hash: e0369b933ed5a912966a4971bb7c7439c30928ff
   name: omniroute-data-home-nvme
   namespace: apps
 spec:
@@ -313,7 +315,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: b370661234cef869f478a0386eaeb86d55652f3f
+    kubenix/hash: e0369b933ed5a912966a4971bb7c7439c30928ff
   name: omniroute-data-nvme
   namespace: apps
 spec:

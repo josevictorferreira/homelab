@@ -190,6 +190,11 @@ in
         # cascades into the heap OOM. Backups are covered by GitOps + the PVC itself.
         controllers.main.containers.main.env.DISABLE_SQLITE_AUTO_BACKUP = "true";
 
+        # Default is 1, which serializes "structurally heavy" chat requests (>32k
+        # estimated tokens — every coding-agent call) and 503s parallel agents
+        # with chat_admission_busy/structure_limit.
+        controllers.main.containers.main.env.OMNIROUTE_CHAT_MAX_HEAVY_IN_FLIGHT = "6";
+
         defaultPodOptions.imagePullSecrets = [
           { name = "ghcr-registry-secret"; }
         ];
