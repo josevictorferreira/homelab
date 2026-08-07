@@ -17,6 +17,9 @@ in
       ELEVENLABS_MODEL = "eleven_v3";
       SPEECHIFY_API_KEY = kubenix.lib.secretsFor "speechify_api_key";
       SPEECHIFY_MODEL = "simba-3.2";
+      NANOGPT_API_KEY = kubenix.lib.secretsFor "velox_nanogpt_api_key";
+      NANOGPT_IMAGE_MODEL = "hidream";
+      NANOGPT_IMAGE_RESOLUTION = "1360x768";
       SUPERTONIC_BASE_URL = "http://10.10.10.10:7788";
       GEPARD_BASE_URL = "http://10.10.10.10:8000";
       QWEN3_TTS_BASE_URL = "http://10.10.10.10:8000";
