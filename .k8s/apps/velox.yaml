@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 075e673e7bc0a24a38dde68fb24fa9f6f6ebc6c9
+    kubenix/hash: 5d554ff2798fab9ea13f649ca19e8957073e500e
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -67,8 +67,8 @@ spec:
               cpu: 1000m
               memory: 256Mi
             requests:
-              cpu: 25m
-              memory: 32Mi
+              cpu: 50m
+              memory: 64Mi
           volumeMounts:
             - mountPath: /etc/velox/velox.toml
               name: config
@@ -105,7 +105,7 @@ metadata:
     app.kubernetes.io/name: velox
     app.kubernetes.io/service: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 075e673e7bc0a24a38dde68fb24fa9f6f6ebc6c9
+    kubenix/hash: 5d554ff2798fab9ea13f649ca19e8957073e500e
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -134,7 +134,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 075e673e7bc0a24a38dde68fb24fa9f6f6ebc6c9
+    kubenix/hash: 5d554ff2798fab9ea13f649ca19e8957073e500e
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -598,6 +598,6 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 075e673e7bc0a24a38dde68fb24fa9f6f6ebc6c9
+    kubenix/hash: 5d554ff2798fab9ea13f649ca19e8957073e500e
   name: velox-config
   namespace: apps
