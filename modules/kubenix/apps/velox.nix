@@ -47,8 +47,8 @@ in
       # streams; memory tracks connection count, not tokens streamed.
       resources = {
         requests = {
-          cpu = "25m";
-          memory = "32Mi";
+          cpu = "50m";
+          memory = "64Mi";
         };
         limits = {
           cpu = "1000m";
