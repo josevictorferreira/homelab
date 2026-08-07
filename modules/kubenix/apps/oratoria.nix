@@ -46,6 +46,23 @@ in
           envFrom = [
             { secretRef.name = "${app}-config"; }
           ];
+          # Map OBC-created credentials (AWS_*) to S3_* env vars expected by the app
+          env = [
+            {
+              name = "S3_ACCESS_KEY_ID";
+              valueFrom.secretKeyRef = {
+                name = "oratoria-audio";
+                key = "AWS_ACCESS_KEY_ID";
+              };
+            }
+            {
+              name = "S3_SECRET_ACCESS_KEY";
+              valueFrom.secretKeyRef = {
+                name = "oratoria-audio";
+                key = "AWS_SECRET_ACCESS_KEY";
+              };
+            }
+          ];
           ports = [
             {
               name = "http";
