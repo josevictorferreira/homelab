@@ -278,6 +278,32 @@ in
               metadataServer = {
                 activeCount = 1;
                 activeStandby = true;
+                # The chart ships the MDS with no requests/limits, so kubelet
+                # eviction ranks it first under node memory pressure (usage far
+                # above its 0 request). 2026-08-07 the active MDS ballooned to
+                # ~2.2Gi during a CephFS setattr storm and was evicted on
+                # lab-gamma-wk, leaving the fs degraded in clientreplay for ~1h
+                # and every CephFS consumer stalled. Rook derives
+                # mds_cache_memory_limit from 50% of the limit (4Gi -> 2Gi).
+                resources = {
+                  limits.memory = "4Gi";
+                  requests.cpu = "100m";
+                  requests.memory = "1Gi";
+                };
+                # Keep the MDS off lab-gamma-wk: 8Gi node already carrying two
+                # OSDs (~3.6Gi actual) with a history of memory-pressure
+                # evictions and reboot loops.
+                placement.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms = [
+                  {
+                    matchExpressions = [
+                      {
+                        key = "kubernetes.io/hostname";
+                        operator = "NotIn";
+                        values = [ "lab-gamma-wk" ];
+                      }
+                    ];
+                  }
+                ];
               };
             };
             storageClass = {
