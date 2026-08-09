@@ -30,6 +30,9 @@ in
       S3_ENDPOINT = "http://rook-ceph-rgw-ceph-objectstore.rook-ceph.svc";
       S3_BUCKET = "oratoria-audio";
       S3_REGION = "us-east-1";
+      IMGPROXY_KEY = kubenix.lib.secretsFor "imgproxy_key";
+      IMGPROXY_SALT = kubenix.lib.secretsFor "imgproxy_salt";
+      IMGPROXY_BASE_URL = "https://imgproxy.josevictor.me";
     };
   };
 }
