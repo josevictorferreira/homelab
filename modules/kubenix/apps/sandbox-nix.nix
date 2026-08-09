@@ -85,7 +85,19 @@ in
               command = [
                 "/bin/sh"
                 "-c"
-                "if [ ! -f /mnt/nix/.seeded ]; then rm -rf /mnt/nix/* /mnt/nix/.[!.]* 2>/dev/null || true; cp -a /nix/. /mnt/nix/ && touch /mnt/nix/.seeded; fi"
+                # The marker records WHICH image seeded the store, not merely that
+                # seeding happened.  The PVC is mounted over /nix and hides the
+                # image's own store, so after an image bump the entrypoint's
+                # interpreter (a /nix/store/...-bash path) is absent from the
+                # stale PVC and the container dies with "bad interpreter".
+                # Re-seed whenever the image reference changes.
+                ''
+                  want='${image}'
+                  if [ "$(cat /mnt/nix/.seeded 2>/dev/null)" != "$want" ]; then
+                    rm -rf /mnt/nix/* /mnt/nix/.[!.]* 2>/dev/null || true
+                    cp -a /nix/. /mnt/nix/ && printf '%s' "$want" > /mnt/nix/.seeded
+                  fi
+                ''
               ];
               volumeMounts = [
                 {
