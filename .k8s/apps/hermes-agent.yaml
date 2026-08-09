@@ -7,7 +7,7 @@ metadata:
   labels:
     app: hermes-agent
     component: dashboard
-    kubenix/hash: 722c1b5e1564be166b67b8e8eb60dd2751e3de91
+    kubenix/hash: c9aee48f9ea605eb0c3a4284f1c358aa4f8bfa5b
   name: hermes-agent-dashboard
   namespace: apps
 spec:
@@ -127,7 +127,7 @@ metadata:
   labels:
     app: hermes-agent
     component: gateway
-    kubenix/hash: 722c1b5e1564be166b67b8e8eb60dd2751e3de91
+    kubenix/hash: c9aee48f9ea605eb0c3a4284f1c358aa4f8bfa5b
   name: hermes-agent-gateway
   namespace: apps
 spec:
@@ -262,14 +262,12 @@ spec:
               value: "true"
             - name: PIP_REQUIRE_VIRTUALENV
               value: "false"
-            - name: SANDBOX_NIX_HOST
+            - name: TERMINAL_SSH_HOST
               value: sandbox-nix.apps.svc.cluster.local
-            - name: SANDBOX_NIX_USER
+            - name: TERMINAL_SSH_USER
               value: hermes-agent
-            - name: SANDBOX_NIX_SSH_KEY
+            - name: TERMINAL_SSH_KEY
               value: /etc/hermes/sandbox-nix-ssh/ssh-private-key
-            - name: SANDBOX_NIX_WORKSPACE
-              value: /workspace
             - name: HOME
               value: /opt/data
             - name: HERMES_HOME
@@ -394,14 +392,12 @@ spec:
               value: "true"
             - name: PIP_REQUIRE_VIRTUALENV
               value: "false"
-            - name: SANDBOX_NIX_HOST
+            - name: TERMINAL_SSH_HOST
               value: sandbox-nix.apps.svc.cluster.local
-            - name: SANDBOX_NIX_USER
+            - name: TERMINAL_SSH_USER
               value: hermes-agent
-            - name: SANDBOX_NIX_SSH_KEY
+            - name: TERMINAL_SSH_KEY
               value: /etc/hermes/sandbox-nix-ssh/ssh-private-key
-            - name: SANDBOX_NIX_WORKSPACE
-              value: /workspace
             - name: HOME
               value: /opt/data
           envFrom:
@@ -558,7 +554,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 722c1b5e1564be166b67b8e8eb60dd2751e3de91
+    kubenix/hash: c9aee48f9ea605eb0c3a4284f1c358aa4f8bfa5b
   name: hermes-agent-cli-wrapper
   namespace: apps
 ---
@@ -570,7 +566,7 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     app: hermes-agent
-    kubenix/hash: 722c1b5e1564be166b67b8e8eb60dd2751e3de91
+    kubenix/hash: c9aee48f9ea605eb0c3a4284f1c358aa4f8bfa5b
   name: hermes-agent-dashboard
   namespace: apps
 spec:
@@ -592,7 +588,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 722c1b5e1564be166b67b8e8eb60dd2751e3de91
+    kubenix/hash: c9aee48f9ea605eb0c3a4284f1c358aa4f8bfa5b
   name: hermes-agent-dashboard
   namespace: apps
 spec:
@@ -621,7 +617,7 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     app: hermes-agent
-    kubenix/hash: 722c1b5e1564be166b67b8e8eb60dd2751e3de91
+    kubenix/hash: c9aee48f9ea605eb0c3a4284f1c358aa4f8bfa5b
   name: hermes-agent-readonly
 rules:
   - apiGroups:
@@ -663,7 +659,7 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     app: hermes-agent
-    kubenix/hash: 722c1b5e1564be166b67b8e8eb60dd2751e3de91
+    kubenix/hash: c9aee48f9ea605eb0c3a4284f1c358aa4f8bfa5b
   name: hermes-agent-readonly
 roleRef:
   apiGroup: rbac.authorization.k8s.io

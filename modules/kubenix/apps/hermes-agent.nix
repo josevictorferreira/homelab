@@ -224,21 +224,22 @@ let
       name = "PIP_REQUIRE_VIRTUALENV";
       value = "false";
     }
+    # Routes the `ssh` terminal backend at the sandbox-nix worker.  Host/user/key
+    # are env-only in hermes (no terminal.ssh_* config keys exist), so they must
+    # live here rather than in config.yaml.  Which profiles actually use them is
+    # decided per-profile by terminal.backend: only valygar is set to `ssh`;
+    # every other profile stays `local` and ignores these.
     {
-      name = "SANDBOX_NIX_HOST";
+      name = "TERMINAL_SSH_HOST";
       value = "sandbox-nix.apps.svc.cluster.local";
     }
     {
-      name = "SANDBOX_NIX_USER";
+      name = "TERMINAL_SSH_USER";
       value = "hermes-agent";
     }
     {
-      name = "SANDBOX_NIX_SSH_KEY";
+      name = "TERMINAL_SSH_KEY";
       value = "/etc/hermes/sandbox-nix-ssh/ssh-private-key";
-    }
-    {
-      name = "SANDBOX_NIX_WORKSPACE";
-      value = "/workspace";
     }
   ];
 
