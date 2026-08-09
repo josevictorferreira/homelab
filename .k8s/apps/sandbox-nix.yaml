@@ -6,7 +6,7 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     app: sandbox-nix
-    kubenix/hash: cbe8231586e6a37e6d54316505c7778a1d3b26ad
+    kubenix/hash: 56e8b5a7aeea2eb82c2fc6bc914c66c42157013b
   name: sandbox-nix
   namespace: apps
 spec:
@@ -22,12 +22,30 @@ spec:
     spec:
       containers:
         - command:
-            - /entrypoint.sh
+            - /bin/sh
+            - -c
+            - |
+              set -e
+              umask 022
+              {
+                printf 'export GITHUB_TOKEN=%s\n' "$GITHUB_TOKEN"
+                printf 'export GH_TOKEN=%s\n' "$GH_TOKEN"
+              } > /etc/profile
+              chmod 444 /etc/profile
+              {
+                printf '[credential "https://github.com"]\n'
+                printf '\thelper = "!f() { echo username=x-access-token; echo password=$GITHUB_TOKEN; }; f"\n'
+              } > /etc/gitconfig
+              chmod 444 /etc/gitconfig
+              exec /entrypoint.sh
           env:
             - name: NIX_CONFIG
               value: |-
                 experimental-features = nix-command flakes
                 sandbox = false
+          envFrom:
+            - secretRef:
+                name: sandbox-nix-env
           image: ghcr.io/josevictorferreira/sandbox-nix:0.1.0@sha256:0158928e91630131c724b8b66a4756f4ef3485041a025dedf07e905e6382eb75
           imagePullPolicy: IfNotPresent
           name: sandbox-nix
@@ -99,7 +117,7 @@ metadata:
     lbipam.cilium.io/sharing-key: sandbox-nix
   labels:
     app: sandbox-nix
-    kubenix/hash: cbe8231586e6a37e6d54316505c7778a1d3b26ad
+    kubenix/hash: 56e8b5a7aeea2eb82c2fc6bc914c66c42157013b
   name: sandbox-nix
   namespace: apps
 spec:

@@ -19,6 +19,33 @@ let
       persistentVolumeClaim.claimName = kubenix.lib.sharedStorage.rootPVC;
     }
   ];
+
+  # sshd does NOT export the container environment into SSH sessions, so the
+  # GITHUB_TOKEN/GH_TOKEN from ${name}-env are invisible to agents arriving over
+  # ssh even though they are set on PID 1.  Bridge them through /etc/profile,
+  # which the login shells hermes runs (`bash -l`) source; the image ships no
+  # /etc/profile of its own.  Written to the container layer (not the CephFS
+  # volume) so the token never lands on shared storage.
+  #
+  # /etc/gitconfig teaches git to authenticate with that token over HTTPS.  The
+  # helper expands $GITHUB_TOKEN at call time, so the value is not stored in the
+  # config file itself.  Kept in the system-level config so the agent's own
+  # ~/.gitconfig (commit identity) stays independent of it.
+  entrypointWrapper = ''
+    set -e
+    umask 022
+    {
+      printf 'export GITHUB_TOKEN=%s\n' "$GITHUB_TOKEN"
+      printf 'export GH_TOKEN=%s\n' "$GH_TOKEN"
+    } > /etc/profile
+    chmod 444 /etc/profile
+    {
+      printf '[credential "https://github.com"]\n'
+      printf '\thelper = "!f() { echo username=x-access-token; echo password=$GITHUB_TOKEN; }; f"\n'
+    } > /etc/gitconfig
+    chmod 444 /etc/gitconfig
+    exec /entrypoint.sh
+  '';
 in
 {
   kubernetes.resources.statefulSets.${name} = {
@@ -73,7 +100,12 @@ in
               name = name;
               inherit image;
               imagePullPolicy = "IfNotPresent";
-              command = [ "/entrypoint.sh" ];
+              command = [
+                "/bin/sh"
+                "-c"
+                entrypointWrapper
+              ];
+              envFrom = [ { secretRef.name = "${name}-env"; } ];
               env = [
                 {
                   name = "NIX_CONFIG";
