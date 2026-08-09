@@ -22,6 +22,13 @@ max_body_bytes = 4194304
 shutdown_drain_ms = 10000
 shutdown_grace_ms = 30000
 
+# Apply both input compressors globally to every configured combo.
+[compression.rtk]
+enabled = true
+
+[compression.caveman]
+enabled = true
+
 # ---------------------------------------------------------------------------
 # Providers
 # ---------------------------------------------------------------------------
