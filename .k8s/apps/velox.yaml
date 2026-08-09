@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 5d554ff2798fab9ea13f649ca19e8957073e500e
+    kubenix/hash: cdef01d12fb17729683728f4e5806d8b5fb321fd
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -29,7 +29,7 @@ spec:
   template:
     metadata:
       annotations:
-        velox.josevictor.me/config-hash: 4548ebe66f60b35b9a44badea71b94cd51361ad17bece6deb41edf20631ca55a
+        velox.josevictor.me/config-hash: f1143916a787da7e6985a4225c4b28fe0a690c2d087ce7cc01dd9de8bfbeadab
       labels:
         app.kubernetes.io/controller: main
         app.kubernetes.io/instance: velox
@@ -105,7 +105,7 @@ metadata:
     app.kubernetes.io/name: velox
     app.kubernetes.io/service: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 5d554ff2798fab9ea13f649ca19e8957073e500e
+    kubenix/hash: cdef01d12fb17729683728f4e5806d8b5fb321fd
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -134,7 +134,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 5d554ff2798fab9ea13f649ca19e8957073e500e
+    kubenix/hash: cdef01d12fb17729683728f4e5806d8b5fb321fd
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -184,6 +184,13 @@ data:
     max_body_bytes = 4194304
     shutdown_drain_ms = 10000
     shutdown_grace_ms = 30000
+
+    # Apply both input compressors globally to every configured combo.
+    [compression.rtk]
+    enabled = true
+
+    [compression.caveman]
+    enabled = true
 
     # ---------------------------------------------------------------------------
     # Providers
@@ -598,6 +605,6 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 5d554ff2798fab9ea13f649ca19e8957073e500e
+    kubenix/hash: cdef01d12fb17729683728f4e5806d8b5fb321fd
   name: velox-config
   namespace: apps
