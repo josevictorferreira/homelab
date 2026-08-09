@@ -3,7 +3,7 @@
 let
   name = "sandbox-nix";
   namespace = homelab.kubernetes.namespaces.applications;
-  image = "ghcr.io/josevictorferreira/sandbox-nix:0.1.0@sha256:0158928e91630131c724b8b66a4756f4ef3485041a025dedf07e905e6382eb75";
+  image = "ghcr.io/josevictorferreira/sandbox-nix:0.1.1@sha256:451fc43fc788be37b6d01e7205f97ed2b2c90ab8b69b986ef240934adfd42b76";
 
   # CephFS-backed workspace where project repos and task workspaces live, so
   # state (checkouts, generated files) persists across sessions.
@@ -131,6 +131,16 @@ in
                   readOnly = true;
                 }
               ];
+              # Without this the pod reports 1/1 Running while sshd is not
+              # listening, so a startup stall looks healthy and the Service
+              # keeps routing to a socket that refuses connections.
+              readinessProbe = {
+                tcpSocket.port = 22;
+                initialDelaySeconds = 5;
+                periodSeconds = 10;
+                timeoutSeconds = 3;
+                failureThreshold = 3;
+              };
               resources = {
                 requests = {
                   cpu = "100m";

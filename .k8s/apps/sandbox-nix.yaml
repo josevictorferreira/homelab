@@ -6,7 +6,7 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     app: sandbox-nix
-    kubenix/hash: 56e8b5a7aeea2eb82c2fc6bc914c66c42157013b
+    kubenix/hash: bc53ce9242d8e67995ae20c7e29b1946e561e70d
   name: sandbox-nix
   namespace: apps
 spec:
@@ -46,13 +46,20 @@ spec:
           envFrom:
             - secretRef:
                 name: sandbox-nix-env
-          image: ghcr.io/josevictorferreira/sandbox-nix:0.1.0@sha256:0158928e91630131c724b8b66a4756f4ef3485041a025dedf07e905e6382eb75
+          image: ghcr.io/josevictorferreira/sandbox-nix:0.1.1@sha256:451fc43fc788be37b6d01e7205f97ed2b2c90ab8b69b986ef240934adfd42b76
           imagePullPolicy: IfNotPresent
           name: sandbox-nix
           ports:
             - containerPort: 22
               name: ssh
               protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            tcpSocket:
+              port: 22
+            timeoutSeconds: 3
           resources:
             limits:
               cpu: 2000m
@@ -76,7 +83,7 @@ spec:
             - /bin/sh
             - -c
             - if [ ! -f /mnt/nix/.seeded ]; then rm -rf /mnt/nix/* /mnt/nix/.[!.]* 2>/dev/null || true; cp -a /nix/. /mnt/nix/ && touch /mnt/nix/.seeded; fi
-          image: ghcr.io/josevictorferreira/sandbox-nix:0.1.0@sha256:0158928e91630131c724b8b66a4756f4ef3485041a025dedf07e905e6382eb75
+          image: ghcr.io/josevictorferreira/sandbox-nix:0.1.1@sha256:451fc43fc788be37b6d01e7205f97ed2b2c90ab8b69b986ef240934adfd42b76
           imagePullPolicy: IfNotPresent
           name: seed-nix-store
           volumeMounts:
@@ -117,7 +124,7 @@ metadata:
     lbipam.cilium.io/sharing-key: sandbox-nix
   labels:
     app: sandbox-nix
-    kubenix/hash: 56e8b5a7aeea2eb82c2fc6bc914c66c42157013b
+    kubenix/hash: bc53ce9242d8e67995ae20c7e29b1946e561e70d
   name: sandbox-nix
   namespace: apps
 spec:

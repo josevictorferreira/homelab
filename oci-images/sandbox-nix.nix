@@ -126,9 +126,18 @@ let
     mkdir -p /var/empty
     chmod 755 /var/empty
 
-    # Ensure workspace is writable by the hermes-agent user.  The CephFS mount is
-    # group-managed via GID 2002; the worker also needs to traverse it.
-    chown -R 10000:2002 /workspace 2>/dev/null || true
+    # /workspace is the ROOT of the shared CephFS volume (~600k inodes), not a
+    # private scratch dir.  A recursive chown here is doubly harmful: it delays
+    # sshd by ~13 minutes on every restart (agents get "Connection refused" the
+    # whole time), and it rewrites the volume root's GID out from under the
+    # hermes gateway, whose fsGroup=100 + OnRootMismatch then makes kubelet
+    # recursively re-chown every inode on the next mount until it times out.
+    #
+    # It is also unnecessary: the volume is already owned by uid 10000, which is
+    # the same uid hermes-agent runs as here, so the tree is writable already.
+    # Only keep the root inode at the uid/gid the gateway's fsGroup expects, and
+    # never recurse.  The setgid bit on the root propagates gid 100 to new files.
+    chown 10000:100 /workspace 2>/dev/null || true
 
     # Start sshd in the foreground so the pod stays alive.
     exec /usr/bin/sshd -D -f /etc/ssh/sshd_config
@@ -137,7 +146,7 @@ let
 in
 pkgs.dockerTools.buildImage {
   name = "localhost/sandbox-nix";
-  tag = "0.1.0";
+  tag = "0.1.1";
   fromImage = baseImage;
   copyToRoot = [
     toolsRoot
