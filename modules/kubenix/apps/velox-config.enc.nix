@@ -33,6 +33,7 @@ in
       BAZAARLINK_API_KEY = kubenix.lib.secretsFor "velox_bazaarlink_api_key";
       PUTER_API_KEY = kubenix.lib.secretsFor "velox_puter_api_key";
       NANOGPT_API_KEY = kubenix.lib.secretsFor "velox_nanogpt_api_key";
+      KIMI_API_KEY = kubenix.lib.secretsFor "moonshot_api_key";
     };
   };
 }

@@ -81,6 +81,11 @@ kind = "openai-compatible"
 base_url = "https://token-plan-sgp.xiaomimimo.com/v1"
 api_key_env = "XIAOMI_MIMO_API_KEY"
 
+[providers.kimi-coding]
+kind = "anthropic"
+base_url = "https://api.kimi.com/coding"
+api_key_env = "KIMI_API_KEY"
+
 [providers.cerebras]
 kind = "openai-compatible"
 base_url = "https://api.cerebras.ai/v1"
@@ -222,6 +227,10 @@ upstream_model = "kimi-k2.7-code"
 [models.kimi-k2-7-code-nanogpt]
 provider = "nanogpt"
 upstream_model = "kimi-k2.7-code"
+
+[models.kimi-k3-kimi-coding]
+provider = "kimi-coding"
+upstream_model = "k3"
 
 [models.kimi-k3-ocgo]
 provider = "opencode-go"
@@ -377,6 +386,7 @@ targets = [
 
 [combos.kimi-k3]
 targets = [
+  { model = "kimi-k3-kimi-coding" },
   { model = "kimi-k3-ocgo" },
   { model = "kimi-k3-openrouter" },
 ]
