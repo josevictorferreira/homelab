@@ -450,12 +450,19 @@ let
               # ingress. "bookmarks" rather than "monitor" on purpose: most of
               # these answer / with a non-200 (Keycloak 302s, and several have
               # no root route), so a monitor widget would render them as down.
+              #
+              # Three groups rather than four, and no group titles: the middle
+              # column is 924px and glance's .dynamic-columns only permits 3
+              # columns below 1250px, so a fourth group wraps onto a second grid
+              # row and nearly doubles the height (434px vs 258px). Dropping the
+              # group titles (glance omits the element when the title is empty)
+              # takes it to 231px. The groups survive purely as layout columns,
+              # distinguished by colour.
               {
                 type = "bookmarks";
                 title = "Homelab";
                 groups = [
                   {
-                    title = "Apps";
                     color = "24 97 58";
                     "same-tab" = false;
                     links = [
@@ -480,11 +487,6 @@ let
                         icon = "sh:searxng";
                       }
                       {
-                        title = "SFTPGo";
-                        url = "https://sftpgo.josevictor.me";
-                        icon = "sh:sftpgo";
-                      }
-                      {
                         title = "Oratoria";
                         url = "https://oratoria.josevictor.me";
                         icon = "mdi:presentation";
@@ -492,7 +494,6 @@ let
                     ];
                   }
                   {
-                    title = "AI";
                     color = "280 60 60";
                     "same-tab" = false;
                     links = [
@@ -511,13 +512,6 @@ let
                         url = "https://hindsight.josevictor.me";
                         icon = "mdi:brain";
                       }
-                    ];
-                  }
-                  {
-                    title = "Finance";
-                    color = "150 60 55";
-                    "same-tab" = false;
-                    links = [
                       {
                         title = "Valoris";
                         url = "https://valoris.josevictor.me";
@@ -531,7 +525,6 @@ let
                     ];
                   }
                   {
-                    title = "Infra";
                     color = "209 88 54";
                     "same-tab" = false;
                     links = [
@@ -549,6 +542,11 @@ let
                         title = "Keycloak";
                         url = "https://identity.josevictor.me";
                         icon = "sh:keycloak";
+                      }
+                      {
+                        title = "SFTPGo";
+                        url = "https://sftpgo.josevictor.me";
+                        icon = "sh:sftpgo";
                       }
                     ];
                   }
