@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: cdef01d12fb17729683728f4e5806d8b5fb321fd
+    kubenix/hash: 382a16240e41ca6861752eaa3fefff552f6e6798
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -29,7 +29,7 @@ spec:
   template:
     metadata:
       annotations:
-        velox.josevictor.me/config-hash: f1143916a787da7e6985a4225c4b28fe0a690c2d087ce7cc01dd9de8bfbeadab
+        velox.josevictor.me/config-hash: 155644a2e6aff7a6ef25fcbf72c4d989ffa50ad070c9cc96d0175bbb8a4b5b71
       labels:
         app.kubernetes.io/controller: main
         app.kubernetes.io/instance: velox
@@ -105,7 +105,7 @@ metadata:
     app.kubernetes.io/name: velox
     app.kubernetes.io/service: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: cdef01d12fb17729683728f4e5806d8b5fb321fd
+    kubenix/hash: 382a16240e41ca6861752eaa3fefff552f6e6798
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -134,7 +134,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: cdef01d12fb17729683728f4e5806d8b5fb321fd
+    kubenix/hash: 382a16240e41ca6861752eaa3fefff552f6e6798
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -243,6 +243,11 @@ data:
     kind = "openai-compatible"
     base_url = "https://token-plan-sgp.xiaomimimo.com/v1"
     api_key_env = "XIAOMI_MIMO_API_KEY"
+
+    [providers.kimi-coding]
+    kind = "anthropic"
+    base_url = "https://api.kimi.com/coding"
+    api_key_env = "KIMI_API_KEY"
 
     [providers.cerebras]
     kind = "openai-compatible"
@@ -385,6 +390,10 @@ data:
     [models.kimi-k2-7-code-nanogpt]
     provider = "nanogpt"
     upstream_model = "kimi-k2.7-code"
+
+    [models.kimi-k3-kimi-coding]
+    provider = "kimi-coding"
+    upstream_model = "k3"
 
     [models.kimi-k3-ocgo]
     provider = "opencode-go"
@@ -540,6 +549,7 @@ data:
 
     [combos.kimi-k3]
     targets = [
+      { model = "kimi-k3-kimi-coding" },
       { model = "kimi-k3-ocgo" },
       { model = "kimi-k3-openrouter" },
     ]
@@ -605,6 +615,6 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: cdef01d12fb17729683728f4e5806d8b5fb321fd
+    kubenix/hash: 382a16240e41ca6861752eaa3fefff552f6e6798
   name: velox-config
   namespace: apps

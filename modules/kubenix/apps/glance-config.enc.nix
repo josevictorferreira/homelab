@@ -446,6 +446,147 @@ let
           {
             size = "full";
             widgets = [
+              # Links to every service currently running with 1+ replicas and a
+              # public ingress. Deliberately "bookmarks" and not "monitor":
+              # 12 of these 20 answer / with a non-200 (Keycloak 302s, blocky
+              # 503s, velox and homelab-bridge have no root route), so a
+              # monitor widget would render most of the homelab as down.
+              {
+                type = "bookmarks";
+                title = "Homelab";
+                groups = [
+                  {
+                    title = "Apps";
+                    color = "24 97 58";
+                    "same-tab" = false;
+                    links = [
+                      {
+                        title = "Home Assistant";
+                        url = "https://home.josevictor.me";
+                        icon = "sh:home-assistant";
+                      }
+                      {
+                        title = "Calibre-Web";
+                        url = "https://calibre.josevictor.me";
+                        icon = "sh:calibre-web";
+                      }
+                      {
+                        title = "Readeck";
+                        url = "https://readeck.josevictor.me";
+                        icon = "sh:readeck";
+                      }
+                      {
+                        title = "SearXNG";
+                        url = "https://searxng.josevictor.me";
+                        icon = "sh:searxng";
+                      }
+                      {
+                        title = "Matrix";
+                        url = "https://matrix.josevictor.me";
+                        # base "matrix" icon is #040404 and vanishes on the
+                        # dark theme; -light is the inverted variant
+                        icon = "sh:matrix-light";
+                      }
+                      {
+                        title = "SFTPGo";
+                        url = "https://sftpgo.josevictor.me";
+                        icon = "sh:sftpgo";
+                      }
+                      {
+                        title = "Oratoria";
+                        url = "https://oratoria.josevictor.me";
+                        icon = "mdi:presentation";
+                      }
+                      {
+                        title = "Dramaturge";
+                        url = "https://dramaturge.josevictor.me";
+                        icon = "mdi:drama-masks";
+                      }
+                    ];
+                  }
+                  {
+                    title = "AI";
+                    color = "280 60 60";
+                    "same-tab" = false;
+                    links = [
+                      {
+                        title = "Hermes";
+                        url = "https://hermes.josevictor.me";
+                        icon = "sh:hermes-agent";
+                      }
+                      {
+                        title = "OmniRoute";
+                        url = "https://omniroute.josevictor.me";
+                        icon = "sh:omniroute";
+                      }
+                      {
+                        title = "Hindsight";
+                        url = "https://hindsight.josevictor.me";
+                        icon = "mdi:brain";
+                      }
+                      {
+                        title = "Velox";
+                        url = "https://velox.josevictor.me";
+                        icon = "mdi:lightning-bolt";
+                      }
+                    ];
+                  }
+                  {
+                    title = "Finance";
+                    color = "150 60 55";
+                    "same-tab" = false;
+                    links = [
+                      {
+                        title = "Valoris";
+                        url = "https://valoris.josevictor.me";
+                        icon = "mdi:chart-line";
+                      }
+                      {
+                        title = "Wealtho";
+                        url = "https://wealtho.josevictor.me";
+                        icon = "mdi:wallet";
+                      }
+                      {
+                        title = "Personal Finances";
+                        url = "https://personal-finances.josevictor.me";
+                        icon = "mdi:cash-multiple";
+                      }
+                    ];
+                  }
+                  {
+                    title = "Infra";
+                    color = "209 88 54";
+                    "same-tab" = false;
+                    links = [
+                      {
+                        title = "Grafana";
+                        url = "https://grafana.josevictor.me";
+                        icon = "sh:grafana";
+                      }
+                      {
+                        title = "Ceph";
+                        url = "https://ceph.josevictor.me";
+                        icon = "sh:ceph";
+                      }
+                      {
+                        title = "Keycloak";
+                        url = "https://identity.josevictor.me";
+                        icon = "sh:keycloak";
+                      }
+                      {
+                        title = "Blocky";
+                        url = "https://blocky.josevictor.me";
+                        icon = "sh:blocky";
+                      }
+                      {
+                        title = "Homelab Bridge";
+                        url = "https://homelab-bridge.josevictor.me";
+                        icon = "mdi:transit-connection-variant";
+                      }
+                    ];
+                  }
+                ];
+              }
               {
                 type = "group";
                 widgets = [
