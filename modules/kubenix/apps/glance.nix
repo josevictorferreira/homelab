@@ -1,5 +1,23 @@
-{ homelab, ... }:
+{ homelab, kubenix, ... }:
 
+let
+  # A subPath-mounted ConfigMap is never refreshed by the kubelet, and a
+  # ConfigMap-only change leaves the Deployment spec untouched, so Flux would
+  # apply the new config while the running pod keeps the old one indefinitely
+  # (see apps/AGENTS.md). Hashing the content into a pod annotation makes any
+  # config edit roll the Deployment.
+  #
+  # The config lives in a sibling .enc.nix file because it embeds secrets, and
+  # every file under modules/kubenix/ gets its own evalModules call, so the
+  # rendered YAML has to be imported directly instead of read from module state.
+  # The hash covers the pre-vals text, so editing the config rolls the pod but
+  # rotating only a secret value does not.
+  glanceConfigYaml =
+    (import ./glance-config.enc.nix { inherit homelab kubenix; })
+    .kubernetes.resources.configMaps."glance".data."glance.yml";
+
+  configHash = builtins.hashString "sha256" glanceConfigYaml;
+in
 {
   submodules.instances.glance = {
     submodule = "release";
@@ -27,6 +45,8 @@
       };
 
       values = {
+        controllers.main.pod.annotations."glance.josevictor.me/config-hash" = configHash;
+
         defaultPodOptions.affinity = homelab.kubernetes.affinities.piNode;
         defaultPodOptions.tolerations = [
           {
