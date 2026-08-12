@@ -557,24 +557,6 @@ let
                 widgets = [
                   { type = "hacker-news"; }
                   { type = "lobsters"; }
-                ];
-              }
-              {
-                type = "videos";
-                cache = "1h";
-                channels = [
-                  "UCOuGATIAbd2DvzJmUgXn2IQ" # Network Chuck
-                  "UCHnyfMqiRRG1u-2MsSQLbXA" # Veritasium
-                  "UCR-DXc1voovS8nhAvccRZhg" # Jeff Geerling
-                  "UCpMcsdZf2KkAnfmxiq2MfMQ" # Arvin Ash
-                  "UC9PIn6-XuRKZ5HmYeu46AIw" # Barely Sociable
-                  "UCqnYRbOnwVAWU6plY904eAg" # VULDAR
-                  "UC_zBdZ0_H_jn41FDRG7q4Tw" # Vimjoyer
-                ];
-              }
-              {
-                type = "group";
-                widgets = [
                   {
                     type = "reddit";
                     subreddit = "selfhosted";
@@ -595,6 +577,19 @@ let
                     subreddit = "StableDiffusion";
                     "show-thumbnails" = true;
                   }
+                ];
+              }
+              {
+                type = "videos";
+                cache = "1h";
+                channels = [
+                  "UCOuGATIAbd2DvzJmUgXn2IQ" # Network Chuck
+                  "UCHnyfMqiRRG1u-2MsSQLbXA" # Veritasium
+                  "UCR-DXc1voovS8nhAvccRZhg" # Jeff Geerling
+                  "UCpMcsdZf2KkAnfmxiq2MfMQ" # Arvin Ash
+                  "UC9PIn6-XuRKZ5HmYeu46AIw" # Barely Sociable
+                  "UCqnYRbOnwVAWU6plY904eAg" # VULDAR
+                  "UC_zBdZ0_H_jn41FDRG7q4Tw" # Vimjoyer
                 ];
               }
             ];
