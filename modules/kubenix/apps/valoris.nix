@@ -131,8 +131,10 @@ in
           limits = {
             memory = "1Gi";
           };
+          # Peaks near the limit while scraping; the 2.5Gi Pi evicts anything
+          # far above its request, so keep this close to real usage.
           requests = {
-            memory = "256Mi";
+            memory = "512Mi";
           };
         };
         priorityClassName = "preemptible";
@@ -156,6 +158,11 @@ in
               { secretRef.name = secretName; }
               { secretRef.name = "valoris-s3"; }
             ];
+            env = {
+              # One scraping job at a time. The default of 3 pushed peak memory
+              # to ~925Mi and got the pod evicted off the Pi, failing in-flight jobs.
+              JOB_THREADS.value = "1";
+            };
           };
         };
       };
