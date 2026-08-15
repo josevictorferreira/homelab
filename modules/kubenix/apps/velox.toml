@@ -124,6 +124,10 @@ api_key_env = "NANOGPT_API_KEY"
 # providers stays addressable.
 # ---------------------------------------------------------------------------
 
+[models.glm-5-3-zai]
+provider = "glm"
+upstream_model = "glm-5.3"
+
 [models.glm-5-2-zai]
 provider = "glm"
 upstream_model = "glm-5.2"
@@ -139,6 +143,10 @@ upstream_model = "glm-5.1"
 [models.glm-4-5-air-zai]
 provider = "glm"
 upstream_model = "glm-4.5-air"
+
+[models.glm-5-3-ocgo]
+provider = "opencode-go"
+upstream_model = "glm-5.3"
 
 [models.glm-5-2-ocgo]
 provider = "opencode-go"
@@ -308,6 +316,12 @@ upstream_model = "google/gemini-3.1-flash-lite-preview"
 targets = [
   { model = "qwen3-6-35b-yoloauto" },
   { model = "glm-4-5-air-zai" },
+]
+
+[combos.glm-5-3]
+targets = [
+  { model = "glm-5-3-zai" },
+  { model = "glm-5-3-ocgo" },
 ]
 
 [combos.glm-5-2]

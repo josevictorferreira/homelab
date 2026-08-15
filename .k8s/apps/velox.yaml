@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 382a16240e41ca6861752eaa3fefff552f6e6798
+    kubenix/hash: eee68fc9fbb5d057323def65d1d4a61da3673cae
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -29,7 +29,7 @@ spec:
   template:
     metadata:
       annotations:
-        velox.josevictor.me/config-hash: 155644a2e6aff7a6ef25fcbf72c4d989ffa50ad070c9cc96d0175bbb8a4b5b71
+        velox.josevictor.me/config-hash: 2a8ce978959c4212c14e84959e9c870e479be0deb4c379092a39c90e54e32249
       labels:
         app.kubernetes.io/controller: main
         app.kubernetes.io/instance: velox
@@ -105,7 +105,7 @@ metadata:
     app.kubernetes.io/name: velox
     app.kubernetes.io/service: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 382a16240e41ca6861752eaa3fefff552f6e6798
+    kubenix/hash: eee68fc9fbb5d057323def65d1d4a61da3673cae
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -134,7 +134,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 382a16240e41ca6861752eaa3fefff552f6e6798
+    kubenix/hash: eee68fc9fbb5d057323def65d1d4a61da3673cae
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -287,6 +287,10 @@ data:
     # providers stays addressable.
     # ---------------------------------------------------------------------------
 
+    [models.glm-5-3-zai]
+    provider = "glm"
+    upstream_model = "glm-5.3"
+
     [models.glm-5-2-zai]
     provider = "glm"
     upstream_model = "glm-5.2"
@@ -302,6 +306,10 @@ data:
     [models.glm-4-5-air-zai]
     provider = "glm"
     upstream_model = "glm-4.5-air"
+
+    [models.glm-5-3-ocgo]
+    provider = "opencode-go"
+    upstream_model = "glm-5.3"
 
     [models.glm-5-2-ocgo]
     provider = "opencode-go"
@@ -473,6 +481,12 @@ data:
       { model = "glm-4-5-air-zai" },
     ]
 
+    [combos.glm-5-3]
+    targets = [
+      { model = "glm-5-3-zai" },
+      { model = "glm-5-3-ocgo" },
+    ]
+
     [combos.glm-5-2]
     targets = [
       { model = "glm-5-2-zai" },
@@ -615,6 +629,6 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 382a16240e41ca6861752eaa3fefff552f6e6798
+    kubenix/hash: eee68fc9fbb5d057323def65d1d4a61da3673cae
   name: velox-config
   namespace: apps
