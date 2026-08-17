@@ -29,6 +29,13 @@ if [ -n "$all_staged" ]; then
     cp ".gitleaksignore" "$temp_dir/"
   fi
 
+  # Copy .gitleaks.toml too. gitleaks reads its config from the --source dir, so
+  # without this the scan below silently runs on defaults and the repo allowlist
+  # (generated .k8s manifests, known-benign checksum hashes) never applies.
+  if [ -f ".gitleaks.toml" ]; then
+    cp ".gitleaks.toml" "$temp_dir/"
+  fi
+
   # Run gitleaks on the temp directory with staged content
   if ! (cd "$temp_dir" && gitleaks detect --source="." --no-git --verbose --exit-code=1) 2>&1; then
     echo ""
