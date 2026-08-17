@@ -48,9 +48,8 @@ let
   # every reconcile. Bootstrap it manually per the runbook:
   #   kubectl -n ${namespace} create secret generic ${oauthStateSecret} --from-literal=.bootstrap=1
   agentConfig = ''
-    # velox-oauth-agent config. Zero credentials: inert until the operator
-    # adds approved [credentials.*] entries. Never put secret values here;
-    # client_secret_env would name an env var injected from ${secretName}.
+    # velox-oauth-agent config. Never put secret values here; client_secret_env
+    # names an env var injected from ${secretName}.
     #
     # Credential shapes and the login/rollout procedure:
     # docs/oauth-operator-runbook.md in the velox repo.
@@ -66,6 +65,19 @@ let
 
     [runtime]
     dir = "/oauth-runtime"
+
+    [credentials.antigravity-primary]
+    provider = "antigravity"
+    client_id = "APPROVED-ANTIGRAVITY-CLIENT-ID"
+    client_secret_env = "ANTIGRAVITY_CLIENT_SECRET"
+    authorize_url = "https://accounts.google.com/o/oauth2/v2/auth"
+    token_url = "https://oauth2.googleapis.com/token"
+    scopes = [
+      "https://www.googleapis.com/auth/cloud-platform"
+    ]
+    metadata_url = "https://cloudcode-pa.googleapis.com/v1internal:loadCodeAssist"
+    metadata_body_json = "{\"metadata\":{}}"
+    metadata_extract = "cloudaicompanionProject"
   '';
   agentConfigHash = builtins.hashString "sha256" agentConfig;
 in
@@ -256,11 +268,10 @@ in
               };
             };
           };
-          # When a credential uses a confidential client, inject its secret as
-          # an env var here from the sops-managed ${secretName} Secret, e.g.:
-          # env.ANTIGRAVITY_CLIENT_SECRET.valueFrom.secretKeyRef = {
-          #   name = secretName; key = "ANTIGRAVITY_CLIENT_SECRET";
-          # };
+          env.ANTIGRAVITY_CLIENT_SECRET.valueFrom.secretKeyRef = {
+            name = secretName;
+            key = "ANTIGRAVITY_CLIENT_SECRET";
+          };
         };
 
         persistence.config = {

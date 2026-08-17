@@ -39,50 +39,21 @@ in
           configuration = {
             trash.enabled = true;
             trash.days = 30;
+            # No machine-learning pod deployed; keep the server from queueing
+            # smart-search/face-detection jobs against a service that is gone.
+            machineLearning.enabled = false;
           };
 
           metrics.enabled = true;
         };
 
-        machine-learning = {
-          enabled = true;
-
-          controllers.main = {
-            replicas = 0;
-            containers.main = {
-              image = {
-                repository = "ghcr.io/immich-app/immich-machine-learning";
-                tag = "v2.7.2";
-                pullPolicy = "IfNotPresent";
-              };
-              resources = {
-                requests = {
-                  cpu = "100m";
-                  memory = "256Mi";
-                };
-                limits = {
-                  cpu = "500m";
-                  memory = "1Gi";
-                };
-              };
-            };
-          };
-
-          env.TRANSFORMERS_CACHE = "/cache";
-
-          persistence.cache = {
-            enabled = true;
-            size = "20Gi";
-            type = "persistentVolumeClaim";
-            accessMode = "ReadWriteOnce";
-            storageClass = kubenix.lib.defaultStorageClass;
-          };
-        };
+        # Disabled: the inference workload is too compute intensive for this cluster.
+        machine-learning.enabled = false;
 
         server = {
           enabled = true;
           controllers.main = {
-            replicas = 0;
+            replicas = 1;
             pod.priorityClassName = "preemptible";
           };
           controllers.main.containers.main = {

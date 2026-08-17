@@ -34,6 +34,9 @@ in
       PUTER_API_KEY = kubenix.lib.secretsFor "velox_puter_api_key";
       NANOGPT_API_KEY = kubenix.lib.secretsFor "velox_nanogpt_api_key";
       KIMI_API_KEY = kubenix.lib.secretsFor "moonshot_api_key";
+
+      # OAuth credential agent sidecar environment variables
+      ANTIGRAVITY_CLIENT_SECRET = kubenix.lib.secretsFor "velox_antigravity_client_secret";
     };
   };
 }
