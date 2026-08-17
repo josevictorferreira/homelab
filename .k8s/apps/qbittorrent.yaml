@@ -12,7 +12,7 @@ metadata:
     app.kubernetes.io/version: 5.1.4
     helm-revision: "1"
     helm.sh/chart: qbittorrent-24.2.20
-    kubenix/hash: fc546fae7a380758bd9c3d32b689e2e671c03259
+    kubenix/hash: ce1ccd18d8fbf5b3efefceabfeafea7d5514596e
     release: qbittorrent
   name: qbittorrent
   namespace: apps
@@ -430,7 +430,7 @@ metadata:
     app.kubernetes.io/version: 5.1.4
     helm-revision: "1"
     helm.sh/chart: qbittorrent-24.2.20
-    kubenix/hash: fc546fae7a380758bd9c3d32b689e2e671c03259
+    kubenix/hash: ce1ccd18d8fbf5b3efefceabfeafea7d5514596e
     release: qbittorrent
   name: qbittorrent-config
   namespace: apps
@@ -458,7 +458,7 @@ metadata:
     app.kubernetes.io/version: 5.1.4
     helm-revision: "1"
     helm.sh/chart: qbittorrent-24.2.20
-    kubenix/hash: fc546fae7a380758bd9c3d32b689e2e671c03259
+    kubenix/hash: ce1ccd18d8fbf5b3efefceabfeafea7d5514596e
     release: qbittorrent
     service.name: main
   name: qbittorrent
@@ -491,7 +491,7 @@ metadata:
     app.kubernetes.io/version: 5.1.4
     helm-revision: "1"
     helm.sh/chart: qbittorrent-24.2.20
-    kubenix/hash: fc546fae7a380758bd9c3d32b689e2e671c03259
+    kubenix/hash: ce1ccd18d8fbf5b3efefceabfeafea7d5514596e
     release: qbittorrent
     service.name: torrent
   name: qbittorrent-torrent
@@ -517,7 +517,6 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
-    cert-manager.io/cluster-issuer: cloudflare-issuer
     checksum/secrets: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
     checksum/services: 679331a7d47999fc30ce1c03b38556d783771376cb312c79190d3c5f7419adb7
     kubenix/k8s-version: "1.32"
@@ -530,7 +529,7 @@ metadata:
     app.kubernetes.io/version: 5.1.4
     helm-revision: "1"
     helm.sh/chart: qbittorrent-24.2.20
-    kubenix/hash: fc546fae7a380758bd9c3d32b689e2e671c03259
+    kubenix/hash: ce1ccd18d8fbf5b3efefceabfeafea7d5514596e
     release: qbittorrent
   name: qbittorrent
   namespace: apps

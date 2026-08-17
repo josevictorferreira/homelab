@@ -176,9 +176,7 @@ in
           ingress.main = {
             enabled = true;
             className = kubenix.lib.defaultIngressClass;
-            annotations = {
-              "cert-manager.io/cluster-issuer" = kubenix.lib.defaultClusterIssuer;
-            };
+            annotations = { };
             hosts = [
               {
                 host = kubenix.lib.domainFor "hindsight";

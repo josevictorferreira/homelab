@@ -291,7 +291,7 @@ in
     ingresses.${name} = {
       metadata = {
         inherit name namespace;
-        annotations."cert-manager.io/cluster-issuer" = kubenix.lib.defaultClusterIssuer;
+        annotations = { };
       };
       spec = {
         ingressClassName = kubenix.lib.defaultIngressClass;

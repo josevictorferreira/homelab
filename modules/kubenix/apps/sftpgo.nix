@@ -113,9 +113,7 @@ in
         ui.ingress = {
           enabled = true;
           className = kubenix.lib.defaultIngressClass;
-          annotations = {
-            "cert-manager.io/cluster-issuer" = kubenix.lib.defaultClusterIssuer;
-          };
+          annotations = { };
           tls = [
             {
               secretName = kubenix.lib.defaultTLSSecret;
@@ -138,9 +136,7 @@ in
         api.ingress = {
           enabled = true;
           className = kubenix.lib.defaultIngressClass;
-          annotations = {
-            "cert-manager.io/cluster-issuer" = kubenix.lib.defaultClusterIssuer;
-          };
+          annotations = { };
           tls = [
             {
               secretName = kubenix.lib.defaultTLSSecret;

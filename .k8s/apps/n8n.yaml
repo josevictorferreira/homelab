@@ -10,7 +10,7 @@ metadata:
     app: n8n
     chart: n8n-1.15.5
     heritage: Helm
-    kubenix/hash: 18427fa4f225b5e8ced500c67d2ffbb92ee0a6b7
+    kubenix/hash: c2e6a43d34af1d3d543b394ea60ede5713179eda
     release: n8n
   name: n8n-binary-data-configmap
   namespace: apps
@@ -34,7 +34,7 @@ metadata:
     app: n8n
     chart: n8n-1.15.5
     heritage: Helm
-    kubenix/hash: 18427fa4f225b5e8ced500c67d2ffbb92ee0a6b7
+    kubenix/hash: c2e6a43d34af1d3d543b394ea60ede5713179eda
     release: n8n
   name: n8n-database-configmap
   namespace: apps
@@ -57,7 +57,7 @@ metadata:
     app: n8n
     chart: n8n-1.15.5
     heritage: Helm
-    kubenix/hash: 18427fa4f225b5e8ced500c67d2ffbb92ee0a6b7
+    kubenix/hash: c2e6a43d34af1d3d543b394ea60ede5713179eda
     release: n8n
   name: n8n-diagnostics-configmap
   namespace: apps
@@ -75,7 +75,7 @@ metadata:
     app: n8n
     chart: n8n-1.15.5
     heritage: Helm
-    kubenix/hash: 18427fa4f225b5e8ced500c67d2ffbb92ee0a6b7
+    kubenix/hash: c2e6a43d34af1d3d543b394ea60ede5713179eda
     release: n8n
   name: n8n-logging-configmap
   namespace: apps
@@ -104,7 +104,7 @@ metadata:
     app: n8n
     chart: n8n-1.15.5
     heritage: Helm
-    kubenix/hash: 18427fa4f225b5e8ced500c67d2ffbb92ee0a6b7
+    kubenix/hash: c2e6a43d34af1d3d543b394ea60ede5713179eda
     release: n8n
   name: n8n-metrics-configmap
   namespace: apps
@@ -123,7 +123,7 @@ metadata:
     app: n8n
     chart: n8n-1.15.5
     heritage: Helm
-    kubenix/hash: 18427fa4f225b5e8ced500c67d2ffbb92ee0a6b7
+    kubenix/hash: c2e6a43d34af1d3d543b394ea60ede5713179eda
     release: n8n
   name: n8n-public-api-configmap
   namespace: apps
@@ -144,7 +144,7 @@ metadata:
     app: n8n
     chart: n8n-1.15.5
     heritage: Helm
-    kubenix/hash: 18427fa4f225b5e8ced500c67d2ffbb92ee0a6b7
+    kubenix/hash: c2e6a43d34af1d3d543b394ea60ede5713179eda
     release: n8n
   name: n8n-task-broker-configmap
   namespace: apps
@@ -161,7 +161,7 @@ metadata:
     app: n8n
     chart: n8n-1.15.5
     heritage: Helm
-    kubenix/hash: 18427fa4f225b5e8ced500c67d2ffbb92ee0a6b7
+    kubenix/hash: c2e6a43d34af1d3d543b394ea60ede5713179eda
     release: n8n
   name: n8n-version-notifications-configmap
   namespace: apps
@@ -179,7 +179,7 @@ metadata:
     app: n8n
     chart: n8n-1.15.5
     heritage: Helm
-    kubenix/hash: 18427fa4f225b5e8ced500c67d2ffbb92ee0a6b7
+    kubenix/hash: c2e6a43d34af1d3d543b394ea60ede5713179eda
     release: n8n
   name: n8n-workflow-history-configmap
   namespace: apps
@@ -198,7 +198,7 @@ metadata:
     app.kubernetes.io/part-of: n8n
     app.kubernetes.io/version: 1.110.1
     helm.sh/chart: n8n-1.15.5
-    kubenix/hash: 18427fa4f225b5e8ced500c67d2ffbb92ee0a6b7
+    kubenix/hash: c2e6a43d34af1d3d543b394ea60ede5713179eda
   name: n8n
   namespace: apps
 spec:
@@ -227,7 +227,7 @@ metadata:
     app.kubernetes.io/part-of: n8n
     app.kubernetes.io/version: 1.110.1
     helm.sh/chart: n8n-1.15.5
-    kubenix/hash: 18427fa4f225b5e8ced500c67d2ffbb92ee0a6b7
+    kubenix/hash: c2e6a43d34af1d3d543b394ea60ede5713179eda
   name: n8n
   namespace: apps
 ---
@@ -235,7 +235,6 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
-    cert-manager.io/cluster-issuer: cloudflare-issuer
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
@@ -246,7 +245,7 @@ metadata:
     app.kubernetes.io/part-of: n8n
     app.kubernetes.io/version: 1.110.1
     helm.sh/chart: n8n-1.15.5
-    kubenix/hash: 18427fa4f225b5e8ced500c67d2ffbb92ee0a6b7
+    kubenix/hash: c2e6a43d34af1d3d543b394ea60ede5713179eda
   name: n8n
   namespace: apps
 spec:
@@ -274,7 +273,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 18427fa4f225b5e8ced500c67d2ffbb92ee0a6b7
+    kubenix/hash: c2e6a43d34af1d3d543b394ea60ede5713179eda
   name: n8n-s3
   namespace: apps
 spec:
@@ -295,7 +294,7 @@ metadata:
     app.kubernetes.io/part-of: n8n
     app.kubernetes.io/version: 1.110.1
     helm.sh/chart: n8n-1.15.5
-    kubenix/hash: 18427fa4f225b5e8ced500c67d2ffbb92ee0a6b7
+    kubenix/hash: c2e6a43d34af1d3d543b394ea60ede5713179eda
   name: n8n
   namespace: apps
 spec:

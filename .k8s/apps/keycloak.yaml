@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/name: keycloak
     app.kubernetes.io/version: 26.5.2
     helm.sh/chart: keycloak-0.14.2
-    kubenix/hash: 90e90b2754bc7719d0276b3b9e310f70b26ccf3c
+    kubenix/hash: 91bde3105499e2d0f0f703c90a9c36148f235eef
   name: keycloak
   namespace: apps
 spec:
@@ -226,7 +226,7 @@ metadata:
     app.kubernetes.io/name: keycloak
     app.kubernetes.io/version: 26.5.2
     helm.sh/chart: keycloak-0.14.2
-    kubenix/hash: 90e90b2754bc7719d0276b3b9e310f70b26ccf3c
+    kubenix/hash: 91bde3105499e2d0f0f703c90a9c36148f235eef
   name: keycloak
   namespace: apps
 spec:
@@ -252,7 +252,7 @@ metadata:
     app.kubernetes.io/name: keycloak
     app.kubernetes.io/version: 26.5.2
     helm.sh/chart: keycloak-0.14.2
-    kubenix/hash: 90e90b2754bc7719d0276b3b9e310f70b26ccf3c
+    kubenix/hash: 91bde3105499e2d0f0f703c90a9c36148f235eef
   name: keycloak-headless
   namespace: apps
 spec:
@@ -272,7 +272,6 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
-    cert-manager.io/cluster-issuer: cloudflare-issuer
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
     kubernetes.io/ingress.class: cilium
@@ -282,7 +281,7 @@ metadata:
     app.kubernetes.io/name: keycloak
     app.kubernetes.io/version: 26.5.2
     helm.sh/chart: keycloak-0.14.2
-    kubenix/hash: 90e90b2754bc7719d0276b3b9e310f70b26ccf3c
+    kubenix/hash: 91bde3105499e2d0f0f703c90a9c36148f235eef
   name: keycloak
   namespace: apps
 spec:

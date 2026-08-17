@@ -7,7 +7,7 @@ metadata:
   labels:
     app: hermes-agent
     component: dashboard
-    kubenix/hash: c9aee48f9ea605eb0c3a4284f1c358aa4f8bfa5b
+    kubenix/hash: a5a7ac4e0fd9027c8299b10607c0a196233ccca2
   name: hermes-agent-dashboard
   namespace: apps
 spec:
@@ -127,7 +127,7 @@ metadata:
   labels:
     app: hermes-agent
     component: gateway
-    kubenix/hash: c9aee48f9ea605eb0c3a4284f1c358aa4f8bfa5b
+    kubenix/hash: a5a7ac4e0fd9027c8299b10607c0a196233ccca2
   name: hermes-agent-gateway
   namespace: apps
 spec:
@@ -554,7 +554,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: c9aee48f9ea605eb0c3a4284f1c358aa4f8bfa5b
+    kubenix/hash: a5a7ac4e0fd9027c8299b10607c0a196233ccca2
   name: hermes-agent-cli-wrapper
   namespace: apps
 ---
@@ -566,7 +566,7 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     app: hermes-agent
-    kubenix/hash: c9aee48f9ea605eb0c3a4284f1c358aa4f8bfa5b
+    kubenix/hash: a5a7ac4e0fd9027c8299b10607c0a196233ccca2
   name: hermes-agent-dashboard
   namespace: apps
 spec:
@@ -584,11 +584,10 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
-    cert-manager.io/cluster-issuer: cloudflare-issuer
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: c9aee48f9ea605eb0c3a4284f1c358aa4f8bfa5b
+    kubenix/hash: a5a7ac4e0fd9027c8299b10607c0a196233ccca2
   name: hermes-agent-dashboard
   namespace: apps
 spec:
@@ -617,7 +616,7 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     app: hermes-agent
-    kubenix/hash: c9aee48f9ea605eb0c3a4284f1c358aa4f8bfa5b
+    kubenix/hash: a5a7ac4e0fd9027c8299b10607c0a196233ccca2
   name: hermes-agent-readonly
 rules:
   - apiGroups:
@@ -659,7 +658,7 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     app: hermes-agent
-    kubenix/hash: c9aee48f9ea605eb0c3a4284f1c358aa4f8bfa5b
+    kubenix/hash: a5a7ac4e0fd9027c8299b10607c0a196233ccca2
   name: hermes-agent-readonly
 roleRef:
   apiGroup: rbac.authorization.k8s.io

@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/name: sftpgo
     app.kubernetes.io/version: 2.7.4
     helm.sh/chart: sftpgo-0.47.0
-    kubenix/hash: e2af4f1c05501dfc4faa10a72e4588ff4eab1e21
+    kubenix/hash: 4232e1a79caec9d3d1a00395721446b9c273b54d
   name: sftpgo
   namespace: apps
 spec:
@@ -124,7 +124,7 @@ metadata:
     app.kubernetes.io/name: sftpgo
     app.kubernetes.io/version: 2.7.4
     helm.sh/chart: sftpgo-0.47.0
-    kubenix/hash: e2af4f1c05501dfc4faa10a72e4588ff4eab1e21
+    kubenix/hash: 4232e1a79caec9d3d1a00395721446b9c273b54d
   name: sftpgo
   namespace: apps
 ---
@@ -142,7 +142,7 @@ metadata:
     app.kubernetes.io/name: sftpgo
     app.kubernetes.io/version: 2.7.4
     helm.sh/chart: sftpgo-0.47.0
-    kubenix/hash: e2af4f1c05501dfc4faa10a72e4588ff4eab1e21
+    kubenix/hash: 4232e1a79caec9d3d1a00395721446b9c273b54d
   name: sftpgo
   namespace: apps
 spec:
@@ -167,7 +167,7 @@ metadata:
     app.kubernetes.io/name: sftpgo
     app.kubernetes.io/version: 2.7.4
     helm.sh/chart: sftpgo-0.47.0
-    kubenix/hash: e2af4f1c05501dfc4faa10a72e4588ff4eab1e21
+    kubenix/hash: 4232e1a79caec9d3d1a00395721446b9c273b54d
   name: sftpgo
   namespace: apps
 spec:
@@ -266,7 +266,7 @@ metadata:
     app.kubernetes.io/name: sftpgo
     app.kubernetes.io/version: 2.7.4
     helm.sh/chart: sftpgo-0.47.0
-    kubenix/hash: e2af4f1c05501dfc4faa10a72e4588ff4eab1e21
+    kubenix/hash: 4232e1a79caec9d3d1a00395721446b9c273b54d
   name: sftpgo
   namespace: apps
 ---
@@ -274,7 +274,6 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
-    cert-manager.io/cluster-issuer: cloudflare-issuer
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
@@ -283,7 +282,7 @@ metadata:
     app.kubernetes.io/name: sftpgo
     app.kubernetes.io/version: 2.7.4
     helm.sh/chart: sftpgo-0.47.0
-    kubenix/hash: e2af4f1c05501dfc4faa10a72e4588ff4eab1e21
+    kubenix/hash: 4232e1a79caec9d3d1a00395721446b9c273b54d
   name: sftpgo-api
   namespace: apps
 spec:
@@ -308,7 +307,6 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
-    cert-manager.io/cluster-issuer: cloudflare-issuer
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
@@ -317,7 +315,7 @@ metadata:
     app.kubernetes.io/name: sftpgo
     app.kubernetes.io/version: 2.7.4
     helm.sh/chart: sftpgo-0.47.0
-    kubenix/hash: e2af4f1c05501dfc4faa10a72e4588ff4eab1e21
+    kubenix/hash: 4232e1a79caec9d3d1a00395721446b9c273b54d
   name: sftpgo-ui
   namespace: apps
 spec:

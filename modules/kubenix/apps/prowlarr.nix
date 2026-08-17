@@ -95,9 +95,7 @@ in
           enabled = true;
           primary = true;
           ingressClassName = kubenix.lib.defaultIngressClass;
-          annotations = {
-            "cert-manager.io/cluster-issuer" = kubenix.lib.defaultClusterIssuer;
-          };
+          annotations = { };
           hosts = [
             { host = "prowlarr.${homelab.domain}"; }
           ];

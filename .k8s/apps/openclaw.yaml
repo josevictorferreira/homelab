@@ -6,7 +6,7 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     app: openclaw
-    kubenix/hash: f804f9a4fe7f4e006dd34f855caf470fe0986545
+    kubenix/hash: 7c5fd99016fca25b893ae54896a5737e30c6b47a
   name: openclaw
   namespace: apps
 spec:
@@ -202,7 +202,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: f804f9a4fe7f4e006dd34f855caf470fe0986545
+    kubenix/hash: 7c5fd99016fca25b893ae54896a5737e30c6b47a
   name: openclaw-local
   namespace: apps
 spec:
@@ -220,7 +220,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: f804f9a4fe7f4e006dd34f855caf470fe0986545
+    kubenix/hash: 7c5fd99016fca25b893ae54896a5737e30c6b47a
   name: openclaw
   namespace: apps
 spec:
@@ -240,7 +240,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: f804f9a4fe7f4e006dd34f855caf470fe0986545
+    kubenix/hash: 7c5fd99016fca25b893ae54896a5737e30c6b47a
   name: openclaw
   namespace: apps
 ---
@@ -248,11 +248,10 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
-    cert-manager.io/cluster-issuer: cloudflare-issuer
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: f804f9a4fe7f4e006dd34f855caf470fe0986545
+    kubenix/hash: 7c5fd99016fca25b893ae54896a5737e30c6b47a
   name: openclaw
   namespace: apps
 spec:
@@ -281,7 +280,7 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     app: openclaw
-    kubenix/hash: f804f9a4fe7f4e006dd34f855caf470fe0986545
+    kubenix/hash: 7c5fd99016fca25b893ae54896a5737e30c6b47a
   name: openclaw
 roleRef:
   apiGroup: rbac.authorization.k8s.io

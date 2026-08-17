@@ -28,9 +28,7 @@ rec {
   ingressDomainFor = serviceName: {
     enabled = true;
     ingressClassName = defaultIngressClass;
-    annotations = {
-      "cert-manager.io/cluster-issuer" = defaultClusterIssuer;
-    };
+    annotations = { };
     hosts = [
       "${serviceName}.${homelab.domain}"
     ];
@@ -48,9 +46,7 @@ rec {
     enabled = true;
     ingressClassName = defaultIngressClass;
     className = defaultIngressClass;
-    annotations = {
-      "cert-manager.io/cluster-issuer" = defaultClusterIssuer;
-    };
+    annotations = { };
     hosts = [
       {
         host = domainFor serviceName;
@@ -82,9 +78,7 @@ rec {
     enabled = true;
     primary = true;
     ingressClassName = defaultIngressClass;
-    annotations = {
-      "cert-manager.io/cluster-issuer" = defaultClusterIssuer;
-    };
+    annotations = { };
     hosts = [
       { host = "${serviceName}.${homelab.domain}"; }
     ];
@@ -102,6 +96,11 @@ rec {
 
   defaultStorageClass = "rook-ceph-block";
   defaultIngressClass = "cilium";
+  # Ingresses using defaultTLSSecret must NOT carry a cert-manager.io/cluster-issuer
+  # annotation: system/cert-manager.nix already issues `wildcard-certificate` into
+  # this secret in every namespace. The annotation makes ingress-shim create a second
+  # Certificate for the same secret, and the two fight ("IncorrectCertificate: Secret
+  # was issued for ..."). Apps with their own TLS secret annotate their ingress inline.
   defaultTLSSecret = "wildcard-tls";
   defaultClusterIssuer = "cloudflare-issuer";
 

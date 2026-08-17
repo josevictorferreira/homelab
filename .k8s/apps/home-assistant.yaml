@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/name: home-assistant
     app.kubernetes.io/version: 2026.7.0
     helm.sh/chart: home-assistant-0.3.68
-    kubenix/hash: d8adf3f47e3403f087d90faf893fb1ad8d04df40
+    kubenix/hash: cc9a456b4b4895429c10d669f4b966bfdb17cba5
   name: home-assistant
   namespace: apps
 spec:
@@ -136,7 +136,7 @@ metadata:
     app.kubernetes.io/name: home-assistant
     app.kubernetes.io/version: 2026.7.0
     helm.sh/chart: home-assistant-0.3.68
-    kubenix/hash: d8adf3f47e3403f087d90faf893fb1ad8d04df40
+    kubenix/hash: cc9a456b4b4895429c10d669f4b966bfdb17cba5
   name: home-assistant
   namespace: apps
 spec:
@@ -162,7 +162,7 @@ metadata:
     app.kubernetes.io/name: home-assistant
     app.kubernetes.io/version: 2026.7.0
     helm.sh/chart: home-assistant-0.3.68
-    kubenix/hash: d8adf3f47e3403f087d90faf893fb1ad8d04df40
+    kubenix/hash: cc9a456b4b4895429c10d669f4b966bfdb17cba5
   name: home-assistant
   namespace: apps
 ---
@@ -170,7 +170,6 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
-    cert-manager.io/cluster-issuer: cloudflare-issuer
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
@@ -179,7 +178,7 @@ metadata:
     app.kubernetes.io/name: home-assistant
     app.kubernetes.io/version: 2026.7.0
     helm.sh/chart: home-assistant-0.3.68
-    kubenix/hash: d8adf3f47e3403f087d90faf893fb1ad8d04df40
+    kubenix/hash: cc9a456b4b4895429c10d669f4b966bfdb17cba5
   name: home-assistant
   namespace: apps
 spec:
