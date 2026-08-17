@@ -34,9 +34,13 @@ let
       };
     };
 
+    # filterUnmappedTypes must stay false: the mapping below covers the whole
+    # domain (and its subdomains), so filtering would blackhole every non-A/AAAA
+    # type under it -- including the _acme-challenge TXT records cert-manager
+    # self-checks during DNS-01, which silently blocks wildcard renewal.
     customDNS = {
       customTTL = "1h";
-      filterUnmappedTypes = true;
+      filterUnmappedTypes = false;
       mapping =
         builtins.listToAttrs
           (
