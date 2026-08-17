@@ -117,6 +117,50 @@ base_url = "https://nano-gpt.com/api/v1"
 api_key_env = "NANOGPT_API_KEY"
 
 # ---------------------------------------------------------------------------
+# OAuth subscription providers (all disabled)
+#
+# These are served by the velox-oauth-agent sidecar, which owns the OAuth
+# flow and refresh and publishes access-token + metadata files to the shared
+# oauth-runtime emptyDir. Velox reads the files at dispatch time, so rotation
+# needs no restart. Do NOT enable an entry until the corresponding credential
+# has been logged in and the runtime files exist in the pod — Velox fails
+# startup on a missing credential_file. Full procedure:
+# docs/oauth-operator-runbook.md in the velox repo.
+#
+# Every endpoint is an APPROVED-* placeholder on purpose: enable only after
+# the Milestone-0 prerequisites (operator-owned/authorized client
+# registration, approved endpoints/scopes, approved proxy use) are satisfied.
+#
+# [providers.claude-oauth]
+# kind = "anthropic"
+# base_url = "https://api.anthropic.com/v1"
+# credential_file = "/etc/velox/oauth-runtime/claude-primary.access-token"
+#
+# [providers.codex-subscription]
+# kind = "codex"
+# base_url = "https://APPROVED-CODEX-HOST/backend-api/codex/responses"
+# credential_file = "/etc/velox/oauth-runtime/codex-primary.access-token"
+# codex_metadata_file = "/etc/velox/oauth-runtime/codex-primary.metadata.json"
+#
+# [providers.codex-subscription.capabilities]
+# streaming = true
+# tools = true
+# vision = false
+# structured_output = false
+#
+# [providers.antigravity]
+# kind = "antigravity"
+# base_url = "https://APPROVED-CLOUD-CODE-HOST"
+# credential_file = "/etc/velox/oauth-runtime/antigravity-primary.access-token"
+# antigravity_metadata_file = "/etc/velox/oauth-runtime/antigravity-primary.metadata.json"
+#
+# [providers.antigravity.capabilities]
+# streaming = true
+# tools = true
+# vision = false
+# structured_output = false
+
+# ---------------------------------------------------------------------------
 # Models
 #
 # One alias per (provider, upstream model) pair a combo needs. Aliases are

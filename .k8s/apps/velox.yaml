@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: eee68fc9fbb5d057323def65d1d4a61da3673cae
+    kubenix/hash: d4bd373417f901a8aa1632ab2cef9b90232e9d0f
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -29,13 +29,14 @@ spec:
   template:
     metadata:
       annotations:
-        velox.josevictor.me/config-hash: 2a8ce978959c4212c14e84959e9c870e479be0deb4c379092a39c90e54e32249
+        velox.josevictor.me/config-hash: 2c7c6fa38ade3b58f69a1eed691f9afb6219e9a6e3aba3512932b46c9b28a081
+        velox.josevictor.me/oauth-agent-config-hash: f610fbbee407a64c347164a158cb4327f0428538dd95d66a2128eb282f7d1efa
       labels:
         app.kubernetes.io/controller: main
         app.kubernetes.io/instance: velox
         app.kubernetes.io/name: velox
     spec:
-      automountServiceAccountToken: true
+      automountServiceAccountToken: false
       containers:
         - args:
             - --config
@@ -74,6 +75,44 @@ spec:
               name: config
               readOnly: true
               subPath: velox.toml
+            - mountPath: /etc/velox/oauth-runtime
+              name: oauth-runtime
+              readOnly: true
+        - image: ghcr.io/josevictorferreira/velox-oauth-agent:latest
+          imagePullPolicy: Always
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8081
+            initialDelaySeconds: 5
+            periodSeconds: 15
+          name: velox-oauth-agent
+          resources:
+            limits:
+              cpu: 500m
+              memory: 128Mi
+            requests:
+              cpu: 25m
+              memory: 32Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+            runAsGroup: 65532
+            runAsNonRoot: true
+            runAsUser: 65532
+          volumeMounts:
+            - mountPath: /etc/velox-oauth/agent.toml
+              name: agent-config
+              readOnly: true
+              subPath: agent.toml
+            - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+              name: agent-sa-token
+              readOnly: true
+            - mountPath: /oauth-runtime
+              name: oauth-runtime
       dnsPolicy: ClusterFirst
       enableServiceLinks: false
       hostIPC: false
@@ -81,15 +120,35 @@ spec:
       hostPID: false
       imagePullSecrets:
         - name: ghcr-registry-secret
-      serviceAccountName: default
+      serviceAccountName: velox-oauth-agent
       terminationGracePeriodSeconds: 45
       volumes:
+        - configMap:
+            items:
+              - key: agent.toml
+                path: agent.toml
+            name: velox-oauth-agent-config
+          name: agent-config
+        - name: agent-sa-token
+          projected:
+            defaultMode: 420
+            sources:
+              - serviceAccountToken:
+                  expirationSeconds: 3607
+                  path: token
+              - configMap:
+                  items:
+                    - key: ca.crt
+                      path: ca.crt
+                  name: kube-root-ca.crt
         - configMap:
             items:
               - key: velox.toml
                 path: velox.toml
             name: velox-config
           name: config
+        - emptyDir: {}
+          name: oauth-runtime
 ---
 apiVersion: v1
 kind: Service
@@ -105,7 +164,7 @@ metadata:
     app.kubernetes.io/name: velox
     app.kubernetes.io/service: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: eee68fc9fbb5d057323def65d1d4a61da3673cae
+    kubenix/hash: d4bd373417f901a8aa1632ab2cef9b90232e9d0f
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -134,7 +193,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: eee68fc9fbb5d057323def65d1d4a61da3673cae
+    kubenix/hash: d4bd373417f901a8aa1632ab2cef9b90232e9d0f
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -278,6 +337,50 @@ data:
     kind = "openai-compatible"
     base_url = "https://nano-gpt.com/api/v1"
     api_key_env = "NANOGPT_API_KEY"
+
+    # ---------------------------------------------------------------------------
+    # OAuth subscription providers (all disabled)
+    #
+    # These are served by the velox-oauth-agent sidecar, which owns the OAuth
+    # flow and refresh and publishes access-token + metadata files to the shared
+    # oauth-runtime emptyDir. Velox reads the files at dispatch time, so rotation
+    # needs no restart. Do NOT enable an entry until the corresponding credential
+    # has been logged in and the runtime files exist in the pod — Velox fails
+    # startup on a missing credential_file. Full procedure:
+    # docs/oauth-operator-runbook.md in the velox repo.
+    #
+    # Every endpoint is an APPROVED-* placeholder on purpose: enable only after
+    # the Milestone-0 prerequisites (operator-owned/authorized client
+    # registration, approved endpoints/scopes, approved proxy use) are satisfied.
+    #
+    # [providers.claude-oauth]
+    # kind = "anthropic"
+    # base_url = "https://api.anthropic.com/v1"
+    # credential_file = "/etc/velox/oauth-runtime/claude-primary.access-token"
+    #
+    # [providers.codex-subscription]
+    # kind = "codex"
+    # base_url = "https://APPROVED-CODEX-HOST/backend-api/codex/responses"
+    # credential_file = "/etc/velox/oauth-runtime/codex-primary.access-token"
+    # codex_metadata_file = "/etc/velox/oauth-runtime/codex-primary.metadata.json"
+    #
+    # [providers.codex-subscription.capabilities]
+    # streaming = true
+    # tools = true
+    # vision = false
+    # structured_output = false
+    #
+    # [providers.antigravity]
+    # kind = "antigravity"
+    # base_url = "https://APPROVED-CLOUD-CODE-HOST"
+    # credential_file = "/etc/velox/oauth-runtime/antigravity-primary.access-token"
+    # antigravity_metadata_file = "/etc/velox/oauth-runtime/antigravity-primary.metadata.json"
+    #
+    # [providers.antigravity.capabilities]
+    # streaming = true
+    # tools = true
+    # vision = false
+    # structured_output = false
 
     # ---------------------------------------------------------------------------
     # Models
@@ -629,6 +732,89 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: eee68fc9fbb5d057323def65d1d4a61da3673cae
+    kubenix/hash: d4bd373417f901a8aa1632ab2cef9b90232e9d0f
   name: velox-config
   namespace: apps
+---
+apiVersion: v1
+data:
+  agent.toml: |
+    # velox-oauth-agent config. Zero credentials: inert until the operator
+    # adds approved [credentials.*] entries. Never put secret values here;
+    # client_secret_env would name an env var injected from velox-config.
+    #
+    # Credential shapes and the login/rollout procedure:
+    # docs/oauth-operator-runbook.md in the velox repo.
+
+    [store]
+    secret_name = "velox-oauth-state"
+    namespace = "apps"
+
+    [server]
+    # Pod probes reach this over the pod IP, so it cannot stay loopback; the
+    # metrics surface carries no sensitive data (provider/state labels only).
+    bind = "0.0.0.0:8081"
+
+    [runtime]
+    dir = "/oauth-runtime"
+kind: ConfigMap
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: d4bd373417f901a8aa1632ab2cef9b90232e9d0f
+  name: velox-oauth-agent-config
+  namespace: apps
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: d4bd373417f901a8aa1632ab2cef9b90232e9d0f
+  name: velox-oauth-agent
+  namespace: apps
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: d4bd373417f901a8aa1632ab2cef9b90232e9d0f
+  name: velox-oauth-agent
+  namespace: apps
+rules:
+  - apiGroups:
+      - ""
+    resourceNames:
+      - velox-oauth-state
+    resources:
+      - secrets
+    verbs:
+      - get
+      - patch
+      - update
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: d4bd373417f901a8aa1632ab2cef9b90232e9d0f
+  name: velox-oauth-agent
+  namespace: apps
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: velox-oauth-agent
+subjects:
+  - kind: ServiceAccount
+    name: velox-oauth-agent
+    namespace: apps
