@@ -134,7 +134,7 @@ data:
       securityContext:
         runAsUser: 10000
         runAsGroup: 2002
-        fsGroup: 2002
+        fsGroup: 100
         seccompProfile: RuntimeDefault
         readOnlyRootFilesystem: false
       # Worker imports Hermes (venv) + the plugin (shared user-site + PYTHONPATH).

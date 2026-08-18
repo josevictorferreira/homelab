@@ -58,10 +58,14 @@ let
         default:
           requests: { cpu: 500m, memory: 1Gi, ephemeral-storage: 5Gi }
           limits:   { cpu: "2",  memory: 4Gi, ephemeral-storage: 20Gi }
+      # fsGroup must be 100 (users) to match the shared CephFS volume root; a
+      # differing fsGroup makes kubelet recursively chown the whole shared
+      # volume on every mount, wedging the node's volume manager. gid 2002
+      # access is retained via runAsGroup.
       securityContext:
         runAsUser: 10000
         runAsGroup: 2002
-        fsGroup: 2002
+        fsGroup: 100
         seccompProfile: RuntimeDefault
         readOnlyRootFilesystem: false
       # Worker imports Hermes (venv) + the plugin (shared user-site + PYTHONPATH).

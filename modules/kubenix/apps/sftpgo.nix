@@ -39,8 +39,14 @@ in
           readOnlyRootFilesystem = false;
         };
 
+        # fsGroup must be 100 (users) to match the shared CephFS volume root,
+        # which is uid 10000 / gid 100. With OnRootMismatch, a differing fsGroup
+        # (e.g. 2002) makes kubelet recursively chown every inode on the whole
+        # shared volume on each mount; that exceeds kubelet's 2min mount timeout,
+        # retries forever, wedges the node's volume manager and saturates the MDS.
+        # The process still reaches gid 2002 paths via runAsGroup above.
         podSecurityContext = {
-          fsGroup = 2002;
+          fsGroup = 100;
           fsGroupChangePolicy = "OnRootMismatch";
         };
 

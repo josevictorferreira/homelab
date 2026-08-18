@@ -96,7 +96,7 @@ spec:
               readOnly: false
       hostNetwork: false
       securityContext:
-        fsGroup: 2002
+        fsGroup: 100
         fsGroupChangePolicy: OnRootMismatch
       serviceAccountName: sftpgo
       volumes:
