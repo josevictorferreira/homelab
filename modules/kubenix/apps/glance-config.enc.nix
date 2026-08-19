@@ -548,6 +548,11 @@ let
                         url = "https://sftpgo.josevictor.me";
                         icon = "sh:sftpgo";
                       }
+                      {
+                        title = "Immich";
+                        url = "https://immich.josevictor.me";
+                        icon = "sh:immich";
+                      }
                     ];
                   }
                 ];
