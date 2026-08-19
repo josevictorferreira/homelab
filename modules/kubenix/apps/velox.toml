@@ -52,6 +52,16 @@ kind = "openai-compatible"
 base_url = "https://openrouter.ai/api/v1"
 api_key_env = "OPENROUTER_API_KEY"
 
+# The only configured provider that accepts image content parts. Verified by
+# sending a data: URL image to each candidate: opencode-go rejects the content
+# type outright, alibaba-token-plan does not serve qwen3.8-max, and z-ai/glm-5.3
+# has no image-capable endpoint. Capabilities are per provider, so this also
+# marks openrouter's text-only models as vision-capable; that is fine because
+# vision requests only reach openrouter through combos that name a
+# multimodal model.
+[providers.openrouter.capabilities]
+vision = true
+
 # Z.AI / GLM. API key, but the endpoint is Anthropic-shaped.
 [providers.glm]
 kind = "anthropic"

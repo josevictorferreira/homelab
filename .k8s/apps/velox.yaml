@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 75f4cf6c65b2c2312bda8d3b436ea3384e2ac7dd
+    kubenix/hash: d92bedf815df2dc9e9a19da1f56b30c2dc081f22
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -29,7 +29,7 @@ spec:
   template:
     metadata:
       annotations:
-        velox.josevictor.me/config-hash: 0a4a430185729fa2f1ec75749b6e8b03b2783188a8a35baca45591d645034a21
+        velox.josevictor.me/config-hash: 6cee62fcee4200381386b94cebea784daa36af756d1f17ff7f9b3dd40b5656a3
         velox.josevictor.me/oauth-agent-config-hash: d0f394f94a804835efefcc60632f8072918f0557b2e6969ae3ea2999cf242384
       labels:
         app.kubernetes.io/controller: main
@@ -170,7 +170,7 @@ metadata:
     app.kubernetes.io/name: velox
     app.kubernetes.io/service: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 75f4cf6c65b2c2312bda8d3b436ea3384e2ac7dd
+    kubenix/hash: d92bedf815df2dc9e9a19da1f56b30c2dc081f22
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -199,7 +199,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 75f4cf6c65b2c2312bda8d3b436ea3384e2ac7dd
+    kubenix/hash: d92bedf815df2dc9e9a19da1f56b30c2dc081f22
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -279,6 +279,16 @@ data:
     kind = "openai-compatible"
     base_url = "https://openrouter.ai/api/v1"
     api_key_env = "OPENROUTER_API_KEY"
+
+    # The only configured provider that accepts image content parts. Verified by
+    # sending a data: URL image to each candidate: opencode-go rejects the content
+    # type outright, alibaba-token-plan does not serve qwen3.8-max, and z-ai/glm-5.3
+    # has no image-capable endpoint. Capabilities are per provider, so this also
+    # marks openrouter's text-only models as vision-capable; that is fine because
+    # vision requests only reach openrouter through combos that name a
+    # multimodal model.
+    [providers.openrouter.capabilities]
+    vision = true
 
     # Z.AI / GLM. API key, but the endpoint is Anthropic-shaped.
     [providers.glm]
@@ -757,7 +767,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 75f4cf6c65b2c2312bda8d3b436ea3384e2ac7dd
+    kubenix/hash: d92bedf815df2dc9e9a19da1f56b30c2dc081f22
   name: velox-config
   namespace: apps
 ---
@@ -800,7 +810,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 75f4cf6c65b2c2312bda8d3b436ea3384e2ac7dd
+    kubenix/hash: d92bedf815df2dc9e9a19da1f56b30c2dc081f22
   name: velox-oauth-agent-config
   namespace: apps
 ---
@@ -811,7 +821,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 75f4cf6c65b2c2312bda8d3b436ea3384e2ac7dd
+    kubenix/hash: d92bedf815df2dc9e9a19da1f56b30c2dc081f22
   name: velox-oauth-agent
   namespace: apps
 ---
@@ -822,7 +832,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 75f4cf6c65b2c2312bda8d3b436ea3384e2ac7dd
+    kubenix/hash: d92bedf815df2dc9e9a19da1f56b30c2dc081f22
   name: velox-oauth-agent
   namespace: apps
 rules:
@@ -844,7 +854,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 75f4cf6c65b2c2312bda8d3b436ea3384e2ac7dd
+    kubenix/hash: d92bedf815df2dc9e9a19da1f56b30c2dc081f22
   name: velox-oauth-agent
   namespace: apps
 roleRef:
