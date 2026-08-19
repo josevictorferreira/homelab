@@ -6,6 +6,8 @@
     sops-nix.url = "github:Mic92/sops-nix";
     deploy-rs.url = "github:serokell/deploy-rs";
     kubenix.url = "github:hall/kubenix";
+    terranix.url = "github:terranix/terranix";
+    terranix.inputs.nixpkgs.follows = "nixpkgs";
     nix-openclaw.url = "git+https://github.com/openclaw/nix-openclaw?ref=main";
   };
 
@@ -15,6 +17,7 @@
     , sops-nix
     , deploy-rs
     , kubenix
+    , terranix
     , ...
     }@inputs:
     let
@@ -157,6 +160,10 @@
         in
         {
           gen-manifests = kubenixModule.mkRenderer system sysPkgs;
+          terraform-oci = terranix.lib.terranixConfiguration {
+            inherit system;
+            modules = [ ./terraform/oci/config.nix ];
+          };
           openclaw-nix-image = openclawNixImage;
           postgresql-vchord-image = postgresqlVchordImage;
           openclaw-debian-image = openclawDebianImage;
@@ -186,6 +193,7 @@
             image-outdated
             push-openclaw-debian
             ghcr-size
+            tf
             ;
         }
       );

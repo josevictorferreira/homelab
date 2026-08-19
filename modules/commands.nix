@@ -825,6 +825,22 @@ let
 
       '';
 
+  # ============================================================================
+  # Terraform / OpenTofu commands
+  # ============================================================================
+
+  tf = mkCommand "tf" "Render the terranix config and run OpenTofu against terraform/oci"
+    [ pkgs.nix pkgs.git pkgs.opentofu ] ''
+    root="$(git rev-parse --show-toplevel)"
+    workdir="$root/terraform/oci"
+
+    echo "=== Rendering config.tf.json via terranix ==="
+    nix build "$root#terraform-oci" -o "$workdir/config.tf.json"
+
+    cd "$workdir"
+    exec tofu "$@"
+  '';
+
 in
 {
   inherit
@@ -853,5 +869,6 @@ in
     push-openclaw-debian
     ghcr-size
     push-postgresql-vchord
+    tf
     ;
 }
