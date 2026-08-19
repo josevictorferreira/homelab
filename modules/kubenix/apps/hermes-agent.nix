@@ -260,9 +260,11 @@ let
                         python3 -c "import faster_whisper" 2>/dev/null || {
                           pip install --user -q faster-whisper 2>/dev/null || true
                         }
-                        # Bootstrap Matrix dependencies if not installed
-                        python3 -c "import mautrix" 2>/dev/null || {
-                          python3 -m pip install --user --break-system-packages 'mautrix[encryption]' aiohttp==3.14.1 asyncpg aiosqlite Markdown aiohttp-socks 2>/dev/null || true
+                        # Bootstrap Matrix dependencies at the versions the platform pins.
+                        # The image bumps these pins on upgrade; the user-site copies on the
+                        # PVC persist the old versions, so install the exact pins when they drift.
+                        python3 -c "import importlib.metadata as m, sys; sys.exit(0 if m.version('mautrix') == '0.21.1' and m.version('aiohttp') == '3.14.3' else 1)" 2>/dev/null || {
+                          python3 -m pip install --user --break-system-packages 'mautrix[encryption]==0.21.1' aiohttp==3.14.3 asyncpg aiosqlite Markdown aiohttp-socks 2>/dev/null || true
                         }
                         # Bootstrap hindsight-client at the version the memory plugin pins.
                         # The image bumps this pin on upgrade; the user-site copy on the PVC
