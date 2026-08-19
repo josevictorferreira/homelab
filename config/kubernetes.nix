@@ -67,6 +67,7 @@
       dramaturge-worker = "10.10.10.155";
       wealtho = "10.10.10.156";
       velox = "10.10.10.158";
+      poise = "10.10.10.159";
       grafana = "10.10.10.190";
     };
   };
@@ -91,6 +92,10 @@
       "grafana"
       "dramaturge"
       "wealtho"
+      "poise_production"
+      "poise_production_cache"
+      "poise_production_queue"
+      "poise_production_cable"
     ];
   };
 

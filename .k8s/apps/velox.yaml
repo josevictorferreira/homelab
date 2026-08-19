@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 12576734bbfa5857047367c54cf9e063acc0c152
+    kubenix/hash: 75f4cf6c65b2c2312bda8d3b436ea3384e2ac7dd
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -29,7 +29,7 @@ spec:
   template:
     metadata:
       annotations:
-        velox.josevictor.me/config-hash: 2c7c6fa38ade3b58f69a1eed691f9afb6219e9a6e3aba3512932b46c9b28a081
+        velox.josevictor.me/config-hash: 0a4a430185729fa2f1ec75749b6e8b03b2783188a8a35baca45591d645034a21
         velox.josevictor.me/oauth-agent-config-hash: d0f394f94a804835efefcc60632f8072918f0557b2e6969ae3ea2999cf242384
       labels:
         app.kubernetes.io/controller: main
@@ -170,7 +170,7 @@ metadata:
     app.kubernetes.io/name: velox
     app.kubernetes.io/service: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 12576734bbfa5857047367c54cf9e063acc0c152
+    kubenix/hash: 75f4cf6c65b2c2312bda8d3b436ea3384e2ac7dd
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -199,7 +199,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 12576734bbfa5857047367c54cf9e063acc0c152
+    kubenix/hash: 75f4cf6c65b2c2312bda8d3b436ea3384e2ac7dd
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -343,6 +343,19 @@ data:
     kind = "openai-compatible"
     base_url = "https://nano-gpt.com/api/v1"
     api_key_env = "NANOGPT_API_KEY"
+
+    # Voyage AI, embeddings only. Its /embeddings surface is OpenAI-shaped, which is
+    # the prerequisite for the `embedding` capability; it serves no chat models, so
+    # streaming and tools are declared off and no combo targets it.
+    [providers.voyage]
+    kind = "openai-compatible"
+    base_url = "https://api.voyageai.com/v1"
+    api_key_env = "VOYAGE_API_KEY"
+
+    [providers.voyage.capabilities]
+    streaming = false
+    tools = false
+    embedding = true
 
     # ---------------------------------------------------------------------------
     # OAuth subscription providers (all disabled)
@@ -576,6 +589,12 @@ data:
     provider = "puter"
     upstream_model = "google/gemini-3.1-flash-lite-preview"
 
+    # Embeddings. 1024 dimensions, which is what poise's photo_analyses.embedding
+    # vector column is declared as.
+    [models.voyage-3]
+    provider = "voyage"
+    upstream_model = "voyage-3"
+
     # ---------------------------------------------------------------------------
     # Combos
     #
@@ -738,7 +757,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 12576734bbfa5857047367c54cf9e063acc0c152
+    kubenix/hash: 75f4cf6c65b2c2312bda8d3b436ea3384e2ac7dd
   name: velox-config
   namespace: apps
 ---
@@ -781,7 +800,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 12576734bbfa5857047367c54cf9e063acc0c152
+    kubenix/hash: 75f4cf6c65b2c2312bda8d3b436ea3384e2ac7dd
   name: velox-oauth-agent-config
   namespace: apps
 ---
@@ -792,7 +811,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 12576734bbfa5857047367c54cf9e063acc0c152
+    kubenix/hash: 75f4cf6c65b2c2312bda8d3b436ea3384e2ac7dd
   name: velox-oauth-agent
   namespace: apps
 ---
@@ -803,7 +822,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 12576734bbfa5857047367c54cf9e063acc0c152
+    kubenix/hash: 75f4cf6c65b2c2312bda8d3b436ea3384e2ac7dd
   name: velox-oauth-agent
   namespace: apps
 rules:
@@ -825,7 +844,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 12576734bbfa5857047367c54cf9e063acc0c152
+    kubenix/hash: 75f4cf6c65b2c2312bda8d3b436ea3384e2ac7dd
   name: velox-oauth-agent
   namespace: apps
 roleRef:

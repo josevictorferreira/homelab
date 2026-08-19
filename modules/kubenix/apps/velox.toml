@@ -116,6 +116,19 @@ kind = "openai-compatible"
 base_url = "https://nano-gpt.com/api/v1"
 api_key_env = "NANOGPT_API_KEY"
 
+# Voyage AI, embeddings only. Its /embeddings surface is OpenAI-shaped, which is
+# the prerequisite for the `embedding` capability; it serves no chat models, so
+# streaming and tools are declared off and no combo targets it.
+[providers.voyage]
+kind = "openai-compatible"
+base_url = "https://api.voyageai.com/v1"
+api_key_env = "VOYAGE_API_KEY"
+
+[providers.voyage.capabilities]
+streaming = false
+tools = false
+embedding = true
+
 # ---------------------------------------------------------------------------
 # OAuth subscription providers (all disabled)
 #
@@ -347,6 +360,12 @@ upstream_model = "gemma-4-26b-a4b-it"
 [models.gemini-flash-lite-puter]
 provider = "puter"
 upstream_model = "google/gemini-3.1-flash-lite-preview"
+
+# Embeddings. 1024 dimensions, which is what poise's photo_analyses.embedding
+# vector column is declared as.
+[models.voyage-3]
+provider = "voyage"
+upstream_model = "voyage-3"
 
 # ---------------------------------------------------------------------------
 # Combos
