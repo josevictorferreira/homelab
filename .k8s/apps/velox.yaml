@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: d92bedf815df2dc9e9a19da1f56b30c2dc081f22
+    kubenix/hash: 22fb1e1e344e73ce88aa1f8b7a23922827e9db67
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -29,7 +29,7 @@ spec:
   template:
     metadata:
       annotations:
-        velox.josevictor.me/config-hash: 6cee62fcee4200381386b94cebea784daa36af756d1f17ff7f9b3dd40b5656a3
+        velox.josevictor.me/config-hash: aa86f640a13b9b60c824c664b2d65050e6d8e5e662e8f1873036188f7d8b7a20
         velox.josevictor.me/oauth-agent-config-hash: d0f394f94a804835efefcc60632f8072918f0557b2e6969ae3ea2999cf242384
       labels:
         app.kubernetes.io/controller: main
@@ -170,7 +170,7 @@ metadata:
     app.kubernetes.io/name: velox
     app.kubernetes.io/service: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: d92bedf815df2dc9e9a19da1f56b30c2dc081f22
+    kubenix/hash: 22fb1e1e344e73ce88aa1f8b7a23922827e9db67
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -199,7 +199,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: d92bedf815df2dc9e9a19da1f56b30c2dc081f22
+    kubenix/hash: 22fb1e1e344e73ce88aa1f8b7a23922827e9db67
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -338,6 +338,12 @@ data:
     kind = "openai-compatible"
     base_url = "https://api.mistral.ai/v1"
     api_key_env = "MISTRAL_API_KEY"
+
+    # The second provider that accepts image content parts, verified the same way as
+    # openrouter: sent a data: URL image and it named the colour correctly. It exists
+    # so image work survives an openrouter outage rather than stopping dead.
+    [providers.mistral.capabilities]
+    vision = true
 
     [providers.bazaarlink]
     kind = "openai-compatible"
@@ -665,6 +671,16 @@ data:
       { model = "qwen3-8-max-openrouter" },
     ]
 
+    # Image description, in preference order. Both targets are vision-capable, so
+    # Velox falls back rather than returning unsupported_capability when the first
+    # provider is down. Named for the job because the two targets are different
+    # models, not one model behind two providers.
+    [combos.vision]
+    targets = [
+      { model = "qwen3-8-max-openrouter" },
+      { model = "mistral-medium" },
+    ]
+
     [combos.qwen3-6-plus]
     strategy = "round-robin"
     targets = [
@@ -767,7 +783,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: d92bedf815df2dc9e9a19da1f56b30c2dc081f22
+    kubenix/hash: 22fb1e1e344e73ce88aa1f8b7a23922827e9db67
   name: velox-config
   namespace: apps
 ---
@@ -810,7 +826,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: d92bedf815df2dc9e9a19da1f56b30c2dc081f22
+    kubenix/hash: 22fb1e1e344e73ce88aa1f8b7a23922827e9db67
   name: velox-oauth-agent-config
   namespace: apps
 ---
@@ -821,7 +837,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: d92bedf815df2dc9e9a19da1f56b30c2dc081f22
+    kubenix/hash: 22fb1e1e344e73ce88aa1f8b7a23922827e9db67
   name: velox-oauth-agent
   namespace: apps
 ---
@@ -832,7 +848,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: d92bedf815df2dc9e9a19da1f56b30c2dc081f22
+    kubenix/hash: 22fb1e1e344e73ce88aa1f8b7a23922827e9db67
   name: velox-oauth-agent
   namespace: apps
 rules:
@@ -854,7 +870,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: d92bedf815df2dc9e9a19da1f56b30c2dc081f22
+    kubenix/hash: 22fb1e1e344e73ce88aa1f8b7a23922827e9db67
   name: velox-oauth-agent
   namespace: apps
 roleRef:

@@ -111,6 +111,12 @@ kind = "openai-compatible"
 base_url = "https://api.mistral.ai/v1"
 api_key_env = "MISTRAL_API_KEY"
 
+# The second provider that accepts image content parts, verified the same way as
+# openrouter: sent a data: URL image and it named the colour correctly. It exists
+# so image work survives an openrouter outage rather than stopping dead.
+[providers.mistral.capabilities]
+vision = true
+
 [providers.bazaarlink]
 kind = "openai-compatible"
 base_url = "https://bazaarlink.ai/api/v1"
@@ -435,6 +441,16 @@ targets = [
 targets = [
   { model = "qwen3-8-max-alibaba" },
   { model = "qwen3-8-max-openrouter" },
+]
+
+# Image description, in preference order. Both targets are vision-capable, so
+# Velox falls back rather than returning unsupported_capability when the first
+# provider is down. Named for the job because the two targets are different
+# models, not one model behind two providers.
+[combos.vision]
+targets = [
+  { model = "qwen3-8-max-openrouter" },
+  { model = "mistral-medium" },
 ]
 
 [combos.qwen3-6-plus]
