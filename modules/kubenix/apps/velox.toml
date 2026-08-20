@@ -160,18 +160,19 @@ embedding = true
 # base_url = "https://api.anthropic.com/v1"
 # credential_file = "/etc/velox/oauth-runtime/claude-primary.access-token"
 #
-# [providers.codex-subscription]
-# kind = "codex"
-# base_url = "https://APPROVED-CODEX-HOST/backend-api/codex/responses"
-# credential_file = "/etc/velox/oauth-runtime/codex-primary.access-token"
-# codex_metadata_file = "/etc/velox/oauth-runtime/codex-primary.metadata.json"
-#
-# [providers.codex-subscription.capabilities]
-# streaming = true
-# tools = true
-# vision = false
-# structured_output = false
-#
+[providers.codex-subscription]
+kind = "codex"
+base_url = "https://chatgpt.com/backend-api/codex/responses"
+credential_file = "/etc/velox/oauth-runtime/codex-primary.access-token"
+codex_metadata_file = "/etc/velox/oauth-runtime/codex-primary.metadata.json"
+
+[providers.codex-subscription.capabilities]
+streaming = true
+tools = true
+vision = false
+structured_output = false
+embedding = false
+
 [providers.antigravity-primary]
 kind = "antigravity"
 base_url = "https://cloudcode-pa.googleapis.com"
@@ -384,6 +385,14 @@ upstream_model = "gemma-4-26b-a4b-it"
 provider = "puter"
 upstream_model = "google/gemini-3.1-flash-lite-preview"
 
+[models.gpt-5-6-luna-codex]
+provider = "codex-subscription"
+upstream_model = "gpt-5.6-luna-high"
+
+[models.gpt-5-6-terra-codex]
+provider = "codex-subscription"
+upstream_model = "gpt-5.6-terra"
+
 [models.gemini-3-1-pro-antigravity-primary]
 provider = "antigravity-primary"
 upstream_model = "gemini-3.1-pro"
@@ -577,6 +586,20 @@ strategy = "round-robin"
 targets = [
   { model = "gemini-3-7-flash-antigravity-primary" },
   { model = "gemini-3-7-flash-antigravity-secondary" },
+]
+
+[combos.radagast]
+strategy = "round-robin"
+targets = [
+  { model = "gemini-3-7-flash-antigravity-primary" },
+  { model = "gemini-3-7-flash-antigravity-secondary" },
+]
+
+[combos.gandalf]
+strategy = "priority"
+targets = [
+  { model = "gpt-5-6-luna-codex" },
+  { model = "gpt-5-6-terra-codex" },
 ]
 
 [combos.samwise]

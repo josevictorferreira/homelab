@@ -159,7 +159,9 @@ in
           done
 
           ## Per-service creds + policies
-          SERVICES="velero postgres rgw etcd shared"
+          ## (no "shared" here: the shared bucket exists but has no per-service
+          ## minio_shared_* secrets — its writers use other credentials)
+          SERVICES="velero postgres rgw etcd"
           for svc in $SERVICES; do
             BUCKET="homelab-backup-$svc"
             AK_FILE="/run/secrets/minio_''${svc}_access_key_id"

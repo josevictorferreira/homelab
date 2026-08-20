@@ -66,6 +66,19 @@ let
     [runtime]
     dir = "/oauth-runtime"
 
+    [credentials.codex-primary]
+    provider = "codex"
+    client_id = "app_EMoamEEZ73f0CkXaXp7hrann"
+    authorize_url = "https://auth.openai.com/oauth/authorize"
+    token_url = "https://auth.openai.com/oauth/token"
+    scopes = ["openid", "profile", "email", "offline_access"]
+    workspace_id_claim = "https://api.openai.com/auth.chatgpt_account_id"
+    extra_authorize_params = {
+      id_token_add_organizations = "true"
+      codex_cli_simplified_flow = "true"
+      originator = "codex_cli_rs"
+    }
+
     [credentials.antigravity-primary]
     provider = "antigravity"
     client_id = "1071006060591-tmhssin2h21lcre235vtolojh4g403ep.apps.googleusercontent.com"

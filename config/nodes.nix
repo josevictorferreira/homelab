@@ -34,6 +34,7 @@ rec {
         "nixos-server"
         "system-admin"
         "tailscale"
+        "offsite-backup"
       ];
     };
     lab-alpha-cp = {

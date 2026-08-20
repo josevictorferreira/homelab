@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 0652834763b9e16ea4f07f49c0b7d81ab8cc237d
+    kubenix/hash: 1459d556c773773f6a2b9adec340c259f76c78cf
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -29,8 +29,8 @@ spec:
   template:
     metadata:
       annotations:
-        velox.josevictor.me/config-hash: f170ddbc34595dddff5b9843204c52c3ca622a0617dcca4be1a014c3caa1fd79
-        velox.josevictor.me/oauth-agent-config-hash: f156f9b67c0b971eb8ecfb5b0d4a7ee836acaee67b82b4b3ec3f69b794ad12a8
+        velox.josevictor.me/config-hash: 8213c7edecf80e6b601d23e12c08063d1d7610d0c706fccd3804d74cd88f395e
+        velox.josevictor.me/oauth-agent-config-hash: 926d0997ad466cc342274b10472baeadffb2b66a160dc58e36a0b96121331645
       labels:
         app.kubernetes.io/controller: main
         app.kubernetes.io/instance: velox
@@ -170,7 +170,7 @@ metadata:
     app.kubernetes.io/name: velox
     app.kubernetes.io/service: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 0652834763b9e16ea4f07f49c0b7d81ab8cc237d
+    kubenix/hash: 1459d556c773773f6a2b9adec340c259f76c78cf
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -199,7 +199,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 0652834763b9e16ea4f07f49c0b7d81ab8cc237d
+    kubenix/hash: 1459d556c773773f6a2b9adec340c259f76c78cf
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -388,18 +388,19 @@ data:
     # base_url = "https://api.anthropic.com/v1"
     # credential_file = "/etc/velox/oauth-runtime/claude-primary.access-token"
     #
-    # [providers.codex-subscription]
-    # kind = "codex"
-    # base_url = "https://APPROVED-CODEX-HOST/backend-api/codex/responses"
-    # credential_file = "/etc/velox/oauth-runtime/codex-primary.access-token"
-    # codex_metadata_file = "/etc/velox/oauth-runtime/codex-primary.metadata.json"
-    #
-    # [providers.codex-subscription.capabilities]
-    # streaming = true
-    # tools = true
-    # vision = false
-    # structured_output = false
-    #
+    [providers.codex-subscription]
+    kind = "codex"
+    base_url = "https://chatgpt.com/backend-api/codex/responses"
+    credential_file = "/etc/velox/oauth-runtime/codex-primary.access-token"
+    codex_metadata_file = "/etc/velox/oauth-runtime/codex-primary.metadata.json"
+
+    [providers.codex-subscription.capabilities]
+    streaming = true
+    tools = true
+    vision = false
+    structured_output = false
+    embedding = false
+
     [providers.antigravity-primary]
     kind = "antigravity"
     base_url = "https://cloudcode-pa.googleapis.com"
@@ -612,6 +613,14 @@ data:
     provider = "puter"
     upstream_model = "google/gemini-3.1-flash-lite-preview"
 
+    [models.gpt-5-6-luna-codex]
+    provider = "codex-subscription"
+    upstream_model = "gpt-5.6-luna-high"
+
+    [models.gpt-5-6-terra-codex]
+    provider = "codex-subscription"
+    upstream_model = "gpt-5.6-terra"
+
     [models.gemini-3-1-pro-antigravity-primary]
     provider = "antigravity-primary"
     upstream_model = "gemini-3.1-pro"
@@ -807,6 +816,20 @@ data:
       { model = "gemini-3-7-flash-antigravity-secondary" },
     ]
 
+    [combos.radagast]
+    strategy = "round-robin"
+    targets = [
+      { model = "gemini-3-7-flash-antigravity-primary" },
+      { model = "gemini-3-7-flash-antigravity-secondary" },
+    ]
+
+    [combos.gandalf]
+    strategy = "priority"
+    targets = [
+      { model = "gpt-5-6-luna-codex" },
+      { model = "gpt-5-6-terra-codex" },
+    ]
+
     [combos.samwise]
     strategy = "random"
     targets = [
@@ -820,7 +843,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 0652834763b9e16ea4f07f49c0b7d81ab8cc237d
+    kubenix/hash: 1459d556c773773f6a2b9adec340c259f76c78cf
   name: velox-config
   namespace: apps
 ---
@@ -844,6 +867,19 @@ data:
 
     [runtime]
     dir = "/oauth-runtime"
+
+    [credentials.codex-primary]
+    provider = "codex"
+    client_id = "app_EMoamEEZ73f0CkXaXp7hrann"
+    authorize_url = "https://auth.openai.com/oauth/authorize"
+    token_url = "https://auth.openai.com/oauth/token"
+    scopes = ["openid", "profile", "email", "offline_access"]
+    workspace_id_claim = "https://api.openai.com/auth.chatgpt_account_id"
+    extra_authorize_params = {
+      id_token_add_organizations = "true"
+      codex_cli_simplified_flow = "true"
+      originator = "codex_cli_rs"
+    }
 
     [credentials.antigravity-primary]
     provider = "antigravity"
@@ -884,7 +920,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 0652834763b9e16ea4f07f49c0b7d81ab8cc237d
+    kubenix/hash: 1459d556c773773f6a2b9adec340c259f76c78cf
   name: velox-oauth-agent-config
   namespace: apps
 ---
@@ -895,7 +931,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 0652834763b9e16ea4f07f49c0b7d81ab8cc237d
+    kubenix/hash: 1459d556c773773f6a2b9adec340c259f76c78cf
   name: velox-oauth-agent
   namespace: apps
 ---
@@ -906,7 +942,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 0652834763b9e16ea4f07f49c0b7d81ab8cc237d
+    kubenix/hash: 1459d556c773773f6a2b9adec340c259f76c78cf
   name: velox-oauth-agent
   namespace: apps
 rules:
@@ -928,7 +964,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 0652834763b9e16ea4f07f49c0b7d81ab8cc237d
+    kubenix/hash: 1459d556c773773f6a2b9adec340c259f76c78cf
   name: velox-oauth-agent
   namespace: apps
 roleRef:
