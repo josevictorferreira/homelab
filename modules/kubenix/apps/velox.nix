@@ -73,11 +73,10 @@ let
     token_url = "https://auth.openai.com/oauth/token"
     scopes = ["openid", "profile", "email", "offline_access"]
     workspace_id_claim = "https://api.openai.com/auth.chatgpt_account_id"
-    extra_authorize_params = {
-      id_token_add_organizations = "true"
-      codex_cli_simplified_flow = "true"
-      originator = "codex_cli_rs"
-    }
+    # A TOML inline table has to be on one line with commas. Written across
+    # several lines it does not parse, the agent refuses to start, and Velox
+    # then fails its own startup on the access-token file the agent never wrote.
+    extra_authorize_params = { id_token_add_organizations = "true", codex_cli_simplified_flow = "true", originator = "codex_cli_rs" }
 
     [credentials.antigravity-primary]
     provider = "antigravity"

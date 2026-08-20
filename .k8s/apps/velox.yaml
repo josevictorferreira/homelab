@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 1459d556c773773f6a2b9adec340c259f76c78cf
+    kubenix/hash: 1f71aaf5e6419b98ac77bba911396b39adf3b998
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -30,7 +30,7 @@ spec:
     metadata:
       annotations:
         velox.josevictor.me/config-hash: 8213c7edecf80e6b601d23e12c08063d1d7610d0c706fccd3804d74cd88f395e
-        velox.josevictor.me/oauth-agent-config-hash: 926d0997ad466cc342274b10472baeadffb2b66a160dc58e36a0b96121331645
+        velox.josevictor.me/oauth-agent-config-hash: b07701c227eb80f0988e779e9fd925337b10b54acc06e0167df45e010dc8a5cc
       labels:
         app.kubernetes.io/controller: main
         app.kubernetes.io/instance: velox
@@ -170,7 +170,7 @@ metadata:
     app.kubernetes.io/name: velox
     app.kubernetes.io/service: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 1459d556c773773f6a2b9adec340c259f76c78cf
+    kubenix/hash: 1f71aaf5e6419b98ac77bba911396b39adf3b998
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -199,7 +199,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 1459d556c773773f6a2b9adec340c259f76c78cf
+    kubenix/hash: 1f71aaf5e6419b98ac77bba911396b39adf3b998
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -843,7 +843,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 1459d556c773773f6a2b9adec340c259f76c78cf
+    kubenix/hash: 1f71aaf5e6419b98ac77bba911396b39adf3b998
   name: velox-config
   namespace: apps
 ---
@@ -875,11 +875,10 @@ data:
     token_url = "https://auth.openai.com/oauth/token"
     scopes = ["openid", "profile", "email", "offline_access"]
     workspace_id_claim = "https://api.openai.com/auth.chatgpt_account_id"
-    extra_authorize_params = {
-      id_token_add_organizations = "true"
-      codex_cli_simplified_flow = "true"
-      originator = "codex_cli_rs"
-    }
+    # A TOML inline table has to be on one line with commas. Written across
+    # several lines it does not parse, the agent refuses to start, and Velox
+    # then fails its own startup on the access-token file the agent never wrote.
+    extra_authorize_params = { id_token_add_organizations = "true", codex_cli_simplified_flow = "true", originator = "codex_cli_rs" }
 
     [credentials.antigravity-primary]
     provider = "antigravity"
@@ -920,7 +919,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 1459d556c773773f6a2b9adec340c259f76c78cf
+    kubenix/hash: 1f71aaf5e6419b98ac77bba911396b39adf3b998
   name: velox-oauth-agent-config
   namespace: apps
 ---
@@ -931,7 +930,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 1459d556c773773f6a2b9adec340c259f76c78cf
+    kubenix/hash: 1f71aaf5e6419b98ac77bba911396b39adf3b998
   name: velox-oauth-agent
   namespace: apps
 ---
@@ -942,7 +941,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 1459d556c773773f6a2b9adec340c259f76c78cf
+    kubenix/hash: 1f71aaf5e6419b98ac77bba911396b39adf3b998
   name: velox-oauth-agent
   namespace: apps
 rules:
@@ -964,7 +963,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 1459d556c773773f6a2b9adec340c259f76c78cf
+    kubenix/hash: 1f71aaf5e6419b98ac77bba911396b39adf3b998
   name: velox-oauth-agent
   namespace: apps
 roleRef:
