@@ -123,6 +123,7 @@ in
             const deleteKey = db.prepare("DELETE FROM key_value WHERE namespace = ? AND key = ?");
             const insertKey = db.prepare("INSERT INTO key_value (namespace, key, value) VALUES (?, ?, ?)");
             const updateProviderConcurrency = db.prepare("UPDATE provider_connections SET max_concurrent = 2 WHERE is_active = 1 AND (max_concurrent IS NULL OR max_concurrent <> 2)");
+            const disableGoogleOAuth = db.prepare("UPDATE provider_connections SET is_active = 0, updated_at = datetime('now') WHERE is_active = 1 AND provider IN ('antigravity', 'agy', 'gemini-cli')");
             const selectCombos = db.prepare("SELECT id, name, data FROM combos WHERE name IN (" + comboNames.map(() => "?").join(",") + ")");
             const updateCombo = db.prepare("UPDATE combos SET data = ?, updated_at = datetime('now') WHERE id = ?");
 
@@ -133,6 +134,7 @@ in
               }
 
               const providerChanges = updateProviderConcurrency.run().changes;
+              const disabledGoogleOAuthRows = disableGoogleOAuth.run().changes;
               let comboChanges = 0;
 
               for (const row of selectCombos.all(...comboNames)) {
@@ -156,7 +158,7 @@ in
                 comboChanges += 1;
               }
 
-              console.log("[omniroute-startup] provider concurrency rows=" + providerChanges + " combo rows=" + comboChanges + " log settings=" + logSettings.length);
+              console.log("[omniroute-startup] provider concurrency rows=" + providerChanges + " disabled Google OAuth rows=" + disabledGoogleOAuthRows + " combo rows=" + comboChanges + " log settings=" + logSettings.length);
             });
 
             tx();
@@ -194,6 +196,7 @@ in
         # estimated tokens — every coding-agent call) and 503s parallel agents
         # with chat_admission_busy/structure_limit.
         controllers.main.containers.main.env.OMNIROUTE_CHAT_MAX_HEAVY_IN_FLIGHT = "6";
+        controllers.main.containers.main.env.OMNIROUTE_HEALTHCHECK_SKIP_PROVIDERS = "antigravity,agy,gemini-cli";
 
         defaultPodOptions.imagePullSecrets = [
           { name = "ghcr-registry-secret"; }
