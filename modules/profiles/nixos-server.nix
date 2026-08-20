@@ -30,7 +30,7 @@ in
         (builtins.substring 0 8 (builtins.hashString "sha1" hostName));
 
       staticIP = {
-        enable = true;
+        enable = homelab.nodes.hosts.${hostName}.staticNetwork;
         inherit (homelab.nodes.hosts.${hostName}) interface;
         address = homelab.nodes.hosts.${hostName}.ipAddress;
         prefixLength = 24;

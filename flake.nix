@@ -8,6 +8,8 @@
     kubenix.url = "github:hall/kubenix";
     terranix.url = "github:terranix/terranix";
     terranix.inputs.nixpkgs.follows = "nixpkgs";
+    disko.url = "github:nix-community/disko";
+    disko.inputs.nixpkgs.follows = "nixpkgs";
     nix-openclaw.url = "git+https://github.com/openclaw/nix-openclaw?ref=main";
   };
 

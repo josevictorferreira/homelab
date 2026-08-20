@@ -27,6 +27,10 @@ in
         ]
         ++ lib.optionals (!isRouter) [
           "--accept-dns=true"
+        ]
+        # Off-LAN nodes (e.g. cloud) reach 10.10.10.0/24 through the subnet routers
+        ++ lib.optionals (!hostConfig.staticNetwork) [
+          "--accept-routes"
         ];
     };
 

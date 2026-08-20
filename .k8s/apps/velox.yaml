@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 22fb1e1e344e73ce88aa1f8b7a23922827e9db67
+    kubenix/hash: 0652834763b9e16ea4f07f49c0b7d81ab8cc237d
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -29,8 +29,8 @@ spec:
   template:
     metadata:
       annotations:
-        velox.josevictor.me/config-hash: aa86f640a13b9b60c824c664b2d65050e6d8e5e662e8f1873036188f7d8b7a20
-        velox.josevictor.me/oauth-agent-config-hash: d0f394f94a804835efefcc60632f8072918f0557b2e6969ae3ea2999cf242384
+        velox.josevictor.me/config-hash: f170ddbc34595dddff5b9843204c52c3ca622a0617dcca4be1a014c3caa1fd79
+        velox.josevictor.me/oauth-agent-config-hash: f156f9b67c0b971eb8ecfb5b0d4a7ee836acaee67b82b4b3ec3f69b794ad12a8
       labels:
         app.kubernetes.io/controller: main
         app.kubernetes.io/instance: velox
@@ -170,7 +170,7 @@ metadata:
     app.kubernetes.io/name: velox
     app.kubernetes.io/service: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 22fb1e1e344e73ce88aa1f8b7a23922827e9db67
+    kubenix/hash: 0652834763b9e16ea4f07f49c0b7d81ab8cc237d
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -199,7 +199,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 22fb1e1e344e73ce88aa1f8b7a23922827e9db67
+    kubenix/hash: 0652834763b9e16ea4f07f49c0b7d81ab8cc237d
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -374,19 +374,14 @@ data:
     embedding = true
 
     # ---------------------------------------------------------------------------
-    # OAuth subscription providers (all disabled)
+    # OAuth subscription providers
     #
     # These are served by the velox-oauth-agent sidecar, which owns the OAuth
     # flow and refresh and publishes access-token + metadata files to the shared
     # oauth-runtime emptyDir. Velox reads the files at dispatch time, so rotation
-    # needs no restart. Do NOT enable an entry until the corresponding credential
-    # has been logged in and the runtime files exist in the pod — Velox fails
-    # startup on a missing credential_file. Full procedure:
-    # docs/oauth-operator-runbook.md in the velox repo.
-    #
-    # Every endpoint is an APPROVED-* placeholder on purpose: enable only after
-    # the Milestone-0 prerequisites (operator-owned/authorized client
-    # registration, approved endpoints/scopes, approved proxy use) are satisfied.
+    # needs no restart. The Antigravity entries below use the explicitly approved
+    # OmniRoute client registration and the two migrated account records.
+    # Full procedure: docs/oauth-operator-runbook.md in the velox repo.
     #
     # [providers.claude-oauth]
     # kind = "anthropic"
@@ -405,17 +400,29 @@ data:
     # vision = false
     # structured_output = false
     #
-    # [providers.antigravity]
-    # kind = "antigravity"
-    # base_url = "https://APPROVED-CLOUD-CODE-HOST"
-    # credential_file = "/etc/velox/oauth-runtime/antigravity-primary.access-token"
-    # antigravity_metadata_file = "/etc/velox/oauth-runtime/antigravity-primary.metadata.json"
-    #
-    # [providers.antigravity.capabilities]
-    # streaming = true
-    # tools = true
-    # vision = false
-    # structured_output = false
+    [providers.antigravity-primary]
+    kind = "antigravity"
+    base_url = "https://cloudcode-pa.googleapis.com"
+    credential_file = "/etc/velox/oauth-runtime/antigravity-primary.access-token"
+    antigravity_metadata_file = "/etc/velox/oauth-runtime/antigravity-primary.metadata.json"
+
+    [providers.antigravity-primary.capabilities]
+    streaming = true
+    tools = true
+    vision = false
+    structured_output = false
+
+    [providers.antigravity-secondary]
+    kind = "antigravity"
+    base_url = "https://cloudcode-pa.googleapis.com"
+    credential_file = "/etc/velox/oauth-runtime/antigravity-secondary.access-token"
+    antigravity_metadata_file = "/etc/velox/oauth-runtime/antigravity-secondary.metadata.json"
+
+    [providers.antigravity-secondary.capabilities]
+    streaming = true
+    tools = true
+    vision = false
+    structured_output = false
 
     # ---------------------------------------------------------------------------
     # Models
@@ -605,6 +612,22 @@ data:
     provider = "puter"
     upstream_model = "google/gemini-3.1-flash-lite-preview"
 
+    [models.gemini-3-1-pro-antigravity-primary]
+    provider = "antigravity-primary"
+    upstream_model = "gemini-3.1-pro"
+
+    [models.gemini-3-1-pro-antigravity-secondary]
+    provider = "antigravity-secondary"
+    upstream_model = "gemini-3.1-pro"
+
+    [models.gemini-3-7-flash-antigravity-primary]
+    provider = "antigravity-primary"
+    upstream_model = "gemini-3.7-flash-high"
+
+    [models.gemini-3-7-flash-antigravity-secondary]
+    provider = "antigravity-secondary"
+    upstream_model = "gemini-3.7-flash-high"
+
     # Embeddings. 1024 dimensions, which is what poise's photo_analyses.embedding
     # vector column is declared as.
     [models.voyage-3]
@@ -770,6 +793,20 @@ data:
       { model = "gemini-flash-lite-puter" },
     ]
 
+    [combos.gemini-3-1-pro]
+    strategy = "round-robin"
+    targets = [
+      { model = "gemini-3-1-pro-antigravity-primary" },
+      { model = "gemini-3-1-pro-antigravity-secondary" },
+    ]
+
+    [combos.gemini-3-7-flash]
+    strategy = "round-robin"
+    targets = [
+      { model = "gemini-3-7-flash-antigravity-primary" },
+      { model = "gemini-3-7-flash-antigravity-secondary" },
+    ]
+
     [combos.samwise]
     strategy = "random"
     targets = [
@@ -783,7 +820,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 22fb1e1e344e73ce88aa1f8b7a23922827e9db67
+    kubenix/hash: 0652834763b9e16ea4f07f49c0b7d81ab8cc237d
   name: velox-config
   namespace: apps
 ---
@@ -810,12 +847,33 @@ data:
 
     [credentials.antigravity-primary]
     provider = "antigravity"
-    client_id = "APPROVED-ANTIGRAVITY-CLIENT-ID"
+    client_id = "1071006060591-tmhssin2h21lcre235vtolojh4g403ep.apps.googleusercontent.com"
     client_secret_env = "ANTIGRAVITY_CLIENT_SECRET"
     authorize_url = "https://accounts.google.com/o/oauth2/v2/auth"
     token_url = "https://oauth2.googleapis.com/token"
     scopes = [
-      "https://www.googleapis.com/auth/cloud-platform"
+      "https://www.googleapis.com/auth/cloud-platform",
+      "https://www.googleapis.com/auth/userinfo.email",
+      "https://www.googleapis.com/auth/userinfo.profile",
+      "https://www.googleapis.com/auth/cclog",
+      "https://www.googleapis.com/auth/experimentsandconfigs"
+    ]
+    metadata_url = "https://cloudcode-pa.googleapis.com/v1internal:loadCodeAssist"
+    metadata_body_json = "{\"metadata\":{}}"
+    metadata_extract = "cloudaicompanionProject"
+
+    [credentials.antigravity-secondary]
+    provider = "antigravity"
+    client_id = "1071006060591-tmhssin2h21lcre235vtolojh4g403ep.apps.googleusercontent.com"
+    client_secret_env = "ANTIGRAVITY_CLIENT_SECRET"
+    authorize_url = "https://accounts.google.com/o/oauth2/v2/auth"
+    token_url = "https://oauth2.googleapis.com/token"
+    scopes = [
+      "https://www.googleapis.com/auth/cloud-platform",
+      "https://www.googleapis.com/auth/userinfo.email",
+      "https://www.googleapis.com/auth/userinfo.profile",
+      "https://www.googleapis.com/auth/cclog",
+      "https://www.googleapis.com/auth/experimentsandconfigs"
     ]
     metadata_url = "https://cloudcode-pa.googleapis.com/v1internal:loadCodeAssist"
     metadata_body_json = "{\"metadata\":{}}"
@@ -826,7 +884,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 22fb1e1e344e73ce88aa1f8b7a23922827e9db67
+    kubenix/hash: 0652834763b9e16ea4f07f49c0b7d81ab8cc237d
   name: velox-oauth-agent-config
   namespace: apps
 ---
@@ -837,7 +895,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 22fb1e1e344e73ce88aa1f8b7a23922827e9db67
+    kubenix/hash: 0652834763b9e16ea4f07f49c0b7d81ab8cc237d
   name: velox-oauth-agent
   namespace: apps
 ---
@@ -848,7 +906,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 22fb1e1e344e73ce88aa1f8b7a23922827e9db67
+    kubenix/hash: 0652834763b9e16ea4f07f49c0b7d81ab8cc237d
   name: velox-oauth-agent
   namespace: apps
 rules:
@@ -870,7 +928,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 22fb1e1e344e73ce88aa1f8b7a23922827e9db67
+    kubenix/hash: 0652834763b9e16ea4f07f49c0b7d81ab8cc237d
   name: velox-oauth-agent
   namespace: apps
 roleRef:

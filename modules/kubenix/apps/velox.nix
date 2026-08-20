@@ -68,12 +68,33 @@ let
 
     [credentials.antigravity-primary]
     provider = "antigravity"
-    client_id = "APPROVED-ANTIGRAVITY-CLIENT-ID"
+    client_id = "1071006060591-tmhssin2h21lcre235vtolojh4g403ep.apps.googleusercontent.com"
     client_secret_env = "ANTIGRAVITY_CLIENT_SECRET"
     authorize_url = "https://accounts.google.com/o/oauth2/v2/auth"
     token_url = "https://oauth2.googleapis.com/token"
     scopes = [
-      "https://www.googleapis.com/auth/cloud-platform"
+      "https://www.googleapis.com/auth/cloud-platform",
+      "https://www.googleapis.com/auth/userinfo.email",
+      "https://www.googleapis.com/auth/userinfo.profile",
+      "https://www.googleapis.com/auth/cclog",
+      "https://www.googleapis.com/auth/experimentsandconfigs"
+    ]
+    metadata_url = "https://cloudcode-pa.googleapis.com/v1internal:loadCodeAssist"
+    metadata_body_json = "{\"metadata\":{}}"
+    metadata_extract = "cloudaicompanionProject"
+
+    [credentials.antigravity-secondary]
+    provider = "antigravity"
+    client_id = "1071006060591-tmhssin2h21lcre235vtolojh4g403ep.apps.googleusercontent.com"
+    client_secret_env = "ANTIGRAVITY_CLIENT_SECRET"
+    authorize_url = "https://accounts.google.com/o/oauth2/v2/auth"
+    token_url = "https://oauth2.googleapis.com/token"
+    scopes = [
+      "https://www.googleapis.com/auth/cloud-platform",
+      "https://www.googleapis.com/auth/userinfo.email",
+      "https://www.googleapis.com/auth/userinfo.profile",
+      "https://www.googleapis.com/auth/cclog",
+      "https://www.googleapis.com/auth/experimentsandconfigs"
     ]
     metadata_url = "https://cloudcode-pa.googleapis.com/v1internal:loadCodeAssist"
     metadata_body_json = "{\"metadata\":{}}"

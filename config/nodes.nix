@@ -21,6 +21,21 @@ rec {
         "k8s-worker"
       ];
     };
+    lab-oci-bk = {
+      # Tailscale IP — the node is off-LAN and only reachable through the tailnet
+      # (public SSH is closed; use a subnet router as jump host from the LAN).
+      ipAddress = "100.104.138.109";
+      system = "aarch64-linux";
+      machine = "oracle-a1";
+      interface = "enp0s6";
+      mac = "02:00:17:00:4E:D5";
+      staticNetwork = false;
+      roles = [
+        "nixos-server"
+        "system-admin"
+        "tailscale"
+      ];
+    };
     lab-alpha-cp = {
       ipAddress = "10.10.10.200";
       system = "x86_64-linux";

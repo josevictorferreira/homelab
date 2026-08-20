@@ -146,19 +146,14 @@ tools = false
 embedding = true
 
 # ---------------------------------------------------------------------------
-# OAuth subscription providers (all disabled)
+# OAuth subscription providers
 #
 # These are served by the velox-oauth-agent sidecar, which owns the OAuth
 # flow and refresh and publishes access-token + metadata files to the shared
 # oauth-runtime emptyDir. Velox reads the files at dispatch time, so rotation
-# needs no restart. Do NOT enable an entry until the corresponding credential
-# has been logged in and the runtime files exist in the pod — Velox fails
-# startup on a missing credential_file. Full procedure:
-# docs/oauth-operator-runbook.md in the velox repo.
-#
-# Every endpoint is an APPROVED-* placeholder on purpose: enable only after
-# the Milestone-0 prerequisites (operator-owned/authorized client
-# registration, approved endpoints/scopes, approved proxy use) are satisfied.
+# needs no restart. The Antigravity entries below use the explicitly approved
+# OmniRoute client registration and the two migrated account records.
+# Full procedure: docs/oauth-operator-runbook.md in the velox repo.
 #
 # [providers.claude-oauth]
 # kind = "anthropic"
@@ -177,17 +172,29 @@ embedding = true
 # vision = false
 # structured_output = false
 #
-# [providers.antigravity]
-# kind = "antigravity"
-# base_url = "https://APPROVED-CLOUD-CODE-HOST"
-# credential_file = "/etc/velox/oauth-runtime/antigravity-primary.access-token"
-# antigravity_metadata_file = "/etc/velox/oauth-runtime/antigravity-primary.metadata.json"
-#
-# [providers.antigravity.capabilities]
-# streaming = true
-# tools = true
-# vision = false
-# structured_output = false
+[providers.antigravity-primary]
+kind = "antigravity"
+base_url = "https://cloudcode-pa.googleapis.com"
+credential_file = "/etc/velox/oauth-runtime/antigravity-primary.access-token"
+antigravity_metadata_file = "/etc/velox/oauth-runtime/antigravity-primary.metadata.json"
+
+[providers.antigravity-primary.capabilities]
+streaming = true
+tools = true
+vision = false
+structured_output = false
+
+[providers.antigravity-secondary]
+kind = "antigravity"
+base_url = "https://cloudcode-pa.googleapis.com"
+credential_file = "/etc/velox/oauth-runtime/antigravity-secondary.access-token"
+antigravity_metadata_file = "/etc/velox/oauth-runtime/antigravity-secondary.metadata.json"
+
+[providers.antigravity-secondary.capabilities]
+streaming = true
+tools = true
+vision = false
+structured_output = false
 
 # ---------------------------------------------------------------------------
 # Models
@@ -377,6 +384,22 @@ upstream_model = "gemma-4-26b-a4b-it"
 provider = "puter"
 upstream_model = "google/gemini-3.1-flash-lite-preview"
 
+[models.gemini-3-1-pro-antigravity-primary]
+provider = "antigravity-primary"
+upstream_model = "gemini-3.1-pro"
+
+[models.gemini-3-1-pro-antigravity-secondary]
+provider = "antigravity-secondary"
+upstream_model = "gemini-3.1-pro"
+
+[models.gemini-3-7-flash-antigravity-primary]
+provider = "antigravity-primary"
+upstream_model = "gemini-3.7-flash-high"
+
+[models.gemini-3-7-flash-antigravity-secondary]
+provider = "antigravity-secondary"
+upstream_model = "gemini-3.7-flash-high"
+
 # Embeddings. 1024 dimensions, which is what poise's photo_analyses.embedding
 # vector column is declared as.
 [models.voyage-3]
@@ -540,6 +563,20 @@ strategy = "round-robin"
 targets = [
   { model = "gpt-oss-120b-openrouter" },
   { model = "gemini-flash-lite-puter" },
+]
+
+[combos.gemini-3-1-pro]
+strategy = "round-robin"
+targets = [
+  { model = "gemini-3-1-pro-antigravity-primary" },
+  { model = "gemini-3-1-pro-antigravity-secondary" },
+]
+
+[combos.gemini-3-7-flash]
+strategy = "round-robin"
+targets = [
+  { model = "gemini-3-7-flash-antigravity-primary" },
+  { model = "gemini-3-7-flash-antigravity-secondary" },
 ]
 
 [combos.samwise]

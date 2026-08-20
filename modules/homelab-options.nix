@@ -40,6 +40,11 @@ let
         type = t.str;
         description = "MAC address of the primary network interface of the node.";
       };
+      staticNetwork = mkOption {
+        type = t.bool;
+        description = "Whether the node uses the LAN static IP configuration. Set to false for nodes with DHCP-managed networking (e.g. cloud nodes).";
+        default = true;
+      };
       disks = mkOption {
         type = t.listOf t.str;
         description = "List of disk device names (e.g. /dev/sda) attached to the node.";
