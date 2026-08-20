@@ -9,7 +9,10 @@
 let
   cfg = config.profiles."backup-server";
   servicesPath = homelab.paths.services;
-  wolMachines = lib.attrsets.filterAttrs (name: _: name != hostName) homelab.nodes.hosts;
+  # Only LAN nodes can be woken via WoL; off-LAN nodes (staticNetwork = false) are excluded
+  wolMachines = lib.attrsets.filterAttrs (
+    name: value: name != hostName && value.staticNetwork
+  ) homelab.nodes.hosts;
   wolMachinesList = lib.attrValues (
     lib.mapAttrs (name: value: value // { inherit name; }) wolMachines
   );
