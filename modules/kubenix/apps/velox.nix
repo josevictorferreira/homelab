@@ -91,8 +91,12 @@ let
       "https://www.googleapis.com/auth/cclog",
       "https://www.googleapis.com/auth/experimentsandconfigs"
     ]
-    metadata_url = "https://cloudcode-pa.googleapis.com/v1internal:loadCodeAssist"
-    metadata_body_json = "{\"metadata\":{}}"
+    metadata_urls = [
+      "https://daily-cloudcode-pa.googleapis.com/v1internal:loadCodeAssist",
+      "https://cloudcode-pa.googleapis.com/v1internal:loadCodeAssist",
+      "https://daily-cloudcode-pa.sandbox.googleapis.com/v1internal:loadCodeAssist",
+    ]
+    metadata_body_json = "{\"metadata\":{\"ideType\":\"ANTIGRAVITY\"}}"
     metadata_extract = "cloudaicompanionProject"
 
     [credentials.antigravity-secondary]
@@ -108,8 +112,12 @@ let
       "https://www.googleapis.com/auth/cclog",
       "https://www.googleapis.com/auth/experimentsandconfigs"
     ]
-    metadata_url = "https://cloudcode-pa.googleapis.com/v1internal:loadCodeAssist"
-    metadata_body_json = "{\"metadata\":{}}"
+    metadata_urls = [
+      "https://daily-cloudcode-pa.googleapis.com/v1internal:loadCodeAssist",
+      "https://cloudcode-pa.googleapis.com/v1internal:loadCodeAssist",
+      "https://daily-cloudcode-pa.sandbox.googleapis.com/v1internal:loadCodeAssist",
+    ]
+    metadata_body_json = "{\"metadata\":{\"ideType\":\"ANTIGRAVITY\"}}"
     metadata_extract = "cloudaicompanionProject"
   '';
   agentConfigHash = builtins.hashString "sha256" agentConfig;
