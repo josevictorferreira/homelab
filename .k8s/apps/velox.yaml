@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 1f71aaf5e6419b98ac77bba911396b39adf3b998
+    kubenix/hash: fa3fbf37a38bc11f574a739ce273fe51349748a7
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -29,7 +29,7 @@ spec:
   template:
     metadata:
       annotations:
-        velox.josevictor.me/config-hash: 8213c7edecf80e6b601d23e12c08063d1d7610d0c706fccd3804d74cd88f395e
+        velox.josevictor.me/config-hash: e2a4cc26e018232b34ed6ea1b37db13f78a29716c65546cc629e7c7e4aa34081
         velox.josevictor.me/oauth-agent-config-hash: b07701c227eb80f0988e779e9fd925337b10b54acc06e0167df45e010dc8a5cc
       labels:
         app.kubernetes.io/controller: main
@@ -170,7 +170,7 @@ metadata:
     app.kubernetes.io/name: velox
     app.kubernetes.io/service: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 1f71aaf5e6419b98ac77bba911396b39adf3b998
+    kubenix/hash: fa3fbf37a38bc11f574a739ce273fe51349748a7
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -199,7 +199,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 1f71aaf5e6419b98ac77bba911396b39adf3b998
+    kubenix/hash: fa3fbf37a38bc11f574a739ce273fe51349748a7
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -280,13 +280,9 @@ data:
     base_url = "https://openrouter.ai/api/v1"
     api_key_env = "OPENROUTER_API_KEY"
 
-    # The only configured provider that accepts image content parts. Verified by
-    # sending a data: URL image to each candidate: opencode-go rejects the content
-    # type outright, alibaba-token-plan does not serve qwen3.8-max, and z-ai/glm-5.3
-    # has no image-capable endpoint. Capabilities are per provider, so this also
-    # marks openrouter's text-only models as vision-capable; that is fine because
-    # vision requests only reach openrouter through combos that name a
-    # multimodal model.
+    # Providers that accept image content parts. OpenRouter, Mistral, and the
+    # Google Gemini models exposed through Antigravity are marked vision-capable;
+    # vision requests are filtered against these provider capabilities.
     [providers.openrouter.capabilities]
     vision = true
 
@@ -410,7 +406,7 @@ data:
     [providers.antigravity-primary.capabilities]
     streaming = true
     tools = true
-    vision = false
+    vision = true
     structured_output = false
 
     [providers.antigravity-secondary]
@@ -422,7 +418,7 @@ data:
     [providers.antigravity-secondary.capabilities]
     streaming = true
     tools = true
-    vision = false
+    vision = true
     structured_output = false
 
     # ---------------------------------------------------------------------------
@@ -629,6 +625,22 @@ data:
     provider = "antigravity-secondary"
     upstream_model = "gemini-3.1-pro"
 
+    [models.gemini-3-1-pro-preview-antigravity-primary]
+    provider = "antigravity-primary"
+    upstream_model = "gemini-3.1-pro-preview"
+
+    [models.gemini-3-1-pro-preview-antigravity-secondary]
+    provider = "antigravity-secondary"
+    upstream_model = "gemini-3.1-pro-preview"
+
+    [models.gemini-3-pro-antigravity-primary]
+    provider = "antigravity-primary"
+    upstream_model = "gemini-3-pro"
+
+    [models.gemini-3-pro-antigravity-secondary]
+    provider = "antigravity-secondary"
+    upstream_model = "gemini-3-pro"
+
     [models.gemini-3-7-flash-antigravity-primary]
     provider = "antigravity-primary"
     upstream_model = "gemini-3.7-flash-high"
@@ -703,14 +715,14 @@ data:
       { model = "qwen3-8-max-openrouter" },
     ]
 
-    # Image description, in preference order. Both targets are vision-capable, so
-    # Velox falls back rather than returning unsupported_capability when the first
-    # provider is down. Named for the job because the two targets are different
-    # models, not one model behind two providers.
+    # Vision-focused Google models, distributed across both Antigravity accounts.
     [combos.vision]
+    strategy = "round-robin"
     targets = [
-      { model = "qwen3-8-max-openrouter" },
-      { model = "mistral-medium" },
+      { model = "gemini-3-1-pro-preview-antigravity-primary" },
+      { model = "gemini-3-1-pro-preview-antigravity-secondary" },
+      { model = "gemini-3-pro-antigravity-primary" },
+      { model = "gemini-3-pro-antigravity-secondary" },
     ]
 
     [combos.qwen3-6-plus]
@@ -843,7 +855,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 1f71aaf5e6419b98ac77bba911396b39adf3b998
+    kubenix/hash: fa3fbf37a38bc11f574a739ce273fe51349748a7
   name: velox-config
   namespace: apps
 ---
@@ -919,7 +931,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 1f71aaf5e6419b98ac77bba911396b39adf3b998
+    kubenix/hash: fa3fbf37a38bc11f574a739ce273fe51349748a7
   name: velox-oauth-agent-config
   namespace: apps
 ---
@@ -930,7 +942,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 1f71aaf5e6419b98ac77bba911396b39adf3b998
+    kubenix/hash: fa3fbf37a38bc11f574a739ce273fe51349748a7
   name: velox-oauth-agent
   namespace: apps
 ---
@@ -941,7 +953,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 1f71aaf5e6419b98ac77bba911396b39adf3b998
+    kubenix/hash: fa3fbf37a38bc11f574a739ce273fe51349748a7
   name: velox-oauth-agent
   namespace: apps
 rules:
@@ -963,7 +975,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 1f71aaf5e6419b98ac77bba911396b39adf3b998
+    kubenix/hash: fa3fbf37a38bc11f574a739ce273fe51349748a7
   name: velox-oauth-agent
   namespace: apps
 roleRef:

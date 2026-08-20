@@ -52,13 +52,9 @@ kind = "openai-compatible"
 base_url = "https://openrouter.ai/api/v1"
 api_key_env = "OPENROUTER_API_KEY"
 
-# The only configured provider that accepts image content parts. Verified by
-# sending a data: URL image to each candidate: opencode-go rejects the content
-# type outright, alibaba-token-plan does not serve qwen3.8-max, and z-ai/glm-5.3
-# has no image-capable endpoint. Capabilities are per provider, so this also
-# marks openrouter's text-only models as vision-capable; that is fine because
-# vision requests only reach openrouter through combos that name a
-# multimodal model.
+# Providers that accept image content parts. OpenRouter, Mistral, and the
+# Google Gemini models exposed through Antigravity are marked vision-capable;
+# vision requests are filtered against these provider capabilities.
 [providers.openrouter.capabilities]
 vision = true
 
@@ -182,7 +178,7 @@ antigravity_metadata_file = "/etc/velox/oauth-runtime/antigravity-primary.metada
 [providers.antigravity-primary.capabilities]
 streaming = true
 tools = true
-vision = false
+vision = true
 structured_output = false
 
 [providers.antigravity-secondary]
@@ -194,7 +190,7 @@ antigravity_metadata_file = "/etc/velox/oauth-runtime/antigravity-secondary.meta
 [providers.antigravity-secondary.capabilities]
 streaming = true
 tools = true
-vision = false
+vision = true
 structured_output = false
 
 # ---------------------------------------------------------------------------
@@ -401,6 +397,22 @@ upstream_model = "gemini-3.1-pro"
 provider = "antigravity-secondary"
 upstream_model = "gemini-3.1-pro"
 
+[models.gemini-3-1-pro-preview-antigravity-primary]
+provider = "antigravity-primary"
+upstream_model = "gemini-3.1-pro-preview"
+
+[models.gemini-3-1-pro-preview-antigravity-secondary]
+provider = "antigravity-secondary"
+upstream_model = "gemini-3.1-pro-preview"
+
+[models.gemini-3-pro-antigravity-primary]
+provider = "antigravity-primary"
+upstream_model = "gemini-3-pro"
+
+[models.gemini-3-pro-antigravity-secondary]
+provider = "antigravity-secondary"
+upstream_model = "gemini-3-pro"
+
 [models.gemini-3-7-flash-antigravity-primary]
 provider = "antigravity-primary"
 upstream_model = "gemini-3.7-flash-high"
@@ -475,14 +487,14 @@ targets = [
   { model = "qwen3-8-max-openrouter" },
 ]
 
-# Image description, in preference order. Both targets are vision-capable, so
-# Velox falls back rather than returning unsupported_capability when the first
-# provider is down. Named for the job because the two targets are different
-# models, not one model behind two providers.
+# Vision-focused Google models, distributed across both Antigravity accounts.
 [combos.vision]
+strategy = "round-robin"
 targets = [
-  { model = "qwen3-8-max-openrouter" },
-  { model = "mistral-medium" },
+  { model = "gemini-3-1-pro-preview-antigravity-primary" },
+  { model = "gemini-3-1-pro-preview-antigravity-secondary" },
+  { model = "gemini-3-pro-antigravity-primary" },
+  { model = "gemini-3-pro-antigravity-secondary" },
 ]
 
 [combos.qwen3-6-plus]
