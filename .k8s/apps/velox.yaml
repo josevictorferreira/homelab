@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 0ff45cda8e0c21be299c4e1d56d10be6ba1b5e8c
+    kubenix/hash: 4e10cafc57aaa51ef499205e20bbadb9f411543c
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -29,7 +29,7 @@ spec:
   template:
     metadata:
       annotations:
-        velox.josevictor.me/config-hash: b30dbeba31899ea9439544391fd7088d146505926a4c966f92fef1ff612254e6
+        velox.josevictor.me/config-hash: 7cb28af53594e2c16ab099a2a78f68f36a61b09469bac5bdc7e54e224ed6bd3b
         velox.josevictor.me/oauth-agent-config-hash: 72b7f1b202300c363471312cd880f37085429ad305f9944b37c6926c9dee941d
       labels:
         app.kubernetes.io/controller: main
@@ -170,7 +170,7 @@ metadata:
     app.kubernetes.io/name: velox
     app.kubernetes.io/service: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 0ff45cda8e0c21be299c4e1d56d10be6ba1b5e8c
+    kubenix/hash: 4e10cafc57aaa51ef499205e20bbadb9f411543c
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -199,7 +199,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 0ff45cda8e0c21be299c4e1d56d10be6ba1b5e8c
+    kubenix/hash: 4e10cafc57aaa51ef499205e20bbadb9f411543c
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -399,7 +399,7 @@ data:
 
     [providers.antigravity-primary]
     kind = "antigravity"
-    base_url = "https://cloudcode-pa.googleapis.com"
+    base_url = "https://daily-cloudcode-pa.googleapis.com"
     credential_file = "/etc/velox/oauth-runtime/antigravity-primary.access-token"
     antigravity_metadata_file = "/etc/velox/oauth-runtime/antigravity-primary.metadata.json"
 
@@ -411,7 +411,7 @@ data:
 
     [providers.antigravity-secondary]
     kind = "antigravity"
-    base_url = "https://cloudcode-pa.googleapis.com"
+    base_url = "https://daily-cloudcode-pa.googleapis.com"
     credential_file = "/etc/velox/oauth-runtime/antigravity-secondary.access-token"
     antigravity_metadata_file = "/etc/velox/oauth-runtime/antigravity-secondary.metadata.json"
 
@@ -860,7 +860,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 0ff45cda8e0c21be299c4e1d56d10be6ba1b5e8c
+    kubenix/hash: 4e10cafc57aaa51ef499205e20bbadb9f411543c
   name: velox-config
   namespace: apps
 ---
@@ -944,7 +944,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 0ff45cda8e0c21be299c4e1d56d10be6ba1b5e8c
+    kubenix/hash: 4e10cafc57aaa51ef499205e20bbadb9f411543c
   name: velox-oauth-agent-config
   namespace: apps
 ---
@@ -955,7 +955,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 0ff45cda8e0c21be299c4e1d56d10be6ba1b5e8c
+    kubenix/hash: 4e10cafc57aaa51ef499205e20bbadb9f411543c
   name: velox-oauth-agent
   namespace: apps
 ---
@@ -966,7 +966,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 0ff45cda8e0c21be299c4e1d56d10be6ba1b5e8c
+    kubenix/hash: 4e10cafc57aaa51ef499205e20bbadb9f411543c
   name: velox-oauth-agent
   namespace: apps
 rules:
@@ -988,7 +988,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 0ff45cda8e0c21be299c4e1d56d10be6ba1b5e8c
+    kubenix/hash: 4e10cafc57aaa51ef499205e20bbadb9f411543c
   name: velox-oauth-agent
   namespace: apps
 roleRef:
