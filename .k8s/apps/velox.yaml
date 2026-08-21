@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 4e10cafc57aaa51ef499205e20bbadb9f411543c
+    kubenix/hash: d49cdb63420002e3168d7c155fe9568072a8899f
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -78,6 +78,14 @@ spec:
             - mountPath: /etc/velox/oauth-runtime
               name: oauth-runtime
               readOnly: true
+      dnsPolicy: ClusterFirst
+      enableServiceLinks: false
+      hostIPC: false
+      hostNetwork: false
+      hostPID: false
+      imagePullSecrets:
+        - name: ghcr-registry-secret
+      initContainers:
         - env:
             - name: ANTIGRAVITY_CLIENT_SECRET
               valueFrom:
@@ -100,6 +108,7 @@ spec:
             requests:
               cpu: 50m
               memory: 64Mi
+          restartPolicy: Always
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
@@ -119,13 +128,44 @@ spec:
               readOnly: true
             - mountPath: /oauth-runtime
               name: oauth-runtime
-      dnsPolicy: ClusterFirst
-      enableServiceLinks: false
-      hostIPC: false
-      hostNetwork: false
-      hostPID: false
-      imagePullSecrets:
-        - name: ghcr-registry-secret
+        - args:
+            - |
+              for _ in $(seq 1 60); do
+                if [ -f /etc/velox/oauth-runtime/codex-primary.access-token ] \
+                  && [ -f /etc/velox/oauth-runtime/antigravity-primary.access-token ] \
+                  && [ -f /etc/velox/oauth-runtime/antigravity-secondary.access-token ]; then
+                  echo "oauth credential files published"
+                  exit 0
+                fi
+                sleep 1
+              done
+              echo "timed out waiting for oauth credential files; starting Velox anyway" >&2
+              exit 0
+          command:
+            - sh
+            - -c
+          image: busybox:1.36.1
+          name: wait-for-oauth-tokens
+          resources:
+            limits:
+              cpu: 100m
+              memory: 64Mi
+            requests:
+              cpu: 50m
+              memory: 16Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+            runAsGroup: 65532
+            runAsNonRoot: true
+            runAsUser: 65532
+          volumeMounts:
+            - mountPath: /etc/velox/oauth-runtime
+              name: oauth-runtime
+              readOnly: true
       serviceAccountName: velox-oauth-agent
       terminationGracePeriodSeconds: 45
       volumes:
@@ -170,7 +210,7 @@ metadata:
     app.kubernetes.io/name: velox
     app.kubernetes.io/service: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 4e10cafc57aaa51ef499205e20bbadb9f411543c
+    kubenix/hash: d49cdb63420002e3168d7c155fe9568072a8899f
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -199,7 +239,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 4e10cafc57aaa51ef499205e20bbadb9f411543c
+    kubenix/hash: d49cdb63420002e3168d7c155fe9568072a8899f
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -860,7 +900,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 4e10cafc57aaa51ef499205e20bbadb9f411543c
+    kubenix/hash: d49cdb63420002e3168d7c155fe9568072a8899f
   name: velox-config
   namespace: apps
 ---
@@ -944,7 +984,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 4e10cafc57aaa51ef499205e20bbadb9f411543c
+    kubenix/hash: d49cdb63420002e3168d7c155fe9568072a8899f
   name: velox-oauth-agent-config
   namespace: apps
 ---
@@ -955,7 +995,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 4e10cafc57aaa51ef499205e20bbadb9f411543c
+    kubenix/hash: d49cdb63420002e3168d7c155fe9568072a8899f
   name: velox-oauth-agent
   namespace: apps
 ---
@@ -966,7 +1006,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 4e10cafc57aaa51ef499205e20bbadb9f411543c
+    kubenix/hash: d49cdb63420002e3168d7c155fe9568072a8899f
   name: velox-oauth-agent
   namespace: apps
 rules:
@@ -988,7 +1028,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 4e10cafc57aaa51ef499205e20bbadb9f411543c
+    kubenix/hash: d49cdb63420002e3168d7c155fe9568072a8899f
   name: velox-oauth-agent
   namespace: apps
 roleRef:
