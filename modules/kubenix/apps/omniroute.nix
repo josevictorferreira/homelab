@@ -38,6 +38,7 @@ in
       };
       secretName = "${app}-env";
       port = 20128;
+      replicas = 0;
       command = [
         "sh"
         "-ec"
