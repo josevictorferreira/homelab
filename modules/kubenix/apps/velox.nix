@@ -267,7 +267,15 @@ in
           };
         };
 
-        controllers.main.containers.${agentApp} = {
+        # A native sidecar (init container with restartPolicy = "Always"), not a
+        # plain container. The credential files live in an ephemeral emptyDir the
+        # agent republishes on every pod start, and Velox fails startup on a
+        # missing credential_file — as two ordinary containers they raced, so
+        # Velox crash-looped on `credential_file ... does not exist` until the
+        # agent caught up. Consumers saw that window as a Service with no ready
+        # endpoints, which surfaces in clients as a rejected connection.
+        controllers.main.initContainers.${agentApp} = {
+          restartPolicy = "Always";
           image = {
             repository = "ghcr.io/josevictorferreira/${agentApp}";
             tag = "latest";
@@ -314,6 +322,55 @@ in
           };
         };
 
+        # Runs after the sidecar above (init containers start in key order) and
+        # blocks `main` until every credential_file named in velox.toml exists.
+        #
+        # The wait is bounded and always exits 0 on purpose: the agent's /readyz
+        # is deliberately kept out of pod readiness so an OAuth outage cannot
+        # take the proxy out of service, and a gate that blocked forever would
+        # reintroduce exactly that coupling. On timeout this degrades to the old
+        # behaviour (Velox starts, fails, restarts) instead of wedging in Init.
+        controllers.main.initContainers.wait-for-oauth-tokens = {
+          image = {
+            repository = "busybox";
+            tag = "1.36.1";
+          };
+          command = [ "sh" "-c" ];
+          args = [
+            ''
+              for _ in $(seq 1 60); do
+                if [ -f /etc/velox/oauth-runtime/codex-primary.access-token ] \
+                  && [ -f /etc/velox/oauth-runtime/antigravity-primary.access-token ] \
+                  && [ -f /etc/velox/oauth-runtime/antigravity-secondary.access-token ]; then
+                  echo "oauth credential files published"
+                  exit 0
+                fi
+                sleep 1
+              done
+              echo "timed out waiting for oauth credential files; starting Velox anyway" >&2
+              exit 0
+            ''
+          ];
+          resources = {
+            requests = {
+              cpu = "50m";
+              memory = "16Mi";
+            };
+            limits = {
+              cpu = "100m";
+              memory = "64Mi";
+            };
+          };
+          securityContext = {
+            runAsNonRoot = true;
+            runAsUser = 65532;
+            runAsGroup = 65532;
+            readOnlyRootFilesystem = true;
+            allowPrivilegeEscalation = false;
+            capabilities.drop = [ "ALL" ];
+          };
+        };
+
         persistence.config = {
           enabled = true;
           type = "configMap";
@@ -350,6 +407,12 @@ in
               {
                 path = "/oauth-runtime";
                 readOnly = false;
+              }
+            ];
+            wait-for-oauth-tokens = [
+              {
+                path = "/etc/velox/oauth-runtime";
+                readOnly = true;
               }
             ];
           };
