@@ -285,6 +285,10 @@ upstream_model = "deepseek/deepseek-v4-flash-0731"
 provider = "alibaba-token-plan"
 upstream_model = "alibaba-token-plan/deepseek-v4-flash-0731"
 
+[models.deepseek-v4-flash-neuralwatt]
+provider = "neuralwatt"
+upstream_model = "deepseek-v4-flash-0731"
+
 [models.deepseek-v4-pro-ocgo]
 provider = "opencode-go"
 upstream_model = "deepseek-v4-pro"
@@ -505,8 +509,9 @@ targets = [
 ]
 
 [combos.deepseek-v4-flash]
-strategy = "round-robin"
+strategy = "priority"
 targets = [
+  { model = "deepseek-v4-flash-neuralwatt" },
   { model = "deepseek-v4-flash-openrouter" },
   { model = "deepseek-v4-flash-alibaba" },
 ]
