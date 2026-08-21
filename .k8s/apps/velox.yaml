@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 4ff86fc4d782c503bc577ad272298ba5253b613f
+    kubenix/hash: 0ff45cda8e0c21be299c4e1d56d10be6ba1b5e8c
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -29,8 +29,8 @@ spec:
   template:
     metadata:
       annotations:
-        velox.josevictor.me/config-hash: e2a4cc26e018232b34ed6ea1b37db13f78a29716c65546cc629e7c7e4aa34081
-        velox.josevictor.me/oauth-agent-config-hash: ec47a460b1ff2b2217389ac18a5caebcfcc957f798e079a345e88fa76e313140
+        velox.josevictor.me/config-hash: b30dbeba31899ea9439544391fd7088d146505926a4c966f92fef1ff612254e6
+        velox.josevictor.me/oauth-agent-config-hash: 72b7f1b202300c363471312cd880f37085429ad305f9944b37c6926c9dee941d
       labels:
         app.kubernetes.io/controller: main
         app.kubernetes.io/instance: velox
@@ -170,7 +170,7 @@ metadata:
     app.kubernetes.io/name: velox
     app.kubernetes.io/service: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 4ff86fc4d782c503bc577ad272298ba5253b613f
+    kubenix/hash: 0ff45cda8e0c21be299c4e1d56d10be6ba1b5e8c
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -199,7 +199,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 4ff86fc4d782c503bc577ad272298ba5253b613f
+    kubenix/hash: 0ff45cda8e0c21be299c4e1d56d10be6ba1b5e8c
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -513,6 +513,10 @@ data:
     provider = "alibaba-token-plan"
     upstream_model = "alibaba-token-plan/deepseek-v4-flash-0731"
 
+    [models.deepseek-v4-flash-neuralwatt]
+    provider = "neuralwatt"
+    upstream_model = "deepseek-v4-flash-0731"
+
     [models.deepseek-v4-pro-ocgo]
     provider = "opencode-go"
     upstream_model = "deepseek-v4-pro"
@@ -733,8 +737,9 @@ data:
     ]
 
     [combos.deepseek-v4-flash]
-    strategy = "round-robin"
+    strategy = "priority"
     targets = [
+      { model = "deepseek-v4-flash-neuralwatt" },
       { model = "deepseek-v4-flash-openrouter" },
       { model = "deepseek-v4-flash-alibaba" },
     ]
@@ -855,7 +860,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 4ff86fc4d782c503bc577ad272298ba5253b613f
+    kubenix/hash: 0ff45cda8e0c21be299c4e1d56d10be6ba1b5e8c
   name: velox-config
   namespace: apps
 ---
@@ -890,7 +895,7 @@ data:
     # A TOML inline table has to be on one line with commas. Written across
     # several lines it does not parse, the agent refuses to start, and Velox
     # then fails its own startup on the access-token file the agent never wrote.
-    extra_authorize_params = { id_token_add_organizations = "true", codex_cli_simplified_flow = "true", originator = "codex_cli_rs" }
+    extra_authorize_params = { id_token_add_organizations = "true", codex_cli_simplified_flow = "true", originator = "codex_cli_rs", prompt = "login" }
 
     [credentials.antigravity-primary]
     provider = "antigravity"
@@ -939,7 +944,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 4ff86fc4d782c503bc577ad272298ba5253b613f
+    kubenix/hash: 0ff45cda8e0c21be299c4e1d56d10be6ba1b5e8c
   name: velox-oauth-agent-config
   namespace: apps
 ---
@@ -950,7 +955,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 4ff86fc4d782c503bc577ad272298ba5253b613f
+    kubenix/hash: 0ff45cda8e0c21be299c4e1d56d10be6ba1b5e8c
   name: velox-oauth-agent
   namespace: apps
 ---
@@ -961,7 +966,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 4ff86fc4d782c503bc577ad272298ba5253b613f
+    kubenix/hash: 0ff45cda8e0c21be299c4e1d56d10be6ba1b5e8c
   name: velox-oauth-agent
   namespace: apps
 rules:
@@ -983,7 +988,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 4ff86fc4d782c503bc577ad272298ba5253b613f
+    kubenix/hash: 0ff45cda8e0c21be299c4e1d56d10be6ba1b5e8c
   name: velox-oauth-agent
   namespace: apps
 roleRef:

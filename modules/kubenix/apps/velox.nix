@@ -76,7 +76,7 @@ let
     # A TOML inline table has to be on one line with commas. Written across
     # several lines it does not parse, the agent refuses to start, and Velox
     # then fails its own startup on the access-token file the agent never wrote.
-    extra_authorize_params = { id_token_add_organizations = "true", codex_cli_simplified_flow = "true", originator = "codex_cli_rs" }
+    extra_authorize_params = { id_token_add_organizations = "true", codex_cli_simplified_flow = "true", originator = "codex_cli_rs", prompt = "login" }
 
     [credentials.antigravity-primary]
     provider = "antigravity"
@@ -228,8 +228,7 @@ in
         controllers.main.serviceAccount.name = agentApp;
 
         controllers.main.pod.annotations."velox.josevictor.me/config-hash" = configHash;
-        controllers.main.pod.annotations."velox.josevictor.me/oauth-agent-config-hash" =
-          agentConfigHash;
+        controllers.main.pod.annotations."velox.josevictor.me/oauth-agent-config-hash" = agentConfigHash;
 
         controllers.main.containers.main = {
           args = [
