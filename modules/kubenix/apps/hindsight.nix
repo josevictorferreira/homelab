@@ -41,7 +41,7 @@ in
               HINDSIGHT_API_HOST = "0.0.0.0";
               HINDSIGHT_API_LLM_PROVIDER = "openai";
               HINDSIGHT_API_LLM_MODEL = "pippin";
-              HINDSIGHT_API_LLM_BASE_URL = "https://omniroute.josevictor.me/v1";
+              HINDSIGHT_API_LLM_BASE_URL = "http://${kubenix.lib.serviceHostFor "velox" namespace}:8080/v1";
               HINDSIGHT_API_REFLECT_LLM_MODEL = "haldir";
               HINDSIGHT_API_EMBEDDINGS_PROVIDER = "openai";
               HINDSIGHT_API_EMBEDDINGS_OPENAI_BASE_URL = "https://openrouter.ai/api/v1";
@@ -55,9 +55,9 @@ in
               HINDSIGHT_API_WORKER_CONSOLIDATION_MAX_SLOTS = "2";
               HINDSIGHT_API_LLM_TIMEOUT = "120";
               HINDSIGHT_API_LLM_MAX_RETRIES = "2";
-              # Cap concurrent LLM calls to omniroute (#5152): 8 parallel large bodies
-              # through pippin stacked enough compression-pipeline heap to OOM omniroute.
-              # Defense-in-depth alongside omniroute's compression concurrency gate.
+              # Cap concurrent LLM calls (#5152, from the omniroute era): 8 parallel
+              # large bodies through pippin stacked enough compression-pipeline heap
+              # to OOM the router. Kept as defense-in-depth now that Velox serves this.
               HINDSIGHT_API_LLM_MAX_CONCURRENT = "2";
               HINDSIGHT_API_RETAIN_LLM_TIMEOUT = "120";
               HINDSIGHT_API_RETAIN_LLM_MAX_RETRIES = "2";

@@ -11,8 +11,12 @@ in
       inherit namespace;
     };
     stringData = {
-      OMNIROUTE_API_KEY = kubenix.lib.secretsFor "omniroute_api_key";
-      OMNIROUTE_BASE_URL = "https://omniroute.josevictor.me";
+      # Oratoria's omniroute client only calls /v1/chat/completions, so Velox
+      # serves it; the OMNIROUTE_* names are the app's env contract. The model
+      # must be set explicitly: the code default "kimi-k2.6" is not a Velox combo.
+      OMNIROUTE_API_KEY = kubenix.lib.secretsFor "velox_api_keys";
+      OMNIROUTE_BASE_URL = "http://${kubenix.lib.serviceHostFor "velox" namespace}:8080";
+      OMNIROUTE_MODEL = "kimi-k2-6";
       ELEVENLABS_API_KEY = kubenix.lib.secretsFor "elevenlabs_api_key";
       ELEVENLABS_MODEL = "eleven_v3";
       SPEECHIFY_API_KEY = kubenix.lib.secretsFor "speechify_api_key";

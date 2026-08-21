@@ -503,11 +503,6 @@ let
                         icon = "sh:hermes-agent";
                       }
                       {
-                        title = "OmniRoute";
-                        url = "https://omniroute.josevictor.me";
-                        icon = "sh:omniroute";
-                      }
-                      {
                         title = "Hindsight";
                         url = "https://hindsight.josevictor.me";
                         icon = "mdi:brain";
