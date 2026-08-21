@@ -335,7 +335,10 @@ in
             repository = "busybox";
             tag = "1.36.1";
           };
-          command = [ "sh" "-c" ];
+          command = [
+            "sh"
+            "-c"
+          ];
           args = [
             ''
               for _ in $(seq 1 60); do
@@ -354,7 +357,7 @@ in
           resources = {
             requests = {
               cpu = "50m";
-              memory = "16Mi";
+              memory = "64Mi";
             };
             limits = {
               cpu = "100m";
