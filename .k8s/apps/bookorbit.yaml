@@ -1,0 +1,196 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/controller: main
+    app.kubernetes.io/instance: bookorbit
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: bookorbit
+    helm.sh/chart: app-template-4.2.0
+    kubenix/hash: ed6b7b3c9a97543664e1b9089e8306e49ded5677
+    kubenix/module-instance: bookorbit
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: bookorbit
+  namespace: apps
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/controller: main
+      app.kubernetes.io/instance: bookorbit
+      app.kubernetes.io/name: bookorbit
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/controller: main
+        app.kubernetes.io/instance: bookorbit
+        app.kubernetes.io/name: bookorbit
+    spec:
+      automountServiceAccountToken: true
+      containers:
+        - env:
+            - name: APP_URL
+              value: http://bookorbit.josevictor.me
+            - name: BOOK_DOCK_PATH
+              value: /books
+            - name: CLIENT_URL
+              value: http://bookorbit.josevictor.me
+            - name: LIBRARY_BROWSE_ROOT
+              value: /books
+            - name: NODE_ENV
+              value: production
+            - name: NODE_MAX_OLD_SPACE_SIZE
+              value: "2048"
+            - name: PGID
+              value: "1000"
+            - name: PORT
+              value: "3000"
+            - name: PUID
+              value: "1000"
+          envFrom:
+            - secretRef:
+                name: bookorbit-config
+          image: ghcr.io/bookorbit/bookorbit:latest@sha256:a2e1f5e59f9b1aec58116ced886d547f16af5d1da911c8e5b920d23b9826a96a
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            httpGet:
+              path: /api/v1/health
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 15
+          name: main
+          ports:
+            - containerPort: 3000
+              name: http
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /api/v1/health
+              port: 3000
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          resources:
+            limits:
+              cpu: "2"
+              memory: 2Gi
+            requests:
+              cpu: 100m
+              memory: 512Mi
+          volumeMounts:
+            - mountPath: /books
+              name: books
+              subPath: books
+            - mountPath: /data
+              name: main
+      dnsPolicy: ClusterFirst
+      enableServiceLinks: false
+      hostIPC: false
+      hostNetwork: false
+      hostPID: false
+      serviceAccountName: default
+      volumes:
+        - name: books
+          persistentVolumeClaim:
+            claimName: cephfs-shared-storage-root
+        - name: main
+          persistentVolumeClaim:
+            claimName: bookorbit
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: bookorbit
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: bookorbit
+    helm.sh/chart: app-template-4.2.0
+    kubenix/hash: ed6b7b3c9a97543664e1b9089e8306e49ded5677
+    kubenix/module-instance: bookorbit
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: bookorbit
+  namespace: apps
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: rook-ceph-block
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+    lbipam.cilium.io/ips: 10.10.10.160
+    lbipam.cilium.io/sharing-key: bookorbit
+  labels:
+    app.kubernetes.io/instance: bookorbit
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: bookorbit
+    app.kubernetes.io/service: bookorbit
+    helm.sh/chart: app-template-4.2.0
+    kubenix/hash: ed6b7b3c9a97543664e1b9089e8306e49ded5677
+    kubenix/module-instance: bookorbit
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: bookorbit
+  namespace: apps
+spec:
+  ports:
+    - name: http
+      port: 3000
+      protocol: TCP
+      targetPort: 3000
+  selector:
+    app.kubernetes.io/controller: main
+    app.kubernetes.io/instance: bookorbit
+    app.kubernetes.io/name: bookorbit
+  type: LoadBalancer
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: bookorbit
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: bookorbit
+    helm.sh/chart: app-template-4.2.0
+    kubenix/hash: ed6b7b3c9a97543664e1b9089e8306e49ded5677
+    kubenix/module-instance: bookorbit
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: bookorbit
+  namespace: apps
+spec:
+  ingressClassName: cilium
+  rules:
+    - host: bookorbit.josevictor.me
+      http:
+        paths:
+          - backend:
+              service:
+                name: bookorbit
+                port:
+                  number: 3000
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - bookorbit.josevictor.me
+      secretName: wildcard-tls

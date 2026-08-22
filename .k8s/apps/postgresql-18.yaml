@@ -11,7 +11,7 @@ metadata:
     app.kubernetes.io/name: postgresql
     app.kubernetes.io/version: 17.6.0
     helm.sh/chart: postgresql-16.7.27
-    kubenix/hash: a2295ec248b670a9b0b2270abf0a48b3d23f23e9
+    kubenix/hash: ed3ad5c19a58b7eea5a515d67ed445c0d2f46a72
   name: postgresql-18
   namespace: apps
 spec:
@@ -195,14 +195,14 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: a2295ec248b670a9b0b2270abf0a48b3d23f23e9
-  name: postgresql-18-bootstrap-04a52110
+    kubenix/hash: ed3ad5c19a58b7eea5a515d67ed445c0d2f46a72
+  name: postgresql-18-bootstrap-bc0589db
   namespace: apps
 spec:
   template:
     metadata:
       annotations:
-        checksum/config: 04a521101c6197b00bd12bc44074985108879e56857dafaf1e4817f4f577cb6b
+        checksum/config: bc0589db1e1d74557b29189947d1929bb517c26e79a5db61591d950276c6d05c
     spec:
       containers:
         - args:
@@ -383,6 +383,14 @@ spec:
 
               echo "Installing pgvecto.rs extension in database 'poise_production_cable'..."
               psql -h postgresql-18 -U postgres -d poise_production_cable -c "DROP EXTENSION IF EXISTS vectors;CREATE EXTENSION IF NOT EXISTS vchord CASCADE;" || echo "Extension installation completed for poise_production_cable"
+
+              psql -h postgresql-18 -U postgres -c 'ALTER SYSTEM SET shared_preload_libraries = "vchord.so"'
+              echo "Ensuring database 'bookorbit' exists..."
+              psql -h postgresql-18 -U postgres -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname='bookorbit'" | grep -q 1 \
+                || psql -h postgresql-18 -U postgres -d postgres -c "CREATE DATABASE \"bookorbit\";"
+
+              echo "Installing pgvecto.rs extension in database 'bookorbit'..."
+              psql -h postgresql-18 -U postgres -d bookorbit -c "DROP EXTENSION IF EXISTS vectors;CREATE EXTENSION IF NOT EXISTS vchord CASCADE;" || echo "Extension installation completed for bookorbit"
 
           command:
             - sh
@@ -577,13 +585,21 @@ data:
 
     echo "Installing pgvecto.rs extension in database 'poise_production_cable'..."
     psql -h postgresql-18 -U postgres -d poise_production_cable -c "DROP EXTENSION IF EXISTS vectors;CREATE EXTENSION IF NOT EXISTS vchord CASCADE;" || echo "Extension installation completed for poise_production_cable"
+
+    psql -h postgresql-18 -U postgres -c 'ALTER SYSTEM SET shared_preload_libraries = "vchord.so"'
+    echo "Ensuring database 'bookorbit' exists..."
+    psql -h postgresql-18 -U postgres -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname='bookorbit'" | grep -q 1 \
+      || psql -h postgresql-18 -U postgres -d postgres -c "CREATE DATABASE \"bookorbit\";"
+
+    echo "Installing pgvecto.rs extension in database 'bookorbit'..."
+    psql -h postgresql-18 -U postgres -d bookorbit -c "DROP EXTENSION IF EXISTS vectors;CREATE EXTENSION IF NOT EXISTS vchord CASCADE;" || echo "Extension installation completed for bookorbit"
 kind: ConfigMap
 metadata:
   annotations:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: a2295ec248b670a9b0b2270abf0a48b3d23f23e9
+    kubenix/hash: ed3ad5c19a58b7eea5a515d67ed445c0d2f46a72
   name: postgresql-18-bootstrap
   namespace: apps
 ---
@@ -623,7 +639,7 @@ metadata:
     app.kubernetes.io/name: postgresql
     app.kubernetes.io/version: 17.6.0
     helm.sh/chart: postgresql-16.7.27
-    kubenix/hash: a2295ec248b670a9b0b2270abf0a48b3d23f23e9
+    kubenix/hash: ed3ad5c19a58b7eea5a515d67ed445c0d2f46a72
   name: postgresql-18-extended-configuration
   namespace: apps
 ---
@@ -642,7 +658,7 @@ metadata:
     app.kubernetes.io/name: postgresql
     app.kubernetes.io/version: 17.6.0
     helm.sh/chart: postgresql-16.7.27
-    kubenix/hash: a2295ec248b670a9b0b2270abf0a48b3d23f23e9
+    kubenix/hash: ed3ad5c19a58b7eea5a515d67ed445c0d2f46a72
   name: postgresql-18
   namespace: apps
 spec:
@@ -671,7 +687,7 @@ metadata:
     app.kubernetes.io/name: postgresql
     app.kubernetes.io/version: 17.6.0
     helm.sh/chart: postgresql-16.7.27
-    kubenix/hash: a2295ec248b670a9b0b2270abf0a48b3d23f23e9
+    kubenix/hash: ed3ad5c19a58b7eea5a515d67ed445c0d2f46a72
   name: postgresql-18-hl
   namespace: apps
 spec:
@@ -700,7 +716,7 @@ metadata:
     app.kubernetes.io/name: postgresql
     app.kubernetes.io/version: 17.6.0
     helm.sh/chart: postgresql-16.7.27
-    kubenix/hash: a2295ec248b670a9b0b2270abf0a48b3d23f23e9
+    kubenix/hash: ed3ad5c19a58b7eea5a515d67ed445c0d2f46a72
   name: postgresql-18
   namespace: apps
 ---
@@ -717,7 +733,7 @@ metadata:
     app.kubernetes.io/name: postgresql
     app.kubernetes.io/version: 17.6.0
     helm.sh/chart: postgresql-16.7.27
-    kubenix/hash: a2295ec248b670a9b0b2270abf0a48b3d23f23e9
+    kubenix/hash: ed3ad5c19a58b7eea5a515d67ed445c0d2f46a72
   name: postgresql-18
   namespace: apps
 spec:
@@ -748,7 +764,7 @@ metadata:
     app.kubernetes.io/name: postgresql
     app.kubernetes.io/version: 17.6.0
     helm.sh/chart: postgresql-16.7.27
-    kubenix/hash: a2295ec248b670a9b0b2270abf0a48b3d23f23e9
+    kubenix/hash: ed3ad5c19a58b7eea5a515d67ed445c0d2f46a72
   name: postgresql-18
   namespace: apps
 spec:
