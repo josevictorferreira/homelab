@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/name: searxng
     app.kubernetes.io/version: 1.1.0
     helm.sh/chart: searxng-1.1.0
-    kubenix/hash: dcef489cec09c33d69b648f7984731edfc0f7b76
+    kubenix/hash: 1007359e1cc1165f9f3a86eb51801e043906ee9b
   name: searxng
   namespace: apps
 spec:
@@ -44,7 +44,7 @@ spec:
           envFrom:
             - secretRef:
                 name: searxng-secret
-          image: ghcr.io/searxng/searxng:2026.6.20-fd42d4fda
+          image: ghcr.io/searxng/searxng@sha256:3ca53992a55678daf44bd62cd052a956972f2de2f9cd952b729f9aa351decafa
           imagePullPolicy: IfNotPresent
           livenessProbe:
             httpGet:
@@ -103,7 +103,7 @@ metadata:
     app.kubernetes.io/name: searxng
     app.kubernetes.io/version: 1.1.0
     helm.sh/chart: searxng-1.1.0
-    kubenix/hash: dcef489cec09c33d69b648f7984731edfc0f7b76
+    kubenix/hash: 1007359e1cc1165f9f3a86eb51801e043906ee9b
   name: searxng
   namespace: apps
 spec:
@@ -129,7 +129,7 @@ metadata:
     app.kubernetes.io/name: searxng
     app.kubernetes.io/version: 1.1.0
     helm.sh/chart: searxng-1.1.0
-    kubenix/hash: dcef489cec09c33d69b648f7984731edfc0f7b76
+    kubenix/hash: 1007359e1cc1165f9f3a86eb51801e043906ee9b
   name: searxng
   namespace: apps
 spec:
