@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: bookorbit
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: ed6b7b3c9a97543664e1b9089e8306e49ded5677
+    kubenix/hash: e74fc495df5f9baa7da7a6ae590826f81205a2cd
     kubenix/module-instance: bookorbit
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -94,6 +94,9 @@ spec:
       hostIPC: false
       hostNetwork: false
       hostPID: false
+      securityContext:
+        supplementalGroups:
+          - 100
       serviceAccountName: default
       volumes:
         - name: books
@@ -114,7 +117,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: bookorbit
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: ed6b7b3c9a97543664e1b9089e8306e49ded5677
+    kubenix/hash: e74fc495df5f9baa7da7a6ae590826f81205a2cd
     kubenix/module-instance: bookorbit
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -142,7 +145,7 @@ metadata:
     app.kubernetes.io/name: bookorbit
     app.kubernetes.io/service: bookorbit
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: ed6b7b3c9a97543664e1b9089e8306e49ded5677
+    kubenix/hash: e74fc495df5f9baa7da7a6ae590826f81205a2cd
     kubenix/module-instance: bookorbit
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -171,7 +174,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: bookorbit
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: ed6b7b3c9a97543664e1b9089e8306e49ded5677
+    kubenix/hash: e74fc495df5f9baa7da7a6ae590826f81205a2cd
     kubenix/module-instance: bookorbit
     kubenix/module-name: release
     kubenix/module-version: 1.0.0

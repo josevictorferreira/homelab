@@ -45,6 +45,9 @@ in
         ];
       };
       values = {
+        # Pod joins GID 100 (users) so the PUID=1000 file worker can write
+        # to the shared CephFS books library (owned 10000:100, mode 2775).
+        controllers.main.pod.securityContext.supplementalGroups = [ 100 ];
         controllers.main.containers.main.env = {
           APP_URL = "http://bookorbit.${homelab.domain}";
           CLIENT_URL = "http://bookorbit.${homelab.domain}";
