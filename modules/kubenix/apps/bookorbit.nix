@@ -45,16 +45,18 @@ in
         ];
       };
       values = {
-        # Pod joins GID 100 (users) so the PUID=1000 file worker can write
-        # to the shared CephFS books library (owned 10000:100, mode 2775).
-        controllers.main.pod.securityContext.supplementalGroups = [ 100 ];
+        # The shared CephFS Calibre library (/books) is owned 10000:100, mode
+        # 2775 (setgid, group-writable). The image entrypoint re-execs via
+        # `su-exec $PUID:$PGID`, which WIPES K8s supplementalGroups. Set PGID=100
+        # so the app's PRIMARY group is 100 (survives su-exec) and it can write
+        # books + cover images into the library.
         controllers.main.containers.main.env = {
           APP_URL = "http://bookorbit.${homelab.domain}";
           CLIENT_URL = "http://bookorbit.${homelab.domain}";
           NODE_ENV = "production";
           PORT = "${toString port}";
           PUID = "1000";
-          PGID = "1000";
+          PGID = "100";
           LIBRARY_BROWSE_ROOT = "/books";
           BOOK_DOCK_PATH = "/books";
           NODE_MAX_OLD_SPACE_SIZE = "2048";
