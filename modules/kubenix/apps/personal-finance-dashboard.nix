@@ -11,7 +11,7 @@ in
         inherit name namespace;
       };
       spec = {
-        replicas = 1;
+        replicas = 0;
         selector.matchLabels.app = name;
         template = {
           metadata = {

@@ -5,11 +5,11 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 18c2558446989bdad75717debcd5bdfc031234cf
+    kubenix/hash: 4f075dfbf3c63585df3684bb32ef4ede29aa76bf
   name: personal-finances
   namespace: apps
 spec:
-  replicas: 1
+  replicas: 0
   selector:
     matchLabels:
       app: personal-finances
@@ -47,7 +47,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 18c2558446989bdad75717debcd5bdfc031234cf
+    kubenix/hash: 4f075dfbf3c63585df3684bb32ef4ede29aa76bf
   name: personal-finances
   namespace: apps
 spec:
@@ -67,7 +67,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 18c2558446989bdad75717debcd5bdfc031234cf
+    kubenix/hash: 4f075dfbf3c63585df3684bb32ef4ede29aa76bf
   name: personal-finances
   namespace: apps
 spec:

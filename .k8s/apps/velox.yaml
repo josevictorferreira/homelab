@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: afb3528cf0fe0db235306c16338ae07b562343e1
+    kubenix/hash: 65d8363562f57a214428061eb40ff5225f199d2d
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -29,7 +29,7 @@ spec:
   template:
     metadata:
       annotations:
-        velox.josevictor.me/config-hash: 7cb28af53594e2c16ab099a2a78f68f36a61b09469bac5bdc7e54e224ed6bd3b
+        velox.josevictor.me/config-hash: 8322c19b3fff3e78cff4cf927be72f421fe3202aecd963c6ab5dce3c07d5052b
         velox.josevictor.me/oauth-agent-config-hash: 72b7f1b202300c363471312cd880f37085429ad305f9944b37c6926c9dee941d
       labels:
         app.kubernetes.io/controller: main
@@ -210,7 +210,7 @@ metadata:
     app.kubernetes.io/name: velox
     app.kubernetes.io/service: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: afb3528cf0fe0db235306c16338ae07b562343e1
+    kubenix/hash: 65d8363562f57a214428061eb40ff5225f199d2d
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -239,7 +239,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: afb3528cf0fe0db235306c16338ae07b562343e1
+    kubenix/hash: 65d8363562f57a214428061eb40ff5225f199d2d
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -555,7 +555,7 @@ data:
 
     [models.deepseek-v4-flash-neuralwatt]
     provider = "neuralwatt"
-    upstream_model = "deepseek-v4-flash-0731"
+    upstream_model = "deepseek-v4-flash"
 
     [models.deepseek-v4-pro-ocgo]
     provider = "opencode-go"
@@ -780,8 +780,6 @@ data:
     strategy = "priority"
     targets = [
       { model = "deepseek-v4-flash-neuralwatt" },
-      { model = "deepseek-v4-flash-openrouter" },
-      { model = "deepseek-v4-flash-alibaba" },
     ]
 
     [combos.deepseek-v4-pro]
@@ -900,7 +898,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: afb3528cf0fe0db235306c16338ae07b562343e1
+    kubenix/hash: 65d8363562f57a214428061eb40ff5225f199d2d
   name: velox-config
   namespace: apps
 ---
@@ -984,7 +982,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: afb3528cf0fe0db235306c16338ae07b562343e1
+    kubenix/hash: 65d8363562f57a214428061eb40ff5225f199d2d
   name: velox-oauth-agent-config
   namespace: apps
 ---
@@ -995,7 +993,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: afb3528cf0fe0db235306c16338ae07b562343e1
+    kubenix/hash: 65d8363562f57a214428061eb40ff5225f199d2d
   name: velox-oauth-agent
   namespace: apps
 ---
@@ -1006,7 +1004,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: afb3528cf0fe0db235306c16338ae07b562343e1
+    kubenix/hash: 65d8363562f57a214428061eb40ff5225f199d2d
   name: velox-oauth-agent
   namespace: apps
 rules:
@@ -1028,7 +1026,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: afb3528cf0fe0db235306c16338ae07b562343e1
+    kubenix/hash: 65d8363562f57a214428061eb40ff5225f199d2d
   name: velox-oauth-agent
   namespace: apps
 roleRef:

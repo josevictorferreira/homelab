@@ -517,6 +517,11 @@ let
                         url = "https://wealtho.josevictor.me";
                         icon = "mdi:wallet";
                       }
+                      {
+                        title = "Poise";
+                        url = "https://poise.josevictor.me";
+                        icon = "mdi:hanger";
+                      }
                     ];
                   }
                   {
