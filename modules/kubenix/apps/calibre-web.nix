@@ -14,7 +14,7 @@ in
         pullPolicy = "IfNotPresent";
       };
       port = 8083;
-      replicas = 1;
+      replicas = 0;
       resources = {
         requests = {
           cpu = "100m";

@@ -10,14 +10,14 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: calibre-web
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 0c1e79dda441f0cd752d9eb4b676524189807470
+    kubenix/hash: 7bff6e45e81f72e6ee7a16f90334ef735a549389
     kubenix/module-instance: calibre-web
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
   name: calibre-web
   namespace: apps
 spec:
-  replicas: 1
+  replicas: 0
   revisionHistoryLimit: 3
   selector:
     matchLabels:
@@ -91,7 +91,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: calibre-web
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 0c1e79dda441f0cd752d9eb4b676524189807470
+    kubenix/hash: 7bff6e45e81f72e6ee7a16f90334ef735a549389
     kubenix/module-instance: calibre-web
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -119,7 +119,7 @@ metadata:
     app.kubernetes.io/name: calibre-web
     app.kubernetes.io/service: calibre-web
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 0c1e79dda441f0cd752d9eb4b676524189807470
+    kubenix/hash: 7bff6e45e81f72e6ee7a16f90334ef735a549389
     kubenix/module-instance: calibre-web
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -148,7 +148,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: calibre-web
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 0c1e79dda441f0cd752d9eb4b676524189807470
+    kubenix/hash: 7bff6e45e81f72e6ee7a16f90334ef735a549389
     kubenix/module-instance: calibre-web
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
