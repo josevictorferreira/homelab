@@ -472,9 +472,9 @@ let
                         icon = "sh:home-assistant";
                       }
                       {
-                        title = "Calibre-Web";
-                        url = "https://calibre.josevictor.me";
-                        icon = "sh:calibre-web";
+                        title = "BookOrbit";
+                        url = "https://bookorbit.josevictor.me";
+                        icon = "mdi:book-open-variant";
                       }
                       {
                         title = "Readeck";
