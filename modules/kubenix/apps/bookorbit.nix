@@ -5,7 +5,7 @@ let
   namespace = homelab.kubernetes.namespaces.applications;
   image = {
     repository = "ghcr.io/bookorbit/bookorbit";
-    tag = "latest@sha256:a2e1f5e59f9b1aec58116ced886d547f16af5d1da911c8e5b920d23b9826a96a";
+    tag = "2.7.0@sha256:0f46241c54ba7cd07ddf7dc519386a29c98dd0f3679cebc9ca35f3305dc79e69";
     pullPolicy = "IfNotPresent";
   };
   port = 3000;
