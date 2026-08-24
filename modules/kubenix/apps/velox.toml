@@ -624,3 +624,44 @@ targets = [
   { model = "mimo-v2-5-pro-xiaomi" },
   { model = "qwen3-7-plus-alibaba" },
 ]
+
+# ---------------------------------------------------------------------------
+# Web search & fetch
+#
+# Pools for POST /v1/search and POST /v1/web/fetch. Independent of the LLM
+# `providers` above: no models, no combos. `pool` is the priority order for a
+# request that does not pin a `provider`; a pinned provider never falls back.
+#
+# Without these tables both pools are empty and Velox answers every web call
+# with 404 web_provider_not_found — it starts fine, so the omission only shows
+# up at request time.
+#
+# SearXNG leads the search pool: it runs in this namespace, needs no key, and
+# already fans out to its own engines (Tavily included), so Tavily is not
+# listed here as a separate Velox provider.
+# ---------------------------------------------------------------------------
+
+[web.search]
+pool = ["searxng", "exa"]
+
+# In-cluster Service. The instance must serve `format=json`, which
+# searxng-config.enc.nix enables (search.formats) with the limiter off;
+# otherwise SearXNG answers 403/HTML and the adapter treats it as a failure.
+[web.search.providers.searxng]
+kind = "searxng"
+base_url = "http://searxng:8080"
+
+[web.search.providers.exa]
+kind = "exa"
+api_key_env = "EXA_API_KEY"
+
+[web.fetch]
+pool = ["firecrawl", "jina-reader"]
+
+[web.fetch.providers.firecrawl]
+kind = "firecrawl"
+api_key_env = "FIRECRAWL_API_KEY"
+
+[web.fetch.providers.jina-reader]
+kind = "jina-reader"
+api_key_env = "JINA_API_KEY"

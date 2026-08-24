@@ -36,6 +36,12 @@ in
       KIMI_API_KEY = kubenix.lib.secretsFor "moonshot_api_key";
       VOYAGE_API_KEY = kubenix.lib.secretsFor "voyage_api_key";
 
+      # --- web search/fetch credentials (one per web.*.providers.<id>.api_key_env) ---
+      # SearXNG leads the search pool and takes no key.
+      EXA_API_KEY = kubenix.lib.secretsFor "exa_api_key";
+      FIRECRAWL_API_KEY = kubenix.lib.secretsFor "firecrawl_api_key";
+      JINA_API_KEY = kubenix.lib.secretsFor "jina_api_key";
+
       # OAuth credential agent sidecar environment variables
       ANTIGRAVITY_CLIENT_SECRET = kubenix.lib.secretsFor "velox_antigravity_client_secret";
     };
