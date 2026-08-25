@@ -52,6 +52,11 @@ in
       type = "string";
       default = "~/.ssh/id_ed25519.pub";
     };
+
+    budget_alert_email = {
+      description = "Recipient of the budget alert that fires on any real spend";
+      type = "string";
+    };
   };
 
   data = {
@@ -68,6 +73,47 @@ in
   };
 
   resource = {
+    # --- Cost guardrails ---
+    # lab-oci-bk uses the whole Always Free allowance (4 OCPU / 24 GB A1,
+    # 200 GB block storage), so anything else in the tenancy is billed. The
+    # quota makes such allocations fail at the API instead; the budget emails
+    # if a charge shows up anyway. Existing resources are never affected.
+    oci_limits_quota.free_tier_only = {
+      compartment_id = tenancy;
+      name = "free-tier-only";
+      description = "Hard-cap the tenancy to the Always Free allowance";
+      statements = [
+        "zero compute-core quotas in tenancy"
+        "zero compute-memory quotas in tenancy"
+        "set compute-core quota standard-a1-core-count to 4 in tenancy"
+        "set compute-memory quota standard-a1-memory-count to 24 in tenancy"
+        "set block-storage quota total-storage-gb to 200 in tenancy"
+        "zero database quotas in tenancy"
+        "zero load-balancer quotas in tenancy"
+        "zero filesystem quotas in tenancy"
+      ];
+    };
+
+    oci_budget_budget.zero_spend = {
+      compartment_id = tenancy;
+      display_name = "zero-spend";
+      description = "Everything here must be Always Free";
+      amount = 5; # BRL; alert threshold below is 1% of this
+      reset_period = "MONTHLY";
+      target_type = "COMPARTMENT";
+      targets = [ tenancy ];
+    };
+
+    oci_budget_alert_rule.zero_spend = {
+      budget_id = tfRef "oci_budget_budget.zero_spend.id";
+      display_name = "any-spend";
+      type = "ACTUAL";
+      threshold = 1;
+      threshold_type = "PERCENTAGE";
+      recipients = tfRef "var.budget_alert_email";
+      message = "OCI tenancy incurred a real charge; only Always Free resources are expected.";
+    };
+
     # --- Network ---
 
     oci_core_vcn.homelab = {
