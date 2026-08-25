@@ -153,6 +153,19 @@ api_key_env = "SPEECHIFY_API_KEY"
 [providers.speechify.capabilities]
 tts = true
 
+# --- Audio (STT) -----------------------------------------------------------
+# OpenRouter STT (bespoke `openrouter` kind: JSON body with base64 audio, not
+# multipart). Distinct provider instance from the chat `[providers.openrouter]`
+# so its audio adapter and `stt` capability stay isolated. Reuses the same
+# OPENROUTER_API_KEY secret. Verified against openai/whisper-1 (0.0002 cr/min).
+[providers.openrouter-audio]
+kind = "openrouter"
+base_url = "https://openrouter.ai/api/v1"
+api_key_env = "OPENROUTER_API_KEY"
+
+[providers.openrouter-audio.capabilities]
+stt = true
+
 # ---------------------------------------------------------------------------
 # OAuth subscription providers
 #
@@ -218,6 +231,11 @@ structured_output = false
 [models.tts-1]
 provider = "speechify"
 upstream_model = "simba-english"
+# STT model alias: resolves `model="stt-1"` to OpenRouter Whisper. Multipart
+# uploads (file + model); the OpenRouter adapter sends base64 audio in JSON.
+[models.stt-1]
+provider = "openrouter-audio"
+upstream_model = "openai/whisper-1"
 
 [models.glm-5-3-zai]
 provider = "glm"

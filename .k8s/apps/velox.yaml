@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 73b8dbf19f0638a0ebbb81cd77a5c41b9407f9d1
+    kubenix/hash: 30d4faf42fa232bd632629e9ef781d7a036b412a
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -29,7 +29,7 @@ spec:
   template:
     metadata:
       annotations:
-        velox.josevictor.me/config-hash: 7fac336b3d1da54f5eeafc3459f343c2156c257d56efaa948db1e8e02819dffb
+        velox.josevictor.me/config-hash: 5f8f281fa26d6ee64ef6d3788c2bb51cb3f7e932a8852f10bfe85025f8f3f99a
         velox.josevictor.me/oauth-agent-config-hash: 72b7f1b202300c363471312cd880f37085429ad305f9944b37c6926c9dee941d
       labels:
         app.kubernetes.io/controller: main
@@ -210,7 +210,7 @@ metadata:
     app.kubernetes.io/name: velox
     app.kubernetes.io/service: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 73b8dbf19f0638a0ebbb81cd77a5c41b9407f9d1
+    kubenix/hash: 30d4faf42fa232bd632629e9ef781d7a036b412a
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -239,7 +239,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 73b8dbf19f0638a0ebbb81cd77a5c41b9407f9d1
+    kubenix/hash: 30d4faf42fa232bd632629e9ef781d7a036b412a
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -421,6 +421,19 @@ data:
     [providers.speechify.capabilities]
     tts = true
 
+    # --- Audio (STT) -----------------------------------------------------------
+    # OpenRouter STT (bespoke `openrouter` kind: JSON body with base64 audio, not
+    # multipart). Distinct provider instance from the chat `[providers.openrouter]`
+    # so its audio adapter and `stt` capability stay isolated. Reuses the same
+    # OPENROUTER_API_KEY secret. Verified against openai/whisper-1 (0.0002 cr/min).
+    [providers.openrouter-audio]
+    kind = "openrouter"
+    base_url = "https://openrouter.ai/api/v1"
+    api_key_env = "OPENROUTER_API_KEY"
+
+    [providers.openrouter-audio.capabilities]
+    stt = true
+
     # ---------------------------------------------------------------------------
     # OAuth subscription providers
     #
@@ -486,6 +499,11 @@ data:
     [models.tts-1]
     provider = "speechify"
     upstream_model = "simba-english"
+    # STT model alias: resolves `model="stt-1"` to OpenRouter Whisper. Multipart
+    # uploads (file + model); the OpenRouter adapter sends base64 audio in JSON.
+    [models.stt-1]
+    provider = "openrouter-audio"
+    upstream_model = "openai/whisper-1"
 
     [models.glm-5-3-zai]
     provider = "glm"
@@ -957,7 +975,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 73b8dbf19f0638a0ebbb81cd77a5c41b9407f9d1
+    kubenix/hash: 30d4faf42fa232bd632629e9ef781d7a036b412a
   name: velox-config
   namespace: apps
 ---
@@ -1041,7 +1059,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 73b8dbf19f0638a0ebbb81cd77a5c41b9407f9d1
+    kubenix/hash: 30d4faf42fa232bd632629e9ef781d7a036b412a
   name: velox-oauth-agent-config
   namespace: apps
 ---
@@ -1052,7 +1070,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 73b8dbf19f0638a0ebbb81cd77a5c41b9407f9d1
+    kubenix/hash: 30d4faf42fa232bd632629e9ef781d7a036b412a
   name: velox-oauth-agent
   namespace: apps
 ---
@@ -1063,7 +1081,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 73b8dbf19f0638a0ebbb81cd77a5c41b9407f9d1
+    kubenix/hash: 30d4faf42fa232bd632629e9ef781d7a036b412a
   name: velox-oauth-agent
   namespace: apps
 rules:
@@ -1085,7 +1103,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 73b8dbf19f0638a0ebbb81cd77a5c41b9407f9d1
+    kubenix/hash: 30d4faf42fa232bd632629e9ef781d7a036b412a
   name: velox-oauth-agent
   namespace: apps
 roleRef:
