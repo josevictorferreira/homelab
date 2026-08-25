@@ -233,7 +233,7 @@ data:
         data:
         - datasourceUid: prometheus
           model:
-            expr: increase(kube_job_status_failed{namespace="apps", job_name=~"postgres-backup.*"}[6h])
+            expr: increase(kube_job_status_failed{namespace="backup", job_name=~"postgres-backup.*"}[6h])
               > 0
             intervalMs: 1000
             maxDataPoints: 43200
@@ -268,7 +268,7 @@ data:
         data:
         - datasourceUid: prometheus
           model:
-            expr: time() - kube_cronjob_status_last_successful_time{namespace="apps",
+            expr: time() - kube_cronjob_status_last_successful_time{namespace="backup",
               cronjob="postgres-backup"} > 93600
             intervalMs: 1000
             maxDataPoints: 43200
@@ -303,7 +303,7 @@ data:
         data:
         - datasourceUid: prometheus
           model:
-            expr: increase(kube_job_status_failed{namespace="apps", job_name=~"postgres-restore-drill.*"}[168h])
+            expr: increase(kube_job_status_failed{namespace="backup", job_name=~"postgres-restore-drill.*"}[168h])
               > 0
             intervalMs: 1000
             maxDataPoints: 43200
@@ -338,7 +338,7 @@ data:
         data:
         - datasourceUid: prometheus
           model:
-            expr: time() - kube_cronjob_status_last_successful_time{namespace="apps",
+            expr: time() - kube_cronjob_status_last_successful_time{namespace="backup",
               cronjob="postgres-restore-drill"} > 604800
             intervalMs: 1000
             maxDataPoints: 43200
@@ -378,7 +378,7 @@ data:
         data:
         - datasourceUid: prometheus
           model:
-            expr: increase(kube_job_status_failed{namespace="apps", job_name=~"shared-subfolders-backup.*"}[6h])
+            expr: increase(kube_job_status_failed{namespace="backup", job_name=~"shared-subfolders-backup.*"}[6h])
               > 0
             intervalMs: 1000
             maxDataPoints: 43200
@@ -413,7 +413,7 @@ data:
         data:
         - datasourceUid: prometheus
           model:
-            expr: time() - kube_cronjob_status_last_successful_time{namespace="apps",
+            expr: time() - kube_cronjob_status_last_successful_time{namespace="backup",
               cronjob="shared-subfolders-backup"} > 93600
             intervalMs: 1000
             maxDataPoints: 43200
@@ -453,7 +453,7 @@ data:
         data:
         - datasourceUid: prometheus
           model:
-            expr: increase(kube_job_status_failed{namespace="apps", job_name=~"shared-subfolders-proton-sync.*"}[6h])
+            expr: increase(kube_job_status_failed{namespace="backup", job_name=~"shared-subfolders-proton-sync.*"}[6h])
               > 0
             intervalMs: 1000
             maxDataPoints: 43200
@@ -489,7 +489,7 @@ data:
         data:
         - datasourceUid: prometheus
           model:
-            expr: time() - kube_cronjob_status_last_successful_time{namespace="apps",
+            expr: time() - kube_cronjob_status_last_successful_time{namespace="backup",
               cronjob="shared-subfolders-proton-sync"} > 93600
             intervalMs: 1000
             maxDataPoints: 43200
@@ -517,6 +517,47 @@ data:
           severity: critical
         title: Proton Sync Staleness
         uid: backup-proton-sync-stale
+    - folder: Backup Alerts
+      interval: 5m
+      name: Backup - Off-site Mirror
+      orgId: 1
+      rules:
+      - annotations:
+          description: No successful minio-offsite-mirror heartbeat from lab-oci-bk in
+            over 30 hours.
+          summary: Off-site backup mirror (lab-oci-bk) has not succeeded in 30h
+        condition: C
+        data:
+        - datasourceUid: prometheus
+          model:
+            expr: (time() - offsite_mirror_last_success_timestamp_seconds > 108000) or
+              absent(offsite_mirror_last_success_timestamp_seconds)
+            intervalMs: 1000
+            maxDataPoints: 43200
+            refId: A
+          refId: A
+          relativeTimeRange:
+            from: 600
+            to: 0
+        - datasourceUid: __expr__
+          model:
+            conditions:
+            - evaluator:
+                params:
+                - 0
+                type: gt
+            expression: A
+            refId: C
+            type: threshold
+          refId: C
+          relativeTimeRange:
+            from: 600
+            to: 0
+        for: 15m
+        labels:
+          severity: critical
+        title: Off-site Mirror Staleness
+        uid: backup-offsite-mirror-stale
 kind: ConfigMap
 metadata:
   annotations:
@@ -524,6 +565,6 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     grafana_alert: "1"
-    kubenix/hash: f4bf44a8a8e23e9056d062d409b73149620d6960
+    kubenix/hash: fcfcddb5d96c56ac275e58e026b1defe6e7d9fc5
   name: grafana-alerting-backup-rules
   namespace: monitoring

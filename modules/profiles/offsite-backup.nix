@@ -11,6 +11,7 @@ let
 
   # Primary backup MinIO on lab-pi-bk, reached through the Tailscale subnet routers.
   sourceHost = "10.10.10.209:9000";
+  pushgatewayUrl = "http://${homelab.kubernetes.loadBalancer.services.pushgateway}:9091";
 
   # Buckets pulled from the primary. mc mirror copies current versions only,
   # so sizes here are far below the source's on-disk usage (which includes
@@ -89,6 +90,13 @@ in
         done
 
         echo "Off-site mirror complete"
+
+        # Heartbeat for the "Off-site Mirror Staleness" alert (pushgateway in the
+        # cluster, reached over the Tailscale subnet route). Best effort.
+        echo "offsite_mirror_last_success_timestamp_seconds $(date +%s)" \
+          | curl -sf --max-time 30 --data-binary @- \
+              "${pushgatewayUrl}/metrics/job/minio-offsite-mirror/instance/lab-oci-bk" \
+          || echo "WARN: heartbeat push to pushgateway failed" >&2
       '';
     };
 

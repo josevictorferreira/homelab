@@ -7,7 +7,6 @@ let
   minioBucket = "homelab-backup-rgw";
   buckets = [
     "imgproxy"
-    "linkwarden-files"
     "n8n-files"
     "open-webui-files"
     "valoris-s3"
@@ -29,6 +28,8 @@ let
     export RCLONE_CONFIG_MINIO_TYPE=s3
     export RCLONE_CONFIG_MINIO_PROVIDER=Minio
     export RCLONE_CONFIG_MINIO_ENDPOINT="${minioEndpoint}"
+    # Must match MINIO_REGION on lab-pi-bk, otherwise every request is a 400.
+    export RCLONE_CONFIG_MINIO_REGION=sa-east-1
 
     BUCKETS="${builtins.concatStringsSep " " buckets}"
 

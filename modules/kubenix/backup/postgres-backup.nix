@@ -17,12 +17,10 @@ let
     echo "Setting up mc alias..."
     mc alias set backup "$MINIO_ENDPOINT" "$AWS_ACCESS_KEY_ID" "$AWS_SECRET_ACCESS_KEY"
 
-    echo "Running pg_dumpall..."
-    pg_dumpall -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" > /tmp/full.sql
-
-    echo "Compressing with zstd..."
-    zstd -T0 /tmp/full.sql -o /tmp/full.sql.zst
-    rm /tmp/full.sql
+    # Stream straight into zstd: the uncompressed dump no longer fits the
+    # container's ephemeral-storage limit (pods were being evicted mid-compress).
+    echo "Running pg_dumpall | zstd..."
+    pg_dumpall -h "$PGHOST" -p "$PGPORT" -U "$PGUSER" | zstd -T0 -o /tmp/full.sql.zst
 
     echo "Computing sha256..."
     sha256sum /tmp/full.sql.zst > /tmp/full.sql.zst.sha256

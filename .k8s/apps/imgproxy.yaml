@@ -8,7 +8,7 @@ metadata:
     app: imgproxy-imgproxy
     chart: imgproxy-1.1.0
     heritage: Helm
-    kubenix/hash: 95a8e6ed5a17997bf738e57f9a0b3fab2e7d79fa
+    kubenix/hash: 6c434cafb5f4f73427553d0cb79ed2d1cad444fe
     release: imgproxy
   name: imgproxy-imgproxy
   namespace: apps
@@ -99,7 +99,7 @@ metadata:
     chart: imgproxy-1.1.0
     heritage: Helm
     imgproxy: "true"
-    kubenix/hash: 95a8e6ed5a17997bf738e57f9a0b3fab2e7d79fa
+    kubenix/hash: 6c434cafb5f4f73427553d0cb79ed2d1cad444fe
     release: imgproxy
   name: imgproxy-imgproxy-env-secrets
   namespace: apps
@@ -118,7 +118,7 @@ metadata:
     chart: imgproxy-1.1.0
     heritage: Helm
     imgproxy: "true"
-    kubenix/hash: 95a8e6ed5a17997bf738e57f9a0b3fab2e7d79fa
+    kubenix/hash: 6c434cafb5f4f73427553d0cb79ed2d1cad444fe
     release: imgproxy
   name: imgproxy-imgproxy
   namespace: apps
@@ -146,7 +146,7 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     imgproxy: "true"
-    kubenix/hash: 95a8e6ed5a17997bf738e57f9a0b3fab2e7d79fa
+    kubenix/hash: 6c434cafb5f4f73427553d0cb79ed2d1cad444fe
     release: prometheus-operator
   name: imgproxy-imgproxy
   namespace: apps
@@ -177,7 +177,7 @@ metadata:
     chart: imgproxy-1.1.0
     heritage: Helm
     imgproxy: "true"
-    kubenix/hash: 95a8e6ed5a17997bf738e57f9a0b3fab2e7d79fa
+    kubenix/hash: 6c434cafb5f4f73427553d0cb79ed2d1cad444fe
     release: imgproxy
   name: imgproxy-imgproxy
   namespace: apps
@@ -206,10 +206,12 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 95a8e6ed5a17997bf738e57f9a0b3fab2e7d79fa
+    kubenix/hash: 6c434cafb5f4f73427553d0cb79ed2d1cad444fe
   name: imgproxy-s3
   namespace: apps
 spec:
+  additionalConfig:
+    bucketPolicy: '{"Statement":[{"Action":["s3:ListBucket","s3:GetObject"],"Effect":"Allow","Principal":{"AWS":["arn:aws:iam:::user/s3-user"]},"Resource":["arn:aws:s3:::imgproxy","arn:aws:s3:::imgproxy/*"],"Sid":"rgw-mirror-read"}],"Version":"2012-10-17"}'
   bucketName: imgproxy
   storageClassName: rook-ceph-objectstore
 ---
@@ -221,7 +223,7 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     imgproxy: "true"
-    kubenix/hash: 95a8e6ed5a17997bf738e57f9a0b3fab2e7d79fa
+    kubenix/hash: 6c434cafb5f4f73427553d0cb79ed2d1cad444fe
   name: imgproxy-imgproxy-pdb
   namespace: apps
 spec:

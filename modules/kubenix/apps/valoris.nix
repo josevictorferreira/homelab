@@ -1,4 +1,4 @@
-{ homelab, ... }:
+{ kubenix, homelab, ... }:
 
 let
   imageTag = "latest";
@@ -178,6 +178,7 @@ in
         spec = {
           inherit bucketName;
           storageClassName = "rook-ceph-objectstore";
+          additionalConfig.bucketPolicy = kubenix.lib.rgwMirrorReadPolicyFor bucketName;
         };
       };
     };

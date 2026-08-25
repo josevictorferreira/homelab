@@ -165,7 +165,7 @@ in
             retentionSize = "40GiB";
             resources = {
               requests = {
-                cpu = "1";
+                cpu = "300m";
                 memory = "2Gi";
               };
               limits = {

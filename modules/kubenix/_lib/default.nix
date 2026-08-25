@@ -19,6 +19,22 @@ rec {
     "lbipam.cilium.io/sharing-key" = serviceName;
   };
 
+  # Bucket policy for OBC-provisioned RGW buckets: lets the shared `s3-user`
+  # (used by the rgw-mirror CronJob) read the bucket so it can be backed up.
+  # Pass via `spec.additionalConfig.bucketPolicy`.
+  rgwMirrorReadPolicyFor = bucket: builtins.toJSON {
+    Version = "2012-10-17";
+    Statement = [
+      {
+        Sid = "rgw-mirror-read";
+        Effect = "Allow";
+        Principal.AWS = [ "arn:aws:iam:::user/s3-user" ];
+        Action = [ "s3:ListBucket" "s3:GetObject" ];
+        Resource = [ "arn:aws:s3:::${bucket}" "arn:aws:s3:::${bucket}/*" ];
+      }
+    ];
+  };
+
   plainServiceFor = serviceName: {
     enabled = true;
     type = "LoadBalancer";

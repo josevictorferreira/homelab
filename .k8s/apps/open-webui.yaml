@@ -11,7 +11,7 @@ metadata:
     app.kubernetes.io/name: open-webui
     app.kubernetes.io/version: 0.6.26
     helm.sh/chart: open-webui-8.1.0
-    kubenix/hash: 91ae0256c158941c6aa99c3fd894a656d75b7068
+    kubenix/hash: a4d1118c753ebd4efc49ea92c1fae30ca5859b86
   name: open-webui
   namespace: apps
 spec:
@@ -115,7 +115,7 @@ metadata:
     app.kubernetes.io/name: open-webui
     app.kubernetes.io/version: 0.6.26
     helm.sh/chart: open-webui-8.1.0
-    kubenix/hash: 91ae0256c158941c6aa99c3fd894a656d75b7068
+    kubenix/hash: a4d1118c753ebd4efc49ea92c1fae30ca5859b86
   name: open-webui
   namespace: apps
 spec:
@@ -143,7 +143,7 @@ metadata:
     app.kubernetes.io/name: open-webui
     app.kubernetes.io/version: 0.6.26
     helm.sh/chart: open-webui-8.1.0
-    kubenix/hash: 91ae0256c158941c6aa99c3fd894a656d75b7068
+    kubenix/hash: a4d1118c753ebd4efc49ea92c1fae30ca5859b86
   name: open-webui
   namespace: apps
 ---
@@ -160,7 +160,7 @@ metadata:
     app.kubernetes.io/name: open-webui
     app.kubernetes.io/version: 0.6.26
     helm.sh/chart: open-webui-8.1.0
-    kubenix/hash: 91ae0256c158941c6aa99c3fd894a656d75b7068
+    kubenix/hash: a4d1118c753ebd4efc49ea92c1fae30ca5859b86
   name: open-webui
   namespace: apps
 spec:
@@ -188,9 +188,11 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 91ae0256c158941c6aa99c3fd894a656d75b7068
+    kubenix/hash: a4d1118c753ebd4efc49ea92c1fae30ca5859b86
   name: open-webui-s3
   namespace: apps
 spec:
+  additionalConfig:
+    bucketPolicy: '{"Statement":[{"Action":["s3:ListBucket","s3:GetObject"],"Effect":"Allow","Principal":{"AWS":["arn:aws:iam:::user/s3-user"]},"Resource":["arn:aws:s3:::open-webui-files","arn:aws:s3:::open-webui-files/*"],"Sid":"rgw-mirror-read"}],"Version":"2012-10-17"}'
   bucketName: open-webui-files
   storageClassName: rook-ceph-objectstore

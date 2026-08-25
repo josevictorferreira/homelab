@@ -140,7 +140,7 @@ let
           (mkPromRule {
             uid = "backup-pg-job-failed";
             title = "Postgres Backup Job Failed";
-            expr = ''increase(kube_job_status_failed{namespace="${homelab.kubernetes.namespaces.applications}", job_name=~"postgres-backup.*"}[6h]) > 0'';
+            expr = ''increase(kube_job_status_failed{namespace="${homelab.kubernetes.namespaces.backup}", job_name=~"postgres-backup.*"}[6h]) > 0'';
             severity = "critical";
             summary = "Postgres backup job failed";
             description = "A postgres-backup job has failed in the last 6 hours.";
@@ -148,7 +148,7 @@ let
           (mkPromRule {
             uid = "backup-pg-stale";
             title = "Postgres Backup Stale (>26h)";
-            expr = ''time() - kube_cronjob_status_last_successful_time{namespace="${homelab.kubernetes.namespaces.applications}", cronjob="postgres-backup"} > 93600'';
+            expr = ''time() - kube_cronjob_status_last_successful_time{namespace="${homelab.kubernetes.namespaces.backup}", cronjob="postgres-backup"} > 93600'';
             forDuration = "15m";
             severity = "critical";
             summary = "No successful postgres backup in 26+ hours";
@@ -157,7 +157,7 @@ let
           (mkPromRule {
             uid = "backup-pg-drill-failed";
             title = "Postgres Restore Drill Failed";
-            expr = ''increase(kube_job_status_failed{namespace="${homelab.kubernetes.namespaces.applications}", job_name=~"postgres-restore-drill.*"}[168h]) > 0'';
+            expr = ''increase(kube_job_status_failed{namespace="${homelab.kubernetes.namespaces.backup}", job_name=~"postgres-restore-drill.*"}[168h]) > 0'';
             severity = "warning";
             summary = "Postgres restore drill failed";
             description = "A postgres-restore-drill job has failed in the last 7 days.";
@@ -165,7 +165,7 @@ let
           (mkPromRule {
             uid = "backup-pg-drill-stale";
             title = "Postgres Restore Drill Stale (>7d)";
-            expr = ''time() - kube_cronjob_status_last_successful_time{namespace="${homelab.kubernetes.namespaces.applications}", cronjob="postgres-restore-drill"} > 604800'';
+            expr = ''time() - kube_cronjob_status_last_successful_time{namespace="${homelab.kubernetes.namespaces.backup}", cronjob="postgres-restore-drill"} > 604800'';
             forDuration = "30m";
             severity = "warning";
             summary = "No successful postgres restore drill in 7+ days";
@@ -182,7 +182,7 @@ let
           (mkPromRule {
             uid = "backup-shared-job-failed";
             title = "Shared Subfolders Backup Job Failed";
-            expr = ''increase(kube_job_status_failed{namespace="${homelab.kubernetes.namespaces.applications}", job_name=~"shared-subfolders-backup.*"}[6h]) > 0'';
+            expr = ''increase(kube_job_status_failed{namespace="${homelab.kubernetes.namespaces.backup}", job_name=~"shared-subfolders-backup.*"}[6h]) > 0'';
             severity = "critical";
             summary = "Shared subfolders backup job failed";
             description = "A shared-subfolders-backup job has failed in the last 6 hours.";
@@ -190,7 +190,7 @@ let
           (mkPromRule {
             uid = "backup-shared-stale";
             title = "Shared Subfolders Backup Stale (>26h)";
-            expr = ''time() - kube_cronjob_status_last_successful_time{namespace="${homelab.kubernetes.namespaces.applications}", cronjob="shared-subfolders-backup"} > 93600'';
+            expr = ''time() - kube_cronjob_status_last_successful_time{namespace="${homelab.kubernetes.namespaces.backup}", cronjob="shared-subfolders-backup"} > 93600'';
             forDuration = "15m";
             severity = "critical";
             summary = "No successful shared subfolders backup in 26+ hours";
@@ -207,7 +207,7 @@ let
           (mkPromRule {
             uid = "backup-proton-sync-job-failed";
             title = "Proton Sync Job Failure";
-            expr = ''increase(kube_job_status_failed{namespace="${homelab.kubernetes.namespaces.applications}", job_name=~"shared-subfolders-proton-sync.*"}[6h]) > 0'';
+            expr = ''increase(kube_job_status_failed{namespace="${homelab.kubernetes.namespaces.backup}", job_name=~"shared-subfolders-proton-sync.*"}[6h]) > 0'';
             severity = "warning";
             summary = "Shared subfolders Proton Drive sync job failed";
             description = "A shared-subfolders-proton-sync job has failed in the last 6 hours.";
@@ -215,11 +215,31 @@ let
           (mkPromRule {
             uid = "backup-proton-sync-stale";
             title = "Proton Sync Staleness";
-            expr = ''time() - kube_cronjob_status_last_successful_time{namespace="${homelab.kubernetes.namespaces.applications}", cronjob="shared-subfolders-proton-sync"} > 93600'';
+            expr = ''time() - kube_cronjob_status_last_successful_time{namespace="${homelab.kubernetes.namespaces.backup}", cronjob="shared-subfolders-proton-sync"} > 93600'';
             forDuration = "15m";
             severity = "critical";
             summary = "Shared subfolders Proton Drive sync has not succeeded in 26h";
             description = "CronJob shared-subfolders-proton-sync has not succeeded in over 26 hours.";
+          })
+        ];
+      }
+      {
+        orgId = 1;
+        name = "Backup - Off-site Mirror";
+        folder = "Backup Alerts";
+        interval = "5m";
+        rules = [
+          (mkPromRule {
+            uid = "backup-offsite-mirror-stale";
+            title = "Off-site Mirror Staleness";
+            # Heartbeat pushed by minio-offsite-mirror on lab-oci-bk after each
+            # successful run. Also fires while the series is missing entirely
+            # (pushgateway restarted, host down, push never arrived).
+            expr = ''(time() - offsite_mirror_last_success_timestamp_seconds > 108000) or absent(offsite_mirror_last_success_timestamp_seconds)'';
+            forDuration = "15m";
+            severity = "critical";
+            summary = "Off-site backup mirror (lab-oci-bk) has not succeeded in 30h";
+            description = "No successful minio-offsite-mirror heartbeat from lab-oci-bk in over 30 hours.";
           })
         ];
       }
