@@ -141,6 +141,18 @@ streaming = false
 tools = false
 embedding = true
 
+# --- Audio (TTS) ------------------------------------------------------------
+# Speechify TTS (11-class voice model). `voice` is supplied per request; when
+# the client omits it the adapter applies its curated default voice. Speechify
+# is TTS-only: do not set `stt = true` here or validation fails at startup.
+[providers.speechify]
+kind = "speechify"
+base_url = "https://api.speechify.ai"
+api_key_env = "SPEECHIFY_API_KEY"
+
+[providers.speechify.capabilities]
+tts = true
+
 # ---------------------------------------------------------------------------
 # OAuth subscription providers
 #
@@ -200,6 +212,12 @@ structured_output = false
 # prefixed with the provider so the same upstream model reached through two
 # providers stays addressable.
 # ---------------------------------------------------------------------------
+# TTS model alias: resolves `model="tts-1"` to Speechify TTS. The upstream
+# model id is sent as Speechify `model`; the voice comes from the per-request
+# `voice` field (adapter curated default if omitted).
+[models.tts-1]
+provider = "speechify"
+upstream_model = "simba-english"
 
 [models.glm-5-3-zai]
 provider = "glm"

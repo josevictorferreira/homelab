@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: ee133df161e0b37ad3d3e7b345662ec018e694bc
+    kubenix/hash: 73b8dbf19f0638a0ebbb81cd77a5c41b9407f9d1
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -29,7 +29,7 @@ spec:
   template:
     metadata:
       annotations:
-        velox.josevictor.me/config-hash: e34eec380f26edd14e51fd1004d5176ce357b4d4557640984f419f86f07d98b6
+        velox.josevictor.me/config-hash: 7fac336b3d1da54f5eeafc3459f343c2156c257d56efaa948db1e8e02819dffb
         velox.josevictor.me/oauth-agent-config-hash: 72b7f1b202300c363471312cd880f37085429ad305f9944b37c6926c9dee941d
       labels:
         app.kubernetes.io/controller: main
@@ -210,7 +210,7 @@ metadata:
     app.kubernetes.io/name: velox
     app.kubernetes.io/service: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: ee133df161e0b37ad3d3e7b345662ec018e694bc
+    kubenix/hash: 73b8dbf19f0638a0ebbb81cd77a5c41b9407f9d1
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -239,7 +239,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: ee133df161e0b37ad3d3e7b345662ec018e694bc
+    kubenix/hash: 73b8dbf19f0638a0ebbb81cd77a5c41b9407f9d1
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -409,6 +409,18 @@ data:
     tools = false
     embedding = true
 
+    # --- Audio (TTS) ------------------------------------------------------------
+    # Speechify TTS (11-class voice model). `voice` is supplied per request; when
+    # the client omits it the adapter applies its curated default voice. Speechify
+    # is TTS-only: do not set `stt = true` here or validation fails at startup.
+    [providers.speechify]
+    kind = "speechify"
+    base_url = "https://api.speechify.ai"
+    api_key_env = "SPEECHIFY_API_KEY"
+
+    [providers.speechify.capabilities]
+    tts = true
+
     # ---------------------------------------------------------------------------
     # OAuth subscription providers
     #
@@ -468,6 +480,12 @@ data:
     # prefixed with the provider so the same upstream model reached through two
     # providers stays addressable.
     # ---------------------------------------------------------------------------
+    # TTS model alias: resolves `model="tts-1"` to Speechify TTS. The upstream
+    # model id is sent as Speechify `model`; the voice comes from the per-request
+    # `voice` field (adapter curated default if omitted).
+    [models.tts-1]
+    provider = "speechify"
+    upstream_model = "simba-english"
 
     [models.glm-5-3-zai]
     provider = "glm"
@@ -939,7 +957,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: ee133df161e0b37ad3d3e7b345662ec018e694bc
+    kubenix/hash: 73b8dbf19f0638a0ebbb81cd77a5c41b9407f9d1
   name: velox-config
   namespace: apps
 ---
@@ -1023,7 +1041,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: ee133df161e0b37ad3d3e7b345662ec018e694bc
+    kubenix/hash: 73b8dbf19f0638a0ebbb81cd77a5c41b9407f9d1
   name: velox-oauth-agent-config
   namespace: apps
 ---
@@ -1034,7 +1052,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: ee133df161e0b37ad3d3e7b345662ec018e694bc
+    kubenix/hash: 73b8dbf19f0638a0ebbb81cd77a5c41b9407f9d1
   name: velox-oauth-agent
   namespace: apps
 ---
@@ -1045,7 +1063,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: ee133df161e0b37ad3d3e7b345662ec018e694bc
+    kubenix/hash: 73b8dbf19f0638a0ebbb81cd77a5c41b9407f9d1
   name: velox-oauth-agent
   namespace: apps
 rules:
@@ -1067,7 +1085,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: ee133df161e0b37ad3d3e7b345662ec018e694bc
+    kubenix/hash: 73b8dbf19f0638a0ebbb81cd77a5c41b9407f9d1
   name: velox-oauth-agent
   namespace: apps
 roleRef:
