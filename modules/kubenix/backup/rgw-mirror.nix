@@ -5,11 +5,14 @@ let
   rgwEndpoint = kubenix.lib.objectStoreEndpoint;
   minioEndpoint = "http://10.10.10.209:9000";
   minioBucket = "homelab-backup-rgw";
+  # valoris-s3 (~263 GiB of scraped listing images) is deliberately excluded:
+  # it does not fit the off-site mirror (lab-oci-bk, 200 GB disk).
   buckets = [
     "imgproxy"
     "n8n-files"
     "open-webui-files"
-    "valoris-s3"
+    "oratoria-audio"
+    "poise"
   ];
 
   mirrorScript = ''

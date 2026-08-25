@@ -1,4 +1,4 @@
-{ homelab, ... }:
+{ homelab, kubenix, ... }:
 
 let
   app = "poise";
@@ -117,6 +117,7 @@ in
     spec = {
       inherit bucketName;
       storageClassName = "rook-ceph-objectstore";
+      additionalConfig.bucketPolicy = kubenix.lib.rgwMirrorReadPolicyFor bucketName;
     };
   };
 }

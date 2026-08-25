@@ -91,6 +91,18 @@ in
     };
   };
 
+  # Adopts the OBC that was originally created by hand with kubectl.
+  kubernetes.resources.objectbucketclaim."${app}-audio" = {
+    metadata = {
+      inherit namespace;
+    };
+    spec = {
+      bucketName = "${app}-audio";
+      storageClassName = "rook-ceph-objectstore";
+      additionalConfig.bucketPolicy = kubenix.lib.rgwMirrorReadPolicyFor "${app}-audio";
+    };
+  };
+
   kubernetes.resources.configMaps."${app}-vite-config" = {
     metadata = {
       name = "${app}-vite-config";

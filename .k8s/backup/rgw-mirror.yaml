@@ -5,7 +5,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 0adb1d030869d72d7928e249d0c4ea3535762a11
+    kubenix/hash: e31c6b9e08860221da3a3c077a87ac11c03c6584
   name: rgw-mirror
   namespace: backup
 spec:
@@ -37,7 +37,7 @@ spec:
                   # Must match MINIO_REGION on lab-pi-bk, otherwise every request is a 400.
                   export RCLONE_CONFIG_MINIO_REGION=sa-east-1
 
-                  BUCKETS="imgproxy n8n-files open-webui-files valoris-s3"
+                  BUCKETS="imgproxy n8n-files open-webui-files oratoria-audio poise"
 
                   for BUCKET in $BUCKETS; do
                     echo "--- Syncing $BUCKET ---"

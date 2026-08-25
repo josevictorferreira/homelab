@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: poise
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: bad6a152eb84677725591c467c143c54fd8b9a77
+    kubenix/hash: 2ff8da7a7efc53d67fb895987c50a518cbf4c2e4
     kubenix/module-instance: poise
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -109,7 +109,7 @@ metadata:
     app.kubernetes.io/name: poise
     app.kubernetes.io/service: poise
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: bad6a152eb84677725591c467c143c54fd8b9a77
+    kubenix/hash: 2ff8da7a7efc53d67fb895987c50a518cbf4c2e4
     kubenix/module-instance: poise
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -138,7 +138,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: poise
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: bad6a152eb84677725591c467c143c54fd8b9a77
+    kubenix/hash: 2ff8da7a7efc53d67fb895987c50a518cbf4c2e4
     kubenix/module-instance: poise
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -169,9 +169,11 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: bad6a152eb84677725591c467c143c54fd8b9a77
+    kubenix/hash: 2ff8da7a7efc53d67fb895987c50a518cbf4c2e4
   name: poise-s3
   namespace: apps
 spec:
+  additionalConfig:
+    bucketPolicy: '{"Statement":[{"Action":["s3:ListBucket","s3:GetObject"],"Effect":"Allow","Principal":{"AWS":["arn:aws:iam:::user/s3-user"]},"Resource":["arn:aws:s3:::poise","arn:aws:s3:::poise/*"],"Sid":"rgw-mirror-read"}],"Version":"2012-10-17"}'
   bucketName: poise
   storageClassName: rook-ceph-objectstore

@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: oratoria
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 5842925e2155b3d31387281d81dcc8125ad472c4
+    kubenix/hash: 576b99b34ef8a87c598bca8c84c8c9c022759357
     kubenix/module-instance: oratoria
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -100,7 +100,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: oratoria
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 5842925e2155b3d31387281d81dcc8125ad472c4
+    kubenix/hash: 576b99b34ef8a87c598bca8c84c8c9c022759357
     kubenix/module-instance: oratoria
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -128,7 +128,7 @@ metadata:
     app.kubernetes.io/name: oratoria
     app.kubernetes.io/service: oratoria
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 5842925e2155b3d31387281d81dcc8125ad472c4
+    kubenix/hash: 576b99b34ef8a87c598bca8c84c8c9c022759357
     kubenix/module-instance: oratoria
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -157,7 +157,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: oratoria
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 5842925e2155b3d31387281d81dcc8125ad472c4
+    kubenix/hash: 576b99b34ef8a87c598bca8c84c8c9c022759357
     kubenix/module-instance: oratoria
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -196,6 +196,22 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 5842925e2155b3d31387281d81dcc8125ad472c4
+    kubenix/hash: 576b99b34ef8a87c598bca8c84c8c9c022759357
   name: oratoria-vite-config
   namespace: apps
+---
+apiVersion: objectbucket.io/v1alpha1
+kind: ObjectBucketClaim
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 576b99b34ef8a87c598bca8c84c8c9c022759357
+  name: oratoria-audio
+  namespace: apps
+spec:
+  additionalConfig:
+    bucketPolicy: '{"Statement":[{"Action":["s3:ListBucket","s3:GetObject"],"Effect":"Allow","Principal":{"AWS":["arn:aws:iam:::user/s3-user"]},"Resource":["arn:aws:s3:::oratoria-audio","arn:aws:s3:::oratoria-audio/*"],"Sid":"rgw-mirror-read"}],"Version":"2012-10-17"}'
+  bucketName: oratoria-audio
+  storageClassName: rook-ceph-objectstore
