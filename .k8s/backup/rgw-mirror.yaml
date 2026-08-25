@@ -5,7 +5,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: e31c6b9e08860221da3a3c077a87ac11c03c6584
+    kubenix/hash: 84bfd5693afc3cb30cf057e538a204e05d9d0278
   name: rgw-mirror
   namespace: backup
 spec:
@@ -36,6 +36,8 @@ spec:
                   export RCLONE_CONFIG_MINIO_ENDPOINT="http://10.10.10.209:9000"
                   # Must match MINIO_REGION on lab-pi-bk, otherwise every request is a 400.
                   export RCLONE_CONFIG_MINIO_REGION=sa-east-1
+                  # The backup user cannot create buckets; skip rclone's implicit CreateBucket.
+                  export RCLONE_CONFIG_MINIO_NO_CHECK_BUCKET=true
 
                   BUCKETS="imgproxy n8n-files open-webui-files oratoria-audio poise"
 

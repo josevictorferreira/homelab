@@ -33,6 +33,8 @@ let
     export RCLONE_CONFIG_MINIO_ENDPOINT="${minioEndpoint}"
     # Must match MINIO_REGION on lab-pi-bk, otherwise every request is a 400.
     export RCLONE_CONFIG_MINIO_REGION=sa-east-1
+    # The backup user cannot create buckets; skip rclone's implicit CreateBucket.
+    export RCLONE_CONFIG_MINIO_NO_CHECK_BUCKET=true
 
     BUCKETS="${builtins.concatStringsSep " " buckets}"
 
