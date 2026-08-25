@@ -32,6 +32,9 @@ in
       noHooks = false;
       values = {
         crds.enabled = true;
+        # Let OBCs carry a bucket policy (used to grant the rgw-mirror backup
+        # user read access to app buckets). Default allowlist is maxObjects,maxSize.
+        obcAllowAdditionalConfigFields = "maxObjects,maxSize,bucketPolicy";
         csi = {
           cephFSAttachRequired = true;
           csiRBDPluginVolume = [ libModulesVolume hostNixVolume ];
