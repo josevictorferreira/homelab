@@ -70,6 +70,7 @@
       velox = "10.10.10.158";
       poise = "10.10.10.159";
       bookorbit = "10.10.10.160";
+      attic = "10.10.10.161";
       grafana = "10.10.10.190";
     };
   };
@@ -99,6 +100,7 @@
       "poise_production_queue"
       "poise_production_cable"
       "bookorbit"
+      "attic"
     ];
   };
 

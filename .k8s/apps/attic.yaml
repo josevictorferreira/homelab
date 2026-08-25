@@ -1,0 +1,150 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    app: attic
+    kubenix/hash: 81cbc4d1e3900b1e850b86ee12e6280b08632ec6
+  name: attic
+  namespace: apps
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: attic
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: attic
+    spec:
+      containers:
+        - args:
+            - -f
+            - /etc/attic/config.toml
+          env:
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  key: AWS_ACCESS_KEY_ID
+                  name: attic-s3
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: AWS_SECRET_ACCESS_KEY
+                  name: attic-s3
+          envFrom:
+            - secretRef:
+                name: attic-config
+          image: ghcr.io/zhaofengli/attic:main@sha256:317924e10e70416e69d401880bb71b3aae69b413ecafcfc54018f61929464526
+          livenessProbe:
+            initialDelaySeconds: 30
+            periodSeconds: 20
+            tcpSocket:
+              port: 8080
+          name: attic
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+          readinessProbe:
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            tcpSocket:
+              port: 8080
+          resources:
+            limits:
+              cpu: 500m
+              memory: 1Gi
+            requests:
+              cpu: 100m
+              memory: 256Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          volumeMounts:
+            - mountPath: /etc/attic/config.toml
+              name: config
+              readOnly: true
+              subPath: config.toml
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - configMap:
+            name: attic-config
+          name: config
+---
+apiVersion: v1
+data:
+  config.toml: |
+    listen = "[::]:8080"
+
+    [database]
+    heartbeat = true
+
+    [storage]
+    type = "s3"
+    region = "us-east-1"
+    bucket = "attic"
+    endpoint = "http://rook-ceph-rgw-ceph-objectstore.rook-ceph.svc"
+
+    [chunking]
+    nar-size-threshold = 65536
+    min-size = 16384
+    avg-size = 65536
+    max-size = 262144
+
+    [compression]
+    type = "zstd"
+    level = 8
+
+    [garbage-collection]
+    interval = "12 hours"
+    default-retention-period = "3 months"
+kind: ConfigMap
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 81cbc4d1e3900b1e850b86ee12e6280b08632ec6
+  name: attic-config
+  namespace: apps
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+    lbipam.cilium.io/ips: 10.10.10.161
+  labels:
+    kubenix/hash: 81cbc4d1e3900b1e850b86ee12e6280b08632ec6
+  name: attic
+  namespace: apps
+spec:
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+  selector:
+    app: attic
+  type: LoadBalancer
+---
+apiVersion: objectbucket.io/v1alpha1
+kind: ObjectBucketClaim
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 81cbc4d1e3900b1e850b86ee12e6280b08632ec6
+  name: attic-s3
+  namespace: apps
+spec:
+  bucketName: attic
+  storageClassName: rook-ceph-objectstore

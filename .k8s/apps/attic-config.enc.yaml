@@ -1,0 +1,46 @@
+apiVersion: v1
+kind: Secret
+metadata:
+    annotations:
+        kubenix/k8s-version: "1.32"
+        kubenix/project-name: ze-homelab
+    labels:
+        kubenix/hash: 50fbe2f2993e0f5de5cc828416ddf5c96ef9e9c3
+    name: attic-config
+    namespace: apps
+stringData:
+    ATTIC_SERVER_DATABASE_URL: ENC[AES256_GCM,data:GsHJZWJEf148TY4+wXTpBgO8yCvhLFq1d9Q8RngRYYXcf3mcy2TbSHRXHp+1+UmiHjwXncxUNTEsKsGjU9YjGcC7cMCu,iv:u8+vxYPO41f4VvGK6Rkm5xb36CXO4A7afDPXzECyOys=,tag:Ibm3nZBrFhcfolsfaSxyhw==,type:str]
+    ATTIC_SERVER_TOKEN_HS256_SECRET_BASE64: ENC[AES256_GCM,data:5obRuVl5efLuukXkJ2rzwf4uydFEJNfDKcuaM5pBKqixUcolBb1SmBj/RSyjkEgP8+J4hfxBTcfSzyINzD6l+o7rFhi/4Kh4CXghVzunG+kftLl53Ansrw==,iv:xr53bx1zygtVu47b3kVZ4fZJA/csyYpZlLyEqztIWsQ=,tag:X5cG8anBD6OzMAT71I9mBA==,type:str]
+sops:
+    age:
+        - recipient: age16yrhmz8fytj7j9ns80zl40zjcdfd3pdxh48ld7ys7veea774udtqfn9jyx
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBRd0xJZ1Z3QkJ1ak1pL0Rt
+            MFBhT3V3aHBwZEROTVlWeURiMXE4TFlZSXlRClJWdCsyUWRjZlFINEVpREtheEZv
+            RFlQeG9OeXJHc2pjcFdSc2ROdS9ScWsKLS0tIGNueFA4a2l4M2pPQVhNNkE4L1hq
+            QjVOME05eGJQUWNDMHdveStWeVF2L1EKwcRjnbBLurdEUSF+SkOJE+E21pqCUPAC
+            GJ2xCyZr90pIqGj7FVzlJcW3A7/0tz/+QjjZUr5jp5svhqCZa+bvVQ==
+            -----END AGE ENCRYPTED FILE-----
+        - recipient: age1jx9qu5p0ycvymrl2gykd9z3w8x8n67jxnatxs49j7qzspjr6asqqf8u35h
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSB1NTRyc3B4OUIvNnNHVkdN
+            NjhFZmhTWnlEd2xrMEdMTHZHTkR2M0RwL0hZCnlRdllKM1BoT0lrOUQzMjFOcHd2
+            M1duekZIaUxCcWN2NG42eFVCV1ZabmcKLS0tIDNYTWNqZlFDNllRajB4czFvOWQ2
+            ZlRqL3lLMnBqU1Zkek85dm1XaURtTzQKSAKuZTYwtG2BDK92RG+3vD8LFH9mlbb4
+            PhEG7nOh9PmJ3dTWGyxUD0lXRxmapvykLIYNJwFOuNl2xKplm4Po+w==
+            -----END AGE ENCRYPTED FILE-----
+        - recipient: age1myzhwq67gu5zrfk8fvs0p7mh5fk67d20ltwqf9325ya83lm06ytsyax3j2
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBZQ0Ywd1RwMlljdXhtaTBi
+            MFp5Z3NXMngxUGxEUHRaRWVqalE3MTZIUUNvCjVXSzNvaWd3MG1DTFNsR3BEdHNX
+            S3dBTStnd2ZQZ3M0L0R2eXpwTnlRazQKLS0tIFVVRlgycGdNSCtqbkdaSlprNkJ5
+            ZzVjMmFCL1dZSlA3WmNYemJEdDUySWcK5f8KHqocFh+SJOM/hHYKhneHzj/tNS1I
+            0W4j2ychi84EWBDjnqXPKUrwRiB3YcWIOhQCI1N3GMJeRJtvAe38WA==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2026-08-25T14:51:22Z"
+    mac: ENC[AES256_GCM,data:M4LVcm5ihBZL0DkdbBrG6C6Q5GJPJMFOpEteP9YM8dYwTxeJuEsBso7eFwzZkBmuJWUwoRkfZ0sFqR8MjZNdOer/HJyv5jwULuQGKXDP7+c/31hmKjLv2BIkvKJHcGxLIQLPjJIrivoJFEIynDnwxWKAyA0c0x/ij2VwbNeMmZI=,iv:JRyYFGdKA4QtnPjd2cSAAPPh4TJA9mwA7+m7BYqp1KQ=,tag:V9vd9CGxPu9tLiQaVjxVYg==,type:str]
+    encrypted_regex: ^(data|stringData)$
+    version: 3.11.0

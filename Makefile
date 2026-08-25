@@ -1,4 +1,4 @@
-.PHONY: lgroups check ddeploy deploy gdeploy secrets manifests kubesync wusbiso docker-build docker-login docker-init-repo docker-push lint format backup-postgres restore-postgres reconcile events backup-rgw backup-etcd backup-verify images images-outdated images-check push-openclaw-debian ghcr-size tf help
+.PHONY: lgroups check ddeploy deploy gdeploy secrets manifests kubesync wusbiso docker-build docker-login docker-init-repo docker-push lint format backup-postgres restore-postgres reconcile events backup-rgw backup-etcd backup-verify images images-outdated images-check push-openclaw-debian ghcr-size tf push-cache help
 
 .DEFAULT_GOAL := help
 
@@ -91,6 +91,11 @@ images-check: ## Check specific image for updates. Usage: make images-check IMAG
 
 push-openclaw-debian: ## Build and push openclaw-debian image to GHCR (manual deploy).
 	@nix run .#push-openclaw-debian
+
+push-cache: ## Push a store path/closure to the Attic binary cache. Usage: make push-cache P=$(nix build .#gen-manifests --print-out-paths)
+	@if ! command -v attic >/dev/null 2>&1; then echo "attic CLI not found. Install it (e.g. nix shell nixpkgs#attic)."; exit 1; fi
+	@if [ -z "$(P)" ]; then echo "Usage: make push-cache P=<store-path-or-result>"; exit 1; fi
+	@attic push homelab $(P)
 
 ghcr-size: ## Check GHCR image size without downloading. Usage: make ghcr-size IMAGE=user/package:tag
 	@nix run .#ghcr-size -- $(IMAGE)
