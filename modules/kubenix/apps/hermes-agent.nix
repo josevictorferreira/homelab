@@ -35,6 +35,11 @@ let
     }
     {
       name = "hermes-data";
+      mountPath = "/shared/3d-models";
+      subPath = "3d-models";
+    }
+    {
+      name = "hermes-data";
       mountPath = "/opt/hermes/scripts/whatsapp-bridge/node_modules";
       subPath = "whatsapp-bridge-node_modules";
     }
