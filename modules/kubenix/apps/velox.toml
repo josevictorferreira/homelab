@@ -241,6 +241,10 @@ upstream_model = "openai/whisper-1"
 provider = "glm"
 upstream_model = "glm-5.3"
 
+[models.glm-5-3-flash-zai]
+provider = "glm"
+upstream_model = "glm-5.3-flash"
+
 [models.glm-5-2-zai]
 provider = "glm"
 upstream_model = "glm-5.2"
@@ -260,6 +264,10 @@ upstream_model = "glm-4.5-air"
 [models.glm-5-3-ocgo]
 provider = "opencode-go"
 upstream_model = "glm-5.3"
+
+[models.glm-5-3-flash-ocgo]
+provider = "opencode-go"
+upstream_model = "glm-5.3-flash"
 
 [models.glm-5-2-ocgo]
 provider = "opencode-go"
@@ -485,6 +493,12 @@ targets = [
 targets = [
   { model = "glm-5-3-zai" },
   { model = "glm-5-3-ocgo" },
+]
+
+[combos.glm-5-3-flash]
+targets = [
+  { model = "glm-5-3-flash-zai" },
+  { model = "glm-5-3-flash-ocgo" },
 ]
 
 [combos.glm-5-2]
