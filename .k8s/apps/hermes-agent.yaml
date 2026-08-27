@@ -7,7 +7,7 @@ metadata:
   labels:
     app: hermes-agent
     component: dashboard
-    kubenix/hash: 9fb83532de5cb18032711b88ff8a8a9480bb58e6
+    kubenix/hash: 98a595af1adf07d0088b190c55aec2d56434420c
   name: hermes-agent-dashboard
   namespace: apps
 spec:
@@ -95,6 +95,9 @@ spec:
             - mountPath: /shared/images
               name: hermes-data
               subPath: images
+            - mountPath: /shared/3d-models
+              name: hermes-data
+              subPath: 3d-models
             - mountPath: /opt/hermes/scripts/whatsapp-bridge/node_modules
               name: hermes-data
               subPath: whatsapp-bridge-node_modules
@@ -127,7 +130,7 @@ metadata:
   labels:
     app: hermes-agent
     component: gateway
-    kubenix/hash: 9fb83532de5cb18032711b88ff8a8a9480bb58e6
+    kubenix/hash: 98a595af1adf07d0088b190c55aec2d56434420c
   name: hermes-agent-gateway
   namespace: apps
 spec:
@@ -311,6 +314,9 @@ spec:
             - mountPath: /shared/images
               name: hermes-data
               subPath: images
+            - mountPath: /shared/3d-models
+              name: hermes-data
+              subPath: 3d-models
             - mountPath: /opt/hermes/scripts/whatsapp-bridge/node_modules
               name: hermes-data
               subPath: whatsapp-bridge-node_modules
@@ -439,6 +445,9 @@ spec:
             - mountPath: /shared/images
               name: hermes-data
               subPath: images
+            - mountPath: /shared/3d-models
+              name: hermes-data
+              subPath: 3d-models
             - mountPath: /opt/hermes/scripts/whatsapp-bridge/node_modules
               name: hermes-data
               subPath: whatsapp-bridge-node_modules
@@ -520,6 +529,9 @@ spec:
             - mountPath: /shared/images
               name: hermes-data
               subPath: images
+            - mountPath: /shared/3d-models
+              name: hermes-data
+              subPath: 3d-models
             - mountPath: /opt/hermes/scripts/whatsapp-bridge/node_modules
               name: hermes-data
               subPath: whatsapp-bridge-node_modules
@@ -556,7 +568,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 9fb83532de5cb18032711b88ff8a8a9480bb58e6
+    kubenix/hash: 98a595af1adf07d0088b190c55aec2d56434420c
   name: hermes-agent-cli-wrapper
   namespace: apps
 ---
@@ -568,7 +580,7 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     app: hermes-agent
-    kubenix/hash: 9fb83532de5cb18032711b88ff8a8a9480bb58e6
+    kubenix/hash: 98a595af1adf07d0088b190c55aec2d56434420c
   name: hermes-agent-dashboard
   namespace: apps
 spec:
@@ -589,7 +601,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 9fb83532de5cb18032711b88ff8a8a9480bb58e6
+    kubenix/hash: 98a595af1adf07d0088b190c55aec2d56434420c
   name: hermes-agent-dashboard
   namespace: apps
 spec:
@@ -618,7 +630,7 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     app: hermes-agent
-    kubenix/hash: 9fb83532de5cb18032711b88ff8a8a9480bb58e6
+    kubenix/hash: 98a595af1adf07d0088b190c55aec2d56434420c
   name: hermes-agent-readonly
 rules:
   - apiGroups:
@@ -660,7 +672,7 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     app: hermes-agent
-    kubenix/hash: 9fb83532de5cb18032711b88ff8a8a9480bb58e6
+    kubenix/hash: 98a595af1adf07d0088b190c55aec2d56434420c
   name: hermes-agent-readonly
 roleRef:
   apiGroup: rbac.authorization.k8s.io
