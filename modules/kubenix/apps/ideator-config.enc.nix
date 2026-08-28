@@ -8,17 +8,20 @@ let
   dbPassword = kubenix.lib.secretsInlineFor "postgresql_admin_password";
 in
 {
-  # Rails multi-DB: DATABASE_URL covers primary; the queue and cable
-  # connections derive from it per connection name.
   kubernetes.resources.secrets."${app}-config" = {
     metadata = {
       name = "${app}-config";
       inherit namespace;
     };
     stringData = {
-      DATABASE_URL = "postgresql://${dbUser}:${dbPassword}@${dbHost}:${dbPort}/ideator_production";
-      QUEUE_DATABASE_URL = "postgresql://${dbUser}:${dbPassword}@${dbHost}:${dbPort}/ideator_production_queue";
-      CABLE_DATABASE_URL = "postgresql://${dbUser}:${dbPassword}@${dbHost}:${dbPort}/ideator_production_cable";
+      # config/database.yml derives the primary, cache, queue, and cable
+      # connections from IDEATOR_DATABASE_* by suffix, so host/user/password
+      # are shared and only the database name differs.
+      IDEATOR_DATABASE_HOST = dbHost;
+      IDEATOR_DATABASE_PORT = dbPort;
+      IDEATOR_DATABASE_NAME = "ideator_production";
+      IDEATOR_DATABASE_USER = dbUser;
+      IDEATOR_DATABASE_PASSWORD = dbPassword;
       # Chat goes through the in-cluster Velox LLM gateway (OpenAI-compatible);
       # the initializer reads OMNIROUTE_* names by default, no code change needed.
       OMNIROUTE_BASE_URL = "http://${kubenix.lib.serviceHostFor "velox" namespace}:8080/v1";
