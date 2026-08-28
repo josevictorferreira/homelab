@@ -1,0 +1,253 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/controller: main
+    app.kubernetes.io/instance: foyer
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: foyer
+    helm.sh/chart: app-template-4.2.0
+    kubenix/hash: 23196591e45dfd10a5fa2694067f8577254b3a1f
+    kubenix/module-instance: foyer
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: foyer
+  namespace: apps
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/controller: main
+      app.kubernetes.io/instance: foyer
+      app.kubernetes.io/name: foyer
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        checksum/configMaps: b1332146b1791ca32dd1b88f1f4354ab4634b5f907dc8a66a8f784a73af0a99c
+      labels:
+        app.kubernetes.io/controller: main
+        app.kubernetes.io/instance: foyer
+        app.kubernetes.io/name: foyer
+    spec:
+      automountServiceAccountToken: true
+      containers:
+        - image: ghcr.io/josevictorferreira/foyer:latest
+          imagePullPolicy: Always
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            periodSeconds: 30
+            timeoutSeconds: 5
+          name: main
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 8080
+            periodSeconds: 10
+            timeoutSeconds: 5
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 50m
+              memory: 64Mi
+          startupProbe:
+            failureThreshold: 30
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          volumeMounts:
+            - mountPath: /app/cache
+              name: cache
+            - mountPath: /app/config/foyer.yml
+              name: config
+              readOnly: true
+              subPath: foyer.yml
+            - mountPath: /app/data
+              name: data
+      dnsPolicy: ClusterFirst
+      enableServiceLinks: false
+      hostIPC: false
+      hostNetwork: false
+      hostPID: false
+      imagePullSecrets:
+        - name: ghcr-registry-secret
+      serviceAccountName: default
+      volumes:
+        - name: cache
+          persistentVolumeClaim:
+            claimName: foyer-cache
+        - configMap:
+            items:
+              - key: foyer.yml
+                path: foyer.yml
+            name: foyer
+          name: config
+        - name: data
+          persistentVolumeClaim:
+            claimName: foyer-data
+---
+apiVersion: v1
+data:
+  foyer.yml: |
+    modules: {}
+    pages:
+    - columns:
+      - size: full
+        widgets:
+        - title: Welcome to Foyer
+          type: custom-api
+      name: Home
+      slug: home
+    server:
+      host: 0.0.0.0
+      port: 8080
+    theme:
+      name: dark
+kind: ConfigMap
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: foyer
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: foyer
+    helm.sh/chart: app-template-4.2.0
+    kubenix/hash: 23196591e45dfd10a5fa2694067f8577254b3a1f
+    kubenix/module-instance: foyer
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: foyer
+  namespace: apps
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: foyer
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: foyer
+    helm.sh/chart: app-template-4.2.0
+    kubenix/hash: 23196591e45dfd10a5fa2694067f8577254b3a1f
+    kubenix/module-instance: foyer
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: foyer-cache
+  namespace: apps
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: rook-ceph-block
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: foyer
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: foyer
+    helm.sh/chart: app-template-4.2.0
+    kubenix/hash: 23196591e45dfd10a5fa2694067f8577254b3a1f
+    kubenix/module-instance: foyer
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: foyer-data
+  namespace: apps
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: rook-ceph-block
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+    lbipam.cilium.io/ips: 10.10.10.163
+    lbipam.cilium.io/sharing-key: foyer
+  labels:
+    app.kubernetes.io/instance: foyer
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: foyer
+    app.kubernetes.io/service: foyer
+    helm.sh/chart: app-template-4.2.0
+    kubenix/hash: 23196591e45dfd10a5fa2694067f8577254b3a1f
+    kubenix/module-instance: foyer
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: foyer
+  namespace: apps
+spec:
+  ports:
+    - name: http
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    app.kubernetes.io/controller: main
+    app.kubernetes.io/instance: foyer
+    app.kubernetes.io/name: foyer
+  type: LoadBalancer
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: foyer
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: foyer
+    helm.sh/chart: app-template-4.2.0
+    kubenix/hash: 23196591e45dfd10a5fa2694067f8577254b3a1f
+    kubenix/module-instance: foyer
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: foyer
+  namespace: apps
+spec:
+  ingressClassName: cilium
+  rules:
+    - host: foyer.josevictor.me
+      http:
+        paths:
+          - backend:
+              service:
+                name: foyer
+                port:
+                  number: 8080
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - foyer.josevictor.me
+      secretName: wildcard-tls

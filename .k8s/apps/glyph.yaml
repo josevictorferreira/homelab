@@ -1,0 +1,150 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/controller: main
+    app.kubernetes.io/instance: glyph
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: glyph
+    helm.sh/chart: app-template-4.2.0
+    kubenix/hash: 3528a3545a1eb882e5efc8acaf7845af33d19f85
+    kubenix/module-instance: glyph
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: glyph
+  namespace: apps
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/controller: main
+      app.kubernetes.io/instance: glyph
+      app.kubernetes.io/name: glyph
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/controller: main
+        app.kubernetes.io/instance: glyph
+        app.kubernetes.io/name: glyph
+    spec:
+      automountServiceAccountToken: true
+      containers:
+        - envFrom:
+            - secretRef:
+                name: glyph-config
+          image: ghcr.io/josevictorferreira/glyph:latest
+          imagePullPolicy: Always
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /up
+              port: 3000
+            periodSeconds: 30
+            timeoutSeconds: 5
+          name: main
+          ports:
+            - containerPort: 3000
+              name: http
+              protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /up
+              port: 3000
+            periodSeconds: 10
+            timeoutSeconds: 5
+          resources:
+            limits:
+              cpu: 2000m
+              memory: 4Gi
+            requests:
+              cpu: 100m
+              memory: 512Mi
+          startupProbe:
+            failureThreshold: 30
+            httpGet:
+              path: /up
+              port: 3000
+            initialDelaySeconds: 15
+            periodSeconds: 10
+      dnsPolicy: ClusterFirst
+      enableServiceLinks: false
+      hostIPC: false
+      hostNetwork: false
+      hostPID: false
+      imagePullSecrets:
+        - name: ghcr-registry-secret
+      serviceAccountName: default
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+    lbipam.cilium.io/ips: 10.10.10.162
+    lbipam.cilium.io/sharing-key: glyph
+  labels:
+    app.kubernetes.io/instance: glyph
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: glyph
+    app.kubernetes.io/service: glyph
+    helm.sh/chart: app-template-4.2.0
+    kubenix/hash: 3528a3545a1eb882e5efc8acaf7845af33d19f85
+    kubenix/module-instance: glyph
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: glyph
+  namespace: apps
+spec:
+  ports:
+    - name: http
+      port: 3000
+      protocol: TCP
+      targetPort: 3000
+  selector:
+    app.kubernetes.io/controller: main
+    app.kubernetes.io/instance: glyph
+    app.kubernetes.io/name: glyph
+  type: LoadBalancer
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: glyph
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: glyph
+    helm.sh/chart: app-template-4.2.0
+    kubenix/hash: 3528a3545a1eb882e5efc8acaf7845af33d19f85
+    kubenix/module-instance: glyph
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: glyph
+  namespace: apps
+spec:
+  ingressClassName: cilium
+  rules:
+    - host: glyph.josevictor.me
+      http:
+        paths:
+          - backend:
+              service:
+                name: glyph
+                port:
+                  number: 3000
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - glyph.josevictor.me
+      secretName: wildcard-tls

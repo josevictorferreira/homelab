@@ -71,6 +71,8 @@
       poise = "10.10.10.159";
       bookorbit = "10.10.10.160";
       attic = "10.10.10.161";
+      glyph = "10.10.10.162";
+      foyer = "10.10.10.163";
       grafana = "10.10.10.190";
     };
   };
@@ -101,6 +103,10 @@
       "poise_production_cable"
       "bookorbit"
       "attic"
+      "glyph_production"
+      "glyph_production_cache"
+      "glyph_production_queue"
+      "glyph_production_cable"
     ];
   };
 
