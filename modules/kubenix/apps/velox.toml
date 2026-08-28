@@ -21,6 +21,12 @@ log_format = "json"
 max_body_bytes = 4194304
 shutdown_drain_ms = 10000
 shutdown_grace_ms = 30000
+# Default TTFB (30s) kills LLM extraction calls that carry a whole story in
+# the prompt: GLM/opencode-go routinely take 30-60s before the first byte,
+# so both combo targets time out and the request dies as 502 at ~60s.
+# There is no total-request timeout in velox; stream_idle_timeout_ms (60s
+# default) still guards a stalled stream after the head arrives.
+time_to_first_byte_timeout_ms = 120000
 
 # Apply both input compressors globally to every configured combo.
 [compression.rtk]

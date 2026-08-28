@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 30d4faf42fa232bd632629e9ef781d7a036b412a
+    kubenix/hash: 2f4deb39e803650cdbe50f19d211309ff4a95724
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -29,7 +29,7 @@ spec:
   template:
     metadata:
       annotations:
-        velox.josevictor.me/config-hash: 5f8f281fa26d6ee64ef6d3788c2bb51cb3f7e932a8852f10bfe85025f8f3f99a
+        velox.josevictor.me/config-hash: 0877c1986d8ae476791d0ba8ed04afad547dd9cf7dd361036c0704700eacbea8
         velox.josevictor.me/oauth-agent-config-hash: 72b7f1b202300c363471312cd880f37085429ad305f9944b37c6926c9dee941d
       labels:
         app.kubernetes.io/controller: main
@@ -210,7 +210,7 @@ metadata:
     app.kubernetes.io/name: velox
     app.kubernetes.io/service: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 30d4faf42fa232bd632629e9ef781d7a036b412a
+    kubenix/hash: 2f4deb39e803650cdbe50f19d211309ff4a95724
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -239,7 +239,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 30d4faf42fa232bd632629e9ef781d7a036b412a
+    kubenix/hash: 2f4deb39e803650cdbe50f19d211309ff4a95724
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -289,6 +289,12 @@ data:
     max_body_bytes = 4194304
     shutdown_drain_ms = 10000
     shutdown_grace_ms = 30000
+    # Default TTFB (30s) kills LLM extraction calls that carry a whole story in
+    # the prompt: GLM/opencode-go routinely take 30-60s before the first byte,
+    # so both combo targets time out and the request dies as 502 at ~60s.
+    # There is no total-request timeout in velox; stream_idle_timeout_ms (60s
+    # default) still guards a stalled stream after the head arrives.
+    time_to_first_byte_timeout_ms = 120000
 
     # Apply both input compressors globally to every configured combo.
     [compression.rtk]
@@ -509,6 +515,10 @@ data:
     provider = "glm"
     upstream_model = "glm-5.3"
 
+    [models.glm-5-3-flash-zai]
+    provider = "glm"
+    upstream_model = "glm-5.3-flash"
+
     [models.glm-5-2-zai]
     provider = "glm"
     upstream_model = "glm-5.2"
@@ -528,6 +538,10 @@ data:
     [models.glm-5-3-ocgo]
     provider = "opencode-go"
     upstream_model = "glm-5.3"
+
+    [models.glm-5-3-flash-ocgo]
+    provider = "opencode-go"
+    upstream_model = "glm-5.3-flash"
 
     [models.glm-5-2-ocgo]
     provider = "opencode-go"
@@ -755,6 +769,12 @@ data:
       { model = "glm-5-3-ocgo" },
     ]
 
+    [combos.glm-5-3-flash]
+    targets = [
+      { model = "glm-5-3-flash-zai" },
+      { model = "glm-5-3-flash-ocgo" },
+    ]
+
     [combos.glm-5-2]
     targets = [
       { model = "glm-5-2-zai" },
@@ -975,7 +995,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 30d4faf42fa232bd632629e9ef781d7a036b412a
+    kubenix/hash: 2f4deb39e803650cdbe50f19d211309ff4a95724
   name: velox-config
   namespace: apps
 ---
@@ -1059,7 +1079,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 30d4faf42fa232bd632629e9ef781d7a036b412a
+    kubenix/hash: 2f4deb39e803650cdbe50f19d211309ff4a95724
   name: velox-oauth-agent-config
   namespace: apps
 ---
@@ -1070,7 +1090,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 30d4faf42fa232bd632629e9ef781d7a036b412a
+    kubenix/hash: 2f4deb39e803650cdbe50f19d211309ff4a95724
   name: velox-oauth-agent
   namespace: apps
 ---
@@ -1081,7 +1101,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 30d4faf42fa232bd632629e9ef781d7a036b412a
+    kubenix/hash: 2f4deb39e803650cdbe50f19d211309ff4a95724
   name: velox-oauth-agent
   namespace: apps
 rules:
@@ -1103,7 +1123,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 30d4faf42fa232bd632629e9ef781d7a036b412a
+    kubenix/hash: 2f4deb39e803650cdbe50f19d211309ff4a95724
   name: velox-oauth-agent
   namespace: apps
 roleRef:
