@@ -6,7 +6,7 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     app: attic
-    kubenix/hash: 81cbc4d1e3900b1e850b86ee12e6280b08632ec6
+    kubenix/hash: b75f6c6869ef6186a4f2ed21e39a28e3f72c11e2
   name: attic
   namespace: apps
 spec:
@@ -18,6 +18,8 @@ spec:
     type: Recreate
   template:
     metadata:
+      annotations:
+        attic.josevictor.me/config-hash: 41b79ef62f22d2b4b72d7112f79270449a28e1f3ca919c7e04ffb756764bf83c
       labels:
         app: attic
     spec:
@@ -90,7 +92,7 @@ data:
     type = "s3"
     region = "us-east-1"
     bucket = "attic"
-    endpoint = "http://rook-ceph-rgw-ceph-objectstore.rook-ceph.svc"
+    endpoint = "https://objectstore.josevictor.me"
 
     [chunking]
     nar-size-threshold = 65536
@@ -111,7 +113,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 81cbc4d1e3900b1e850b86ee12e6280b08632ec6
+    kubenix/hash: b75f6c6869ef6186a4f2ed21e39a28e3f72c11e2
   name: attic-config
   namespace: apps
 ---
@@ -123,7 +125,7 @@ metadata:
     kubenix/project-name: ze-homelab
     lbipam.cilium.io/ips: 10.10.10.161
   labels:
-    kubenix/hash: 81cbc4d1e3900b1e850b86ee12e6280b08632ec6
+    kubenix/hash: b75f6c6869ef6186a4f2ed21e39a28e3f72c11e2
   name: attic
   namespace: apps
 spec:
@@ -142,7 +144,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 81cbc4d1e3900b1e850b86ee12e6280b08632ec6
+    kubenix/hash: b75f6c6869ef6186a4f2ed21e39a28e3f72c11e2
   name: attic-s3
   namespace: apps
 spec:
