@@ -29,6 +29,7 @@ in
       # Embeddings sidecar: Velox serves voyage-3 (1024 dims, matches the
       # embedding vector columns).
       EMBEDDINGS_BASE_URL = "http://${kubenix.lib.serviceHostFor "velox" namespace}:8080/v1";
+      EMBEDDINGS_API_KEY = kubenix.lib.secretsFor "velox_api_keys";
       SECRET_KEY_BASE = kubenix.lib.secretsFor "ideator_secret_key_base";
     };
   };
