@@ -73,6 +73,7 @@
       attic = "10.10.10.161";
       glyph = "10.10.10.162";
       foyer = "10.10.10.163";
+      ideator = "10.10.10.164";
       grafana = "10.10.10.190";
     };
   };
@@ -103,6 +104,10 @@
       "poise_production_cable"
       "bookorbit"
       "attic"
+      "ideator_production"
+      "ideator_production_cache"
+      "ideator_production_queue"
+      "ideator_production_cable"
       "glyph_production"
       "glyph_production_cache"
       "glyph_production_queue"

@@ -5,7 +5,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 9e6186d7c0f89ae9b314c722f2ca181dd9fb2e38
+    kubenix/hash: e109be6ed0e2e36903a476bf49fd9c97fba4bb40
   name: postgres-restore-drill
   namespace: backup
 spec:
@@ -126,7 +126,7 @@ spec:
 
                   # Check expected databases exist
                   ACTUAL_DBS=$(psql -h localhost -U postgres -Atc "SELECT datname FROM pg_database WHERE datistemplate = false ORDER BY 1;")
-                  for db in openwebui n8n immich valoris_production valoris_production_queue keycloak synapse mautrix_slack mautrix_discord mautrix_whatsapp mautrix_slack_v2 mautrix_discord_v2 mautrix_whatsapp_v2 readeck hindsight grafana dramaturge wealtho poise_production poise_production_cache poise_production_queue poise_production_cable bookorbit attic glyph_production glyph_production_cache glyph_production_queue glyph_production_cable; do
+                  for db in openwebui n8n immich valoris_production valoris_production_queue keycloak synapse mautrix_slack mautrix_discord mautrix_whatsapp mautrix_slack_v2 mautrix_discord_v2 mautrix_whatsapp_v2 readeck hindsight grafana dramaturge wealtho poise_production poise_production_cache poise_production_queue poise_production_cable bookorbit attic ideator_production ideator_production_cache ideator_production_queue ideator_production_cable glyph_production glyph_production_cache glyph_production_queue glyph_production_cable; do
                     if echo "$ACTUAL_DBS" | grep -qw "$db"; then
                       echo "OK: database $db exists"
                     else
@@ -136,7 +136,7 @@ spec:
                   done
 
                   # Check each DB has at least 1 table
-                  for db in openwebui n8n immich valoris_production valoris_production_queue keycloak synapse mautrix_slack mautrix_discord mautrix_whatsapp mautrix_slack_v2 mautrix_discord_v2 mautrix_whatsapp_v2 readeck hindsight grafana dramaturge wealtho poise_production poise_production_cache poise_production_queue poise_production_cable bookorbit attic glyph_production glyph_production_cache glyph_production_queue glyph_production_cable; do
+                  for db in openwebui n8n immich valoris_production valoris_production_queue keycloak synapse mautrix_slack mautrix_discord mautrix_whatsapp mautrix_slack_v2 mautrix_discord_v2 mautrix_whatsapp_v2 readeck hindsight grafana dramaturge wealtho poise_production poise_production_cache poise_production_queue poise_production_cable bookorbit attic ideator_production ideator_production_cache ideator_production_queue ideator_production_cable glyph_production glyph_production_cache glyph_production_queue glyph_production_cable; do
                     TABLE_COUNT=$(psql -h localhost -U postgres -d "$db" -Atc "SELECT count(*) FROM information_schema.tables WHERE table_schema = 'public';" 2>/dev/null || echo "0")
                     if [ "$TABLE_COUNT" -gt 0 ]; then
                       echo "OK: $db has $TABLE_COUNT tables"
