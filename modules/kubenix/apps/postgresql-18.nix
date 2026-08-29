@@ -65,6 +65,18 @@ in
           };
           service = kubenix.lib.plainServiceFor "postgresql-18";
           initdb.args = "--data-checksums";
+          # Crash recovery (e.g. after a power outage) must finish its
+          # end-of-recovery checkpoint before Postgres accepts connections. On
+          # RBD that can exceed the liveness budget, and a SIGKILL mid-checkpoint
+          # restarts redo from the same LSN forever. The startup probe holds
+          # liveness/readiness off until recovery completes.
+          startupProbe = {
+            enabled = true;
+            initialDelaySeconds = 30;
+            periodSeconds = 10;
+            timeoutSeconds = 5;
+            failureThreshold = 60;
+          };
           extendedConfiguration = ''
             shared_preload_libraries = 'vchord.so'
             search_path = '"$user", public, vectors'
