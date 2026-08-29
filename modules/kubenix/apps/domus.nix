@@ -44,6 +44,12 @@ in
             { secretRef.name = bucketName; }
           ];
           env = [
+            # Solid Queue runs inside Puma: 12 generation threads + 3 default
+            # + dispatcher/scheduler need more than the default pool of 5.
+            {
+              name = "RAILS_MAX_THREADS";
+              value = "16";
+            }
             {
               name = "S3_ACCESS_KEY_ID";
               valueFrom.secretKeyRef = {
