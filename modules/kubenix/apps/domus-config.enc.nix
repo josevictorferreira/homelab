@@ -10,6 +10,12 @@ in
       name = "${app}-config";
       inherit namespace;
     };
+    # imgproxy_key / imgproxy_salt are stored base64-encoded in k8s-secrets;
+    # `data` (not `stringData`) hands the app the decoded hex imgproxy signs with.
+    data = {
+      IMGPROXY_KEY = kubenix.lib.secretsFor "imgproxy_key";
+      IMGPROXY_SALT = kubenix.lib.secretsFor "imgproxy_salt";
+    };
     stringData = {
       # Database connection for the Domus Rails app (multi-db: primary/cache/queue/cable).
       DOMUS_DATABASE_HOST = "postgresql-18-hl";
@@ -24,8 +30,6 @@ in
       S3_BUCKET = "${app}-s3";
       S3_REGION = "us-east-1";
       IMGPROXY_ENDPOINT = "https://${kubenix.lib.domainFor "imgproxy"}";
-      IMGPROXY_KEY = kubenix.lib.secretsFor "imgproxy_key";
-      IMGPROXY_SALT = kubenix.lib.secretsFor "imgproxy_salt";
 
       # Image generation goes through Velox (in-cluster).
       DOMUS_VELOX_URL = "http://${kubenix.lib.serviceHostFor "velox" namespace}:8080";
