@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: foyer
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: be40814fc8eb5c3cbc6a134daf14d25064da4727
+    kubenix/hash: 7ce16b25d9eafce2d8e47fe6c23644c5a7433f76
     kubenix/module-instance: foyer
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -29,7 +29,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/configMaps: b52ca131509fad5b48896194140e4277b4abce338fdc7f8108c40b09641db634
+        foyer.josevictor.me/config-hash: dd3fc1e365905a16c7917fa2481eb0af9d228f74caf5b241210a21cb4d4b43a6
       labels:
         app.kubernetes.io/controller: main
         app.kubernetes.io/instance: foyer
@@ -102,220 +102,6 @@ spec:
             claimName: foyer-data
 ---
 apiVersion: v1
-data:
-  foyer.yml: |
-    modules:
-      allow_hosts:
-      - readeck.apps.svc.cluster.local
-    pages:
-    - columns:
-      - size: small
-        widgets:
-        - first_day_of_week: monday
-          title: Calendar
-          type: calendar
-        - cache: 1h
-          headers:
-            Authorization: Bearer ref+sops://secrets/k8s-secrets.enc.yaml#readeck_api_token
-          method: GET
-          template: '<ul class="list bookmarks">{% for bookmark in data.response.body.bookmarks|default([])
-            %}<li><a href="{{ bookmark.url }}">{{ bookmark.title|truncate(50)
-            }}</a><div class="meta">{{ bookmark.site_name|default("")
-            }}</div></li>{% endfor %}</ul>
-
-            '
-          title: Bookmarks
-          type: custom-api
-          url: http://readeck.apps.svc.cluster.local:8000/api/bookmarks?limit=15
-      - size: full
-        widgets:
-        - groups:
-          - class: green
-            items:
-            - icon: home
-              name: Home Assistant
-              same_tab: false
-              url: https://home.josevictor.me
-            - icon: book
-              name: BookOrbit
-              same_tab: false
-              url: https://bookorbit.josevictor.me
-            - icon: read
-              name: Readeck
-              same_tab: false
-              url: https://readeck.josevictor.me
-            - icon: search
-              name: SearXNG
-              same_tab: false
-              url: https://searxng.josevictor.me
-            - icon: presentation
-              name: Oratoria
-              same_tab: false
-              url: https://oratoria.josevictor.me
-          - class: purple
-            items:
-            - icon: agent
-              name: Hermes
-              same_tab: false
-              url: https://hermes.josevictor.me
-            - icon: brain
-              name: Hindsight
-              same_tab: false
-              url: https://hindsight.josevictor.me
-            - icon: chart
-              name: Valoris
-              same_tab: false
-              url: https://valoris.josevictor.me
-            - icon: wallet
-              name: Wealtho
-              same_tab: false
-              url: https://wealtho.josevictor.me
-            - icon: hanger
-              name: Poise
-              same_tab: false
-              url: https://poise.josevictor.me
-          - class: red
-            items:
-            - icon: grafana
-              name: Grafana
-              same_tab: false
-              url: https://grafana.josevictor.me
-            - icon: ceph
-              name: Ceph
-              same_tab: false
-              url: https://ceph.josevictor.me
-            - icon: keycloak
-              name: Keycloak
-              same_tab: false
-              url: https://identity.josevictor.me
-            - icon: sftpgo
-              name: SFTPGo
-              same_tab: false
-              url: https://sftpgo.josevictor.me
-            - icon: immich
-              name: Immich
-              same_tab: false
-              url: https://immich.josevictor.me
-          title: Homelab
-          type: bookmarks
-        - type: group
-          widgets:
-          - title: Hacker News
-            type: hackernews
-          - title: Lobsters
-            type: lobsters
-          - show_thumbnails: true
-            subreddit: selfhosted
-            title: r/selfhosted
-            type: reddit
-          - show_thumbnails: true
-            subreddit: LocalLLaMA
-            title: r/LocalLLaMA
-            type: reddit
-          - show_thumbnails: true
-            subreddit: functionalprint
-            title: r/functionalprint
-            type: reddit
-          - show_thumbnails: true
-            subreddit: StableDiffusion
-            title: r/StableDiffusion
-            type: reddit
-        - channels:
-          - UCOuGATIAbd2DvzJmUgXn2IQ
-          - UCHnyfMqiRRG1u-2MsSQLbXA
-          - UCR-DXc1voovS8nhAvccRZhg
-          - UCpMcsdZf2KkAnfmxiq2MfMQ
-          - UC9PIn6-XuRKZ5HmYeu46AIw
-          - UCqnYRbOnwVAWU6plY904eAg
-          - UC_zBdZ0_H_jn41FDRG7q4Tw
-          title: Videos
-          type: videos
-      - size: small
-        widgets:
-        - location: ref+sops://secrets/k8s-secrets.enc.yaml#weather_location
-          title: Weather Forecast
-          type: weather
-        - author: josevictorferreira
-          title: Recent GitHub Repositories
-          token: ref+sops://secrets/k8s-secrets.enc.yaml#github_token
-          type: github-activity
-        - title: Markets
-          type: markets
-        - repositories:
-          - glanceapp/glance
-          - 0xERR0R/blocky
-          - n8n-io/n8n
-          - open-webui/open-webui
-          - grafana/grafana
-          - linkwarden/linkwarden
-          - rook/rook
-          - drakkan/sftpgo
-          - cilium/cilium
-          - prometheus/prometheus
-          - cert-manager/cert-manager
-          - fluxcd/flux2
-          - k3s-io/k3s
-          - binwiederhier/ntfy
-          - louislam/uptime-kuma
-          - prowlarr/prowlarr
-          - immich-app/immich
-          - rishikanthc/scriberr
-          - comfyanonymous/ComfyUI
-          - imgproxy/imgproxy
-          - openclaw/openclaw
-          - nousresearch/hermes-agent
-          - vectorize-io/hindsight
-          - kong/kong
-          - keycloak/keycloak
-          - ruby/ruby
-          - rails/rails
-          - anthropics/claude-code
-          - NixOS/nixpkgs
-          - NixOS/nix
-          - hall/kubenix
-          - neovim/neovim
-          - kovidgoyal/kitty
-          - hyprwm/hyprland
-          - hyprwm/hyprlock
-          - derailed/k9s
-          - davatorium/rofi
-          - tmux/tmux
-          - erikreider/swaynotificationcenter
-          - weechat/weechat
-          - alexays/waybar
-          - jtheoof/swappy
-          - sst/opencode
-          - code-yeongyu/oh-my-opencode
-          - Opencode-DCP/opencode-dynamic-context-pruning
-          - NoeFabris/opencode-antigravity-auth
-          title: Releases
-          token: ref+sops://secrets/k8s-secrets.enc.yaml#github_token
-          type: releases
-      name: Home
-      slug: home
-    server:
-      host: 0.0.0.0
-      port: 8080
-    theme:
-      name: glance-home
-kind: ConfigMap
-metadata:
-  annotations:
-    kubenix/k8s-version: "1.32"
-    kubenix/project-name: ze-homelab
-  labels:
-    app.kubernetes.io/instance: foyer
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: foyer
-    helm.sh/chart: app-template-4.2.0
-    kubenix/hash: be40814fc8eb5c3cbc6a134daf14d25064da4727
-    kubenix/module-instance: foyer
-    kubenix/module-name: release
-    kubenix/module-version: 1.0.0
-  name: foyer
-  namespace: apps
----
-apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   annotations:
@@ -326,7 +112,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: foyer
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: be40814fc8eb5c3cbc6a134daf14d25064da4727
+    kubenix/hash: 7ce16b25d9eafce2d8e47fe6c23644c5a7433f76
     kubenix/module-instance: foyer
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -351,7 +137,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: foyer
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: be40814fc8eb5c3cbc6a134daf14d25064da4727
+    kubenix/hash: 7ce16b25d9eafce2d8e47fe6c23644c5a7433f76
     kubenix/module-instance: foyer
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -379,7 +165,7 @@ metadata:
     app.kubernetes.io/name: foyer
     app.kubernetes.io/service: foyer
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: be40814fc8eb5c3cbc6a134daf14d25064da4727
+    kubenix/hash: 7ce16b25d9eafce2d8e47fe6c23644c5a7433f76
     kubenix/module-instance: foyer
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -408,7 +194,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: foyer
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: be40814fc8eb5c3cbc6a134daf14d25064da4727
+    kubenix/hash: 7ce16b25d9eafce2d8e47fe6c23644c5a7433f76
     kubenix/module-instance: foyer
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
