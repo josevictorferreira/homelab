@@ -65,6 +65,7 @@
       oratoria = "10.10.10.152";
       calibre-web = "10.10.10.153";
       dramaturge = "10.10.10.154";
+      domus = "10.10.10.165";
       dramaturge-worker = "10.10.10.155";
       wealtho = "10.10.10.156";
       velox = "10.10.10.158";
