@@ -134,6 +134,18 @@ kind = "openai-compatible"
 base_url = "https://nano-gpt.com/api/v1"
 api_key_env = "NANOGPT_API_KEY"
 
+# NanoGPT's image surface lives under a different prefix than its chat API.
+# Serves /images/generations (incl. imageDataUrl edits) for Domus.
+[providers.nanogpt-images]
+kind = "openai-compatible"
+base_url = "https://nano-gpt.com/v1"
+api_key_env = "NANOGPT_API_KEY"
+
+[providers.nanogpt-images.capabilities]
+streaming = false
+tools = false
+image_generation = true
+
 # Voyage AI, embeddings only. Its /embeddings surface is OpenAI-shaped, which is
 # the prerequisite for the `embedding` capability; it serves no chat models, so
 # streaming and tools are declared off and no combo targets it.
@@ -294,6 +306,11 @@ upstream_model = "glm-5.2-short"
 [models.glm-5-2-nanogpt]
 provider = "nanogpt"
 upstream_model = "glm-5.2"
+
+# Image edit model used by Domus (DOMUS_VELOX_IMAGE_MODEL).
+[models.hidream]
+provider = "nanogpt-images"
+upstream_model = "hidream"
 
 [models.qwen3-6-35b-yoloauto]
 provider = "yoloauto"

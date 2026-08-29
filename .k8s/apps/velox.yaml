@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 2f4deb39e803650cdbe50f19d211309ff4a95724
+    kubenix/hash: 1580a4eb1892b17a6e08efe62bb17c80dce737ac
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -29,7 +29,7 @@ spec:
   template:
     metadata:
       annotations:
-        velox.josevictor.me/config-hash: 0877c1986d8ae476791d0ba8ed04afad547dd9cf7dd361036c0704700eacbea8
+        velox.josevictor.me/config-hash: f3a2236755e452ff611b338e95951cdddf3ea194f17ab79166d38c5d2cf75265
         velox.josevictor.me/oauth-agent-config-hash: 72b7f1b202300c363471312cd880f37085429ad305f9944b37c6926c9dee941d
       labels:
         app.kubernetes.io/controller: main
@@ -210,7 +210,7 @@ metadata:
     app.kubernetes.io/name: velox
     app.kubernetes.io/service: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 2f4deb39e803650cdbe50f19d211309ff4a95724
+    kubenix/hash: 1580a4eb1892b17a6e08efe62bb17c80dce737ac
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -239,7 +239,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 2f4deb39e803650cdbe50f19d211309ff4a95724
+    kubenix/hash: 1580a4eb1892b17a6e08efe62bb17c80dce737ac
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -402,6 +402,18 @@ data:
     base_url = "https://nano-gpt.com/api/v1"
     api_key_env = "NANOGPT_API_KEY"
 
+    # NanoGPT's image surface lives under a different prefix than its chat API.
+    # Serves /images/generations (incl. imageDataUrl edits) for Domus.
+    [providers.nanogpt-images]
+    kind = "openai-compatible"
+    base_url = "https://nano-gpt.com/v1"
+    api_key_env = "NANOGPT_API_KEY"
+
+    [providers.nanogpt-images.capabilities]
+    streaming = false
+    tools = false
+    image_generation = true
+
     # Voyage AI, embeddings only. Its /embeddings surface is OpenAI-shaped, which is
     # the prerequisite for the `embedding` capability; it serves no chat models, so
     # streaming and tools are declared off and no combo targets it.
@@ -562,6 +574,11 @@ data:
     [models.glm-5-2-nanogpt]
     provider = "nanogpt"
     upstream_model = "glm-5.2"
+
+    # Image edit model used by Domus (DOMUS_VELOX_IMAGE_MODEL).
+    [models.hidream]
+    provider = "nanogpt-images"
+    upstream_model = "hidream"
 
     [models.qwen3-6-35b-yoloauto]
     provider = "yoloauto"
@@ -995,7 +1012,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 2f4deb39e803650cdbe50f19d211309ff4a95724
+    kubenix/hash: 1580a4eb1892b17a6e08efe62bb17c80dce737ac
   name: velox-config
   namespace: apps
 ---
@@ -1079,7 +1096,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 2f4deb39e803650cdbe50f19d211309ff4a95724
+    kubenix/hash: 1580a4eb1892b17a6e08efe62bb17c80dce737ac
   name: velox-oauth-agent-config
   namespace: apps
 ---
@@ -1090,7 +1107,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 2f4deb39e803650cdbe50f19d211309ff4a95724
+    kubenix/hash: 1580a4eb1892b17a6e08efe62bb17c80dce737ac
   name: velox-oauth-agent
   namespace: apps
 ---
@@ -1101,7 +1118,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 2f4deb39e803650cdbe50f19d211309ff4a95724
+    kubenix/hash: 1580a4eb1892b17a6e08efe62bb17c80dce737ac
   name: velox-oauth-agent
   namespace: apps
 rules:
@@ -1123,7 +1140,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 2f4deb39e803650cdbe50f19d211309ff4a95724
+    kubenix/hash: 1580a4eb1892b17a6e08efe62bb17c80dce737ac
   name: velox-oauth-agent
   namespace: apps
 roleRef:
