@@ -153,44 +153,55 @@ let
               }
               {
                 type = "group";
+                layout = "tabs";
                 widgets = [
                   {
                     type = "hackernews";
                     title = "Hacker News";
+                    limit = 15;
+                    collapse_after = 5;
                   }
                   {
                     type = "lobsters";
                     title = "Lobsters";
+                    limit = 15;
+                    collapse_after = 5;
                   }
                   {
                     type = "reddit";
                     title = "r/selfhosted";
                     subreddit = "selfhosted";
                     show_thumbnails = true;
+                    collapse_after = 5;
                   }
                   {
                     type = "reddit";
                     title = "r/LocalLLaMA";
                     subreddit = "LocalLLaMA";
                     show_thumbnails = true;
+                    collapse_after = 5;
                   }
                   {
                     type = "reddit";
                     title = "r/functionalprint";
                     subreddit = "functionalprint";
                     show_thumbnails = true;
+                    collapse_after = 5;
                   }
                   {
                     type = "reddit";
                     title = "r/StableDiffusion";
                     subreddit = "StableDiffusion";
                     show_thumbnails = true;
+                    collapse_after = 5;
                   }
                 ];
               }
               {
                 type = "videos";
                 title = "Videos";
+                style = "horizontal-cards";
+                limit = 25;
                 channels = [
                   "UCOuGATIAbd2DvzJmUgXn2IQ"
                   "UCHnyfMqiRRG1u-2MsSQLbXA"

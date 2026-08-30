@@ -146,6 +146,28 @@ streaming = false
 tools = false
 image_generation = true
 
+# OpenRouter's image surface. Same host and same key as [providers.openrouter],
+# declared as its own instance so the image-only capability set stays accurate
+# — exactly how openrouter-audio is split out for STT.
+#
+# The OpenAI-shaped /images/generations path is an alias for OpenRouter's own
+# /images API, so no new provider kind is needed; responses always come back as
+# data[].b64_json (+ media_type), and `response_format` is accepted but ignored.
+#
+# Edits work here, but NOT through the NanoGPT fields: OpenRouter takes
+# reference images in `input_references` and silently ignores `imageDataUrl`,
+# answering an edit request with an unrelated fresh image. That is why no
+# openrouter model shares a combo with `hidream` — see [combos.image] below.
+[providers.openrouter-images]
+kind = "openai-compatible"
+base_url = "https://openrouter.ai/api/v1"
+api_key_env = "OPENROUTER_API_KEY"
+
+[providers.openrouter-images.capabilities]
+streaming = false
+tools = false
+image_generation = true
+
 # Voyage AI, embeddings only. Its /embeddings surface is OpenAI-shaped, which is
 # the prerequisite for the `embedding` capability; it serves no chat models, so
 # streaming and tools are declared off and no combo targets it.
@@ -311,6 +333,38 @@ upstream_model = "glm-5.2"
 [models.hidream]
 provider = "nanogpt-images"
 upstream_model = "hidream"
+
+# OpenRouter image models. Every alias below was verified end to end against
+# /images/generations (200 + a decoded image); the two `-preview` slugs
+# OpenRouter also lists are the same endpoints and are deliberately omitted.
+# These models reject `n > 1`; ask for one image per request.
+[models.gemini-3-1-flash-image-openrouter]
+provider = "openrouter-images"
+upstream_model = "google/gemini-3.1-flash-image"
+
+[models.gemini-3-1-flash-lite-image-openrouter]
+provider = "openrouter-images"
+upstream_model = "google/gemini-3.1-flash-lite-image"
+
+[models.gemini-3-pro-image-openrouter]
+provider = "openrouter-images"
+upstream_model = "google/gemini-3-pro-image"
+
+[models.gemini-2-5-flash-image-openrouter]
+provider = "openrouter-images"
+upstream_model = "google/gemini-2.5-flash-image"
+
+[models.gpt-5-image-openrouter]
+provider = "openrouter-images"
+upstream_model = "openai/gpt-5-image"
+
+[models.gpt-5-image-mini-openrouter]
+provider = "openrouter-images"
+upstream_model = "openai/gpt-5-image-mini"
+
+[models.gpt-5-4-image-2-openrouter]
+provider = "openrouter-images"
+upstream_model = "openai/gpt-5.4-image-2"
 
 [models.qwen3-6-35b-yoloauto]
 provider = "yoloauto"
@@ -696,6 +750,20 @@ targets = [
   { model = "glm-5-2-zai" },
   { model = "mimo-v2-5-pro-xiaomi" },
   { model = "qwen3-7-plus-alibaba" },
+]
+
+# Image generation for POST /v1/images/generations. Priority, not round-robin:
+# these models differ in price and quality, so the order is the preference and
+# the rest are outage fallbacks. `hidream` is NOT a target — it is the only
+# alias that speaks the NanoGPT `imageDataUrl` edit contract, and an edit
+# request falling through to OpenRouter would come back as an unrelated fresh
+# image rather than an error.
+[combos.image]
+strategy = "priority"
+targets = [
+  { model = "gemini-3-1-flash-image-openrouter" },
+  { model = "gemini-2-5-flash-image-openrouter" },
+  { model = "gpt-5-image-mini-openrouter" },
 ]
 
 # ---------------------------------------------------------------------------
