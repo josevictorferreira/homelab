@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 1580a4eb1892b17a6e08efe62bb17c80dce737ac
+    kubenix/hash: 729d3cad061c0168884e81701f304e96927acfb7
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -29,7 +29,7 @@ spec:
   template:
     metadata:
       annotations:
-        velox.josevictor.me/config-hash: f3a2236755e452ff611b338e95951cdddf3ea194f17ab79166d38c5d2cf75265
+        velox.josevictor.me/config-hash: 2f0134fad6ea6be5daf9ecdc2c8b440dad7a7ddb3f849904a62d0f6cfe984c12
         velox.josevictor.me/oauth-agent-config-hash: 72b7f1b202300c363471312cd880f37085429ad305f9944b37c6926c9dee941d
       labels:
         app.kubernetes.io/controller: main
@@ -210,7 +210,7 @@ metadata:
     app.kubernetes.io/name: velox
     app.kubernetes.io/service: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 1580a4eb1892b17a6e08efe62bb17c80dce737ac
+    kubenix/hash: 729d3cad061c0168884e81701f304e96927acfb7
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -239,7 +239,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 1580a4eb1892b17a6e08efe62bb17c80dce737ac
+    kubenix/hash: 729d3cad061c0168884e81701f304e96927acfb7
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -414,6 +414,28 @@ data:
     tools = false
     image_generation = true
 
+    # OpenRouter's image surface. Same host and same key as [providers.openrouter],
+    # declared as its own instance so the image-only capability set stays accurate
+    # — exactly how openrouter-audio is split out for STT.
+    #
+    # The OpenAI-shaped /images/generations path is an alias for OpenRouter's own
+    # /images API, so no new provider kind is needed; responses always come back as
+    # data[].b64_json (+ media_type), and `response_format` is accepted but ignored.
+    #
+    # Edits work here, but NOT through the NanoGPT fields: OpenRouter takes
+    # reference images in `input_references` and silently ignores `imageDataUrl`,
+    # answering an edit request with an unrelated fresh image. That is why no
+    # openrouter model shares a combo with `hidream` — see [combos.image] below.
+    [providers.openrouter-images]
+    kind = "openai-compatible"
+    base_url = "https://openrouter.ai/api/v1"
+    api_key_env = "OPENROUTER_API_KEY"
+
+    [providers.openrouter-images.capabilities]
+    streaming = false
+    tools = false
+    image_generation = true
+
     # Voyage AI, embeddings only. Its /embeddings surface is OpenAI-shaped, which is
     # the prerequisite for the `embedding` capability; it serves no chat models, so
     # streaming and tools are declared off and no combo targets it.
@@ -579,6 +601,38 @@ data:
     [models.hidream]
     provider = "nanogpt-images"
     upstream_model = "hidream"
+
+    # OpenRouter image models. Every alias below was verified end to end against
+    # /images/generations (200 + a decoded image); the two `-preview` slugs
+    # OpenRouter also lists are the same endpoints and are deliberately omitted.
+    # These models reject `n > 1`; ask for one image per request.
+    [models.gemini-3-1-flash-image-openrouter]
+    provider = "openrouter-images"
+    upstream_model = "google/gemini-3.1-flash-image"
+
+    [models.gemini-3-1-flash-lite-image-openrouter]
+    provider = "openrouter-images"
+    upstream_model = "google/gemini-3.1-flash-lite-image"
+
+    [models.gemini-3-pro-image-openrouter]
+    provider = "openrouter-images"
+    upstream_model = "google/gemini-3-pro-image"
+
+    [models.gemini-2-5-flash-image-openrouter]
+    provider = "openrouter-images"
+    upstream_model = "google/gemini-2.5-flash-image"
+
+    [models.gpt-5-image-openrouter]
+    provider = "openrouter-images"
+    upstream_model = "openai/gpt-5-image"
+
+    [models.gpt-5-image-mini-openrouter]
+    provider = "openrouter-images"
+    upstream_model = "openai/gpt-5-image-mini"
+
+    [models.gpt-5-4-image-2-openrouter]
+    provider = "openrouter-images"
+    upstream_model = "openai/gpt-5.4-image-2"
 
     [models.qwen3-6-35b-yoloauto]
     provider = "yoloauto"
@@ -966,6 +1020,20 @@ data:
       { model = "qwen3-7-plus-alibaba" },
     ]
 
+    # Image generation for POST /v1/images/generations. Priority, not round-robin:
+    # these models differ in price and quality, so the order is the preference and
+    # the rest are outage fallbacks. `hidream` is NOT a target — it is the only
+    # alias that speaks the NanoGPT `imageDataUrl` edit contract, and an edit
+    # request falling through to OpenRouter would come back as an unrelated fresh
+    # image rather than an error.
+    [combos.image]
+    strategy = "priority"
+    targets = [
+      { model = "gemini-3-1-flash-image-openrouter" },
+      { model = "gemini-2-5-flash-image-openrouter" },
+      { model = "gpt-5-image-mini-openrouter" },
+    ]
+
     # ---------------------------------------------------------------------------
     # Web search & fetch
     #
@@ -1012,7 +1080,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 1580a4eb1892b17a6e08efe62bb17c80dce737ac
+    kubenix/hash: 729d3cad061c0168884e81701f304e96927acfb7
   name: velox-config
   namespace: apps
 ---
@@ -1096,7 +1164,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 1580a4eb1892b17a6e08efe62bb17c80dce737ac
+    kubenix/hash: 729d3cad061c0168884e81701f304e96927acfb7
   name: velox-oauth-agent-config
   namespace: apps
 ---
@@ -1107,7 +1175,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 1580a4eb1892b17a6e08efe62bb17c80dce737ac
+    kubenix/hash: 729d3cad061c0168884e81701f304e96927acfb7
   name: velox-oauth-agent
   namespace: apps
 ---
@@ -1118,7 +1186,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 1580a4eb1892b17a6e08efe62bb17c80dce737ac
+    kubenix/hash: 729d3cad061c0168884e81701f304e96927acfb7
   name: velox-oauth-agent
   namespace: apps
 rules:
@@ -1140,7 +1208,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 1580a4eb1892b17a6e08efe62bb17c80dce737ac
+    kubenix/hash: 729d3cad061c0168884e81701f304e96927acfb7
   name: velox-oauth-agent
   namespace: apps
 roleRef:
