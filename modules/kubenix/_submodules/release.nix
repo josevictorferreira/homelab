@@ -34,8 +34,8 @@ let
       ];
       resources = {
         requests = {
-          cpu = "10m";
-          memory = "32Mi";
+          cpu = "50m";
+          memory = "64Mi";
         };
         limits = {
           cpu = "100m";
@@ -63,8 +63,8 @@ let
       ];
       resources = {
         requests = {
-          cpu = "10m";
-          memory = "32Mi";
+          cpu = "50m";
+          memory = "64Mi";
         };
         limits = {
           cpu = "100m";

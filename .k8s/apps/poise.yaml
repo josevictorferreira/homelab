@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: poise
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 0673350205c2775f8e5a30c5021fc9731f645a0f
+    kubenix/hash: ee06a9f9ff3bd2b47b4f709fd1b211b06460a20d
     kubenix/module-instance: poise
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -109,8 +109,8 @@ spec:
               cpu: 100m
               memory: 64Mi
             requests:
-              cpu: 10m
-              memory: 32Mi
+              cpu: 50m
+              memory: 64Mi
       serviceAccountName: default
 ---
 apiVersion: v1
@@ -127,7 +127,7 @@ metadata:
     app.kubernetes.io/name: poise
     app.kubernetes.io/service: poise
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 0673350205c2775f8e5a30c5021fc9731f645a0f
+    kubenix/hash: ee06a9f9ff3bd2b47b4f709fd1b211b06460a20d
     kubenix/module-instance: poise
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -156,7 +156,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: poise
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 0673350205c2775f8e5a30c5021fc9731f645a0f
+    kubenix/hash: ee06a9f9ff3bd2b47b4f709fd1b211b06460a20d
     kubenix/module-instance: poise
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -187,7 +187,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 0673350205c2775f8e5a30c5021fc9731f645a0f
+    kubenix/hash: ee06a9f9ff3bd2b47b4f709fd1b211b06460a20d
   name: poise-s3
   namespace: apps
 spec:

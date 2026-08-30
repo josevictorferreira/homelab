@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: readeck
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: e8119aad416727b11afeef1910a3fb676183a0c6
+    kubenix/hash: 485bfaef3dc9cfa19213682d6dc2f05dc804e65f
     kubenix/module-instance: readeck
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -85,8 +85,8 @@ spec:
               cpu: 100m
               memory: 64Mi
             requests:
-              cpu: 10m
-              memory: 32Mi
+              cpu: 50m
+              memory: 64Mi
           volumeMounts:
             - mountPath: /readeck
               name: main
@@ -107,7 +107,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: readeck
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: e8119aad416727b11afeef1910a3fb676183a0c6
+    kubenix/hash: 485bfaef3dc9cfa19213682d6dc2f05dc804e65f
     kubenix/module-instance: readeck
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -135,7 +135,7 @@ metadata:
     app.kubernetes.io/name: readeck
     app.kubernetes.io/service: readeck
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: e8119aad416727b11afeef1910a3fb676183a0c6
+    kubenix/hash: 485bfaef3dc9cfa19213682d6dc2f05dc804e65f
     kubenix/module-instance: readeck
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -164,7 +164,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: readeck
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: e8119aad416727b11afeef1910a3fb676183a0c6
+    kubenix/hash: 485bfaef3dc9cfa19213682d6dc2f05dc804e65f
     kubenix/module-instance: readeck
     kubenix/module-name: release
     kubenix/module-version: 1.0.0

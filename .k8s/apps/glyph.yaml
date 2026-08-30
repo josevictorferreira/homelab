@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: glyph
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 2a9a6acfb7334048b277190b0d2bc48737f644b4
+    kubenix/hash: 3d1b252824a3ebfd1ec9e1abfcbc47b4a5f8f7d7
     kubenix/module-instance: glyph
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -96,8 +96,8 @@ spec:
               cpu: 100m
               memory: 64Mi
             requests:
-              cpu: 10m
-              memory: 32Mi
+              cpu: 50m
+              memory: 64Mi
       serviceAccountName: default
 ---
 apiVersion: v1
@@ -114,7 +114,7 @@ metadata:
     app.kubernetes.io/name: glyph
     app.kubernetes.io/service: glyph
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 2a9a6acfb7334048b277190b0d2bc48737f644b4
+    kubenix/hash: 3d1b252824a3ebfd1ec9e1abfcbc47b4a5f8f7d7
     kubenix/module-instance: glyph
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -143,7 +143,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: glyph
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 2a9a6acfb7334048b277190b0d2bc48737f644b4
+    kubenix/hash: 3d1b252824a3ebfd1ec9e1abfcbc47b4a5f8f7d7
     kubenix/module-instance: glyph
     kubenix/module-name: release
     kubenix/module-version: 1.0.0

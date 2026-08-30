@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: bookorbit
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 84b9e88fe270ece00ed76d3d5286eb84dc4832ca
+    kubenix/hash: c917732ac53f301eced011b092ed7194ed899497
     kubenix/module-instance: bookorbit
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -110,8 +110,8 @@ spec:
               cpu: 100m
               memory: 64Mi
             requests:
-              cpu: 10m
-              memory: 32Mi
+              cpu: 50m
+              memory: 64Mi
           volumeMounts:
             - mountPath: /data
               name: main
@@ -135,7 +135,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: bookorbit
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 84b9e88fe270ece00ed76d3d5286eb84dc4832ca
+    kubenix/hash: c917732ac53f301eced011b092ed7194ed899497
     kubenix/module-instance: bookorbit
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -163,7 +163,7 @@ metadata:
     app.kubernetes.io/name: bookorbit
     app.kubernetes.io/service: bookorbit
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 84b9e88fe270ece00ed76d3d5286eb84dc4832ca
+    kubenix/hash: c917732ac53f301eced011b092ed7194ed899497
     kubenix/module-instance: bookorbit
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -192,7 +192,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: bookorbit
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 84b9e88fe270ece00ed76d3d5286eb84dc4832ca
+    kubenix/hash: c917732ac53f301eced011b092ed7194ed899497
     kubenix/module-instance: bookorbit
     kubenix/module-name: release
     kubenix/module-version: 1.0.0

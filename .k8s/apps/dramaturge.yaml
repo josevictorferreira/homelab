@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: dramaturge
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 5c2c2baabda9c07da87423e8ef0794d54bbed9bc
+    kubenix/hash: bcde538438994a2af6f40a0ba597804c4bdda344
     kubenix/module-instance: dramaturge
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -87,8 +87,8 @@ spec:
               cpu: 100m
               memory: 64Mi
             requests:
-              cpu: 10m
-              memory: 32Mi
+              cpu: 50m
+              memory: 64Mi
       serviceAccountName: default
 ---
 apiVersion: v1
@@ -105,7 +105,7 @@ metadata:
     app.kubernetes.io/name: dramaturge
     app.kubernetes.io/service: dramaturge
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 5c2c2baabda9c07da87423e8ef0794d54bbed9bc
+    kubenix/hash: bcde538438994a2af6f40a0ba597804c4bdda344
     kubenix/module-instance: dramaturge
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -134,7 +134,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: dramaturge
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 5c2c2baabda9c07da87423e8ef0794d54bbed9bc
+    kubenix/hash: bcde538438994a2af6f40a0ba597804c4bdda344
     kubenix/module-instance: dramaturge
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -170,7 +170,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: dramaturge-worker
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 5c2c2baabda9c07da87423e8ef0794d54bbed9bc
+    kubenix/hash: bcde538438994a2af6f40a0ba597804c4bdda344
     kubenix/module-instance: dramaturge-worker
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -238,8 +238,8 @@ spec:
               cpu: 100m
               memory: 64Mi
             requests:
-              cpu: 10m
-              memory: 32Mi
+              cpu: 50m
+              memory: 64Mi
       serviceAccountName: default
 ---
 apiVersion: v1
@@ -256,7 +256,7 @@ metadata:
     app.kubernetes.io/name: dramaturge-worker
     app.kubernetes.io/service: dramaturge-worker
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 5c2c2baabda9c07da87423e8ef0794d54bbed9bc
+    kubenix/hash: bcde538438994a2af6f40a0ba597804c4bdda344
     kubenix/module-instance: dramaturge-worker
     kubenix/module-name: release
     kubenix/module-version: 1.0.0

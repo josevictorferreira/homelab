@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: wealtho
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: ba293276c5c551b3f721909ada0d94878d9537fa
+    kubenix/hash: 84ccc7b3abf07589cda55c02a8b786d104a6f78f
     kubenix/module-instance: wealtho
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -87,8 +87,8 @@ spec:
               cpu: 100m
               memory: 64Mi
             requests:
-              cpu: 10m
-              memory: 32Mi
+              cpu: 50m
+              memory: 64Mi
       serviceAccountName: default
 ---
 apiVersion: v1
@@ -105,7 +105,7 @@ metadata:
     app.kubernetes.io/name: wealtho
     app.kubernetes.io/service: wealtho
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: ba293276c5c551b3f721909ada0d94878d9537fa
+    kubenix/hash: 84ccc7b3abf07589cda55c02a8b786d104a6f78f
     kubenix/module-instance: wealtho
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -134,7 +134,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: wealtho
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: ba293276c5c551b3f721909ada0d94878d9537fa
+    kubenix/hash: 84ccc7b3abf07589cda55c02a8b786d104a6f78f
     kubenix/module-instance: wealtho
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
