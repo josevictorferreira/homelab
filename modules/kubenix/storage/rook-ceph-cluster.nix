@@ -276,16 +276,20 @@ in
               metadataServer = {
                 activeCount = 1;
                 activeStandby = true;
-                # Cold boot after an outage: MDS journal replay on this
-                # cluster can outrun the chart's ~180s liveness budget, and a
-                # kill mid-replay restarts replay from the beginning. Every
-                # CephFS consumer stalls while that loops. startupProbe holds
-                # liveness off until the MDS is actually up.
-                startupProbe = {
+                # Cold boot after an outage: MDS journal replay can outrun
+                # Rook's default liveness budget (failureThreshold 5 x
+                # periodSeconds 30 = 150s), and a kill mid-replay restarts
+                # replay from the beginning while every CephFS consumer stalls.
+                # Widen to 20 x 30s = 600s.
+                #
+                # NOTE: metadataServer.startupProbe is accepted by the CRD but
+                # Rook v1.19 never applies it to the mds container -- verified
+                # inert. livenessProbe is the knob Rook actually honours.
+                livenessProbe = {
                   disabled = false;
                   probe = {
-                    failureThreshold = 60;
-                    periodSeconds = 10;
+                    failureThreshold = 20;
+                    periodSeconds = 30;
                   };
                 };
                 # The chart ships the MDS with no requests/limits, so kubelet
