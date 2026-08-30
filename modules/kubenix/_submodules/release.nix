@@ -10,6 +10,69 @@ let
       "json"
     else
       throw "Unsupported config file extension in '${filename}'. Use .yaml, .yml, or .json.";
+
+  # An `until` loop never exits non-zero, so the pod blocks in Init instead of
+  # crashing. That keeps it out of CrashLoopBackOff entirely and lets it start
+  # the moment the dependency is actually reachable.
+  waitForContainer = {
+    postgres = {
+      # Public official image on purpose: these apps carry no imagePullSecrets,
+      # so the private ghcr postgres image would ImagePullBackOff here.
+      image = {
+        repository = "docker.io/library/postgres";
+        tag = "18-alpine";
+      };
+      command = [
+        "sh"
+        "-c"
+        ''
+          until pg_isready -h postgresql-18 -p 5432 -U postgres; do
+            echo "waiting for postgresql-18..."
+            sleep 3
+          done
+        ''
+      ];
+      resources = {
+        requests = {
+          cpu = "10m";
+          memory = "32Mi";
+        };
+        limits = {
+          cpu = "100m";
+          memory = "64Mi";
+        };
+      };
+    };
+    redis = {
+      image = {
+        repository = "docker.io/library/redis";
+        tag = "8-alpine";
+      };
+      command = [
+        "sh"
+        "-c"
+        ''
+          # NOAUTH means the server is up and serving (auth is enabled, and we
+          # deliberately hold no credentials here); LOADING means it is still
+          # reading the dataset, so keep waiting on that one.
+          until redis-cli -h redis-master -p 6379 ping 2>&1 | grep -qE "PONG|NOAUTH"; do
+            echo "waiting for redis-master..."
+            sleep 3
+          done
+        ''
+      ];
+      resources = {
+        requests = {
+          cpu = "10m";
+          memory = "32Mi";
+        };
+        limits = {
+          cpu = "100m";
+          memory = "64Mi";
+        };
+      };
+    };
+  };
 in
 
 {
@@ -76,6 +139,20 @@ in
               type = types.nullOr types.str;
               default = null;
               description = "priority class name for the pods";
+            };
+
+            waitFor = mkOption {
+              type = types.listOf (types.enum [
+                "postgres"
+                "redis"
+              ]);
+              default = [ ];
+              description = ''
+                Backing services to block on before the main container starts.
+                Adds an init container that polls until the dependency answers,
+                so a cold boot waits quietly instead of crash-looping into
+                exponential backoff (which caps at 5min and stacks per app).
+              '';
             };
 
             persistence = mkOption {
@@ -229,6 +306,14 @@ in
                 })
                 (mkIf (cfg.priorityClassName != null) {
                   controllers.main.pod.priorityClassName = cfg.priorityClassName;
+                })
+                (mkIf (cfg.waitFor != [ ]) {
+                  controllers.main.initContainers = builtins.listToAttrs (
+                    map (dep: {
+                      name = "wait-for-${dep}";
+                      value = waitForContainer.${dep};
+                    }) cfg.waitFor
+                  );
                 })
                 cfg.values
               ];

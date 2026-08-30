@@ -16,6 +16,7 @@ in
   submodules.instances.${app} = {
     submodule = "release";
     args = {
+      waitFor = [ "postgres" ];
       inherit
         namespace
         image

@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: poise
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 2ff8da7a7efc53d67fb895987c50a518cbf4c2e4
+    kubenix/hash: 0673350205c2775f8e5a30c5021fc9731f645a0f
     kubenix/module-instance: poise
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -93,6 +93,24 @@ spec:
       hostPID: false
       imagePullSecrets:
         - name: ghcr-registry-secret
+      initContainers:
+        - command:
+            - sh
+            - -c
+            - |
+              until pg_isready -h postgresql-18 -p 5432 -U postgres; do
+                echo "waiting for postgresql-18..."
+                sleep 3
+              done
+          image: docker.io/library/postgres:18-alpine
+          name: wait-for-postgres
+          resources:
+            limits:
+              cpu: 100m
+              memory: 64Mi
+            requests:
+              cpu: 10m
+              memory: 32Mi
       serviceAccountName: default
 ---
 apiVersion: v1
@@ -109,7 +127,7 @@ metadata:
     app.kubernetes.io/name: poise
     app.kubernetes.io/service: poise
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 2ff8da7a7efc53d67fb895987c50a518cbf4c2e4
+    kubenix/hash: 0673350205c2775f8e5a30c5021fc9731f645a0f
     kubenix/module-instance: poise
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -138,7 +156,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: poise
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 2ff8da7a7efc53d67fb895987c50a518cbf4c2e4
+    kubenix/hash: 0673350205c2775f8e5a30c5021fc9731f645a0f
     kubenix/module-instance: poise
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -169,7 +187,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 2ff8da7a7efc53d67fb895987c50a518cbf4c2e4
+    kubenix/hash: 0673350205c2775f8e5a30c5021fc9731f645a0f
   name: poise-s3
   namespace: apps
 spec:

@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: ideator
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 02d05b87048284c2c621635b9fa5f22bb4b64172
+    kubenix/hash: 372f44828dc9cb2bc434e632108337a120e004f2
     kubenix/module-instance: ideator
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -80,6 +80,24 @@ spec:
       hostPID: false
       imagePullSecrets:
         - name: ghcr-registry-secret
+      initContainers:
+        - command:
+            - sh
+            - -c
+            - |
+              until pg_isready -h postgresql-18 -p 5432 -U postgres; do
+                echo "waiting for postgresql-18..."
+                sleep 3
+              done
+          image: docker.io/library/postgres:18-alpine
+          name: wait-for-postgres
+          resources:
+            limits:
+              cpu: 100m
+              memory: 64Mi
+            requests:
+              cpu: 10m
+              memory: 32Mi
       serviceAccountName: default
 ---
 apiVersion: v1
@@ -96,7 +114,7 @@ metadata:
     app.kubernetes.io/name: ideator
     app.kubernetes.io/service: ideator
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 02d05b87048284c2c621635b9fa5f22bb4b64172
+    kubenix/hash: 372f44828dc9cb2bc434e632108337a120e004f2
     kubenix/module-instance: ideator
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -125,7 +143,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: ideator
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 02d05b87048284c2c621635b9fa5f22bb4b64172
+    kubenix/hash: 372f44828dc9cb2bc434e632108337a120e004f2
     kubenix/module-instance: ideator
     kubenix/module-name: release
     kubenix/module-version: 1.0.0

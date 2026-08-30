@@ -19,6 +19,7 @@ in
     dramaturge = {
       submodule = "release";
       args = {
+        waitFor = [ "postgres" ];
         inherit namespace image port secretName;
         resources = {
           requests = {
@@ -68,6 +69,7 @@ in
     dramaturge-worker = {
       submodule = "release";
       args = {
+        waitFor = [ "postgres" ];
         inherit namespace image port secretName;
         resources = {
           requests = {

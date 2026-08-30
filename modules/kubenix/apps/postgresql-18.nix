@@ -70,6 +70,10 @@ in
           # RBD that can exceed the liveness budget, and a SIGKILL mid-checkpoint
           # restarts redo from the same LSN forever. The startup probe holds
           # liveness/readiness off until recovery completes.
+          # 30s is shorter than the shutdown checkpoint on this storage, so
+          # every rollout SIGKILLs postgres and forces crash recovery on the
+          # next boot. Give the shutdown checkpoint room to finish cleanly.
+          terminationGracePeriodSeconds = 300;
           startupProbe = {
             enabled = true;
             initialDelaySeconds = 30;

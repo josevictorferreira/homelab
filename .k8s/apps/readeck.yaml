@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: readeck
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 9bea9e7d9ec9c4b0c401ac54e52f8be2ecd4c8fd
+    kubenix/hash: e8119aad416727b11afeef1910a3fb676183a0c6
     kubenix/module-instance: readeck
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -69,6 +69,27 @@ spec:
       hostIPC: false
       hostNetwork: false
       hostPID: false
+      initContainers:
+        - command:
+            - sh
+            - -c
+            - |
+              until pg_isready -h postgresql-18 -p 5432 -U postgres; do
+                echo "waiting for postgresql-18..."
+                sleep 3
+              done
+          image: docker.io/library/postgres:18-alpine
+          name: wait-for-postgres
+          resources:
+            limits:
+              cpu: 100m
+              memory: 64Mi
+            requests:
+              cpu: 10m
+              memory: 32Mi
+          volumeMounts:
+            - mountPath: /readeck
+              name: main
       serviceAccountName: default
       volumes:
         - name: main
@@ -86,7 +107,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: readeck
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 9bea9e7d9ec9c4b0c401ac54e52f8be2ecd4c8fd
+    kubenix/hash: e8119aad416727b11afeef1910a3fb676183a0c6
     kubenix/module-instance: readeck
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -114,7 +135,7 @@ metadata:
     app.kubernetes.io/name: readeck
     app.kubernetes.io/service: readeck
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 9bea9e7d9ec9c4b0c401ac54e52f8be2ecd4c8fd
+    kubenix/hash: e8119aad416727b11afeef1910a3fb676183a0c6
     kubenix/module-instance: readeck
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -143,7 +164,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: readeck
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 9bea9e7d9ec9c4b0c401ac54e52f8be2ecd4c8fd
+    kubenix/hash: e8119aad416727b11afeef1910a3fb676183a0c6
     kubenix/module-instance: readeck
     kubenix/module-name: release
     kubenix/module-version: 1.0.0

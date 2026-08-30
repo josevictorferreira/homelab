@@ -276,6 +276,18 @@ in
               metadataServer = {
                 activeCount = 1;
                 activeStandby = true;
+                # Cold boot after an outage: MDS journal replay on this
+                # cluster can outrun the chart's ~180s liveness budget, and a
+                # kill mid-replay restarts replay from the beginning. Every
+                # CephFS consumer stalls while that loops. startupProbe holds
+                # liveness off until the MDS is actually up.
+                startupProbe = {
+                  disabled = false;
+                  probe = {
+                    failureThreshold = 60;
+                    periodSeconds = 10;
+                  };
+                };
                 # The chart ships the MDS with no requests/limits, so kubelet
                 # eviction ranks it first under node memory pressure (usage far
                 # above its 0 request). 2026-08-07 the active MDS ballooned to

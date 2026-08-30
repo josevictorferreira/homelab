@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: wealtho
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 289eab5d388af0e131449c9ff36c1a6c9ba188a2
+    kubenix/hash: ba293276c5c551b3f721909ada0d94878d9537fa
     kubenix/module-instance: wealtho
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -71,6 +71,24 @@ spec:
       hostPID: false
       imagePullSecrets:
         - name: ghcr-registry-secret
+      initContainers:
+        - command:
+            - sh
+            - -c
+            - |
+              until pg_isready -h postgresql-18 -p 5432 -U postgres; do
+                echo "waiting for postgresql-18..."
+                sleep 3
+              done
+          image: docker.io/library/postgres:18-alpine
+          name: wait-for-postgres
+          resources:
+            limits:
+              cpu: 100m
+              memory: 64Mi
+            requests:
+              cpu: 10m
+              memory: 32Mi
       serviceAccountName: default
 ---
 apiVersion: v1
@@ -87,7 +105,7 @@ metadata:
     app.kubernetes.io/name: wealtho
     app.kubernetes.io/service: wealtho
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 289eab5d388af0e131449c9ff36c1a6c9ba188a2
+    kubenix/hash: ba293276c5c551b3f721909ada0d94878d9537fa
     kubenix/module-instance: wealtho
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -116,7 +134,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: wealtho
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 289eab5d388af0e131449c9ff36c1a6c9ba188a2
+    kubenix/hash: ba293276c5c551b3f721909ada0d94878d9537fa
     kubenix/module-instance: wealtho
     kubenix/module-name: release
     kubenix/module-version: 1.0.0

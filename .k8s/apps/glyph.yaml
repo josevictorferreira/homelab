@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: glyph
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 3528a3545a1eb882e5efc8acaf7845af33d19f85
+    kubenix/hash: 2a9a6acfb7334048b277190b0d2bc48737f644b4
     kubenix/module-instance: glyph
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -80,6 +80,24 @@ spec:
       hostPID: false
       imagePullSecrets:
         - name: ghcr-registry-secret
+      initContainers:
+        - command:
+            - sh
+            - -c
+            - |
+              until pg_isready -h postgresql-18 -p 5432 -U postgres; do
+                echo "waiting for postgresql-18..."
+                sleep 3
+              done
+          image: docker.io/library/postgres:18-alpine
+          name: wait-for-postgres
+          resources:
+            limits:
+              cpu: 100m
+              memory: 64Mi
+            requests:
+              cpu: 10m
+              memory: 32Mi
       serviceAccountName: default
 ---
 apiVersion: v1
@@ -96,7 +114,7 @@ metadata:
     app.kubernetes.io/name: glyph
     app.kubernetes.io/service: glyph
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 3528a3545a1eb882e5efc8acaf7845af33d19f85
+    kubenix/hash: 2a9a6acfb7334048b277190b0d2bc48737f644b4
     kubenix/module-instance: glyph
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -125,7 +143,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: glyph
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 3528a3545a1eb882e5efc8acaf7845af33d19f85
+    kubenix/hash: 2a9a6acfb7334048b277190b0d2bc48737f644b4
     kubenix/module-instance: glyph
     kubenix/module-name: release
     kubenix/module-version: 1.0.0

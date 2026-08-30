@@ -42,6 +42,18 @@ in
           };
 
           service = kubenix.lib.plainServiceFor "redis";
+
+          # Cold boot after an outage: AOF/RDB load on RBD can exceed the
+          # chart's 45s liveness budget. startupProbe holds liveness off until
+          # Redis has actually loaded; the longer grace lets it persist on exit.
+          terminationGracePeriodSeconds = 120;
+          startupProbe = {
+            enabled = true;
+            initialDelaySeconds = 10;
+            periodSeconds = 10;
+            timeoutSeconds = 5;
+            failureThreshold = 30;
+          };
         };
 
         metrics.enabled = false;

@@ -8,6 +8,7 @@ in
   submodules.instances.${app} = {
     submodule = "release";
     args = {
+      waitFor = [ "postgres" ];
       inherit namespace;
       image = {
         repository = "codeberg.org/readeck/readeck";
