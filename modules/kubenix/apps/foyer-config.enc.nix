@@ -30,9 +30,35 @@ let
                 cache = "1h";
                 url = "http://readeck.${namespace}.svc.cluster.local:8000/api/bookmarks?limit=15";
                 method = "GET";
+                body_format = "json";
                 headers.Authorization = "Bearer ${kubenix.lib.secretsFor "readeck_api_token"}";
                 template = ''
-                  <ul class="list bookmarks">{% for bookmark in data.response.body.bookmarks|default([]) %}<li><a href="{{ "{{" }} bookmark.url {{ "}}" }}">{{ "{{" }} bookmark.title|truncate(50) {{ "}}" }}</a><div class="meta">{{ "{{" }} bookmark.site_name|default("") {{ "}}" }}</div></li>{% endfor %}</ul>
+                  {% set bookmarks = data.response.body|default([]) %}
+                  {% if bookmarks|length > 7 %}<input class="collapse-toggle" type="checkbox" id="collapse-{{ "{{" }} widget.id {{ "}}" }}">{% endif %}
+                  <ul class="list list-gap-10">
+                  {% for bookmark in bookmarks %}
+                    <li{% if loop.index > 7 %} class="collapsed"{% endif %}>
+                      <div class="flex gap-10">
+                        {% set thumb = "" %}
+                        {% if bookmark.resources and bookmark.resources.thumbnail %}{% set thumb = bookmark.resources.thumbnail.src|default("") %}{% endif %}
+                        {% if thumb %}<img class="forum-post-list-thumbnail thumbnail" src="{{ "{{" }} thumb {{ "}}" }}" alt="" loading="lazy">{% endif %}
+                        <div class="grow min-width-0">
+                          <a href="{{ "{{" }} bookmark.url {{ "}}" }}" class="size-title-dynamic color-primary-if-not-visited">{{ "{{" }} bookmark.title|default(bookmark.url)|truncate(50) {{ "}}" }}</a>
+                          <ul class="list-horizontal-text">
+                            <li>{{ "{{" }} bookmark.created|default("")|relative_time {{ "}}" }}</li>
+                            {% if bookmark.site_name %}<li class="shrink-0">{{ "{{" }} bookmark.site_name {{ "}}" }}</li>{% endif %}
+                            {% for label in bookmark.labels|default([]) %}
+                              <li class="shrink-0" style="background-color: hsl({{ "{{" }} (loop.index0 * 30) % 360 {{ "}}" }}, 50%, 20%); color: hsl({{ "{{" }} (loop.index0 * 30) % 360 {{ "}}" }}, 60%, 70%); padding: 1px 6px; border-radius: 4px;">{{ "{{" }} label {{ "}}" }}</li>
+                            {% endfor %}
+                          </ul>
+                        </div>
+                      </div>
+                    </li>
+                  {% else %}
+                    <li class="muted">No bookmarks available.</li>
+                  {% endfor %}
+                  </ul>
+                  {% if bookmarks|length > 7 %}<label class="collapse-label" for="collapse-{{ "{{" }} widget.id {{ "}}" }}"><span class="more">Show more</span><span class="less">Show less</span><span class="chevron">⌄</span></label>{% endif %}
                 '';
               }
             ];
@@ -45,108 +71,36 @@ let
                 title = "Homelab";
                 groups = [
                   {
-                    class = "green";
-                    items = [
-                      {
-                        name = "Home Assistant";
-                        url = "https://home.josevictor.me";
-                        icon = "home";
-                        same_tab = false;
-                      }
-                      {
-                        name = "BookOrbit";
-                        url = "https://bookorbit.josevictor.me";
-                        icon = "book";
-                        same_tab = false;
-                      }
-                      {
-                        name = "Readeck";
-                        url = "https://readeck.josevictor.me";
-                        icon = "read";
-                        same_tab = false;
-                      }
-                      {
-                        name = "SearXNG";
-                        url = "https://searxng.josevictor.me";
-                        icon = "search";
-                        same_tab = false;
-                      }
-                      {
-                        name = "Oratoria";
-                        url = "https://oratoria.josevictor.me";
-                        icon = "presentation";
-                        same_tab = false;
-                      }
+                    color = "24 97 58";
+                    same_tab = false;
+                    links = [
+                      { title = "Home Assistant"; url = "https://home.josevictor.me"; icon = "sh:home-assistant"; }
+                      { title = "BookOrbit"; url = "https://bookorbit.josevictor.me"; icon = "mdi:book-open-variant"; }
+                      { title = "Readeck"; url = "https://readeck.josevictor.me"; icon = "sh:readeck"; }
+                      { title = "SearXNG"; url = "https://searxng.josevictor.me"; icon = "sh:searxng"; }
+                      { title = "Oratoria"; url = "https://oratoria.josevictor.me"; icon = "mdi:presentation"; }
                     ];
                   }
                   {
-                    class = "purple";
-                    items = [
-                      {
-                        name = "Hermes";
-                        url = "https://hermes.josevictor.me";
-                        icon = "agent";
-                        same_tab = false;
-                      }
-                      {
-                        name = "Hindsight";
-                        url = "https://hindsight.josevictor.me";
-                        icon = "brain";
-                        same_tab = false;
-                      }
-                      {
-                        name = "Valoris";
-                        url = "https://valoris.josevictor.me";
-                        icon = "chart";
-                        same_tab = false;
-                      }
-                      {
-                        name = "Wealtho";
-                        url = "https://wealtho.josevictor.me";
-                        icon = "wallet";
-                        same_tab = false;
-                      }
-                      {
-                        name = "Poise";
-                        url = "https://poise.josevictor.me";
-                        icon = "hanger";
-                        same_tab = false;
-                      }
+                    color = "280 60 60";
+                    same_tab = false;
+                    links = [
+                      { title = "Hermes"; url = "https://hermes.josevictor.me"; icon = "mdi:robot"; }
+                      { title = "Hindsight"; url = "https://hindsight.josevictor.me"; icon = "mdi:brain"; }
+                      { title = "Valoris"; url = "https://valoris.josevictor.me"; icon = "mdi:chart-line"; }
+                      { title = "Wealtho"; url = "https://wealtho.josevictor.me"; icon = "mdi:wallet"; }
+                      { title = "Poise"; url = "https://poise.josevictor.me"; icon = "mdi:hanger"; }
                     ];
                   }
                   {
-                    class = "red";
-                    items = [
-                      {
-                        name = "Grafana";
-                        url = "https://grafana.josevictor.me";
-                        icon = "grafana";
-                        same_tab = false;
-                      }
-                      {
-                        name = "Ceph";
-                        url = "https://ceph.josevictor.me";
-                        icon = "ceph";
-                        same_tab = false;
-                      }
-                      {
-                        name = "Keycloak";
-                        url = "https://identity.josevictor.me";
-                        icon = "keycloak";
-                        same_tab = false;
-                      }
-                      {
-                        name = "SFTPGo";
-                        url = "https://sftpgo.josevictor.me";
-                        icon = "sftpgo";
-                        same_tab = false;
-                      }
-                      {
-                        name = "Immich";
-                        url = "https://immich.josevictor.me";
-                        icon = "immich";
-                        same_tab = false;
-                      }
+                    color = "209 88 54";
+                    same_tab = false;
+                    links = [
+                      { title = "Grafana"; url = "https://grafana.josevictor.me"; icon = "sh:grafana"; }
+                      { title = "Ceph"; url = "https://ceph.josevictor.me"; icon = "sh:ceph"; }
+                      { title = "Keycloak"; url = "https://identity.josevictor.me"; icon = "sh:keycloak"; }
+                      { title = "SFTPGo"; url = "https://sftpgo.josevictor.me"; icon = "sh:sftpgo"; }
+                      { title = "Immich"; url = "https://immich.josevictor.me"; icon = "sh:immich"; }
                     ];
                   }
                 ];
@@ -231,6 +185,11 @@ let
               {
                 type = "markets";
                 title = "Markets";
+                markets = [
+                  { name = "Bitcoin"; symbol = "BTC-USD"; }
+                  { name = "Kaspa"; symbol = "KAS-USD"; }
+                  { name = "Brazilian Real"; symbol = "USDBRL=X"; }
+                ];
               }
               {
                 type = "releases";

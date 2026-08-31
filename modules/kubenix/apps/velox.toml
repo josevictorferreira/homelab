@@ -264,6 +264,20 @@ structured_output = false
 # One alias per (provider, upstream model) pair a combo needs. Aliases are
 # prefixed with the provider so the same upstream model reached through two
 # providers stays addressable.
+#
+# `max_tokens` appears only on aliases whose provider is `kind = "anthropic"`.
+# The Messages API makes the field mandatory, so Velox has to send a value for
+# the many clients that omit it (pi omits it on every agent turn), and its
+# built-in fallback is a conservative 16384 — low enough that long answers came
+# back truncated with `finish_reason: "length"`. The values below are the
+# ceilings each upstream actually accepts: z.ai reports the range as [1,131072]
+# and rejects 200000, and opencode-go's /messages surface took 131072 alongside
+# an 80k-token prompt. Both treat it as a cap rather than a reserved budget, so
+# a large prompt does not push the request over the context window.
+#
+# `kimi-k3-kimi-coding` is deliberately left without one: that endpoint is
+# currently answering 404, so no ceiling could be verified against it, and the
+# adapter default applies until it can be.
 # ---------------------------------------------------------------------------
 # TTS model alias: resolves `model="tts-1"` to Speechify TTS. The upstream
 # model id is sent as Speechify `model`; the voice comes from the per-request
@@ -280,26 +294,32 @@ upstream_model = "openai/whisper-1"
 [models.glm-5-3-zai]
 provider = "glm"
 upstream_model = "glm-5.3"
+max_tokens = 131072
 
 [models.glm-5-3-flash-zai]
 provider = "glm"
 upstream_model = "glm-5.3-flash"
+max_tokens = 131072
 
 [models.glm-5-2-zai]
 provider = "glm"
 upstream_model = "glm-5.2"
+max_tokens = 131072
 
 [models.glm-5-2-max-zai]
 provider = "glm"
 upstream_model = "glm-5.2-max"
+max_tokens = 131072
 
 [models.glm-5-1-zai]
 provider = "glm"
 upstream_model = "glm-5.1"
+max_tokens = 131072
 
 [models.glm-4-5-air-zai]
 provider = "glm"
 upstream_model = "glm-4.5-air"
+max_tokens = 131072
 
 [models.glm-5-3-ocgo]
 provider = "opencode-go"
@@ -453,6 +473,7 @@ upstream_model = "moonshotai/kimi-k3"
 [models.minimax-m2-5-ocgo]
 provider = "opencode-go-anthropic"
 upstream_model = "minimax-m2.5"
+max_tokens = 131072
 
 [models.minimax-m2-5-alibaba]
 provider = "alibaba-token-plan"
@@ -461,6 +482,7 @@ upstream_model = "MiniMax-M2.5"
 [models.minimax-m2-7-ocgo]
 provider = "opencode-go-anthropic"
 upstream_model = "minimax-m2.7"
+max_tokens = 131072
 
 [models.minimax-m2-7-nvidia]
 provider = "nvidia"
