@@ -25,6 +25,8 @@ in
       OPENAI_API_KEY = kubenix.lib.secretsFor "openai_api_key";
       OMNIROUTE_API_KEY = kubenix.lib.secretsFor "omniroute_api_key";
       OMNIROUTE_BASE_URL = "https://omniroute.josevictor.me/api/v1";
+      VELOX_API_KEY = kubenix.lib.secretsFor "velox_api_keys";
+      VELOX_BASE_URL = "http://velox.apps.svc.cluster.local:8080/v1";
       MATRIX_HOMESERVER = kubenix.lib.secretsFor "hermes_matrix_homeserver";
       MATRIX_ACCESS_TOKEN = kubenix.lib.secretsFor "hermes_matrix_access_token";
       MATRIX_ALLOWED_USERS = kubenix.lib.secretsFor "hermes_matrix_allowed_users";
