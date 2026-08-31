@@ -40,7 +40,7 @@ let
                     <li{% if loop.index > 7 %} class="collapsed"{% endif %}>
                       <div class="flex gap-10">
                         {% set thumb = "" %}
-                        {% if bookmark.resources and bookmark.resources.thumbnail %}{% set thumb = bookmark.resources.thumbnail.src|default("") %}{% endif %}
+                        {% if bookmark.resources and bookmark.resources.thumbnail %}{% set thumb = bookmark.resources.thumbnail.src|default("")|replace("http://readeck.apps.svc.cluster.local:8000", "https://readeck.josevictor.me") %}{% endif %}
                         {% if thumb %}<img class="forum-post-list-thumbnail thumbnail" src="{{ thumb }}" alt="" loading="lazy">{% endif %}
                         <div class="grow min-width-0">
                           <a href="{{ bookmark.url }}" class="size-title-dynamic color-primary-if-not-visited">{{ bookmark.title|default(bookmark.url)|truncate(50) }}</a>
