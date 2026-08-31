@@ -34,21 +34,21 @@ let
                 headers.Authorization = "Bearer ${kubenix.lib.secretsFor "readeck_api_token"}";
                 template = ''
                   {% set bookmarks = data.response.body|default([]) %}
-                  {% if bookmarks|length > 7 %}<input class="collapse-toggle" type="checkbox" id="collapse-{{ "{{" }} widget.id {{ "}}" }}">{% endif %}
+                  {% if bookmarks|length > 7 %}<input class="collapse-toggle" type="checkbox" id="collapse-{{ widget.id }}">{% endif %}
                   <ul class="list list-gap-10">
                   {% for bookmark in bookmarks %}
                     <li{% if loop.index > 7 %} class="collapsed"{% endif %}>
                       <div class="flex gap-10">
                         {% set thumb = "" %}
                         {% if bookmark.resources and bookmark.resources.thumbnail %}{% set thumb = bookmark.resources.thumbnail.src|default("") %}{% endif %}
-                        {% if thumb %}<img class="forum-post-list-thumbnail thumbnail" src="{{ "{{" }} thumb {{ "}}" }}" alt="" loading="lazy">{% endif %}
+                        {% if thumb %}<img class="forum-post-list-thumbnail thumbnail" src="{{ thumb }}" alt="" loading="lazy">{% endif %}
                         <div class="grow min-width-0">
-                          <a href="{{ "{{" }} bookmark.url {{ "}}" }}" class="size-title-dynamic color-primary-if-not-visited">{{ "{{" }} bookmark.title|default(bookmark.url)|truncate(50) {{ "}}" }}</a>
+                          <a href="{{ bookmark.url }}" class="size-title-dynamic color-primary-if-not-visited">{{ bookmark.title|default(bookmark.url)|truncate(50) }}</a>
                           <ul class="list-horizontal-text">
-                            <li>{{ "{{" }} bookmark.created|default("")|relative_time {{ "}}" }}</li>
-                            {% if bookmark.site_name %}<li class="shrink-0">{{ "{{" }} bookmark.site_name {{ "}}" }}</li>{% endif %}
+                            <li>{{ bookmark.created|default("")|relative_time }}</li>
+                            {% if bookmark.site_name %}<li class="shrink-0">{{ bookmark.site_name }}</li>{% endif %}
                             {% for label in bookmark.labels|default([]) %}
-                              <li class="shrink-0" style="background-color: hsl({{ "{{" }} (loop.index0 * 30) % 360 {{ "}}" }}, 50%, 20%); color: hsl({{ "{{" }} (loop.index0 * 30) % 360 {{ "}}" }}, 60%, 70%); padding: 1px 6px; border-radius: 4px;">{{ "{{" }} label {{ "}}" }}</li>
+                              <li class="shrink-0" style="background-color: hsl({{ (loop.index0 * 30) % 360 }}, 50%, 20%); color: hsl({{ (loop.index0 * 30) % 360 }}, 60%, 70%); padding: 1px 6px; border-radius: 4px;">{{ label }}</li>
                             {% endfor %}
                           </ul>
                         </div>
@@ -58,7 +58,7 @@ let
                     <li class="muted">No bookmarks available.</li>
                   {% endfor %}
                   </ul>
-                  {% if bookmarks|length > 7 %}<label class="collapse-label" for="collapse-{{ "{{" }} widget.id {{ "}}" }}"><span class="more">Show more</span><span class="less">Show less</span><span class="chevron">⌄</span></label>{% endif %}
+                  {% if bookmarks|length > 7 %}<label class="collapse-label" for="collapse-{{ widget.id }}"><span class="more">Show more</span><span class="less">Show less</span><span class="chevron">⌄</span></label>{% endif %}
                 '';
               }
             ];
