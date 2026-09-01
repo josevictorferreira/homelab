@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: ef4c48416e9dedf27018ae444b029e7adda155ea
+    kubenix/hash: 518123084f6c7d190a2aa60264a0168e209e88f7
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -29,7 +29,7 @@ spec:
   template:
     metadata:
       annotations:
-        velox.josevictor.me/config-hash: 6dc9a89eff5d1473ddaee1530fcf21c398aec9ac0f5227dce3fbed3ad81ff1e3
+        velox.josevictor.me/config-hash: f89f6ec767195a48b83d9916c81f2aa2232625fc4c29cbeb2a02dd63b56ac78a
         velox.josevictor.me/oauth-agent-config-hash: 72b7f1b202300c363471312cd880f37085429ad305f9944b37c6926c9dee941d
       labels:
         app.kubernetes.io/controller: main
@@ -210,7 +210,7 @@ metadata:
     app.kubernetes.io/name: velox
     app.kubernetes.io/service: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: ef4c48416e9dedf27018ae444b029e7adda155ea
+    kubenix/hash: 518123084f6c7d190a2aa60264a0168e209e88f7
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -239,7 +239,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: ef4c48416e9dedf27018ae444b029e7adda155ea
+    kubenix/hash: 518123084f6c7d190a2aa60264a0168e209e88f7
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -295,6 +295,16 @@ data:
     # There is no total-request timeout in velox; stream_idle_timeout_ms (60s
     # default) still guards a stalled stream after the head arrives.
     time_to_first_byte_timeout_ms = 120000
+    # `models.<alias>.max_tokens` only fills in for a client that omits an output
+    # ceiling, which pi never does: it sends 16384 on every agent turn whatever the
+    # model, GLM spends that inside its own thinking block, and the answer comes
+    # back truncated with `finish_reason: "length"`. This raises such a ceiling to
+    # the target's declared `max_tokens`, but only on requests carrying `tools` --
+    # the one shape where a small ceiling is never a deliberate "keep it short" --
+    # and only for targets that declare one, so it can never exceed what an upstream
+    # accepts. Targets without a declared ceiling are left exactly as the client
+    # sent them. (OmniRoute did the same thing implicitly, floor 32000.)
+    min_client_max_tokens = 131072
 
     # Apply both input compressors globally to every configured combo.
     [compression.rtk]
@@ -1102,7 +1112,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: ef4c48416e9dedf27018ae444b029e7adda155ea
+    kubenix/hash: 518123084f6c7d190a2aa60264a0168e209e88f7
   name: velox-config
   namespace: apps
 ---
@@ -1186,7 +1196,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: ef4c48416e9dedf27018ae444b029e7adda155ea
+    kubenix/hash: 518123084f6c7d190a2aa60264a0168e209e88f7
   name: velox-oauth-agent-config
   namespace: apps
 ---
@@ -1197,7 +1207,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: ef4c48416e9dedf27018ae444b029e7adda155ea
+    kubenix/hash: 518123084f6c7d190a2aa60264a0168e209e88f7
   name: velox-oauth-agent
   namespace: apps
 ---
@@ -1208,7 +1218,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: ef4c48416e9dedf27018ae444b029e7adda155ea
+    kubenix/hash: 518123084f6c7d190a2aa60264a0168e209e88f7
   name: velox-oauth-agent
   namespace: apps
 rules:
@@ -1230,7 +1240,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: ef4c48416e9dedf27018ae444b029e7adda155ea
+    kubenix/hash: 518123084f6c7d190a2aa60264a0168e209e88f7
   name: velox-oauth-agent
   namespace: apps
 roleRef:

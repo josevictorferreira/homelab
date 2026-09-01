@@ -27,6 +27,16 @@ shutdown_grace_ms = 30000
 # There is no total-request timeout in velox; stream_idle_timeout_ms (60s
 # default) still guards a stalled stream after the head arrives.
 time_to_first_byte_timeout_ms = 120000
+# `models.<alias>.max_tokens` only fills in for a client that omits an output
+# ceiling, which pi never does: it sends 16384 on every agent turn whatever the
+# model, GLM spends that inside its own thinking block, and the answer comes
+# back truncated with `finish_reason: "length"`. This raises such a ceiling to
+# the target's declared `max_tokens`, but only on requests carrying `tools` --
+# the one shape where a small ceiling is never a deliberate "keep it short" --
+# and only for targets that declare one, so it can never exceed what an upstream
+# accepts. Targets without a declared ceiling are left exactly as the client
+# sent them. (OmniRoute did the same thing implicitly, floor 32000.)
+min_client_max_tokens = 131072
 
 # Apply both input compressors globally to every configured combo.
 [compression.rtk]
