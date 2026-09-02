@@ -572,6 +572,14 @@ upstream_model = "gemini-3-pro"
 provider = "antigravity-secondary"
 upstream_model = "gemini-3-pro"
 
+[models.gemini-3-8-flash-antigravity-primary]
+provider = "antigravity-primary"
+upstream_model = "gemini-3.8-flash-high"
+
+[models.gemini-3-8-flash-antigravity-secondary]
+provider = "antigravity-secondary"
+upstream_model = "gemini-3.8-flash-high"
+
 [models.gemini-3-7-flash-antigravity-primary]
 provider = "antigravity-primary"
 upstream_model = "gemini-3.7-flash-high"
@@ -757,6 +765,13 @@ targets = [
   { model = "gemini-3-1-pro-antigravity-secondary" },
 ]
 
+[combos.gemini-3-8-flash]
+strategy = "round-robin"
+targets = [
+  { model = "gemini-3-8-flash-antigravity-primary" },
+  { model = "gemini-3-8-flash-antigravity-secondary" },
+]
+
 [combos.gemini-3-7-flash]
 strategy = "round-robin"
 targets = [
@@ -767,8 +782,8 @@ targets = [
 [combos.radagast]
 strategy = "round-robin"
 targets = [
-  { model = "gemini-3-7-flash-antigravity-primary" },
-  { model = "gemini-3-7-flash-antigravity-secondary" },
+  { model = "gemini-3-8-flash-antigravity-primary" },
+  { model = "gemini-3-8-flash-antigravity-secondary" },
 ]
 
 [combos.gandalf]

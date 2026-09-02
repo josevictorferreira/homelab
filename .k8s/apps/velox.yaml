@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: b1268728e552ec7f7325161679b2d7cf547dc448
+    kubenix/hash: 4b1e6d34b94173197f2f49ee2435e4dea3a1797f
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -29,7 +29,7 @@ spec:
   template:
     metadata:
       annotations:
-        velox.josevictor.me/config-hash: 65a01925fc6150c0cc472c9cdaf5d7d4a7f6e5df59997c4c898e6b0291346b93
+        velox.josevictor.me/config-hash: 1e3f761cd65cf8f388d0a2ead194d5d71a51b62c30e815e4f06a0b538314fdc2
         velox.josevictor.me/oauth-agent-config-hash: 72b7f1b202300c363471312cd880f37085429ad305f9944b37c6926c9dee941d
       labels:
         app.kubernetes.io/controller: main
@@ -210,7 +210,7 @@ metadata:
     app.kubernetes.io/name: velox
     app.kubernetes.io/service: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: b1268728e552ec7f7325161679b2d7cf547dc448
+    kubenix/hash: 4b1e6d34b94173197f2f49ee2435e4dea3a1797f
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -239,7 +239,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: b1268728e552ec7f7325161679b2d7cf547dc448
+    kubenix/hash: 4b1e6d34b94173197f2f49ee2435e4dea3a1797f
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -840,6 +840,14 @@ data:
     provider = "antigravity-secondary"
     upstream_model = "gemini-3-pro"
 
+    [models.gemini-3-8-flash-antigravity-primary]
+    provider = "antigravity-primary"
+    upstream_model = "gemini-3.8-flash-high"
+
+    [models.gemini-3-8-flash-antigravity-secondary]
+    provider = "antigravity-secondary"
+    upstream_model = "gemini-3.8-flash-high"
+
     [models.gemini-3-7-flash-antigravity-primary]
     provider = "antigravity-primary"
     upstream_model = "gemini-3.7-flash-high"
@@ -1025,6 +1033,13 @@ data:
       { model = "gemini-3-1-pro-antigravity-secondary" },
     ]
 
+    [combos.gemini-3-8-flash]
+    strategy = "round-robin"
+    targets = [
+      { model = "gemini-3-8-flash-antigravity-primary" },
+      { model = "gemini-3-8-flash-antigravity-secondary" },
+    ]
+
     [combos.gemini-3-7-flash]
     strategy = "round-robin"
     targets = [
@@ -1035,8 +1050,8 @@ data:
     [combos.radagast]
     strategy = "round-robin"
     targets = [
-      { model = "gemini-3-7-flash-antigravity-primary" },
-      { model = "gemini-3-7-flash-antigravity-secondary" },
+      { model = "gemini-3-8-flash-antigravity-primary" },
+      { model = "gemini-3-8-flash-antigravity-secondary" },
     ]
 
     [combos.gandalf]
@@ -1114,7 +1129,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: b1268728e552ec7f7325161679b2d7cf547dc448
+    kubenix/hash: 4b1e6d34b94173197f2f49ee2435e4dea3a1797f
   name: velox-config
   namespace: apps
 ---
@@ -1198,7 +1213,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: b1268728e552ec7f7325161679b2d7cf547dc448
+    kubenix/hash: 4b1e6d34b94173197f2f49ee2435e4dea3a1797f
   name: velox-oauth-agent-config
   namespace: apps
 ---
@@ -1209,7 +1224,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: b1268728e552ec7f7325161679b2d7cf547dc448
+    kubenix/hash: 4b1e6d34b94173197f2f49ee2435e4dea3a1797f
   name: velox-oauth-agent
   namespace: apps
 ---
@@ -1220,7 +1235,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: b1268728e552ec7f7325161679b2d7cf547dc448
+    kubenix/hash: 4b1e6d34b94173197f2f49ee2435e4dea3a1797f
   name: velox-oauth-agent
   namespace: apps
 rules:
@@ -1242,7 +1257,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: b1268728e552ec7f7325161679b2d7cf547dc448
+    kubenix/hash: 4b1e6d34b94173197f2f49ee2435e4dea3a1797f
   name: velox-oauth-agent
   namespace: apps
 roleRef:
