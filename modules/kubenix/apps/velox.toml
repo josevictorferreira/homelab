@@ -360,9 +360,11 @@ provider = "nanogpt"
 upstream_model = "glm-5.2"
 
 # Image edit model used by Domus (DOMUS_VELOX_IMAGE_MODEL).
+# Use NanoGPT's current HiDream O1 edit-capable model, not the legacy
+# `hidream` generation alias, which can redraw the source room.
 [models.hidream]
 provider = "nanogpt-images"
-upstream_model = "hidream"
+upstream_model = "hidream-o1-image"
 
 # OpenRouter image models. Every alias below was verified end to end against
 # /images/generations (200 + a decoded image); the two `-preview` slugs

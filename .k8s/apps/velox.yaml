@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 518123084f6c7d190a2aa60264a0168e209e88f7
+    kubenix/hash: b1268728e552ec7f7325161679b2d7cf547dc448
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -29,7 +29,7 @@ spec:
   template:
     metadata:
       annotations:
-        velox.josevictor.me/config-hash: f89f6ec767195a48b83d9916c81f2aa2232625fc4c29cbeb2a02dd63b56ac78a
+        velox.josevictor.me/config-hash: 65a01925fc6150c0cc472c9cdaf5d7d4a7f6e5df59997c4c898e6b0291346b93
         velox.josevictor.me/oauth-agent-config-hash: 72b7f1b202300c363471312cd880f37085429ad305f9944b37c6926c9dee941d
       labels:
         app.kubernetes.io/controller: main
@@ -210,7 +210,7 @@ metadata:
     app.kubernetes.io/name: velox
     app.kubernetes.io/service: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 518123084f6c7d190a2aa60264a0168e209e88f7
+    kubenix/hash: b1268728e552ec7f7325161679b2d7cf547dc448
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -239,7 +239,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 518123084f6c7d190a2aa60264a0168e209e88f7
+    kubenix/hash: b1268728e552ec7f7325161679b2d7cf547dc448
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -628,9 +628,11 @@ data:
     upstream_model = "glm-5.2"
 
     # Image edit model used by Domus (DOMUS_VELOX_IMAGE_MODEL).
+    # Use NanoGPT's current HiDream O1 edit-capable model, not the legacy
+    # `hidream` generation alias, which can redraw the source room.
     [models.hidream]
     provider = "nanogpt-images"
-    upstream_model = "hidream"
+    upstream_model = "hidream-o1-image"
 
     # OpenRouter image models. Every alias below was verified end to end against
     # /images/generations (200 + a decoded image); the two `-preview` slugs
@@ -1112,7 +1114,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 518123084f6c7d190a2aa60264a0168e209e88f7
+    kubenix/hash: b1268728e552ec7f7325161679b2d7cf547dc448
   name: velox-config
   namespace: apps
 ---
@@ -1196,7 +1198,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 518123084f6c7d190a2aa60264a0168e209e88f7
+    kubenix/hash: b1268728e552ec7f7325161679b2d7cf547dc448
   name: velox-oauth-agent-config
   namespace: apps
 ---
@@ -1207,7 +1209,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 518123084f6c7d190a2aa60264a0168e209e88f7
+    kubenix/hash: b1268728e552ec7f7325161679b2d7cf547dc448
   name: velox-oauth-agent
   namespace: apps
 ---
@@ -1218,7 +1220,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 518123084f6c7d190a2aa60264a0168e209e88f7
+    kubenix/hash: b1268728e552ec7f7325161679b2d7cf547dc448
   name: velox-oauth-agent
   namespace: apps
 rules:
@@ -1240,7 +1242,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 518123084f6c7d190a2aa60264a0168e209e88f7
+    kubenix/hash: b1268728e552ec7f7325161679b2d7cf547dc448
   name: velox-oauth-agent
   namespace: apps
 roleRef:

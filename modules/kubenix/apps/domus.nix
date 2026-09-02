@@ -32,7 +32,7 @@ in
         };
         limits = {
           cpu = "1000m";
-          memory = "1Gi";
+          memory = "2Gi";
         };
       };
       values = {
@@ -44,11 +44,11 @@ in
             { secretRef.name = bucketName; }
           ];
           env = [
-            # Solid Queue runs inside Puma: 12 generation threads + 3 default
-            # + dispatcher/scheduler need more than the default pool of 5.
+            # Solid Queue runs inside Puma. Generation is deliberately limited
+            # to one thread; keep the web/database pool bounded as well.
             {
               name = "RAILS_MAX_THREADS";
-              value = "16";
+              value = "8";
             }
             {
               name = "S3_ACCESS_KEY_ID";
