@@ -672,7 +672,6 @@ targets = [
 [combos.glm-5-3-flash]
 targets = [
   { model = "glm-5-3-flash-zai" },
-  { model = "glm-5-3-flash-ocgo" },
   { model = "glm-5-3-flash-pgsgrove" },
 ]
 
@@ -736,7 +735,6 @@ targets = [
 [combos.deepseek-v4-flash]
 strategy = "priority"
 targets = [
-  { model = "deepseek-v4-flash-neuralwatt" },
   { model = "deepseek-v4-flash-pgsgrove" },
   { model = "deepseek-v4-flash-turbo-pgsgrove" },
 ]
