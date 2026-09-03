@@ -24,9 +24,11 @@ shutdown_grace_ms = 30000
 # Default TTFB (30s) kills LLM extraction calls that carry a whole story in
 # the prompt: GLM/opencode-go routinely take 30-60s before the first byte,
 # so both combo targets time out and the request dies as 502 at ~60s.
-# There is no total-request timeout in velox; stream_idle_timeout_ms (60s
-# default) still guards a stalled stream after the head arrives.
+# There is no total-request timeout in velox; stream_idle_timeout_ms guards
+# a stalled stream after the head arrives. Reasoning models (e.g. gpt-5.6-luna
+# on gandalf) can spend 60-120s thinking on large contexts.
 time_to_first_byte_timeout_ms = 120000
+stream_idle_timeout_ms = 180000
 # `models.<alias>.max_tokens` only fills in for a client that omits an output
 # ceiling, which pi never does: it sends 16384 on every agent turn whatever the
 # model, GLM spends that inside its own thinking block, and the answer comes

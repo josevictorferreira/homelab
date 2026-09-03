@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 4b1e6d34b94173197f2f49ee2435e4dea3a1797f
+    kubenix/hash: 1e385949f7101bd3deb2a0163ba4278d1655863a
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -29,7 +29,7 @@ spec:
   template:
     metadata:
       annotations:
-        velox.josevictor.me/config-hash: 1e3f761cd65cf8f388d0a2ead194d5d71a51b62c30e815e4f06a0b538314fdc2
+        velox.josevictor.me/config-hash: cd12c6407211fe16c4644aca0327b8708dcba60bfd524a68ab1cd39f9d740078
         velox.josevictor.me/oauth-agent-config-hash: 72b7f1b202300c363471312cd880f37085429ad305f9944b37c6926c9dee941d
       labels:
         app.kubernetes.io/controller: main
@@ -210,7 +210,7 @@ metadata:
     app.kubernetes.io/name: velox
     app.kubernetes.io/service: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 4b1e6d34b94173197f2f49ee2435e4dea3a1797f
+    kubenix/hash: 1e385949f7101bd3deb2a0163ba4278d1655863a
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -239,7 +239,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 4b1e6d34b94173197f2f49ee2435e4dea3a1797f
+    kubenix/hash: 1e385949f7101bd3deb2a0163ba4278d1655863a
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -292,9 +292,11 @@ data:
     # Default TTFB (30s) kills LLM extraction calls that carry a whole story in
     # the prompt: GLM/opencode-go routinely take 30-60s before the first byte,
     # so both combo targets time out and the request dies as 502 at ~60s.
-    # There is no total-request timeout in velox; stream_idle_timeout_ms (60s
-    # default) still guards a stalled stream after the head arrives.
+    # There is no total-request timeout in velox; stream_idle_timeout_ms guards
+    # a stalled stream after the head arrives. Reasoning models (e.g. gpt-5.6-luna
+    # on gandalf) can spend 60-120s thinking on large contexts.
     time_to_first_byte_timeout_ms = 120000
+    stream_idle_timeout_ms = 180000
     # `models.<alias>.max_tokens` only fills in for a client that omits an output
     # ceiling, which pi never does: it sends 16384 on every agent turn whatever the
     # model, GLM spends that inside its own thinking block, and the answer comes
@@ -1129,7 +1131,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 4b1e6d34b94173197f2f49ee2435e4dea3a1797f
+    kubenix/hash: 1e385949f7101bd3deb2a0163ba4278d1655863a
   name: velox-config
   namespace: apps
 ---
@@ -1213,7 +1215,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 4b1e6d34b94173197f2f49ee2435e4dea3a1797f
+    kubenix/hash: 1e385949f7101bd3deb2a0163ba4278d1655863a
   name: velox-oauth-agent-config
   namespace: apps
 ---
@@ -1224,7 +1226,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 4b1e6d34b94173197f2f49ee2435e4dea3a1797f
+    kubenix/hash: 1e385949f7101bd3deb2a0163ba4278d1655863a
   name: velox-oauth-agent
   namespace: apps
 ---
@@ -1235,7 +1237,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 4b1e6d34b94173197f2f49ee2435e4dea3a1797f
+    kubenix/hash: 1e385949f7101bd3deb2a0163ba4278d1655863a
   name: velox-oauth-agent
   namespace: apps
 rules:
@@ -1257,7 +1259,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 4b1e6d34b94173197f2f49ee2435e4dea3a1797f
+    kubenix/hash: 1e385949f7101bd3deb2a0163ba4278d1655863a
   name: velox-oauth-agent
   namespace: apps
 roleRef:
