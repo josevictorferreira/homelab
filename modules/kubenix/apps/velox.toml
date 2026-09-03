@@ -553,42 +553,52 @@ upstream_model = "gpt-5.6-terra"
 [models.gemini-3-1-pro-antigravity-primary]
 provider = "antigravity-primary"
 upstream_model = "gemini-3.1-pro"
+max_tokens = 65536
 
 [models.gemini-3-1-pro-antigravity-secondary]
 provider = "antigravity-secondary"
 upstream_model = "gemini-3.1-pro"
+max_tokens = 65536
 
 [models.gemini-3-1-pro-preview-antigravity-primary]
 provider = "antigravity-primary"
 upstream_model = "gemini-3.1-pro-preview"
+max_tokens = 65536
 
 [models.gemini-3-1-pro-preview-antigravity-secondary]
 provider = "antigravity-secondary"
 upstream_model = "gemini-3.1-pro-preview"
+max_tokens = 65536
 
 [models.gemini-3-pro-antigravity-primary]
 provider = "antigravity-primary"
 upstream_model = "gemini-3-pro"
+max_tokens = 65536
 
 [models.gemini-3-pro-antigravity-secondary]
 provider = "antigravity-secondary"
 upstream_model = "gemini-3-pro"
+max_tokens = 65536
 
 [models.gemini-3-8-flash-antigravity-primary]
 provider = "antigravity-primary"
 upstream_model = "gemini-3.8-flash-high"
+max_tokens = 65536
 
 [models.gemini-3-8-flash-antigravity-secondary]
 provider = "antigravity-secondary"
 upstream_model = "gemini-3.8-flash-high"
+max_tokens = 65536
 
 [models.gemini-3-7-flash-antigravity-primary]
 provider = "antigravity-primary"
 upstream_model = "gemini-3.7-flash-high"
+max_tokens = 65536
 
 [models.gemini-3-7-flash-antigravity-secondary]
 provider = "antigravity-secondary"
 upstream_model = "gemini-3.7-flash-high"
+max_tokens = 65536
 
 # Embeddings. 1024 dimensions, which is what poise's photo_analyses.embedding
 # vector column is declared as.
