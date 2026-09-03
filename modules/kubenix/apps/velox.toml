@@ -141,6 +141,33 @@ kind = "openai-compatible"
 base_url = "https://api.puter.com/puterai/openai/v1"
 api_key_env = "PUTER_API_KEY"
 
+# PGS Grove. Its /v1 surface is OpenAI-shaped, so the stock
+# `openai-compatible` adapter serves it unchanged -- verified end to end
+# against a local velox: /models, a non-streaming completion, an SSE stream,
+# and a tool call all came back correct.
+#
+# GET /v1/models advertises 38 models, but that is the vendor catalog rather
+# than an entitlement list: everything outside the plan answers 400
+# `model_not_in_plan`, and only the three chat models aliased below actually
+# serve. Because that refusal is a 400, an unentitled alias in a combo would
+# fail the whole attempt rather than fall through -- so only verified-serving
+# models are aliased here.
+#
+# `embeddinggemma-300m` and `kokoro-82m` are listed and reachable on this host
+# but are billed from prepaid API credits the plan does not include (400
+# `endpoint_not_in_plan`), so no `embedding`/`tts` capability is declared and
+# the default openai-compatible capability set (streaming + tools, no vision)
+# is exactly right: both entitled families refuse image parts with 400
+# `unsupported_content`.
+#
+# The plan's own consumption is exposed at GET /v1/usage
+# (weekly/daily used-percent). Velox has no quota adapter for this provider
+# yet; see .agents/specs/0002-provider-quotas in the velox repo.
+[providers.pgs-grove]
+kind = "openai-compatible"
+base_url = "https://api.pgsgrove.com/v1"
+api_key_env = "PGS_GROVE_API_KEY"
+
 [providers.nanogpt]
 kind = "openai-compatible"
 base_url = "https://nano-gpt.com/api/v1"
@@ -341,6 +368,10 @@ upstream_model = "glm-5.3"
 provider = "opencode-go"
 upstream_model = "glm-5.3-flash"
 
+[models.glm-5-3-flash-pgsgrove]
+provider = "pgs-grove"
+upstream_model = "glm-5.3-flash"
+
 [models.glm-5-2-ocgo]
 provider = "opencode-go"
 upstream_model = "glm-5.2"
@@ -443,6 +474,18 @@ upstream_model = "alibaba-token-plan/deepseek-v4-flash-0731"
 [models.deepseek-v4-flash-neuralwatt]
 provider = "neuralwatt"
 upstream_model = "deepseek-v4-flash"
+
+# pgs-grove entitles the dated 0731 snapshot, not the bare `deepseek-v4-flash`
+# slug, which answers `model_not_in_plan`. `-turbo` is a second route to the
+# same snapshot; measured latency was indistinguishable, so it earns its place
+# as a same-provider fallback rather than as a faster primary.
+[models.deepseek-v4-flash-pgsgrove]
+provider = "pgs-grove"
+upstream_model = "deepseek-v4-flash-0731"
+
+[models.deepseek-v4-flash-turbo-pgsgrove]
+provider = "pgs-grove"
+upstream_model = "deepseek-v4-flash-0731-turbo"
 
 [models.deepseek-v4-pro-ocgo]
 provider = "opencode-go"
@@ -630,6 +673,7 @@ targets = [
 targets = [
   { model = "glm-5-3-flash-zai" },
   { model = "glm-5-3-flash-ocgo" },
+  { model = "glm-5-3-flash-pgsgrove" },
 ]
 
 [combos.glm-5-2]
@@ -693,6 +737,8 @@ targets = [
 strategy = "priority"
 targets = [
   { model = "deepseek-v4-flash-neuralwatt" },
+  { model = "deepseek-v4-flash-pgsgrove" },
+  { model = "deepseek-v4-flash-turbo-pgsgrove" },
 ]
 
 [combos.deepseek-v4-pro]

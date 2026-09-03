@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: df224af948ba4382629ee8960913e91a23c99d06
+    kubenix/hash: 89b46d0a75b64ae707feae1a051cc4849b0c4f78
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -29,7 +29,7 @@ spec:
   template:
     metadata:
       annotations:
-        velox.josevictor.me/config-hash: cfa91216374b4dee57e50c8ad76262f4916c309e57707f742ab2d47ac15e4870
+        velox.josevictor.me/config-hash: 05e15ae55a13180e380fca26a4c54892015f02037263d8c98acd940503b2b88a
         velox.josevictor.me/oauth-agent-config-hash: 72b7f1b202300c363471312cd880f37085429ad305f9944b37c6926c9dee941d
       labels:
         app.kubernetes.io/controller: main
@@ -210,7 +210,7 @@ metadata:
     app.kubernetes.io/name: velox
     app.kubernetes.io/service: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: df224af948ba4382629ee8960913e91a23c99d06
+    kubenix/hash: 89b46d0a75b64ae707feae1a051cc4849b0c4f78
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -239,7 +239,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: df224af948ba4382629ee8960913e91a23c99d06
+    kubenix/hash: 89b46d0a75b64ae707feae1a051cc4849b0c4f78
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -408,6 +408,33 @@ data:
     kind = "openai-compatible"
     base_url = "https://api.puter.com/puterai/openai/v1"
     api_key_env = "PUTER_API_KEY"
+
+    # PGS Grove. Its /v1 surface is OpenAI-shaped, so the stock
+    # `openai-compatible` adapter serves it unchanged -- verified end to end
+    # against a local velox: /models, a non-streaming completion, an SSE stream,
+    # and a tool call all came back correct.
+    #
+    # GET /v1/models advertises 38 models, but that is the vendor catalog rather
+    # than an entitlement list: everything outside the plan answers 400
+    # `model_not_in_plan`, and only the three chat models aliased below actually
+    # serve. Because that refusal is a 400, an unentitled alias in a combo would
+    # fail the whole attempt rather than fall through -- so only verified-serving
+    # models are aliased here.
+    #
+    # `embeddinggemma-300m` and `kokoro-82m` are listed and reachable on this host
+    # but are billed from prepaid API credits the plan does not include (400
+    # `endpoint_not_in_plan`), so no `embedding`/`tts` capability is declared and
+    # the default openai-compatible capability set (streaming + tools, no vision)
+    # is exactly right: both entitled families refuse image parts with 400
+    # `unsupported_content`.
+    #
+    # The plan's own consumption is exposed at GET /v1/usage
+    # (weekly/daily used-percent). Velox has no quota adapter for this provider
+    # yet; see .agents/specs/0002-provider-quotas in the velox repo.
+    [providers.pgs-grove]
+    kind = "openai-compatible"
+    base_url = "https://api.pgsgrove.com/v1"
+    api_key_env = "PGS_GROVE_API_KEY"
 
     [providers.nanogpt]
     kind = "openai-compatible"
@@ -609,6 +636,10 @@ data:
     provider = "opencode-go"
     upstream_model = "glm-5.3-flash"
 
+    [models.glm-5-3-flash-pgsgrove]
+    provider = "pgs-grove"
+    upstream_model = "glm-5.3-flash"
+
     [models.glm-5-2-ocgo]
     provider = "opencode-go"
     upstream_model = "glm-5.2"
@@ -711,6 +742,18 @@ data:
     [models.deepseek-v4-flash-neuralwatt]
     provider = "neuralwatt"
     upstream_model = "deepseek-v4-flash"
+
+    # pgs-grove entitles the dated 0731 snapshot, not the bare `deepseek-v4-flash`
+    # slug, which answers `model_not_in_plan`. `-turbo` is a second route to the
+    # same snapshot; measured latency was indistinguishable, so it earns its place
+    # as a same-provider fallback rather than as a faster primary.
+    [models.deepseek-v4-flash-pgsgrove]
+    provider = "pgs-grove"
+    upstream_model = "deepseek-v4-flash-0731"
+
+    [models.deepseek-v4-flash-turbo-pgsgrove]
+    provider = "pgs-grove"
+    upstream_model = "deepseek-v4-flash-0731-turbo"
 
     [models.deepseek-v4-pro-ocgo]
     provider = "opencode-go"
@@ -898,6 +941,7 @@ data:
     targets = [
       { model = "glm-5-3-flash-zai" },
       { model = "glm-5-3-flash-ocgo" },
+      { model = "glm-5-3-flash-pgsgrove" },
     ]
 
     [combos.glm-5-2]
@@ -961,6 +1005,8 @@ data:
     strategy = "priority"
     targets = [
       { model = "deepseek-v4-flash-neuralwatt" },
+      { model = "deepseek-v4-flash-pgsgrove" },
+      { model = "deepseek-v4-flash-turbo-pgsgrove" },
     ]
 
     [combos.deepseek-v4-pro]
@@ -1141,7 +1187,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: df224af948ba4382629ee8960913e91a23c99d06
+    kubenix/hash: 89b46d0a75b64ae707feae1a051cc4849b0c4f78
   name: velox-config
   namespace: apps
 ---
@@ -1225,7 +1271,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: df224af948ba4382629ee8960913e91a23c99d06
+    kubenix/hash: 89b46d0a75b64ae707feae1a051cc4849b0c4f78
   name: velox-oauth-agent-config
   namespace: apps
 ---
@@ -1236,7 +1282,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: df224af948ba4382629ee8960913e91a23c99d06
+    kubenix/hash: 89b46d0a75b64ae707feae1a051cc4849b0c4f78
   name: velox-oauth-agent
   namespace: apps
 ---
@@ -1247,7 +1293,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: df224af948ba4382629ee8960913e91a23c99d06
+    kubenix/hash: 89b46d0a75b64ae707feae1a051cc4849b0c4f78
   name: velox-oauth-agent
   namespace: apps
 rules:
@@ -1269,7 +1315,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: df224af948ba4382629ee8960913e91a23c99d06
+    kubenix/hash: 89b46d0a75b64ae707feae1a051cc4849b0c4f78
   name: velox-oauth-agent
   namespace: apps
 roleRef:
