@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: foyer
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 5fbb4f7196c3100142c9e026f906069deb8fbbec
+    kubenix/hash: dc86314c43234bf8236de7c56b96285061eea32c
     kubenix/module-instance: foyer
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -29,7 +29,7 @@ spec:
   template:
     metadata:
       annotations:
-        foyer.josevictor.me/config-hash: c6250613a5ca8a5a73fbee59963d83cdd2bc4cba16fc7ed3f86a315829acf6b3
+        foyer.josevictor.me/config-hash: f520e553876fbe06ce991c1213d7c33163e9bb77233c41fc77a6598a7c5f3324
       labels:
         app.kubernetes.io/controller: main
         app.kubernetes.io/instance: foyer
@@ -77,6 +77,10 @@ spec:
               name: config
               readOnly: true
               subPath: foyer.yml
+            - mountPath: /app/config/custom.css
+              name: custom-css
+              readOnly: true
+              subPath: custom.css
             - mountPath: /app/data
               name: data
       dnsPolicy: ClusterFirst
@@ -97,6 +101,12 @@ spec:
                 path: foyer.yml
             name: foyer
           name: config
+        - configMap:
+            items:
+              - key: custom.css
+                path: custom.css
+            name: foyer
+          name: custom-css
         - name: data
           persistentVolumeClaim:
             claimName: foyer-data
@@ -112,7 +122,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: foyer
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 5fbb4f7196c3100142c9e026f906069deb8fbbec
+    kubenix/hash: dc86314c43234bf8236de7c56b96285061eea32c
     kubenix/module-instance: foyer
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -137,7 +147,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: foyer
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 5fbb4f7196c3100142c9e026f906069deb8fbbec
+    kubenix/hash: dc86314c43234bf8236de7c56b96285061eea32c
     kubenix/module-instance: foyer
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -165,7 +175,7 @@ metadata:
     app.kubernetes.io/name: foyer
     app.kubernetes.io/service: foyer
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 5fbb4f7196c3100142c9e026f906069deb8fbbec
+    kubenix/hash: dc86314c43234bf8236de7c56b96285061eea32c
     kubenix/module-instance: foyer
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -194,7 +204,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: foyer
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 5fbb4f7196c3100142c9e026f906069deb8fbbec
+    kubenix/hash: dc86314c43234bf8236de7c56b96285061eea32c
     kubenix/module-instance: foyer
     kubenix/module-name: release
     kubenix/module-version: 1.0.0

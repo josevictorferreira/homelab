@@ -5,9 +5,8 @@ let
   namespace = homelab.kubernetes.namespaces.applications;
   port = 8080;
   pullSecrets = [{ name = "ghcr-registry-secret"; }];
-  foyerConfigYaml =
-    (import ./foyer-config.enc.nix { inherit homelab kubenix; }).kubernetes.resources.configMaps."foyer".data."foyer.yml";
-  configHash = builtins.hashString "sha256" foyerConfigYaml;
+  foyerConfigMap = (import ./foyer-config.enc.nix { inherit homelab kubenix; }).kubernetes.resources.configMaps."foyer".data;
+  configHash = builtins.hashString "sha256" (foyerConfigMap."foyer.yml" + foyerConfigMap."custom.css");
 in
 {
   submodules.instances.${app} = {
@@ -76,6 +75,25 @@ in
               timeoutSeconds = 5;
             };
           };
+        };
+        # theme.custom_css_file points here; served by foyer at /custom.css.
+        persistence.custom-css = {
+          enabled = true;
+          type = "configMap";
+          name = app;
+          items = [
+            {
+              key = "custom.css";
+              path = "custom.css";
+            }
+          ];
+          globalMounts = [
+            {
+              path = "/app/config/custom.css";
+              subPath = "custom.css";
+              readOnly = true;
+            }
+          ];
         };
         persistence.data = {
           enabled = true;
