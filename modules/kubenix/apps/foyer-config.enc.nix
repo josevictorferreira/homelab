@@ -112,18 +112,21 @@ let
                   {
                     type = "hackernews";
                     title = "Hacker News";
+                    cache = "2h";
                     limit = 15;
                     collapse_after = 5;
                   }
                   {
                     type = "lobsters";
                     title = "Lobsters";
+                    cache = "2h";
                     limit = 15;
                     collapse_after = 5;
                   }
                   {
                     type = "reddit";
                     title = "r/selfhosted";
+                    cache = "3h";
                     subreddit = "selfhosted";
                     show_thumbnails = true;
                     collapse_after = 5;
@@ -131,6 +134,7 @@ let
                   {
                     type = "reddit";
                     title = "r/LocalLLaMA";
+                    cache = "3h";
                     subreddit = "LocalLLaMA";
                     show_thumbnails = true;
                     collapse_after = 5;
@@ -138,6 +142,7 @@ let
                   {
                     type = "reddit";
                     title = "r/functionalprint";
+                    cache = "3h";
                     subreddit = "functionalprint";
                     show_thumbnails = true;
                     collapse_after = 5;
@@ -145,6 +150,7 @@ let
                   {
                     type = "reddit";
                     title = "r/StableDiffusion";
+                    cache = "3h";
                     subreddit = "StableDiffusion";
                     show_thumbnails = true;
                     collapse_after = 5;
@@ -154,6 +160,7 @@ let
               {
                 type = "videos";
                 title = "Videos";
+                cache = "1d";
                 style = "horizontal-cards";
                 limit = 25;
                 channels = [
