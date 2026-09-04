@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 89b46d0a75b64ae707feae1a051cc4849b0c4f78
+    kubenix/hash: 9c253f4a00516b07ba440f9f57e5167913253c13
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -29,7 +29,7 @@ spec:
   template:
     metadata:
       annotations:
-        velox.josevictor.me/config-hash: 05e15ae55a13180e380fca26a4c54892015f02037263d8c98acd940503b2b88a
+        velox.josevictor.me/config-hash: 95de210aff7949660ceee842153db3ec623319ce0640334e181f6d89651f4eb9
         velox.josevictor.me/oauth-agent-config-hash: 72b7f1b202300c363471312cd880f37085429ad305f9944b37c6926c9dee941d
       labels:
         app.kubernetes.io/controller: main
@@ -210,7 +210,7 @@ metadata:
     app.kubernetes.io/name: velox
     app.kubernetes.io/service: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 89b46d0a75b64ae707feae1a051cc4849b0c4f78
+    kubenix/hash: 9c253f4a00516b07ba440f9f57e5167913253c13
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -239,7 +239,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 89b46d0a75b64ae707feae1a051cc4849b0c4f78
+    kubenix/hash: 9c253f4a00516b07ba440f9f57e5167913253c13
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -829,9 +829,12 @@ data:
     provider = "xiaomi-mimo"
     upstream_model = "mimo-v2.5-pro"
 
+    # Not `:free`: OpenRouter retired the free tier for this model and now answers
+    # that slug with a 404 naming the paid one, which is the same weights (served
+    # by Cerebras) at a price this account already pays.
     [models.gpt-oss-120b-openrouter]
     provider = "openrouter"
-    upstream_model = "openai/gpt-oss-120b:free"
+    upstream_model = "openai/gpt-oss-120b"
 
     [models.gpt-oss-120b-cerebras]
     provider = "cerebras"
@@ -940,7 +943,6 @@ data:
     [combos.glm-5-3-flash]
     targets = [
       { model = "glm-5-3-flash-zai" },
-      { model = "glm-5-3-flash-ocgo" },
       { model = "glm-5-3-flash-pgsgrove" },
     ]
 
@@ -980,7 +982,6 @@ data:
 
     [combos.qwen3-8-max]
     targets = [
-      { model = "qwen3-8-max-alibaba" },
       { model = "qwen3-8-max-openrouter" },
     ]
 
@@ -1004,7 +1005,6 @@ data:
     [combos.deepseek-v4-flash]
     strategy = "priority"
     targets = [
-      { model = "deepseek-v4-flash-neuralwatt" },
       { model = "deepseek-v4-flash-pgsgrove" },
       { model = "deepseek-v4-flash-turbo-pgsgrove" },
     ]
@@ -1031,8 +1031,6 @@ data:
 
     [combos.kimi-k3]
     targets = [
-      { model = "kimi-k3-kimi-coding" },
-      { model = "kimi-k3-ocgo" },
       { model = "kimi-k3-openrouter" },
     ]
 
@@ -1187,7 +1185,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 89b46d0a75b64ae707feae1a051cc4849b0c4f78
+    kubenix/hash: 9c253f4a00516b07ba440f9f57e5167913253c13
   name: velox-config
   namespace: apps
 ---
@@ -1271,7 +1269,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 89b46d0a75b64ae707feae1a051cc4849b0c4f78
+    kubenix/hash: 9c253f4a00516b07ba440f9f57e5167913253c13
   name: velox-oauth-agent-config
   namespace: apps
 ---
@@ -1282,7 +1280,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 89b46d0a75b64ae707feae1a051cc4849b0c4f78
+    kubenix/hash: 9c253f4a00516b07ba440f9f57e5167913253c13
   name: velox-oauth-agent
   namespace: apps
 ---
@@ -1293,7 +1291,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 89b46d0a75b64ae707feae1a051cc4849b0c4f78
+    kubenix/hash: 9c253f4a00516b07ba440f9f57e5167913253c13
   name: velox-oauth-agent
   namespace: apps
 rules:
@@ -1315,7 +1313,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 89b46d0a75b64ae707feae1a051cc4849b0c4f78
+    kubenix/hash: 9c253f4a00516b07ba440f9f57e5167913253c13
   name: velox-oauth-agent
   namespace: apps
 roleRef:

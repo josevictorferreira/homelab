@@ -561,9 +561,12 @@ upstream_model = "mimo-v2.5-pro"
 provider = "xiaomi-mimo"
 upstream_model = "mimo-v2.5-pro"
 
+# Not `:free`: OpenRouter retired the free tier for this model and now answers
+# that slug with a 404 naming the paid one, which is the same weights (served
+# by Cerebras) at a price this account already pays.
 [models.gpt-oss-120b-openrouter]
 provider = "openrouter"
-upstream_model = "openai/gpt-oss-120b:free"
+upstream_model = "openai/gpt-oss-120b"
 
 [models.gpt-oss-120b-cerebras]
 provider = "cerebras"
