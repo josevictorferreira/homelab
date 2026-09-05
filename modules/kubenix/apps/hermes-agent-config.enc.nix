@@ -28,7 +28,6 @@ in
       VELOX_API_KEY = kubenix.lib.secretsFor "velox_api_keys";
       VELOX_BASE_URL = "http://velox.apps.svc.cluster.local:8080/v1";
       MATRIX_HOMESERVER = kubenix.lib.secretsFor "hermes_matrix_homeserver";
-      MATRIX_ACCESS_TOKEN = kubenix.lib.secretsFor "hermes_matrix_access_token";
       MATRIX_ALLOWED_USERS = kubenix.lib.secretsFor "hermes_matrix_allowed_users";
       MATRIX_ENCRYPTION = kubenix.lib.secretsFor "hermes_matrix_encryption";
       MATRIX_RECOVERY_KEY = kubenix.lib.secretsFor "hermes_matrix_recovery_key";
