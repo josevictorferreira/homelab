@@ -35,6 +35,12 @@ in
       DOMUS_VELOX_URL = "http://${kubenix.lib.serviceHostFor "velox" namespace}:8080";
       DOMUS_VELOX_API_KEY = kubenix.lib.secretsFor "velox_api_keys";
       DOMUS_VELOX_IMAGE_MODEL = "hidream";
+
+      # Room reconstruction runs on the GPU desktop (zeh-pc, RX 6900 XT), which
+      # serves `nix run .#reconstruction` on the LAN; the pod only has the
+      # video and the splat. The token must match DOMUS_RECONSTRUCTION_TOKEN there.
+      DOMUS_RECONSTRUCTION_URL = "http://10.10.10.10:9300";
+      DOMUS_RECONSTRUCTION_TOKEN = kubenix.lib.secretsFor "domus_reconstruction_token";
     };
   };
 }
