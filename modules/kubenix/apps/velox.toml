@@ -349,9 +349,9 @@ structured_output = false
 # currently answering 404, so no ceiling could be verified against it, and the
 # adapter default applies until it can be.
 # ---------------------------------------------------------------------------
-# TTS model aliases. `tts-1` is no longer a model: it is the combo below, which
-# prefers the self-hosted box and falls back to Speechify. Clients keep sending
-# `model="tts-1"` and are unaffected by the split.
+# TTS model aliases. The client-facing name is the `voice` combo below, which
+# prefers the self-hosted box and falls back to Speechify then ElevenLabs.
+# These two exist to be its targets; clients send `model="voice"`.
 #
 # The upstream model id is sent as Speechify `model`; the voice comes from the
 # per-request `voice` field (adapter curated default if omitted).
@@ -920,7 +920,7 @@ targets = [
 # retryable, so the next target runs. Note that Speechify reports a spent
 # balance as a terminal 4xx, which does NOT fall through; the local target
 # leading is what keeps that off the hot path rather than the combo curing it.
-[combos.tts-1]
+[combos.voice]
 strategy = "priority"
 targets = [
   { model = "tts-local" },
@@ -942,36 +942,36 @@ targets = [
 # Requires a Velox image with combo voice tables. An older binary rejects the
 # key at startup, so roll the image before this config.
 
-[combos.tts-1.voices.ariadne]
+[combos.voice.voices.ariadne]
 tts-local = "ariadne"
 
-[combos.tts-1.voices.felix]
+[combos.voice.voices.felix]
 tts-local = "felix"
 
-[combos.tts-1.voices.gwen]
+[combos.voice.voices.gwen]
 tts-local = "gwen"
 
-[combos.tts-1.voices.ink]
+[combos.voice.voices.ink]
 tts-local = "ink"
 
-[combos.tts-1.voices.max]
+[combos.voice.voices.max]
 tts-local = "max"
 
-[combos.tts-1.voices.orpheus]
+[combos.voice.voices.orpheus]
 tts-local = "orpheus"
 
-[combos.tts-1.voices.rex]
+[combos.voice.voices.rex]
 tts-local = "rex"
 
-[combos.tts-1.voices.scylla]
+[combos.voice.voices.scylla]
 tts-local = "scylla"
 tts-speechify = "geffen_32"
 tts-elevenlabs = "21m00Tcm4TlvDq8ikWAM"
 
-[combos.tts-1.voices.stone]
+[combos.voice.voices.stone]
 tts-local = "stone"
 
-[combos.tts-1.voices.tuesday]
+[combos.voice.voices.tuesday]
 tts-local = "tuesday"
 
 # ---------------------------------------------------------------------------
