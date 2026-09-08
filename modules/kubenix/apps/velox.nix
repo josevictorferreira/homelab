@@ -235,6 +235,11 @@ in
             "--config"
             "/etc/velox/velox.toml"
           ];
+          # Not a credential: the self-hosted TTS box on the LAN takes no auth,
+          # but Velox requires every provider to name a non-empty credential
+          # variable or it refuses to start. A literal here keeps a value that
+          # protects nothing out of the sealed Secret.
+          env.LOCAL_TTS_KEY = "local";
           probes = {
             # /healthz is pure liveness and never touches an upstream, so a
             # provider outage cannot restart the proxy.

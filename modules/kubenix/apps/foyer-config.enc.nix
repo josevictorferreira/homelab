@@ -36,9 +36,24 @@ let
             style = "ticker";
             hide_header = true;
             markets = [
-              { name = "Bitcoin"; symbol = "BTC-USD"; icon = "₿"; color = "#f7931a"; }
-              { name = "Dollar / Real"; symbol = "USDBRL=X"; icon = "R$"; color = "#2e9e5b"; }
-              { name = "Kaspa"; symbol = "KAS-USD"; icon = "K"; color = "#49c8b0"; }
+              {
+                name = "Bitcoin";
+                symbol = "BTC-USD";
+                icon = "₿";
+                color = "#f7931a";
+              }
+              {
+                name = "Dollar / Real";
+                symbol = "USDBRL=X";
+                icon = "R$";
+                color = "#2e9e5b";
+              }
+              {
+                name = "Kaspa";
+                symbol = "KAS-USD";
+                icon = "K";
+                color = "#49c8b0";
+              }
             ];
           }
         ];
@@ -51,31 +66,106 @@ let
               {
                 title = "Daily";
                 links = [
-                  { title = "Home Assistant"; url = "https://home.josevictor.me"; icon = "sh:home-assistant"; color = "#41bdf5"; }
-                  { title = "BookOrbit"; url = "https://bookorbit.josevictor.me"; icon = "mdi:book-open-variant"; color = "#b57cf5"; }
-                  { title = "Readeck"; url = "https://readeck.josevictor.me"; icon = "sh:readeck"; color = "#ff7a3d"; }
-                  { title = "SearXNG"; url = "https://searxng.josevictor.me"; icon = "sh:searxng"; color = "#3d7cf5"; }
-                  { title = "Oratoria"; url = "https://oratoria.josevictor.me"; icon = "mdi:presentation"; color = "#ec5b9a"; }
+                  {
+                    title = "Home Assistant";
+                    url = "https://home.josevictor.me";
+                    icon = "sh:home-assistant";
+                    color = "#41bdf5";
+                  }
+                  {
+                    title = "BookOrbit";
+                    url = "https://bookorbit.josevictor.me";
+                    icon = "mdi:book-open-variant";
+                    color = "#b57cf5";
+                  }
+                  {
+                    title = "Readeck";
+                    url = "https://readeck.josevictor.me";
+                    icon = "sh:readeck";
+                    color = "#ff7a3d";
+                  }
+                  {
+                    title = "SearXNG";
+                    url = "https://searxng.josevictor.me";
+                    icon = "sh:searxng";
+                    color = "#3d7cf5";
+                  }
+                  {
+                    title = "Oratoria";
+                    url = "https://oratoria.josevictor.me";
+                    icon = "mdi:presentation";
+                    color = "#ec5b9a";
+                  }
                 ];
               }
               {
                 title = "Intel";
                 links = [
-                  { title = "Hermes"; url = "https://hermes.josevictor.me"; icon = "mdi:robot"; color = "#8fd13f"; }
-                  { title = "Hindsight"; url = "https://hindsight.josevictor.me"; icon = "mdi:brain"; color = "#19b3a3"; }
-                  { title = "Valoris"; url = "https://valoris.josevictor.me"; icon = "mdi:chart-line"; color = "#e0a81c"; }
-                  { title = "Wealtho"; url = "https://wealtho.josevictor.me"; icon = "mdi:wallet"; color = "#2fb86a"; }
-                  { title = "Poise"; url = "https://poise.josevictor.me"; icon = "mdi:hanger"; color = "#f06292"; }
+                  {
+                    title = "Hermes";
+                    url = "https://hermes.josevictor.me";
+                    icon = "mdi:robot";
+                    color = "#8fd13f";
+                  }
+                  {
+                    title = "Hindsight";
+                    url = "https://hindsight.josevictor.me";
+                    icon = "mdi:brain";
+                    color = "#19b3a3";
+                  }
+                  {
+                    title = "Valoris";
+                    url = "https://valoris.josevictor.me";
+                    icon = "mdi:chart-line";
+                    color = "#e0a81c";
+                  }
+                  {
+                    title = "Wealtho";
+                    url = "https://wealtho.josevictor.me";
+                    icon = "mdi:wallet";
+                    color = "#2fb86a";
+                  }
+                  {
+                    title = "Poise";
+                    url = "https://poise.josevictor.me";
+                    icon = "mdi:hanger";
+                    color = "#f06292";
+                  }
                 ];
               }
               {
                 title = "Infra";
                 links = [
-                  { title = "Grafana"; url = "https://grafana.josevictor.me"; icon = "sh:grafana"; color = "#f46800"; }
-                  { title = "Ceph"; url = "https://ceph.josevictor.me"; icon = "sh:ceph"; color = "#e9453d"; }
-                  { title = "Keycloak"; url = "https://identity.josevictor.me"; icon = "sh:keycloak"; color = "#4d9de0"; }
-                  { title = "SFTPGo"; url = "https://sftpgo.josevictor.me"; icon = "sh:sftpgo"; color = "#2ea3d9"; }
-                  { title = "Immich"; url = "https://immich.josevictor.me"; icon = "sh:immich"; color = "#8e6cf7"; }
+                  {
+                    title = "Grafana";
+                    url = "https://grafana.josevictor.me";
+                    icon = "sh:grafana";
+                    color = "#f46800";
+                  }
+                  {
+                    title = "Ceph";
+                    url = "https://ceph.josevictor.me";
+                    icon = "sh:ceph";
+                    color = "#e9453d";
+                  }
+                  {
+                    title = "Keycloak";
+                    url = "https://identity.josevictor.me";
+                    icon = "sh:keycloak";
+                    color = "#4d9de0";
+                  }
+                  {
+                    title = "SFTPGo";
+                    url = "https://sftpgo.josevictor.me";
+                    icon = "sh:sftpgo";
+                    color = "#2ea3d9";
+                  }
+                  {
+                    title = "Immich";
+                    url = "https://immich.josevictor.me";
+                    icon = "sh:immich";
+                    color = "#8e6cf7";
+                  }
                 ];
               }
             ];
@@ -227,10 +317,22 @@ let
                 grow = true;
                 token = kubenix.lib.secretsFor "github_token";
                 groups = [
-                  { name = "cluster"; color = "#7dd3fc"; }
-                  { name = "homelab"; color = "#8fd13f"; }
-                  { name = "ai"; color = "#d97757"; }
-                  { name = "desktop"; color = "#c4b5fd"; }
+                  {
+                    name = "cluster";
+                    color = "#7dd3fc";
+                  }
+                  {
+                    name = "homelab";
+                    color = "#8fd13f";
+                  }
+                  {
+                    name = "ai";
+                    color = "#d97757";
+                  }
+                  {
+                    name = "desktop";
+                    color = "#c4b5fd";
+                  }
                 ];
                 repositories =
                   let
@@ -260,6 +362,7 @@ let
                     "prowlarr/prowlarr"
                     "immich-app/immich"
                     "rishikanthc/scriberr"
+                    "bookorbit/bookorbit"
                   ]
                   ++ grouped "ai" [
                     "open-webui/open-webui"
