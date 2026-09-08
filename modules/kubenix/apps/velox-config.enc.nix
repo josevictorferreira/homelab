@@ -37,6 +37,13 @@ in
       KIMI_API_KEY = kubenix.lib.secretsFor "moonshot_api_key";
       VOYAGE_API_KEY = kubenix.lib.secretsFor "voyage_api_key";
       SPEECHIFY_API_KEY = kubenix.lib.secretsFor "speechify_api_key";
+      ELEVENLABS_API_KEY = kubenix.lib.secretsFor "elevenlabs_api_key";
+
+      # Not a credential: the self-hosted TTS box on the LAN takes no auth, but
+      # Velox refuses to start unless every provider names a non-empty
+      # credential variable. A literal keeps that requirement satisfied without
+      # inventing a secret, and keeps every *_env name in this one file.
+      LOCAL_TTS_KEY = "local";
 
       # --- web search/fetch credentials (one per web.*.providers.<id>.api_key_env) ---
       # SearXNG leads the search pool and takes no key.

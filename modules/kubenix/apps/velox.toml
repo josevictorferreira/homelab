@@ -250,6 +250,19 @@ api_key_env = "LOCAL_TTS_KEY"
 [providers.local-tts.capabilities]
 tts = true
 
+# ElevenLabs TTS. `xi-api-key` auth and a per-voice URL path, both handled by
+# the adapter. The key is the shared `elevenlabs_api_key` already used by
+# oratoria, so nothing new had to be sealed. `stt` is deliberately left off:
+# ElevenLabs can transcribe, but STT here stays on OpenRouter Whisper until
+# that is a decision someone makes on purpose.
+[providers.elevenlabs]
+kind = "elevenlabs"
+base_url = "https://api.elevenlabs.io"
+api_key_env = "ELEVENLABS_API_KEY"
+
+[providers.elevenlabs.capabilities]
+tts = true
+
 # --- Audio (STT) -----------------------------------------------------------
 # OpenRouter STT (bespoke `openrouter` kind: JSON body with base64 audio, not
 # multipart). Distinct provider instance from the chat `[providers.openrouter]`
@@ -350,6 +363,11 @@ upstream_model = "simba-english"
 [models.tts-local]
 provider = "local-tts"
 upstream_model = "local"
+
+# `eleven_v3` matches what oratoria already asks ElevenLabs for.
+[models.tts-elevenlabs]
+provider = "elevenlabs"
+upstream_model = "eleven_v3"
 # STT model alias: resolves `model="stt-1"` to OpenRouter Whisper. Multipart
 # uploads (file + model); the OpenRouter adapter sends base64 audio in JSON.
 [models.stt-1]
@@ -897,29 +915,64 @@ targets = [
   { model = "gpt-5-image-mini-openrouter" },
 ]
 
-# TTS. The self-hosted box first — it is free and on the LAN — with Speechify
-# as the outage fallback. A box that is off answers with a connection refusal,
-# which is retryable, so the fallback runs. Note that Speechify reports a spent
+# TTS. The self-hosted box first — it is free and on the LAN — then Speechify,
+# then ElevenLabs. A box that is off answers with a connection refusal, which is
+# retryable, so the next target runs. Note that Speechify reports a spent
 # balance as a terminal 4xx, which does NOT fall through; the local target
 # leading is what keeps that off the hot path rather than the combo curing it.
-#
-# `voice` is passed through as the client sent it. To make one client-facing
-# name work on both targets, name it here and give each target its own
-# identifier — until then a voice that exists only on one target will be
-# rejected by the other:
-#
-#   [combos.tts-1.voices.<name>]
-#   tts-local = "<local voice id>"
-#   tts-speechify = "<speechify voice id>"
-#
-# Requires a Velox image with combo voice tables; an older binary rejects the
-# key at startup. Everything else here is compatible with both.
 [combos.tts-1]
 strategy = "priority"
 targets = [
   { model = "tts-local" },
   { model = "tts-speechify" },
+  { model = "tts-elevenlabs" },
 ]
+
+# One client-facing voice name, spelled per target. Names come from the box's
+# own GET /v1/audio/voices, so a client that already sends voice = "scylla"
+# keeps working and now survives a fallback.
+#
+# A target listed here answers only for the names it maps: a voice it does not
+# map is dropped and that provider's own default is used, so a request is never
+# failed over a name. That is why the hosted targets appear only under `scylla`
+# — those are the two identifiers verified against their catalogues. Add the
+# rest as you look them up; until then the other nine names are self-hosted
+# voices that degrade to a default if the box is down.
+#
+# Requires a Velox image with combo voice tables. An older binary rejects the
+# key at startup, so roll the image before this config.
+
+[combos.tts-1.voices.ariadne]
+tts-local = "ariadne"
+
+[combos.tts-1.voices.felix]
+tts-local = "felix"
+
+[combos.tts-1.voices.gwen]
+tts-local = "gwen"
+
+[combos.tts-1.voices.ink]
+tts-local = "ink"
+
+[combos.tts-1.voices.max]
+tts-local = "max"
+
+[combos.tts-1.voices.orpheus]
+tts-local = "orpheus"
+
+[combos.tts-1.voices.rex]
+tts-local = "rex"
+
+[combos.tts-1.voices.scylla]
+tts-local = "scylla"
+tts-speechify = "geffen_32"
+tts-elevenlabs = "21m00Tcm4TlvDq8ikWAM"
+
+[combos.tts-1.voices.stone]
+tts-local = "stone"
+
+[combos.tts-1.voices.tuesday]
+tts-local = "tuesday"
 
 # ---------------------------------------------------------------------------
 # Web search & fetch

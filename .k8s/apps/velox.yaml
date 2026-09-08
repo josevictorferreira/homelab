@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 9c253f4a00516b07ba440f9f57e5167913253c13
+    kubenix/hash: ffd75576b38a28e123f889be64aa6bb2358175c8
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -29,7 +29,7 @@ spec:
   template:
     metadata:
       annotations:
-        velox.josevictor.me/config-hash: 95de210aff7949660ceee842153db3ec623319ce0640334e181f6d89651f4eb9
+        velox.josevictor.me/config-hash: 639b78462778c622e17e70797266f2adb409c084f5ae3e86ffc31318c21f1e36
         velox.josevictor.me/oauth-agent-config-hash: 72b7f1b202300c363471312cd880f37085429ad305f9944b37c6926c9dee941d
       labels:
         app.kubernetes.io/controller: main
@@ -41,6 +41,9 @@ spec:
         - args:
             - --config
             - /etc/velox/velox.toml
+          env:
+            - name: LOCAL_TTS_KEY
+              value: local
           envFrom:
             - secretRef:
                 name: velox-config
@@ -210,7 +213,7 @@ metadata:
     app.kubernetes.io/name: velox
     app.kubernetes.io/service: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 9c253f4a00516b07ba440f9f57e5167913253c13
+    kubenix/hash: ffd75576b38a28e123f889be64aa6bb2358175c8
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -239,7 +242,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 9c253f4a00516b07ba440f9f57e5167913253c13
+    kubenix/hash: ffd75576b38a28e123f889be64aa6bb2358175c8
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -500,6 +503,24 @@ data:
     [providers.speechify.capabilities]
     tts = true
 
+    # Self-hosted TTS on the cluster's own LAN (10.10.10.0/24, same subnet as the
+    # nodes). It speaks the OpenAI audio shape — POST {base_url}/audio/speech, JSON
+    # in, audio bytes out — which is the `openrouter` kind: that adapter is the
+    # generic one for this protocol and its name only records where it was first
+    # needed. Extension fields such as `emotion` are relayed verbatim.
+    #
+    # The server takes no auth, but every Velox provider must name a credential
+    # variable or validation fails at startup, so LOCAL_TTS_KEY is a non-secret
+    # placeholder injected as a literal in velox.nix rather than from the sealed
+    # Secret.
+    [providers.local-tts]
+    kind = "openrouter"
+    base_url = "http://10.10.10.10:8099/v1"
+    api_key_env = "LOCAL_TTS_KEY"
+
+    [providers.local-tts.capabilities]
+    tts = true
+
     # --- Audio (STT) -----------------------------------------------------------
     # OpenRouter STT (bespoke `openrouter` kind: JSON body with base64 audio, not
     # multipart). Distinct provider instance from the chat `[providers.openrouter]`
@@ -586,12 +607,20 @@ data:
     # currently answering 404, so no ceiling could be verified against it, and the
     # adapter default applies until it can be.
     # ---------------------------------------------------------------------------
-    # TTS model alias: resolves `model="tts-1"` to Speechify TTS. The upstream
-    # model id is sent as Speechify `model`; the voice comes from the per-request
-    # `voice` field (adapter curated default if omitted).
-    [models.tts-1]
+    # TTS model aliases. `tts-1` is no longer a model: it is the combo below, which
+    # prefers the self-hosted box and falls back to Speechify. Clients keep sending
+    # `model="tts-1"` and are unaffected by the split.
+    #
+    # The upstream model id is sent as Speechify `model`; the voice comes from the
+    # per-request `voice` field (adapter curated default if omitted).
+    [models.tts-speechify]
     provider = "speechify"
     upstream_model = "simba-english"
+
+    # The self-hosted box ignores the model id, but Velox always sends one.
+    [models.tts-local]
+    provider = "local-tts"
+    upstream_model = "local"
     # STT model alias: resolves `model="stt-1"` to OpenRouter Whisper. Multipart
     # uploads (file + model); the OpenRouter adapter sends base64 audio in JSON.
     [models.stt-1]
@@ -1139,6 +1168,30 @@ data:
       { model = "gpt-5-image-mini-openrouter" },
     ]
 
+    # TTS. The self-hosted box first — it is free and on the LAN — with Speechify
+    # as the outage fallback. A box that is off answers with a connection refusal,
+    # which is retryable, so the fallback runs. Note that Speechify reports a spent
+    # balance as a terminal 4xx, which does NOT fall through; the local target
+    # leading is what keeps that off the hot path rather than the combo curing it.
+    #
+    # `voice` is passed through as the client sent it. To make one client-facing
+    # name work on both targets, name it here and give each target its own
+    # identifier — until then a voice that exists only on one target will be
+    # rejected by the other:
+    #
+    #   [combos.tts-1.voices.<name>]
+    #   tts-local = "<local voice id>"
+    #   tts-speechify = "<speechify voice id>"
+    #
+    # Requires a Velox image with combo voice tables; an older binary rejects the
+    # key at startup. Everything else here is compatible with both.
+    [combos.tts-1]
+    strategy = "priority"
+    targets = [
+      { model = "tts-local" },
+      { model = "tts-speechify" },
+    ]
+
     # ---------------------------------------------------------------------------
     # Web search & fetch
     #
@@ -1185,7 +1238,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 9c253f4a00516b07ba440f9f57e5167913253c13
+    kubenix/hash: ffd75576b38a28e123f889be64aa6bb2358175c8
   name: velox-config
   namespace: apps
 ---
@@ -1269,7 +1322,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 9c253f4a00516b07ba440f9f57e5167913253c13
+    kubenix/hash: ffd75576b38a28e123f889be64aa6bb2358175c8
   name: velox-oauth-agent-config
   namespace: apps
 ---
@@ -1280,7 +1333,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 9c253f4a00516b07ba440f9f57e5167913253c13
+    kubenix/hash: ffd75576b38a28e123f889be64aa6bb2358175c8
   name: velox-oauth-agent
   namespace: apps
 ---
@@ -1291,7 +1344,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 9c253f4a00516b07ba440f9f57e5167913253c13
+    kubenix/hash: ffd75576b38a28e123f889be64aa6bb2358175c8
   name: velox-oauth-agent
   namespace: apps
 rules:
@@ -1313,7 +1366,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 9c253f4a00516b07ba440f9f57e5167913253c13
+    kubenix/hash: ffd75576b38a28e123f889be64aa6bb2358175c8
   name: velox-oauth-agent
   namespace: apps
 roleRef:
