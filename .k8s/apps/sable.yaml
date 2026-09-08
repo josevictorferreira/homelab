@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sable
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 56545783341a1a754240a9d5e8d86dba905774f2
+    kubenix/hash: 184cd7df18827955ca0a83cefc37e2864a97a148
     kubenix/module-instance: sable
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -29,8 +29,8 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/configMaps: 9fc29c22e3023927276eeb72f244a2ea59f3e68866149efd7cc797dc05fc353e
-        sable.josevictor.me/config-hash: b332bb1318a3303696552327b4f9cf54f9cf8c7df000fd4fdc7e73948ffe7b5e
+        checksum/configMaps: 5dfbb14bd611f780d851f16deede58b2570844db96c0897c1d734aa5c37e4c68
+        sable.josevictor.me/config-hash: 624b4a64cd5706f59f04389b860d02ea53ccdb455b5615856b28eb592794e2b1
       labels:
         app.kubernetes.io/controller: main
         app.kubernetes.io/instance: sable
@@ -94,7 +94,7 @@ spec:
 ---
 apiVersion: v1
 data:
-  config.json: '{"allowCustomHomeservers":true,"defaultHomeserver":0,"disableAccountSwitcher":false,"featuredCommunities":{"openAsDefault":false,"rooms":[],"servers":[],"spaces":[]},"hashRouter":{"basename":"/","enabled":false},"hideUsernamePasswordFields":false,"homeserverList":["josevictor.me"],"productName":"Sable"}'
+  config.json: '{"allowCustomHomeservers":true,"defaultHomeserver":0,"disableAccountSwitcher":false,"featuredCommunities":{"openAsDefault":false,"rooms":[],"servers":[],"spaces":[]},"hashRouter":{"basename":"/","enabled":false},"hideUsernamePasswordFields":false,"homeserverList":["matrix.josevictor.me"],"productName":"Sable"}'
 kind: ConfigMap
 metadata:
   annotations:
@@ -105,7 +105,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sable
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 56545783341a1a754240a9d5e8d86dba905774f2
+    kubenix/hash: 184cd7df18827955ca0a83cefc37e2864a97a148
     kubenix/module-instance: sable
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -126,7 +126,7 @@ metadata:
     app.kubernetes.io/name: sable
     app.kubernetes.io/service: sable
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 56545783341a1a754240a9d5e8d86dba905774f2
+    kubenix/hash: 184cd7df18827955ca0a83cefc37e2864a97a148
     kubenix/module-instance: sable
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -155,7 +155,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sable
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 56545783341a1a754240a9d5e8d86dba905774f2
+    kubenix/hash: 184cd7df18827955ca0a83cefc37e2864a97a148
     kubenix/module-instance: sable
     kubenix/module-name: release
     kubenix/module-version: 1.0.0

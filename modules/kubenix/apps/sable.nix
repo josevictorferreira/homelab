@@ -12,14 +12,14 @@ let
   pullSecrets = [{ name = "ghcr-registry-secret"; }];
 
   # Static SPA served by Caddy; this file replaces the bundled /app/config.json.
-  # The homeserver is discovered through https://josevictor.me/.well-known/matrix,
-  # which tuwunel serves and points at matrix.josevictor.me. GIFs are left out:
+  # Login goes straight to matrix.josevictor.me, which also serves its own
+  # .well-known for the josevictor.me server name. GIFs are left out:
   # Sable can only send them through a Matrix media proxy, and tuwunel does not
   # fetch remote media with federation disabled.
   config = {
     productName = "Sable";
     defaultHomeserver = 0;
-    homeserverList = [ homelab.domain ];
+    homeserverList = [ "matrix.${homelab.domain}" ];
     allowCustomHomeservers = true;
     disableAccountSwitcher = false;
     hideUsernamePasswordFields = false;
