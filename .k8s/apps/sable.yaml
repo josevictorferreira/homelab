@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sable
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: abdca11ab42f01a6dfa73a25b677fc3a7a1ed672
+    kubenix/hash: 56545783341a1a754240a9d5e8d86dba905774f2
     kubenix/module-instance: sable
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -64,8 +64,8 @@ spec:
               cpu: 200m
               memory: 128Mi
             requests:
-              cpu: 10m
-              memory: 32Mi
+              cpu: 50m
+              memory: 64Mi
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
@@ -105,7 +105,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sable
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: abdca11ab42f01a6dfa73a25b677fc3a7a1ed672
+    kubenix/hash: 56545783341a1a754240a9d5e8d86dba905774f2
     kubenix/module-instance: sable
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -126,7 +126,7 @@ metadata:
     app.kubernetes.io/name: sable
     app.kubernetes.io/service: sable
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: abdca11ab42f01a6dfa73a25b677fc3a7a1ed672
+    kubenix/hash: 56545783341a1a754240a9d5e8d86dba905774f2
     kubenix/module-instance: sable
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -155,7 +155,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sable
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: abdca11ab42f01a6dfa73a25b677fc3a7a1ed672
+    kubenix/hash: 56545783341a1a754240a9d5e8d86dba905774f2
     kubenix/module-instance: sable
     kubenix/module-name: release
     kubenix/module-version: 1.0.0

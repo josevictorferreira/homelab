@@ -46,8 +46,8 @@ in
       inherit namespace image port;
       resources = {
         requests = {
-          cpu = "10m";
-          memory = "32Mi";
+          cpu = "50m";
+          memory = "64Mi";
         };
         limits = {
           cpu = "200m";
