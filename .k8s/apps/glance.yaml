@@ -10,14 +10,14 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: glance
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 96eee4e253eb44785eab1012bae1c288ad9cb052
+    kubenix/hash: 6375665526afd3db79a7f8d9e81c318c38c5a67c
     kubenix/module-instance: glance
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
   name: glance
   namespace: apps
 spec:
-  replicas: 1
+  replicas: 0
   revisionHistoryLimit: 3
   selector:
     matchLabels:
@@ -98,7 +98,7 @@ metadata:
     app.kubernetes.io/name: glance
     app.kubernetes.io/service: glance
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 96eee4e253eb44785eab1012bae1c288ad9cb052
+    kubenix/hash: 6375665526afd3db79a7f8d9e81c318c38c5a67c
     kubenix/module-instance: glance
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -127,7 +127,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: glance
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 96eee4e253eb44785eab1012bae1c288ad9cb052
+    kubenix/hash: 6375665526afd3db79a7f8d9e81c318c38c5a67c
     kubenix/module-instance: glance
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
