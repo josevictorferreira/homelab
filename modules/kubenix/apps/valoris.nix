@@ -128,13 +128,15 @@ in
           "start"
         ];
         resources = {
+          # 1Gi was OOMKilling the worker mid-scrape; steady state is ~840Mi and
+          # parsing a large listing page spikes well past that.
           limits = {
-            memory = "1Gi";
+            memory = "1536Mi";
           };
           # Peaks near the limit while scraping; the 2.5Gi Pi evicts anything
           # far above its request, so keep this close to real usage.
           requests = {
-            memory = "512Mi";
+            memory = "768Mi";
           };
         };
         priorityClassName = "preemptible";

@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 19857b74c6a57c7161c3e7e13278ab8d7b66c543
+    kubenix/hash: bcb488931657d3b6bbf62d4ce27839004c726655
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -29,7 +29,7 @@ spec:
   template:
     metadata:
       annotations:
-        velox.josevictor.me/config-hash: c694b03b46932eee5d5e2b9e20599266b7bc0869bca17c7e51ca0c001d83858f
+        velox.josevictor.me/config-hash: febf62f7ba61c29244ab7ade60c2cd3cc16bacaaa5d717b519928b8a2ad6e6f4
         velox.josevictor.me/oauth-agent-config-hash: 72b7f1b202300c363471312cd880f37085429ad305f9944b37c6926c9dee941d
       labels:
         app.kubernetes.io/controller: main
@@ -210,7 +210,7 @@ metadata:
     app.kubernetes.io/name: velox
     app.kubernetes.io/service: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 19857b74c6a57c7161c3e7e13278ab8d7b66c543
+    kubenix/hash: bcb488931657d3b6bbf62d4ce27839004c726655
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -239,7 +239,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 19857b74c6a57c7161c3e7e13278ab8d7b66c543
+    kubenix/hash: bcb488931657d3b6bbf62d4ce27839004c726655
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -623,9 +623,12 @@ data:
     #
     # The upstream model id is sent as Speechify `model`; the voice comes from the
     # per-request `voice` field (adapter curated default if omitted).
+    # simba-3.2 rather than simba-english: the curated `*_32` voice ids the combo
+    # maps below belong to that model, and Speechify's docs name it as the one to
+    # use for new English integrations. It is also what oratoria already asks for.
     [models.tts-speechify]
     provider = "speechify"
-    upstream_model = "simba-english"
+    upstream_model = "simba-3.2"
 
     # The self-hosted box ignores the model id, but Velox always sends one.
     [models.tts-local]
@@ -1196,51 +1199,88 @@ data:
       { model = "tts-elevenlabs" },
     ]
 
-    # One client-facing voice name, spelled per target. Names come from the box's
-    # own GET /v1/audio/voices, so a client that already sends voice = "scylla"
-    # keeps working and now survives a fallback.
+    # One client-facing voice name, spelled per target. The names are the ones the
+    # box reports at GET /v1/audio/voices, so a client already sending
+    # voice = "scylla" keeps working and now survives a fallback in a deliberate
+    # voice rather than whatever default the provider picks.
     #
-    # A target listed here answers only for the names it maps: a voice it does not
-    # map is dropped and that provider's own default is used, so a request is never
-    # failed over a name. That is why the hosted targets appear only under `scylla`
-    # — those are the two identifiers verified against their catalogues. Add the
-    # rest as you look them up; until then the other nine names are self-hosted
-    # voices that degrade to a default if the box is down.
+    # Speechify ids are the curated simba-3.2 set from its docs; ElevenLabs ids are
+    # its premade voices. Both were taken from the providers' documentation, not
+    # from their live catalogues — the ids are real, but WHICH hosted voice best
+    # matches a given self-hosted one is a judgement made from names, genders and
+    # accents on paper. Nobody has listened to these side by side. Re-pair them
+    # freely; only the identifiers need to stay valid.
+    #
+    # Two caveats worth knowing before relying on a fallback:
+    #   - ElevenLabs Default voices are documented as expiring 2026-12-31 and are
+    #     only available to accounts created before March 2026. If this account is
+    #     newer, these ids will not resolve and the target will 400. Verify against
+    #     GET /v1/voices on the real key.
+    #   - A voice a target does not map is dropped, not rejected, so a typo here
+    #     degrades quietly to a provider default instead of failing loudly.
     #
     # Requires a Velox image with combo voice tables. An older binary rejects the
     # key at startup, so roll the image before this config.
 
+    # Rachel — calm US female
     [combos.voice.voices.ariadne]
     tts-local = "ariadne"
-
-    [combos.voice.voices.felix]
-    tts-local = "felix"
-
-    [combos.voice.voices.gwen]
-    tts-local = "gwen"
-
-    [combos.voice.voices.ink]
-    tts-local = "ink"
-
-    [combos.voice.voices.max]
-    tts-local = "max"
-
-    [combos.voice.voices.orpheus]
-    tts-local = "orpheus"
-
-    [combos.voice.voices.rex]
-    tts-local = "rex"
-
-    [combos.voice.voices.scylla]
-    tts-local = "scylla"
-    tts-speechify = "geffen_32"
+    tts-speechify = "beatrice_32"
     tts-elevenlabs = "21m00Tcm4TlvDq8ikWAM"
 
+    # Antoni — warm US male
+    [combos.voice.voices.felix]
+    tts-local = "felix"
+    tts-speechify = "dominic_32"
+    tts-elevenlabs = "ErXwobaYiN019PkySvjV"
+
+    # Sarah — soft US female
+    [combos.voice.voices.gwen]
+    tts-local = "gwen"
+    tts-speechify = "harper_32"
+    tts-elevenlabs = "EXAVITQu4vr4xnSDxMaL"
+
+    # Daniel — British male
+    [combos.voice.voices.ink]
+    tts-local = "ink"
+    tts-speechify = "edmund_32"
+    tts-elevenlabs = "onwK4e9ZLuTAKqWW03F9"
+
+    # Adam — deep US male
+    [combos.voice.voices.max]
+    tts-local = "max"
+    tts-speechify = "wyatt_32"
+    tts-elevenlabs = "pNInz6obpgDQGcFmaJgB"
+
+    # George — British male
+    [combos.voice.voices.orpheus]
+    tts-local = "orpheus"
+    tts-speechify = "edmund_32"
+    tts-elevenlabs = "JBFqnCBsd6RMkjVDRZzb"
+
+    # Josh — deep US male
+    [combos.voice.voices.rex]
+    tts-local = "rex"
+    tts-speechify = "hugh_32"
+    tts-elevenlabs = "TxGEqnHWrfWFTfGW9XjX"
+
+    # Domi — strong US female
+    [combos.voice.voices.scylla]
+    tts-local = "scylla"
+    tts-speechify = "imogen_32"
+    tts-elevenlabs = "AZnzlk1XvdvUeBnXmlld"
+
+    # Arnold — crisp US male
     [combos.voice.voices.stone]
     tts-local = "stone"
+    tts-speechify = "geffen_32"
+    tts-elevenlabs = "VR6AewLTigWG4xSOukaG"
 
+    # Alice — British female
     [combos.voice.voices.tuesday]
     tts-local = "tuesday"
+    tts-speechify = "beatrice_32"
+    tts-elevenlabs = "Xb7hH8MSUJpSbSDYk0k2"
 
     # ---------------------------------------------------------------------------
     # Web search & fetch
@@ -1288,7 +1328,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 19857b74c6a57c7161c3e7e13278ab8d7b66c543
+    kubenix/hash: bcb488931657d3b6bbf62d4ce27839004c726655
   name: velox-config
   namespace: apps
 ---
@@ -1372,7 +1412,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 19857b74c6a57c7161c3e7e13278ab8d7b66c543
+    kubenix/hash: bcb488931657d3b6bbf62d4ce27839004c726655
   name: velox-oauth-agent-config
   namespace: apps
 ---
@@ -1383,7 +1423,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 19857b74c6a57c7161c3e7e13278ab8d7b66c543
+    kubenix/hash: bcb488931657d3b6bbf62d4ce27839004c726655
   name: velox-oauth-agent
   namespace: apps
 ---
@@ -1394,7 +1434,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 19857b74c6a57c7161c3e7e13278ab8d7b66c543
+    kubenix/hash: bcb488931657d3b6bbf62d4ce27839004c726655
   name: velox-oauth-agent
   namespace: apps
 rules:
@@ -1416,7 +1456,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 19857b74c6a57c7161c3e7e13278ab8d7b66c543
+    kubenix/hash: bcb488931657d3b6bbf62d4ce27839004c726655
   name: velox-oauth-agent
   namespace: apps
 roleRef:
