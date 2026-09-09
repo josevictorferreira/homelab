@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 4b494a245bca9b57ec5e2d3b56033c9f9f6bde2c
+    kubenix/hash: 861b33a588d48c08d58aed94a4a5eaaff71725b7
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -29,7 +29,7 @@ spec:
   template:
     metadata:
       annotations:
-        velox.josevictor.me/config-hash: 5ad3bfee5872d92755773eafbcb46db9f0ff576d080fca3283634d0ca73478a5
+        velox.josevictor.me/config-hash: ac08f95d685a0bbe7622756c450f7fdbf0e2316e51babfe465a7d353d8c39b07
         velox.josevictor.me/oauth-agent-config-hash: 72b7f1b202300c363471312cd880f37085429ad305f9944b37c6926c9dee941d
       labels:
         app.kubernetes.io/controller: main
@@ -210,7 +210,7 @@ metadata:
     app.kubernetes.io/name: velox
     app.kubernetes.io/service: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 4b494a245bca9b57ec5e2d3b56033c9f9f6bde2c
+    kubenix/hash: 861b33a588d48c08d58aed94a4a5eaaff71725b7
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -239,7 +239,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 4b494a245bca9b57ec5e2d3b56033c9f9f6bde2c
+    kubenix/hash: 861b33a588d48c08d58aed94a4a5eaaff71725b7
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -648,10 +648,17 @@ data:
     # but fatal — 400 "unknown voice" when response_format is set, and a 200 with a
     # ZERO-BYTE body when it is not. The second is the dangerous one: it reaches a
     # client as a successful, silent response. Velox therefore never sends one.
+    # formats: this build serves wav and pcm and nothing else — asking it for mp3
+    # returns 400 "response_format must be 'pcm' or 'wav'". Without this line Velox
+    # assumes the `openrouter` kind's full OpenAI set (all six formats) and asks for
+    # whatever the client named, which is exactly how that 400 reached clients.
+    # Declaring the real set makes Velox ask only for wav or pcm, and — when
+    # `[audio].transcode` is on — convert to whatever else was requested.
     [models.tts-local]
     provider = "local-tts"
     upstream_model = "local"
     accepts_voice = false
+    formats = ["wav", "pcm"]
 
     # `eleven_v3` matches what oratoria already asks ElevenLabs for.
     [models.tts-elevenlabs]
@@ -1402,7 +1409,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 4b494a245bca9b57ec5e2d3b56033c9f9f6bde2c
+    kubenix/hash: 861b33a588d48c08d58aed94a4a5eaaff71725b7
   name: velox-config
   namespace: apps
 ---
@@ -1486,7 +1493,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 4b494a245bca9b57ec5e2d3b56033c9f9f6bde2c
+    kubenix/hash: 861b33a588d48c08d58aed94a4a5eaaff71725b7
   name: velox-oauth-agent-config
   namespace: apps
 ---
@@ -1497,7 +1504,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 4b494a245bca9b57ec5e2d3b56033c9f9f6bde2c
+    kubenix/hash: 861b33a588d48c08d58aed94a4a5eaaff71725b7
   name: velox-oauth-agent
   namespace: apps
 ---
@@ -1508,7 +1515,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 4b494a245bca9b57ec5e2d3b56033c9f9f6bde2c
+    kubenix/hash: 861b33a588d48c08d58aed94a4a5eaaff71725b7
   name: velox-oauth-agent
   namespace: apps
 rules:
@@ -1530,7 +1537,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 4b494a245bca9b57ec5e2d3b56033c9f9f6bde2c
+    kubenix/hash: 861b33a588d48c08d58aed94a4a5eaaff71725b7
   name: velox-oauth-agent
   namespace: apps
 roleRef:

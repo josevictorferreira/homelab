@@ -380,10 +380,17 @@ upstream_model = "simba-3.0"
 # but fatal — 400 "unknown voice" when response_format is set, and a 200 with a
 # ZERO-BYTE body when it is not. The second is the dangerous one: it reaches a
 # client as a successful, silent response. Velox therefore never sends one.
+# formats: this build serves wav and pcm and nothing else — asking it for mp3
+# returns 400 "response_format must be 'pcm' or 'wav'". Without this line Velox
+# assumes the `openrouter` kind's full OpenAI set (all six formats) and asks for
+# whatever the client named, which is exactly how that 400 reached clients.
+# Declaring the real set makes Velox ask only for wav or pcm, and — when
+# `[audio].transcode` is on — convert to whatever else was requested.
 [models.tts-local]
 provider = "local-tts"
 upstream_model = "local"
 accepts_voice = false
+formats = ["wav", "pcm"]
 
 # `eleven_v3` matches what oratoria already asks ElevenLabs for.
 [models.tts-elevenlabs]
