@@ -945,10 +945,24 @@ targets = [
 strategy = "priority"
 targets = [
   { model = "tts-local" },
+  { model = "tts-speechify" },
   { model = "tts-speechify-multi" },
   { model = "tts-elevenlabs" },
 ]
 
+# Every name here works in BOTH en-US and pt-BR, which is the rule this list is
+# kept to — but it gets there by resolving to a NATIVE voice per language
+# rather than by finding one voice that stretches across both:
+#
+#   tts-speechify       simba-3.2, English only, curated *_32 voices
+#   tts-speechify-multi simba-3.0, Brazilian Portuguese, pt-BR voices
+#   tts-elevenlabs      eleven_v3, carries across languages on its own
+#
+# The language tables below make each Speechify alias eligible only for the
+# languages it can actually speak, so an English *_32 voice is never reached by
+# a pt-BR request and a Brazilian voice is never reached by an English one.
+# tts-local needs no entry at all — that model has no voice parameter.
+#
 # One client-facing voice name, spelled per target. The names are the ones the
 # box reports at GET /v1/audio/voices, so a client already sending
 # voice = "scylla" keeps working and now survives a fallback in a deliberate
@@ -975,61 +989,61 @@ targets = [
 # Rachel — calm US female
 [combos.voice.voices.ariadne]
 tts-speechify = "beatrice_32"
-tts-speechify-multi = "beatrice_32"
+tts-speechify-multi = "valentina"
 tts-elevenlabs = "21m00Tcm4TlvDq8ikWAM"
 
 # Antoni — warm US male
 [combos.voice.voices.felix]
 tts-speechify = "dominic_32"
-tts-speechify-multi = "dominic_32"
+tts-speechify-multi = "theo"
 tts-elevenlabs = "ErXwobaYiN019PkySvjV"
 
 # Sarah — soft US female
 [combos.voice.voices.gwen]
 tts-speechify = "harper_32"
-tts-speechify-multi = "harper_32"
+tts-speechify-multi = "lorena"
 tts-elevenlabs = "EXAVITQu4vr4xnSDxMaL"
 
 # Daniel — British male
 [combos.voice.voices.ink]
 tts-speechify = "edmund_32"
-tts-speechify-multi = "edmund_32"
+tts-speechify-multi = "gabriel"
 tts-elevenlabs = "onwK4e9ZLuTAKqWW03F9"
 
 # Adam — deep US male
 [combos.voice.voices.max]
 tts-speechify = "wyatt_32"
-tts-speechify-multi = "wyatt_32"
+tts-speechify-multi = "ravi"
 tts-elevenlabs = "pNInz6obpgDQGcFmaJgB"
 
 # George — British male
 [combos.voice.voices.orpheus]
 tts-speechify = "edmund_32"
-tts-speechify-multi = "edmund_32"
+tts-speechify-multi = "benicio"
 tts-elevenlabs = "JBFqnCBsd6RMkjVDRZzb"
 
 # Josh — deep US male
 [combos.voice.voices.rex]
 tts-speechify = "hugh_32"
-tts-speechify-multi = "hugh_32"
+tts-speechify-multi = "lucas"
 tts-elevenlabs = "TxGEqnHWrfWFTfGW9XjX"
 
 # Domi — strong US female
 [combos.voice.voices.scylla]
 tts-speechify = "imogen_32"
-tts-speechify-multi = "imogen_32"
+tts-speechify-multi = "luiza"
 tts-elevenlabs = "AZnzlk1XvdvUeBnXmlld"
 
 # Arnold — crisp US male
 [combos.voice.voices.stone]
 tts-speechify = "geffen_32"
-tts-speechify-multi = "geffen_32"
+tts-speechify-multi = "antonio"
 tts-elevenlabs = "VR6AewLTigWG4xSOukaG"
 
 # Alice — British female
 [combos.voice.voices.tuesday]
 tts-speechify = "beatrice_32"
-tts-speechify-multi = "beatrice_32"
+tts-speechify-multi = "talita"
 tts-elevenlabs = "Xb7hH8MSUJpSbSDYk0k2"
 
 # Which targets can speak what, and what each one calls it.
@@ -1046,18 +1060,15 @@ tts-elevenlabs = "Xb7hH8MSUJpSbSDYk0k2"
 [combos.voice.languages."en-US"]
 tts-local = "English"
 tts-speechify = "en-US"
-tts-speechify-multi = "en-US"
 tts-elevenlabs = "en"
 
 [combos.voice.languages."en-GB"]
 tts-local = "British English"
 tts-speechify = "en-GB"
-tts-speechify-multi = "en-GB"
 tts-elevenlabs = "en"
 
 # Brazilian Portuguese. The box handles this now — that is why it changed — so
-# it leads here like everywhere else. tts-speechify is still absent because
-# simba-3.2 is English only.
+# it leads here like everywhere else.
 #
 # "Brazillian Portuguese" is spelled exactly as the string that was tested
 # against this model. The endpoint accepts any wording, so the misspelling is
@@ -1071,12 +1082,10 @@ tts-elevenlabs = "pt"
 
 [combos.voice.languages."es-ES"]
 tts-local = "Spanish"
-tts-speechify-multi = "es-ES"
 tts-elevenlabs = "es"
 
 [combos.voice.languages."it-IT"]
 tts-local = "Italian"
-tts-speechify-multi = "it-IT"
 tts-elevenlabs = "it"
 
 # ---------------------------------------------------------------------------
