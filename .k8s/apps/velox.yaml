@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 7880feed6c44f2976cc24b40aafeb3f786cc3d62
+    kubenix/hash: 556352a08b355e6b3787f957a850b16336d8d88f
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -29,7 +29,7 @@ spec:
   template:
     metadata:
       annotations:
-        velox.josevictor.me/config-hash: 39014921b42cecddeae7c6ef3a95da518927b6610ad69b22c6a9284e9c2427f5
+        velox.josevictor.me/config-hash: ac6b0991d363f2fdb312b80677bdb578a7960c71f09241d271d42539ff2efab1
         velox.josevictor.me/oauth-agent-config-hash: 72b7f1b202300c363471312cd880f37085429ad305f9944b37c6926c9dee941d
       labels:
         app.kubernetes.io/controller: main
@@ -210,7 +210,7 @@ metadata:
     app.kubernetes.io/name: velox
     app.kubernetes.io/service: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 7880feed6c44f2976cc24b40aafeb3f786cc3d62
+    kubenix/hash: 556352a08b355e6b3787f957a850b16336d8d88f
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -239,7 +239,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 7880feed6c44f2976cc24b40aafeb3f786cc3d62
+    kubenix/hash: 556352a08b355e6b3787f957a850b16336d8d88f
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -1350,26 +1350,27 @@ data:
     # harmless, but it is also unverified against the alternatives: "Brazilian
     # Portuguese", "portuguese" and "pt-BR" all return 200 and all produce
     # DIFFERENT audio. Worth one listen before trusting it.
-    # tts-local is deliberately ABSENT here, so pt-BR is served by Speechify
-    # simba-3.0 first (native pt-BR voices) and ElevenLabs second. English keeps
-    # using the box, where its one voice is correct.
+    # Brazilian Portuguese. The self-hosted box leads, as it does for every other
+    # language here; Speechify simba-3.0 and ElevenLabs follow as fallbacks.
     #
-    # Measured against the deployed build (omnivoice-base-Q8_0.gguf), not inferred:
-    #   - `language` is accepted and ignored. "pt-BR", "Brazillian Portuguese" and
-    #     no language field at all return the same 213164-byte body for the same
-    #     input, and Whisper transcribes all three to identical text.
-    #   - `voice`, `instructions` and `speaker` do nothing either: voice is
-    #     rejected for every value (400 "unknown voice"), the other two are
-    #     accepted and ignored. GET /v1/voices 404s and GET /v1/audio/voices
-    #     returns an empty list.
-    # It renders one fixed voice, and that voice reads Portuguese in an English
-    # accent. Nothing in this file can change that, which is why the target is
-    # removed rather than reconfigured.
+    # Until the Hermes plugin was fixed, `language` never left the caller at all,
+    # so the box has only just started receiving this string. What is known about
+    # how it treats it, measured against omnivoice-base-Q8_0.gguf:
+    #   - The same input returns the same 213164-byte body for "pt-BR", for
+    #     "Brazillian Portuguese", and for no language field at all, and Whisper
+    #     transcribes all three to identical Portuguese text. The words are right;
+    #     the parameter appears not to change them.
+    #   - `voice` is rejected for every value (400 "unknown voice"), and
+    #     `instructions` and `speaker` are accepted and ignored. GET /v1/voices
+    #     404s; GET /v1/audio/voices returns an empty list. So the build renders
+    #     one fixed voice, and its accent is not addressable from here.
+    # If that voice reads Portuguese in an English accent, this is the line to
+    # remove: dropping tts-local sends pt-BR to Speechify's native pt-BR voices
+    # instead, which the combo already maps per canonical name.
     #
-    # To put it back: upgrade omnivoice-server to a build serving GET /v1/voices,
-    # which takes design attributes via `voice`/`instructions` and a real language
-    # code. Confirm that endpoint answers 200 first.
+    # "Brazillian Portuguese" is spelled as tested; the endpoint validates nothing.
     [combos.voice.languages."pt-BR"]
+    tts-local = "Brazillian Portuguese"
     tts-speechify-multi = "pt-BR"
     tts-elevenlabs = "pt"
 
@@ -1427,7 +1428,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 7880feed6c44f2976cc24b40aafeb3f786cc3d62
+    kubenix/hash: 556352a08b355e6b3787f957a850b16336d8d88f
   name: velox-config
   namespace: apps
 ---
@@ -1511,7 +1512,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 7880feed6c44f2976cc24b40aafeb3f786cc3d62
+    kubenix/hash: 556352a08b355e6b3787f957a850b16336d8d88f
   name: velox-oauth-agent-config
   namespace: apps
 ---
@@ -1522,7 +1523,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 7880feed6c44f2976cc24b40aafeb3f786cc3d62
+    kubenix/hash: 556352a08b355e6b3787f957a850b16336d8d88f
   name: velox-oauth-agent
   namespace: apps
 ---
@@ -1533,7 +1534,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 7880feed6c44f2976cc24b40aafeb3f786cc3d62
+    kubenix/hash: 556352a08b355e6b3787f957a850b16336d8d88f
   name: velox-oauth-agent
   namespace: apps
 rules:
@@ -1555,7 +1556,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 7880feed6c44f2976cc24b40aafeb3f786cc3d62
+    kubenix/hash: 556352a08b355e6b3787f957a850b16336d8d88f
   name: velox-oauth-agent
   namespace: apps
 roleRef:

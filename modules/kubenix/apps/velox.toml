@@ -1082,26 +1082,27 @@ tts-elevenlabs = "en"
 # harmless, but it is also unverified against the alternatives: "Brazilian
 # Portuguese", "portuguese" and "pt-BR" all return 200 and all produce
 # DIFFERENT audio. Worth one listen before trusting it.
-# tts-local is deliberately ABSENT here, so pt-BR is served by Speechify
-# simba-3.0 first (native pt-BR voices) and ElevenLabs second. English keeps
-# using the box, where its one voice is correct.
+# Brazilian Portuguese. The self-hosted box leads, as it does for every other
+# language here; Speechify simba-3.0 and ElevenLabs follow as fallbacks.
 #
-# Measured against the deployed build (omnivoice-base-Q8_0.gguf), not inferred:
-#   - `language` is accepted and ignored. "pt-BR", "Brazillian Portuguese" and
-#     no language field at all return the same 213164-byte body for the same
-#     input, and Whisper transcribes all three to identical text.
-#   - `voice`, `instructions` and `speaker` do nothing either: voice is
-#     rejected for every value (400 "unknown voice"), the other two are
-#     accepted and ignored. GET /v1/voices 404s and GET /v1/audio/voices
-#     returns an empty list.
-# It renders one fixed voice, and that voice reads Portuguese in an English
-# accent. Nothing in this file can change that, which is why the target is
-# removed rather than reconfigured.
+# Until the Hermes plugin was fixed, `language` never left the caller at all,
+# so the box has only just started receiving this string. What is known about
+# how it treats it, measured against omnivoice-base-Q8_0.gguf:
+#   - The same input returns the same 213164-byte body for "pt-BR", for
+#     "Brazillian Portuguese", and for no language field at all, and Whisper
+#     transcribes all three to identical Portuguese text. The words are right;
+#     the parameter appears not to change them.
+#   - `voice` is rejected for every value (400 "unknown voice"), and
+#     `instructions` and `speaker` are accepted and ignored. GET /v1/voices
+#     404s; GET /v1/audio/voices returns an empty list. So the build renders
+#     one fixed voice, and its accent is not addressable from here.
+# If that voice reads Portuguese in an English accent, this is the line to
+# remove: dropping tts-local sends pt-BR to Speechify's native pt-BR voices
+# instead, which the combo already maps per canonical name.
 #
-# To put it back: upgrade omnivoice-server to a build serving GET /v1/voices,
-# which takes design attributes via `voice`/`instructions` and a real language
-# code. Confirm that endpoint answers 200 first.
+# "Brazillian Portuguese" is spelled as tested; the endpoint validates nothing.
 [combos.voice.languages."pt-BR"]
+tts-local = "Brazillian Portuguese"
 tts-speechify-multi = "pt-BR"
 tts-elevenlabs = "pt"
 
