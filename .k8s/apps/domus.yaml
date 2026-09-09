@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: domus
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 1a7aa3759870f601374f909d2804976f552b112c
+    kubenix/hash: 6f6aa9161ac0e2efa9e3fc2e328e2c6e1175dd51
     kubenix/module-instance: domus
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -38,6 +38,14 @@ spec:
         - env:
             - name: RAILS_MAX_THREADS
               value: "8"
+            - name: VIPS_CACHE_MAX
+              value: "0"
+            - name: VIPS_CACHE_MAX_MEM
+              value: "0"
+            - name: VIPS_CONCURRENCY
+              value: "1"
+            - name: MALLOC_ARENA_MAX
+              value: "2"
             - name: S3_ACCESS_KEY_ID
               valueFrom:
                 secretKeyRef:
@@ -111,7 +119,7 @@ metadata:
     app.kubernetes.io/name: domus
     app.kubernetes.io/service: domus
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 1a7aa3759870f601374f909d2804976f552b112c
+    kubenix/hash: 6f6aa9161ac0e2efa9e3fc2e328e2c6e1175dd51
     kubenix/module-instance: domus
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -140,7 +148,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: domus
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 1a7aa3759870f601374f909d2804976f552b112c
+    kubenix/hash: 6f6aa9161ac0e2efa9e3fc2e328e2c6e1175dd51
     kubenix/module-instance: domus
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -171,7 +179,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 1a7aa3759870f601374f909d2804976f552b112c
+    kubenix/hash: 6f6aa9161ac0e2efa9e3fc2e328e2c6e1175dd51
   name: domus-s3
   namespace: apps
 spec:

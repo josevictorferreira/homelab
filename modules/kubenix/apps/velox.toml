@@ -362,10 +362,28 @@ structured_output = false
 provider = "speechify"
 upstream_model = "simba-3.2"
 
-# The self-hosted box ignores the model id, but Velox always sends one.
+# simba-3.0 is the model Speechify documents as streaming-native for German,
+# Spanish, French, Italian and Brazilian Portuguese. simba-3.2 above is English
+# only, so pt-BR needs its own alias rather than a language parameter on that
+# one. (simba-multilingual also covers pt-BR but is documented as switching off
+# 2026-11-21, so it is deliberately not used here.)
+[models.tts-speechify-multi]
+provider = "speechify"
+upstream_model = "simba-3.0"
+
+# The box now runs omnivoice-base (GGUF, served locally); GET /v1/models names
+# the exact build. It ignores the model id in a request, so "local" is kept
+# rather than the real id, whose hash prefix changes on every rebuild.
+#
+# accepts_voice = false because this model has no voices at all: GET
+# /v1/audio/voices returns an empty list, and sending a `voice` is not ignored
+# but fatal — 400 "unknown voice" when response_format is set, and a 200 with a
+# ZERO-BYTE body when it is not. The second is the dangerous one: it reaches a
+# client as a successful, silent response. Velox therefore never sends one.
 [models.tts-local]
 provider = "local-tts"
 upstream_model = "local"
+accepts_voice = false
 
 # `eleven_v3` matches what oratoria already asks ElevenLabs for.
 [models.tts-elevenlabs]
@@ -928,6 +946,7 @@ strategy = "priority"
 targets = [
   { model = "tts-local" },
   { model = "tts-speechify" },
+  { model = "tts-speechify-multi" },
   { model = "tts-elevenlabs" },
 ]
 
@@ -956,63 +975,110 @@ targets = [
 
 # Rachel — calm US female
 [combos.voice.voices.ariadne]
-tts-local = "ariadne"
 tts-speechify = "beatrice_32"
+tts-speechify-multi = "beatrice_32"
 tts-elevenlabs = "21m00Tcm4TlvDq8ikWAM"
 
 # Antoni — warm US male
 [combos.voice.voices.felix]
-tts-local = "felix"
 tts-speechify = "dominic_32"
+tts-speechify-multi = "dominic_32"
 tts-elevenlabs = "ErXwobaYiN019PkySvjV"
 
 # Sarah — soft US female
 [combos.voice.voices.gwen]
-tts-local = "gwen"
 tts-speechify = "harper_32"
+tts-speechify-multi = "harper_32"
 tts-elevenlabs = "EXAVITQu4vr4xnSDxMaL"
 
 # Daniel — British male
 [combos.voice.voices.ink]
-tts-local = "ink"
 tts-speechify = "edmund_32"
+tts-speechify-multi = "edmund_32"
 tts-elevenlabs = "onwK4e9ZLuTAKqWW03F9"
 
 # Adam — deep US male
 [combos.voice.voices.max]
-tts-local = "max"
 tts-speechify = "wyatt_32"
+tts-speechify-multi = "wyatt_32"
 tts-elevenlabs = "pNInz6obpgDQGcFmaJgB"
 
 # George — British male
 [combos.voice.voices.orpheus]
-tts-local = "orpheus"
 tts-speechify = "edmund_32"
+tts-speechify-multi = "edmund_32"
 tts-elevenlabs = "JBFqnCBsd6RMkjVDRZzb"
 
 # Josh — deep US male
 [combos.voice.voices.rex]
-tts-local = "rex"
 tts-speechify = "hugh_32"
+tts-speechify-multi = "hugh_32"
 tts-elevenlabs = "TxGEqnHWrfWFTfGW9XjX"
 
 # Domi — strong US female
 [combos.voice.voices.scylla]
-tts-local = "scylla"
 tts-speechify = "imogen_32"
+tts-speechify-multi = "imogen_32"
 tts-elevenlabs = "AZnzlk1XvdvUeBnXmlld"
 
 # Arnold — crisp US male
 [combos.voice.voices.stone]
-tts-local = "stone"
 tts-speechify = "geffen_32"
+tts-speechify-multi = "geffen_32"
 tts-elevenlabs = "VR6AewLTigWG4xSOukaG"
 
 # Alice — British female
 [combos.voice.voices.tuesday]
-tts-local = "tuesday"
 tts-speechify = "beatrice_32"
+tts-speechify-multi = "beatrice_32"
 tts-elevenlabs = "Xb7hH8MSUJpSbSDYk0k2"
+
+# Which targets can speak what, and what each one calls it.
+#
+# This decides eligibility, not just spelling: a target absent from a language
+# is not attempted for it at all.
+#
+# Spellings differ on purpose. Speechify wants BCP-47 locales and ElevenLabs
+# wants an ISO 639-1 code, but the self-hosted box takes a free-form NAME —
+# it validates nothing, accepts "pt-BR" and "portuguese" and nonsense alike,
+# and returns different audio for each. The strings below are the ones proven
+# against it; changing the wording changes the result, so re-check by ear
+# rather than by status code.
+[combos.voice.languages."en-US"]
+tts-local = "English"
+tts-speechify = "en-US"
+tts-speechify-multi = "en-US"
+tts-elevenlabs = "en"
+
+[combos.voice.languages."en-GB"]
+tts-local = "British English"
+tts-speechify = "en-GB"
+tts-speechify-multi = "en-GB"
+tts-elevenlabs = "en"
+
+# Brazilian Portuguese. The box handles this now — that is why it changed — so
+# it leads here like everywhere else. tts-speechify is still absent because
+# simba-3.2 is English only.
+#
+# "Brazillian Portuguese" is spelled exactly as the string that was tested
+# against this model. The endpoint accepts any wording, so the misspelling is
+# harmless, but it is also unverified against the alternatives: "Brazilian
+# Portuguese", "portuguese" and "pt-BR" all return 200 and all produce
+# DIFFERENT audio. Worth one listen before trusting it.
+[combos.voice.languages."pt-BR"]
+tts-local = "Brazillian Portuguese"
+tts-speechify-multi = "pt-BR"
+tts-elevenlabs = "pt"
+
+[combos.voice.languages."es-ES"]
+tts-local = "Spanish"
+tts-speechify-multi = "es-ES"
+tts-elevenlabs = "es"
+
+[combos.voice.languages."it-IT"]
+tts-local = "Italian"
+tts-speechify-multi = "it-IT"
+tts-elevenlabs = "it"
 
 # ---------------------------------------------------------------------------
 # Web search & fetch

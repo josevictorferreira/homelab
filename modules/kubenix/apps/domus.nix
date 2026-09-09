@@ -50,6 +50,30 @@ in
               name = "RAILS_MAX_THREADS";
               value = "8";
             }
+            # vips image pipelines decode 12MP HEIC photos per generation job.
+            # The libvips operation cache (100 ops / 100 MiB) pins decoded pixel
+            # buffers, and glibc malloc retains freed pixel chunks in per-thread
+            # arenas instead of returning them to the OS (the pod sees the
+            # node's 12 cores despite the 1-CPU limit, so arenas multiply).
+            # Measured in-pod: 10 jobs retain +568 MiB without these, +67 MiB
+            # with them. Generation is single-threaded, so 12 vips threads were
+            # pure overhead anyway.
+            {
+              name = "VIPS_CACHE_MAX";
+              value = "0";
+            }
+            {
+              name = "VIPS_CACHE_MAX_MEM";
+              value = "0";
+            }
+            {
+              name = "VIPS_CONCURRENCY";
+              value = "1";
+            }
+            {
+              name = "MALLOC_ARENA_MAX";
+              value = "2";
+            }
             {
               name = "S3_ACCESS_KEY_ID";
               valueFrom.secretKeyRef = {
