@@ -1,0 +1,204 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 669ed7d136a81463b1c8115bc6f3ac3afbec49a2
+  name: tuwunel-media-retention
+  namespace: apps
+spec:
+  concurrencyPolicy: Forbid
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 7200
+      backoffLimit: 1
+      template:
+        spec:
+          containers:
+            - args:
+                - |
+                  set -euo pipefail
+
+                  if [ ! -s /work/targets.txt ]; then
+                    echo "=== nothing pruned ==="
+                    exit 0
+                  fi
+
+                  CUTOFF=$(cat /work/cutoff)
+                  # Drop the mappings whose media we just deleted, so a Discord URL posted
+                  # again is re-uploaded instead of resolving to a dead MXC forever.
+                  psql -h "postgresql-18-hl.apps.svc.cluster.local" -U postgres -d mautrix_discord_v2 -c \
+                    "delete from discord_file where timestamp < $CUTOFF"
+                  echo "=== pruned discord_file rows older than cutoff ==="
+              command:
+                - bash
+                - -c
+              env:
+                - name: PGPASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      key: admin-password
+                      name: postgresql-auth
+              image: ghcr.io/josevictorferreira/backup-toolbox@sha256:08bda3ee3383b093cc0ed74d42ed9b167ecb92dd7c01e090a542d0a75dec8abb
+              name: prune-rows
+              resources:
+                limits:
+                  cpu: 200m
+                  memory: 256Mi
+                requests:
+                  cpu: 50m
+                  memory: 64Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                    - ALL
+              volumeMounts:
+                - mountPath: /work
+                  name: work
+          imagePullSecrets:
+            - name: ghcr-registry-secret
+          initContainers:
+            - args:
+                - |
+                  set -euo pipefail
+
+                  CUTOFF=$(( ($(date +%s) - 7 * 86400) * 1000 ))
+                  echo "$CUTOFF" > /work/cutoff
+                  echo "=== retention cutoff: $(date -d "@$((CUTOFF / 1000))") ==="
+
+                  psql -h "postgresql-18-hl.apps.svc.cluster.local" -U postgres -d mautrix_discord_v2 -tAc \
+                    "select mxc from discord_file
+                     where timestamp < $CUTOFF and mxc like 'mxc://josevictor.me/%'" \
+                    | tr -d ' ' \
+                    | grep -E '^mxc://josevictor.me/[A-Za-z0-9_-]+$' \
+                    | sort -u > /work/targets.txt || true
+
+                  COUNT=$(wc -l < /work/targets.txt)
+                  echo "=== $COUNT files past retention ==="
+                  if [ "$COUNT" -eq 0 ]; then
+                    exit 0
+                  fi
+
+                  split -l 400 -d -a 4 /work/targets.txt /work/batch-
+                  for f in /work/batch-*; do
+                    jq -Rs '{msgtype:"m.text", body:("!admin media delete-list\n```\n" + . + "```")}' \
+                      < "$f" > "$f.json"
+                  done
+
+                  # Built here rather than in the curl stage: this image has jq, so the
+                  # password is escaped properly instead of pasted into a printf template.
+                  jq -n --arg pw "$EMERGENCY_PASSWORD" --arg user "conduit" \
+                    '{type:"m.login.password", identifier:{type:"m.id.user", user:$user},
+                      password:$pw, initial_device_display_name:"tuwunel-media-retention"}' \
+                    > /work/login.json
+
+                  echo "=== $(ls /work/batch-*.json | wc -l) batches prepared ==="
+              command:
+                - bash
+                - -c
+              env:
+                - name: PGPASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      key: admin-password
+                      name: postgresql-auth
+                - name: EMERGENCY_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      key: TUWUNEL_EMERGENCY_PASSWORD
+                      name: tuwunel-env
+              image: ghcr.io/josevictorferreira/backup-toolbox@sha256:08bda3ee3383b093cc0ed74d42ed9b167ecb92dd7c01e090a542d0a75dec8abb
+              name: select
+              resources:
+                limits:
+                  cpu: 200m
+                  memory: 256Mi
+                requests:
+                  cpu: 50m
+                  memory: 64Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                    - ALL
+              volumeMounts:
+                - mountPath: /work
+                  name: work
+            - args:
+                - |
+                  set -eu
+
+                  if [ ! -s /work/targets.txt ]; then
+                    echo "=== nothing past retention, skipping ==="
+                    exit 0
+                  fi
+
+                  api() { curl -sS -f -m 120 -H "Content-Type: application/json" "$@"; }
+
+                  TOKEN=$(api -X POST --data-binary @/work/login.json \
+                    "http://tuwunel.apps.svc.cluster.local:8008/_matrix/client/v3/login" 2>/dev/null \
+                    | sed -n 's/.*"access_token":"\([^"]*\)".*/\1/p' || true)
+                  if [ -z "$TOKEN" ]; then
+                    echo "FATAL: cannot log in as @conduit. Is TUWUNEL_EMERGENCY_PASSWORD still set?" >&2
+                    exit 1
+                  fi
+                  trap 'curl -sS -m 30 -X POST -H "Authorization: Bearer $TOKEN" \
+                    -d "{}" "http://tuwunel.apps.svc.cluster.local:8008/_matrix/client/v3/logout" >/dev/null 2>&1 || true' EXIT
+
+                  ROOM=$(api -H "Authorization: Bearer $TOKEN" \
+                    "http://tuwunel.apps.svc.cluster.local:8008/_matrix/client/v3/directory/room/%23admins%3Ajosevictor.me" 2>/dev/null \
+                    | sed -n 's/.*"room_id":"\([^"]*\)".*/\1/p' || true)
+                  if [ -z "$ROOM" ]; then
+                    echo "FATAL: cannot resolve #admins:josevictor.me" >&2
+                    exit 1
+                  fi
+
+                  TOTAL=$(ls /work/batch-*.json | wc -l)
+                  N=0
+                  for f in /work/batch-*.json; do
+                    N=$((N + 1))
+                    # tuwunel answers a large delete-list with "PDU exceeds 65535 bytes"
+                    # instead of the per-file log, and the deletion still runs, so the HTTP
+                    # status is the only thing that tells us the command was accepted.
+                    if ! api -X PUT -H "Authorization: Bearer $TOKEN" --data-binary @"$f" \
+                      "http://tuwunel.apps.svc.cluster.local:8008/_matrix/client/v3/rooms/$ROOM/send/m.room.message/tuwunel-media-retention-$(date +%s)-$N" \
+                      > /dev/null; then
+                      echo "FATAL: batch $N/$TOTAL was rejected" >&2
+                      exit 1
+                    fi
+                    echo "=== batch $N/$TOTAL sent ==="
+                    sleep 60
+                  done
+
+                  echo "=== all $TOTAL batches sent ==="
+              command:
+                - sh
+                - -c
+              image: curlimages/curl@sha256:c1fe1679c34d9784c1b0d1e5f62ac0a79fca01fb6377cdd33e90473c6f9f9a69
+              name: delete-media
+              resources:
+                limits:
+                  cpu: 200m
+                  memory: 256Mi
+                requests:
+                  cpu: 50m
+                  memory: 64Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                    - ALL
+              volumeMounts:
+                - mountPath: /work
+                  name: work
+          restartPolicy: OnFailure
+          volumes:
+            - emptyDir: {}
+              name: work
+  schedule: 20 4 * * *
+  successfulJobsHistoryLimit: 3
+  timeZone: America/Sao_Paulo

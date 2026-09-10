@@ -35,6 +35,11 @@ in
       allow_local_presence = true
       allow_encryption = true
 
+      # Admin command output is echoed into the admin room. At the default
+      # "info" a media delete-list logs one line per deleted file, which blows
+      # past the 64 KiB event limit and replies with M_TOO_LARGE instead.
+      admin_log_capture = "error"
+
       [global.well_known]
       client = "https://matrix.josevictor.me"
       server = "matrix.josevictor.me:443"
