@@ -53,6 +53,22 @@ in
           bluestore_bdev_label_require_all = false
         '';
         cephClusterSpec = {
+          # Pinned to 19.2.4: 19.2.3 carries an upstream regression (tracker
+          # #71534, introduced by ceph/ceph#62514) where BlueFS::truncate asserts
+          # `cut_off == p->length`, wrongly assuming extents are always aligned to
+          # the current alloc_unit. A near-full, fragmented OSD makes BlueFS fall
+          # back from bluefs_shared_alloc_size (64K) to min_alloc_size (4K), which
+          # trips the assert. osd.0 on lab-delta-cp crashed mid-RocksDB-flush and
+          # then crash-looped forever replaying the same WAL. Fixed by
+          # ceph/ceph#63753, released in v19.2.4.
+          cephVersion.image = "quay.io/ceph/ceph:v19.2.4";
+          cephVersion.allowUnsupported = false;
+          # Rook gates each daemon rollout on cluster health. Recovery here is
+          # stalled (backfill_toofull) and cannot clear until osd.0 is back, which
+          # is exactly what this upgrade fixes - so the health gate deadlocks the
+          # fix. Allow the rollout to proceed on an unhealthy cluster.
+          # TODO: set back to false once osd.0 is up and PGs are active+clean.
+          continueUpgradeAfterChecksEvenIfNotHealthy = true;
           mon.count = builtins.length monitorHostNames;
           mon.allowMultiplePerNode = false;
           dashboard.enabled = true;
