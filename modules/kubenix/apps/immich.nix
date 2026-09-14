@@ -59,7 +59,7 @@ in
           controllers.main.containers.main = {
             image = {
               repository = "ghcr.io/immich-app/immich-server";
-              tag = "v3.1.0@sha256:b434cb9287eea1471c9974845914d4dd328c9c2d652e446ed4930f99944f0ceb";
+              tag = "v3.2.1@sha256:2ab6a6273755d9b8a5c4f25dbaa2d097fc4a2cc261b70bc73621e6405cc106fe";
               pullPolicy = "IfNotPresent";
             };
             resources = {
