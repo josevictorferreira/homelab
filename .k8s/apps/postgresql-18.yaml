@@ -11,7 +11,7 @@ metadata:
     app.kubernetes.io/name: postgresql
     app.kubernetes.io/version: 17.6.0
     helm.sh/chart: postgresql-16.7.27
-    kubenix/hash: de3c8461dfc5008322257f4e5c90ff66407f92f7
+    kubenix/hash: edcb3dbd4814eeff3caec0f90918d07ba6d5a89a
   name: postgresql-18
   namespace: apps
 spec:
@@ -87,11 +87,11 @@ spec:
                 - /bin/sh
                 - -c
                 - exec pg_isready -U "postgres" -d "dbname=linkwarden" -h 127.0.0.1 -p 5432
-            failureThreshold: 6
+            failureThreshold: 12
             initialDelaySeconds: 30
             periodSeconds: 10
             successThreshold: 1
-            timeoutSeconds: 5
+            timeoutSeconds: 15
           name: postgresql
           ports:
             - containerPort: 5432
@@ -109,7 +109,7 @@ spec:
             initialDelaySeconds: 5
             periodSeconds: 10
             successThreshold: 1
-            timeoutSeconds: 5
+            timeoutSeconds: 15
           resources:
             limits:
               cpu: 1000m
@@ -207,7 +207,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: de3c8461dfc5008322257f4e5c90ff66407f92f7
+    kubenix/hash: edcb3dbd4814eeff3caec0f90918d07ba6d5a89a
   name: postgresql-18-bootstrap-91a67ee2
   namespace: apps
 spec:
@@ -755,7 +755,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: de3c8461dfc5008322257f4e5c90ff66407f92f7
+    kubenix/hash: edcb3dbd4814eeff3caec0f90918d07ba6d5a89a
   name: postgresql-18-bootstrap
   namespace: apps
 ---
@@ -795,7 +795,7 @@ metadata:
     app.kubernetes.io/name: postgresql
     app.kubernetes.io/version: 17.6.0
     helm.sh/chart: postgresql-16.7.27
-    kubenix/hash: de3c8461dfc5008322257f4e5c90ff66407f92f7
+    kubenix/hash: edcb3dbd4814eeff3caec0f90918d07ba6d5a89a
   name: postgresql-18-extended-configuration
   namespace: apps
 ---
@@ -814,7 +814,7 @@ metadata:
     app.kubernetes.io/name: postgresql
     app.kubernetes.io/version: 17.6.0
     helm.sh/chart: postgresql-16.7.27
-    kubenix/hash: de3c8461dfc5008322257f4e5c90ff66407f92f7
+    kubenix/hash: edcb3dbd4814eeff3caec0f90918d07ba6d5a89a
   name: postgresql-18
   namespace: apps
 spec:
@@ -843,7 +843,7 @@ metadata:
     app.kubernetes.io/name: postgresql
     app.kubernetes.io/version: 17.6.0
     helm.sh/chart: postgresql-16.7.27
-    kubenix/hash: de3c8461dfc5008322257f4e5c90ff66407f92f7
+    kubenix/hash: edcb3dbd4814eeff3caec0f90918d07ba6d5a89a
   name: postgresql-18-hl
   namespace: apps
 spec:
@@ -872,7 +872,7 @@ metadata:
     app.kubernetes.io/name: postgresql
     app.kubernetes.io/version: 17.6.0
     helm.sh/chart: postgresql-16.7.27
-    kubenix/hash: de3c8461dfc5008322257f4e5c90ff66407f92f7
+    kubenix/hash: edcb3dbd4814eeff3caec0f90918d07ba6d5a89a
   name: postgresql-18
   namespace: apps
 ---
@@ -889,7 +889,7 @@ metadata:
     app.kubernetes.io/name: postgresql
     app.kubernetes.io/version: 17.6.0
     helm.sh/chart: postgresql-16.7.27
-    kubenix/hash: de3c8461dfc5008322257f4e5c90ff66407f92f7
+    kubenix/hash: edcb3dbd4814eeff3caec0f90918d07ba6d5a89a
   name: postgresql-18
   namespace: apps
 spec:
@@ -920,7 +920,7 @@ metadata:
     app.kubernetes.io/name: postgresql
     app.kubernetes.io/version: 17.6.0
     helm.sh/chart: postgresql-16.7.27
-    kubenix/hash: de3c8461dfc5008322257f4e5c90ff66407f92f7
+    kubenix/hash: edcb3dbd4814eeff3caec0f90918d07ba6d5a89a
   name: postgresql-18
   namespace: apps
 spec:

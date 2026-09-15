@@ -81,6 +81,16 @@ in
             timeoutSeconds = 5;
             failureThreshold = 60;
           };
+          # Storage stalls (slow OSD, recovery, bulk dumps) make pg_isready take
+          # tens of seconds. With 5s x 6 the kubelet SIGKILLed a healthy Postgres
+          # into crash recovery on 2026-09-15; give it 3 minutes before acting.
+          livenessProbe = {
+            timeoutSeconds = 15;
+            failureThreshold = 12;
+          };
+          readinessProbe = {
+            timeoutSeconds = 15;
+          };
           extendedConfiguration = ''
             shared_preload_libraries = 'vchord.so'
             search_path = '"$user", public, vectors'
