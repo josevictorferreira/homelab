@@ -29,7 +29,8 @@ Living log of gates passed and open decisions. Update at every phase boundary.
 ### Phase 2 — Custom image — **GREEN**
 See [image.md](./image.md). `ghcr.io/josevictorferreira/postgresql-cnpg:18.6-vchord1.1.1-postgis3@sha256:5b3c66d1…` (private).
 
-### Phase 3 — Nix (written, `make manifests` green, **not committed**)
+### Phase 3 — Nix — **GREEN** (commit `9c478b66`, Flux applied 12:55 BRT)
+Gate checked 12:57: namespace Active, ResourceQuota + LimitRange present, `cloudnative-pg` and `plugin-barman-cloud` pods Running (one restart each from a lab-gamma-wk sandbox blip, plugin re-registered), 4 CRDs, 3 secrets with the right types, barman client/server Certificates Ready. `make reconcile` itself failed (attic cache 500 while fetching the command derivation), Flux picked the commit up on its own. NixOS deploy of lab-alpha-cp for the k3s bootstrap copy of the quota: see below.
 - `config/kubernetes.nix`: namespace `databases`.
 - `bootstrap/resource-quotas.nix`: quota 1/3Gi requests, 4/8Gi limits; LimitRange default 250m/256Mi, max 2/6Gi. Needs a NixOS deploy of `lab-alpha-cp` (k3s addon controller).
 - `_crds.nix`: `cluster`, `database`, `scheduledbackup`, `backup` (postgresql.cnpg.io/v1), `objectstore` (barmancloud.cnpg.io/v1), plus cert-manager `issuer` (the barman chart renders one).
@@ -50,3 +51,9 @@ See [image.md](./image.md). `ghcr.io/josevictorferreira/postgresql-cnpg:18.6-vch
 - Storage is the bottleneck: `ceph osd perf` shows `osd.1` (lab-alpha-cp, **Crucial BX500 1 TB**, DRAM-less consumer SSD) at 450–2700 ms commit latency while osd.0/osd.4 sit at 5–20 ms. Every `replicapool` write (size 3) waits for osd.1. Ceph also reports `BLUESTORE_SLOW_OP_ALERT` and `DB_DEVICE_STALLED_READ` for osd.1, and lab-alpha-cp logged hung tasks on 2026-09-12.
 - Consequence for this plan: the CNPG import (Phase 4/5) is the same read pattern as `pg_dumpall` plus a full write of ~20 GB into the same pool. **Do not start Phase 4 until osd.1 latency is addressed**, or accept that the source instance may be liveness-killed during the import (the import job itself would then fail and need a retry). Also reconsider the `postgresql-18` liveness probe (`pg_isready` 5 s timeout × 6) which turns storage stalls into outages; see memory `postgres-recovery-liveness-deadlock`.
 - The in-cluster backup job was **not** rerun after the kill (it would repeat the stall). Gate 0.2 therefore stays open. The workstation dump from Phase 1 is verified and is the current safety net.
+
+### Incident 2026-09-15 12:51– BRT — lab-gamma-wk reboot loop (pre-existing gk3v issue)
+- Boots at 12:51:52, 12:54:15, 12:56:14, 12:57:36; journals end mid-activity (hard reset, no shutdown message). `x86_pkg_temp` reads 100 °C one minute after boot with the 10 W RAPL cap in place. See memory `gamma-gk3v-reboot-loops-two-causes`.
+- Effect: osd.3 and osd.5 down, `ceph-bluestore-tool` ABRT during OSD activation on one boot, CephFS "No mds server is up", 28 % objects degraded. The CNPG operator + barman plugin pods were scheduled on gamma (2 sandbox restarts, healthy afterwards). Consider a soft anti-affinity away from lab-gamma-wk for the operator pods.
+- NixOS deploy of lab-alpha-cp (k3s bootstrap copy of the `databases` quota) **deferred**: Flux already applied the quota, and k3s's addon controller only manages its own objectset, so nothing reverts it. Do the deploy (memory `deploy-rs-broken-use-copy-switch`) once Ceph is HEALTH_OK-ish.
+- Phase 4 stays blocked: Ceph capacity (0.3), osd.1 latency, and now degraded redundancy.

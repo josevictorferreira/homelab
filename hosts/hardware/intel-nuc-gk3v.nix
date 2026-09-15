@@ -67,7 +67,9 @@
   # turbo on and ZERO throttle events, so capping it would only slow a healthy
   # node. Drop this block once alpha gets the same service - a cap is a
   # workaround for bad cooling, not a substitute for fixing it.
-  systemd.services = lib.mkIf (config.networking.hostName == "lab-alpha-cp") {
+  # 2026-09-15: gamma's cooler failed again (104 C at boot, hard-reset loop),
+  # so the cap applies to every gk3v host until both are physically serviced.
+  systemd.services = {
     gk3v-power-cap = {
       description = "Cap Celeron N5105 package power (thermal mitigation)";
       wantedBy = [ "multi-user.target" ];
@@ -86,6 +88,10 @@
         if [ -w /sys/devices/system/cpu/intel_pstate/no_turbo ]; then
           echo 1 > /sys/devices/system/cpu/intel_pstate/no_turbo || true
         fi
+        # Clamp clocks well below the 2.9GHz max; heat, not throughput, is the limit.
+        for f in /sys/devices/system/cpu/cpu*/cpufreq/scaling_max_freq; do
+          echo 1500000 > "$f" || true
+        done
       '';
     };
   };
