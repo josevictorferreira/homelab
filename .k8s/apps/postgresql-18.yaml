@@ -11,7 +11,7 @@ metadata:
     app.kubernetes.io/name: postgresql
     app.kubernetes.io/version: 17.6.0
     helm.sh/chart: postgresql-16.7.27
-    kubenix/hash: edcb3dbd4814eeff3caec0f90918d07ba6d5a89a
+    kubenix/hash: efa6a5c7aa2d98356c2bb23c940cf06e30a66fc5
   name: postgresql-18
   namespace: apps
 spec:
@@ -25,7 +25,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/extended-configuration: c83622280de1b2ec109345d283f505523d0fc57efb285cf5987f4c0bb2eb00b9
+        checksum/extended-configuration: f4ef1763703dac7c76090192009d6916279d81f4cc5a8c42140c55b9f78ec8dc
       labels:
         app.kubernetes.io/component: primary
         app.kubernetes.io/instance: postgresql-18
@@ -207,7 +207,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: edcb3dbd4814eeff3caec0f90918d07ba6d5a89a
+    kubenix/hash: efa6a5c7aa2d98356c2bb23c940cf06e30a66fc5
   name: postgresql-18-bootstrap-91a67ee2
   namespace: apps
 spec:
@@ -755,7 +755,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: edcb3dbd4814eeff3caec0f90918d07ba6d5a89a
+    kubenix/hash: efa6a5c7aa2d98356c2bb23c940cf06e30a66fc5
   name: postgresql-18-bootstrap
   namespace: apps
 ---
@@ -783,6 +783,12 @@ data:
     autovacuum_vacuum_cost_limit = 2000
     log_min_duration_statement = 2000
     log_checkpoints = on
+    # Node hard-resets leave idle backends behind until the TCP stack
+    # notices (2h by default); on 2026-09-15 they exhausted max_connections.
+    tcp_keepalives_idle = 60
+    tcp_keepalives_interval = 10
+    tcp_keepalives_count = 3
+    idle_session_timeout = '2h'
 kind: ConfigMap
 metadata:
   annotations:
@@ -795,7 +801,7 @@ metadata:
     app.kubernetes.io/name: postgresql
     app.kubernetes.io/version: 17.6.0
     helm.sh/chart: postgresql-16.7.27
-    kubenix/hash: edcb3dbd4814eeff3caec0f90918d07ba6d5a89a
+    kubenix/hash: efa6a5c7aa2d98356c2bb23c940cf06e30a66fc5
   name: postgresql-18-extended-configuration
   namespace: apps
 ---
@@ -814,7 +820,7 @@ metadata:
     app.kubernetes.io/name: postgresql
     app.kubernetes.io/version: 17.6.0
     helm.sh/chart: postgresql-16.7.27
-    kubenix/hash: edcb3dbd4814eeff3caec0f90918d07ba6d5a89a
+    kubenix/hash: efa6a5c7aa2d98356c2bb23c940cf06e30a66fc5
   name: postgresql-18
   namespace: apps
 spec:
@@ -843,7 +849,7 @@ metadata:
     app.kubernetes.io/name: postgresql
     app.kubernetes.io/version: 17.6.0
     helm.sh/chart: postgresql-16.7.27
-    kubenix/hash: edcb3dbd4814eeff3caec0f90918d07ba6d5a89a
+    kubenix/hash: efa6a5c7aa2d98356c2bb23c940cf06e30a66fc5
   name: postgresql-18-hl
   namespace: apps
 spec:
@@ -872,7 +878,7 @@ metadata:
     app.kubernetes.io/name: postgresql
     app.kubernetes.io/version: 17.6.0
     helm.sh/chart: postgresql-16.7.27
-    kubenix/hash: edcb3dbd4814eeff3caec0f90918d07ba6d5a89a
+    kubenix/hash: efa6a5c7aa2d98356c2bb23c940cf06e30a66fc5
   name: postgresql-18
   namespace: apps
 ---
@@ -889,7 +895,7 @@ metadata:
     app.kubernetes.io/name: postgresql
     app.kubernetes.io/version: 17.6.0
     helm.sh/chart: postgresql-16.7.27
-    kubenix/hash: edcb3dbd4814eeff3caec0f90918d07ba6d5a89a
+    kubenix/hash: efa6a5c7aa2d98356c2bb23c940cf06e30a66fc5
   name: postgresql-18
   namespace: apps
 spec:
@@ -920,7 +926,7 @@ metadata:
     app.kubernetes.io/name: postgresql
     app.kubernetes.io/version: 17.6.0
     helm.sh/chart: postgresql-16.7.27
-    kubenix/hash: edcb3dbd4814eeff3caec0f90918d07ba6d5a89a
+    kubenix/hash: efa6a5c7aa2d98356c2bb23c940cf06e30a66fc5
   name: postgresql-18
   namespace: apps
 spec:

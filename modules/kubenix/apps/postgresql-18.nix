@@ -113,6 +113,12 @@ in
             autovacuum_vacuum_cost_limit = 2000
             log_min_duration_statement = 2000
             log_checkpoints = on
+            # Node hard-resets leave idle backends behind until the TCP stack
+            # notices (2h by default); on 2026-09-15 they exhausted max_connections.
+            tcp_keepalives_idle = 60
+            tcp_keepalives_interval = 10
+            tcp_keepalives_count = 3
+            idle_session_timeout = '2h'
           '';
           resources = {
             limits = {
