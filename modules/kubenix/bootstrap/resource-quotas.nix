@@ -1,7 +1,7 @@
 { homelab, ... }:
 
 let
-  inherit (homelab.kubernetes.namespaces) monitoring applications backup;
+  inherit (homelab.kubernetes.namespaces) monitoring applications backup databases;
 
   # ResourceQuotas for namespaces
   resourceQuotas = {
@@ -33,6 +33,16 @@ let
         "requests.memory" = "2Gi";
         "limits.cpu" = "2";
         "limits.memory" = "4Gi";
+      };
+    };
+    ${databases} = {
+      metadata.name = databases;
+      metadata.namespace = databases;
+      spec.hard = {
+        "requests.cpu" = "1";
+        "requests.memory" = "3Gi";
+        "limits.cpu" = "4";
+        "limits.memory" = "8Gi";
       };
     };
   };
@@ -105,6 +115,31 @@ let
           max = {
             cpu = "1";
             memory = "2Gi";
+          };
+          min = {
+            cpu = "50m";
+            memory = "64Mi";
+          };
+        }
+      ];
+    };
+    ${databases} = {
+      metadata.name = "default-limits";
+      metadata.namespace = databases;
+      spec.limits = [
+        {
+          type = "Container";
+          default = {
+            cpu = "250m";
+            memory = "256Mi";
+          };
+          defaultRequest = {
+            cpu = "100m";
+            memory = "128Mi";
+          };
+          max = {
+            cpu = "2";
+            memory = "6Gi";
           };
           min = {
             cpu = "50m";

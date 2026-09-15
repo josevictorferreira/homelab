@@ -1,0 +1,10 @@
+# PostgreSQL 18 image for CloudNativePG with VectorChord (vchord + pgvector) and PostGIS.
+# Base: tensorchord's CNPG-compatible VectorChord image (uid 26, barman-cloud included).
+# Build + push:  see .agents/features/0002-postgres-operator-refactory/image.md
+FROM ghcr.io/tensorchord/cloudnative-vectorchord:18.6-1.1.1@sha256:c7672bc011351a587cc292a94aac7eeebb593ed2e120077bd9c9944c9467db93
+
+USER root
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends postgresql-18-postgis-3 postgresql-18-postgis-3-scripts \
+ && rm -rf /var/lib/apt/lists/*
+USER 26

@@ -123,6 +123,7 @@
     applications = "apps";
     storage = "rook-ceph";
     backup = "backup";
+    databases = "databases";
   };
 
   affinities = {

@@ -108,6 +108,9 @@ rec {
     ];
   };
 
+  # Primary (read-write) service of the CloudNativePG cluster in databases/postgresql.nix.
+  postgresHost = "postgresql-rw.${homelab.kubernetes.namespaces.databases}.svc.cluster.local";
+
   objectStoreEndpoint = "http://rook-ceph-rgw-ceph-objectstore.${homelab.kubernetes.namespaces.storage}.svc.cluster.local";
 
   defaultStorageClass = "rook-ceph-block";

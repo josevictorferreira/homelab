@@ -5,7 +5,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: e9b6e507ea7ff82775c9ada7ff81c5aecb08168d
+    kubenix/hash: 2c94b2ec86b243f3b22a544d2752290cf20a96d8
   name: default-limits
   namespace: apps
 spec:
@@ -30,7 +30,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: e9b6e507ea7ff82775c9ada7ff81c5aecb08168d
+    kubenix/hash: 2c94b2ec86b243f3b22a544d2752290cf20a96d8
   name: default-limits
   namespace: backup
 spec:
@@ -56,7 +56,33 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: e9b6e507ea7ff82775c9ada7ff81c5aecb08168d
+    kubenix/hash: 2c94b2ec86b243f3b22a544d2752290cf20a96d8
+  name: default-limits
+  namespace: databases
+spec:
+  limits:
+    - default:
+        cpu: 250m
+        memory: 256Mi
+      defaultRequest:
+        cpu: 100m
+        memory: 128Mi
+      max:
+        cpu: "2"
+        memory: 6Gi
+      min:
+        cpu: 50m
+        memory: 64Mi
+      type: Container
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 2c94b2ec86b243f3b22a544d2752290cf20a96d8
   name: default-limits
   namespace: monitoring
 spec:
@@ -82,7 +108,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: e9b6e507ea7ff82775c9ada7ff81c5aecb08168d
+    kubenix/hash: 2c94b2ec86b243f3b22a544d2752290cf20a96d8
   name: apps
   namespace: apps
 spec:
@@ -99,7 +125,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: e9b6e507ea7ff82775c9ada7ff81c5aecb08168d
+    kubenix/hash: 2c94b2ec86b243f3b22a544d2752290cf20a96d8
   name: backup
   namespace: backup
 spec:
@@ -116,7 +142,24 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: e9b6e507ea7ff82775c9ada7ff81c5aecb08168d
+    kubenix/hash: 2c94b2ec86b243f3b22a544d2752290cf20a96d8
+  name: databases
+  namespace: databases
+spec:
+  hard:
+    limits.cpu: "4"
+    limits.memory: 8Gi
+    requests.cpu: "1"
+    requests.memory: 3Gi
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 2c94b2ec86b243f3b22a544d2752290cf20a96d8
   name: monitoring
   namespace: monitoring
 spec:

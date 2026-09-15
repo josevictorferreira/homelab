@@ -5,7 +5,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 3fb1562015fb2c6c16db44b82c16cb3193254d17
+    kubenix/hash: 1ee631a80625e0ae896b940cf24b9083323eff9b
   name: apps
 ---
 apiVersion: v1
@@ -15,7 +15,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 3fb1562015fb2c6c16db44b82c16cb3193254d17
+    kubenix/hash: 1ee631a80625e0ae896b940cf24b9083323eff9b
   name: backup
 ---
 apiVersion: v1
@@ -25,7 +25,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 3fb1562015fb2c6c16db44b82c16cb3193254d17
+    kubenix/hash: 1ee631a80625e0ae896b940cf24b9083323eff9b
   name: cert-manager
 ---
 apiVersion: v1
@@ -35,7 +35,17 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 3fb1562015fb2c6c16db44b82c16cb3193254d17
+    kubenix/hash: 1ee631a80625e0ae896b940cf24b9083323eff9b
+  name: databases
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 1ee631a80625e0ae896b940cf24b9083323eff9b
   name: monitoring
 ---
 apiVersion: v1
@@ -45,5 +55,5 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 3fb1562015fb2c6c16db44b82c16cb3193254d17
+    kubenix/hash: 1ee631a80625e0ae896b940cf24b9083323eff9b
   name: rook-ceph

@@ -14,6 +14,13 @@
         kind = "ClusterIssuer";
       };
 
+      issuer = {
+        attrName = "issuer";
+        group = "cert-manager.io";
+        version = "v1";
+        kind = "Issuer";
+      };
+
       certificate = {
         attrName = "certificate";
         group = "cert-manager.io";
@@ -124,6 +131,41 @@
         group = "monitoring.coreos.com";
         version = "v1";
         kind = "PodMonitor";
+      };
+      # CloudNativePG
+      cluster = {
+        attrName = "cluster";
+        group = "postgresql.cnpg.io";
+        version = "v1";
+        kind = "Cluster";
+      };
+
+      database = {
+        attrName = "database";
+        group = "postgresql.cnpg.io";
+        version = "v1";
+        kind = "Database";
+      };
+
+      scheduledbackup = {
+        attrName = "scheduledbackup";
+        group = "postgresql.cnpg.io";
+        version = "v1";
+        kind = "ScheduledBackup";
+      };
+
+      backup = {
+        attrName = "backup";
+        group = "postgresql.cnpg.io";
+        version = "v1";
+        kind = "Backup";
+      };
+
+      objectstore = {
+        attrName = "objectstore";
+        group = "barmancloud.cnpg.io";
+        version = "v1";
+        kind = "ObjectStore";
       };
     };
   };
