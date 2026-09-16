@@ -5,13 +5,13 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+    kubenix/hash: 438299b7e290e36b707932fb5f5df5d34d0c712d
   name: pi-minio
   namespace: databases
 spec:
   configuration:
     data:
-      compression: zstd
+      compression: gzip
     destinationPath: s3://homelab-backup-postgres/cnpg/
     endpointURL: http://10.10.10.209:9000
     s3Credentials:
@@ -32,7 +32,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+    kubenix/hash: 438299b7e290e36b707932fb5f5df5d34d0c712d
   name: attic
   namespace: databases
 spec:
@@ -53,7 +53,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+    kubenix/hash: 438299b7e290e36b707932fb5f5df5d34d0c712d
   name: bookorbit
   namespace: databases
 spec:
@@ -74,7 +74,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+    kubenix/hash: 438299b7e290e36b707932fb5f5df5d34d0c712d
   name: dramaturge
   namespace: databases
 spec:
@@ -95,7 +95,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+    kubenix/hash: 438299b7e290e36b707932fb5f5df5d34d0c712d
   name: glyph-production
   namespace: databases
 spec:
@@ -116,7 +116,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+    kubenix/hash: 438299b7e290e36b707932fb5f5df5d34d0c712d
   name: glyph-production-cable
   namespace: databases
 spec:
@@ -137,7 +137,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+    kubenix/hash: 438299b7e290e36b707932fb5f5df5d34d0c712d
   name: glyph-production-cache
   namespace: databases
 spec:
@@ -158,7 +158,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+    kubenix/hash: 438299b7e290e36b707932fb5f5df5d34d0c712d
   name: glyph-production-queue
   namespace: databases
 spec:
@@ -179,7 +179,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+    kubenix/hash: 438299b7e290e36b707932fb5f5df5d34d0c712d
   name: grafana
   namespace: databases
 spec:
@@ -200,7 +200,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+    kubenix/hash: 438299b7e290e36b707932fb5f5df5d34d0c712d
   name: hindsight
   namespace: databases
 spec:
@@ -221,7 +221,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+    kubenix/hash: 438299b7e290e36b707932fb5f5df5d34d0c712d
   name: ideator-production
   namespace: databases
 spec:
@@ -242,7 +242,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+    kubenix/hash: 438299b7e290e36b707932fb5f5df5d34d0c712d
   name: ideator-production-cable
   namespace: databases
 spec:
@@ -263,7 +263,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+    kubenix/hash: 438299b7e290e36b707932fb5f5df5d34d0c712d
   name: ideator-production-cache
   namespace: databases
 spec:
@@ -284,7 +284,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+    kubenix/hash: 438299b7e290e36b707932fb5f5df5d34d0c712d
   name: ideator-production-queue
   namespace: databases
 spec:
@@ -305,7 +305,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+    kubenix/hash: 438299b7e290e36b707932fb5f5df5d34d0c712d
   name: immich
   namespace: databases
 spec:
@@ -326,7 +326,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+    kubenix/hash: 438299b7e290e36b707932fb5f5df5d34d0c712d
   name: keycloak
   namespace: databases
 spec:
@@ -347,7 +347,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+    kubenix/hash: 438299b7e290e36b707932fb5f5df5d34d0c712d
   name: mautrix-discord
   namespace: databases
 spec:
@@ -368,7 +368,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+    kubenix/hash: 438299b7e290e36b707932fb5f5df5d34d0c712d
   name: mautrix-discord-v2
   namespace: databases
 spec:
@@ -389,7 +389,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+    kubenix/hash: 438299b7e290e36b707932fb5f5df5d34d0c712d
   name: mautrix-slack
   namespace: databases
 spec:
@@ -410,7 +410,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+    kubenix/hash: 438299b7e290e36b707932fb5f5df5d34d0c712d
   name: mautrix-slack-v2
   namespace: databases
 spec:
@@ -431,7 +431,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+    kubenix/hash: 438299b7e290e36b707932fb5f5df5d34d0c712d
   name: mautrix-whatsapp
   namespace: databases
 spec:
@@ -452,7 +452,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+    kubenix/hash: 438299b7e290e36b707932fb5f5df5d34d0c712d
   name: mautrix-whatsapp-v2
   namespace: databases
 spec:
@@ -473,7 +473,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+    kubenix/hash: 438299b7e290e36b707932fb5f5df5d34d0c712d
   name: n8n
   namespace: databases
 spec:
@@ -494,7 +494,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+    kubenix/hash: 438299b7e290e36b707932fb5f5df5d34d0c712d
   name: openwebui
   namespace: databases
 spec:
@@ -515,7 +515,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+    kubenix/hash: 438299b7e290e36b707932fb5f5df5d34d0c712d
   name: poise-production
   namespace: databases
 spec:
@@ -536,7 +536,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+    kubenix/hash: 438299b7e290e36b707932fb5f5df5d34d0c712d
   name: poise-production-cable
   namespace: databases
 spec:
@@ -557,7 +557,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+    kubenix/hash: 438299b7e290e36b707932fb5f5df5d34d0c712d
   name: poise-production-cache
   namespace: databases
 spec:
@@ -578,7 +578,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+    kubenix/hash: 438299b7e290e36b707932fb5f5df5d34d0c712d
   name: poise-production-queue
   namespace: databases
 spec:
@@ -599,7 +599,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+    kubenix/hash: 438299b7e290e36b707932fb5f5df5d34d0c712d
   name: readeck
   namespace: databases
 spec:
@@ -620,7 +620,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+    kubenix/hash: 438299b7e290e36b707932fb5f5df5d34d0c712d
   name: synapse
   namespace: databases
 spec:
@@ -641,7 +641,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+    kubenix/hash: 438299b7e290e36b707932fb5f5df5d34d0c712d
   name: valoris-production
   namespace: databases
 spec:
@@ -662,7 +662,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+    kubenix/hash: 438299b7e290e36b707932fb5f5df5d34d0c712d
   name: valoris-production-queue
   namespace: databases
 spec:
@@ -683,7 +683,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+    kubenix/hash: 438299b7e290e36b707932fb5f5df5d34d0c712d
   name: wealtho
   namespace: databases
 spec:
@@ -704,7 +704,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+    kubenix/hash: 438299b7e290e36b707932fb5f5df5d34d0c712d
   name: postgresql-daily
   namespace: databases
 spec:

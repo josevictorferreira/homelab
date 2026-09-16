@@ -52,7 +52,8 @@ in
             };
           };
           wal.compression = "zstd";
-          data.compression = "zstd";
+          # plugin-barman-cloud 0.8 only accepts bzip2/gzip/lz4/snappy for data.
+          data.compression = "gzip";
         };
         retentionPolicy = "30d";
       };
