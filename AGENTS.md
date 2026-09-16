@@ -235,6 +235,21 @@ After initial Tailscale deployment:
 2. Enable 10.10.10.0/24 for both subnet routers
 3. Connect clients with: `tailscale up --accept-routes`
 
+## POSTGRES (CloudNativePG)
+
+Since 2026-09-16 the shared Postgres is the CloudNativePG cluster `postgresql` in namespace `databases`
+(`modules/kubenix/databases/`), reachable at `kubenix.lib.postgresHost`
+(`postgresql-rw.databases.svc.cluster.local`) and on the LAN at 10.10.10.101. Never hardcode a host:
+apps use `kubenix.lib.postgresHost`; DSNs kept as SOPS values must carry the same host.
+Postgres parameters live in `databases/_postgresql-lib.nix` (`max_connections = 300`; all apps connect as
+the superuser, so keep it explicit). Restart-required parameters make the operator restart the single
+instance (minutes on this storage). The image is `ghcr.io/josevictorferreira/postgresql-cnpg` (Debian
+PG 18 + vchord + postgis, uid 26, no docker-entrypoint, needs AVX2 → node affinity beta/delta).
+Backups: barman plugin → `s3://homelab-backup-postgres/cnpg/` on the Pi (`postgresql-backups.nix`), plus
+the logical `backup/postgres-backup` dump. The old `postgresql-18` StatefulSet in `apps` is a read-only
+rollback copy until Phase 8 of `.agents/features/0002-postgres-operator-refactory/plan.md`; do not repoint
+anything to it and do not delete its PVC without the user.
+
 ## CLUSTER MANAGEMENT
 
 Our cluster is deployed and accessible in the user system kubectl, the context and cluster name is named as `ze-homelab`. You can access whenever you need to check the production logs or debug something directly in the real environment.
