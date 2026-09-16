@@ -39,8 +39,12 @@ in
                 path = "/up";
                 port = port;
               };
-              initialDelaySeconds = 30;
+              # Puma needs > 60 s to bind on a capped 1.2 GHz node (lab-gamma-wk);
+              # the previous 30 s + 3 x 10 s budget killed it in a loop (2026-09-16).
+              initialDelaySeconds = 120;
               periodSeconds = 10;
+              timeoutSeconds = 5;
+              failureThreshold = 6;
             };
           };
           readiness = {
@@ -53,6 +57,7 @@ in
               };
               initialDelaySeconds = 5;
               periodSeconds = 5;
+              timeoutSeconds = 5;
             };
           };
         };

@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: wealtho
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: e3ff0af648372fadd301fc30b25d28078433179d
+    kubenix/hash: 818412ee6b07d27583a755a62128d5c3e223b546
     kubenix/module-instance: wealtho
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -41,11 +41,13 @@ spec:
           image: ghcr.io/josevictorferreira/wealtho:latest
           imagePullPolicy: Always
           livenessProbe:
+            failureThreshold: 6
             httpGet:
               path: /up
               port: 3000
-            initialDelaySeconds: 30
+            initialDelaySeconds: 120
             periodSeconds: 10
+            timeoutSeconds: 5
           name: main
           ports:
             - containerPort: 3000
@@ -57,6 +59,7 @@ spec:
               port: 3000
             initialDelaySeconds: 5
             periodSeconds: 5
+            timeoutSeconds: 5
           resources:
             limits:
               cpu: 500m
@@ -105,7 +108,7 @@ metadata:
     app.kubernetes.io/name: wealtho
     app.kubernetes.io/service: wealtho
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: e3ff0af648372fadd301fc30b25d28078433179d
+    kubenix/hash: 818412ee6b07d27583a755a62128d5c3e223b546
     kubenix/module-instance: wealtho
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -134,7 +137,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: wealtho
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: e3ff0af648372fadd301fc30b25d28078433179d
+    kubenix/hash: 818412ee6b07d27583a755a62128d5c3e223b546
     kubenix/module-instance: wealtho
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
