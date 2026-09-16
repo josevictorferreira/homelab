@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/name: keycloak
     app.kubernetes.io/version: 26.5.2
     helm.sh/chart: keycloak-0.14.2
-    kubenix/hash: 91bde3105499e2d0f0f703c90a9c36148f235eef
+    kubenix/hash: c1874ea0f7805c37646a6f3598e2360cb50054fb
   name: keycloak
   namespace: apps
 spec:
@@ -41,7 +41,7 @@ spec:
             - --http-port=8080
             - --https-port=8443
             - --db=postgres
-            - --db-url=jdbc:postgresql://postgresql-18-hl:5432/keycloak
+            - --db-url=jdbc:postgresql://postgresql-rw.databases.svc.cluster.local:5432/keycloak
           command:
             - /opt/keycloak/bin/kc.sh
           env:
@@ -226,7 +226,7 @@ metadata:
     app.kubernetes.io/name: keycloak
     app.kubernetes.io/version: 26.5.2
     helm.sh/chart: keycloak-0.14.2
-    kubenix/hash: 91bde3105499e2d0f0f703c90a9c36148f235eef
+    kubenix/hash: c1874ea0f7805c37646a6f3598e2360cb50054fb
   name: keycloak
   namespace: apps
 spec:
@@ -252,7 +252,7 @@ metadata:
     app.kubernetes.io/name: keycloak
     app.kubernetes.io/version: 26.5.2
     helm.sh/chart: keycloak-0.14.2
-    kubenix/hash: 91bde3105499e2d0f0f703c90a9c36148f235eef
+    kubenix/hash: c1874ea0f7805c37646a6f3598e2360cb50054fb
   name: keycloak-headless
   namespace: apps
 spec:
@@ -281,7 +281,7 @@ metadata:
     app.kubernetes.io/name: keycloak
     app.kubernetes.io/version: 26.5.2
     helm.sh/chart: keycloak-0.14.2
-    kubenix/hash: 91bde3105499e2d0f0f703c90a9c36148f235eef
+    kubenix/hash: c1874ea0f7805c37646a6f3598e2360cb50054fb
   name: keycloak
   namespace: apps
 spec:

@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: readeck
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 485bfaef3dc9cfa19213682d6dc2f05dc804e65f
+    kubenix/hash: e02ca7815840a6ce50cda21cd732af26fb7d3c1c
     kubenix/module-instance: readeck
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -74,8 +74,8 @@ spec:
             - sh
             - -c
             - |
-              until pg_isready -h postgresql-18 -p 5432 -U postgres; do
-                echo "waiting for postgresql-18..."
+              until pg_isready -h postgresql-rw.databases.svc.cluster.local -p 5432 -U postgres; do
+                echo "waiting for postgresql..."
                 sleep 3
               done
           image: docker.io/library/postgres:18-alpine
@@ -107,7 +107,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: readeck
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 485bfaef3dc9cfa19213682d6dc2f05dc804e65f
+    kubenix/hash: e02ca7815840a6ce50cda21cd732af26fb7d3c1c
     kubenix/module-instance: readeck
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -135,7 +135,7 @@ metadata:
     app.kubernetes.io/name: readeck
     app.kubernetes.io/service: readeck
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 485bfaef3dc9cfa19213682d6dc2f05dc804e65f
+    kubenix/hash: e02ca7815840a6ce50cda21cd732af26fb7d3c1c
     kubenix/module-instance: readeck
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -164,7 +164,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: readeck
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 485bfaef3dc9cfa19213682d6dc2f05dc804e65f
+    kubenix/hash: e02ca7815840a6ce50cda21cd732af26fb7d3c1c
     kubenix/module-instance: readeck
     kubenix/module-name: release
     kubenix/module-version: 1.0.0

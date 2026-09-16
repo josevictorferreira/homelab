@@ -5,7 +5,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: c827ff328ee191b77192b81e603d10f6f96dac15
+    kubenix/hash: 144b4db387d4e7caf7d8843c5a2b67b118d93517
   name: postgres-backup
   namespace: backup
 spec:
@@ -53,7 +53,7 @@ spec:
                 - -c
               env:
                 - name: PGHOST
-                  value: postgresql-18-hl.apps.svc.cluster.local
+                  value: postgresql-rw.databases.svc.cluster.local
                 - name: PGPORT
                   value: "5432"
                 - name: PGUSER

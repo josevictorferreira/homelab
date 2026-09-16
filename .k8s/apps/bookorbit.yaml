@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: bookorbit
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 4fcaaccd6b05d1d5af294f633052e86d58e97060
+    kubenix/hash: cbe8821e53fc943c4fe64410d5e66ba8957f8980
     kubenix/module-instance: bookorbit
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -99,8 +99,8 @@ spec:
             - sh
             - -c
             - |
-              until pg_isready -h postgresql-18 -p 5432 -U postgres; do
-                echo "waiting for postgresql-18..."
+              until pg_isready -h postgresql-rw.databases.svc.cluster.local -p 5432 -U postgres; do
+                echo "waiting for postgresql..."
                 sleep 3
               done
           image: docker.io/library/postgres:18-alpine
@@ -135,7 +135,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: bookorbit
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 4fcaaccd6b05d1d5af294f633052e86d58e97060
+    kubenix/hash: cbe8821e53fc943c4fe64410d5e66ba8957f8980
     kubenix/module-instance: bookorbit
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -163,7 +163,7 @@ metadata:
     app.kubernetes.io/name: bookorbit
     app.kubernetes.io/service: bookorbit
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 4fcaaccd6b05d1d5af294f633052e86d58e97060
+    kubenix/hash: cbe8821e53fc943c4fe64410d5e66ba8957f8980
     kubenix/module-instance: bookorbit
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -192,7 +192,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: bookorbit
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 4fcaaccd6b05d1d5af294f633052e86d58e97060
+    kubenix/hash: cbe8821e53fc943c4fe64410d5e66ba8957f8980
     kubenix/module-instance: bookorbit
     kubenix/module-name: release
     kubenix/module-version: 1.0.0

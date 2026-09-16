@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: glyph
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 3d1b252824a3ebfd1ec9e1abfcbc47b4a5f8f7d7
+    kubenix/hash: abdbab448af879de1da6d3a64ff17e95643c1ec1
     kubenix/module-instance: glyph
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -85,8 +85,8 @@ spec:
             - sh
             - -c
             - |
-              until pg_isready -h postgresql-18 -p 5432 -U postgres; do
-                echo "waiting for postgresql-18..."
+              until pg_isready -h postgresql-rw.databases.svc.cluster.local -p 5432 -U postgres; do
+                echo "waiting for postgresql..."
                 sleep 3
               done
           image: docker.io/library/postgres:18-alpine
@@ -114,7 +114,7 @@ metadata:
     app.kubernetes.io/name: glyph
     app.kubernetes.io/service: glyph
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 3d1b252824a3ebfd1ec9e1abfcbc47b4a5f8f7d7
+    kubenix/hash: abdbab448af879de1da6d3a64ff17e95643c1ec1
     kubenix/module-instance: glyph
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -143,7 +143,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: glyph
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 3d1b252824a3ebfd1ec9e1abfcbc47b4a5f8f7d7
+    kubenix/hash: abdbab448af879de1da6d3a64ff17e95643c1ec1
     kubenix/module-instance: glyph
     kubenix/module-name: release
     kubenix/module-version: 1.0.0

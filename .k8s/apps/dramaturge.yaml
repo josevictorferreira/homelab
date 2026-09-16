@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: dramaturge
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: bcde538438994a2af6f40a0ba597804c4bdda344
+    kubenix/hash: 5866d4b37ffec1c14ff7c5222b4a0eae20e8652e
     kubenix/module-instance: dramaturge
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -76,8 +76,8 @@ spec:
             - sh
             - -c
             - |
-              until pg_isready -h postgresql-18 -p 5432 -U postgres; do
-                echo "waiting for postgresql-18..."
+              until pg_isready -h postgresql-rw.databases.svc.cluster.local -p 5432 -U postgres; do
+                echo "waiting for postgresql..."
                 sleep 3
               done
           image: docker.io/library/postgres:18-alpine
@@ -105,7 +105,7 @@ metadata:
     app.kubernetes.io/name: dramaturge
     app.kubernetes.io/service: dramaturge
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: bcde538438994a2af6f40a0ba597804c4bdda344
+    kubenix/hash: 5866d4b37ffec1c14ff7c5222b4a0eae20e8652e
     kubenix/module-instance: dramaturge
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -134,7 +134,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: dramaturge
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: bcde538438994a2af6f40a0ba597804c4bdda344
+    kubenix/hash: 5866d4b37ffec1c14ff7c5222b4a0eae20e8652e
     kubenix/module-instance: dramaturge
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -170,7 +170,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: dramaturge-worker
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: bcde538438994a2af6f40a0ba597804c4bdda344
+    kubenix/hash: 5866d4b37ffec1c14ff7c5222b4a0eae20e8652e
     kubenix/module-instance: dramaturge-worker
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -227,8 +227,8 @@ spec:
             - sh
             - -c
             - |
-              until pg_isready -h postgresql-18 -p 5432 -U postgres; do
-                echo "waiting for postgresql-18..."
+              until pg_isready -h postgresql-rw.databases.svc.cluster.local -p 5432 -U postgres; do
+                echo "waiting for postgresql..."
                 sleep 3
               done
           image: docker.io/library/postgres:18-alpine
@@ -256,7 +256,7 @@ metadata:
     app.kubernetes.io/name: dramaturge-worker
     app.kubernetes.io/service: dramaturge-worker
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: bcde538438994a2af6f40a0ba597804c4bdda344
+    kubenix/hash: 5866d4b37ffec1c14ff7c5222b4a0eae20e8652e
     kubenix/module-instance: dramaturge-worker
     kubenix/module-name: release
     kubenix/module-version: 1.0.0

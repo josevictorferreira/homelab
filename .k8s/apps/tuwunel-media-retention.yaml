@@ -5,7 +5,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 669ed7d136a81463b1c8115bc6f3ac3afbec49a2
+    kubenix/hash: e7d1a3ea2dafa3ea9f5debafd9d48517d220c8e1
   name: tuwunel-media-retention
   namespace: apps
 spec:
@@ -30,7 +30,7 @@ spec:
                   CUTOFF=$(cat /work/cutoff)
                   # Drop the mappings whose media we just deleted, so a Discord URL posted
                   # again is re-uploaded instead of resolving to a dead MXC forever.
-                  psql -h "postgresql-18-hl.apps.svc.cluster.local" -U postgres -d mautrix_discord_v2 -c \
+                  psql -h "postgresql-rw.databases.svc.cluster.local" -U postgres -d mautrix_discord_v2 -c \
                     "delete from discord_file where timestamp < $CUTOFF"
                   echo "=== pruned discord_file rows older than cutoff ==="
               command:
@@ -70,7 +70,7 @@ spec:
                   echo "$CUTOFF" > /work/cutoff
                   echo "=== retention cutoff: $(date -d "@$((CUTOFF / 1000))") ==="
 
-                  psql -h "postgresql-18-hl.apps.svc.cluster.local" -U postgres -d mautrix_discord_v2 -tAc \
+                  psql -h "postgresql-rw.databases.svc.cluster.local" -U postgres -d mautrix_discord_v2 -tAc \
                     "select mxc from discord_file
                      where timestamp < $CUTOFF and mxc like 'mxc://josevictor.me/%'" \
                     | tr -d ' ' \

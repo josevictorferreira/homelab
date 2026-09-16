@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: ideator
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: acad8c4e69e5e5b57c7fb5bfdc9d541017dfc7dd
+    kubenix/hash: bf855846cc2910dbc3eea9de9a38a2590b7cdbab
     kubenix/module-instance: ideator
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -85,8 +85,8 @@ spec:
             - sh
             - -c
             - |
-              until pg_isready -h postgresql-18 -p 5432 -U postgres; do
-                echo "waiting for postgresql-18..."
+              until pg_isready -h postgresql-rw.databases.svc.cluster.local -p 5432 -U postgres; do
+                echo "waiting for postgresql..."
                 sleep 3
               done
           image: docker.io/library/postgres:18-alpine
@@ -114,7 +114,7 @@ metadata:
     app.kubernetes.io/name: ideator
     app.kubernetes.io/service: ideator
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: acad8c4e69e5e5b57c7fb5bfdc9d541017dfc7dd
+    kubenix/hash: bf855846cc2910dbc3eea9de9a38a2590b7cdbab
     kubenix/module-instance: ideator
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -143,7 +143,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: ideator
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: acad8c4e69e5e5b57c7fb5bfdc9d541017dfc7dd
+    kubenix/hash: bf855846cc2910dbc3eea9de9a38a2590b7cdbab
     kubenix/module-instance: ideator
     kubenix/module-name: release
     kubenix/module-version: 1.0.0

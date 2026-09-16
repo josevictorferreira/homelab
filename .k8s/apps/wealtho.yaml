@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: wealtho
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 84ccc7b3abf07589cda55c02a8b786d104a6f78f
+    kubenix/hash: e3ff0af648372fadd301fc30b25d28078433179d
     kubenix/module-instance: wealtho
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -76,8 +76,8 @@ spec:
             - sh
             - -c
             - |
-              until pg_isready -h postgresql-18 -p 5432 -U postgres; do
-                echo "waiting for postgresql-18..."
+              until pg_isready -h postgresql-rw.databases.svc.cluster.local -p 5432 -U postgres; do
+                echo "waiting for postgresql..."
                 sleep 3
               done
           image: docker.io/library/postgres:18-alpine
@@ -105,7 +105,7 @@ metadata:
     app.kubernetes.io/name: wealtho
     app.kubernetes.io/service: wealtho
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 84ccc7b3abf07589cda55c02a8b786d104a6f78f
+    kubenix/hash: e3ff0af648372fadd301fc30b25d28078433179d
     kubenix/module-instance: wealtho
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -134,7 +134,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: wealtho
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 84ccc7b3abf07589cda55c02a8b786d104a6f78f
+    kubenix/hash: e3ff0af648372fadd301fc30b25d28078433179d
     kubenix/module-instance: wealtho
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
