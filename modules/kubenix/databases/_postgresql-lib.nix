@@ -42,6 +42,15 @@
       maintenance_work_mem = "512MB";
       synchronous_commit = "off";
       autovacuum_max_workers = "5";
+      # 2026-09-16: all apps connect as the superuser, so the default 100
+      # slots were exhausted (even the local socket) within hours of cutover.
+      max_connections = "300";
+      # Same client-hygiene settings the old instance had (added 2026-09-15
+      # after leaked idle sessions filled max_connections).
+      tcp_keepalives_idle = "60";
+      tcp_keepalives_interval = "10";
+      tcp_keepalives_count = "3";
+      idle_session_timeout = "2h";
       autovacuum_naptime = "10s";
       autovacuum_vacuum_cost_delay = "10ms";
       autovacuum_vacuum_cost_limit = "2000";

@@ -18,7 +18,7 @@ let
         inherit namespace;
       };
       spec = {
-        inherit name db;
+        name = db;
         owner = "postgres";
         cluster.name = name;
         databaseReclaimPolicy = "retain";

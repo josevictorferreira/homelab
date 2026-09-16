@@ -5,7 +5,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 0daa85dea10b4074b3cb8a3b9bff944282fedfdb
+    kubenix/hash: f4f676c3597dcd9d0987efc1bb2e7f436272adfb
   name: postgresql
   namespace: databases
 spec:
@@ -53,14 +53,19 @@ spec:
       checkpoint_completion_target: "0.9"
       checkpoint_timeout: 30min
       effective_cache_size: 2304MB
+      idle_session_timeout: 2h
       log_checkpoints: "on"
       log_min_duration_statement: "2000"
       maintenance_work_mem: 512MB
+      max_connections: "300"
       max_wal_size: 4GB
       min_wal_size: 512MB
       search_path: '"$user", public, vectors'
       shared_buffers: 768MB
       synchronous_commit: "off"
+      tcp_keepalives_count: "3"
+      tcp_keepalives_idle: "60"
+      tcp_keepalives_interval: "10"
       wal_buffers: 32MB
       wal_compression: "on"
       work_mem: 16MB
