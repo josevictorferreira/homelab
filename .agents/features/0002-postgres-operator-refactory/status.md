@@ -140,3 +140,8 @@ Route changed from `bootstrap.initdb.import` to **workstation dump + rate-limite
 - etcd leader moved to lab-delta-cp; beta's root freed by 11.7 GB (`crictl rmi --prune`).
 - Cluster: zero unhealthy pods, Flux Ready at `29668a59`, CNPG healthy with archiving, 68 connections / 17 databases / 15 clients on the new cluster, 0 clients on the read-only old instance.
 - Still open: first CNPG base backup (manual `Backup` or the 01:00 local schedule), backup alerting (6.3), PITR drill, Phase 7 soak → Phase 8 decommission of `postgresql-18` (user decision), `strategy: Recreate` for RWO apps, revert `ceph osd reweight osd.0 0.85` → 1.0 after the balancer settles, and the gamma reset cause (power/board, not thermal) which no software setting fixes.
+
+### 2026-09-16 18:25 BRT — Phase 8 step 1 (user decision, soak waived)
+- `postgresql-18` module disabled (`apps/_postgresql-18.nix`, commit `3ea07041`): StatefulSet, pod, Services (LB 10.10.10.133), bootstrap Job, NetworkPolicy, PDB removed by Flux. The user chose to skip the 14-day soak after the strict diff and the server-side client check.
+- **Retained:** PVC `data-postgresql-18-0` (PV `pvc-58b75079-8264-4714-8ed9-eb46b8ee0482`, 40Gi, reclaim Retain) holding the frozen 10:03 state, plus the workstation dump. Keep ≥ 30 days; delete only with a second explicit confirmation (Phase 8 step 2). Rollback = rename the file back and `make manifests`.
+- Inert leftovers: `postgresql-18 = "10.10.10.133"` in `config/kubernetes.nix`, the `postgresql-18/` MinIO prefix used by the logical dump job, the `postgresql-vchord-bitnami` image reference in the disabled drill.
