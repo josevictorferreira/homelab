@@ -133,3 +133,10 @@ Route changed from `bootstrap.initdb.import` to **workstation dump + rate-limite
 - CNPG `postgresql`: healthy, 2/2 (postgres + barman sidecar), 79 DBs, all consumers connected, WAL archiving on. Old `postgresql-18-0`: Running read-only on gamma, 0 clients (rollback until Phase 8, ≥ 14-day soak per plan).
 - Ceph: 5/6 OSDs up, 17 % degraded, `min_size 1` + `noout` still set, `ceph-restore-replication.sh` watcher running (restores `min_size 2`/unsets `noout` when clean — it cannot become clean while osd.5 is down).
 - Pods: everything Running except `wealtho` (CrashLoopBackOff in `db:prepare`, see below).
+
+### 2026-09-16 18:10 BRT — end of session state
+- `osd.3` back at 17:43 and `osd.5` at 17:59 (one at a time, after gamma had run 60 min without OSDs); gamma still up at 18:10 (68 min, load 16 from recovery, 72 °C, 4 W cap). All 6 OSDs up, 1.3 % degraded / 2.5 % misplaced and falling; `min_size 1` + `noout` remain until the watcher sees a clean cluster.
+- `wealtho` was not a database problem: on the 1.2 GHz node Puma needs > 60 s to bind and the 30 s + 3×10 s liveness budget killed it in a loop. Probes relaxed (commit `29668a59`); Running.
+- etcd leader moved to lab-delta-cp; beta's root freed by 11.7 GB (`crictl rmi --prune`).
+- Cluster: zero unhealthy pods, Flux Ready at `29668a59`, CNPG healthy with archiving, 68 connections / 17 databases / 15 clients on the new cluster, 0 clients on the read-only old instance.
+- Still open: first CNPG base backup (manual `Backup` or the 01:00 local schedule), backup alerting (6.3), PITR drill, Phase 7 soak → Phase 8 decommission of `postgresql-18` (user decision), `strategy: Recreate` for RWO apps, revert `ceph osd reweight osd.0 0.85` → 1.0 after the balancer settles, and the gamma reset cause (power/board, not thermal) which no software setting fixes.
