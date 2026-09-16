@@ -1,11 +1,11 @@
 { lib, kubenix, homelab, ... }:
 
-# Phase 5 final cluster. Enable by renaming to postgresql.nix.
-# Apps reach it at kubenix.lib.postgresHost (postgresql-rw.databases.svc).
+# Phase 6: barman ObjectStore, ScheduledBackup and Database CRs for the
+# postgresql cluster. Enable by renaming to postgresql-backups.nix once the
+# restored data is verified.
 let
   namespace = homelab.kubernetes.namespaces.databases;
   name = "postgresql";
-  pg = import ./_postgresql-lib.nix;
   objectStoreName = "pi-minio";
   barmanPlugin = "barman-cloud.cloudnative-pg.io";
 
@@ -33,41 +33,6 @@ let
 in
 {
   kubernetes.resources = {
-    cluster.${name} = {
-      metadata = {
-        inherit name namespace;
-      };
-      spec = {
-        instances = 1;
-        imageName = pg.image;
-        imagePullSecrets = [ { name = "ghcr-registry-secret"; } ];
-        enableSuperuserAccess = true;
-        superuserSecret.name = "postgresql-superuser";
-        inherit (pg) storage walStorage resources postgresql;
-
-        plugins = [
-          {
-            name = barmanPlugin;
-            isWALArchiver = true;
-            parameters.barmanObjectName = objectStoreName;
-          }
-        ];
-
-        managed.services.additional = [
-          {
-            selectorType = "rw";
-            serviceTemplate = {
-              metadata = {
-                name = "${name}-lb";
-                annotations = kubenix.lib.serviceAnnotationFor name;
-              };
-              spec.type = "LoadBalancer";
-            };
-          }
-        ];
-      } // pg.importFromPostgresql18;
-    };
-
     objectstore.${objectStoreName} = {
       metadata = {
         name = objectStoreName;

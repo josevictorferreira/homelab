@@ -1,0 +1,68 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: b6aae6d2cf35c497b0e93d7652dd521b0f747c4f
+  name: postgresql
+  namespace: databases
+spec:
+  bootstrap:
+    initdb:
+      dataChecksums: true
+  enableSuperuserAccess: true
+  imageName: ghcr.io/josevictorferreira/postgresql-cnpg:18.6-vchord1.1.1-postgis3@sha256:5b3c66d10a39ff0c4a70f4908fc1e8c1c4d4f2a03f517cb5d7dec39b44eacea2
+  imagePullSecrets:
+    - name: ghcr-registry-secret
+  instances: 1
+  managed:
+    services:
+      additional:
+        - selectorType: rw
+          serviceTemplate:
+            metadata:
+              annotations:
+                lbipam.cilium.io/ips: 10.10.10.101
+                lbipam.cilium.io/sharing-key: postgresql
+              name: postgresql-lb
+            spec:
+              type: LoadBalancer
+  postgresql:
+    parameters:
+      autovacuum_max_workers: "5"
+      autovacuum_naptime: 10s
+      autovacuum_vacuum_cost_delay: 10ms
+      autovacuum_vacuum_cost_limit: "2000"
+      checkpoint_completion_target: "0.9"
+      checkpoint_timeout: 30min
+      effective_cache_size: 2304MB
+      log_checkpoints: "on"
+      log_min_duration_statement: "2000"
+      maintenance_work_mem: 512MB
+      max_wal_size: 4GB
+      min_wal_size: 512MB
+      search_path: '"$user", public, vectors'
+      shared_buffers: 768MB
+      synchronous_commit: "off"
+      wal_buffers: 32MB
+      wal_compression: "on"
+      work_mem: 16MB
+    shared_preload_libraries:
+      - vchord.so
+  resources:
+    limits:
+      cpu: "1"
+      memory: 3Gi
+    requests:
+      cpu: 250m
+      memory: 1Gi
+  storage:
+    size: 40Gi
+    storageClass: rook-ceph-block
+  superuserSecret:
+    name: postgresql-superuser
+  walStorage:
+    size: 8Gi
+    storageClass: rook-ceph-block
