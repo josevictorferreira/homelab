@@ -29,6 +29,13 @@ in
         };
       };
       bootstrap.initdb.dataChecksums = true;
+      plugins = [
+        {
+          name = "barman-cloud.cloudnative-pg.io";
+          isWALArchiver = true;
+          parameters.barmanObjectName = "pi-minio";
+        }
+      ];
 
       # The Debian PostgreSQL 18 build raised SIGILL (invalid opcode inside the
       # postgres binary) on the Celeron N5105 nodes (no AVX) during the 2026-09-16

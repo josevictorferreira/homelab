@@ -1,0 +1,718 @@
+apiVersion: barmancloud.cnpg.io/v1
+kind: ObjectStore
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+  name: pi-minio
+  namespace: databases
+spec:
+  configuration:
+    data:
+      compression: zstd
+    destinationPath: s3://homelab-backup-postgres/cnpg/
+    endpointURL: http://10.10.10.209:9000
+    s3Credentials:
+      accessKeyId:
+        key: ACCESS_KEY_ID
+        name: postgresql-backup-s3
+      secretAccessKey:
+        key: ACCESS_SECRET_KEY
+        name: postgresql-backup-s3
+    wal:
+      compression: zstd
+  retentionPolicy: 30d
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+  name: attic
+  namespace: databases
+spec:
+  cluster:
+    name: postgresql
+  databaseReclaimPolicy: retain
+  db: attic
+  extensions:
+    - name: vector
+    - name: vchord
+  name: postgresql
+  owner: postgres
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+  name: bookorbit
+  namespace: databases
+spec:
+  cluster:
+    name: postgresql
+  databaseReclaimPolicy: retain
+  db: bookorbit
+  extensions:
+    - name: vector
+    - name: vchord
+  name: postgresql
+  owner: postgres
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+  name: dramaturge
+  namespace: databases
+spec:
+  cluster:
+    name: postgresql
+  databaseReclaimPolicy: retain
+  db: dramaturge
+  extensions:
+    - name: vector
+    - name: vchord
+  name: postgresql
+  owner: postgres
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+  name: glyph-production
+  namespace: databases
+spec:
+  cluster:
+    name: postgresql
+  databaseReclaimPolicy: retain
+  db: glyph_production
+  extensions:
+    - name: vector
+    - name: vchord
+  name: postgresql
+  owner: postgres
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+  name: glyph-production-cable
+  namespace: databases
+spec:
+  cluster:
+    name: postgresql
+  databaseReclaimPolicy: retain
+  db: glyph_production_cable
+  extensions:
+    - name: vector
+    - name: vchord
+  name: postgresql
+  owner: postgres
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+  name: glyph-production-cache
+  namespace: databases
+spec:
+  cluster:
+    name: postgresql
+  databaseReclaimPolicy: retain
+  db: glyph_production_cache
+  extensions:
+    - name: vector
+    - name: vchord
+  name: postgresql
+  owner: postgres
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+  name: glyph-production-queue
+  namespace: databases
+spec:
+  cluster:
+    name: postgresql
+  databaseReclaimPolicy: retain
+  db: glyph_production_queue
+  extensions:
+    - name: vector
+    - name: vchord
+  name: postgresql
+  owner: postgres
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+  name: grafana
+  namespace: databases
+spec:
+  cluster:
+    name: postgresql
+  databaseReclaimPolicy: retain
+  db: grafana
+  extensions:
+    - name: vector
+    - name: vchord
+  name: postgresql
+  owner: postgres
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+  name: hindsight
+  namespace: databases
+spec:
+  cluster:
+    name: postgresql
+  databaseReclaimPolicy: retain
+  db: hindsight
+  extensions:
+    - name: vector
+    - name: vchord
+  name: postgresql
+  owner: postgres
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+  name: ideator-production
+  namespace: databases
+spec:
+  cluster:
+    name: postgresql
+  databaseReclaimPolicy: retain
+  db: ideator_production
+  extensions:
+    - name: vector
+    - name: vchord
+  name: postgresql
+  owner: postgres
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+  name: ideator-production-cable
+  namespace: databases
+spec:
+  cluster:
+    name: postgresql
+  databaseReclaimPolicy: retain
+  db: ideator_production_cable
+  extensions:
+    - name: vector
+    - name: vchord
+  name: postgresql
+  owner: postgres
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+  name: ideator-production-cache
+  namespace: databases
+spec:
+  cluster:
+    name: postgresql
+  databaseReclaimPolicy: retain
+  db: ideator_production_cache
+  extensions:
+    - name: vector
+    - name: vchord
+  name: postgresql
+  owner: postgres
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+  name: ideator-production-queue
+  namespace: databases
+spec:
+  cluster:
+    name: postgresql
+  databaseReclaimPolicy: retain
+  db: ideator_production_queue
+  extensions:
+    - name: vector
+    - name: vchord
+  name: postgresql
+  owner: postgres
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+  name: immich
+  namespace: databases
+spec:
+  cluster:
+    name: postgresql
+  databaseReclaimPolicy: retain
+  db: immich
+  extensions:
+    - name: vector
+    - name: vchord
+  name: postgresql
+  owner: postgres
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+  name: keycloak
+  namespace: databases
+spec:
+  cluster:
+    name: postgresql
+  databaseReclaimPolicy: retain
+  db: keycloak
+  extensions:
+    - name: vector
+    - name: vchord
+  name: postgresql
+  owner: postgres
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+  name: mautrix-discord
+  namespace: databases
+spec:
+  cluster:
+    name: postgresql
+  databaseReclaimPolicy: retain
+  db: mautrix_discord
+  extensions:
+    - name: vector
+    - name: vchord
+  name: postgresql
+  owner: postgres
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+  name: mautrix-discord-v2
+  namespace: databases
+spec:
+  cluster:
+    name: postgresql
+  databaseReclaimPolicy: retain
+  db: mautrix_discord_v2
+  extensions:
+    - name: vector
+    - name: vchord
+  name: postgresql
+  owner: postgres
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+  name: mautrix-slack
+  namespace: databases
+spec:
+  cluster:
+    name: postgresql
+  databaseReclaimPolicy: retain
+  db: mautrix_slack
+  extensions:
+    - name: vector
+    - name: vchord
+  name: postgresql
+  owner: postgres
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+  name: mautrix-slack-v2
+  namespace: databases
+spec:
+  cluster:
+    name: postgresql
+  databaseReclaimPolicy: retain
+  db: mautrix_slack_v2
+  extensions:
+    - name: vector
+    - name: vchord
+  name: postgresql
+  owner: postgres
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+  name: mautrix-whatsapp
+  namespace: databases
+spec:
+  cluster:
+    name: postgresql
+  databaseReclaimPolicy: retain
+  db: mautrix_whatsapp
+  extensions:
+    - name: vector
+    - name: vchord
+  name: postgresql
+  owner: postgres
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+  name: mautrix-whatsapp-v2
+  namespace: databases
+spec:
+  cluster:
+    name: postgresql
+  databaseReclaimPolicy: retain
+  db: mautrix_whatsapp_v2
+  extensions:
+    - name: vector
+    - name: vchord
+  name: postgresql
+  owner: postgres
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+  name: n8n
+  namespace: databases
+spec:
+  cluster:
+    name: postgresql
+  databaseReclaimPolicy: retain
+  db: n8n
+  extensions:
+    - name: vector
+    - name: vchord
+  name: postgresql
+  owner: postgres
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+  name: openwebui
+  namespace: databases
+spec:
+  cluster:
+    name: postgresql
+  databaseReclaimPolicy: retain
+  db: openwebui
+  extensions:
+    - name: vector
+    - name: vchord
+  name: postgresql
+  owner: postgres
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+  name: poise-production
+  namespace: databases
+spec:
+  cluster:
+    name: postgresql
+  databaseReclaimPolicy: retain
+  db: poise_production
+  extensions:
+    - name: vector
+    - name: vchord
+  name: postgresql
+  owner: postgres
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+  name: poise-production-cable
+  namespace: databases
+spec:
+  cluster:
+    name: postgresql
+  databaseReclaimPolicy: retain
+  db: poise_production_cable
+  extensions:
+    - name: vector
+    - name: vchord
+  name: postgresql
+  owner: postgres
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+  name: poise-production-cache
+  namespace: databases
+spec:
+  cluster:
+    name: postgresql
+  databaseReclaimPolicy: retain
+  db: poise_production_cache
+  extensions:
+    - name: vector
+    - name: vchord
+  name: postgresql
+  owner: postgres
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+  name: poise-production-queue
+  namespace: databases
+spec:
+  cluster:
+    name: postgresql
+  databaseReclaimPolicy: retain
+  db: poise_production_queue
+  extensions:
+    - name: vector
+    - name: vchord
+  name: postgresql
+  owner: postgres
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+  name: readeck
+  namespace: databases
+spec:
+  cluster:
+    name: postgresql
+  databaseReclaimPolicy: retain
+  db: readeck
+  extensions:
+    - name: vector
+    - name: vchord
+  name: postgresql
+  owner: postgres
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+  name: synapse
+  namespace: databases
+spec:
+  cluster:
+    name: postgresql
+  databaseReclaimPolicy: retain
+  db: synapse
+  extensions:
+    - name: vector
+    - name: vchord
+  name: postgresql
+  owner: postgres
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+  name: valoris-production
+  namespace: databases
+spec:
+  cluster:
+    name: postgresql
+  databaseReclaimPolicy: retain
+  db: valoris_production
+  extensions:
+    - name: vector
+    - name: vchord
+  name: postgresql
+  owner: postgres
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+  name: valoris-production-queue
+  namespace: databases
+spec:
+  cluster:
+    name: postgresql
+  databaseReclaimPolicy: retain
+  db: valoris_production_queue
+  extensions:
+    - name: vector
+    - name: vchord
+  name: postgresql
+  owner: postgres
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+  name: wealtho
+  namespace: databases
+spec:
+  cluster:
+    name: postgresql
+  databaseReclaimPolicy: retain
+  db: wealtho
+  extensions:
+    - name: vector
+    - name: vchord
+  name: postgresql
+  owner: postgres
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: ScheduledBackup
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 578b403ec2971e244930d19557e0a79003b8ef19
+  name: postgresql-daily
+  namespace: databases
+spec:
+  backupOwnerReference: self
+  cluster:
+    name: postgresql
+  immediate: false
+  method: plugin
+  pluginConfiguration:
+    name: barman-cloud.cloudnative-pg.io
+  schedule: 0 30 5 * * *

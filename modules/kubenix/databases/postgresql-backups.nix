@@ -1,8 +1,7 @@
 { lib, kubenix, homelab, ... }:
 
 # Phase 6: barman ObjectStore, ScheduledBackup and Database CRs for the
-# postgresql cluster. Enable by renaming to postgresql-backups.nix once the
-# restored data is verified.
+# postgresql cluster (enabled 2026-09-16 after the restored data was verified).
 let
   namespace = homelab.kubernetes.namespaces.databases;
   name = "postgresql";
@@ -67,7 +66,9 @@ in
       };
       spec = {
         schedule = "0 30 5 * * *";
-        immediate = true;
+        # The first base backup is taken by hand once Ceph recovery is done;
+        # the ~22 GB read would compete with backfill on this storage.
+        immediate = false;
         backupOwnerReference = "self";
         cluster.name = name;
         method = "plugin";

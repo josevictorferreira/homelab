@@ -69,7 +69,15 @@
   # workaround for bad cooling, not a substitute for fixing it.
   # 2026-09-15: gamma's cooler failed again (104 C at boot, hard-reset loop),
   # so the cap applies to every gk3v host until both are physically serviced.
-  systemd.services = {
+  # 2026-09-16: gamma hard-resets under load even at 6 W (two resets in seven
+  # minutes while Ceph was recovering), so it gets a tighter cap than alpha,
+  # which runs etcd and cannot afford 1.2 GHz.
+  systemd.services = let
+    gamma = config.networking.hostName == "lab-gamma-wk";
+    pl1 = if gamma then "4000000" else "6000000";
+    pl2 = if gamma then "6000000" else "8000000";
+    maxKhz = if gamma then "1200000" else "1500000";
+  in {
     gk3v-power-cap = {
       description = "Cap Celeron N5105 package power (thermal mitigation)";
       wantedBy = [ "multi-user.target" ];
@@ -80,9 +88,9 @@
       script = ''
         rapl=/sys/class/powercap/intel-rapl:0
         if [ -d "$rapl" ]; then
-          # PL1 sustained 6W, PL2 burst 8W (stock is 10W/15W).
-          echo 6000000 > "$rapl/constraint_0_power_limit_uw" || true
-          echo 8000000 > "$rapl/constraint_1_power_limit_uw" || true
+          # PL1 sustained / PL2 burst (stock is 10W/15W).
+          echo ${pl1} > "$rapl/constraint_0_power_limit_uw" || true
+          echo ${pl2} > "$rapl/constraint_1_power_limit_uw" || true
         fi
         # Turbo to 2.9GHz is the sharpest heat spike on a dead cooler.
         if [ -w /sys/devices/system/cpu/intel_pstate/no_turbo ]; then
@@ -90,7 +98,7 @@
         fi
         # Clamp clocks well below the 2.9GHz max; heat, not throughput, is the limit.
         for f in /sys/devices/system/cpu/cpu*/cpufreq/scaling_max_freq; do
-          echo 1500000 > "$f" || true
+          echo ${maxKhz} > "$f" || true
         done
       '';
     };
