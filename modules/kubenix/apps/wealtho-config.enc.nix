@@ -11,7 +11,7 @@ in
       inherit namespace;
     };
     stringData = {
-      WEALTHO_DATABASE_HOST = "postgresql-18-hl";
+      WEALTHO_DATABASE_HOST = kubenix.lib.postgresHost;
       WEALTHO_DATABASE_PORT = "5432";
       WEALTHO_DATABASE_USERNAME = "postgres";
       WEALTHO_DATABASE_PASSWORD = kubenix.lib.secretsInlineFor "postgresql_admin_password";

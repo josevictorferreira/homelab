@@ -5,10 +5,20 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: b6aae6d2cf35c497b0e93d7652dd521b0f747c4f
+    kubenix/hash: 445000a98ee6a131642456bc719daad9327f49c4
   name: postgresql
   namespace: databases
 spec:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                  - lab-beta-cp
+                  - lab-delta-cp
   bootstrap:
     initdb:
       dataChecksums: true

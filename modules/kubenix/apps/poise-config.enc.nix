@@ -16,7 +16,7 @@ in
       # config/database.yml derives the cache, queue, and cable database names
       # from POISE_DATABASE_NAME by suffix, so all four must exist in
       # homelab.kubernetes.databases.postgres.
-      POISE_DATABASE_HOST = "postgresql-18-hl";
+      POISE_DATABASE_HOST = kubenix.lib.postgresHost;
       POISE_DATABASE_PORT = "5432";
       POISE_DATABASE_NAME = "${app}_production";
       POISE_DATABASE_USER = "postgres";

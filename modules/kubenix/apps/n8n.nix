@@ -95,7 +95,7 @@ in
 
         postgresql.enabled = false;
         externalPostgresql = {
-          host = "postgresql-18-hl";
+          host = kubenix.lib.postgresHost;
           existingSecret = secretName;
         };
 

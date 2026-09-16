@@ -18,7 +18,7 @@ in
     };
     stringData = {
       # Database connection for the Domus Rails app (multi-db: primary/cache/queue/cable).
-      DOMUS_DATABASE_HOST = "postgresql-18-hl";
+      DOMUS_DATABASE_HOST = kubenix.lib.postgresHost;
       DOMUS_DATABASE_PORT = "5432";
       DOMUS_DATABASE_USERNAME = "postgres";
       DOMUS_DATABASE_PASSWORD = kubenix.lib.secretsFor "postgresql_admin_password";

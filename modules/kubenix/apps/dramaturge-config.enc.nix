@@ -10,7 +10,7 @@ in
       inherit namespace;
     };
     stringData = {
-      DATABASE_URL = "postgresql://postgres:${kubenix.lib.secretsInlineFor "postgresql_admin_password"}@postgresql-18-hl:5432/dramaturge";
+      DATABASE_URL = "postgresql://postgres:${kubenix.lib.secretsInlineFor "postgresql_admin_password"}@${kubenix.lib.postgresHost}:5432/dramaturge";
       # Velox is the default LLM provider (combo glm-5-3); the base URL and
       # key mirror how poise talks to the in-cluster Velox service.
       VELOX_API_KEY = kubenix.lib.secretsFor "velox_api_keys";

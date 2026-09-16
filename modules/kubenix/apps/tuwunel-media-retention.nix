@@ -35,7 +35,7 @@ let
   # whole run ahead of the server.
   batchPause = "60";
 
-  pgHost = kubenix.lib.serviceHostFor "postgresql-18-hl" namespace;
+  pgHost = kubenix.lib.postgresHost;
   homeserver = "http://${kubenix.lib.serviceHostFor "tuwunel" namespace}:8008";
   bridgeDatabase = "mautrix_discord_v2";
   # The server user, not a human admin: tuwunel honours its own commands only

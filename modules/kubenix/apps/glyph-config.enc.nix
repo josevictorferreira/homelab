@@ -14,7 +14,7 @@ in
     };
     stringData = {
       # Database connection for Glyph Rails app
-      GLYPH_DATABASE_HOST = "postgresql-18-hl";
+      GLYPH_DATABASE_HOST = kubenix.lib.postgresHost;
       GLYPH_DATABASE_PORT = "5432";
       GLYPH_DATABASE_NAME = "${app}_production";
       GLYPH_DATABASE_USER = "postgres";

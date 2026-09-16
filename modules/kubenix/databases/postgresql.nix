@@ -30,6 +30,21 @@ in
       };
       bootstrap.initdb.dataChecksums = true;
 
+      # The Debian PostgreSQL 18 build raised SIGILL (invalid opcode inside the
+      # postgres binary) on the Celeron N5105 nodes (no AVX) during the 2026-09-16
+      # restore. Keep the instance on the AVX2-capable nodes.
+      affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms = [
+        {
+          matchExpressions = [
+            {
+              key = "kubernetes.io/hostname";
+              operator = "In";
+              values = [ "lab-beta-cp" "lab-delta-cp" ];
+            }
+          ];
+        }
+      ];
+
       managed.services.additional = [
         {
           selectorType = "rw";

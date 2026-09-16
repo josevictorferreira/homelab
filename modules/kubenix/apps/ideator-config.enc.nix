@@ -2,7 +2,7 @@
 let
   app = "ideator";
   namespace = homelab.kubernetes.namespaces.applications;
-  dbHost = "postgresql-18-hl";
+  dbHost = kubenix.lib.postgresHost;
   dbPort = "5432";
   dbUser = "postgres";
   dbPassword = kubenix.lib.secretsInlineFor "postgresql_admin_password";

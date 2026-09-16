@@ -4,7 +4,7 @@ let
   image = "ghcr.io/josevictorferreira/backup-toolbox@sha256:08bda3ee3383b093cc0ed74d42ed9b167ecb92dd7c01e090a542d0a75dec8abb";
   minioEndpoint = "http://10.10.10.209:9000";
   minioBucket = "homelab-backup-postgres";
-  pgHost = "${kubenix.lib.serviceHostFor "postgresql-18-hl" homelab.kubernetes.namespaces.applications}";
+  pgHost = "${kubenix.lib.postgresHost}";
   pgPort = "5432";
   pgUser = "postgres";
 

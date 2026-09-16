@@ -99,7 +99,7 @@ in
           ];
           "grafana.ini".database = {
             type = "postgres";
-            host = "postgresql-18-hl.apps.svc.cluster.local:5432";
+            host = "${kubenix.lib.postgresHost}:5432";
             name = "grafana";
             user = "postgres";
             password = "$__env{GF_DATABASE_PASSWORD}";

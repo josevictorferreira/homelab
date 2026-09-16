@@ -41,7 +41,7 @@ in
         # External PostgreSQL configuration
         database = {
           type = "postgres";
-          host = "postgresql-18-hl";
+          host = kubenix.lib.postgresHost;
           port = "5432";
           name = "keycloak";
           existingSecret = secretName;

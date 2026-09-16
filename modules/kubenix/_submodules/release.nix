@@ -26,8 +26,8 @@ let
         "sh"
         "-c"
         ''
-          until pg_isready -h postgresql-18 -p 5432 -U postgres; do
-            echo "waiting for postgresql-18..."
+          until pg_isready -h ${kubenix.lib.postgresHost} -p 5432 -U postgres; do
+            echo "waiting for postgresql..."
             sleep 3
           done
         ''
