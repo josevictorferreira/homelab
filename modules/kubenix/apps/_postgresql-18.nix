@@ -1,3 +1,11 @@
+# DISABLED 2026-09-16 (Phase 8 of .agents/features/0002-postgres-operator-refactory):
+# the shared Postgres is now the CloudNativePG cluster `postgresql` in the
+# `databases` namespace. This Bitnami StatefulSet was kept read-only as the
+# rollback copy and removed the same day on the user's decision. Its volume
+# `data-postgresql-18-0` (PV pvc-58b75079-…) is RETAINED (StatefulSet retention
+# and PV reclaim policy are both Retain) and must stay for >= 30 days; delete it
+# only with a second explicit confirmation. To roll back, rename this file back
+# without the `_` and run `make manifests`.
 {
   lib,
   kubenix,
