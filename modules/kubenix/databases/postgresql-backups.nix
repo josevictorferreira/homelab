@@ -59,14 +59,16 @@ in
       };
     };
 
-    # CNPG schedules are six-field cron in UTC: 05:30 UTC = 02:30 America/Sao_Paulo.
+    # CNPG schedules are six-field cron in UTC: 04:00 UTC = 01:00 America/Sao_Paulo,
+    # ninety minutes before the logical `postgres-backup` dump (02:30 local) so the
+    # two full reads of the database never overlap on this storage.
     scheduledbackup."${name}-daily" = {
       metadata = {
         name = "${name}-daily";
         inherit namespace;
       };
       spec = {
-        schedule = "0 30 5 * * *";
+        schedule = "0 0 4 * * *";
         # The first base backup is taken by hand once Ceph recovery is done;
         # the ~22 GB read would compete with backfill on this storage.
         immediate = false;

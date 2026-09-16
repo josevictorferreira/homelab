@@ -1,3 +1,12 @@
+# DISABLED 2026-09-16 (Phase 6 of .agents/features/0002): the weekly logical
+# restore drill has failed since 2026-08-30. The database is now ~22 GB on disk;
+# it neither fits the 8Gi emptyDir nor a node's ephemeral storage, and a 40Gi
+# RBD scratch volume is not affordable while replicapool MAX AVAIL is ~120 GiB.
+# The scratch image also has to become the CNPG image (Postgres 18.6, vchord
+# 1.1.1, postgis 3.6) with a manual initdb, since the Bitnami image no longer
+# matches the dump. Re-enable (rename without `_`) once Ceph has capacity for
+# a scratch PVC; until then the CNPG Backup status plus `barman-cloud-backup-list`
+# is the restore-readiness signal.
 { homelab, ... }:
 let
   namespace = homelab.kubernetes.namespaces.backup;
