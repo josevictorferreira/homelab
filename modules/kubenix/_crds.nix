@@ -91,6 +91,20 @@
         kind = "CephNFS";
       };
 
+      csidriver = {
+        attrName = "csidriver";
+        group = "csi.ceph.io";
+        version = "v1";
+        kind = "Driver";
+      };
+
+      csioperatorconfig = {
+        attrName = "csioperatorconfig";
+        group = "csi.ceph.io";
+        version = "v1";
+        kind = "OperatorConfig";
+      };
+
       cephobjectstoreuser = {
         attrName = "cephobjectstoreuser";
         group = "ceph.rook.io";

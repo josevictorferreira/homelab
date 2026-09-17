@@ -1,0 +1,1185 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: cd8f3d39f4a30e30c1e4ffd8e76259a07c0b2039
+  name: rook-ceph-cephfs-csi-ceph-com-ctrlplugin-sa
+  namespace: rook-ceph
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: cd8f3d39f4a30e30c1e4ffd8e76259a07c0b2039
+  name: rook-ceph-cephfs-csi-ceph-com-nodeplugin-sa
+  namespace: rook-ceph
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: cd8f3d39f4a30e30c1e4ffd8e76259a07c0b2039
+  name: rook-ceph-rbd-csi-ceph-com-ctrlplugin-sa
+  namespace: rook-ceph
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: cd8f3d39f4a30e30c1e4ffd8e76259a07c0b2039
+  name: rook-ceph-rbd-csi-ceph-com-nodeplugin-sa
+  namespace: rook-ceph
+---
+apiVersion: csi.ceph.io/v1
+kind: Driver
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: cd8f3d39f4a30e30c1e4ffd8e76259a07c0b2039
+  name: rook-ceph.cephfs.csi.ceph.com
+  namespace: rook-ceph
+spec:
+  attachRequired: true
+  cephFsClientType: kernel
+  controllerPlugin:
+    hostNetwork: false
+    privileged: false
+    replicas: 2
+    serviceAccountName: rook-ceph-cephfs-csi-ceph-com-ctrlplugin-sa
+    tolerations: []
+    volumes: []
+  deployCsiAddons: false
+  enableFencing: false
+  fsGroupPolicy: File
+  fuseMountOptions: {}
+  generateOMapInfo: false
+  grpcTimeout: 150
+  kernelMountOptions: {}
+  log:
+    verbosity: 0
+  nodePlugin:
+    imagePullPolicy: IfNotPresent
+    serviceAccountName: rook-ceph-cephfs-csi-ceph-com-nodeplugin-sa
+    tolerations: []
+    volumes:
+      - volume:
+          hostPath:
+            path: /run/booted-system/kernel-modules/lib/modules/
+          name: lib-modules
+      - mount:
+          mountPath: /nix
+          name: host-nix
+          readOnly: true
+        volume:
+          hostPath:
+            path: /nix
+          name: host-nix
+  snapshotPolicy: volumeSnapshot
+---
+apiVersion: csi.ceph.io/v1
+kind: Driver
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: cd8f3d39f4a30e30c1e4ffd8e76259a07c0b2039
+  name: rook-ceph.rbd.csi.ceph.com
+  namespace: rook-ceph
+spec:
+  attachRequired: true
+  cephFsClientType: kernel
+  controllerPlugin:
+    hostNetwork: false
+    privileged: false
+    replicas: 2
+    serviceAccountName: rook-ceph-rbd-csi-ceph-com-ctrlplugin-sa
+    tolerations: []
+    volumes: []
+  deployCsiAddons: false
+  enableFencing: false
+  fsGroupPolicy: File
+  fuseMountOptions: {}
+  generateOMapInfo: false
+  grpcTimeout: 150
+  kernelMountOptions: {}
+  log:
+    verbosity: 0
+  nodePlugin:
+    imagePullPolicy: IfNotPresent
+    serviceAccountName: rook-ceph-rbd-csi-ceph-com-nodeplugin-sa
+    tolerations: []
+    volumes:
+      - volume:
+          hostPath:
+            path: /run/booted-system/kernel-modules/lib/modules/
+          name: lib-modules
+      - mount:
+          mountPath: /nix
+          name: host-nix
+          readOnly: true
+        volume:
+          hostPath:
+            path: /nix
+          name: host-nix
+  snapshotPolicy: volumeSnapshot
+---
+apiVersion: csi.ceph.io/v1
+kind: OperatorConfig
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: cd8f3d39f4a30e30c1e4ffd8e76259a07c0b2039
+  name: ceph-csi-operator-config
+  namespace: rook-ceph
+spec:
+  driverSpecDefaults:
+    attachRequired: true
+    cephFsClientType: kernel
+    clusterName: rook-ceph
+    controllerPlugin:
+      hostNetwork: false
+      imagePullPolicy: IfNotPresent
+      priorityClassName: system-cluster-critical
+      privileged: false
+      replicas: 1
+      resources:
+        addons: {}
+        attacher:
+          limits:
+            memory: 256Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+        liveness: {}
+        logRotator: {}
+        omapGenerator: {}
+        plugin:
+          limits:
+            memory: 1Gi
+          requests:
+            memory: 512Mi
+        provisioner:
+          limits:
+            memory: 256Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+        resizer:
+          limits:
+            memory: 256Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+        snapshotter:
+          limits:
+            memory: 256Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+      tolerations: []
+      volumes: []
+    deployCsiAddons: false
+    enableFencing: false
+    fsGroupPolicy: File
+    fuseMountOptions: {}
+    generateOMapInfo: false
+    grpcTimeout: 30
+    imageSet:
+      name: rook-csi-operator-image-set-configmap
+    kernelMountOptions: {}
+    log:
+      verbosity: 0
+    nodePlugin:
+      imagePullPolicy: IfNotPresent
+      kubeletDirPath: /var/lib/kubelet
+      priorityClassName: system-node-critical
+      resources:
+        addons: {}
+        liveness: {}
+        logRotator: {}
+        plugin:
+          limits:
+            memory: 1Gi
+          requests:
+            cpu: 250m
+            memory: 512Mi
+        registrar:
+          limits:
+            memory: 256Mi
+          requests:
+            cpu: 50m
+            memory: 128Mi
+      tolerations: []
+      volumes: []
+    snapshotPolicy: none
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: cd8f3d39f4a30e30c1e4ffd8e76259a07c0b2039
+  name: rook-ceph-cephfs-csi-ceph-com-ctrlplugin-cr
+  namespace: rook-ceph
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - secrets
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+    verbs:
+      - get
+  - apiGroups:
+      - ""
+    resources:
+      - nodes
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - storage.k8s.io
+    resources:
+      - csinodes
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - persistentvolumes
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - delete
+      - patch
+      - update
+  - apiGroups:
+      - ""
+    resources:
+      - persistentvolumeclaims
+    verbs:
+      - get
+      - list
+      - watch
+      - patch
+      - update
+  - apiGroups:
+      - storage.k8s.io
+    resources:
+      - storageclasses
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - events
+    verbs:
+      - list
+      - watch
+      - create
+      - update
+      - patch
+  - apiGroups:
+      - storage.k8s.io
+    resources:
+      - volumeattachments
+    verbs:
+      - get
+      - list
+      - watch
+      - patch
+  - apiGroups:
+      - storage.k8s.io
+    resources:
+      - volumeattachments/status
+    verbs:
+      - patch
+  - apiGroups:
+      - ""
+    resources:
+      - persistentvolumeclaims/status
+    verbs:
+      - patch
+  - apiGroups:
+      - snapshot.storage.k8s.io
+    resources:
+      - volumesnapshots
+    verbs:
+      - get
+      - list
+  - apiGroups:
+      - snapshot.storage.k8s.io
+    resources:
+      - volumesnapshotclasses
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - snapshot.storage.k8s.io
+    resources:
+      - volumesnapshotcontents
+    verbs:
+      - get
+      - list
+      - watch
+      - patch
+      - update
+  - apiGroups:
+      - snapshot.storage.k8s.io
+    resources:
+      - volumesnapshotcontents/status
+    verbs:
+      - update
+      - patch
+  - apiGroups:
+      - groupsnapshot.storage.k8s.io
+    resources:
+      - volumegroupsnapshotclasses
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - groupsnapshot.storage.k8s.io
+    resources:
+      - volumegroupsnapshotcontents
+    verbs:
+      - get
+      - list
+      - watch
+      - update
+      - patch
+  - apiGroups:
+      - groupsnapshot.storage.k8s.io
+    resources:
+      - volumegroupsnapshotcontents/status
+    verbs:
+      - update
+      - patch
+  - apiGroups:
+      - groupsnapshot.storage.openshift.io
+    resources:
+      - volumegroupsnapshotclasses
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - groupsnapshot.storage.openshift.io
+    resources:
+      - volumegroupsnapshotcontents
+    verbs:
+      - get
+      - list
+      - watch
+      - update
+      - patch
+  - apiGroups:
+      - groupsnapshot.storage.openshift.io
+    resources:
+      - volumegroupsnapshotcontents/status
+    verbs:
+      - update
+      - patch
+  - apiGroups:
+      - replication.storage.openshift.io
+    resources:
+      - volumegroupreplicationcontents
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - replication.storage.openshift.io
+    resources:
+      - volumegroupreplicationclasses
+    verbs:
+      - get
+  - apiGroups:
+      - ""
+    resources:
+      - serviceaccounts
+    verbs:
+      - get
+  - apiGroups:
+      - ""
+    resources:
+      - serviceaccounts/token
+    verbs:
+      - create
+  - apiGroups:
+      - authentication.k8s.io
+    resources:
+      - tokenreviews
+    verbs:
+      - create
+  - apiGroups:
+      - storage.k8s.io
+    resources:
+      - volumeattributesclasses
+    verbs:
+      - get
+      - list
+      - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: cd8f3d39f4a30e30c1e4ffd8e76259a07c0b2039
+  name: rook-ceph-cephfs-csi-ceph-com-nodeplugin-cr
+  namespace: rook-ceph
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - nodes
+    verbs:
+      - get
+  - apiGroups:
+      - ""
+    resources:
+      - secrets
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+    verbs:
+      - get
+  - apiGroups:
+      - ""
+    resources:
+      - serviceaccounts
+    verbs:
+      - get
+  - apiGroups:
+      - ""
+    resources:
+      - serviceaccounts/token
+    verbs:
+      - create
+  - apiGroups:
+      - ""
+    resources:
+      - events
+    verbs:
+      - list
+      - watch
+      - create
+      - update
+      - patch
+  - apiGroups:
+      - ""
+    resources:
+      - persistentvolumes
+      - persistentvolumeclaims
+    verbs:
+      - get
+  - apiGroups:
+      - authentication.k8s.io
+    resources:
+      - tokenreviews
+    verbs:
+      - create
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: cd8f3d39f4a30e30c1e4ffd8e76259a07c0b2039
+  name: rook-ceph-rbd-csi-ceph-com-ctrlplugin-cr
+  namespace: rook-ceph
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - secrets
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - persistentvolumes
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - delete
+      - patch
+      - update
+  - apiGroups:
+      - ""
+    resources:
+      - persistentvolumeclaims
+    verbs:
+      - get
+      - list
+      - watch
+      - update
+  - apiGroups:
+      - storage.k8s.io
+    resources:
+      - storageclasses
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - events
+    verbs:
+      - list
+      - watch
+      - create
+      - update
+      - patch
+  - apiGroups:
+      - storage.k8s.io
+    resources:
+      - volumeattachments
+    verbs:
+      - get
+      - list
+      - watch
+      - patch
+  - apiGroups:
+      - storage.k8s.io
+    resources:
+      - volumeattachments/status
+    verbs:
+      - patch
+  - apiGroups:
+      - ""
+    resources:
+      - nodes
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - storage.k8s.io
+    resources:
+      - csinodes
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - persistentvolumeclaims/status
+    verbs:
+      - patch
+  - apiGroups:
+      - snapshot.storage.k8s.io
+    resources:
+      - volumesnapshots
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - snapshot.storage.k8s.io
+    resources:
+      - volumesnapshotclasses
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - snapshot.storage.k8s.io
+    resources:
+      - volumesnapshotcontents
+    verbs:
+      - get
+      - list
+      - watch
+      - patch
+      - update
+  - apiGroups:
+      - snapshot.storage.k8s.io
+    resources:
+      - volumesnapshotcontents/status
+    verbs:
+      - update
+      - patch
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+    verbs:
+      - get
+  - apiGroups:
+      - ""
+    resources:
+      - serviceaccounts
+    verbs:
+      - get
+  - apiGroups:
+      - ""
+    resources:
+      - serviceaccounts/token
+    verbs:
+      - create
+  - apiGroups:
+      - groupsnapshot.storage.k8s.io
+    resources:
+      - volumegroupsnapshotclasses
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - groupsnapshot.storage.k8s.io
+    resources:
+      - volumegroupsnapshotcontents
+    verbs:
+      - get
+      - list
+      - watch
+      - update
+      - patch
+  - apiGroups:
+      - groupsnapshot.storage.k8s.io
+    resources:
+      - volumegroupsnapshotcontents/status
+    verbs:
+      - update
+      - patch
+  - apiGroups:
+      - groupsnapshot.storage.openshift.io
+    resources:
+      - volumegroupsnapshotclasses
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - groupsnapshot.storage.openshift.io
+    resources:
+      - volumegroupsnapshotcontents
+    verbs:
+      - get
+      - list
+      - watch
+      - update
+      - patch
+  - apiGroups:
+      - groupsnapshot.storage.openshift.io
+    resources:
+      - volumegroupsnapshotcontents/status
+    verbs:
+      - update
+      - patch
+  - apiGroups:
+      - replication.storage.openshift.io
+    resources:
+      - volumegroupreplicationcontents
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - replication.storage.openshift.io
+    resources:
+      - volumegroupreplicationclasses
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - authentication.k8s.io
+    resources:
+      - tokenreviews
+    verbs:
+      - create
+  - apiGroups:
+      - authorization.k8s.io
+    resources:
+      - subjectaccessreviews
+    verbs:
+      - create
+  - apiGroups:
+      - cbt.storage.k8s.io
+    resources:
+      - snapshotmetadataservices
+    verbs:
+      - get
+      - list
+  - apiGroups:
+      - storage.k8s.io
+    resources:
+      - volumeattributesclasses
+    verbs:
+      - get
+      - list
+      - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: cd8f3d39f4a30e30c1e4ffd8e76259a07c0b2039
+  name: rook-ceph-rbd-csi-ceph-com-nodeplugin-cr
+  namespace: rook-ceph
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - secrets
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - persistentvolumes
+    verbs:
+      - get
+      - list
+  - apiGroups:
+      - storage.k8s.io
+    resources:
+      - volumeattachments
+    verbs:
+      - get
+      - list
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+    verbs:
+      - get
+  - apiGroups:
+      - ""
+    resources:
+      - serviceaccounts
+    verbs:
+      - get
+  - apiGroups:
+      - ""
+    resources:
+      - serviceaccounts/token
+    verbs:
+      - create
+  - apiGroups:
+      - ""
+    resources:
+      - nodes
+    verbs:
+      - get
+  - apiGroups:
+      - authentication.k8s.io
+    resources:
+      - tokenreviews
+    verbs:
+      - create
+  - apiGroups:
+      - ""
+    resources:
+      - events
+    verbs:
+      - list
+      - watch
+      - create
+      - update
+      - patch
+  - apiGroups:
+      - ""
+    resources:
+      - persistentvolumeclaims
+    verbs:
+      - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: cd8f3d39f4a30e30c1e4ffd8e76259a07c0b2039
+  name: rook-ceph-cephfs-csi-ceph-com-ctrlplugin-crb
+  namespace: rook-ceph
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: rook-ceph-cephfs-csi-ceph-com-ctrlplugin-cr
+subjects:
+  - kind: ServiceAccount
+    name: rook-ceph-cephfs-csi-ceph-com-ctrlplugin-sa
+    namespace: rook-ceph
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: cd8f3d39f4a30e30c1e4ffd8e76259a07c0b2039
+  name: rook-ceph-cephfs-csi-ceph-com-nodeplugin-crb
+  namespace: rook-ceph
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: rook-ceph-cephfs-csi-ceph-com-nodeplugin-cr
+subjects:
+  - kind: ServiceAccount
+    name: rook-ceph-cephfs-csi-ceph-com-nodeplugin-sa
+    namespace: rook-ceph
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: cd8f3d39f4a30e30c1e4ffd8e76259a07c0b2039
+  name: rook-ceph-rbd-csi-ceph-com-ctrlplugin-crb
+  namespace: rook-ceph
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: rook-ceph-rbd-csi-ceph-com-ctrlplugin-cr
+subjects:
+  - kind: ServiceAccount
+    name: rook-ceph-rbd-csi-ceph-com-ctrlplugin-sa
+    namespace: rook-ceph
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: cd8f3d39f4a30e30c1e4ffd8e76259a07c0b2039
+  name: rook-ceph-rbd-csi-ceph-com-nodeplugin-crb
+  namespace: rook-ceph
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: rook-ceph-rbd-csi-ceph-com-nodeplugin-cr
+subjects:
+  - kind: ServiceAccount
+    name: rook-ceph-rbd-csi-ceph-com-nodeplugin-sa
+    namespace: rook-ceph
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: cd8f3d39f4a30e30c1e4ffd8e76259a07c0b2039
+  name: rook-ceph-cephfs-csi-ceph-com-ctrlplugin-r
+  namespace: rook-ceph
+rules:
+  - apiGroups:
+      - coordination.k8s.io
+    resources:
+      - leases
+    verbs:
+      - get
+      - watch
+      - list
+      - delete
+      - update
+      - create
+  - apiGroups:
+      - csiaddons.openshift.io
+    resources:
+      - csiaddonsnodes
+    verbs:
+      - get
+      - watch
+      - list
+      - create
+      - update
+      - delete
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+    verbs:
+      - get
+  - apiGroups:
+      - apps
+    resources:
+      - replicasets
+    verbs:
+      - get
+  - apiGroups:
+      - apps
+    resources:
+      - deployments/finalizers
+      - daemonsets/finalizers
+    verbs:
+      - update
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: cd8f3d39f4a30e30c1e4ffd8e76259a07c0b2039
+  name: rook-ceph-cephfs-csi-ceph-com-nodeplugin-r
+  namespace: rook-ceph
+rules:
+  - apiGroups:
+      - csiaddons.openshift.io
+    resources:
+      - csiaddonsnodes
+    verbs:
+      - get
+      - watch
+      - list
+      - create
+      - update
+      - delete
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+    verbs:
+      - get
+  - apiGroups:
+      - apps
+    resources:
+      - replicasets
+    verbs:
+      - get
+  - apiGroups:
+      - apps
+    resources:
+      - deployments/finalizers
+      - daemonsets/finalizers
+    verbs:
+      - update
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: cd8f3d39f4a30e30c1e4ffd8e76259a07c0b2039
+  name: rook-ceph-rbd-csi-ceph-com-ctrlplugin-r
+  namespace: rook-ceph
+rules:
+  - apiGroups:
+      - coordination.k8s.io
+    resources:
+      - leases
+    verbs:
+      - get
+      - watch
+      - list
+      - delete
+      - update
+      - create
+  - apiGroups:
+      - csiaddons.openshift.io
+    resources:
+      - csiaddonsnodes
+    verbs:
+      - get
+      - watch
+      - list
+      - create
+      - update
+      - delete
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+    verbs:
+      - get
+  - apiGroups:
+      - apps
+    resources:
+      - replicasets
+    verbs:
+      - get
+  - apiGroups:
+      - apps
+    resources:
+      - deployments/finalizers
+      - daemonsets/finalizers
+    verbs:
+      - update
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: cd8f3d39f4a30e30c1e4ffd8e76259a07c0b2039
+  name: rook-ceph-rbd-csi-ceph-com-nodeplugin-r
+  namespace: rook-ceph
+rules:
+  - apiGroups:
+      - csiaddons.openshift.io
+    resources:
+      - csiaddonsnodes
+    verbs:
+      - get
+      - watch
+      - list
+      - create
+      - update
+      - delete
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+    verbs:
+      - get
+  - apiGroups:
+      - apps
+    resources:
+      - replicasets
+    verbs:
+      - get
+  - apiGroups:
+      - apps
+    resources:
+      - deployments/finalizers
+      - daemonsets/finalizers
+    verbs:
+      - update
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: cd8f3d39f4a30e30c1e4ffd8e76259a07c0b2039
+  name: rook-ceph-cephfs-csi-ceph-com-ctrlplugin-rb
+  namespace: rook-ceph
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: rook-ceph-cephfs-csi-ceph-com-ctrlplugin-r
+subjects:
+  - kind: ServiceAccount
+    name: rook-ceph-cephfs-csi-ceph-com-ctrlplugin-sa
+    namespace: rook-ceph
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: cd8f3d39f4a30e30c1e4ffd8e76259a07c0b2039
+  name: rook-ceph-cephfs-csi-ceph-com-nodeplugin-rb
+  namespace: rook-ceph
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: rook-ceph-cephfs-csi-ceph-com-nodeplugin-r
+subjects:
+  - kind: ServiceAccount
+    name: rook-ceph-cephfs-csi-ceph-com-nodeplugin-sa
+    namespace: rook-ceph
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: cd8f3d39f4a30e30c1e4ffd8e76259a07c0b2039
+  name: rook-ceph-rbd-csi-ceph-com-ctrlplugin-rb
+  namespace: rook-ceph
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: rook-ceph-rbd-csi-ceph-com-ctrlplugin-r
+subjects:
+  - kind: ServiceAccount
+    name: rook-ceph-rbd-csi-ceph-com-ctrlplugin-sa
+    namespace: rook-ceph
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: cd8f3d39f4a30e30c1e4ffd8e76259a07c0b2039
+  name: rook-ceph-rbd-csi-ceph-com-nodeplugin-rb
+  namespace: rook-ceph
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: rook-ceph-rbd-csi-ceph-com-nodeplugin-r
+subjects:
+  - kind: ServiceAccount
+    name: rook-ceph-rbd-csi-ceph-com-nodeplugin-sa
+    namespace: rook-ceph

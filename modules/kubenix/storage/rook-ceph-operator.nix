@@ -2,21 +2,6 @@
 
 let
   namespace = homelab.kubernetes.namespaces.storage;
-  libModulesVolume = {
-    name = "lib-modules";
-    hostPath.path = "/run/booted-system/kernel-modules/lib/modules/";
-  };
-
-  hostNixVolume = {
-    name = "host-nix";
-    hostPath.path = "/nix";
-  };
-
-  hostNixMount = {
-    name = "host-nix";
-    mountPath = "/nix";
-    readOnly = true;
-  };
 in
 {
   kubernetes = {
@@ -24,8 +9,8 @@ in
       chart = kubenix.lib.helm.fetch {
         repo = "https://charts.rook.io/release";
         chart = "rook-ceph";
-        version = "1.19.0";
-        sha256 = "sha256-zx3yX4JxoYGKXlDJfTXeRQOM7HgB1BFiWLrgspqCLuk=";
+        version = "1.20.7";
+        sha256 = "sha256-L/kouXAJXSHs9mSzERceumXpNVJIVRuj5NC1d5uCwR8=";
       };
       inherit namespace;
       includeCRDs = true;
@@ -35,13 +20,12 @@ in
         # Let OBCs carry a bucket policy (used to grant the rgw-mirror backup
         # user read access to app buckets). Default allowlist is maxObjects,maxSize.
         obcAllowAdditionalConfigFields = "maxObjects,maxSize,bucketPolicy";
-        csi = {
-          cephFSAttachRequired = true;
-          csiRBDPluginVolume = [ libModulesVolume hostNixVolume ];
-          csiRBDPluginVolumeMount = [ hostNixMount ];
-          csiCephFSPluginVolume = [ libModulesVolume hostNixVolume ];
-          csiCephFSPluginVolumeMount = [ hostNixMount ];
-        };
+        # Rook 1.20 deletes CRUSH rules no pool references once the mgr starts.
+        # Keep them: nothing here relies on the cleanup and CRUSH edits are not
+        # something to hand to an automatic sweep on this cluster.
+        deleteUnusedCrushRules = false;
+        # Since Rook 1.20 CSI drivers are configured through the ceph-csi-operator
+        # CRs, rendered by the ceph-csi-drivers chart (see ceph-csi-drivers.nix).
       };
     };
   };
