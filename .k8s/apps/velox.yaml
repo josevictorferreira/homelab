@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 556352a08b355e6b3787f957a850b16336d8d88f
+    kubenix/hash: e20397d8a65dd2ea59645f1d268c22c1430a140b
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -30,7 +30,7 @@ spec:
     metadata:
       annotations:
         velox.josevictor.me/config-hash: ac6b0991d363f2fdb312b80677bdb578a7960c71f09241d271d42539ff2efab1
-        velox.josevictor.me/oauth-agent-config-hash: 72b7f1b202300c363471312cd880f37085429ad305f9944b37c6926c9dee941d
+        velox.josevictor.me/oauth-agent-config-hash: 56586bc48139688a6e1069f9a0d25d36f367e209b88ae0783de43c3b8f546df0
       labels:
         app.kubernetes.io/controller: main
         app.kubernetes.io/instance: velox
@@ -210,7 +210,7 @@ metadata:
     app.kubernetes.io/name: velox
     app.kubernetes.io/service: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 556352a08b355e6b3787f957a850b16336d8d88f
+    kubenix/hash: e20397d8a65dd2ea59645f1d268c22c1430a140b
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -239,7 +239,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 556352a08b355e6b3787f957a850b16336d8d88f
+    kubenix/hash: e20397d8a65dd2ea59645f1d268c22c1430a140b
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -1428,7 +1428,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 556352a08b355e6b3787f957a850b16336d8d88f
+    kubenix/hash: e20397d8a65dd2ea59645f1d268c22c1430a140b
   name: velox-config
   namespace: apps
 ---
@@ -1452,6 +1452,28 @@ data:
 
     [runtime]
     dir = "/oauth-runtime"
+
+    [credentials.claude-primary]
+    provider = "claude"
+    client_id = "9d1c250a-e61b-44d9-88ed-5944d1962f5e"
+    authorize_url = "https://claude.ai/oauth/authorize"
+    token_url = "https://api.anthropic.com/v1/oauth/token"
+    scopes = [
+      "org:create_api_key",
+      "user:profile",
+      "user:inference",
+      "user:sessions:claude_code",
+      "user:mcp_servers"
+    ]
+    # Anthropic's registration does not allow dynamic loopback ports, so login
+    # runs with --paste against this out-of-band callback page, which hands the
+    # operator a "code#state" string the CLI splits and state-checks.
+    redirect_uri = "https://platform.claude.com/oauth/code/callback"
+    # code=true selects the out-of-band code display; prompt=login forces a
+    # fresh authentication instead of silently reusing the browser session,
+    # which would invalidate the previous refresh-token family on this
+    # client_id.
+    extra_authorize_params = { code = "true", prompt = "login" }
 
     [credentials.codex-primary]
     provider = "codex"
@@ -1512,7 +1534,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 556352a08b355e6b3787f957a850b16336d8d88f
+    kubenix/hash: e20397d8a65dd2ea59645f1d268c22c1430a140b
   name: velox-oauth-agent-config
   namespace: apps
 ---
@@ -1523,7 +1545,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 556352a08b355e6b3787f957a850b16336d8d88f
+    kubenix/hash: e20397d8a65dd2ea59645f1d268c22c1430a140b
   name: velox-oauth-agent
   namespace: apps
 ---
@@ -1534,7 +1556,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 556352a08b355e6b3787f957a850b16336d8d88f
+    kubenix/hash: e20397d8a65dd2ea59645f1d268c22c1430a140b
   name: velox-oauth-agent
   namespace: apps
 rules:
@@ -1556,7 +1578,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 556352a08b355e6b3787f957a850b16336d8d88f
+    kubenix/hash: e20397d8a65dd2ea59645f1d268c22c1430a140b
   name: velox-oauth-agent
   namespace: apps
 roleRef:
