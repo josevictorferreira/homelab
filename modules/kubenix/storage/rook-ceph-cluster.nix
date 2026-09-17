@@ -36,6 +36,8 @@ in
       values = {
         toolbox = {
           enabled = true;
+          # Match the running Ceph release; the chart default is Tentacle.
+          image = "quay.io/ceph/ceph:v19.2.4";
           resources = {
             requests.cpu = "50m";
             requests.memory = "64Mi";
