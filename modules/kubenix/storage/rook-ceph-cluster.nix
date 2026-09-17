@@ -65,12 +65,13 @@ in
           # ceph/ceph#63753, released in v19.2.4.
           cephVersion.image = "quay.io/ceph/ceph:v19.2.4";
           cephVersion.allowUnsupported = false;
-          # Rook gates each daemon rollout on cluster health. Recovery here is
-          # stalled (backfill_toofull) and cannot clear until osd.0 is back, which
-          # is exactly what this upgrade fixes - so the health gate deadlocks the
-          # fix. Allow the rollout to proceed on an unhealthy cluster.
-          # TODO: set back to false once osd.0 is up and PGs are active+clean.
-          continueUpgradeAfterChecksEvenIfNotHealthy = true;
+          # Keep Rook's per-daemon health gate on: it waits for PGs to be clean
+          # before restarting the next mon/OSD. This was temporarily true in
+          # 2026-09 to break a backfill_toofull deadlock; with that resolved,
+          # leaving it on would let a rollout restart OSDs while data is still
+          # inactive, which is how the Rook 1.20.7 upgrade nearly compounded a
+          # two-node outage.
+          continueUpgradeAfterChecksEvenIfNotHealthy = false;
           mon.count = builtins.length monitorHostNames;
           mon.allowMultiplePerNode = false;
           dashboard.enabled = true;
