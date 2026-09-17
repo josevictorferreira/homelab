@@ -66,6 +66,28 @@ let
     [runtime]
     dir = "/oauth-runtime"
 
+    [credentials.claude-primary]
+    provider = "claude"
+    client_id = "9d1c250a-e61b-44d9-88ed-5944d1962f5e"
+    authorize_url = "https://claude.ai/oauth/authorize"
+    token_url = "https://api.anthropic.com/v1/oauth/token"
+    scopes = [
+      "org:create_api_key",
+      "user:profile",
+      "user:inference",
+      "user:sessions:claude_code",
+      "user:mcp_servers"
+    ]
+    # Anthropic's registration does not allow dynamic loopback ports, so login
+    # runs with --paste against this out-of-band callback page, which hands the
+    # operator a "code#state" string the CLI splits and state-checks.
+    redirect_uri = "https://platform.claude.com/oauth/code/callback"
+    # code=true selects the out-of-band code display; prompt=login forces a
+    # fresh authentication instead of silently reusing the browser session,
+    # which would invalidate the previous refresh-token family on this
+    # client_id.
+    extra_authorize_params = { code = "true", prompt = "login" }
+
     [credentials.codex-primary]
     provider = "codex"
     client_id = "app_EMoamEEZ73f0CkXaXp7hrann"
