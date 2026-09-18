@@ -81,6 +81,15 @@ vision = true
 kind = "anthropic"
 base_url = "https://api.z.ai/api/anthropic/v1"
 api_key_env = "GLM_API_KEY"
+# Anthropic proper, via API key. Replaces the claude-oauth experiment after
+# Anthropic started gating the OAuth token with hard 429s (rate_limit_error,
+# empty message, no retry-after, on a token minted minutes ago — a
+# client-identity gate, not throughput). Same aliases keep working; see the
+# parked OAuth section below.
+[providers.claude]
+kind = "anthropic"
+base_url = "https://api.anthropic.com/v1"
+api_key_env = "ANTHROPIC_API_KEY"
 
 # Alibaba Model Studio token plan (OmniRoute: openai-compatible-chat-dbe58ac9).
 [providers.alibaba-token-plan]
@@ -285,19 +294,13 @@ stt = true
 # needs no restart. The Antigravity entries below use the explicitly approved
 # OmniRoute client registration and the two migrated account records.
 # Full procedure: docs/oauth-operator-runbook.md in the velox repo.
+# Claude OAuth is parked, not removed: the agent keeps
+# [credentials.claude-primary] and republishes its token, but no Velox
+# provider consumes it. Anthropic answers the OAuth token with immediate
+# 429 rate_limit_error / empty message / no retry-after even on a fresh
+# token — a client-identity gate, not throughput. Claude is served via the
+# API-key [providers.claude] above instead.
 #
-[providers.claude-oauth]
-kind = "anthropic"
-base_url = "https://api.anthropic.com/v1"
-credential_file = "/etc/velox/oauth-runtime/claude-primary.access-token"
-
-[providers.claude-oauth.capabilities]
-streaming = true
-tools = true
-vision = true
-structured_output = false
-embedding = false
-
 [providers.codex-subscription]
 kind = "codex"
 base_url = "https://chatgpt.com/backend-api/codex/responses"
@@ -667,20 +670,20 @@ upstream_model = "gemma-4-26b-a4b-it"
 provider = "puter"
 upstream_model = "google/gemini-3.1-flash-lite-preview"
 
-# Claude subscription aliases. Deliberately without `max_tokens`, for the same
+# Claude API-key aliases. Deliberately without `max_tokens`, for the same
 # reason as `kimi-k3-kimi-coding` above: the ceiling each of these accepts has
 # not been verified against this credential, so the adapter default (16384)
 # applies until it has been. Raise them once a live call confirms the range.
 [models.claude-opus-5-subscription]
-provider = "claude-oauth"
+provider = "claude"
 upstream_model = "claude-opus-5"
 
 [models.claude-sonnet-5-subscription]
-provider = "claude-oauth"
+provider = "claude"
 upstream_model = "claude-sonnet-5"
 
 [models.claude-haiku-4-5-subscription]
-provider = "claude-oauth"
+provider = "claude"
 upstream_model = "claude-haiku-4-5-20251001"
 
 [models.gpt-5-6-luna-codex]

@@ -346,6 +346,8 @@ in
 
         # Runs after the sidecar above (init containers start in key order) and
         # blocks `main` until every credential_file named in velox.toml exists.
+        # claude-primary is deliberately absent: its provider is parked, so its
+        # token file is not one of the credential_files velox.toml names.
         #
         # The wait is bounded and always exits 0 on purpose: the agent's /readyz
         # is deliberately kept out of pod readiness so an OAuth outage cannot
@@ -364,8 +366,7 @@ in
           args = [
             ''
               for _ in $(seq 1 60); do
-                if [ -f /etc/velox/oauth-runtime/claude-primary.access-token ] \
-                  && [ -f /etc/velox/oauth-runtime/codex-primary.access-token ] \
+                if [ -f /etc/velox/oauth-runtime/codex-primary.access-token ] \
                   && [ -f /etc/velox/oauth-runtime/antigravity-primary.access-token ] \
                   && [ -f /etc/velox/oauth-runtime/antigravity-secondary.access-token ]; then
                   echo "oauth credential files published"
