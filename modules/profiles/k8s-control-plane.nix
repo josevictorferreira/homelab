@@ -135,6 +135,15 @@ in
         "L+ /etc/cni/net.d - - - - /var/lib/rancher/k3s/agent/etc/cni/net.d"
       ];
 
+      # Rejoining an existing etcd cluster boots a temporary local etcd first,
+      # and on slow disks that can take several minutes. The systemd default of
+      # 90s kills k3s mid-bootstrap, which turns a single slow start into a
+      # permanent restart loop.
+      services.k3s.serviceConfig = {
+        TimeoutStartSec = "15min";
+        TimeoutStopSec = "2min";
+      };
+
       timers.k3s-etcd-offload = {
         description = "Upload k3s etcd snapshots to MinIO";
         wantedBy = [ "timers.target" ];
