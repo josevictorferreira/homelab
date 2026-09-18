@@ -56,6 +56,14 @@ in
             };
             alerts = {
               enabled = true;
+              # The provisioning dir is an emptyDir, so without an init
+              # container the plain sidecar writes the alerting YAML *after*
+              # grafana has already read provisioning at startup. Grafana then
+              # never picks it up, and the sidecar's hot-reload call to
+              # /api/admin/provisioning/alerting/reload 401s because the local
+              # admin password in the postgres DB no longer matches the secret.
+              # Net effect: alerting provisioning never applied at all.
+              initAlerts = true;
               resources = {
                 requests = {
                   cpu = "50m";
