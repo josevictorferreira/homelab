@@ -364,7 +364,8 @@ in
           args = [
             ''
               for _ in $(seq 1 60); do
-                if [ -f /etc/velox/oauth-runtime/codex-primary.access-token ] \
+                if [ -f /etc/velox/oauth-runtime/claude-primary.access-token ] \
+                  && [ -f /etc/velox/oauth-runtime/codex-primary.access-token ] \
                   && [ -f /etc/velox/oauth-runtime/antigravity-primary.access-token ] \
                   && [ -f /etc/velox/oauth-runtime/antigravity-secondary.access-token ]; then
                   echo "oauth credential files published"
