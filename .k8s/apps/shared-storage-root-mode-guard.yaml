@@ -1,0 +1,63 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 0396c86b2e4c88fe52f1109fdb4e2904899105a9
+  name: shared-storage-root-mode-guard
+  namespace: apps
+spec:
+  concurrencyPolicy: Forbid
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 120
+      backoffLimit: 1
+      template:
+        spec:
+          containers:
+            - args:
+                - |
+                  set -eu
+                  mode=$(stat -c %a /shared)
+                  gid=$(stat -c %g /shared)
+                  if [ "$mode" = "2775" ]; then
+                    echo "ok: /shared mode=$mode gid=$gid"
+                    exit 0
+                  fi
+                  echo "DRIFT: /shared mode=$mode gid=$gid, expected mode=2775"
+                  chmod 2775 /shared
+                  echo "fixed: /shared now mode=$(stat -c %a /shared) gid=$(stat -c %g /shared)"
+              command:
+                - sh
+                - -c
+              image: busybox:1.37
+              name: shared-storage-root-mode-guard
+              resources:
+                limits:
+                  cpu: 100m
+                  memory: 64Mi
+                requests:
+                  cpu: 50m
+                  memory: 64Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                    - ALL
+              volumeMounts:
+                - mountPath: /shared
+                  name: shared-storage
+          restartPolicy: OnFailure
+          securityContext:
+            runAsGroup: 100
+            runAsUser: 10000
+          volumes:
+            - name: shared-storage
+              persistentVolumeClaim:
+                claimName: cephfs-shared-storage-root
+  schedule: '*/10 * * * *'
+  successfulJobsHistoryLimit: 1
+  timeZone: America/Sao_Paulo
