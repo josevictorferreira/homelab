@@ -62,10 +62,13 @@ in
         };
 
         # Resources for single instance (Java needs 1Gi+)
+        # NOTE: 256Mi request is a scheduling hint (down from 512Mi) to fit on
+        # gamma after lab-beta-cp outage squeezed memory headroom; runtime is
+        # governed by the 1.5Gi limit.
         resources = {
           requests = {
             cpu = "200m";
-            memory = "512Mi";
+            memory = "256Mi";
           };
           limits = {
             cpu = "500m";

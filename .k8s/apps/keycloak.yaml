@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/name: keycloak
     app.kubernetes.io/version: 26.5.2
     helm.sh/chart: keycloak-0.14.2
-    kubenix/hash: f4a73bab3d9468d4d16d3fb1db860cfd96e0bd06
+    kubenix/hash: 7417005dc062bb8615b19c695b2f2091c9ca35bc
   name: keycloak
   namespace: apps
 spec:
@@ -99,7 +99,7 @@ spec:
               memory: 1.5Gi
             requests:
               cpu: 200m
-              memory: 512Mi
+              memory: 256Mi
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
@@ -148,7 +148,7 @@ spec:
               memory: 1.5Gi
             requests:
               cpu: 200m
-              memory: 512Mi
+              memory: 256Mi
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
@@ -226,7 +226,7 @@ metadata:
     app.kubernetes.io/name: keycloak
     app.kubernetes.io/version: 26.5.2
     helm.sh/chart: keycloak-0.14.2
-    kubenix/hash: f4a73bab3d9468d4d16d3fb1db860cfd96e0bd06
+    kubenix/hash: 7417005dc062bb8615b19c695b2f2091c9ca35bc
   name: keycloak
   namespace: apps
 spec:
@@ -252,7 +252,7 @@ metadata:
     app.kubernetes.io/name: keycloak
     app.kubernetes.io/version: 26.5.2
     helm.sh/chart: keycloak-0.14.2
-    kubenix/hash: f4a73bab3d9468d4d16d3fb1db860cfd96e0bd06
+    kubenix/hash: 7417005dc062bb8615b19c695b2f2091c9ca35bc
   name: keycloak-headless
   namespace: apps
 spec:
@@ -281,7 +281,7 @@ metadata:
     app.kubernetes.io/name: keycloak
     app.kubernetes.io/version: 26.5.2
     helm.sh/chart: keycloak-0.14.2
-    kubenix/hash: f4a73bab3d9468d4d16d3fb1db860cfd96e0bd06
+    kubenix/hash: 7417005dc062bb8615b19c695b2f2091c9ca35bc
   name: keycloak
   namespace: apps
 spec:
