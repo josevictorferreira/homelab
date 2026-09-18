@@ -166,6 +166,22 @@ in
             "osd/host:lab-delta-cp" = {
               osd_memory_target = "2147483648";
             };
+            # lab-alpha-cp runs osd.1 on a Crucial BX500 and osd.2 on the SAME
+            # disk that holds the root filesystem, and therefore etcd. On
+            # 2026-09-18 an OSD recovery burst drove osd.1 to 16s commit latency,
+            # starved etcd, and k3s lost its lease and crash-looped.
+            # mclock auto-benchmarked these disks at ~32k IOPS, which is nonsense
+            # for this hardware and let it schedule far too much recovery work,
+            # so pin a realistic capacity and favour client I/O over backfill.
+            "osd/host:lab-alpha-cp" = {
+              osd_mclock_profile = "high_client_ops";
+              osd_mclock_max_capacity_iops_ssd = "1500";
+              osd_mclock_override_recovery_settings = "true";
+              osd_max_backfills = "1";
+              osd_recovery_max_active = "1";
+              osd_recovery_op_priority = "1";
+              osd_recovery_sleep_ssd = "0.05";
+            };
           };
           storage = {
             useAllNodes = false;
