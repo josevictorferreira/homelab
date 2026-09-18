@@ -5,65 +5,65 @@ metadata:
         kubenix/k8s-version: "1.32"
         kubenix/project-name: ze-homelab
     labels:
-        kubenix/hash: 0e2f8d19fc6c4a7501fb107be4f798ea00be89d9
+        kubenix/hash: 911b444eb3ddc3b95e1af398213bd4e38c61a99a
     name: velox-config
     namespace: apps
 stringData:
-    ALIBABA_TOKEN_PLAN_API_KEY: ENC[AES256_GCM,data:Kqp9Gh+bUe+Gq4dWstCFbJjxg63MJVnROB2L+X1geAulvugSlG2ZZ38an54/m/UGRmV7e6yYPXGaXQ48a+ahBbZbgjzTZ44wbusw/hEDOEd2COqDPgSpHHc/01E+vFnGxfBgtgnKW1L2YZx2bfuorpJc,iv:5OwNXaD8gu6GYsysjl5st+qxvgzxMHwmlYkYxqR/X8w=,tag:PlfxIMYIl8IyNs/FirmsZQ==,type:str]
-    ANTHROPIC_API_KEY: ENC[AES256_GCM,data:IqPp9bqniz3OEPzJIv0Ty64C9mmS95zpr0nljwRZOIRUIUC/o9ZN8nC2kvB+eaF90mwYZNS08ZnO3l/CvhPkSPr/1MNDZofqkJFA2t19OEBcLaTe8DNZcR4b9EDP5k7jt78hqh+F7Vcu11gnYvHY8e1ZzgkKh1pWc+wWzf2ZINil+GBcMe5kcsFzcSIJ+aKa,iv:sT+ZuoAHoqnr7a5N0CizV4gu/xIZKNFyzpDzJm6iy8A=,tag:9g0EtIPMOw1IpCR0mzGbTQ==,type:str]
-    ANTIGRAVITY_CLIENT_SECRET: ENC[AES256_GCM,data:Yb8Z289gH54zYxnseJjE5LP6hrL0yjUXknCdOycXPmb+1Qk=,iv:6w8dzbYI/9onW4ne9uxCaJfqqBEyhwAnfe0ConIsHwE=,tag:O689AjehpUV0JF6DsYbzHA==,type:str]
-    BAZAARLINK_API_KEY: ENC[AES256_GCM,data:NHXwTEZLCftpJSs1x8sY9dvQQMa0j7fRFj482KVibVyHeSze8eRAyHUX7aXcXn47axgO7ZWA,iv:g/FSYq3JDRMmRiCDp12GGLMcX9nnumro7wXov/3E8+c=,tag:7HUtrRoTeSt9cMhW3lKv+A==,type:str]
-    CEREBRAS_API_KEY: ENC[AES256_GCM,data:uSIUnFvLmaL/YIa8fW2hivJVsjUPeDJaeF/3bgtbC3dxFEnCN4nb2sAkuVINsRWdPSHIqQ==,iv:0ouAcVuiVsp/k++lKpgq/6dumwxM8HTBAMtVBhRy8go=,tag:+jLfnIhhcVGlYm9sDk49vQ==,type:str]
-    ELEVENLABS_API_KEY: ENC[AES256_GCM,data:x/Iw+Os+UAuX7hJ/j+/ik4QMlPwqgRYdpPPqXavBRuf2ROnsfiNAri3k9s8bGkbNM0Tj,iv:Dq4IktnruH7fh8giUI5nkrJ3ylVnIxEQWsS9Rb9xW8o=,tag:p0Js9tUj2zsVHmMqbiKl9g==,type:str]
-    EXA_API_KEY: ENC[AES256_GCM,data:irFI3+sKA6Az8advXbZr7RrqJrryPRmZcBCqL32EQu/Hk5Ui,iv:/YpvtMnjz7LCPKDuASyChzusEB5NynPim0Ho4DjAz2M=,tag:88YeWNY9h76NruiJkTFqxA==,type:str]
-    FIRECRAWL_API_KEY: ENC[AES256_GCM,data:L/3ds+p4uVFmFoBjN9XP0br2MvAXdTliJn/oDC8g3p1w9Cs=,iv:d53M8Rgc08OlVKcPtnTGxfzrq5LkMmEHp/ITs6VAAcA=,tag:sT9qxWKICW21nmMHOz/2hg==,type:str]
-    GLM_API_KEY: ENC[AES256_GCM,data:dZwzGX1GfYQQphBZIg2zAv3dDVEzxnoczykOM3ybEMEghHh+P160C3BeeZvpbGGTzw==,iv:zLO0w72pEimb27jux2ayDIU1S/WrPlTx4eMplb0mkw4=,tag:8Vwq7nzv0ImogLnvfD+5OA==,type:str]
-    JINA_API_KEY: ENC[AES256_GCM,data:eFQlb94iymY7EGvabGdlWMCrOrefHRbLOU8gVxR+M8ruHtIZhmn3qq0Yh7QrQprQBvl+KDWJ6ltWeM5yFDs6ac0=,iv:jZttZDpblPxa3P0Wrc6j8nsE7BcY0QrAZ5+VkM7bMUM=,tag:ZyDvENQiPE4oHtWZzXPp3g==,type:str]
-    KIMI_API_KEY: ENC[AES256_GCM,data:o97TQLsBi6gNPMybd3iQiorhGnVL9DoybWW+fg/7QUe+ET6h3tPSqS3rzJPULZr1akq8Iml5TGVtXKflYtQVvSPAZtp02Xia,iv:Co3zaMZt/LjusfgPfP4ZhpnN55Lo0/19KJeMVOyOkVo=,tag:ZQFFx3waGvTYAYzESvqRFw==,type:str]
-    LOCAL_TTS_KEY: ENC[AES256_GCM,data:L15IhzA=,iv:JgP0G+Mtj9ZiA/WSXaqRh+mxp0RUKK85jBrlMkpb1Vw=,tag:8RJPrNtQ3eCXLJJfyaFoBw==,type:str]
-    MISTRAL_API_KEY: ENC[AES256_GCM,data:KV3cn6hBOIal06LOxxeE+9fsAWlyTVTnxnE6bkfmsxM=,iv:kTUMjmZmf/Bw9Hk9b711AYDRpQAQLE3e+tjCIgKpSEQ=,tag:Z/3gKuZnwvdT+MOMwB8Fag==,type:str]
-    NANOGPT_API_KEY: ENC[AES256_GCM,data:knA3FkgWhKwfqVwXrvWEoU3gya4b1oD9CwnMZy4ygJQKOjVI9NcWCQIN4d0=,iv:yv8uiWWJNJZAa9ucDdJNq7TYhbq1t6zlBTXpguUynzU=,tag:Bx4Kh6JGr+Zi7XDwOilO1Q==,type:str]
-    NEURALWATT_API_KEY: ENC[AES256_GCM,data:MkzRPc/y1vL3fdDA+1a3gz/LdreWfQ+ZUW+Gt+Mt6yHWWW6w9zK7Gm1ZSxWlzMduCILu9PsK5pZuHHeRTWtE2AeHiQ==,iv:SC0WS5jSIphWIirzuK/M/mBwXImi2bBY5aOJ23q+yGY=,tag:GgNg+sMxFVUKOvojULpgew==,type:str]
-    NVIDIA_API_KEY: ENC[AES256_GCM,data:cqfbOEW4a6dxlHK1NT2tzz95Kby4/CuxXsy1ICdsxuEck2u9WR4k0xB2qD98NVFd+lx8elo085d09qn6zNPFAyqeuOgiBg==,iv:lQXcw/knOuqQDJClghiWSUy1ZMEX7BpcXaHK4VuuhIg=,tag:BNGP/AI/jj3Esd5NSOW0AQ==,type:str]
-    OPENCODE_GO_API_KEY: ENC[AES256_GCM,data:mR1B+4NGPazERwLxvrCUHa1+WR65+Q9NW6Y14rSWo9yYZaQFPSqsGMR4HpOi991eCQfEsSiTAtW6zJRU1vHIeLEfJA==,iv:CM259BhWSZtVO3eoM2o+lGU5+aaYGcScB9nuJVtMDuU=,tag:DHVFwqXr33+jNTu8gT5Hhg==,type:str]
-    OPENROUTER_API_KEY: ENC[AES256_GCM,data:8GhBLC2Tr7rfntPWJ+RL7F73flzTMeWkTeBSsDTNp3wq+EmRNaNzrL7BR3WXmJxZHsP6Vh//4RQqUcy35TsBPcbwRp28NQ0U2A==,iv:eMsCTMpsQhKKLy++8TNvZLzhZjvD1E9KBwtoIvOjqko=,tag:h/aQOA8Uk9jViuiDYTuORg==,type:str]
-    PGS_GROVE_API_KEY: ENC[AES256_GCM,data:GBDpWl38fINvIeMY9bIr2p/PCcDe2I7pOovL3F6iVfXiy2G1XyvpjDvxvHVSqNTokcxMiuI3JBcIQFXyCEpxrCx0makuc3RI1xw=,iv:M1oAlfhraUGk52ROIlaUVd5zESzFLSKW6ltsnMu2kVg=,tag:nvvRUtWsoAF0hmvttCgNJQ==,type:str]
-    PUTER_API_KEY: ENC[AES256_GCM,data:9e30iXDaYkaxFJzWlHqb0SOmHRybRuthp5s0eS8a7Ba/W03NQlH4ctRnTRU9W1uTqHD7KXI6BREDFklpSH1FSDJsHGMSALWtz9JbPnh6NYc4dKxQpmQVbA3F/2GFJT3uprkJytnUcDqSmERA5fAiQDl66Jje4Jd6kJvoa5KHzCCw7VrhUNJyLhag+WcS5uil61Krpf2U7c2CT5plH8LysQ6ioBY7ZnegP2YmNiExedlEAxnzPtG9QlELrRwEQCTo3P2jRj/ZRS4HEANioFzpMYoTxN6aw9boHauu3ai6n9x1k7upLcmljFh8OXhj60gghMMdSHwH7wL0jfFlC9Hiz3qDSEZ/Y83XZrnr8OaCrzmwGO35aWQUDQ/Jvqe+Jhh9jKpWuLkpC9WwkkkSH9/IMpavO6rakabrBNquj1BzAYZB0xDZ7tzNh/P8vp6U2wcb4MFld0xqqgl7U5SWvBG645w+rabK5miuCgH6,iv:IZV/m/AaG9jovtt7Hv/Fud1YWSqjCfxgQ95wDj5AAYk=,tag:Tt675HTSIl1hmxcNHtK+Wg==,type:str]
-    SPEECHIFY_API_KEY: ENC[AES256_GCM,data:f/FkTvsJEyZpYWVdhyhTaOmvJBuAHREPaSwzTLSFVcod4qCK0EOMUf3rdnWfGg==,iv:gMoxNIxTVbU1AuAK89e6GK7DUsue9JbuwNmFm7/LIMQ=,tag:7h/GXLpEHiIYMDXxYXT7yA==,type:str]
-    VELOX_API_KEYS: ENC[AES256_GCM,data:D0vVgbQGhcm8LHM/bxmL+bSAJpqbH483BYQVA1h4lzfQJMYtTeFT3mUpmW5JSnJmjmnD1oqi64/2,iv:vkaL5RWP56cxpT+cSGokfBaiOLGBseqbhrtknAad6Kc=,tag:OdEq9l0mGLDQS1pi+ZEsHg==,type:str]
-    VOYAGE_API_KEY: ENC[AES256_GCM,data:k/VaUIGQr2R+sLwStZf8T4Cd+W/WO/cW5bs+WTcSKKJc9Q5Cw7HmBf/IlfW9Ow==,iv:8YsQTJ1OPPcB2/HaiJgChxmJ04GKoPskFC3JhGqAMhc=,tag:OQ4VSjlVoSQwwMSZ3GMGWA==,type:str]
-    XIAOMI_MIMO_API_KEY: ENC[AES256_GCM,data:PdD0lE0SWYJCMfCHI9juUSymnrMAgkcem1UtdtL4Z6z8ubR3kC2RXMvKLWKvMR5e9SS1,iv:Y5NdL+mnWMH0KhMqPlm+UqARDNaQv+7QoXy3fNExIus=,tag:VXQvkPiiwp/EniP5ivOAkg==,type:str]
-    YOLOAUTO_API_KEY: ENC[AES256_GCM,data:XdF3wlyJHo8qgtVZUMrlIEXY6Sj2hZQpMYkuc/rw+yDGOP5GomZ4GLmYPXNCf91Y,iv:5cXt+ED/xh0Gn34vyQPysluaEIVEK0X2cCbb9f3PtxM=,tag:/zeuhfybwYOAxgY5h+5Eug==,type:str]
+    ALIBABA_TOKEN_PLAN_API_KEY: ENC[AES256_GCM,data:ymFMMSnBZO3/6PkaNanf8+UqM01vpKuW2Hsa37eN2Q/UjYU+E9y63HyaTfc5zUwTNwMgzRYAletg9Y+Xeb4epr/W/ZIMzUIjM8xtB6YnjQ3gSItrYy0CkrBiov1Be22KO3oZxOe8EgdR6TTTRcQa3SBN,iv:p/78LeKTmh8GvVsDBnemYYsgCBRt3khRXWmhoHoNl9s=,tag:RC0OUDtU5UHVjn+39Z9AXg==,type:str]
+    ANTHROPIC_API_KEY: ENC[AES256_GCM,data:bpBJmltNU9WXxAQ2AxQ3gunXWA0FANm6Wh/rwsOtja5a4QYVp71GXRUAI1ptI7KGW1syrglpbCbXS6wrZfhQNzSOLOHi2QZfPnzzz4vM8Z8Js/mRRcL1DnKSO1tim9u/NEyiRrDEbragcX/+,iv:hEyo99qwxYS532M04+29EUWOFU3cu1l7RR8rPZJhJlk=,tag:IMZdicvbD8mAbyw3TuUF0A==,type:str]
+    ANTIGRAVITY_CLIENT_SECRET: ENC[AES256_GCM,data:cJsS1HMDGk+QAj1famZhNOS5OQscSJmKNAVAUpve6LAVj10=,iv:4UKt/bNPHoUtfcTMjBUnc8Ini86329pCA7TLh/85wv4=,tag:axGvzxlYh8qtL1grAS9BLw==,type:str]
+    BAZAARLINK_API_KEY: ENC[AES256_GCM,data:p2jXcU+Yy5KkMiCYyvuhx7YCViO+xCp3Ynr4NIEjTJdofwpoFihDNleZg/5cd9lPUSRXMY6c,iv:9XEzRWa6wTorgT5QdTxU0zTgFjs3kUso3wh/5H84/c4=,tag:oE57E6VxgjQ4owp2FPHBVg==,type:str]
+    CEREBRAS_API_KEY: ENC[AES256_GCM,data:6zhpqapdwh2ddUPsPB70JQQrwmPreGVmBM2RaUfkLrmbDFzQ8PjDfJI3+ViRhtpT7npRtg==,iv:p2JgmB6M1EuP9ut69SKnWIuMYHpVZxGIV+DcyZ4GgzE=,tag:UXcbEN/0quQXdhNuS4DzCw==,type:str]
+    ELEVENLABS_API_KEY: ENC[AES256_GCM,data:Uh0pTV3zLCtQ7iPW3/twl3Iqdd9KN4VwsRSvrUiziiNA3Fdb7GgYOj3lIyrg2D8MX2o4,iv:MBGRRuIT/FsUmDUl0dHNnEVRS4Du4AGt+0Axfe4Kfzk=,tag:jL5GvGtLKhxea22yK/pVTQ==,type:str]
+    EXA_API_KEY: ENC[AES256_GCM,data:i4Cbdy+LtHuimgDHSobVHyC0k8qHy+gorsrjsNHybk60+kw2,iv:1O+wg7ITDaf5TOoQz4fS+JJUkR0mNB/iAGqxmvEb5hs=,tag:1B3b2zpbpwXfHhiiR62lzw==,type:str]
+    FIRECRAWL_API_KEY: ENC[AES256_GCM,data:hmiNf9/ocktA6m+4KtC8c/bpGj5sX53Lp/tHI/5TmzHV2uA=,iv:9PLdIzxMyguKrfns1pLH+ojAe2ANyodq+sYNwGjNvks=,tag:GnaE/wexkzFX2XO2mtUF6Q==,type:str]
+    GLM_API_KEY: ENC[AES256_GCM,data:s3ka1lY8uxcefIBERrccb+rWl54Q/4QpeaincbxkvtPhW1ogw/A5yCjMgDYsH3p19g==,iv:6tldLWMVGNhbytf5dtYv5w4lgKZPo05HK0T2FnJCtLI=,tag:2LTwlvoQh10+XTe7HUY4TQ==,type:str]
+    JINA_API_KEY: ENC[AES256_GCM,data:3CWL7jFU92oIf6HYiHK8awhU4xqK3+mMVFdQaggk1SYYL4GDL4U3UV8hZnKfn+t/fCVuNnsamzXnKtDVfBheNDE=,iv:e+NMDUHV7jAipMS8VJjt2tXfi+nuw0sPGhRwVznnUeE=,tag:yzGh0f2tv5Ond+S6O3WwNA==,type:str]
+    KIMI_API_KEY: ENC[AES256_GCM,data:EDO/Ep2QwUhn4SKH++nK5JMbvqmx7hx7V0GWQK3qK2HUeu9Xc4ZUbsjGiRBHhE0RpO/4TyQ+gFgiDBZIejL5PC1pgVKICgrm,iv:9JM8jc2/bXFd2rl7VDhMeGud95Lvhd9QaY4JzY5juvQ=,tag:lIVThb8JvbI3OKr99bh3dQ==,type:str]
+    LOCAL_TTS_KEY: ENC[AES256_GCM,data:jd070xc=,iv:2IrOnlVXmdEgZbLtZVyHFQqZYUXReBNnoFf/mTPRAAc=,tag:kn9rdwwJ8yPrFWELdSucYg==,type:str]
+    MISTRAL_API_KEY: ENC[AES256_GCM,data:HWPENKavxxrbRUTk2B3sUz9mferT17gHAs3T5gNpqr4=,iv:VLCN1O9bJh6SZSldOHC42Q9hPUUnE5OYbbyA5tyB0pU=,tag:6kVuRjCfSs4MRMx7349vfw==,type:str]
+    NANOGPT_API_KEY: ENC[AES256_GCM,data:sLdubY0GkynxGBx7hfoFw8jkhIzr7BisJlwYzeLRzpPVIeolT19rmCB2E0Y=,iv:YPhX10D6D13LO/U+z94GH17qRyskoWf5T/3r2ONnLt4=,tag:qKJd7pFxU1rRYVJOxP/s4w==,type:str]
+    NEURALWATT_API_KEY: ENC[AES256_GCM,data:TFhSxtDwpfi2s5gKl+80ddieoWmG/J//l8Q3XX06E0rSmuhJY7+LK7bjPVLJkoCkL3UAS/oGaNFxVNT6oe3ZuU3wIw==,iv:ErO6c6h0rhZnhcEhIrBcxyxj2GqPxt2/FZlCG8eZRCU=,tag:SF/+9/4qjrOcGmg36pFDjg==,type:str]
+    NVIDIA_API_KEY: ENC[AES256_GCM,data:dvXT6cFzXSVEAi+SD1mpDgc1cutoXhLDiVq4fuv2YmlbLUS6HukB/NF6PDBPFmEwNG8TduO/1SJuQhkem6hm+sRNrDjeVA==,iv:gTdE15o5J2j7iAI8ufTYQTiYbdpehkdabs7FKY1PJV0=,tag:VBK9+TJvB1xFdukw+rZh/A==,type:str]
+    OPENCODE_GO_API_KEY: ENC[AES256_GCM,data:JgckdezWv0tFE+nIlsyVP0CQWpFBPkYo7jNTEPXWPyIDflUXdYtGXWXQlk4MyTiGs2u4l3ZDkFAYOkNTZ+ZFIBOCEw==,iv:N2sqs+c+D/Fco4FzO38Zyy68uVscDAGaXTR2qBPCVyc=,tag:29NDFLqh2ZM5J1RlyC865Q==,type:str]
+    OPENROUTER_API_KEY: ENC[AES256_GCM,data:JcaAzSFTLQ5i2p/FLGgMYO3H6yMyEQsCZbhrKdQWgI0+73YkuzPtgn+2q/ES6KS70sX7X81w4chmkDrS+PvV4bqqHyuJCZYPUw==,iv:Ogq4OXZg9PUuO0RmSAaKITnE0iGVQ4o639U7td0kYZY=,tag:hw2CShD/0i9AQDMIoVriuw==,type:str]
+    PGS_GROVE_API_KEY: ENC[AES256_GCM,data:EV3QsSv/yszi06D7tVejI6mVXe2NbtmMPCxESoWjEz3c1Kouwg2VsE6FzTPDhcUrtnKc8GvjjEHrzl+bHWCA7kXLNh23LOElOgM=,iv:se82jzuXVwZM82j8sqLBWwAMsO0Aoz1Jeekbw/+f7b4=,tag:K4Gd1pRsy5lYNSXSs4Hwfw==,type:str]
+    PUTER_API_KEY: ENC[AES256_GCM,data:j0A0X3N3bCWa2OhkPHfQ7CRq6c23fRtCfndrtxzHdiYIhcMnu5B+2yU4lIn/BcSU/gne3P37sZlr+skajFL54bcPvXdoNHhsPLv8kRtjP6kiuzU2BAJXesXRBaq/gv8b8WMHRBHKnSSJvcF4rLTt0qUiIi5axe/49KaYXuVUQnM/+/4pt/Gcl4/bFHGZc2exAQhEZKsZG6msMJPcqK2sMo4e8et/8Ene0s/EvJxCu4D516MSQCeXMZ1Zj+moeb1MHTCDNcdSn8qm5m33S/UNuv5Dn6qCisybRs1gkzpNV2bITLRNnzr40tKFgGPkVKSjKe7ADorqQp2VUC3DRFlXhART3rN0PFHlxQhccsyTeRgj7BAI3lkxHBBBIdrKQeuGEay7eqlh7pXY9aDT5T6uerOLz8TFDAjsfpZzwmUP1qpnYIOEn6uGDxfCXdUIpXxlCQ5O0cwqnuBjIhzeHuO9Xx7fQvdtqCg+tNWk,iv:/yAY5GrUfl0Hog6PvcydSjyK7iQSjTGt3ZnDMgQaiHw=,tag:uCMlY/oyP2YRebwe0l/9mw==,type:str]
+    SPEECHIFY_API_KEY: ENC[AES256_GCM,data:l0kIkHyuwmMkVZutKerCLcwcS/PLWBEi7s2zUZv8P3DJire7z6IEUwhfLyxZAA==,iv:6zNG7DeET218oPLAr96jENB+/dnECP2s8m3u7z5EKbw=,tag:K9ibbIOEXI2MHKFpuZJb1A==,type:str]
+    VELOX_API_KEYS: ENC[AES256_GCM,data:HHRG1/SR8+Gs75Yz3F38ZQ+jeBrrpfI8XKldR2PGpECUOJA/wTNt9a7ULWAGFhoQPTVK3tiNnHMj,iv:9NifeVr6hMY0oDP+s2T1jxHjiTa1t9F/dhiFb9OjQaw=,tag:c/0uW6lWiVe0I3tVPt/p4Q==,type:str]
+    VOYAGE_API_KEY: ENC[AES256_GCM,data:/GVYTdPv39j7GZ5sc17bkB7LFiIq99EUmtH8QSj1H12MGc0rB5IxpmawiQ+BYA==,iv:yuFL9N/MfxZMQe0IRIupfLhrsylceMihK0xCV1NDVh8=,tag:RR7MfRKP1iMJzEshVWSB1g==,type:str]
+    XIAOMI_MIMO_API_KEY: ENC[AES256_GCM,data:KcpWKoIKu6Yj0L8DXqJc5IJK+O2VQwKzlmpf5FXiMrIj/7Rr0KUIfxe/wPdRszqiI5qS,iv:UTphcguzmJizXpE5feVcPhM7OLmq9WB1M+CQN0puaEw=,tag:ozw9BzsEx8YGw5kke0IuGg==,type:str]
+    YOLOAUTO_API_KEY: ENC[AES256_GCM,data:orbW8Hk7Xf9AHoPGo0HrniPytCaZY1KkxGHP9VRIuiY4XSkOkvXuJbzMy6LGtZl4,iv:HOO1TczlVgUJhQ/l5ZKVndetBvvMoz02b5rkQnBF43k=,tag:dZX+QfwKmhYFM7x2siMSvA==,type:str]
 sops:
     age:
         - recipient: age16yrhmz8fytj7j9ns80zl40zjcdfd3pdxh48ld7ys7veea774udtqfn9jyx
           enc: |
             -----BEGIN AGE ENCRYPTED FILE-----
-            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSB3ZWdpbUVxOHVvOVNGNnhX
-            WnRVUkh2bzJ6dnl2S2tKZElLb3IwRWhSVENJCmVTR2NSdFk5ZjNzSEZ3cGZlSXhH
-            bmNaaXIzSmdnL05qWXNiRU9BVzBtaUkKLS0tICt1b0NySTdVMW1NVGliNGIxOTJo
-            YUY3bWIwbng5ak9tczkwYjIrc2w5c3MKPpL4cAFWSDur9tqsg1XXfktOAM2BvYw7
-            xyLi2Fvf2pnukEkdTFFKrFahjud75grIlyEykP8PqlN2NyuBfEVQlA==
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSB5ODRZdWROQ0tIRHNrQy9n
+            eFAyazZ0aTZXMmZ5aU1kVHRTcXVzTE5uK1VRCk1VMFdnbHhJdGpoQXRhV015S1VL
+            VFdXOVZBNk15U21mYUNNOVg1UlA2T28KLS0tIHNFQ1QwY2FzbzU0SXBRWllKbmZr
+            VkxVNjFjZkFOcGoyVGZsaXIvcFdJVFkKqh7cGwveIWw4OEQQHiwDzWp2fllHhGpe
+            qdxDZD8yu5qi1mPSizRO1Qy1TM6Zy2z2Wu8640ZeEILIcIWxT00ITQ==
             -----END AGE ENCRYPTED FILE-----
         - recipient: age1jx9qu5p0ycvymrl2gykd9z3w8x8n67jxnatxs49j7qzspjr6asqqf8u35h
           enc: |
             -----BEGIN AGE ENCRYPTED FILE-----
-            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBaaDIvZ3BPR1pLQTB4NHZH
-            SVpQbzRoaDc4dVhkZHgrYjJjd0xQd3pnWTM4CmFaSE9TRXBMcHA3TTdzdHRIRk04
-            bEhsZ0Vwem05bmpGRHBUc0FlKzFIMlEKLS0tIEt0T1dUS2pOdk5HVzV0b0N1MUVj
-            ZlM0RVZpZzFzRjRIYkJRcVF2OFZWV2MKeK9Oe921G2mm62oIipn5WdoderyXOorU
-            KV3GC17k1zkdL1pYD7BkHXG+1LBSQgGdouL2mpTR6TRmCLoAkkNlEw==
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBDRWpkUzQ3dUZGWWcvNVNE
+            eHY1MmRHTUY3bmJIcWN6bktSOCtEaTNWZG44CkRMeU54cGFvd3JuMUNTNURYcllL
+            cUV6cEhtMEU1NVZEbTFLbDdtS3RJczAKLS0tIGNFUXVvQTBuNzN0a0loSG5uZmFr
+            OWxTS1JRVXFvWXVIelo0SkR1MWFkVkkKQWXs9RGZjR7IKVJ8lZMlW0i6vLZhtj/B
+            jgQTsMNc6yovhnibfAfAJT268aeZYNaFLhCUN2tGdWbMqQeyF1lMxg==
             -----END AGE ENCRYPTED FILE-----
         - recipient: age1myzhwq67gu5zrfk8fvs0p7mh5fk67d20ltwqf9325ya83lm06ytsyax3j2
           enc: |
             -----BEGIN AGE ENCRYPTED FILE-----
-            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBnTUloTjM4VVl1TlBGMDZz
-            eGkyQXFvdC9hQnB3VFlra2FJeEhxRnJRSUVNCjhTb1VXTVArdnNsQmJCNkR5amhQ
-            ZGRDSzJzKzZUMDJiU2l1UjY4bFE3RWsKLS0tIFdGU0pvNFdaQ1dpVE0weDcxckhm
-            UTg2WU5JMXBjVHNXQkREdjRFcDlYcFUKG0fuLg5Nn/tNCHa1O2MNd7Yyv/dv5eP3
-            CmKEAEdQTR1rHcLdwGTMZZfaLjDNzYlYi7uepEdxb19NesgtfWOPmQ==
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSAvRGZWZTZaTDZPWGdCTUxL
+            OGF3OHdBQzV6Mmg3THordldpN2dYeWQyOTBZCkRjRDRWeE9BWithc1gwcjVyWFd2
+            OWpHbDdXTjY5N045bHhaS2FPVHd4ajQKLS0tIG1xM2tCUUZXeStaeXZQVStBZU9Q
+            MlZWUXBYMzJhYmlTZHNseHgzOFRwVWsKx7LjCDHQsteO7n77/XyMU6v9ZdwL3P9u
+            5n81/IexNO+9FGfoG2Nxuuyzx0GzHwt55veV8HbunKUdwR+ywSSUjA==
             -----END AGE ENCRYPTED FILE-----
-    lastmodified: "2026-09-18T22:47:42Z"
-    mac: ENC[AES256_GCM,data:ZOAhtuvzw8m5Bs5jDcMsFeMjOP8P0TLFBZmQxFWAaJqggIGYbHdCo5hj/tyWxY21pvWkchAIjPwRpjRQ/kXOugUViW8haMByB76eljcw5N+ZA/1kppsrVEIirY6O8ObYrjzb3wwFclgxqJg9aFY6/5Dwl4AtjdF2y+a+msZSH4w=,iv:kSgZ1nnphMaLiUdgIwmq9yNyd7BnUtJp5Lh2bVYxVjM=,tag:3DwYQh9vQ7vUKwcDUaRdew==,type:str]
+    lastmodified: "2026-09-18T22:55:47Z"
+    mac: ENC[AES256_GCM,data:XuzY39kR6j6YZWHyb8jByR+cZ669Ns+QFWpQwgAEzlnAnAD1FMYWIFHwRPJ91kqqXPq7Ce79KghhRf14ekokY1+CDyEQ4mjFJFykwN8ViAkidH6dH5Oxf/lLVNTE7UOcV/Q/ioIayzCHx/Mn1eHNTxAaHDzguR6aYDIZqb/6EyA=,iv:UgI/qQedie+H/7liBuKbkUZXdJj4xA1b1rbxj+u5lGg=,tag:MmgEKzo2RrP3mzdSSCvrFg==,type:str]
     encrypted_regex: ^(data|stringData)$
     version: 3.11.0
