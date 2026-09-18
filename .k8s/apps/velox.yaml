@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: e20397d8a65dd2ea59645f1d268c22c1430a140b
+    kubenix/hash: 522c6de3b13681a437da45b02eae4c50267199b0
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -29,7 +29,7 @@ spec:
   template:
     metadata:
       annotations:
-        velox.josevictor.me/config-hash: ac6b0991d363f2fdb312b80677bdb578a7960c71f09241d271d42539ff2efab1
+        velox.josevictor.me/config-hash: 6e3c93ffc07e04e5df47c6e6225f9eaea3f737093562c81dc2664fc151b5a0b0
         velox.josevictor.me/oauth-agent-config-hash: 56586bc48139688a6e1069f9a0d25d36f367e209b88ae0783de43c3b8f546df0
       labels:
         app.kubernetes.io/controller: main
@@ -131,7 +131,8 @@ spec:
         - args:
             - |
               for _ in $(seq 1 60); do
-                if [ -f /etc/velox/oauth-runtime/codex-primary.access-token ] \
+                if [ -f /etc/velox/oauth-runtime/claude-primary.access-token ] \
+                  && [ -f /etc/velox/oauth-runtime/codex-primary.access-token ] \
                   && [ -f /etc/velox/oauth-runtime/antigravity-primary.access-token ] \
                   && [ -f /etc/velox/oauth-runtime/antigravity-secondary.access-token ]; then
                   echo "oauth credential files published"
@@ -210,7 +211,7 @@ metadata:
     app.kubernetes.io/name: velox
     app.kubernetes.io/service: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: e20397d8a65dd2ea59645f1d268c22c1430a140b
+    kubenix/hash: 522c6de3b13681a437da45b02eae4c50267199b0
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -239,7 +240,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: e20397d8a65dd2ea59645f1d268c22c1430a140b
+    kubenix/hash: 522c6de3b13681a437da45b02eae4c50267199b0
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -554,11 +555,18 @@ data:
     # OmniRoute client registration and the two migrated account records.
     # Full procedure: docs/oauth-operator-runbook.md in the velox repo.
     #
-    # [providers.claude-oauth]
-    # kind = "anthropic"
-    # base_url = "https://api.anthropic.com/v1"
-    # credential_file = "/etc/velox/oauth-runtime/claude-primary.access-token"
-    #
+    [providers.claude-oauth]
+    kind = "anthropic"
+    base_url = "https://api.anthropic.com/v1"
+    credential_file = "/etc/velox/oauth-runtime/claude-primary.access-token"
+
+    [providers.claude-oauth.capabilities]
+    streaming = true
+    tools = true
+    vision = true
+    structured_output = false
+    embedding = false
+
     [providers.codex-subscription]
     kind = "codex"
     base_url = "https://chatgpt.com/backend-api/codex/responses"
@@ -927,6 +935,22 @@ data:
     [models.gemini-flash-lite-puter]
     provider = "puter"
     upstream_model = "google/gemini-3.1-flash-lite-preview"
+
+    # Claude subscription aliases. Deliberately without `max_tokens`, for the same
+    # reason as `kimi-k3-kimi-coding` above: the ceiling each of these accepts has
+    # not been verified against this credential, so the adapter default (16384)
+    # applies until it has been. Raise them once a live call confirms the range.
+    [models.claude-opus-5-subscription]
+    provider = "claude-oauth"
+    upstream_model = "claude-opus-5"
+
+    [models.claude-sonnet-5-subscription]
+    provider = "claude-oauth"
+    upstream_model = "claude-sonnet-5"
+
+    [models.claude-haiku-4-5-subscription]
+    provider = "claude-oauth"
+    upstream_model = "claude-haiku-4-5-20251001"
 
     [models.gpt-5-6-luna-codex]
     provider = "codex-subscription"
@@ -1428,7 +1452,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: e20397d8a65dd2ea59645f1d268c22c1430a140b
+    kubenix/hash: 522c6de3b13681a437da45b02eae4c50267199b0
   name: velox-config
   namespace: apps
 ---
@@ -1534,7 +1558,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: e20397d8a65dd2ea59645f1d268c22c1430a140b
+    kubenix/hash: 522c6de3b13681a437da45b02eae4c50267199b0
   name: velox-oauth-agent-config
   namespace: apps
 ---
@@ -1545,7 +1569,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: e20397d8a65dd2ea59645f1d268c22c1430a140b
+    kubenix/hash: 522c6de3b13681a437da45b02eae4c50267199b0
   name: velox-oauth-agent
   namespace: apps
 ---
@@ -1556,7 +1580,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: e20397d8a65dd2ea59645f1d268c22c1430a140b
+    kubenix/hash: 522c6de3b13681a437da45b02eae4c50267199b0
   name: velox-oauth-agent
   namespace: apps
 rules:
@@ -1578,7 +1602,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: e20397d8a65dd2ea59645f1d268c22c1430a140b
+    kubenix/hash: 522c6de3b13681a437da45b02eae4c50267199b0
   name: velox-oauth-agent
   namespace: apps
 roleRef:
