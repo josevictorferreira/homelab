@@ -22,7 +22,6 @@ in
       # --- provider credentials (one per providers.<id>.api_key_env) ---
       OPENCODE_GO_API_KEY = kubenix.lib.secretsFor "velox_opencode_go_api_key";
       OPENROUTER_API_KEY = kubenix.lib.secretsFor "velox_openrouter_api_key";
-      ANTHROPIC_API_KEY = kubenix.lib.secretsFor "velox_anthropic_api_key";
       GLM_API_KEY = kubenix.lib.secretsFor "velox_glm_api_key";
       ALIBABA_TOKEN_PLAN_API_KEY = kubenix.lib.secretsFor "velox_alibaba_token_plan_api_key";
       YOLOAUTO_API_KEY = kubenix.lib.secretsFor "velox_yoloauto_api_key";
