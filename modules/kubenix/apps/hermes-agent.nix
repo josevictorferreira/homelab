@@ -651,6 +651,31 @@ in
     };
   };
 
+  # Webhook platform on the multiplex gateway (hermes `platforms.webhook`,
+  # port 8644). Reached from the homelab-bridge Funnel sidecar at /hermes/*.
+  kubernetes.resources.services."${name}-gateway" = {
+    metadata = {
+      name = "${name}-gateway";
+      inherit namespace;
+      labels.app = name;
+    };
+    spec = {
+      type = "ClusterIP";
+      selector = {
+        app = name;
+        component = "gateway";
+      };
+      ports = [
+        {
+          name = "webhook";
+          port = 8644;
+          targetPort = 8644;
+          protocol = "TCP";
+        }
+      ];
+    };
+  };
+
   kubernetes.resources.services."${name}-dashboard" = {
     metadata = {
       name = "${name}-dashboard";

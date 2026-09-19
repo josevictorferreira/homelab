@@ -6,7 +6,7 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     app: sandbox-nix
-    kubenix/hash: 4e91edacde32ce4adc0893995bc5853b88ae9f9a
+    kubenix/hash: 6d89eed6c37eb24f0e6c4a5cf85fde4bdbd6b609
   name: sandbox-nix
   namespace: apps
 spec:
@@ -46,7 +46,7 @@ spec:
           envFrom:
             - secretRef:
                 name: sandbox-nix-env
-          image: ghcr.io/josevictorferreira/sandbox-nix:0.1.1@sha256:451fc43fc788be37b6d01e7205f97ed2b2c90ab8b69b986ef240934adfd42b76
+          image: ghcr.io/josevictorferreira/sandbox-nix:0.1.2@sha256:c42b77dba56348905a5adc3d0841a757bd62934fd273242f611404b03875682f
           imagePullPolicy: IfNotPresent
           name: sandbox-nix
           ports:
@@ -83,12 +83,12 @@ spec:
             - /bin/sh
             - -c
             - |
-              want='ghcr.io/josevictorferreira/sandbox-nix:0.1.1@sha256:451fc43fc788be37b6d01e7205f97ed2b2c90ab8b69b986ef240934adfd42b76'
+              want='ghcr.io/josevictorferreira/sandbox-nix:0.1.2@sha256:c42b77dba56348905a5adc3d0841a757bd62934fd273242f611404b03875682f'
               if [ "$(cat /mnt/nix/.seeded 2>/dev/null)" != "$want" ]; then
                 rm -rf /mnt/nix/* /mnt/nix/.[!.]* 2>/dev/null || true
                 cp -a /nix/. /mnt/nix/ && printf '%s' "$want" > /mnt/nix/.seeded
               fi
-          image: ghcr.io/josevictorferreira/sandbox-nix:0.1.1@sha256:451fc43fc788be37b6d01e7205f97ed2b2c90ab8b69b986ef240934adfd42b76
+          image: ghcr.io/josevictorferreira/sandbox-nix:0.1.2@sha256:c42b77dba56348905a5adc3d0841a757bd62934fd273242f611404b03875682f
           imagePullPolicy: IfNotPresent
           name: seed-nix-store
           volumeMounts:
@@ -129,7 +129,7 @@ metadata:
     lbipam.cilium.io/sharing-key: sandbox-nix
   labels:
     app: sandbox-nix
-    kubenix/hash: 4e91edacde32ce4adc0893995bc5853b88ae9f9a
+    kubenix/hash: 6d89eed6c37eb24f0e6c4a5cf85fde4bdbd6b609
   name: sandbox-nix
   namespace: apps
 spec:

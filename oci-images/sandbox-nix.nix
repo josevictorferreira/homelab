@@ -11,6 +11,7 @@ let
   toolPkgs = with pkgs; [
     openssh
     git
+    gh
     cacert
     glibcLocales
     gnutar
@@ -146,7 +147,7 @@ let
 in
 pkgs.dockerTools.buildImage {
   name = "localhost/sandbox-nix";
-  tag = "0.1.1";
+  tag = "0.1.2";
   fromImage = baseImage;
   copyToRoot = [
     toolsRoot

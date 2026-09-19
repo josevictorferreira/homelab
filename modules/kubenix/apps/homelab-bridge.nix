@@ -100,7 +100,9 @@ in
     };
   };
 
-  # Tailscale Funnel serve config — proxies HTTPS 443 to localhost:8080
+  # Tailscale Funnel serve config — proxies HTTPS 443 to localhost:8080.
+  # /hermes/* is forwarded (prefix stripped by tailscale serve) to the hermes
+  # gateway webhook platform, e.g. /hermes/p/keldorn/webhooks/github-pr.
   # ${TS_CERT_DOMAIN} is substituted at runtime by containerboot
   kubernetes.resources.configMaps."${app}-serve-config" = {
     metadata.namespace = namespace;
@@ -110,7 +112,8 @@ in
         "Web": {
           "''${TS_CERT_DOMAIN}:443": {
             "Handlers": {
-              "/": { "Proxy": "http://127.0.0.1:8080" }
+              "/": { "Proxy": "http://127.0.0.1:8080" },
+              "/hermes": { "Proxy": "http://hermes-agent-gateway.apps.svc.cluster.local:8644" }
             }
           }
         },

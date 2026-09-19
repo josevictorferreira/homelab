@@ -52,6 +52,11 @@ in
       HERMES_DASHBOARD_OIDC_CLIENT_ID = kubenix.lib.secretsFor "hermes_dashboard_oidc_client_id";
       HERMES_DASHBOARD_OIDC_CLIENT_SECRET = kubenix.lib.secretsFor "hermes_dashboard_oidc_client_secret";
       HERMES_DASHBOARD_PUBLIC_URL = "https://hermes.josevictor.me";
+      # Gateway webhook platform (GitHub PR review requests -> keldorn profile).
+      # Routes live in the CephFS root config.yaml; env only enables + secures it.
+      WEBHOOK_ENABLED = "true";
+      WEBHOOK_PORT = "8644";
+      WEBHOOK_SECRET = kubenix.lib.secretsFor "hermes_webhook_secret";
     };
   };
   kubernetes.resources.secrets."${name}-sandbox-nix-ssh" = {
