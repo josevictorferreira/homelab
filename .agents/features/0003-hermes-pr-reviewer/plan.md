@@ -88,8 +88,7 @@ Profile name used below: `keldorn` (any name works; BG naming kept).
        cwd: /workspace/hermes/workspace/reviews
      ```
    - `.env` — if a fine-grained PAT is chosen: replace `GH_TOKEN`/`GITHUB_TOKEN` here (profile-scoped; webhook/cron runs load the profile's .env).
-   - `SOUL.md` — short direct reviewer persona (match style of existing profiles: no filler, act first).
-   - `AGENTS.md` — the rubric (verbatim from the request) + operating rules:
+   - `SOUL.md` — persona **and** the whole operating manual. Cron runs load `SOUL.md` always but project context files (`AGENTS.md`) only when the job has `--workdir`, so a profile `AGENTS.md` never reaches the model (verified in `cron/scheduler.py`: "Project context files only with a configured workdir; SOUL.md always"). Rubric (verbatim from the request) + rules:
      ```
      ## Review rubric
      - Scope: does it change only code that's really necessary? Look over all files changed; are they related to what the PR is trying to change?
@@ -194,6 +193,20 @@ After ≥ 1 week of reviews judged sane: change the AGENTS.md final-review rule 
 - Found `/opt/data/.ssh/config` group-writable (`0660`) → OpenSSH refused it ("Bad owner or permissions"), which silently broke the ssh terminal backend for every profile (valygar included). Fixed with `chmod 600` on `config` and `known_hosts`.
 - `podman login --get-login ghcr.io` on the host prints a `ghp_` token as the login name; that value landed in the session transcript. Consider rotating it.
 - Profile `keldorn` created (`--clone-from valygar --no-alias`), config slimmed to unpinned keys, job `pr-review` id `08fa20b03c96`.
+- Under multiplex the cron worker for a routed profile gets the launch `.env` secrets stripped and reloads the profile's own `.env`; a cloned profile has no `VELOX_API_KEY` → `No usable credentials found for provider 'velox'`. Copied `VELOX_API_KEY` from `/opt/data/.env` into `profiles/keldorn/.env` (valygar's `.env` lacks it too, so any future valygar cron/webhook run would hit the same).
+- **First e2e run (hermes-omniroute-plugin#23, 13:35→13:46):** the pipeline worked end to end (monitor diff → agent → inline comment + formal review), but the model (`sauron` was 400 "out of extra usage" on velox, fell back to `glm-5-3`) **approved** and **ran the project's test suite**, both forbidden. Cause: the rules were in `AGENTS.md`, which cron never loads; the loaded github-code-review skill shows `--approve` examples. Fix: manual moved into `SOUL.md` (passes the context-file injection scanner), `AGENTS.md` removed. The approval on #23 was left in place for José to keep or dismiss.
+- Cron monitor scripts run with **secrets scrubbed from the environment** under the multiplex gateway (`build_subprocess_env(scrub_secrets=True)`), so `os.environ["GH_TOKEN"]` raised KeyError on every tick. `pending_reviews.py` now falls back to parsing `$HERMES_HOME/.env` (same pattern as the bundled github-auth skill).
+- Webhook platform live: `[webhook] Listening on *:8644 — routes: github-pr`; unsigned POST to `/p/keldorn/webhooks/github-pr` → 401, other profiles → 404, verified through the public Funnel relay IP (`--resolve` with a 1.1.1.1 answer; the host itself resolves `*.ts.net` to the tailnet IP and is not on the tailnet).
+- containerboot does not hot-reload `TS_SERVE_CONFIG`; the bridge pod was recreated to load the `/hermes` handler.
+- sandbox-nix 0.1.2 rolled out (init container re-seeds the /nix PVC, ~20 min in `Init:0/1` with no log output); `gh auth status` over ssh reports josevictorferreira.
+
+- **Second e2e run (hermes-omniroute-plugin#21, 13:55→14:01):** with the manual in `SOUL.md` the limits held: verdict `COMMENTED`, inline nit at `model_provider/__init__.py:55`, review file explicitly states "Tests not executed — static review only", no test/install commands in `agent.log`. Only defect: the posted body was a one-liner while the findings sat in `review-21.md`; SOUL step 5 now says the body is the file content.
+
+## Follow-ups
+
+- Prompt rules alone held only after moving them to `SOUL.md`; if `--approve` must be impossible rather than forbidden, add a technical guard (a `gh` wrapper on sandbox-nix that rejects `pr review --approve`, or a fine-grained PAT for the profile).
+- `sauron` (Claude combo) was out of velox quota at test time; the profile falls back to `glm-5-3` via the root `fallback_providers`. Pick the review model once quota is back.
+- Consider requesting a Matrix bot user for keldorn so verdicts are also delivered to José.
 
 ## Open decisions for José
 
