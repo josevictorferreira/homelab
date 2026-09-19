@@ -4,6 +4,15 @@ let
   app = "sftpgo";
   namespace = homelab.kubernetes.namespaces.applications;
   pvcName = kubenix.lib.sharedStorage.rootPVC;
+
+  relayPort = 9000;
+  eventRulesPath = "/etc/sftpgo/eventrules";
+
+  # The sidecar reads its script and the event rules from config maps defined in
+  # sftpgo-matrix-relay.nix; hashing them here rolls the pod when either changes,
+  # since both are mounted with subPath-free config map volumes.
+  relayConfigMaps = (import ./sftpgo-matrix-relay.nix { inherit homelab; }).kubernetes.resources.configMaps;
+  relayConfigHash = builtins.hashString "sha256" (builtins.toJSON relayConfigMaps);
 in
 {
   kubernetes = {
@@ -32,6 +41,24 @@ in
             };
           }
         ];
+
+        # Event actions and rules live in git and are re-applied on every start.
+        # Mode 0 updates the objects named in the dump and leaves everything else
+        # (users, folders, admins) untouched.
+        env = {
+          SFTPGO_LOADDATA_FROM = "${eventRulesPath}/loaddata.json";
+          SFTPGO_LOADDATA_MODE = "0";
+        };
+
+        # /var/lib/sftpgo is a ReadWriteOnce RBD volume, so a surging rollout
+        # would deadlock on Multi-Attach.
+        deploymentStrategy = {
+          type = "Recreate";
+        };
+
+        podAnnotations = {
+          "homelab.io/relay-config-hash" = relayConfigHash;
+        };
 
         securityContext = {
           runAsUser = 2002;
@@ -106,6 +133,14 @@ in
               claimName = pvcName;
             };
           }
+          {
+            name = "event-rules";
+            configMap.name = "sftpgo-event-rules";
+          }
+          {
+            name = "matrix-relay";
+            configMap.name = "sftpgo-matrix-relay";
+          }
         ];
 
         volumeMounts = [
@@ -113,6 +148,75 @@ in
             name = "shared-storage";
             mountPath = "/mnt/shared_storage";
             readOnly = false;
+          }
+          {
+            name = "event-rules";
+            mountPath = eventRulesPath;
+            readOnly = true;
+          }
+        ];
+
+        # Turns SFTPGo upload events into Matrix messages; see
+        # sftpgo-matrix-relay.nix for why this cannot be a plain HTTP action.
+        extraContainers = [
+          {
+            name = "matrix-relay";
+            image = "python:3.13-alpine";
+            imagePullPolicy = "IfNotPresent";
+            command = [
+              "python3"
+              "/opt/relay/relay.py"
+            ];
+            env = [
+              {
+                name = "MATRIX_HOMESERVER";
+                value = "http://tuwunel.apps.svc.cluster.local:8008";
+              }
+              {
+                name = "MATRIX_ROOM_ID";
+                value = "!adz2tOeDu1eB6CeUlG:josevictor.me"; # #cctv:josevictor.me
+              }
+              {
+                name = "RELAY_PORT";
+                value = toString relayPort;
+              }
+              {
+                name = "MATRIX_ACCESS_TOKEN";
+                valueFrom.secretKeyRef = {
+                  name = "sftpgo-matrix-relay";
+                  key = "MATRIX_ACCESS_TOKEN";
+                };
+              }
+            ];
+            volumeMounts = [
+              {
+                name = "matrix-relay";
+                mountPath = "/opt/relay";
+                readOnly = true;
+              }
+              {
+                name = "shared-storage";
+                mountPath = "/mnt/shared_storage";
+                readOnly = true;
+              }
+            ];
+            securityContext = {
+              runAsUser = 2002;
+              runAsGroup = 2002;
+              allowPrivilegeEscalation = false;
+              readOnlyRootFilesystem = true;
+              capabilities.drop = [ "ALL" ];
+            };
+            resources = {
+              requests = {
+                cpu = "50m";
+                memory = "64Mi";
+              };
+              limits = {
+                cpu = "200m";
+                memory = "128Mi";
+              };
+            };
           }
         ];
 

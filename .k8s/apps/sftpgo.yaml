@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/name: sftpgo
     app.kubernetes.io/version: 2.7.4
     helm.sh/chart: sftpgo-0.47.0
-    kubenix/hash: d011f97354a18c98e2771a5aa11cecc955de44f1
+    kubenix/hash: 561b901b77c02fa63952cffdfa8c2c0726b88d18
   name: sftpgo
   namespace: apps
 spec:
@@ -20,10 +20,13 @@ spec:
     matchLabels:
       app.kubernetes.io/instance: sftpgo
       app.kubernetes.io/name: sftpgo
+  strategy:
+    type: Recreate
   template:
     metadata:
       annotations:
         checksum/config: ac5a1dbefc70364f206f0a8ec6728a1393aeeeb26afad988a0daba3db694437e
+        homelab.io/relay-config-hash: b9f73f9064b21443921acac6f1474d245e47802d7fb0bd698da7033974f4b288
       labels:
         app.kubernetes.io/instance: sftpgo
         app.kubernetes.io/name: sftpgo
@@ -49,6 +52,10 @@ spec:
               value: "10000"
             - name: SFTPGO_TELEMETRY__BIND_ADDRESS
               value: ""
+            - name: SFTPGO_LOADDATA_FROM
+              value: /etc/sftpgo/eventrules/loaddata.json
+            - name: SFTPGO_LOADDATA_MODE
+              value: "0"
           envFrom:
             - secretRef:
                 name: sftpgo-config
@@ -94,6 +101,49 @@ spec:
             - mountPath: /mnt/shared_storage
               name: shared-storage
               readOnly: false
+            - mountPath: /etc/sftpgo/eventrules
+              name: event-rules
+              readOnly: true
+        - command:
+            - python3
+            - /opt/relay/relay.py
+          env:
+            - name: MATRIX_HOMESERVER
+              value: http://tuwunel.apps.svc.cluster.local:8008
+            - name: MATRIX_ROOM_ID
+              value: '!adz2tOeDu1eB6CeUlG:josevictor.me'
+            - name: RELAY_PORT
+              value: "9000"
+            - name: MATRIX_ACCESS_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  key: MATRIX_ACCESS_TOKEN
+                  name: sftpgo-matrix-relay
+          image: python:3.13-alpine
+          imagePullPolicy: IfNotPresent
+          name: matrix-relay
+          resources:
+            limits:
+              cpu: 200m
+              memory: 128Mi
+            requests:
+              cpu: 50m
+              memory: 64Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+            runAsGroup: 2002
+            runAsUser: 2002
+          volumeMounts:
+            - mountPath: /opt/relay
+              name: matrix-relay
+              readOnly: true
+            - mountPath: /mnt/shared_storage
+              name: shared-storage
+              readOnly: true
       hostNetwork: false
       securityContext:
         fsGroup: 100
@@ -109,6 +159,12 @@ spec:
         - name: shared-storage
           persistentVolumeClaim:
             claimName: cephfs-shared-storage-root
+        - configMap:
+            name: sftpgo-event-rules
+          name: event-rules
+        - configMap:
+            name: sftpgo-matrix-relay
+          name: matrix-relay
 ---
 apiVersion: v1
 data:
@@ -124,7 +180,7 @@ metadata:
     app.kubernetes.io/name: sftpgo
     app.kubernetes.io/version: 2.7.4
     helm.sh/chart: sftpgo-0.47.0
-    kubenix/hash: d011f97354a18c98e2771a5aa11cecc955de44f1
+    kubenix/hash: 561b901b77c02fa63952cffdfa8c2c0726b88d18
   name: sftpgo
   namespace: apps
 ---
@@ -142,7 +198,7 @@ metadata:
     app.kubernetes.io/name: sftpgo
     app.kubernetes.io/version: 2.7.4
     helm.sh/chart: sftpgo-0.47.0
-    kubenix/hash: d011f97354a18c98e2771a5aa11cecc955de44f1
+    kubenix/hash: 561b901b77c02fa63952cffdfa8c2c0726b88d18
   name: sftpgo
   namespace: apps
 spec:
@@ -167,7 +223,7 @@ metadata:
     app.kubernetes.io/name: sftpgo
     app.kubernetes.io/version: 2.7.4
     helm.sh/chart: sftpgo-0.47.0
-    kubenix/hash: d011f97354a18c98e2771a5aa11cecc955de44f1
+    kubenix/hash: 561b901b77c02fa63952cffdfa8c2c0726b88d18
   name: sftpgo
   namespace: apps
 spec:
@@ -266,7 +322,7 @@ metadata:
     app.kubernetes.io/name: sftpgo
     app.kubernetes.io/version: 2.7.4
     helm.sh/chart: sftpgo-0.47.0
-    kubenix/hash: d011f97354a18c98e2771a5aa11cecc955de44f1
+    kubenix/hash: 561b901b77c02fa63952cffdfa8c2c0726b88d18
   name: sftpgo
   namespace: apps
 ---
@@ -282,7 +338,7 @@ metadata:
     app.kubernetes.io/name: sftpgo
     app.kubernetes.io/version: 2.7.4
     helm.sh/chart: sftpgo-0.47.0
-    kubenix/hash: d011f97354a18c98e2771a5aa11cecc955de44f1
+    kubenix/hash: 561b901b77c02fa63952cffdfa8c2c0726b88d18
   name: sftpgo-api
   namespace: apps
 spec:
@@ -315,7 +371,7 @@ metadata:
     app.kubernetes.io/name: sftpgo
     app.kubernetes.io/version: 2.7.4
     helm.sh/chart: sftpgo-0.47.0
-    kubenix/hash: d011f97354a18c98e2771a5aa11cecc955de44f1
+    kubenix/hash: 561b901b77c02fa63952cffdfa8c2c0726b88d18
   name: sftpgo-ui
   namespace: apps
 spec:

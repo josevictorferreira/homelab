@@ -1,0 +1,118 @@
+apiVersion: v1
+data:
+  loaddata.json: '{"event_actions":[{"description":"Hand the uploaded snapshot to the Matrix relay sidecar","name":"cctv-matrix-post","options":{"http_config":{"endpoint":"http://127.0.0.1:9000/notify","method":"POST","query_parameters":[{"key":"fs_path","value":"{{.FsPath}}"},{"key":"name","value":"{{.ObjectName}}"}],"timeout":60}},"type":1}],"event_rules":[{"actions":[{"name":"cctv-matrix-post","order":1,"relation_options":{"execute_sync":false,"is_failure_action":false,"stop_on_failure":false}}],"conditions":{"fs_events":["upload"],"options":{"event_statuses":[1],"fs_paths":[{"pattern":"/*/*/*/pic/*.jpg"}],"names":[{"pattern":"cameraman"}]}},"description":"Post person-detection snapshots to the CCTV Matrix room","name":"cctv-person-detection","status":1,"trigger":1}],"version":17}'
+kind: ConfigMap
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 634e9f2a70c71dd4ac6ca3d34e8f24c4570b5c8c
+  name: sftpgo-event-rules
+  namespace: apps
+---
+apiVersion: v1
+data:
+  relay.py: |
+    #!/usr/bin/env python3
+    """Post files uploaded to SFTPGo into a Matrix room.
+
+    Runs as a sidecar in the sftpgo pod. SFTPGo's event manager calls
+    POST /notify?fs_path=...&name=... ; this reads the file from the shared
+    volume, uploads it to the homeserver media repository and sends an
+    m.image (or m.file) message referencing the returned mxc:// URI.
+    """
+
+    import json
+    import mimetypes
+    import os
+    import time
+    import urllib.parse
+    import urllib.request
+    from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+
+    HOMESERVER = os.environ["MATRIX_HOMESERVER"].rstrip("/")
+    ROOM_ID = os.environ["MATRIX_ROOM_ID"]
+    ACCESS_TOKEN = os.environ["MATRIX_ACCESS_TOKEN"]
+    PORT = int(os.environ.get("RELAY_PORT", "9000"))
+    MAX_BYTES = int(os.environ.get("RELAY_MAX_BYTES", str(32 * 1024 * 1024)))
+
+
+    def log(message):
+        print(time.strftime("%Y-%m-%dT%H:%M:%S"), message, flush=True)
+
+
+    def matrix(method, path, payload, content_type):
+        request = urllib.request.Request(
+            HOMESERVER + path,
+            data=payload,
+            method=method,
+            headers={
+                "Authorization": "Bearer " + ACCESS_TOKEN,
+                "Content-Type": content_type,
+            },
+        )
+        with urllib.request.urlopen(request, timeout=60) as response:
+            return json.load(response)
+
+
+    def post_to_matrix(fs_path, name):
+        with open(fs_path, "rb") as handle:
+            payload = handle.read(MAX_BYTES + 1)
+        if len(payload) > MAX_BYTES:
+            raise ValueError(name + " is larger than " + str(MAX_BYTES) + " bytes")
+
+        mimetype = mimetypes.guess_type(name)[0] or "application/octet-stream"
+        upload = matrix(
+            "POST",
+            "/_matrix/media/v3/upload?filename=" + urllib.parse.quote(name),
+            payload,
+            mimetype,
+        )
+        event = {
+            "msgtype": "m.image" if mimetype.startswith("image/") else "m.file",
+            "body": name,
+            "url": upload["content_uri"],
+            "info": {"mimetype": mimetype, "size": len(payload)},
+        }
+        sent = matrix(
+            "PUT",
+            "/_matrix/client/v3/rooms/%s/send/m.room.message/sftpgo%d"
+            % (urllib.parse.quote(ROOM_ID), time.time_ns()),
+            json.dumps(event).encode(),
+            "application/json",
+        )
+        return sent["event_id"]
+
+
+    class Handler(BaseHTTPRequestHandler):
+        def do_POST(self):
+            query = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+            fs_path = (query.get("fs_path") or [""])[0]
+            name = (query.get("name") or [""])[0] or os.path.basename(fs_path)
+            try:
+                event_id = post_to_matrix(fs_path, name)
+            except Exception as err:
+                log("failed to post %s: %s" % (fs_path, err))
+                self.send_response(500)
+                self.end_headers()
+                return
+            log("posted %s as %s" % (fs_path, event_id))
+            self.send_response(204)
+            self.end_headers()
+
+        def log_message(self, *args):
+            pass
+
+
+    log("relaying sftpgo uploads to %s on %s" % (ROOM_ID, HOMESERVER))
+    ThreadingHTTPServer(("127.0.0.1", PORT), Handler).serve_forever()
+kind: ConfigMap
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 634e9f2a70c71dd4ac6ca3d34e8f24c4570b5c8c
+  name: sftpgo-matrix-relay
+  namespace: apps
