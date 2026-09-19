@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/name: sftpgo
     app.kubernetes.io/version: 2.7.4
     helm.sh/chart: sftpgo-0.47.0
-    kubenix/hash: 561b901b77c02fa63952cffdfa8c2c0726b88d18
+    kubenix/hash: 31624cc199a4dd1ce28376c9f7b62a5f605eb089
   name: sftpgo
   namespace: apps
 spec:
@@ -21,7 +21,10 @@ spec:
       app.kubernetes.io/instance: sftpgo
       app.kubernetes.io/name: sftpgo
   strategy:
-    type: Recreate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+    type: RollingUpdate
   template:
     metadata:
       annotations:
@@ -180,7 +183,7 @@ metadata:
     app.kubernetes.io/name: sftpgo
     app.kubernetes.io/version: 2.7.4
     helm.sh/chart: sftpgo-0.47.0
-    kubenix/hash: 561b901b77c02fa63952cffdfa8c2c0726b88d18
+    kubenix/hash: 31624cc199a4dd1ce28376c9f7b62a5f605eb089
   name: sftpgo
   namespace: apps
 ---
@@ -198,7 +201,7 @@ metadata:
     app.kubernetes.io/name: sftpgo
     app.kubernetes.io/version: 2.7.4
     helm.sh/chart: sftpgo-0.47.0
-    kubenix/hash: 561b901b77c02fa63952cffdfa8c2c0726b88d18
+    kubenix/hash: 31624cc199a4dd1ce28376c9f7b62a5f605eb089
   name: sftpgo
   namespace: apps
 spec:
@@ -223,7 +226,7 @@ metadata:
     app.kubernetes.io/name: sftpgo
     app.kubernetes.io/version: 2.7.4
     helm.sh/chart: sftpgo-0.47.0
-    kubenix/hash: 561b901b77c02fa63952cffdfa8c2c0726b88d18
+    kubenix/hash: 31624cc199a4dd1ce28376c9f7b62a5f605eb089
   name: sftpgo
   namespace: apps
 spec:
@@ -322,7 +325,7 @@ metadata:
     app.kubernetes.io/name: sftpgo
     app.kubernetes.io/version: 2.7.4
     helm.sh/chart: sftpgo-0.47.0
-    kubenix/hash: 561b901b77c02fa63952cffdfa8c2c0726b88d18
+    kubenix/hash: 31624cc199a4dd1ce28376c9f7b62a5f605eb089
   name: sftpgo
   namespace: apps
 ---
@@ -338,7 +341,7 @@ metadata:
     app.kubernetes.io/name: sftpgo
     app.kubernetes.io/version: 2.7.4
     helm.sh/chart: sftpgo-0.47.0
-    kubenix/hash: 561b901b77c02fa63952cffdfa8c2c0726b88d18
+    kubenix/hash: 31624cc199a4dd1ce28376c9f7b62a5f605eb089
   name: sftpgo-api
   namespace: apps
 spec:
@@ -371,7 +374,7 @@ metadata:
     app.kubernetes.io/name: sftpgo
     app.kubernetes.io/version: 2.7.4
     helm.sh/chart: sftpgo-0.47.0
-    kubenix/hash: 561b901b77c02fa63952cffdfa8c2c0726b88d18
+    kubenix/hash: 31624cc199a4dd1ce28376c9f7b62a5f605eb089
   name: sftpgo-ui
   namespace: apps
 spec:

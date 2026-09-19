@@ -50,10 +50,16 @@ in
           SFTPGO_LOADDATA_MODE = "0";
         };
 
-        # /var/lib/sftpgo is a ReadWriteOnce RBD volume, so a surging rollout
-        # would deadlock on Multi-Attach.
+        # /var/lib/sftpgo is a ReadWriteOnce RBD volume, so the old pod has to
+        # release it before the new one starts or the rollout deadlocks on
+        # Multi-Attach. Recreate would express this too, but it cannot be applied
+        # over the chart's default rollingUpdate block without a manual patch.
         deploymentStrategy = {
-          type = "Recreate";
+          type = "RollingUpdate";
+          rollingUpdate = {
+            maxSurge = 0;
+            maxUnavailable = 1;
+          };
         };
 
         podAnnotations = {
