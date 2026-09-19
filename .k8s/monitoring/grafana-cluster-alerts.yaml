@@ -16,8 +16,10 @@ data:
         - datasourceUid: prometheus
           model:
             expr: up{job="apiserver"} == 0
+            instant: true
             intervalMs: 1000
             maxDataPoints: 43200
+            range: false
             refId: A
           refId: A
           relativeTimeRange:
@@ -51,8 +53,10 @@ data:
         - datasourceUid: prometheus
           model:
             expr: sum by (node)(up{job="kubelet"}) == 0
+            instant: true
             intervalMs: 1000
             maxDataPoints: 43200
+            range: false
             refId: A
           refId: A
           relativeTimeRange:
@@ -85,8 +89,10 @@ data:
         - datasourceUid: prometheus
           model:
             expr: kube_node_status_condition{condition="Ready",status="true"} == 0
+            instant: true
             intervalMs: 1000
             maxDataPoints: 43200
+            range: false
             refId: A
           refId: A
           relativeTimeRange:
@@ -120,8 +126,10 @@ data:
           model:
             expr: kube_node_status_condition{condition="MemoryPressure",status="true"}
               == 1
+            instant: true
             intervalMs: 1000
             maxDataPoints: 43200
+            range: false
             refId: A
           refId: A
           relativeTimeRange:
@@ -155,8 +163,10 @@ data:
           model:
             expr: kube_node_status_condition{condition="DiskPressure",status="true"} ==
               1
+            instant: true
             intervalMs: 1000
             maxDataPoints: 43200
+            range: false
             refId: A
           refId: A
           relativeTimeRange:
@@ -193,8 +203,10 @@ data:
           model:
             expr: kube_deployment_status_replicas_available{namespace=~"apps|rook-ceph|kube-system"}
               != kube_deployment_spec_replicas{namespace=~"apps|rook-ceph|kube-system"}
+            instant: true
             intervalMs: 1000
             maxDataPoints: 43200
+            range: false
             refId: A
           refId: A
           relativeTimeRange:
@@ -230,8 +242,10 @@ data:
           model:
             expr: kube_statefulset_status_replicas_ready{namespace=~"apps|rook-ceph"}
               != kube_statefulset_status_replicas{namespace=~"apps|rook-ceph"}
+            instant: true
             intervalMs: 1000
             maxDataPoints: 43200
+            range: false
             refId: A
           refId: A
           relativeTimeRange:
@@ -265,8 +279,10 @@ data:
         - datasourceUid: prometheus
           model:
             expr: increase(kube_pod_container_status_restarts_total[1h]) > 5
+            instant: true
             intervalMs: 1000
             maxDataPoints: 43200
+            range: false
             refId: A
           refId: A
           relativeTimeRange:
@@ -300,8 +316,10 @@ data:
         - datasourceUid: prometheus
           model:
             expr: kube_persistentvolume_status_phase{phase="Pending"} == 1
+            instant: true
             intervalMs: 1000
             maxDataPoints: 43200
+            range: false
             refId: A
           refId: A
           relativeTimeRange:
@@ -333,6 +351,6 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     grafana_alert: "1"
-    kubenix/hash: 5ee0a43361005cf11eba93fc1e2e9fa426376079
+    kubenix/hash: 876315bdacbaaa6782586ad3b6999d4165c5ac3a
   name: grafana-alerting-cluster-health-rules
   namespace: monitoring

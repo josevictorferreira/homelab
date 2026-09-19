@@ -23,6 +23,34 @@ let
     "homelab-backup-rgw"
     "homelab-backup-shared"
   ];
+
+  # Hermes kanban task workspaces are throwaway git clones and scratch build
+  # output — 3.5GiB but ~129k of the shared bucket's 733k versions, so they cost
+  # far more in mirror and ILM-scan time than they are worth off-site. The
+  # primary on lab-pi-bk still keeps them.
+  mirrorExcludes = [
+    "*/hermes/kanban/boards/*/workspaces/*"
+  ];
+
+  # Wipe-protection window: how long a version survives after the mirror
+  # replaces or (via --remove) deletes it. The 195GB disk cannot afford the
+  # 14 days this used to keep.
+  noncurrentExpireDays = 7;
+
+  # Imported as a whole, not appended: `mc ilm rule add` has no stable rule ID,
+  # so running it daily piled up one duplicate rule per run (21-25 per bucket
+  # by 2026-09-19). `mc ilm rule import` replaces the entire configuration and
+  # is therefore idempotent.
+  lifecyclePolicy = builtins.toJSON {
+    Rules = [
+      {
+        ID = "noncurrent-expire";
+        Status = "Enabled";
+        Filter = { };
+        NoncurrentVersionExpiration.NoncurrentDays = noncurrentExpireDays;
+      }
+    ];
+  };
 in
 {
   options.profiles."offsite-backup" = {
@@ -83,10 +111,13 @@ in
         for b in ${lib.concatStringsSep " " mirrorBuckets}; do
           mc mb "oci/$b" --ignore-existing
           mc version enable "oci/$b" 2>/dev/null || true
-          mc ilm rule add --noncurrent-expire-days 14 "oci/$b" 2>/dev/null || true
+          printf '%s' ${lib.escapeShellArg lifecyclePolicy} \
+            | mc ilm rule import "oci/$b" 2>/dev/null || true
 
           echo "Mirroring $b ..."
-          mc mirror --overwrite --remove --quiet "pi/$b" "oci/$b"
+          mc mirror --overwrite --remove --quiet \
+            ${lib.concatMapStringsSep " " (p: "--exclude ${lib.escapeShellArg p}") mirrorExcludes} \
+            "pi/$b" "oci/$b"
         done
 
         echo "Off-site mirror complete"

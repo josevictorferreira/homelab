@@ -17,8 +17,10 @@ data:
           model:
             expr: 100 * (1 - (minio_cluster_capacity_usable_free_bytes / minio_cluster_capacity_usable_total_bytes))
               > 85
+            instant: true
             intervalMs: 1000
             maxDataPoints: 43200
+            range: false
             refId: A
           refId: A
           relativeTimeRange:
@@ -52,8 +54,10 @@ data:
           model:
             expr: 100 * (1 - (minio_cluster_capacity_usable_free_bytes / minio_cluster_capacity_usable_total_bytes))
               > 95
+            instant: true
             intervalMs: 1000
             maxDataPoints: 43200
+            range: false
             refId: A
           refId: A
           relativeTimeRange:
@@ -87,8 +91,10 @@ data:
         - datasourceUid: prometheus
           model:
             expr: minio_bucket_usage_total_bytes{bucket="homelab-backup-shared"} > 107374182400
+            instant: true
             intervalMs: 1000
             maxDataPoints: 43200
+            range: false
             refId: A
           refId: A
           relativeTimeRange:
@@ -126,8 +132,10 @@ data:
         - datasourceUid: prometheus
           model:
             expr: increase(velero_backup_failure_total[1h]) > 0
+            instant: true
             intervalMs: 1000
             maxDataPoints: 43200
+            range: false
             refId: A
           refId: A
           relativeTimeRange:
@@ -160,8 +168,10 @@ data:
         - datasourceUid: prometheus
           model:
             expr: increase(velero_backup_partial_failure_total[1h]) > 0
+            instant: true
             intervalMs: 1000
             maxDataPoints: 43200
+            range: false
             refId: A
           refId: A
           relativeTimeRange:
@@ -195,8 +205,10 @@ data:
           model:
             expr: time() - velero_backup_last_successful_timestamp{schedule="daily-backup"}
               > 93600
+            instant: true
             intervalMs: 1000
             maxDataPoints: 43200
+            range: false
             refId: A
           refId: A
           relativeTimeRange:
@@ -235,8 +247,10 @@ data:
           model:
             expr: increase(kube_job_status_failed{namespace="backup", job_name=~"postgres-backup.*"}[6h])
               > 0
+            instant: true
             intervalMs: 1000
             maxDataPoints: 43200
+            range: false
             refId: A
           refId: A
           relativeTimeRange:
@@ -270,8 +284,10 @@ data:
           model:
             expr: time() - kube_cronjob_status_last_successful_time{namespace="backup",
               cronjob="postgres-backup"} > 93600
+            instant: true
             intervalMs: 1000
             maxDataPoints: 43200
+            range: false
             refId: A
           refId: A
           relativeTimeRange:
@@ -305,8 +321,10 @@ data:
           model:
             expr: increase(kube_job_status_failed{namespace="backup", job_name=~"postgres-restore-drill.*"}[168h])
               > 0
+            instant: true
             intervalMs: 1000
             maxDataPoints: 43200
+            range: false
             refId: A
           refId: A
           relativeTimeRange:
@@ -340,8 +358,10 @@ data:
           model:
             expr: time() - kube_cronjob_status_last_successful_time{namespace="backup",
               cronjob="postgres-restore-drill"} > 604800
+            instant: true
             intervalMs: 1000
             maxDataPoints: 43200
+            range: false
             refId: A
           refId: A
           relativeTimeRange:
@@ -380,8 +400,10 @@ data:
           model:
             expr: increase(kube_job_status_failed{namespace="backup", job_name=~"shared-subfolders-backup.*"}[6h])
               > 0
+            instant: true
             intervalMs: 1000
             maxDataPoints: 43200
+            range: false
             refId: A
           refId: A
           relativeTimeRange:
@@ -415,8 +437,10 @@ data:
           model:
             expr: time() - kube_cronjob_status_last_successful_time{namespace="backup",
               cronjob="shared-subfolders-backup"} > 93600
+            instant: true
             intervalMs: 1000
             maxDataPoints: 43200
+            range: false
             refId: A
           refId: A
           relativeTimeRange:
@@ -455,8 +479,10 @@ data:
           model:
             expr: increase(kube_job_status_failed{namespace="backup", job_name=~"shared-subfolders-proton-sync.*"}[6h])
               > 0
+            instant: true
             intervalMs: 1000
             maxDataPoints: 43200
+            range: false
             refId: A
           refId: A
           relativeTimeRange:
@@ -491,8 +517,10 @@ data:
           model:
             expr: time() - kube_cronjob_status_last_successful_time{namespace="backup",
               cronjob="shared-subfolders-proton-sync"} > 93600
+            instant: true
             intervalMs: 1000
             maxDataPoints: 43200
+            range: false
             refId: A
           refId: A
           relativeTimeRange:
@@ -532,8 +560,10 @@ data:
           model:
             expr: (time() - offsite_mirror_last_success_timestamp_seconds > 108000) or
               absent(offsite_mirror_last_success_timestamp_seconds)
+            instant: true
             intervalMs: 1000
             maxDataPoints: 43200
+            range: false
             refId: A
           refId: A
           relativeTimeRange:
@@ -565,6 +595,6 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     grafana_alert: "1"
-    kubenix/hash: fcfcddb5d96c56ac275e58e026b1defe6e7d9fc5
+    kubenix/hash: 70e29da272b626314eb9ec25f33c50a865b4e264
   name: grafana-alerting-backup-rules
   namespace: monitoring

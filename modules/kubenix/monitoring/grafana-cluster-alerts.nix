@@ -29,6 +29,12 @@ let
           inherit datasourceUid;
           model = {
             inherit expr;
+            # Instant query: the threshold expression below only accepts a
+            # single reduced value per series. A range query makes Grafana
+            # error with "looks like time series data, only reduced data can
+            # be alerted on" whenever the query actually returns samples.
+            instant = true;
+            range = false;
             intervalMs = 1000;
             maxDataPoints = 43200;
             refId = "A";
