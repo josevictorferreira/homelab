@@ -1,4 +1,4 @@
-.PHONY: lgroups check ddeploy deploy gdeploy secrets manifests kubesync wusbiso docker-build docker-login docker-init-repo docker-push lint format backup-postgres restore-postgres reconcile events backup-rgw backup-etcd backup-verify images images-outdated images-check push-openclaw-debian ghcr-size tf push-cache help
+.PHONY: lgroups check ddeploy deploy gdeploy secrets manifests kubesync wusbiso docker-build docker-login docker-init-repo docker-push lint format backup-postgres restore-postgres reconcile events backup-rgw backup-etcd backup-verify images images-outdated images-check push-openclaw-debian ghcr-size tf push-cache matrix-transcript help
 
 .DEFAULT_GOAL := help
 
@@ -102,6 +102,9 @@ ghcr-size: ## Check GHCR image size without downloading. Usage: make ghcr-size I
 
 tf: ## Render terranix config and run OpenTofu in terraform/oci. Usage: make tf ARGS="plan"
 	@nix run .#tf -- $(ARGS)
+
+matrix-transcript: ## Export a full Matrix room transcript. Usage: make matrix-transcript ROOM='<room-id|alias|url>' OUT=oficina.txt
+	@./scripts/matrix-transcript.py $(ROOM) $(if $(OUT),-o $(OUT))
 
 help: ## Show this help.
 	@printf "Usage: make [target]\n\nTARGETS:\n"; grep -F "##" $(MAKEFILE_LIST) | grep -Fv "grep -F" | grep -Fv "printf " | sed -e 's/\\$$//' | sed -e 's/##//' | column -t -s ":" | sed -e 's/^/    /'; printf "\n"

@@ -22,7 +22,7 @@ max_body_bytes = 4194304
 shutdown_drain_ms = 10000
 shutdown_grace_ms = 30000
 # Default TTFB (30s) kills LLM extraction calls that carry a whole story in
-# the prompt: GLM/opencode-go routinely take 30-60s before the first byte,
+# the prompt: GLM routinely takes 30-60s before the first byte,
 # so both combo targets time out and the request dies as 502 at ~60s.
 # There is no total-request timeout in velox; stream_idle_timeout_ms guards
 # a stalled stream after the head arrives. Reasoning models (e.g. gpt-5.6-luna
@@ -50,20 +50,6 @@ enabled = true
 # ---------------------------------------------------------------------------
 # Providers
 # ---------------------------------------------------------------------------
-
-# OpenCode Zen "go" plan. Serves most models over OpenAI chat-completions.
-[providers.opencode-go]
-kind = "openai-compatible"
-base_url = "https://opencode.ai/zen/go/v1"
-api_key_env = "OPENCODE_GO_API_KEY"
-
-# The same host also exposes /messages, which 9router uses for the MiniMax
-# models specifically. Velox binds one wire format per provider, so the
-# Anthropic-speaking half is declared separately against the same credential.
-[providers.opencode-go-anthropic]
-kind = "anthropic"
-base_url = "https://opencode.ai/zen/go/v1"
-api_key_env = "OPENCODE_GO_API_KEY"
 
 [providers.openrouter]
 kind = "openai-compatible"
@@ -349,10 +335,9 @@ structured_output = false
 # the many clients that omit it (pi omits it on every agent turn), and its
 # built-in fallback is a conservative 16384 — low enough that long answers came
 # back truncated with `finish_reason: "length"`. The values below are the
-# ceilings each upstream actually accepts: z.ai reports the range as [1,131072]
-# and rejects 200000, and opencode-go's /messages surface took 131072 alongside
-# an 80k-token prompt. Both treat it as a cap rather than a reserved budget, so
-# a large prompt does not push the request over the context window.
+# ceiling z.ai actually accepts: it reports the range as [1,131072] and rejects
+# 200000. It treats the value as a cap rather than a reserved budget, so a large
+# prompt does not push the request over the context window.
 #
 # `kimi-k3-kimi-coding` is deliberately left without one: that endpoint is
 # currently answering 404, so no ceiling could be verified against it, and the
@@ -441,25 +426,9 @@ provider = "glm"
 upstream_model = "glm-4.5-air"
 max_tokens = 131072
 
-[models.glm-5-3-ocgo]
-provider = "opencode-go"
-upstream_model = "glm-5.3"
-
-[models.glm-5-3-flash-ocgo]
-provider = "opencode-go"
-upstream_model = "glm-5.3-flash"
-
 [models.glm-5-3-flash-pgsgrove]
 provider = "pgs-grove"
 upstream_model = "glm-5.3-flash"
-
-[models.glm-5-2-ocgo]
-provider = "opencode-go"
-upstream_model = "glm-5.2"
-
-[models.glm-5-1-ocgo]
-provider = "opencode-go"
-upstream_model = "glm-5.1"
 
 [models.glm-5-2-alibaba]
 provider = "alibaba-token-plan"
@@ -524,10 +493,6 @@ upstream_model = "qwen3.7-plus"
 provider = "alibaba-token-plan"
 upstream_model = "qwen3.7-max"
 
-[models.qwen3-7-max-ocgo]
-provider = "opencode-go"
-upstream_model = "qwen3.7-max"
-
 [models.qwen3-8-max-alibaba]
 provider = "alibaba-token-plan"
 upstream_model = "alibaba-token-plan/qwen3.8-max"
@@ -538,10 +503,6 @@ upstream_model = "qwen/qwen3.8-max"
 
 [models.qwen3-6-plus-alibaba]
 provider = "alibaba-token-plan"
-upstream_model = "qwen3.6-plus"
-
-[models.qwen3-6-plus-ocgo]
-provider = "opencode-go"
 upstream_model = "qwen3.6-plus"
 
 [models.deepseek-v4-flash-openrouter]
@@ -568,25 +529,9 @@ upstream_model = "deepseek-v4-flash-0731"
 provider = "pgs-grove"
 upstream_model = "deepseek-v4-flash-0731-turbo"
 
-[models.deepseek-v4-pro-ocgo]
-provider = "opencode-go"
-upstream_model = "deepseek-v4-pro"
-
 [models.kimi-k2-5-alibaba]
 provider = "alibaba-token-plan"
 upstream_model = "kimi-k2.5"
-
-[models.kimi-k2-5-ocgo]
-provider = "opencode-go"
-upstream_model = "kimi-k2.5"
-
-[models.kimi-k2-6-ocgo]
-provider = "opencode-go"
-upstream_model = "kimi-k2.6"
-
-[models.kimi-k2-7-code-ocgo]
-provider = "opencode-go"
-upstream_model = "kimi-k2.7-code"
 
 [models.kimi-k2-7-code-neuralwatt]
 provider = "neuralwatt"
@@ -600,43 +545,17 @@ upstream_model = "kimi-k2.7-code"
 provider = "kimi-coding"
 upstream_model = "k3"
 
-[models.kimi-k3-ocgo]
-provider = "opencode-go"
-upstream_model = "kimi-k3-max"
-
 [models.kimi-k3-openrouter]
 provider = "openrouter"
 upstream_model = "moonshotai/kimi-k3"
-
-[models.minimax-m2-5-ocgo]
-provider = "opencode-go-anthropic"
-upstream_model = "minimax-m2.5"
-max_tokens = 131072
 
 [models.minimax-m2-5-alibaba]
 provider = "alibaba-token-plan"
 upstream_model = "MiniMax-M2.5"
 
-[models.minimax-m2-7-ocgo]
-provider = "opencode-go-anthropic"
-upstream_model = "minimax-m2.7"
-max_tokens = 131072
-
 [models.minimax-m2-7-nvidia]
 provider = "nvidia"
 upstream_model = "minimaxai/minimax-m2.7"
-
-[models.minimax-m3-ocgo]
-provider = "opencode-go"
-upstream_model = "minimax-m3"
-
-[models.mimo-v2-5-ocgo]
-provider = "opencode-go"
-upstream_model = "mimo-v2.5"
-
-[models.mimo-v2-5-pro-ocgo]
-provider = "opencode-go"
-upstream_model = "mimo-v2.5-pro"
 
 [models.mimo-v2-5-pro-xiaomi]
 provider = "xiaomi-mimo"
@@ -773,7 +692,6 @@ targets = [
 [combos.glm-5-3]
 targets = [
   { model = "glm-5-3-zai" },
-  { model = "glm-5-3-ocgo" },
 ]
 
 [combos.glm-5-3-flash]
@@ -793,7 +711,6 @@ targets = [
 [combos.glm-5-2-max]
 targets = [
   { model = "glm-5-2-max-zai" },
-  { model = "glm-5-2-ocgo" },
   { model = "glm-5-2-alibaba" },
 ]
 
@@ -801,7 +718,6 @@ targets = [
 strategy = "round-robin"
 targets = [
   { model = "glm-5-1-zai" },
-  { model = "glm-5-1-ocgo" },
 ]
 
 [combos.glm-5-1-thinking]
@@ -813,7 +729,6 @@ targets = [{ model = "qwen3-7-plus-alibaba" }]
 [combos.qwen3-7-max]
 targets = [
   { model = "qwen3-7-max-alibaba" },
-  { model = "qwen3-7-max-ocgo" },
 ]
 
 [combos.qwen3-8-max]
@@ -835,7 +750,6 @@ targets = [
 strategy = "round-robin"
 targets = [
   { model = "qwen3-6-plus-alibaba" },
-  { model = "qwen3-6-plus-ocgo" },
 ]
 
 [combos.deepseek-v4-flash]
@@ -845,23 +759,15 @@ targets = [
   { model = "deepseek-v4-flash-turbo-pgsgrove" },
 ]
 
-[combos.deepseek-v4-pro]
-targets = [{ model = "deepseek-v4-pro-ocgo" }]
-
 [combos.kimi-k2-5]
 strategy = "round-robin"
 targets = [
   { model = "kimi-k2-5-alibaba" },
-  { model = "kimi-k2-5-ocgo" },
 ]
-
-[combos.kimi-k2-6]
-targets = [{ model = "kimi-k2-6-ocgo" }]
 
 [combos.kimi-k2-7-code]
 targets = [
   { model = "kimi-k2-7-code-neuralwatt" },
-  { model = "kimi-k2-7-code-ocgo" },
   { model = "kimi-k2-7-code-nanogpt" },
 ]
 
@@ -873,27 +779,18 @@ targets = [
 [combos.minimax-m2-5]
 strategy = "round-robin"
 targets = [
-  { model = "minimax-m2-5-ocgo" },
   { model = "minimax-m2-5-alibaba" },
 ]
 
 [combos.minimax-m2-7]
 strategy = "round-robin"
 targets = [
-  { model = "minimax-m2-7-ocgo" },
   { model = "minimax-m2-7-nvidia" },
 ]
-
-[combos.minimax-m3]
-targets = [{ model = "minimax-m3-ocgo" }]
-
-[combos.mimo-v2-5]
-targets = [{ model = "mimo-v2-5-ocgo" }]
 
 [combos.mimo-v2-5-pro]
 targets = [
   { model = "mimo-v2-5-pro-xiaomi" },
-  { model = "mimo-v2-5-pro-ocgo" },
 ]
 
 # OmniRoute's broad free-tier spread. Round-robin is what keeps any single
