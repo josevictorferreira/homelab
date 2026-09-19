@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: e91fee2a90b148667c915f7ded8943553cbe510f
+    kubenix/hash: 4124747d2327676955545bfe43d8c3a07e9aaf48
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -29,7 +29,7 @@ spec:
   template:
     metadata:
       annotations:
-        velox.josevictor.me/config-hash: bfa7bdf3586928192cc9db55ffac29ea6aa3712bb02ae378a727749058813728
+        velox.josevictor.me/config-hash: dc46636a3d31c8014cb7ea65a307701735b168bb25f0b1c7418cd78c7da4c69c
         velox.josevictor.me/oauth-agent-config-hash: 56586bc48139688a6e1069f9a0d25d36f367e209b88ae0783de43c3b8f546df0
       labels:
         app.kubernetes.io/controller: main
@@ -211,7 +211,7 @@ metadata:
     app.kubernetes.io/name: velox
     app.kubernetes.io/service: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: e91fee2a90b148667c915f7ded8943553cbe510f
+    kubenix/hash: 4124747d2327676955545bfe43d8c3a07e9aaf48
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -240,7 +240,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: e91fee2a90b148667c915f7ded8943553cbe510f
+    kubenix/hash: 4124747d2327676955545bfe43d8c3a07e9aaf48
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -1222,6 +1222,25 @@ data:
       { model = "gpt-5-6-terra-codex" },
     ]
 
+    # Claude subscription combos, both on the claude-oauth (claude-code auth mode)
+    # provider. Priority, so a lower target is reached only when the one above it
+    # fails — notably the 429 Anthropic serves while the premium quota window is
+    # exhausted, which is retryable and steps down a tier instead of failing.
+    [combos.saruman]
+    strategy = "priority"
+    targets = [
+      { model = "claude-opus-5-subscription" },
+      { model = "claude-sonnet-5-subscription" },
+      { model = "claude-haiku-4-5-subscription" },
+    ]
+
+    [combos.sauron]
+    strategy = "priority"
+    targets = [
+      { model = "claude-fable-5-1-subscription" },
+      { model = "claude-opus-5-subscription" },
+    ]
+
     [combos.samwise]
     strategy = "random"
     targets = [
@@ -1461,7 +1480,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: e91fee2a90b148667c915f7ded8943553cbe510f
+    kubenix/hash: 4124747d2327676955545bfe43d8c3a07e9aaf48
   name: velox-config
   namespace: apps
 ---
@@ -1567,7 +1586,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: e91fee2a90b148667c915f7ded8943553cbe510f
+    kubenix/hash: 4124747d2327676955545bfe43d8c3a07e9aaf48
   name: velox-oauth-agent-config
   namespace: apps
 ---
@@ -1578,7 +1597,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: e91fee2a90b148667c915f7ded8943553cbe510f
+    kubenix/hash: 4124747d2327676955545bfe43d8c3a07e9aaf48
   name: velox-oauth-agent
   namespace: apps
 ---
@@ -1589,7 +1608,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: e91fee2a90b148667c915f7ded8943553cbe510f
+    kubenix/hash: 4124747d2327676955545bfe43d8c3a07e9aaf48
   name: velox-oauth-agent
   namespace: apps
 rules:
@@ -1611,7 +1630,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: e91fee2a90b148667c915f7ded8943553cbe510f
+    kubenix/hash: 4124747d2327676955545bfe43d8c3a07e9aaf48
   name: velox-oauth-agent
   namespace: apps
 roleRef:
