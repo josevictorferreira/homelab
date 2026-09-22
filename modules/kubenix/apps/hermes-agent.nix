@@ -109,6 +109,17 @@ let
       name = "HERMES_GID";
       value = "2002";
     }
+    # The startup watchdog (default 300s) kills the gateway when a startup phase
+    # outlives its window. On CephFS the per-profile state.db auto-maintenance
+    # (prune + VACUUM rewrite of multi-100MB DBs) is I/O-bound with near-zero
+    # CPU, so the CPU-fallback extension (3x300s) is not enough and the gateway
+    # crash-loops mid-VACUUM, rolling back the WAL every time — it can never
+    # finish. 2h lets a one-time VACUUM complete; afterwards the 24h prune
+    # throttle + 30-day VACUUM throttle + freelist-ratio gate keep startups fast.
+    {
+      name = "HERMES_STARTUP_WATCHDOG_TIMEOUT_S";
+      value = "7200";
+    }
     {
       name = "TZ";
       value = homelab.timeZone;
