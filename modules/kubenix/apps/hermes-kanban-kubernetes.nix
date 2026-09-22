@@ -21,7 +21,7 @@ let
   name = "hermes-kanban-kubernetes";
   namespace = homelab.kubernetes.namespaces.applications;
   # Keep in lockstep with modules/kubenix/apps/hermes-agent.nix.
-  image = "docker.io/nousresearch/hermes-agent:v2026.9.11@sha256:930b5b8ebfed43857c3a993f437f0e3a1bffc045c5b241794b35bf102298bdb2";
+  image = "docker.io/nousresearch/hermes-agent:v2026.9.21@sha256:6bece0644e29a347e5ae17db43c36938c86f171c6f5e0cef18aa2075d331f3a3";
   pvc = kubenix.lib.sharedStorage.rootPVC;
   board = "omniroute-plugin";
 
