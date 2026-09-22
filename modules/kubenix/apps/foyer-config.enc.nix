@@ -180,6 +180,14 @@ let
                 title = "Calendar";
                 style = "board";
                 first_day_of_week = "monday";
+                # All feeds merge into one grid; the first feed that declares
+                # an X-WR-TIMEZONE would otherwise pick the display zone.
+                timezone = "America/Sao_Paulo";
+                url = [
+                  (kubenix.lib.secretsFor "calendar_ical_personal")
+                  (kubenix.lib.secretsFor "calendar_ical_family")
+                  "https://calendar.google.com/calendar/ical/pt.brazilian%23holiday%40group.v.calendar.google.com/public/basic.ics"
+                ];
               }
               {
                 type = "weather";
