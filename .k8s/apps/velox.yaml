@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 41d701095fd14b5691bd41ec46e7799a9c21905d
+    kubenix/hash: 627cc46ddf0bba7a3fe7fad1258cfede096e3f9a
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -29,7 +29,7 @@ spec:
   template:
     metadata:
       annotations:
-        velox.josevictor.me/config-hash: 8e29a14b83b3929d77b0ce3716e4726a35c553435b92441850f66a64b8a5f3f9
+        velox.josevictor.me/config-hash: 8fbee59c84855357e09225568817794b0b968228239921e34c51cb3c0a604235
         velox.josevictor.me/oauth-agent-config-hash: 56586bc48139688a6e1069f9a0d25d36f367e209b88ae0783de43c3b8f546df0
       labels:
         app.kubernetes.io/controller: main
@@ -211,7 +211,7 @@ metadata:
     app.kubernetes.io/name: velox
     app.kubernetes.io/service: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 41d701095fd14b5691bd41ec46e7799a9c21905d
+    kubenix/hash: 627cc46ddf0bba7a3fe7fad1258cfede096e3f9a
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -240,7 +240,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 41d701095fd14b5691bd41ec46e7799a9c21905d
+    kubenix/hash: 627cc46ddf0bba7a3fe7fad1258cfede096e3f9a
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -1199,6 +1199,12 @@ data:
     # accents on paper. Nobody has listened to these side by side. Re-pair them
     # freely; only the identifiers need to stay valid.
     #
+    # Exception: the tts-speechify-multi (pt-BR) ids ARE from the live catalogue.
+    # The first set came from docs and 8 of 10 did not exist on this key — Speechify
+    # then 400s or, worse, the voice is dropped and its English default geffen_32
+    # reads Portuguese with a foreign accent. Each one here returned 200 on
+    # simba-3.0 with language pt-BR (GET /v1/voices, paginated, 2026-09-23).
+    #
     # Two caveats worth knowing before relying on a fallback:
     #   - ElevenLabs Default voices are documented as expiring 2026-12-31 and are
     #     only available to accounts created before March 2026. If this account is
@@ -1213,37 +1219,37 @@ data:
     # Rachel — calm US female
     [combos.voice.voices.ariadne]
     tts-speechify = "beatrice_32"
-    tts-speechify-multi = "valentina"
+    tts-speechify-multi = "adriana"
     tts-elevenlabs = "21m00Tcm4TlvDq8ikWAM"
 
     # Antoni — warm US male
     [combos.voice.voices.felix]
     tts-speechify = "dominic_32"
-    tts-speechify-multi = "theo"
+    tts-speechify-multi = "davi"
     tts-elevenlabs = "ErXwobaYiN019PkySvjV"
 
     # Sarah — soft US female
     [combos.voice.voices.gwen]
     tts-speechify = "harper_32"
-    tts-speechify-multi = "lorena"
+    tts-speechify-multi = "luana"
     tts-elevenlabs = "EXAVITQu4vr4xnSDxMaL"
 
     # Daniel — British male
     [combos.voice.voices.ink]
     tts-speechify = "edmund_32"
-    tts-speechify-multi = "gabriel"
+    tts-speechify-multi = "wesley"
     tts-elevenlabs = "onwK4e9ZLuTAKqWW03F9"
 
     # Adam — deep US male
     [combos.voice.voices.max]
     tts-speechify = "wyatt_32"
-    tts-speechify-multi = "ravi"
+    tts-speechify-multi = "gustavo"
     tts-elevenlabs = "pNInz6obpgDQGcFmaJgB"
 
     # George — British male
     [combos.voice.voices.orpheus]
     tts-speechify = "edmund_32"
-    tts-speechify-multi = "benicio"
+    tts-speechify-multi = "andre"
     tts-elevenlabs = "JBFqnCBsd6RMkjVDRZzb"
 
     # Josh — deep US male
@@ -1261,13 +1267,13 @@ data:
     # Arnold — crisp US male
     [combos.voice.voices.stone]
     tts-speechify = "geffen_32"
-    tts-speechify-multi = "antonio"
+    tts-speechify-multi = "caio"
     tts-elevenlabs = "VR6AewLTigWG4xSOukaG"
 
     # Alice — British female
     [combos.voice.voices.tuesday]
     tts-speechify = "beatrice_32"
-    tts-speechify-multi = "talita"
+    tts-speechify-multi = "priscila"
     tts-elevenlabs = "Xb7hH8MSUJpSbSDYk0k2"
 
     # Which targets can speak what, and what each one calls it.
@@ -1377,7 +1383,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 41d701095fd14b5691bd41ec46e7799a9c21905d
+    kubenix/hash: 627cc46ddf0bba7a3fe7fad1258cfede096e3f9a
   name: velox-config
   namespace: apps
 ---
@@ -1483,7 +1489,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 41d701095fd14b5691bd41ec46e7799a9c21905d
+    kubenix/hash: 627cc46ddf0bba7a3fe7fad1258cfede096e3f9a
   name: velox-oauth-agent-config
   namespace: apps
 ---
@@ -1494,7 +1500,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 41d701095fd14b5691bd41ec46e7799a9c21905d
+    kubenix/hash: 627cc46ddf0bba7a3fe7fad1258cfede096e3f9a
   name: velox-oauth-agent
   namespace: apps
 ---
@@ -1505,7 +1511,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 41d701095fd14b5691bd41ec46e7799a9c21905d
+    kubenix/hash: 627cc46ddf0bba7a3fe7fad1258cfede096e3f9a
   name: velox-oauth-agent
   namespace: apps
 rules:
@@ -1527,7 +1533,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 41d701095fd14b5691bd41ec46e7799a9c21905d
+    kubenix/hash: 627cc46ddf0bba7a3fe7fad1258cfede096e3f9a
   name: velox-oauth-agent
   namespace: apps
 roleRef:
