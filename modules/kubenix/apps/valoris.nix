@@ -106,6 +106,8 @@ in
               KEYCLOAK_ISSUER.value = "https://identity.josevictor.me/realms/valoris";
               KEYCLOAK_JWKS_URL.value = "http://keycloak.apps.svc.cluster.local:8080/realms/valoris/protocol/openid-connect/certs";
               KEYCLOAK_AZP.value = "valoris-frontend";
+              OPENJEV_SERVICE_URL.value = "http://10.10.10.10:8102";
+              OPENJEV_SERVICE_ENABLED.value = "true";
             };
           };
         };
@@ -164,6 +166,8 @@ in
               # One scraping job at a time. The default of 3 pushed peak memory
               # to ~925Mi and got the pod evicted off the Pi, failing in-flight jobs.
               JOB_THREADS.value = "1";
+              OPENJEV_SERVICE_URL.value = "http://10.10.10.10:8102";
+              OPENJEV_SERVICE_ENABLED.value = "true";
             };
           };
         };
