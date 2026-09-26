@@ -10,6 +10,11 @@ let
   serviceEnabled = true;
   cfg = config.profiles."k8s-worker";
   roleLabelFlags = map (role: "--node-label=node.kubernetes.io/${role}=true") hostConfig.roles;
+  # Hosts with a small root disk override these in config/nodes.nix (kubeletEviction).
+  eviction = {
+    hard = "memory.available<500Mi,imagefs.available<10%,nodefs.available<5%";
+    soft = "memory.available<750Mi,imagefs.available<15%,nodefs.available<10%";
+  } // hostConfig.kubeletEviction;
 in
 {
   options.profiles."k8s-worker" = {
@@ -29,8 +34,8 @@ in
           "--kubelet-arg=container-log-max-files=3"
           "--kubelet-arg=image-gc-high-threshold=85"
           "--kubelet-arg=image-gc-low-threshold=80"
-          "--kubelet-arg=eviction-hard=memory.available<500Mi,imagefs.available<10%,nodefs.available<5%"
-          "--kubelet-arg=eviction-soft=memory.available<750Mi,imagefs.available<15%,nodefs.available<10%"
+          "--kubelet-arg=eviction-hard=${eviction.hard}"
+          "--kubelet-arg=eviction-soft=${eviction.soft}"
           "--kubelet-arg=eviction-soft-grace-period=memory.available=1m,imagefs.available=2m,nodefs.available=2m"
           "--kubelet-arg=eviction-max-pod-grace-period=30"
         ]

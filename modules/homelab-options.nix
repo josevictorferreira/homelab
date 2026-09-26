@@ -55,6 +55,11 @@ let
         description = "List of roles assigned to the node, used to load specific configuration profiles.";
         default = [ ];
       };
+      kubeletEviction = mkOption {
+        type = t.attrsOf t.str;
+        description = "Per-node override of the kubelet eviction thresholds (keys: hard, soft). Empty keeps the k8s-worker profile defaults.";
+        default = { };
+      };
     };
   };
 

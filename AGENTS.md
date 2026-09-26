@@ -711,6 +711,11 @@ Our cluster is deployed and accessible in the user system kubectl, the context a
 **Context:** OpenClaw pod force-deleted on lab-beta-cp, recreated on lab-gamma-wk. Both PVCs got stuck with "rbd image is still being used" for 6+ minutes.
 **Verify:** `kubectl exec -n rook-ceph deploy/rook-ceph-tools -- rbd status replicapool/csi-vol-<id>` — watcher should be on the NEW node.
 
+#### Pi Disk Pressure Masquerades as a Stuck Valoris Deploy
+**Lesson:** valoris pods `Pending`/`Terminating`/`ContainerStatusUnknown` on `lab-pi-bk` with no app error = kubelet `DiskPressure` on the Pi's 15 GiB SD root (`/nix/store` ~4.5 GiB + containerd ~5 GiB). Eviction reclaim deletes the 616 MB `valoris-backend:latest` image, the next pod re-pulls it at ~0.5 MB/s (16–20 min, un-killable meanwhile), and a `rollout restart` during that window gets its annotation stripped by Flux, so the Recreate deployment flips back and waits out the pull. Check the node condition before touching the app; the Pi node-exporter is not scraped, so nothing alerts.
+**Context:** 2026-09-24: evictions fired 4 times in one day. Fixed with per-node thresholds (`kubeletEviction` in `config/nodes.nix`, consumed by `modules/profiles/k8s-worker.nix`) instead of the worker defaults sized for 500 GB disks. Do NOT move containerd onto `backup-pool` — that USB pool needs `zpool import -F` after unclean reboots.
+**Verify:** `kubectl get node lab-pi-bk -o jsonpath='{.status.conditions[?(@.type=="DiskPressure")].status}'` is `False`; on the Pi `journalctl -u k3s | grep -E 'pods ranked for eviction|Removing image'` is quiet.
+
 #### Kubernetes Service Env Vars Break Integer-Expecting Apps
 **Lesson:** Kubernetes injects `{SERVICE_NAME}_PORT=tcp://IP:PORT` env vars from Service objects. Apps that parse these as integers (e.g., granian, gunicorn) crash with "invalid integer". Always set an explicit env var with the integer value (e.g., `SEARXNG_PORT=8080`) to override the injected `tcp://` value.
 **Context:** Searxng crashed with `Error: Invalid value for '--port': 'tcp://10.43.182.206:8080' is not a valid integer` because K8s injected `SEARXNG_PORT` from the Service.

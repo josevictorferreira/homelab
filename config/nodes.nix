@@ -12,6 +12,13 @@ rec {
       machine = "raspberry-pi-4b";
       interface = "end0";
       mac = "DC:A6:32:BD:01:4C";
+      # 15 GiB SD-card root shared by /nix/store and containerd: the worker
+      # default imagefs thresholds (10%/15% ≈ 1.5–2.2 GiB) leave no headroom and
+      # loop eviction → image GC → 20-min re-pull of valoris-backend.
+      kubeletEviction = {
+        hard = "memory.available<500Mi,imagefs.available<3%,nodefs.available<3%";
+        soft = "memory.available<750Mi,imagefs.available<6%,nodefs.available<6%";
+      };
       roles = [
         "nixos-server"
         "system-admin"
