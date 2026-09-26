@@ -303,6 +303,15 @@ let
                     cache = "3h";
                     subreddit = "StableDiffusion";
                   }
+                  {
+                    # Local news; the outlet names the town, so both the feed
+                    # address and the tab title stay out of git.
+                    type = "rss";
+                    title = kubenix.lib.secretsFor "local_news_title";
+                    cache = "30m";
+                    limit = 15;
+                    url = kubenix.lib.secretsFor "local_news_feed_url";
+                  }
                 ];
               }
             ];
