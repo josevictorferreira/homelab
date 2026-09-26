@@ -108,6 +108,10 @@ in
               KEYCLOAK_AZP.value = "valoris-frontend";
               OPENJEV_SERVICE_URL.value = "http://10.10.10.10:8102";
               OPENJEV_SERVICE_ENABLED.value = "true";
+              # Nota de Valor v2 (valoris spec 0089). Falls back to local
+              # comparables when the service is down or has no estimate.
+              VALUATION_SERVICE_URL.value = "http://valoris-valuation.${namespace}.svc.cluster.local:8000";
+              VALUATION_SERVICE_ENABLED.value = "true";
             };
           };
         };
@@ -168,7 +172,48 @@ in
               JOB_THREADS.value = "1";
               OPENJEV_SERVICE_URL.value = "http://10.10.10.10:8102";
               OPENJEV_SERVICE_ENABLED.value = "true";
+              # Nota de Valor v2 (valoris spec 0089). Falls back to local
+              # comparables when the service is down or has no estimate.
+              VALUATION_SERVICE_URL.value = "http://valoris-valuation.${namespace}.svc.cluster.local:8000";
+              VALUATION_SERVICE_ENABLED.value = "true";
             };
+          };
+        };
+      };
+    };
+    # Hedonic price model for the Nota de Valor (valoris spec 0089). Trains
+    # on startup (~20 s) and nightly via Catalog::Jobs::TriggerValuationTrainingJob;
+    # the model lives on the container filesystem, so a restart retrains.
+    valoris-valuation = {
+      submodule = "release";
+      args = {
+        inherit namespace;
+        image = {
+          repository = "ghcr.io/josevictorferreira/valoris-valuation";
+          tag = imageTag;
+          pullPolicy = "Always";
+        };
+        port = 8000;
+        resources = {
+          limits = {
+            memory = "1Gi";
+          };
+          requests = {
+            memory = "384Mi";
+          };
+        };
+        priorityClassName = "preemptible";
+        values = {
+          defaultPodOptions = {
+            imagePullSecrets = [
+              { name = "ghcr-registry-secret"; }
+            ];
+          };
+          controllers.main.containers.main = {
+            # VALORIS_DATABASE_HOST / _PASSWORD, shared with the backend.
+            envFrom = [
+              { secretRef.name = secretName; }
+            ];
           };
         };
       };
