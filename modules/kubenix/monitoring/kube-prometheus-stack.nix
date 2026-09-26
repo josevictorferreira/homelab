@@ -105,6 +105,7 @@ in
               effect = "NoSchedule";
             }
           ];
+          "grafana.ini".server.root_url = "https://grafana.${homelab.domain}";
           "grafana.ini".database = {
             type = "postgres";
             host = "${kubenix.lib.postgresHost}:5432";

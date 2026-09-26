@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: homelab-bridge
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 314ca9ba733733178933d0443ddbbd548b07b072
+    kubenix/hash: 88049e4077b66cc9a580b01a7869a646d8c0c44e
     kubenix/module-instance: homelab-bridge
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -49,7 +49,7 @@ spec:
           envFrom:
             - secretRef:
                 name: homelab-bridge-env
-          image: ghcr.io/josevictorferreira/homelab-bridge:v2
+          image: ghcr.io/josevictorferreira/homelab-bridge:v3
           imagePullPolicy: IfNotPresent
           name: main
           ports:
@@ -130,7 +130,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: homelab-bridge
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 314ca9ba733733178933d0443ddbbd548b07b072
+    kubenix/hash: 88049e4077b66cc9a580b01a7869a646d8c0c44e
     kubenix/module-instance: homelab-bridge
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -158,7 +158,7 @@ metadata:
     app.kubernetes.io/name: homelab-bridge
     app.kubernetes.io/service: homelab-bridge
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 314ca9ba733733178933d0443ddbbd548b07b072
+    kubenix/hash: 88049e4077b66cc9a580b01a7869a646d8c0c44e
     kubenix/module-instance: homelab-bridge
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -187,7 +187,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: homelab-bridge
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 314ca9ba733733178933d0443ddbbd548b07b072
+    kubenix/hash: 88049e4077b66cc9a580b01a7869a646d8c0c44e
     kubenix/module-instance: homelab-bridge
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -234,6 +234,6 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 314ca9ba733733178933d0443ddbbd548b07b072
+    kubenix/hash: 88049e4077b66cc9a580b01a7869a646d8c0c44e
   name: homelab-bridge-serve-config
   namespace: apps

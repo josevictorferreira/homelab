@@ -11,7 +11,7 @@ in
       inherit namespace;
       image = {
         repository = "ghcr.io/josevictorferreira/homelab-bridge";
-        tag = "v2";
+        tag = "v3";
         pullPolicy = "IfNotPresent";
       };
       port = 8080;
