@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: valoris
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: d270d06a792784e775d5a42b5f0afffd8b5f3980
+    kubenix/hash: 203d2a87e260ea81b3c5b1fe473454addd7e4ef9
     kubenix/module-instance: valoris
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -95,7 +95,7 @@ metadata:
     app.kubernetes.io/name: valoris
     app.kubernetes.io/service: valoris
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: d270d06a792784e775d5a42b5f0afffd8b5f3980
+    kubenix/hash: 203d2a87e260ea81b3c5b1fe473454addd7e4ef9
     kubenix/module-instance: valoris
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -124,7 +124,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: valoris
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: d270d06a792784e775d5a42b5f0afffd8b5f3980
+    kubenix/hash: 203d2a87e260ea81b3c5b1fe473454addd7e4ef9
     kubenix/module-instance: valoris
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -160,7 +160,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: valoris-backend
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: d270d06a792784e775d5a42b5f0afffd8b5f3980
+    kubenix/hash: 203d2a87e260ea81b3c5b1fe473454addd7e4ef9
     kubenix/module-instance: valoris-backend
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -262,7 +262,7 @@ metadata:
     app.kubernetes.io/name: valoris-backend
     app.kubernetes.io/service: valoris-backend
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: d270d06a792784e775d5a42b5f0afffd8b5f3980
+    kubenix/hash: 203d2a87e260ea81b3c5b1fe473454addd7e4ef9
     kubenix/module-instance: valoris-backend
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -291,7 +291,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: valoris-backend
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: d270d06a792784e775d5a42b5f0afffd8b5f3980
+    kubenix/hash: 203d2a87e260ea81b3c5b1fe473454addd7e4ef9
     kubenix/module-instance: valoris-backend
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -327,7 +327,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: valoris-valuation
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: d270d06a792784e775d5a42b5f0afffd8b5f3980
+    kubenix/hash: 203d2a87e260ea81b3c5b1fe473454addd7e4ef9
     kubenix/module-instance: valoris-valuation
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -391,7 +391,7 @@ metadata:
     app.kubernetes.io/name: valoris-valuation
     app.kubernetes.io/service: valoris-valuation
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: d270d06a792784e775d5a42b5f0afffd8b5f3980
+    kubenix/hash: 203d2a87e260ea81b3c5b1fe473454addd7e4ef9
     kubenix/module-instance: valoris-valuation
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -420,7 +420,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: valoris-valuation
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: d270d06a792784e775d5a42b5f0afffd8b5f3980
+    kubenix/hash: 203d2a87e260ea81b3c5b1fe473454addd7e4ef9
     kubenix/module-instance: valoris-valuation
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -456,7 +456,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: valoris-worker
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: d270d06a792784e775d5a42b5f0afffd8b5f3980
+    kubenix/hash: 203d2a87e260ea81b3c5b1fe473454addd7e4ef9
     kubenix/module-instance: valoris-worker
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -479,15 +479,6 @@ spec:
         app.kubernetes.io/instance: valoris-worker
         app.kubernetes.io/name: valoris-worker
     spec:
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-              - matchExpressions:
-                  - key: kubernetes.io/hostname
-                    operator: In
-                    values:
-                      - lab-pi-bk
       automountServiceAccountToken: true
       containers:
         - command:
@@ -502,6 +493,8 @@ spec:
               value: "true"
             - name: OPENJEV_SERVICE_URL
               value: http://10.10.10.10:8102
+            - name: SOLID_QUEUE_WORKER_MAX_RSS_MB
+              value: "600"
             - name: VALUATION_SERVICE_ENABLED
               value: "true"
             - name: VALUATION_SERVICE_URL
@@ -522,7 +515,7 @@ spec:
             limits:
               memory: 1536Mi
             requests:
-              memory: 768Mi
+              memory: 512Mi
       dnsPolicy: ClusterFirst
       enableServiceLinks: false
       hostIPC: false
@@ -532,11 +525,6 @@ spec:
         - name: ghcr-registry-secret
       priorityClassName: preemptible
       serviceAccountName: default
-      tolerations:
-        - effect: NoSchedule
-          key: pi-only
-          operator: Equal
-          value: "true"
 ---
 apiVersion: v1
 kind: Service
@@ -552,7 +540,7 @@ metadata:
     app.kubernetes.io/name: valoris-worker
     app.kubernetes.io/service: valoris-worker
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: d270d06a792784e775d5a42b5f0afffd8b5f3980
+    kubenix/hash: 203d2a87e260ea81b3c5b1fe473454addd7e4ef9
     kubenix/module-instance: valoris-worker
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -581,7 +569,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: valoris-worker
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: d270d06a792784e775d5a42b5f0afffd8b5f3980
+    kubenix/hash: 203d2a87e260ea81b3c5b1fe473454addd7e4ef9
     kubenix/module-instance: valoris-worker
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -612,7 +600,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: d270d06a792784e775d5a42b5f0afffd8b5f3980
+    kubenix/hash: 203d2a87e260ea81b3c5b1fe473454addd7e4ef9
   name: valoris-s3
   namespace: apps
 spec:
