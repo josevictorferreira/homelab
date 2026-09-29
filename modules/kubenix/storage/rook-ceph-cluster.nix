@@ -72,6 +72,19 @@ in
           # inactive, which is how the Rook 1.20.7 upgrade nearly compounded a
           # two-node outage.
           continueUpgradeAfterChecksEvenIfNotHealthy = false;
+          # Rook's default OSD liveness budget is 3 x 10s with a 5s timeout. On
+          # lab-alpha-cp osd.2 shares the root/etcd disk, and under recovery load
+          # the admin-socket check stalls past 30s, so kubelet killed osd.1/osd.2
+          # mid-peering over and over (2026-09-29), re-peering the whole cluster
+          # each time. Widen to 10 x 30s (~5 min) with a 30s timeout.
+          healthCheck.livenessProbe.osd = {
+            disabled = false;
+            probe = {
+              timeoutSeconds = 30;
+              periodSeconds = 30;
+              failureThreshold = 10;
+            };
+          };
           mon.count = builtins.length monitorHostNames;
           mon.allowMultiplePerNode = false;
           dashboard.enabled = true;

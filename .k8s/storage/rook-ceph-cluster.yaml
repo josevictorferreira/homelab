@@ -6,7 +6,7 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     app: rook-ceph-tools
-    kubenix/hash: ef25777c25e1fd7a0df416ed8d1e5ab3c9e65fa6
+    kubenix/hash: 23b05a8bf3c7ee3fa765e5409e0fe3e11c693aab
   name: rook-ceph-tools
   namespace: rook-ceph
 spec:
@@ -225,7 +225,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: ef25777c25e1fd7a0df416ed8d1e5ab3c9e65fa6
+    kubenix/hash: 23b05a8bf3c7ee3fa765e5409e0fe3e11c693aab
   name: omniroute-nvme
   namespace: rook-ceph
 spec:
@@ -242,7 +242,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: ef25777c25e1fd7a0df416ed8d1e5ab3c9e65fa6
+    kubenix/hash: 23b05a8bf3c7ee3fa765e5409e0fe3e11c693aab
   name: replicapool
   namespace: rook-ceph
 spec:
@@ -258,7 +258,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: ef25777c25e1fd7a0df416ed8d1e5ab3c9e65fa6
+    kubenix/hash: 23b05a8bf3c7ee3fa765e5409e0fe3e11c693aab
   name: rook-ceph
   namespace: rook-ceph
 spec:
@@ -313,6 +313,10 @@ spec:
         disabled: false
       osd:
         disabled: false
+        probe:
+          failureThreshold: 10
+          periodSeconds: 30
+          timeoutSeconds: 30
   logCollector:
     enabled: true
     maxLogSize: 500M
@@ -446,7 +450,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: ef25777c25e1fd7a0df416ed8d1e5ab3c9e65fa6
+    kubenix/hash: 23b05a8bf3c7ee3fa765e5409e0fe3e11c693aab
   name: ceph-filesystem
   namespace: rook-ceph
 spec:
@@ -487,7 +491,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: ef25777c25e1fd7a0df416ed8d1e5ab3c9e65fa6
+    kubenix/hash: 23b05a8bf3c7ee3fa765e5409e0fe3e11c693aab
   name: ceph-filesystem-csi
   namespace: rook-ceph
 spec:
@@ -503,7 +507,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: ef25777c25e1fd7a0df416ed8d1e5ab3c9e65fa6
+    kubenix/hash: 23b05a8bf3c7ee3fa765e5409e0fe3e11c693aab
   name: ceph-objectstore
   namespace: rook-ceph
 spec:
@@ -537,7 +541,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: ef25777c25e1fd7a0df416ed8d1e5ab3c9e65fa6
+    kubenix/hash: 23b05a8bf3c7ee3fa765e5409e0fe3e11c693aab
   name: rook-config-override
   namespace: rook-ceph
 ---
@@ -548,7 +552,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: ef25777c25e1fd7a0df416ed8d1e5ab3c9e65fa6
+    kubenix/hash: 23b05a8bf3c7ee3fa765e5409e0fe3e11c693aab
   name: ceph-objectstore
   namespace: rook-ceph
 spec:
@@ -576,7 +580,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: ef25777c25e1fd7a0df416ed8d1e5ab3c9e65fa6
+    kubenix/hash: 23b05a8bf3c7ee3fa765e5409e0fe3e11c693aab
   name: rook-ceph-dashboard
   namespace: rook-ceph
 spec:
@@ -606,7 +610,7 @@ metadata:
     kubenix/project-name: ze-homelab
     storageclass.kubernetes.io/is-default-class: "true"
   labels:
-    kubenix/hash: ef25777c25e1fd7a0df416ed8d1e5ab3c9e65fa6
+    kubenix/hash: 23b05a8bf3c7ee3fa765e5409e0fe3e11c693aab
   name: rook-ceph-block
   namespace: rook-ceph
 parameters:
@@ -635,7 +639,7 @@ metadata:
     kubenix/project-name: ze-homelab
     storageclass.kubernetes.io/is-default-class: "false"
   labels:
-    kubenix/hash: ef25777c25e1fd7a0df416ed8d1e5ab3c9e65fa6
+    kubenix/hash: 23b05a8bf3c7ee3fa765e5409e0fe3e11c693aab
   name: rook-ceph-block-nvme
   namespace: rook-ceph
 parameters:
@@ -664,7 +668,7 @@ metadata:
     kubenix/project-name: ze-homelab
     storageclass.kubernetes.io/is-default-class: "false"
   labels:
-    kubenix/hash: ef25777c25e1fd7a0df416ed8d1e5ab3c9e65fa6
+    kubenix/hash: 23b05a8bf3c7ee3fa765e5409e0fe3e11c693aab
   name: rook-ceph-filesystem
   namespace: rook-ceph
 parameters:
@@ -690,7 +694,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: ef25777c25e1fd7a0df416ed8d1e5ab3c9e65fa6
+    kubenix/hash: 23b05a8bf3c7ee3fa765e5409e0fe3e11c693aab
   name: rook-ceph-objectstore
   namespace: rook-ceph
 parameters:
