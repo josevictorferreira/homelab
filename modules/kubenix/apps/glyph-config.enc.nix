@@ -19,7 +19,7 @@ in
       # Model providers, reached over the cluster network.
       VELOX_BASE_URL = "http://${kubenix.lib.serviceHostFor "velox" namespace}:8080/v1";
       VELOX_API_KEY = kubenix.lib.secretsFor "velox_api_keys";
-      OMNIROUTE_BASE_URL = "http://${kubenix.lib.serviceHostFor "omniroute" namespace}:8080/v1";
+      OMNIROUTE_BASE_URL = "http://${kubenix.lib.serviceHostFor "omniroute" namespace}:20128/v1";
       OMNIROUTE_API_KEY = kubenix.lib.secretsFor "omniroute_api_key";
       # The browser talks to the backend through the frontend's own origin
       # (nginx proxies gRPC-Web), so only the public origin must pass CORS.
