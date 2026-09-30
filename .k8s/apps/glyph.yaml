@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: glyph
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: abdbab448af879de1da6d3a64ff17e95643c1ec1
+    kubenix/hash: 0b0e1911ae087c105ed1f45f27f5a65e0f1f8a76
     kubenix/module-instance: glyph
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -38,7 +38,7 @@ spec:
         - envFrom:
             - secretRef:
                 name: glyph-config
-          image: ghcr.io/josevictorferreira/glyph:latest
+          image: ghcr.io/josevictorferreira/glyph-v2:latest
           imagePullPolicy: Always
           livenessProbe:
             failureThreshold: 3
@@ -114,7 +114,7 @@ metadata:
     app.kubernetes.io/name: glyph
     app.kubernetes.io/service: glyph
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: abdbab448af879de1da6d3a64ff17e95643c1ec1
+    kubenix/hash: 0b0e1911ae087c105ed1f45f27f5a65e0f1f8a76
     kubenix/module-instance: glyph
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -132,6 +132,113 @@ spec:
     app.kubernetes.io/name: glyph
   type: LoadBalancer
 ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/controller: main
+    app.kubernetes.io/instance: glyph-frontend
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: glyph-frontend
+    helm.sh/chart: app-template-4.2.0
+    kubenix/hash: 0b0e1911ae087c105ed1f45f27f5a65e0f1f8a76
+    kubenix/module-instance: glyph-frontend
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: glyph-frontend
+  namespace: apps
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/controller: main
+      app.kubernetes.io/instance: glyph-frontend
+      app.kubernetes.io/name: glyph-frontend
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/controller: main
+        app.kubernetes.io/instance: glyph-frontend
+        app.kubernetes.io/name: glyph-frontend
+    spec:
+      automountServiceAccountToken: true
+      containers:
+        - env:
+            - name: GLYPH_BACKEND_URL
+              value: http://glyph.apps.svc.cluster.local:3000
+          image: ghcr.io/josevictorferreira/glyph-v2-frontend:latest
+          imagePullPolicy: Always
+          livenessProbe:
+            failureThreshold: 3
+            periodSeconds: 30
+            tcpSocket:
+              port: 8080
+            timeoutSeconds: 3
+          name: main
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            periodSeconds: 10
+            tcpSocket:
+              port: 8080
+            timeoutSeconds: 3
+          resources:
+            limits:
+              cpu: 500m
+              memory: 256Mi
+            requests:
+              cpu: 50m
+              memory: 64Mi
+      dnsPolicy: ClusterFirst
+      enableServiceLinks: false
+      hostIPC: false
+      hostNetwork: false
+      hostPID: false
+      imagePullSecrets:
+        - name: ghcr-registry-secret
+      serviceAccountName: default
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+    lbipam.cilium.io/ips: 10.10.10.168
+    lbipam.cilium.io/sharing-key: glyph-frontend
+  labels:
+    app.kubernetes.io/instance: glyph-frontend
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: glyph-frontend
+    app.kubernetes.io/service: glyph-frontend
+    helm.sh/chart: app-template-4.2.0
+    kubenix/hash: 0b0e1911ae087c105ed1f45f27f5a65e0f1f8a76
+    kubenix/module-instance: glyph-frontend
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: glyph-frontend
+  namespace: apps
+spec:
+  ports:
+    - name: http
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    app.kubernetes.io/controller: main
+    app.kubernetes.io/instance: glyph-frontend
+    app.kubernetes.io/name: glyph-frontend
+  type: ClusterIP
+---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -139,15 +246,15 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    app.kubernetes.io/instance: glyph
+    app.kubernetes.io/instance: glyph-frontend
     app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: glyph
+    app.kubernetes.io/name: glyph-frontend
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: abdbab448af879de1da6d3a64ff17e95643c1ec1
-    kubenix/module-instance: glyph
+    kubenix/hash: 0b0e1911ae087c105ed1f45f27f5a65e0f1f8a76
+    kubenix/module-instance: glyph-frontend
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
-  name: glyph
+  name: glyph-frontend
   namespace: apps
 spec:
   ingressClassName: cilium
@@ -157,9 +264,9 @@ spec:
         paths:
           - backend:
               service:
-                name: glyph
+                name: glyph-frontend
                 port:
-                  number: 3000
+                  number: 8080
             path: /
             pathType: Prefix
   tls:
