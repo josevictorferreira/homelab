@@ -115,8 +115,18 @@ in
         values = {
           defaultPodOptions.imagePullSecrets = pullSecrets;
           # nginx template target for the proxied gRPC-Web/artifact routes.
-          controllers.main.containers.main.env.GLYPH_BACKEND_URL =
-            "http://${kubenix.lib.serviceHostFor "glyph" namespace}:${toString backendPort}";
+          controllers.main.containers.main.env = {
+            # nginx template target for the proxied HTTP routes (health,
+            # artifacts, schemas).
+            GLYPH_BACKEND_URL =
+              "http://${kubenix.lib.serviceHostFor "glyph" namespace}:${toString backendPort}";
+            # gRPC routes must reach the backend over HTTP/2: the Cilium
+            # ingress translates browser gRPC-Web to native gRPC (envoy's
+            # grpc_web filter) before it hits nginx, so the template's
+            # grpc_pass needs the grpc:// scheme, not the proxy_pass target.
+            GLYPH_BACKEND_GRPC_URL =
+              "grpc://${kubenix.lib.serviceHostFor "glyph" namespace}:${toString backendPort}";
+          };
           # Ingress-only: no LAN LB IP of its own (entry in loadBalancer.services
           # exists only to satisfy the release submodule's eager annotation
           # lookup; like dramaturge-worker, the ClusterIP service keeps the

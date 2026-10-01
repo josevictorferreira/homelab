@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: glyph
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 0b0e1911ae087c105ed1f45f27f5a65e0f1f8a76
+    kubenix/hash: fdce2df1ee6898337974d3604674899f9f4fb055
     kubenix/module-instance: glyph
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -114,7 +114,7 @@ metadata:
     app.kubernetes.io/name: glyph
     app.kubernetes.io/service: glyph
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 0b0e1911ae087c105ed1f45f27f5a65e0f1f8a76
+    kubenix/hash: fdce2df1ee6898337974d3604674899f9f4fb055
     kubenix/module-instance: glyph
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -144,7 +144,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: glyph-frontend
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 0b0e1911ae087c105ed1f45f27f5a65e0f1f8a76
+    kubenix/hash: fdce2df1ee6898337974d3604674899f9f4fb055
     kubenix/module-instance: glyph-frontend
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -170,6 +170,8 @@ spec:
       automountServiceAccountToken: true
       containers:
         - env:
+            - name: GLYPH_BACKEND_GRPC_URL
+              value: grpc://glyph.apps.svc.cluster.local:3000
             - name: GLYPH_BACKEND_URL
               value: http://glyph.apps.svc.cluster.local:3000
           image: ghcr.io/josevictorferreira/glyph-v2-frontend:latest
@@ -221,7 +223,7 @@ metadata:
     app.kubernetes.io/name: glyph-frontend
     app.kubernetes.io/service: glyph-frontend
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 0b0e1911ae087c105ed1f45f27f5a65e0f1f8a76
+    kubenix/hash: fdce2df1ee6898337974d3604674899f9f4fb055
     kubenix/module-instance: glyph-frontend
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -250,7 +252,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: glyph-frontend
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 0b0e1911ae087c105ed1f45f27f5a65e0f1f8a76
+    kubenix/hash: fdce2df1ee6898337974d3604674899f9f4fb055
     kubenix/module-instance: glyph-frontend
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
