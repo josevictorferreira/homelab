@@ -46,6 +46,12 @@ in
         };
         values = {
           defaultPodOptions.imagePullSecrets = pullSecrets;
+          # Deploys must not drop the service to zero endpoints (Recreate):
+          # the frontend nginx and Cilium ingress answer 502 during the gap,
+          # which breaks imports and refetches. Surge the new pod first
+          # (single replica → maxUnavailable 0, maxSurge 1); the overlap is
+          # safe: job claims and schedule dispatch are idempotent.
+          controllers.main.strategy = "RollingUpdate";
           # Browsers reach the backend through the frontend's nginx proxy; the
           # backend itself gets no ingress (the LAN LB IP still allows direct
           # gRPC for grpcurl).
@@ -114,6 +120,8 @@ in
         };
         values = {
           defaultPodOptions.imagePullSecrets = pullSecrets;
+          # Same as the backend: never serve through a zero-pod window.
+          controllers.main.strategy = "RollingUpdate";
           # nginx template target for the proxied gRPC-Web/artifact routes.
           controllers.main.containers.main.env = {
             # nginx template target for the proxied HTTP routes (health,
