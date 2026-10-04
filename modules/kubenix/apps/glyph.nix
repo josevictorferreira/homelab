@@ -38,9 +38,11 @@ in
             memory = "512Mi";
           };
           # Step runs spawn the Pi agent (Node) as a child process, up to
-          # GLYPH_STEP_CONCURRENCY (5) at a time.
+          # GLYPH_STEP_CONCURRENCY (5) at a time. CPU stays at 1 core: the
+          # RollingUpdate surge pod must fit the apps namespace limits.cpu
+          # quota next to the old one (2 cores left it stuck in FailedCreate).
           limits = {
-            cpu = "2000m";
+            cpu = "1000m";
             memory = "4Gi";
           };
         };
