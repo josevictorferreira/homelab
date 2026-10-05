@@ -27,6 +27,33 @@ let
     }
   ];
 
+  # Sidecars idle at a few millicores; 100m each reserved ~2 CPUs across the
+  # four controller pods and starved app scheduling. Set on the Driver CRs too:
+  # the operator copies OperatorConfig defaults into each Driver once, so
+  # later OperatorConfig changes never reach existing drivers.
+  controllerPluginResources = {
+    plugin = {
+      requests = { cpu = "50m"; memory = "512Mi"; };
+      limits.memory = "1Gi";
+    };
+    provisioner = {
+      requests = { cpu = "20m"; memory = "128Mi"; };
+      limits.memory = "256Mi";
+    };
+    attacher = {
+      requests = { cpu = "20m"; memory = "128Mi"; };
+      limits.memory = "256Mi";
+    };
+    resizer = {
+      requests = { cpu = "20m"; memory = "128Mi"; };
+      limits.memory = "256Mi";
+    };
+    snapshotter = {
+      requests = { cpu = "20m"; memory = "128Mi"; };
+      limits.memory = "256Mi";
+    };
+  };
+
   # Match what Rook 1.19 applied before the CSI settings moved out of the
   # operator: the chart defaults are 30s and "none", which would drop the
   # snapshotter sidecar Velero relies on.
@@ -39,7 +66,10 @@ let
     snapshotPolicy = "volumeSnapshot";
     log.rotation.enabled = false;
     nodePlugin.volumes = nodePluginVolumes;
-    controllerPlugin.replicas = 2;
+    controllerPlugin = {
+      replicas = 2;
+      resources = controllerPluginResources;
+    };
   };
 in
 {
@@ -79,30 +109,7 @@ in
             };
             controllerPlugin = {
               priorityClassName = "system-cluster-critical";
-              # Sidecars idle at a few millicores; 100m each reserved ~2 CPUs
-              # across the four controller pods and starved app scheduling.
-              resources = {
-                plugin = {
-                  requests = { cpu = "50m"; memory = "512Mi"; };
-                  limits.memory = "1Gi";
-                };
-                provisioner = {
-                  requests = { cpu = "20m"; memory = "128Mi"; };
-                  limits.memory = "256Mi";
-                };
-                attacher = {
-                  requests = { cpu = "20m"; memory = "128Mi"; };
-                  limits.memory = "256Mi";
-                };
-                resizer = {
-                  requests = { cpu = "20m"; memory = "128Mi"; };
-                  limits.memory = "256Mi";
-                };
-                snapshotter = {
-                  requests = { cpu = "20m"; memory = "128Mi"; };
-                  limits.memory = "256Mi";
-                };
-              };
+              resources = controllerPluginResources;
             };
           };
         };
