@@ -89,15 +89,12 @@ rec {
       machine = "intel-nuc-gk3v";
       interface = "enp1s0";
       mac = "68:1D:EF:3E:30:37";
-      disks = [
-        "/dev/disk/by-partlabel/CEPH_OSD_NVME"
-        "/dev/disk/by-partlabel/CEPH_OSD_SATA"
-      ];
+      # No OSDs: the consumer SSD/HDD on this node corrupted RocksDB twice after
+      # unclean resets (osd.5 2026-09-15, osd.3 2026-10-01); both were purged 2026-10-05.
       roles = [
         "nixos-server"
         "system-admin"
         "k8s-server"
-        "k8s-storage"
         "k8s-worker"
         "tailscale"
       ];
