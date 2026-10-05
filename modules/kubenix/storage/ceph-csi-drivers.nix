@@ -79,25 +79,27 @@ in
             };
             controllerPlugin = {
               priorityClassName = "system-cluster-critical";
+              # Sidecars idle at a few millicores; 100m each reserved ~2 CPUs
+              # across the four controller pods and starved app scheduling.
               resources = {
                 plugin = {
-                  requests.memory = "512Mi";
+                  requests = { cpu = "50m"; memory = "512Mi"; };
                   limits.memory = "1Gi";
                 };
                 provisioner = {
-                  requests = { cpu = "100m"; memory = "128Mi"; };
+                  requests = { cpu = "20m"; memory = "128Mi"; };
                   limits.memory = "256Mi";
                 };
                 attacher = {
-                  requests = { cpu = "100m"; memory = "128Mi"; };
+                  requests = { cpu = "20m"; memory = "128Mi"; };
                   limits.memory = "256Mi";
                 };
                 resizer = {
-                  requests = { cpu = "100m"; memory = "128Mi"; };
+                  requests = { cpu = "20m"; memory = "128Mi"; };
                   limits.memory = "256Mi";
                 };
                 snapshotter = {
-                  requests = { cpu = "100m"; memory = "128Mi"; };
+                  requests = { cpu = "20m"; memory = "128Mi"; };
                   limits.memory = "256Mi";
                 };
               };
