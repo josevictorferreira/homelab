@@ -11,7 +11,8 @@ let
       spec.hard = {
         "requests.cpu" = "4";
         "requests.memory" = "8Gi";
-        "limits.cpu" = "10";
+        # Raised from 10 for Loki + the 5-node Alloy DaemonSet (~2.5 CPU of limits).
+        "limits.cpu" = "14";
         "limits.memory" = "16Gi";
       };
     };

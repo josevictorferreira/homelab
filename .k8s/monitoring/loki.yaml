@@ -1,0 +1,526 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/component: single-binary
+    app.kubernetes.io/instance: loki
+    app.kubernetes.io/name: loki
+    app.kubernetes.io/version: 3.7.8
+    helm.sh/chart: loki-18.13.7
+    kubenix/hash: 5e3bff4edcc116c3cbed625ebee0d34a008101af
+  name: loki
+  namespace: monitoring
+spec:
+  podManagementPolicy: Parallel
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: single-binary
+      app.kubernetes.io/instance: loki
+      app.kubernetes.io/name: loki
+  serviceName: loki-headless
+  template:
+    metadata:
+      annotations:
+        checksum/config: 15ddc800087c1b2aeba4daaf71754040698a2abd1a494de284a8ed6a8ddfc7a6
+        kubectl.kubernetes.io/default-container: loki
+        storage/size: 5Gi
+      labels:
+        app.kubernetes.io/component: single-binary
+        app.kubernetes.io/instance: loki
+        app.kubernetes.io/name: loki
+        app.kubernetes.io/part-of: memberlist
+        app.kubernetes.io/version: 3.7.8
+        helm.sh/chart: loki-18.13.7
+    spec:
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - preference:
+                matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values:
+                      - lab-alpha-cp
+              weight: 100
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  app.kubernetes.io/component: single-binary
+                  app.kubernetes.io/instance: loki
+                  app.kubernetes.io/name: loki
+              topologyKey: kubernetes.io/hostname
+      automountServiceAccountToken: true
+      containers:
+        - args:
+            - -config.file=/etc/loki/config/config.yaml
+            - -config.expand-env=true
+            - -memberlist.advertise-addr=$(POD_IP)
+            - -target=all
+          env:
+            - name: GOMEMLIMIT
+              value: 870MiB
+            - name: GOGC
+              value: "80"
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+          envFrom:
+            - secretRef:
+                name: loki-s3
+          image: docker.io/grafana/loki:3.7.8
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 10
+            httpGet:
+              path: /loki/api/v1/status/buildinfo
+              port: http-metrics
+            periodSeconds: 30
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: loki
+          ports:
+            - containerPort: 3100
+              name: http-metrics
+              protocol: TCP
+            - containerPort: 9095
+              name: grpc
+              protocol: TCP
+            - containerPort: 7946
+              name: http-memberlist
+              protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /ready
+              port: http-metrics
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: "1"
+              memory: 1Gi
+            requests:
+              cpu: 200m
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+            seccompProfile:
+              type: RuntimeDefault
+          volumeMounts:
+            - mountPath: /etc/loki/config
+              name: config
+            - mountPath: /etc/loki/runtime-config
+              name: runtime-config
+            - mountPath: /var/loki
+              name: storage
+            - mountPath: /tmp
+              name: temp
+      enableServiceLinks: true
+      securityContext:
+        fsGroup: 10001
+        fsGroupChangePolicy: OnRootMismatch
+        runAsGroup: 10001
+        runAsNonRoot: true
+        runAsUser: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      serviceAccountName: loki
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - emptyDir: {}
+          name: temp
+        - configMap:
+            items:
+              - key: config.yaml
+                path: config.yaml
+            name: loki
+          name: config
+        - configMap:
+            name: loki-runtime
+          name: runtime-config
+  updateStrategy:
+    rollingUpdate:
+      partition: 0
+  volumeClaimTemplates:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        name: storage
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 5Gi
+        storageClassName: rook-ceph-block
+---
+apiVersion: v1
+data:
+  config.yaml: |
+
+    auth_enabled: false
+    bloom_build:
+      builder:
+        planner_address: ""
+      enabled: false
+    bloom_gateway:
+      client:
+        addresses: ""
+      enabled: false
+    common:
+      compactor_grpc_address: 'loki.monitoring.svc.cluster.local:9095'
+      path_prefix: /var/loki
+      replication_factor: 1
+      storage:
+        s3:
+          access_key_id: ${AWS_ACCESS_KEY_ID}
+          bucketnames: loki
+          endpoint: rook-ceph-rgw-ceph-objectstore.rook-ceph.svc.cluster.local
+          insecure: true
+          region: us-east-1
+          s3forcepathstyle: true
+          secret_access_key: ${AWS_SECRET_ACCESS_KEY}
+    compactor:
+      compaction_interval: 10m
+      delete_request_store: s3
+      retention_delete_delay: 2h
+      retention_delete_worker_count: 10
+      retention_enabled: true
+      working_directory: /var/loki/compactor
+    frontend:
+      scheduler_address: ""
+      tail_proxy_url: ""
+    frontend_worker:
+      scheduler_address: ""
+    index_gateway:
+      mode: simple
+    ingester:
+      wal:
+        flush_on_shutdown: true
+    limits_config:
+      max_cache_freshness_per_query: 10m
+      query_timeout: 300s
+      reject_old_samples: true
+      reject_old_samples_max_age: 168h
+      retention_period: 336h
+      split_queries_by_interval: 15m
+      volume_enabled: true
+    memberlist:
+      abort_if_cluster_join_fails: true
+      advertise_port: 7946
+      bind_port: 7946
+      join_members:
+      - loki-memberlist.monitoring.svc.cluster.local
+      max_join_backoff: 1m
+      max_join_retries: 10
+      min_join_backoff: 1s
+      rejoin_interval: 90s
+    pattern_ingester:
+      enabled: false
+    query_range:
+      align_queries_with_step: true
+    runtime_config:
+      file: /etc/loki/runtime-config/runtime-config.yaml
+    schema_config:
+      configs:
+      - from: "2026-10-01"
+        index:
+          period: 24h
+          prefix: index_
+        object_store: s3
+        schema: v13
+        store: tsdb
+    server:
+      graceful_shutdown_timeout: 5s
+      grpc_listen_port: 9095
+      grpc_server_max_concurrent_streams: 1000
+      grpc_server_max_recv_msg_size: 104857600
+      grpc_server_max_send_msg_size: 104857600
+      grpc_server_min_time_between_pings: 10s
+      grpc_server_ping_without_stream_allowed: true
+      http_listen_port: 3100
+      http_server_idle_timeout: 30s
+      http_server_read_timeout: 10m0s
+      http_server_write_timeout: 10m0s
+      log_level: info
+    storage_config:
+      bloom_shipper:
+        working_directory: /var/loki/data/bloomshipper
+      boltdb_shipper:
+        index_gateway_client:
+          server_address: ""
+      hedging:
+        at: 250ms
+        max_per_second: 20
+        up_to: 3
+      tsdb_shipper:
+        index_gateway_client:
+          server_address: ""
+      use_thanos_objstore: false
+    tracing:
+      enabled: false
+kind: ConfigMap
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: loki
+    app.kubernetes.io/name: loki
+    app.kubernetes.io/version: 3.7.8
+    helm.sh/chart: loki-18.13.7
+    kubenix/hash: 5e3bff4edcc116c3cbed625ebee0d34a008101af
+  name: loki
+  namespace: monitoring
+---
+apiVersion: v1
+data:
+  runtime-config.yaml: |
+    {}
+kind: ConfigMap
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: loki
+    app.kubernetes.io/name: loki
+    app.kubernetes.io/version: 3.7.8
+    helm.sh/chart: loki-18.13.7
+    kubenix/hash: 5e3bff4edcc116c3cbed625ebee0d34a008101af
+  name: loki-runtime
+  namespace: monitoring
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/component: single-binary
+    app.kubernetes.io/instance: loki
+    app.kubernetes.io/name: loki
+    app.kubernetes.io/version: 3.7.8
+    helm.sh/chart: loki-18.13.7
+    kubenix/hash: 5e3bff4edcc116c3cbed625ebee0d34a008101af
+  name: loki
+  namespace: monitoring
+spec:
+  ports:
+    - name: http-metrics
+      port: 3100
+      protocol: TCP
+      targetPort: http-metrics
+    - name: grpc
+      port: 9095
+      protocol: TCP
+      targetPort: grpc
+    - name: grpclb
+      port: 9096
+      protocol: TCP
+      targetPort: grpc
+  publishNotReadyAddresses: true
+  selector:
+    app.kubernetes.io/component: single-binary
+    app.kubernetes.io/instance: loki
+    app.kubernetes.io/name: loki
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/component: single-binary
+    app.kubernetes.io/instance: loki
+    app.kubernetes.io/name: loki
+    app.kubernetes.io/version: 3.7.8
+    helm.sh/chart: loki-18.13.7
+    kubenix/hash: 5e3bff4edcc116c3cbed625ebee0d34a008101af
+    prometheus.io/service-monitor: "false"
+    variant: headless
+  name: loki-headless
+  namespace: monitoring
+spec:
+  clusterIP: None
+  ports:
+    - name: http-metrics
+      port: 3100
+      protocol: TCP
+      targetPort: http-metrics
+    - name: grpc
+      port: 9095
+      protocol: TCP
+      targetPort: grpc
+    - name: grpclb
+      port: 9096
+      protocol: TCP
+      targetPort: grpc
+  publishNotReadyAddresses: true
+  selector:
+    app.kubernetes.io/component: single-binary
+    app.kubernetes.io/instance: loki
+    app.kubernetes.io/name: loki
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: loki
+    app.kubernetes.io/name: loki
+    app.kubernetes.io/version: 3.7.8
+    helm.sh/chart: loki-18.13.7
+    kubenix/hash: 5e3bff4edcc116c3cbed625ebee0d34a008101af
+  name: loki-memberlist
+  namespace: monitoring
+spec:
+  clusterIP: None
+  ports:
+    - name: tcp
+      port: 7946
+      protocol: TCP
+      targetPort: http-memberlist
+  selector:
+    app.kubernetes.io/instance: loki
+    app.kubernetes.io/name: loki
+    app.kubernetes.io/part-of: memberlist
+  type: ClusterIP
+---
+apiVersion: v1
+automountServiceAccountToken: true
+kind: ServiceAccount
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: loki
+    app.kubernetes.io/name: loki
+    app.kubernetes.io/version: 3.7.8
+    helm.sh/chart: loki-18.13.7
+    kubenix/hash: 5e3bff4edcc116c3cbed625ebee0d34a008101af
+  name: loki
+  namespace: monitoring
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: loki
+    app.kubernetes.io/name: loki
+    app.kubernetes.io/version: 3.7.8
+    helm.sh/chart: loki-18.13.7
+    kubenix/hash: 5e3bff4edcc116c3cbed625ebee0d34a008101af
+  name: loki
+  namespace: monitoring
+spec:
+  endpoints:
+    - interval: 15s
+      path: /metrics
+      port: http-metrics
+      relabelings:
+        - action: replace
+          replacement: monitoring/$1
+          sourceLabels:
+            - job
+          targetLabel: job
+        - action: replace
+          replacement: loki
+          targetLabel: app_instance
+      scheme: http
+  selector:
+    matchExpressions:
+      - key: prometheus.io/service-monitor
+        operator: NotIn
+        values:
+          - "false"
+    matchLabels:
+      app.kubernetes.io/instance: loki
+      app.kubernetes.io/name: loki
+---
+apiVersion: objectbucket.io/v1alpha1
+kind: ObjectBucketClaim
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 5e3bff4edcc116c3cbed625ebee0d34a008101af
+  name: loki-s3
+  namespace: monitoring
+spec:
+  bucketName: loki
+  storageClassName: rook-ceph-objectstore
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: loki
+    app.kubernetes.io/name: loki
+    app.kubernetes.io/version: 3.7.8
+    helm.sh/chart: loki-18.13.7
+    kubenix/hash: 5e3bff4edcc116c3cbed625ebee0d34a008101af
+  name: loki-clusterrole
+  namespace: monitoring
+rules: []
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: loki
+    app.kubernetes.io/name: loki
+    app.kubernetes.io/version: 3.7.8
+    helm.sh/chart: loki-18.13.7
+    kubenix/hash: 5e3bff4edcc116c3cbed625ebee0d34a008101af
+  name: loki-clusterrolebinding
+  namespace: monitoring
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: loki-clusterrole
+subjects:
+  - kind: ServiceAccount
+    name: loki
+    namespace: monitoring
+---
+apiVersion: v1
+data:
+  loki.yaml: '{"apiVersion":1,"datasources":[{"access":"proxy","editable":false,"name":"Loki","type":"loki","uid":"loki","url":"http://loki.monitoring.svc.cluster.local:3100"}]}'
+kind: ConfigMap
+metadata:
+  labels:
+    grafana_datasource: "1"
+    kubenix/hash: 5e3bff4edcc116c3cbed625ebee0d34a008101af
+  name: loki-datasource
+  namespace: monitoring

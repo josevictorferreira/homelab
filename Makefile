@@ -92,19 +92,5 @@ images-check: ## Check specific image for updates. Usage: make images-check IMAG
 push-openclaw-debian: ## Build and push openclaw-debian image to GHCR (manual deploy).
 	@nix run .#push-openclaw-debian
 
-push-cache: ## Push a store path/closure to the Attic binary cache. Usage: make push-cache P=$(nix build .#gen-manifests --print-out-paths)
-	@if ! command -v attic >/dev/null 2>&1; then echo "attic CLI not found. Install it (e.g. nix shell nixpkgs#attic)."; exit 1; fi
-	@if [ -z "$(P)" ]; then echo "Usage: make push-cache P=<store-path-or-result>"; exit 1; fi
-	@attic push homelab $(P)
-
-ghcr-size: ## Check GHCR image size without downloading. Usage: make ghcr-size IMAGE=user/package:tag
-	@nix run .#ghcr-size -- $(IMAGE)
-
-tf: ## Render terranix config and run OpenTofu in terraform/oci. Usage: make tf ARGS="plan"
-	@nix run .#tf -- $(ARGS)
-
-matrix-transcript: ## Export a full Matrix room transcript. Usage: make matrix-transcript ROOM='<room-id|alias|url>' OUT=oficina.txt
-	@./scripts/matrix-transcript.py $(ROOM) $(if $(OUT),-o $(OUT))
-
 help: ## Show this help.
 	@printf "Usage: make [target]\n\nTARGETS:\n"; grep -F "##" $(MAKEFILE_LIST) | grep -Fv "grep -F" | grep -Fv "printf " | sed -e 's/\\$$//' | sed -e 's/##//' | column -t -s ":" | sed -e 's/^/    /'; printf "\n"
