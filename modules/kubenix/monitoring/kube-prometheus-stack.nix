@@ -172,6 +172,10 @@ in
             serviceMonitorSelectorNilUsesHelmValues = false;
             retention = "15d";
             retentionSize = "40GiB";
+            # 2026-10-06: WAL replay on Ceph outlasted the operator's default
+            # 15 min startup probe, so the pod was killed mid-replay (exit 137)
+            # in a loop and the WAL never got compacted. Allow one hour.
+            maximumStartupDurationSeconds = 3600;
             resources = {
               requests = {
                 cpu = "300m";
