@@ -7,8 +7,8 @@ let
   # glyph-v2 (Rust rewrite of the Rails app): a backend serving HTTP, gRPC and
   # gRPC-Web on :3000 (job worker, tickers and boot migrations in-process) and
   # an nginx frontend serving the SPA and reverse-proxying API paths to the
-  # backend. Instance names match the `rollout restart deployment/...` targets
-  # in the glyph-v2 repo's deploy flakes.
+  # backend. Instance names match the deployments the glyph-v2 repo's deploy
+  # flakes recreate pods for (`rollout restart` is reverted by Flux).
   backendImage = {
     repository = "ghcr.io/josevictorferreira/glyph-v2";
     tag = "latest";
@@ -58,6 +58,12 @@ in
           # backend itself gets no ingress (the LAN LB IP still allows direct
           # gRPC for grpcurl).
           ingress.main.enabled = false;
+          # Non-secret settings (keys and URLs live in the glyph-config secret).
+          controllers.main.containers.main.env = {
+            # 2026-10-06: GLM 5.3 spent ~2/3 of the 900s default thinking and
+            # was cut off two-thirds into writing a ~100 KB HTML page.
+            GLYPH_PI_TIMEOUT_SECONDS = "1800";
+          };
           # Health is GET /up: 200 when the database answers.
           controllers.main.containers.main.probes = {
             startup = {
