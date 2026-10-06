@@ -401,6 +401,15 @@ provider = "glm"
 upstream_model = "glm-5.3"
 max_tokens = 131072
 
+# Same upstream as glm-5-3-zai (which keeps Z.ai's default, full thinking),
+# with thinking pinned off. Z.ai still returns a short thinking block, but
+# about half the output tokens of the default.
+[models.glm-5-3-nothink-zai]
+provider = "glm"
+upstream_model = "glm-5.3"
+max_tokens = 131072
+thinking = "disabled"
+
 [models.glm-5-3-flash-zai]
 provider = "glm"
 upstream_model = "glm-5.3-flash"
@@ -686,6 +695,7 @@ upstream_model = "voyage-3"
 [combos.pippin]
 targets = [
   { model = "qwen3-6-35b-yoloauto" },
+  { model = "deepseek-v4-flash-pgsgrove" },
   { model = "glm-4-5-air-zai" },
 ]
 

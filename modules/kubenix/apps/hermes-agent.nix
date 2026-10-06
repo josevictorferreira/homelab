@@ -327,7 +327,11 @@ let
       name = "gateway-multiplex";
       inherit image;
       imagePullPolicy = "IfNotPresent";
+      # tini as PID 1 reaps orphaned children (the image's own entrypoint would otherwise do it).
       command = [
+        "/usr/bin/tini"
+        "-g"
+        "--"
         "/bin/sh"
         "-c"
         ''
