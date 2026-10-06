@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: cba35ed7ed48979d8e95ee51a8f3ef8275b3d450
+    kubenix/hash: d6e8ab6b4e9307666c19565827ffc6482ef95e31
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -29,7 +29,7 @@ spec:
   template:
     metadata:
       annotations:
-        velox.josevictor.me/config-hash: 986449724265079cc289a3930306f833ab8c43a4a0ad17a1504c8bb8b535bcae
+        velox.josevictor.me/config-hash: 63435e26af9486fd1be65a1d7ed5753f819c3e405a19a3681f8ee61cd77aa47b
         velox.josevictor.me/oauth-agent-config-hash: 56586bc48139688a6e1069f9a0d25d36f367e209b88ae0783de43c3b8f546df0
       labels:
         app.kubernetes.io/controller: main
@@ -211,7 +211,7 @@ metadata:
     app.kubernetes.io/name: velox
     app.kubernetes.io/service: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: cba35ed7ed48979d8e95ee51a8f3ef8275b3d450
+    kubenix/hash: d6e8ab6b4e9307666c19565827ffc6482ef95e31
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -240,7 +240,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: cba35ed7ed48979d8e95ee51a8f3ef8275b3d450
+    kubenix/hash: d6e8ab6b4e9307666c19565827ffc6482ef95e31
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -973,6 +973,12 @@ data:
       { model = "glm-5-3-zai" },
     ]
 
+    [combos.glm-5-3-nothink]
+    targets = [
+      { model = "glm-5-3-nothink-zai" },
+    ]
+
+
     [combos.glm-5-3-flash]
     targets = [
       { model = "glm-5-3-flash-zai" },
@@ -1393,7 +1399,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: cba35ed7ed48979d8e95ee51a8f3ef8275b3d450
+    kubenix/hash: d6e8ab6b4e9307666c19565827ffc6482ef95e31
   name: velox-config
   namespace: apps
 ---
@@ -1499,7 +1505,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: cba35ed7ed48979d8e95ee51a8f3ef8275b3d450
+    kubenix/hash: d6e8ab6b4e9307666c19565827ffc6482ef95e31
   name: velox-oauth-agent-config
   namespace: apps
 ---
@@ -1510,7 +1516,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: cba35ed7ed48979d8e95ee51a8f3ef8275b3d450
+    kubenix/hash: d6e8ab6b4e9307666c19565827ffc6482ef95e31
   name: velox-oauth-agent
   namespace: apps
 ---
@@ -1521,7 +1527,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: cba35ed7ed48979d8e95ee51a8f3ef8275b3d450
+    kubenix/hash: d6e8ab6b4e9307666c19565827ffc6482ef95e31
   name: velox-oauth-agent
   namespace: apps
 rules:
@@ -1543,7 +1549,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: cba35ed7ed48979d8e95ee51a8f3ef8275b3d450
+    kubenix/hash: d6e8ab6b4e9307666c19565827ffc6482ef95e31
   name: velox-oauth-agent
   namespace: apps
 roleRef:

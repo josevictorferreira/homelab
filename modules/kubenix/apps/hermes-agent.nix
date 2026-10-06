@@ -327,11 +327,7 @@ let
       name = "gateway-multiplex";
       inherit image;
       imagePullPolicy = "IfNotPresent";
-      # tini as PID 1 reaps orphaned children (the image's own entrypoint would otherwise do it).
       command = [
-        "/usr/bin/tini"
-        "-g"
-        "--"
         "/bin/sh"
         "-c"
         ''
@@ -468,6 +464,9 @@ in
         };
         spec = {
           securityContext = podSecurityContext;
+          # The pause container becomes PID 1 and reaps orphaned children. The image's
+          # /usr/bin/tini is now an s6-overlay shim that cannot start as non-root.
+          shareProcessNamespace = true;
           terminationGracePeriodSeconds = 60;
           imagePullSecrets = [ { name = "ghcr-registry-secret"; } ];
           initContainers = [
