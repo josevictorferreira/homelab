@@ -469,65 +469,6 @@ in
           shareProcessNamespace = true;
           terminationGracePeriodSeconds = 60;
           imagePullSecrets = [ { name = "ghcr-registry-secret"; } ];
-          initContainers = [
-            {
-              name = "fix-profile-permissions";
-              inherit image;
-              command = [
-                "/bin/sh"
-                "-c"
-                ''
-                  # Plugins installed via the dashboard land in /opt/data/plugins
-                  # (its HERMES_HOME is /opt/data), but per-profile agents scan
-                  # $HERMES_HOME/plugins = /opt/data/profiles/<p>/plugins. Link the
-                  # shared plugins into every profile so dashboard-installed
-                  # backends (e.g. omniroute) are discovered by each agent.
-                  # (config still gates which ones actually load via plugins.enabled.)
-                  if [ -d /opt/data/plugins ]; then
-                    for d in /opt/data/profiles/*/; do
-                      [ -d "$d" ] || continue
-                      mkdir -p "$d/plugins"
-                      for p in /opt/data/plugins/*/; do
-                        [ -d "$p" ] || continue
-                        ln -sfn "$p" "$d/plugins/$(basename "$p")"
-                      done
-                    done
-                  fi
-                  # Profile HOMEs: hermes creates each /opt/data/profiles/<p>
-                  # as 0700 owned by the runtime uid, which locks the SMB client
-                  # (authenticated as GID 2002, not the dir owner) out of that
-                  # profile's folder — the cause of "sometimes I lose access".
-                  # Normalize ownership + group access so every profile is
-                  # reachable. Only touches wrong entries, so it stays fast.
-                  for d in /opt/data/profiles/*/; do
-                    [ -d "$d" ] || continue
-                    find "$d" ! -user 10000 -exec chown 10000 {} + 2>/dev/null || true
-                    find "$d" ! -group 2002 -exec chgrp 2002 {} + 2>/dev/null || true
-                    find "$d" -type d ! -perm -2070 -exec chmod g+rwxs {} + 2>/dev/null || true
-                    find "$d" -type f ! -perm -060 -exec chmod g+rw {} + 2>/dev/null || true
-                  done
-                  # Guarantee read/write for everything in the unified "homelab" group
-                  # (GID 2002 — the agents' primary gid and the host user's group, and
-                  # what other pods join via supplementalGroups). setgid on dirs so new
-                  # entries inherit the group; group-writable. Only touches wrong
-                  # entries, so it stays fast on large trees.
-                  for d in /shared/*/; do
-                    [ -d "$d" ] || continue
-                    find "$d" ! -group 2002 -exec chgrp 2002 {} + 2>/dev/null || true
-                    find "$d" -type d ! -perm -2070 -exec chmod g+rwxs {} + 2>/dev/null || true
-                    find "$d" -type f ! -perm -060 -exec chmod g+rw {} + 2>/dev/null || true
-                  done
-                ''
-              ];
-              volumeMounts = dataVolumeMounts;
-              securityContext = {
-                runAsUser = 0;
-                runAsGroup = 0;
-                capabilities.add = [ "DAC_OVERRIDE" ];
-                capabilities.drop = [ ];
-              };
-            }
-          ];
           inherit containers;
           volumes =
             dataVolumes
