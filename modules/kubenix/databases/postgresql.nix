@@ -21,7 +21,10 @@ in
       imagePullSecrets = [ { name = "ghcr-registry-secret"; } ];
       enableSuperuserAccess = true;
       superuserSecret.name = "postgresql-superuser";
-      inherit (pg) storage walStorage resources;
+      inherit (pg) storage resources;
+      # Grown from 8Gi on 2026-10-05: WAL filled up while archiving to the Pi
+      # failed, and CNPG refuses to start PostgreSQL without WAL free space.
+      walStorage = pg.walStorage // { size = "12Gi"; };
       postgresql = pg.postgresql // {
         parameters = pg.postgresql.parameters // {
           # Bulk restore: fewer checkpoints while data streams in.
@@ -32,7 +35,10 @@ in
       plugins = [
         {
           name = "barman-cloud.cloudnative-pg.io";
-          isWALArchiver = true;
+          # Paused 2026-10-05: the Pi backup-pool is down (ZFS space-map panic), so
+          # archiving failed and WAL piled up. Set back to true once MinIO is healthy,
+          # then take a fresh base backup.
+          isWALArchiver = false;
           parameters.barmanObjectName = "pi-minio";
         }
       ];
