@@ -63,6 +63,21 @@ in
           NODE_MAX_OLD_SPACE_SIZE = "2048";
         };
         controllers.main.containers.main.probes = {
+          # 2026-10-06: startup is CPU-bound and ran past the liveness window
+          # on a busy node (lab-alpha-cp saturated), crash-looping the pod.
+          # Liveness and readiness only start once this passes (up to 10 min).
+          startup = {
+            enabled = true;
+            custom = true;
+            spec = {
+              httpGet = {
+                path = "/api/v1/health";
+                port = port;
+              };
+              periodSeconds = 10;
+              failureThreshold = 60;
+            };
+          };
           liveness = {
             enabled = true;
             custom = true;
