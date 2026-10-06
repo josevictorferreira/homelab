@@ -55,6 +55,15 @@
       autovacuum_vacuum_cost_delay = "10ms";
       autovacuum_vacuum_cost_limit = "2000";
       log_min_duration_statement = "2000";
+      # 2026-10-06: slow statements were logged with their bind parameters in
+      # full (default -1 = unlimited). A 60 MB bytea UPDATE became a 62 MB hex
+      # log line, built in the backend and re-parsed by the CNPG instance
+      # manager in the same container: repeated OOM kills at the 3Gi limit.
+      log_parameter_max_length = "1024";
+      log_parameter_max_length_on_error = "1024";
+      # Autovacuum otherwise inherits maintenance_work_mem (512MB) per worker:
+      # 5 workers could claim 2.5GB on top of shared_buffers under a 3Gi limit.
+      autovacuum_work_mem = "128MB";
       log_checkpoints = "on";
     };
   };

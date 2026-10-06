@@ -5,7 +5,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 4686b3c0fc4b0f3f5221764b73842379156691a8
+    kubenix/hash: 69fd14bb06fa734540a1902c14903c8c54e0a88a
   name: postgresql
   namespace: databases
 spec:
@@ -51,12 +51,15 @@ spec:
       autovacuum_naptime: 10s
       autovacuum_vacuum_cost_delay: 10ms
       autovacuum_vacuum_cost_limit: "2000"
+      autovacuum_work_mem: 128MB
       checkpoint_completion_target: "0.9"
       checkpoint_timeout: 30min
       effective_cache_size: 2304MB
       idle_session_timeout: 2h
       log_checkpoints: "on"
       log_min_duration_statement: "2000"
+      log_parameter_max_length: "1024"
+      log_parameter_max_length_on_error: "1024"
       maintenance_work_mem: 512MB
       max_connections: "300"
       max_wal_size: 4GB
