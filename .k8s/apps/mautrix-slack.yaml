@@ -5,7 +5,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 9cb4d13b22bf2ae1ececda3b997c6e9097d1cf8a
+    kubenix/hash: 1c383a75580e620ef929bb71ab8ca54ce0db6097
   name: mautrix-slack
   namespace: apps
 spec:
@@ -14,7 +14,9 @@ spec:
     matchLabels:
       app: mautrix-slack
   strategy:
-    type: Recreate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
   template:
     metadata:
       labels:
@@ -82,7 +84,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 9cb4d13b22bf2ae1ececda3b997c6e9097d1cf8a
+    kubenix/hash: 1c383a75580e620ef929bb71ab8ca54ce0db6097
   name: mautrix-slack-v2
   namespace: apps
 spec:
@@ -100,7 +102,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 9cb4d13b22bf2ae1ececda3b997c6e9097d1cf8a
+    kubenix/hash: 1c383a75580e620ef929bb71ab8ca54ce0db6097
   name: mautrix-slack
   namespace: apps
 spec:

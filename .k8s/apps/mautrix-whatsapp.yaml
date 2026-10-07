@@ -5,7 +5,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 5a018e0a78ff12341586a47323172ed1692f265e
+    kubenix/hash: 07d0129dffab805247e3b39001927b64d3977216
   name: mautrix-whatsapp
   namespace: apps
 spec:
@@ -14,7 +14,9 @@ spec:
     matchLabels:
       app: mautrix-whatsapp
   strategy:
-    type: Recreate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
   template:
     metadata:
       labels:
@@ -82,7 +84,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 5a018e0a78ff12341586a47323172ed1692f265e
+    kubenix/hash: 07d0129dffab805247e3b39001927b64d3977216
   name: mautrix-whatsapp
   namespace: apps
 spec:
@@ -100,7 +102,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 5a018e0a78ff12341586a47323172ed1692f265e
+    kubenix/hash: 07d0129dffab805247e3b39001927b64d3977216
   name: mautrix-whatsapp
   namespace: apps
 spec:

@@ -34,8 +34,13 @@ in
         metadata = { inherit namespace; };
         spec = {
           replicas = 1;
-          # RWO data volume: a rolling update deadlocks on Multi-Attach.
-          strategy.type = "Recreate";
+          # RWO data volume: stop the old pod before starting the new one, or the
+          # new pod deadlocks on Multi-Attach. Same effect as Recreate, but
+          # Recreate can't be applied over the live defaulted rollingUpdate.
+          strategy.rollingUpdate = {
+            maxSurge = 0;
+            maxUnavailable = 1;
+          };
           selector.matchLabels = { inherit app; };
           template = {
             metadata.labels = { inherit app; };
