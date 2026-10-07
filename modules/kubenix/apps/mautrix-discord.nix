@@ -35,6 +35,8 @@ in
         metadata = { inherit namespace; };
         spec = {
           replicas = 1;
+          # RWO data volume: a rolling update deadlocks on Multi-Attach.
+          strategy.type = "Recreate";
           selector.matchLabels = { inherit app; };
           template = {
             metadata.labels = { inherit app; };

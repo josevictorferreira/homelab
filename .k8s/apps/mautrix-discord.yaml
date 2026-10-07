@@ -5,7 +5,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: e4c951e9d991bd655f530b46c3af43a157fcde62
+    kubenix/hash: c5ad793bcb5872079d7e9b1fb1e410b3287078d2
   name: mautrix-discord
   namespace: apps
 spec:
@@ -13,6 +13,8 @@ spec:
   selector:
     matchLabels:
       app: mautrix-discord
+  strategy:
+    type: Recreate
   template:
     metadata:
       labels:
@@ -73,7 +75,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: e4c951e9d991bd655f530b46c3af43a157fcde62
+    kubenix/hash: c5ad793bcb5872079d7e9b1fb1e410b3287078d2
   name: mautrix-discord-v2
   namespace: apps
 spec:
@@ -91,7 +93,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: e4c951e9d991bd655f530b46c3af43a157fcde62
+    kubenix/hash: c5ad793bcb5872079d7e9b1fb1e410b3287078d2
   name: mautrix-discord
   namespace: apps
 spec:
