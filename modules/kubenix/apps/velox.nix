@@ -259,7 +259,10 @@ in
           ];
           probes = {
             # /healthz is pure liveness and never touches an upstream, so a
-            # provider outage cannot restart the proxy.
+            # provider outage cannot restart the proxy. The kubelet's 1s default
+            # timeout restarted a healthy pod whenever its node was CPU-starved,
+            # and the restart is what clients saw as Envoy's 503 "connection
+            # refused"; a minute of unresponsiveness is needed before a kill.
             liveness = {
               enabled = true;
               custom = true;
@@ -270,6 +273,8 @@ in
                 };
                 initialDelaySeconds = 5;
                 periodSeconds = 10;
+                timeoutSeconds = 5;
+                failureThreshold = 6;
               };
             };
             # /readyz reports not-ready while draining, which is what pulls this
@@ -284,6 +289,7 @@ in
                 };
                 initialDelaySeconds = 2;
                 periodSeconds = 5;
+                timeoutSeconds = 3;
               };
             };
           };
