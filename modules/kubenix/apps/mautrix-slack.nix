@@ -86,7 +86,7 @@ in
               containers = [
                 {
                   name = app;
-                  image = "dock.mau.dev/mautrix/slack:v0.2605.0@sha256:43c6f43c3d24f5e6092321e27e5558ff18c47bf9003bb02197d64134b504607c";
+                  image = "dock.mau.dev/mautrix/slack:v0.2609.1@sha256:f4a9ec0bd3261dcc5ecbf09c59ebd35ce812e0099a2ea0845a92be3fd090e484";
                   ports = [
                     {
                       name = "http";

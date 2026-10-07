@@ -5,7 +5,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 51cd621aef69b7cbcc7e6bba6de17e1e03cc2994
+    kubenix/hash: 7b88821e06c953fe026df4919c78a780b18d9b85
   name: mautrix-slack
   namespace: apps
 spec:
@@ -19,7 +19,7 @@ spec:
         app: mautrix-slack
     spec:
       containers:
-        - image: dock.mau.dev/mautrix/slack:v0.2605.0@sha256:43c6f43c3d24f5e6092321e27e5558ff18c47bf9003bb02197d64134b504607c
+        - image: dock.mau.dev/mautrix/slack:v0.2609.1@sha256:f4a9ec0bd3261dcc5ecbf09c59ebd35ce812e0099a2ea0845a92be3fd090e484
           name: mautrix-slack
           ports:
             - containerPort: 29333
@@ -80,7 +80,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 51cd621aef69b7cbcc7e6bba6de17e1e03cc2994
+    kubenix/hash: 7b88821e06c953fe026df4919c78a780b18d9b85
   name: mautrix-slack-v2
   namespace: apps
 spec:
@@ -98,7 +98,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 51cd621aef69b7cbcc7e6bba6de17e1e03cc2994
+    kubenix/hash: 7b88821e06c953fe026df4919c78a780b18d9b85
   name: mautrix-slack
   namespace: apps
 spec:
