@@ -19,13 +19,16 @@ rec {
         hard = "memory.available<500Mi,imagefs.available<3%,nodefs.available<3%";
         soft = "memory.available<750Mi,imagefs.available<6%,nodefs.available<6%";
       };
+      # Third etcd member so lab-alpha-cp could leave the
+      # control plane; etcd-only keeps the apiserver off its 3.7 GiB of RAM.
+      etcdOnly = true;
       roles = [
         "nixos-server"
         "system-admin"
         "backup-server"
         "tailscale"
         "k8s-server"
-        "k8s-worker"
+        "k8s-control-plane"
       ];
     };
     lab-oci-bk = {
@@ -58,12 +61,14 @@ rec {
         "/dev/disk/by-partlabel/CEPH_OSD_NVME"
         "/dev/disk/by-partlabel/CEPH_OSD_SATA"
       ];
+      # Not a control plane: the dead cooler and the root disk shared by etcd
+      # and osd.2 made it the cluster's weakest etcd member.
       roles = [
         "nixos-server"
         "system-admin"
         "k8s-server"
         "k8s-storage"
-        "k8s-control-plane"
+        "k8s-worker"
         "tailscale"
         "tailscale-router"
       ];

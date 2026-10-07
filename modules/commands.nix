@@ -11,7 +11,7 @@ let
   lockFile = "manifests.lock";
 
   # Configuration
-  controlPlaneIp = "10.10.10.200";
+  controlPlaneIp = "10.10.10.201";
   clusterIp = "10.10.10.250";
   port = "6443";
   username = "josevictor";

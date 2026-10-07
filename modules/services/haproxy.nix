@@ -8,7 +8,7 @@ let
       in
       "${name} ${host.ipAddress}:6444"
     )
-    homelab.nodes.group."k8s-control-plane".names;
+    (lib.attrNames (lib.filterAttrs (_: host: !host.etcdOnly) homelab.nodes.group."k8s-control-plane".configs));
 in
 {
   services.haproxy = {

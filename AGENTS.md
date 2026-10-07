@@ -212,11 +212,11 @@ option (the host bindfs layer rejects `setfacl`).
 
 | Node | IP | Roles |
 |------|----|-------|
-| lab-alpha-cp | 10.10.10.200 | control-plane, storage, tailscale, tailscale-router |
+| lab-alpha-cp | 10.10.10.200 | worker, storage, tailscale, tailscale-router |
 | lab-beta-cp | 10.10.10.201 | control-plane, storage, tailscale, tailscale-router |
 | lab-gamma-wk | 10.10.10.202 | worker, storage, tailscale |
 | lab-delta-cp | 10.10.10.203 | control-plane, storage, amd-gpu, tailscale |
-| lab-pi-bk | 10.10.10.209 | backup-server, tailscale |
+| lab-pi-bk | 10.10.10.209 | control-plane (etcd-only), backup-server, tailscale |
 
 **VIP**: 10.10.10.250 (HAProxy+Keepalived)
 
@@ -673,9 +673,9 @@ Our cluster is deployed and accessible in the user system kubectl, the context a
 ### K3s Bootstrap Resources
 
 #### K3s Addon Controller Manages Bootstrap Manifests from Init Node
-**Lesson:** Changes to bootstrap resources (ResourceQuota, LimitRange, etc.) cannot be applied via `kubectl` — K3s's `objectset.rio.cattle.io` controller will revert them. Must redeploy NixOS to the init node (`lab-alpha-cp`) to update manifests in `/var/lib/rancher/k3s/server/manifests/`.
+**Lesson:** Changes to bootstrap resources (ResourceQuota, LimitRange, etc.) cannot be applied via `kubectl` — K3s's `objectset.rio.cattle.io` controller will revert them. Must redeploy NixOS to the init node (the first `k8s-control-plane` host, `lab-beta-cp`) to update manifests in `/var/lib/rancher/k3s/server/manifests/`.
 **Context:** K3s auto-deploys manifests from the init node's filesystem. The controller continuously reconciles these files, overwriting any kubectl changes.
-**Verify:** After NixOS deploy, check init node: `ssh root@lab-alpha-cp 'cat /var/lib/rancher/k3s/server/manifests/resource-quotas.yaml'`
+**Verify:** After NixOS deploy, check init node: `ssh root@lab-beta-cp 'cat /var/lib/rancher/k3s/server/manifests/resource-quotas.yaml'`
 
 #### `.k8s/` Directory IS Tracked by Git — Generated via `make manifests`
 **Lesson:** The `.k8s/` directory is generated via `make manifests`, IS tracked by git, and Flux reconciles from `./.k8s`. Never edit `.k8s/*.yaml` files directly — always regenerate via `make manifests`. If you remove a file from `.k8s/`, `git rm` it before committing.
@@ -710,6 +710,11 @@ Our cluster is deployed and accessible in the user system kubectl, the context a
 **Lesson:** Force-deleting a pod with RWO PVCs on one node and recreating on another causes Multi-Attach errors. Deleting Kubernetes `VolumeAttachment` resources does NOT release Ceph-side RBD watchers. Either: (1) wait 30-60s for RBD lock timeout, or (2) use rook-ceph-tools: `rbd lock ls replicapool/<image>` then `rbd lock remove` or `rbd feature disable exclusive-lock`.
 **Context:** OpenClaw pod force-deleted on lab-beta-cp, recreated on lab-gamma-wk. Both PVCs got stuck with "rbd image is still being used" for 6+ minutes.
 **Verify:** `kubectl exec -n rook-ceph deploy/rook-ceph-tools -- rbd status replicapool/csi-vol-<id>` — watcher should be on the NEW node.
+
+#### Changing etcd Membership: Add First, Remove by Annotation, Watch the Leader
+**Lesson:** To move an etcd member, join the new node first, then remove the old one with `kubectl annotate node <old> etcd.k3s.cattle.io/remove=true` (k3s drops the member but keeps the Node, so its OSDs/mon keep running through a server→agent switch). Move `/var/lib/rancher/k3s/server` aside on the old node before switching it to agent. Never restart a remaining server while a 4th member is down (2/4 = no quorum). After any restart check the leader and `move-leader` back to delta; the etcd-only Pi (~1s commits on SD) won elections twice.
+**Context:** 2026-10-07 lab-alpha-cp → agent, lab-pi-bk → etcd-only (`etcdOnly = true` in `config/nodes.nix`). The Pi's join timed out twice because alpha (load 30) answered its supervisor requests slowly; the 4th member's catch-up stalled etcd for seconds and k3s on alpha+delta restarted after losing leases. Turning a worker into a control plane also replaces `/opt/cni/bin` with the k3s symlink, losing `cilium-cni` until the node's cilium pod restarts.
+**Verify:** `etcdctl member list` shows only beta/delta/pi; `endpoint status` leader is delta; `ls /opt/cni/bin/cilium-cni` on a converted node.
 
 #### Pi Disk Pressure Masquerades as a Stuck Valoris Deploy
 **Lesson:** valoris pods `Pending`/`Terminating`/`ContainerStatusUnknown` on `lab-pi-bk` with no app error = kubelet `DiskPressure` on the Pi's 15 GiB SD root (`/nix/store` ~4.5 GiB + containerd ~5 GiB). Eviction reclaim deletes the 616 MB `valoris-backend:latest` image, the next pod re-pulls it at ~0.5 MB/s (16–20 min, un-killable meanwhile), and a `rollout restart` during that window gets its annotation stripped by Flux, so the Recreate deployment flips back and waits out the pull. Check the node condition before touching the app; the Pi node-exporter is not scraped, so nothing alerts.

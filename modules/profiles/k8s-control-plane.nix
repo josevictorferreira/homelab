@@ -16,6 +16,24 @@ let
   ];
   roleLabelFlags = map (role: "--node-label=node.kubernetes.io/${role}=true") hostConfig.roles;
   initNodeHostName = builtins.head homelab.nodes.group."k8s-control-plane".names;
+  # An etcd-only member stays an ordinary node for scheduling: no control-plane
+  # taint and the same eviction thresholds a k8s-worker would get on this host.
+  eviction = {
+    hard = "memory.available<500Mi,imagefs.available<10%,nodefs.available<5%";
+    soft = "memory.available<750Mi,imagefs.available<15%,nodefs.available<10%";
+  } // hostConfig.kubeletEviction;
+  etcdOnlyFlags = [
+    "--disable-apiserver"
+    "--disable-controller-manager"
+    "--disable-scheduler"
+    "--kubelet-arg=eviction-hard=${eviction.hard}"
+    "--kubelet-arg=eviction-soft=${eviction.soft}"
+    "--kubelet-arg=eviction-soft-grace-period=memory.available=1m,imagefs.available=2m,nodefs.available=2m"
+  ];
+  controlPlaneFlags = [
+    "--kubelet-arg=eviction-hard=memory.available<500Mi,nodefs.available<10%"
+    "--node-taint=node-role.kubernetes.io/control-plane=true:NoSchedule"
+  ];
   serverFlagList = [
     "--https-listen-port=6444"
     "--tls-san=${homelab.kubernetes.vipAddress}"
@@ -36,9 +54,8 @@ let
     "--etcd-arg=auto-compaction-retention=30m"
     "--kubelet-arg=system-reserved=cpu=250m,memory=256Mi"
     "--kubelet-arg=kube-reserved=cpu=500m,memory=512Mi"
-    "--kubelet-arg=eviction-hard=memory.available<500Mi,nodefs.available<10%"
-    "--node-taint=node-role.kubernetes.io/control-plane=true:NoSchedule"
   ]
+  ++ (if hostConfig.etcdOnly then etcdOnlyFlags else controlPlaneFlags)
   ++ (if cfg.isInit then clusterInitFlags else [ ])
   ++ roleLabelFlags;
   bootstrapManifestFiles = builtins.attrNames (
