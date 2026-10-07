@@ -50,6 +50,10 @@ rec {
       machine = "intel-nuc-gk3v";
       interface = "enp1s0";
       mac = "68:1D:EF:30:C1:03";
+      storageNetwork = {
+        ipAddress = "10.10.20.200";
+        mac = "00:E0:4C:68:07:9A";
+      };
       disks = [
         "/dev/disk/by-partlabel/CEPH_OSD_NVME"
         "/dev/disk/by-partlabel/CEPH_OSD_SATA"
@@ -89,6 +93,10 @@ rec {
       machine = "intel-nuc-gk3v";
       interface = "enp1s0";
       mac = "68:1D:EF:3E:30:37";
+      storageNetwork = {
+        ipAddress = "10.10.20.202";
+        mac = "00:E0:4C:68:09:01";
+      };
       # No OSDs: the consumer SSD/HDD on this node corrupted RocksDB twice after
       # unclean resets (osd.5 2026-09-15, osd.3 2026-10-01); both were purged 2026-10-05.
       roles = [
@@ -105,6 +113,10 @@ rec {
       machine = "amd-ryzen-beelink-eqr5";
       interface = "enp1s0";
       mac = "B0:41:6F:16:1F:72";
+      storageNetwork = {
+        ipAddress = "10.10.20.203";
+        mac = "00:E0:4C:68:09:AB";
+      };
       disks = [
         "/dev/disk/by-partlabel/CEPH_OSD_NVME"
       ];

@@ -45,6 +45,22 @@ let
         description = "Whether the node uses the LAN static IP configuration. Set to false for nodes with DHCP-managed networking (e.g. cloud nodes).";
         default = true;
       };
+      storageNetwork = mkOption {
+        type = t.nullOr (t.submodule {
+          options = {
+            ipAddress = mkOption {
+              type = t.str;
+              description = "IP address on the storage network.";
+            };
+            mac = mkOption {
+              type = t.str;
+              description = "MAC address of the storage network adapter.";
+            };
+          };
+        });
+        description = "Dedicated 2.5 GbE storage network adapter used for the Ceph cluster network. Null when the node has none.";
+        default = null;
+      };
       disks = mkOption {
         type = t.listOf t.str;
         description = "List of disk device names (e.g. /dev/sda) attached to the node.";

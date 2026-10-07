@@ -13,6 +13,7 @@ in
     "${homelab.paths.commons}/nix.nix"
     "${homelab.paths.commons}/locale.nix"
     "${homelab.paths.commons}/static-ip.nix"
+    "${homelab.paths.commons}/storage-network.nix"
   ];
 
   config = lib.mkIf cfg.enable {
@@ -37,6 +38,16 @@ in
         inherit (homelab) gateway;
         nameservers = [ homelab.kubernetes.loadBalancer.services.blocky ] ++ homelab.dnsServers;
       };
+
+      storageNetwork =
+        let
+          storage = homelab.nodes.hosts.${hostName}.storageNetwork;
+        in
+        lib.mkIf (storage != null) {
+          enable = true;
+          inherit (storage) mac;
+          address = storage.ipAddress;
+        };
     };
 
     services = {
