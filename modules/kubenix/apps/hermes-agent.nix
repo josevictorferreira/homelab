@@ -125,10 +125,11 @@ let
       value = homelab.timeZone;
     }
     # Shared config via Managed Scope: /opt/data/managed/config.yaml is overlaid
-    # (leaf-level, managed wins) on top of every profile's config.yaml, so all 5
-    # profiles share one config. Per-profile config.yaml carries only the keys
-    # that must differ (model.default, skills.disabled; + kira whatsapp, + spike
-    # kanban). Kept out of /opt/data itself so host-only keys aren't pinned.
+    # (leaf-level, managed wins) on top of every profile's config.yaml, so all
+    # profiles share one config. Any key in it is pinned for every profile, so
+    # per-profile keys (model.default, agent.reasoning_effort, agent.max_turns,
+    # tts.velox.voice, skills.disabled) must stay out of it; the default
+    # profile's own values live in /opt/data/config.yaml.
     {
       name = "HERMES_MANAGED_DIR";
       value = "/opt/data/managed";
@@ -231,7 +232,9 @@ let
     }
     {
       name = "PYTHONPATH";
-      value = "/opt/data/.local/lib/python3.13/site-packages";
+      # Match the image venv minor (3.14 since v0.21.6). Native user-site
+      # modules are ABI-locked to this minor; bump it on every image Python bump.
+      value = "/opt/data/.local/lib/python3.14/site-packages";
     }
     {
       name = "PYTHONUSERBASE";
@@ -371,8 +374,13 @@ let
       securityContext = commonSecurityContext;
     };
 
-  cronMultiplexContainer = {
-    name = "cron-multiplex";
+  # SQLite WAL is not crash-safe on CephFS (state.db and kanban.db kept corrupting), so the
+  # config sets database.journal_mode: delete. Hermes never downgrades an existing WAL file on
+  # open, so convert every store here, before the gateway opens them. It refuses (and leaves the
+  # file alone) while any other process holds a store; already-converted files are a no-op.
+  # The hermes-lcm plugin forces WAL on its own lcm.db, so that file is left out.
+  journalModeInitContainer = {
+    name = "sqlite-journal-mode";
     inherit image;
     imagePullPolicy = "IfNotPresent";
     command = [
@@ -380,42 +388,32 @@ let
       "-c"
       ''
         umask 0002
-        while true; do
-          for profile in /opt/data/profiles/*; do
-            [ -f "$profile/cron/jobs.json" ] || continue
-            HERMES_HOME="$profile" hermes cron tick --accept-hooks || true
-          done
-          sleep 60
+        for db in /opt/data/*.db /opt/data/profiles/*/*.db /opt/data/profiles/*/cron/*.db /opt/data/cron/*.db /opt/data/kanban/boards/*/kanban.db; do
+          [ -f "$db" ] || continue
+          case "$db" in */lcm.db) continue ;; esac
+          /opt/hermes/.venv/bin/hermes sessions set-journal-mode delete --db "$db" || true
         done
       ''
     ];
-    env =
-      commonEnv
-      ++ [
-        {
-          name = "HOME";
-          value = "/opt/data";
-        }
-      ];
-    envFrom = envFromSecret;
-    volumeMounts =
-      dataVolumeMounts
-      ++ sshKeyVolumeMounts
-      ++ [
-        {
-          name = cliWrapper.volumeName;
-          mountPath = cliWrapper.mountPath;
-          subPath = "hermes";
-        }
-      ];
+    env = commonEnv ++ [
+      {
+        name = "HOME";
+        value = "/opt/data";
+      }
+      {
+        name = "HERMES_HOME";
+        value = "/opt/data";
+      }
+    ];
+    volumeMounts = dataVolumeMounts;
     resources = {
       requests = {
         cpu = "100m";
-        memory = "512Mi";
+        memory = "256Mi";
       };
       limits = {
         cpu = "500m";
-        memory = "1Gi";
+        memory = "512Mi";
       };
     };
     securityContext = commonSecurityContext;
@@ -423,7 +421,6 @@ let
 
   containers = [
     multiplexGatewayContainer
-    cronMultiplexContainer
   ];
 
 in
@@ -469,6 +466,7 @@ in
           shareProcessNamespace = true;
           terminationGracePeriodSeconds = 60;
           imagePullSecrets = [ { name = "ghcr-registry-secret"; } ];
+          initContainers = [ journalModeInitContainer ];
           inherit containers;
           volumes =
             dataVolumes
