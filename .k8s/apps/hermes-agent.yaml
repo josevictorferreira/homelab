@@ -7,7 +7,7 @@ metadata:
   labels:
     app: hermes-agent
     component: dashboard
-    kubenix/hash: 55cdbbecf75feb707d6de5360c1c7671e2740216
+    kubenix/hash: 8178d84cab55f066f91166a04d1d1d584c604512
   name: hermes-agent-dashboard
   namespace: apps
 spec:
@@ -133,7 +133,7 @@ metadata:
   labels:
     app: hermes-agent
     component: gateway
-    kubenix/hash: 55cdbbecf75feb707d6de5360c1c7671e2740216
+    kubenix/hash: 8178d84cab55f066f91166a04d1d1d584c604512
   name: hermes-agent-gateway
   namespace: apps
 spec:
@@ -345,6 +345,9 @@ spec:
               for db in /opt/data/*.db /opt/data/profiles/*/*.db /opt/data/profiles/*/cron/*.db /opt/data/cron/*.db /opt/data/kanban/boards/*/kanban.db; do
                 [ -f "$db" ] || continue
                 case "$db" in */lcm.db) continue ;; esac
+                # Header bytes 18-19 are "2 2" only for WAL. Each hermes CLI cold start costs
+                # ~40s on CephFS, so only invoke it for files that still need converting.
+                [ "$(od -An -tu1 -j18 -N2 "$db" 2>/dev/null | tr -s ' ')" = " 2 2" ] || continue
                 /opt/hermes/.venv/bin/hermes sessions set-journal-mode delete --db "$db" || true
               done
           env:
@@ -498,7 +501,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 55cdbbecf75feb707d6de5360c1c7671e2740216
+    kubenix/hash: 8178d84cab55f066f91166a04d1d1d584c604512
   name: hermes-agent-cli-wrapper
   namespace: apps
 ---
@@ -510,7 +513,7 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     app: hermes-agent
-    kubenix/hash: 55cdbbecf75feb707d6de5360c1c7671e2740216
+    kubenix/hash: 8178d84cab55f066f91166a04d1d1d584c604512
   name: hermes-agent-dashboard
   namespace: apps
 spec:
@@ -532,7 +535,7 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     app: hermes-agent
-    kubenix/hash: 55cdbbecf75feb707d6de5360c1c7671e2740216
+    kubenix/hash: 8178d84cab55f066f91166a04d1d1d584c604512
   name: hermes-agent-gateway
   namespace: apps
 spec:
@@ -553,7 +556,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 55cdbbecf75feb707d6de5360c1c7671e2740216
+    kubenix/hash: 8178d84cab55f066f91166a04d1d1d584c604512
   name: hermes-agent-dashboard
   namespace: apps
 spec:
@@ -582,7 +585,7 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     app: hermes-agent
-    kubenix/hash: 55cdbbecf75feb707d6de5360c1c7671e2740216
+    kubenix/hash: 8178d84cab55f066f91166a04d1d1d584c604512
   name: hermes-agent-readonly
 rules:
   - apiGroups:
@@ -624,7 +627,7 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     app: hermes-agent
-    kubenix/hash: 55cdbbecf75feb707d6de5360c1c7671e2740216
+    kubenix/hash: 8178d84cab55f066f91166a04d1d1d584c604512
   name: hermes-agent-readonly
 roleRef:
   apiGroup: rbac.authorization.k8s.io

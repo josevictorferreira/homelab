@@ -391,6 +391,9 @@ let
         for db in /opt/data/*.db /opt/data/profiles/*/*.db /opt/data/profiles/*/cron/*.db /opt/data/cron/*.db /opt/data/kanban/boards/*/kanban.db; do
           [ -f "$db" ] || continue
           case "$db" in */lcm.db) continue ;; esac
+          # Header bytes 18-19 are "2 2" only for WAL. Each hermes CLI cold start costs
+          # ~40s on CephFS, so only invoke it for files that still need converting.
+          [ "$(od -An -tu1 -j18 -N2 "$db" 2>/dev/null | tr -s ' ')" = " 2 2" ] || continue
           /opt/hermes/.venv/bin/hermes sessions set-journal-mode delete --db "$db" || true
         done
       ''
