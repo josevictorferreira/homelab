@@ -44,8 +44,11 @@ in
             { secretRef.name = bucketName; }
           ];
           env = [
-            # Solid Queue runs inside Puma. Generation is deliberately limited
-            # to one thread; keep the web/database pool bounded as well.
+            # Solid Queue runs inside Puma in async mode: dispatcher, scheduler
+            # and workers are threads of the Puma process (fork mode loaded
+            # Rails seven times, ~600 MiB idle). Generation is deliberately
+            # limited to one thread; the app sizes its database pools to
+            # RAILS_MAX_THREADS + 10 for the shared job threads.
             {
               name = "RAILS_MAX_THREADS";
               value = "8";
