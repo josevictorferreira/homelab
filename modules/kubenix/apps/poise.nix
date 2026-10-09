@@ -25,13 +25,15 @@ in
         secretName
         ;
       resources = {
+        # Solid Queue runs inside Puma in async mode (SOLID_QUEUE_IN_PUMA), so
+        # its dispatcher, scheduler and workers are threads of the Puma process
+        # (~150 MiB idle; fork mode loaded Rails six times, ~500 MiB). The
+        # vision and rating jobs — which base64 a whole photo into the request
+        # body — share this heap with the web threads.
         requests = {
           cpu = "100m";
-          memory = "512Mi";
+          memory = "256Mi";
         };
-        # Solid Queue runs inside Puma (SOLID_QUEUE_IN_PUMA), so the vision and
-        # rating jobs — which base64 a whole photo into the request body — share
-        # this container's heap with the web workers.
         limits = {
           cpu = "1000m";
           memory = "2Gi";
