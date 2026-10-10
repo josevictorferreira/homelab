@@ -282,6 +282,7 @@ let
                     title = "Agentic";
                     style = "scoreboard";
                     cache = "3h";
+                    show_thumbnails = true;
                     feed = kubenix.lib.secretsFor "reddit_agentic_feed";
                   }
                 ];
