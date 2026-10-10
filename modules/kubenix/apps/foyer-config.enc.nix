@@ -304,6 +304,15 @@ let
                     subreddit = "StableDiffusion";
                   }
                   {
+                    # Public custom feed; its path carries the reddit account
+                    # name, so it stays out of git.
+                    type = "reddit";
+                    title = "Agentic";
+                    style = "scoreboard";
+                    cache = "3h";
+                    feed = kubenix.lib.secretsFor "reddit_agentic_feed";
+                  }
+                  {
                     # Local news; the outlet names the town, so both the feed
                     # address and the tab title stay out of git.
                     type = "rss";
