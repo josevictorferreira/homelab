@@ -14,7 +14,7 @@ let
   namespace = homelab.kubernetes.namespaces.monitoring;
   bucketName = name;
   s3Secret = "${name}-s3";
-  retention = "336h"; # 14 days
+  retention = "168h"; # 7 days
 in
 {
   kubernetes = {
