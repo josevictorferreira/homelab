@@ -285,6 +285,22 @@ let
                     show_thumbnails = true;
                     feed = kubenix.lib.secretsFor "reddit_agentic_feed";
                   }
+                  {
+                    type = "reddit";
+                    title = "Maker";
+                    style = "scoreboard";
+                    cache = "3h";
+                    show_thumbnails = true;
+                    feed = kubenix.lib.secretsFor "reddit_maker_feed";
+                  }
+                  {
+                    type = "reddit";
+                    title = "Homelab";
+                    style = "scoreboard";
+                    cache = "3h";
+                    show_thumbnails = true;
+                    feed = kubenix.lib.secretsFor "reddit_homelab_feed";
+                  }
                 ];
               }
             ];
