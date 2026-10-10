@@ -35,12 +35,11 @@ in
       plugins = [
         {
           name = "barman-cloud.cloudnative-pg.io";
-          # Paused 2026-10-05: the Pi backup-pool is down (ZFS space-map panic), so
-          # archiving failed and WAL piled up. CNPG still calls ArchiveWAL on any
-          # enabled plugin, so the plugin itself is disabled. Restore both to true
-          # once MinIO is healthy, then take a fresh base backup.
-          enabled = false;
-          isWALArchiver = false;
+          # Re-enabled 2026-10-10 after the Pi backup-pool was recreated and MinIO
+          # restored. If the Pi goes down again, set both to false (CNPG calls
+          # ArchiveWAL on any enabled plugin) or WAL fills the volume.
+          enabled = true;
+          isWALArchiver = true;
           parameters.barmanObjectName = "pi-minio";
         }
       ];
