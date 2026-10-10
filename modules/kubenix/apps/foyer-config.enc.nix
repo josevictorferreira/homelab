@@ -276,34 +276,6 @@ let
                     limit = 15;
                   }
                   {
-                    type = "reddit";
-                    title = "r/selfhosted";
-                    style = "scoreboard";
-                    cache = "3h";
-                    subreddit = "selfhosted";
-                  }
-                  {
-                    type = "reddit";
-                    title = "r/LocalLLaMA";
-                    style = "scoreboard";
-                    cache = "3h";
-                    subreddit = "LocalLLaMA";
-                  }
-                  {
-                    type = "reddit";
-                    title = "r/functionalprint";
-                    style = "scoreboard";
-                    cache = "3h";
-                    subreddit = "functionalprint";
-                  }
-                  {
-                    type = "reddit";
-                    title = "r/StableDiffusion";
-                    style = "scoreboard";
-                    cache = "3h";
-                    subreddit = "StableDiffusion";
-                  }
-                  {
                     # Public custom feed; its path carries the reddit account
                     # name, so it stays out of git.
                     type = "reddit";
@@ -311,15 +283,6 @@ let
                     style = "scoreboard";
                     cache = "3h";
                     feed = kubenix.lib.secretsFor "reddit_agentic_feed";
-                  }
-                  {
-                    # Local news; the outlet names the town, so both the feed
-                    # address and the tab title stay out of git.
-                    type = "rss";
-                    title = kubenix.lib.secretsFor "local_news_title";
-                    cache = "30m";
-                    limit = 15;
-                    url = kubenix.lib.secretsFor "local_news_feed_url";
                   }
                 ];
               }
