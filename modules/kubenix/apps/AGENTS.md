@@ -115,3 +115,9 @@ kubectl exec -n apps deploy/<app> -- grep <marker> <mountPath>/<filename>
 4. Run `make manifests`
 5. Commit and push → Flux deploys
 6. Config-only change? Also `kubectl rollout restart deploy/myapp -n apps` (see above)
+
+## UPGRADING APP VERSIONS
+
+Use the `upgrading-homelab-packages` skill (`.agents/skills/upgrading-homelab-packages/SKILL.md`).
+Helper scripts: `scripts/github-latest-release.sh` (latest stable tag, filters beta/alpha/rc)
+and `scripts/github-tag-hash.sh` (commit SHA shown on the GitHub release page).
