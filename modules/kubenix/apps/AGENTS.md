@@ -119,5 +119,7 @@ kubectl exec -n apps deploy/<app> -- grep <marker> <mountPath>/<filename>
 ## UPGRADING APP VERSIONS
 
 Use the `upgrading-homelab-packages` skill (`.agents/skills/upgrading-homelab-packages/SKILL.md`).
-Helper scripts: `scripts/github-latest-release.sh` (latest stable tag, filters beta/alpha/rc)
-and `scripts/github-tag-hash.sh` (commit SHA shown on the GitHub release page).
+Helper scripts: `scripts/github-latest-release.sh` (latest stable tag, filters beta/alpha/rc),
+`scripts/github-tag-hash.sh` (commit SHA shown on the GitHub release page), and
+`scripts/image-digests.sh` (tells which digest level — amd64 child vs multi-arch index —
+an app's existing pin uses; conventions are per-app, not repo-wide).
