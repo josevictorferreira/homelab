@@ -247,6 +247,10 @@ in
     # Override nixos-server's firewall.enable = false
     networking.firewall = {
       enable = lib.mkForce true;
+      # Cilium TPROXY-marked traffic (Envoy ingress) resolves to a local route in
+      # table 2004; NixOS's rpfilter chain treats that as a failure and drops it,
+      # which breaks every ingress host for pods on this node.
+      checkReversePath = lib.mkForce false;
       # MinIO API+console: LAN interface only (end0)
       interfaces.end0.allowedTCPPorts = [
         9000
