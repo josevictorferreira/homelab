@@ -7,7 +7,7 @@ metadata:
   labels:
     app: hermes-agent
     component: dashboard
-    kubenix/hash: 8178d84cab55f066f91166a04d1d1d584c604512
+    kubenix/hash: e492743349818ceebebdfbb1096428963d443de8
   name: hermes-agent-dashboard
   namespace: apps
 spec:
@@ -43,7 +43,7 @@ spec:
           envFrom:
             - secretRef:
                 name: hermes-agent-env
-          image: docker.io/nousresearch/hermes-agent:v0.21.6@sha256:32d095e84190ae7266afbb361579e6921f2c633e899f5eacfb88111b9c851a22
+          image: docker.io/nousresearch/hermes-agent:rc.15-v0.21.7@sha256:3140cc382d3f21a18019d28a1f89efb2af21ae9f86364895ccc019c7c7f8a446
           imagePullPolicy: IfNotPresent
           livenessProbe:
             failureThreshold: 3
@@ -133,7 +133,7 @@ metadata:
   labels:
     app: hermes-agent
     component: gateway
-    kubenix/hash: 8178d84cab55f066f91166a04d1d1d584c604512
+    kubenix/hash: e492743349818ceebebdfbb1096428963d443de8
   name: hermes-agent-gateway
   namespace: apps
 spec:
@@ -285,7 +285,7 @@ spec:
           envFrom:
             - secretRef:
                 name: hermes-agent-env
-          image: docker.io/nousresearch/hermes-agent:v0.21.6@sha256:32d095e84190ae7266afbb361579e6921f2c633e899f5eacfb88111b9c851a22
+          image: docker.io/nousresearch/hermes-agent:rc.15-v0.21.7@sha256:3140cc382d3f21a18019d28a1f89efb2af21ae9f86364895ccc019c7c7f8a446
           imagePullPolicy: IfNotPresent
           name: gateway-multiplex
           resources:
@@ -424,7 +424,7 @@ spec:
               value: /opt/data
             - name: HERMES_HOME
               value: /opt/data
-          image: docker.io/nousresearch/hermes-agent:v0.21.6@sha256:32d095e84190ae7266afbb361579e6921f2c633e899f5eacfb88111b9c851a22
+          image: docker.io/nousresearch/hermes-agent:rc.15-v0.21.7@sha256:3140cc382d3f21a18019d28a1f89efb2af21ae9f86364895ccc019c7c7f8a446
           imagePullPolicy: IfNotPresent
           name: sqlite-journal-mode
           resources:
@@ -501,7 +501,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 8178d84cab55f066f91166a04d1d1d584c604512
+    kubenix/hash: e492743349818ceebebdfbb1096428963d443de8
   name: hermes-agent-cli-wrapper
   namespace: apps
 ---
@@ -513,7 +513,7 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     app: hermes-agent
-    kubenix/hash: 8178d84cab55f066f91166a04d1d1d584c604512
+    kubenix/hash: e492743349818ceebebdfbb1096428963d443de8
   name: hermes-agent-dashboard
   namespace: apps
 spec:
@@ -535,7 +535,7 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     app: hermes-agent
-    kubenix/hash: 8178d84cab55f066f91166a04d1d1d584c604512
+    kubenix/hash: e492743349818ceebebdfbb1096428963d443de8
   name: hermes-agent-gateway
   namespace: apps
 spec:
@@ -556,7 +556,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 8178d84cab55f066f91166a04d1d1d584c604512
+    kubenix/hash: e492743349818ceebebdfbb1096428963d443de8
   name: hermes-agent-dashboard
   namespace: apps
 spec:
@@ -585,7 +585,7 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     app: hermes-agent
-    kubenix/hash: 8178d84cab55f066f91166a04d1d1d584c604512
+    kubenix/hash: e492743349818ceebebdfbb1096428963d443de8
   name: hermes-agent-readonly
 rules:
   - apiGroups:
@@ -627,7 +627,7 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     app: hermes-agent
-    kubenix/hash: 8178d84cab55f066f91166a04d1d1d584c604512
+    kubenix/hash: e492743349818ceebebdfbb1096428963d443de8
   name: hermes-agent-readonly
 roleRef:
   apiGroup: rbac.authorization.k8s.io
