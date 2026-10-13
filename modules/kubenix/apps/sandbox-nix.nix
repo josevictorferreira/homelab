@@ -3,7 +3,7 @@
 let
   name = "sandbox-nix";
   namespace = homelab.kubernetes.namespaces.applications;
-  image = "ghcr.io/josevictorferreira/sandbox-nix:0.1.2@sha256:c42b77dba56348905a5adc3d0841a757bd62934fd273242f611404b03875682f";
+  image = "ghcr.io/josevictorferreira/sandbox-nix:0.1.3@sha256:8bac86da82680b74f2542f9cf134ca5c7dbcfb06bd49c336d1255d2807892d6b";
 
   # CephFS-backed workspace where project repos and task workspaces live, so
   # state (checkouts, generated files) persists across sessions.
@@ -31,13 +31,23 @@ let
   # helper expands $GITHUB_TOKEN at call time, so the value is not stored in the
   # config file itself.  Kept in the system-level config so the agent's own
   # ~/.gitconfig (commit identity) stays independent of it.
+  #
+  # The /nix store is root-owned single-user, so hermes-agent cannot open its
+  # lock and `nix develop` fails.  nix-daemon gives the agent multi-user access
+  # (non-root nix falls back to the daemon socket on its own); NIX_CONFIG is
+  # bridged through /etc/profile for the same reason as the tokens.  LANG keeps
+  # dev-shell Postgres clusters UTF8: under the C locale initdb picks SQL_ASCII
+  # and Rails cannot create its databases.
   entrypointWrapper = ''
     set -e
     umask 022
     {
       printf 'export GITHUB_TOKEN=%s\n' "$GITHUB_TOKEN"
       printf 'export GH_TOKEN=%s\n' "$GH_TOKEN"
+      printf "export NIX_CONFIG='%s'\n" "$NIX_CONFIG"
+      printf 'export LANG=C.UTF-8\n'
     } > /etc/profile
+    nix-daemon > /tmp/nix-daemon.log 2>&1 &
     chmod 444 /etc/profile
     {
       printf '[credential "https://github.com"]\n'

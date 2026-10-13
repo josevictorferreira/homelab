@@ -36,6 +36,10 @@ let
       [ -e "$out/usr/bin/$name" ] && continue
       ln -s "$f" "$out/usr/bin/$name"
     done
+    # Rails (tzinfo) only reads zoneinfo from fixed system paths; without it no
+    # Rails app or spec can boot in a dev shell here.
+    mkdir -p $out/usr/share
+    ln -s ${pkgs.tzdata}/share/zoneinfo $out/usr/share/zoneinfo
   '';
 
   # SSH host keys are generated at runtime so they persist across restarts on
@@ -147,7 +151,7 @@ let
 in
 pkgs.dockerTools.buildImage {
   name = "localhost/sandbox-nix";
-  tag = "0.1.2";
+  tag = "0.1.3";
   fromImage = baseImage;
   copyToRoot = [
     toolsRoot

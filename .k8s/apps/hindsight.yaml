@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: hindsight-api
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 836bc3ac2dae6bf71dfd167d683fde76e7e62445
+    kubenix/hash: fdc49c3638fd6c53333d4a0534376a3815963b65
     kubenix/module-instance: hindsight-api
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -91,7 +91,7 @@ spec:
           envFrom:
             - secretRef:
                 name: hindsight-secrets
-          image: ghcr.io/vectorize-io/hindsight-api:0.10.3@sha256:9174480a41edae0ad27d22346e12bb20bb7af2aba2edace95f2182d6143df29b
+          image: ghcr.io/vectorize-io/hindsight-api:1.0.0@sha256:0e96d2eb989051b0d2b28bbd5321c521a9b86c0af979d4d64373b654c1509e65
           imagePullPolicy: IfNotPresent
           livenessProbe:
             failureThreshold: 3
@@ -151,7 +151,7 @@ metadata:
     app.kubernetes.io/name: hindsight-api
     app.kubernetes.io/service: hindsight-api
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 836bc3ac2dae6bf71dfd167d683fde76e7e62445
+    kubenix/hash: fdc49c3638fd6c53333d4a0534376a3815963b65
     kubenix/module-instance: hindsight-api
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -180,7 +180,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: hindsight-api
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 836bc3ac2dae6bf71dfd167d683fde76e7e62445
+    kubenix/hash: fdc49c3638fd6c53333d4a0534376a3815963b65
     kubenix/module-instance: hindsight-api
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -216,7 +216,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: hindsight-cp
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 836bc3ac2dae6bf71dfd167d683fde76e7e62445
+    kubenix/hash: fdc49c3638fd6c53333d4a0534376a3815963b65
     kubenix/module-instance: hindsight-cp
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -253,7 +253,7 @@ spec:
           envFrom:
             - secretRef:
                 name: hindsight-secrets
-          image: ghcr.io/vectorize-io/hindsight-control-plane:0.10.3@sha256:bc2984e7bf27f4c84fbc2bb99271f0dfcbf607faad6a9358d817d0244cac7663
+          image: ghcr.io/vectorize-io/hindsight-control-plane:1.0.0@sha256:5d8035f2d4f5d5f9585275a4a739c1fb269715ad1d44e388e075d9ec36f35f12
           imagePullPolicy: IfNotPresent
           livenessProbe:
             failureThreshold: 3
@@ -303,7 +303,7 @@ metadata:
     app.kubernetes.io/name: hindsight-cp
     app.kubernetes.io/service: hindsight-cp
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 836bc3ac2dae6bf71dfd167d683fde76e7e62445
+    kubenix/hash: fdc49c3638fd6c53333d4a0534376a3815963b65
     kubenix/module-instance: hindsight-cp
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -332,7 +332,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: hindsight-cp
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: 836bc3ac2dae6bf71dfd167d683fde76e7e62445
+    kubenix/hash: fdc49c3638fd6c53333d4a0534376a3815963b65
     kubenix/module-instance: hindsight-cp
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -363,7 +363,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 836bc3ac2dae6bf71dfd167d683fde76e7e62445
+    kubenix/hash: fdc49c3638fd6c53333d4a0534376a3815963b65
   name: hindsight-reaper
   namespace: apps
 spec:
@@ -480,7 +480,7 @@ spec:
               envFrom:
                 - secretRef:
                     name: hindsight-secrets
-              image: ghcr.io/vectorize-io/hindsight-api:0.10.3@sha256:9174480a41edae0ad27d22346e12bb20bb7af2aba2edace95f2182d6143df29b
+              image: ghcr.io/vectorize-io/hindsight-api:1.0.0@sha256:0e96d2eb989051b0d2b28bbd5321c521a9b86c0af979d4d64373b654c1509e65
               imagePullPolicy: IfNotPresent
               name: hindsight-reaper
               resources:
@@ -501,7 +501,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 836bc3ac2dae6bf71dfd167d683fde76e7e62445
+    kubenix/hash: fdc49c3638fd6c53333d4a0534376a3815963b65
   name: hindsight-reaper
   namespace: apps
 ---
@@ -512,7 +512,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 836bc3ac2dae6bf71dfd167d683fde76e7e62445
+    kubenix/hash: fdc49c3638fd6c53333d4a0534376a3815963b65
   name: hindsight-reaper
   namespace: apps
 rules:
@@ -531,7 +531,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 836bc3ac2dae6bf71dfd167d683fde76e7e62445
+    kubenix/hash: fdc49c3638fd6c53333d4a0534376a3815963b65
   name: hindsight-reaper
   namespace: apps
 roleRef:
