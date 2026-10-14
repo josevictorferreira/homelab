@@ -35,13 +35,21 @@ The script excludes GitHub-marked prereleases/drafts AND tag names containing
 
 Watch for **version-scheme changes**: hermes switched from calendar tags
 (`v2026.9.x`) to semver (`v0.21.6`) — don't assume the old scheme matches what's
-published now.
+published now. Since hermes v0.22.0 a plain `vX.Y.Z` tag is published alongside
+the `rc.N-vX.Y.Z` attempt refs — prefer the plain tag when both exist and are
+byte-identical (in 0.21.3–0.21.7 mostly only rc.N refs existed).
 
 ### Container images without a GitHub release
 
 Check the registry tags (Docker Hub API or GHCR UI) and pick the newest tag that
 is not a prerelease, `latest`, or rolling. Note the tag format the app's `.nix`
 file already uses (`v` prefix or not — bookorbit has no `v`, immich does).
+
+Some apps publish no GitHub releases at all (searxng uses rolling date tags like
+`2026.10.13-22c64b8d3`); resolve those purely from the registry. For
+**digest-only pins** (searxng), tag identity is lost in the manifest — recover
+the running version from the container (`/config` endpoint or startup log)
+before upgrading, so you know the gap you're jumping.
 
 ## Digest Conventions (per-app, NOT repo-wide)
 
@@ -50,6 +58,7 @@ file already uses (`v` prefix or not — bookorbit has no `v`, immich does).
 | App | Pins |
 |---|---|
 | keycloak, hindsight, hermes-agent | **linux/amd64 child** digest |
+| searxng (Pi-hosted) | **linux/arm64 child** digest |
 | immich, bookorbit | **multi-arch index** digest |
 
 Before fetching the new digest, determine THIS app's convention by checking the
@@ -62,6 +71,17 @@ scripts/image-digests.sh <registry/repo>:<current-tag> --check sha256:<current-p
 
 Then get the new tag's digests and pick the level that matches. Mixing levels
 within an app's history makes verification and rollbacks confusing.
+
+**arm64-pinned apps (Pi-hosted)**: `image-digests.sh` only surfaces the amd64
+child, and its `--check` misreports an arm64 child pin as "the multi-arch index
+digest" (it doesn't distinguish). Get the arm64 child straight from the
+manifest list, and confirm an ambiguous existing pin by running it:
+
+```bash
+podman manifest inspect <registry/repo>:<tag> \
+  | jq -r '.manifests[] | select(.platform.architecture=="arm64") | .digest'
+podman run --rm --entrypoint '' <registry/repo>@sha256:<existing-pin> uname -m
+```
 
 ## Workflow
 
@@ -79,21 +99,36 @@ within an app's history makes verification and rollbacks confusing.
    - main image, init containers, sidecars
    - env vars that duplicate the version (immich has `IMMICH_VERSION` in its
      secrets file — an image bump alone leaves it stale)
-   - companion manifests sharing the image (hermes: gateway + kanban files;
-     hindsight: reaper CronJob inherits `apiImageRef` automatically)
-   - **do NOT bump** intentional contract pins: hermes kanban compatibility gate
-     stays at its plugin-contract baseline, not the deployed version
+   - companion manifests sharing the image (hindsight: reaper CronJob inherits
+     `apiImageRef` automatically; hermes kanban companion files were REMOVED at
+     v0.21.6 — don't look for them on newer versions)
+   - PVC-side version literals that must track the image: hermes' startup
+     bootstrap guards (pip package floors in `hermes-agent.nix`) — check
+     whether the new image's bundled/catalog plugin set moved the floor and
+     bump the guard to match, or the guard silently reinstalls a stale pin
+   - **do NOT bump** intentional contract pins that exist for compatibility
+     with something external, not for the app's own version
 
 3. **Pre-flight breaking changes** for major/minor jumps:
    - Release notes + upgrading guide (e.g. keycloak `/docs/latest/upgrading/`)
    - Env vars still valid? (imgproxy v4 removed deprecated `IMGPROXY_*` vars)
    - DB requirements? (immich v3 requires VectorChord — verify extensions before deploying)
-   - Removed features needing config cleanup? (searxng dropped the `tavily` engine)
+   - Removed features needing config cleanup? (searxng dropped the `tavily`
+     engine — its settings entry was silently NOT loading; verify engine entries
+     actually load via `kubectl exec ... wget -qO- http://localhost:8080/config`)
+   - Config-key renames may be non-fatal: check the new tag's loader code for
+     deprecated fallbacks (searxng `redis:` → `valkey:` still accepted via
+     `get_setting('redis.url')` fallback) before rewriting ConfigMaps
    - Runtime-interpreter drift for apps with PVC-mounted deps? (hermes image
      python 3.13→3.14 broke native modules in the CephFS user-site)
    - Boot-time maintenance on slow storage? (hermes ran DB VACUUM at startup on
      CephFS; the startup watchdog killed it mid-VACUUM → crash loop. Fix was an
      env knob: `HERMES_STARTUP_WATCHDOG_TIMEOUT_S`)
+   - Verify the contract surface directly at the new tag BEFORE deploying:
+     `curl raw.githubusercontent.com/<org>/<repo>/<tag-commit>/<path>` (HTTP 200
+     = module/key still exists) for CLI flags, env vars and config keys; and
+     `podman run --rm --entrypoint '' <new-image>` to inspect venv versions,
+     bundled plugins and `--help` output
    - Surface findings to the user BEFORE editing; don't silently assume fine.
 
 4. **Fetch digests** per the app's convention (see above).
@@ -152,6 +187,31 @@ within an app's history makes verification and rollbacks confusing.
   CephFS-walking init containers (12+ min in Init); etcd timeouts delay volume
   mounts. Check node/Ceph health before blaming the version bump.
 
+## Hermes-specific Contract Notes
+
+Hermes is the most contract-heavy app in the repo. On every image bump, verify
+these survive (all verified for 0.21.7→0.22.0; re-verify each time):
+
+- **Python minor pinned via PYTHONPATH**: the image ships a venv for a specific
+  python minor; the PVC user-site (`/opt/data/.local/lib/python3.X/site-packages`)
+  must match it or native modules break. Check the new image:
+  `podman run --rm --entrypoint '' <img> /usr/bin/env python3 -V`
+- **Bootstrap guards in `hermes-agent.nix`**: pip package floors installed into
+  the PVC user-site at startup. When a plugin moves from core to the catalog
+  (hindsight did), its `requires` floor may jump (0.6.1 → ≥0.10.1) — bump the
+  guard literal or the PVC keeps the stale shadowing pin. These literals do
+  NOT update themselves; check them every bump.
+- **Custom plugins on the PVC import core modules** (`agent.context_engine`,
+  `agent.tts_provider`, `plugins/dashboard_auth`...): fetch those files at the
+  new tag and confirm the imports still exist (HTTP 200 on raw.githubusercontent).
+- **Env contract**: `HERMES_MANAGED_DIR`, `HERMES_WRITE_SAFE_ROOT` (empty string,
+  NOT `/` — see AGENTS.md), `HERMES_UID/GID`, watchdog timeout, multiplex mode
+  (upstream default since 0.22.0; we already ran it).
+- **Webhook routes**: `/health`, `/webhooks/{route}`, `/p/<profile>/...` —
+  confirm in the new tag's route registration source or `--help`.
+- **Matrix bridge pins**: mautrix 0.21.1 / aiohttp 3.14.3 guards exist for a
+  reason — check the new image's venv before bumping them.
+
 ## Helm Chart Upgrades
 
 Charts are pinned separately from app versions — chart `version` ≠ app version.
@@ -168,8 +228,10 @@ chart deliberately:
 
 ## Verification Checklist
 
-- [ ] Digest level matches the app's existing convention (checked with `--check`)
-- [ ] All version occurrences updated (image(s), init containers, env vars)
+- [ ] Digest level matches the app's existing convention (checked with `--check`;
+      for arm64 apps, via `podman manifest inspect` + jq)
+- [ ] All version occurrences updated (image(s), init containers, env vars,
+      PVC-side guard literals for hermes)
 - [ ] Intentional contract pins NOT touched
 - [ ] Breaking changes reviewed / surfaced to user
 - [ ] `make manifests` clean; `.k8s/` diff = version changes only
