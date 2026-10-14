@@ -39,7 +39,7 @@ in
       };
       spec = {
         configuration = {
-          destinationPath = "s3://homelab-backup-postgres/cnpg/";
+          destinationPath = "s3://homelab-backup-postgres/cnpg";
           endpointURL = "http://10.10.10.209:9000";
           s3Credentials = {
             accessKeyId = {
@@ -56,6 +56,19 @@ in
           data.compression = "gzip";
         };
         retentionPolicy = "30d";
+        # The sidecar runs barman-cloud-backup (3 python processes), wal-archive
+        # and backup-delete at the same time; the namespace default of 256Mi
+        # OOM-killed it mid-backup (2026-10-10, "error reading from server: EOF").
+        instanceSidecarConfiguration.resources = {
+          requests = {
+            cpu = "100m";
+            memory = "128Mi";
+          };
+          limits = {
+            cpu = "1";
+            memory = "1Gi";
+          };
+        };
       };
     };
 
