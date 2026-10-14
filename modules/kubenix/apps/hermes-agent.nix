@@ -3,7 +3,7 @@
 let
   name = "hermes-agent";
   namespace = homelab.kubernetes.namespaces.applications;
-  image = "docker.io/nousresearch/hermes-agent:rc.15-v0.21.7@sha256:3140cc382d3f21a18019d28a1f89efb2af21ae9f86364895ccc019c7c7f8a446";
+  image = "docker.io/nousresearch/hermes-agent:v0.22.0@sha256:c50eef7ccc91db06cdfe729008f45267a7208d899c73dd257c19eb4a30450c7d";
   envFromSecret = [
     { secretRef.name = "${name}-env"; }
   ];
@@ -290,11 +290,13 @@ let
                         python3 -c "import importlib.metadata as m, sys; sys.exit(0 if m.version('mautrix') == '0.21.1' and m.version('aiohttp') == '3.14.3' else 1)" 2>/dev/null || {
                           python3 -m pip install --user --break-system-packages 'mautrix[encryption]==0.21.1' aiohttp==3.14.3 asyncpg aiosqlite Markdown aiohttp-socks 2>/dev/null || true
                         }
-                        # Bootstrap hindsight-client at the version the memory plugin pins.
-                        # The image bumps this pin on upgrade; the user-site copy on the PVC
-                        # persists the old version, so install the exact pin when it drifts.
-                        python3 -c "import importlib.metadata as m, sys; sys.exit(0 if m.version('hindsight-client') == '0.6.1' else 1)" 2>/dev/null || {
-                          python3 -m pip install --user --break-system-packages 'hindsight-client==0.6.1' 2>/dev/null || true
+                        # Bootstrap hindsight-client at the version the catalog memory
+                        # plugin requires (floor 0.10.1 since hindsight plugin 1.x; the
+                        # provider left core for the catalog). The plugin bumps this pin on
+                        # update; the user-site copy on the PVC persists the old version,
+                        # so install the exact pin when they drift.
+                        python3 -c "import importlib.metadata as m, sys; sys.exit(0 if m.version('hindsight-client') == '0.10.3' else 1)" 2>/dev/null || {
+                          python3 -m pip install --user --break-system-packages 'hindsight-client==0.10.3' 2>/dev/null || true
                         }
                         # Bootstrap kubectl if not present
                         command -v kubectl >/dev/null 2>&1 || {
