@@ -21,7 +21,7 @@ in
       values = {
         image = {
           repo = "ghcr.io/imgproxy/imgproxy";
-          tag = "v4.0.15@sha256:4ec770c72bffea108ba404dc86d3be88e6bf4fd58958782770ff890cca4c7a82";
+          tag = "v4.0.18@sha256:03aec6708216c3e017d7ad3fb08eba11d6b83be65556262f8d6cd72803fefeb6";
         };
 
         env = {
