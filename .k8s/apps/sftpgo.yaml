@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/name: sftpgo
     app.kubernetes.io/version: 2.7.4
     helm.sh/chart: sftpgo-0.47.0
-    kubenix/hash: 31624cc199a4dd1ce28376c9f7b62a5f605eb089
+    kubenix/hash: 17e8cb2aee0f6652e57ec3b7564623bef656516d
   name: sftpgo
   namespace: apps
 spec:
@@ -28,7 +28,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: ac5a1dbefc70364f206f0a8ec6728a1393aeeeb26afad988a0daba3db694437e
+        checksum/config: 402aed95d2a57bdfa78c5ef24221e6d2dc5cdf686bfdae7991fa2cee0afb3045
         homelab.io/relay-config-hash: b9f73f9064b21443921acac6f1474d245e47802d7fb0bd698da7033974f4b288
       labels:
         app.kubernetes.io/instance: sftpgo
@@ -171,7 +171,7 @@ spec:
 ---
 apiVersion: v1
 data:
-  sftpgo.json: '{"ftpd":{"bindings":[{"active_connections_security":1,"debug":true,"force_passive_ip":"10.10.10.115","passive_connections_security":1,"port":21,"tls_mode":0}],"passive_port_range":{"end":50009,"start":50000}},"sftpd":{"bindings":[{"port":22}],"max_auth_tries":4}}'
+  sftpgo.json: '{"common":{"umask":"002"},"ftpd":{"bindings":[{"active_connections_security":1,"debug":true,"force_passive_ip":"10.10.10.115","passive_connections_security":1,"port":21,"tls_mode":0}],"passive_port_range":{"end":50009,"start":50000}},"sftpd":{"bindings":[{"port":22}],"max_auth_tries":4}}'
 kind: ConfigMap
 metadata:
   annotations:
@@ -183,7 +183,7 @@ metadata:
     app.kubernetes.io/name: sftpgo
     app.kubernetes.io/version: 2.7.4
     helm.sh/chart: sftpgo-0.47.0
-    kubenix/hash: 31624cc199a4dd1ce28376c9f7b62a5f605eb089
+    kubenix/hash: 17e8cb2aee0f6652e57ec3b7564623bef656516d
   name: sftpgo
   namespace: apps
 ---
@@ -201,7 +201,7 @@ metadata:
     app.kubernetes.io/name: sftpgo
     app.kubernetes.io/version: 2.7.4
     helm.sh/chart: sftpgo-0.47.0
-    kubenix/hash: 31624cc199a4dd1ce28376c9f7b62a5f605eb089
+    kubenix/hash: 17e8cb2aee0f6652e57ec3b7564623bef656516d
   name: sftpgo
   namespace: apps
 spec:
@@ -226,7 +226,7 @@ metadata:
     app.kubernetes.io/name: sftpgo
     app.kubernetes.io/version: 2.7.4
     helm.sh/chart: sftpgo-0.47.0
-    kubenix/hash: 31624cc199a4dd1ce28376c9f7b62a5f605eb089
+    kubenix/hash: 17e8cb2aee0f6652e57ec3b7564623bef656516d
   name: sftpgo
   namespace: apps
 spec:
@@ -325,7 +325,7 @@ metadata:
     app.kubernetes.io/name: sftpgo
     app.kubernetes.io/version: 2.7.4
     helm.sh/chart: sftpgo-0.47.0
-    kubenix/hash: 31624cc199a4dd1ce28376c9f7b62a5f605eb089
+    kubenix/hash: 17e8cb2aee0f6652e57ec3b7564623bef656516d
   name: sftpgo
   namespace: apps
 ---
@@ -341,7 +341,7 @@ metadata:
     app.kubernetes.io/name: sftpgo
     app.kubernetes.io/version: 2.7.4
     helm.sh/chart: sftpgo-0.47.0
-    kubenix/hash: 31624cc199a4dd1ce28376c9f7b62a5f605eb089
+    kubenix/hash: 17e8cb2aee0f6652e57ec3b7564623bef656516d
   name: sftpgo-api
   namespace: apps
 spec:
@@ -374,7 +374,7 @@ metadata:
     app.kubernetes.io/name: sftpgo
     app.kubernetes.io/version: 2.7.4
     helm.sh/chart: sftpgo-0.47.0
-    kubenix/hash: 31624cc199a4dd1ce28376c9f7b62a5f605eb089
+    kubenix/hash: 17e8cb2aee0f6652e57ec3b7564623bef656516d
   name: sftpgo-ui
   namespace: apps
 spec:
@@ -393,4 +393,32 @@ spec:
   tls:
     - hosts:
         - sftpgo.josevictor.me
+      secretName: wildcard-tls
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    kubenix/hash: 17e8cb2aee0f6652e57ec3b7564623bef656516d
+  name: sftpgo-webdav
+  namespace: apps
+spec:
+  ingressClassName: cilium
+  rules:
+    - host: webdav.josevictor.me
+      http:
+        paths:
+          - backend:
+              service:
+                name: sftpgo
+                port:
+                  name: webdav
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - webdav.josevictor.me
       secretName: wildcard-tls

@@ -84,6 +84,9 @@ in
         };
 
         config = {
+          # Clients write into the shared CephFS space, which is shared through
+          # gid 2002, so new files must be group-writable (see CLAUDE.md).
+          common.umask = "002";
           sftpd = {
             max_auth_tries = 4;
             bindings = [
@@ -271,6 +274,39 @@ in
             }
           ];
         };
+      };
+    };
+
+    # The chart only ships ingresses for the UI and API. WebDAV gets its own
+    # host so phones can sync the Obsidian vault over HTTPS (Remotely Save).
+    resources.ingresses."${app}-webdav" = {
+      metadata = {
+        name = "${app}-webdav";
+        inherit namespace;
+      };
+      spec = {
+        ingressClassName = kubenix.lib.defaultIngressClass;
+        rules = [
+          {
+            host = "webdav.${homelab.domain}";
+            http.paths = [
+              {
+                path = "/";
+                pathType = "Prefix";
+                backend.service = {
+                  name = app;
+                  port.name = "webdav";
+                };
+              }
+            ];
+          }
+        ];
+        tls = [
+          {
+            hosts = [ "webdav.${homelab.domain}" ];
+            secretName = kubenix.lib.defaultTLSSecret;
+          }
+        ];
       };
     };
   };
