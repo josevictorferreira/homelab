@@ -3,7 +3,7 @@
 let
   name = "hermes-agent";
   namespace = homelab.kubernetes.namespaces.applications;
-  image = "docker.io/nousresearch/hermes-agent:v0.22.0@sha256:c50eef7ccc91db06cdfe729008f45267a7208d899c73dd257c19eb4a30450c7d";
+  image = "docker.io/nousresearch/hermes-agent:v0.22.2@sha256:a11574b7fe8e1631d7d88d556677dac693bc058abf558cdeb899155688c1bf05";
   envFromSecret = [
     { secretRef.name = "${name}-env"; }
   ];
