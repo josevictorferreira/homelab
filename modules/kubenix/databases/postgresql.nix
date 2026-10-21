@@ -22,9 +22,10 @@ in
       enableSuperuserAccess = true;
       superuserSecret.name = "postgresql-superuser";
       inherit (pg) storage resources;
-      # Grown from 8Gi on 2026-10-05: WAL filled up while archiving to the Pi
-      # failed, and CNPG refuses to start PostgreSQL without WAL free space.
-      walStorage = pg.walStorage // { size = "12Gi"; };
+      # Grown from 8Gi on 2026-10-05 and to 16Gi on 2026-10-21: WAL filled up
+      # while archiving to the Pi failed, and CNPG refuses to start PostgreSQL
+      # without WAL free space (the PVC then has to be patched by hand).
+      walStorage = pg.walStorage // { size = "16Gi"; };
       postgresql = pg.postgresql // {
         parameters = pg.postgresql.parameters // {
           # Bulk restore: fewer checkpoints while data streams in.

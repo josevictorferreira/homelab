@@ -5,7 +5,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 9d3ff71773213ed590d56931d13233904e319677
+    kubenix/hash: 882c74f7cee7470c7a395f63cdbafee5c75e0d1f
   name: postgresql
   namespace: databases
 spec:
@@ -88,5 +88,5 @@ spec:
   superuserSecret:
     name: postgresql-superuser
   walStorage:
-    size: 12Gi
+    size: 16Gi
     storageClass: rook-ceph-block
