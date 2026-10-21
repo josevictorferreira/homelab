@@ -170,8 +170,10 @@ in
             replicas = 1;
             podMonitorSelectorNilUsesHelmValues = false;
             serviceMonitorSelectorNilUsesHelmValues = false;
-            retention = "15d";
-            retentionSize = "40GiB";
+            # 2026-10-21: 40GiB left no headroom for the WAL on the 50Gi volume
+            # (ENOSPC crash loop) while Ceph itself was full.
+            retention = "7d";
+            retentionSize = "20GiB";
             # 2026-10-06: WAL replay on Ceph outlasted the operator's default
             # 15 min startup probe, so the pod was killed mid-replay (exit 137)
             # in a loop and the WAL never got compacted. Allow one hour.

@@ -37,7 +37,6 @@
       mcpo = "10.10.10.126";
       glance = "10.10.10.127";
       ollama = "10.10.10.128";
-      llama-cpp = "10.10.10.129";
       openrouter-proxy = "10.10.10.130";
       valoris-backend = "10.10.10.131";
       valoris-worker = "10.10.10.132";
