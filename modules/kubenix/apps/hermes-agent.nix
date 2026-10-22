@@ -560,6 +560,19 @@ in
                 };
               };
               securityContext = commonSecurityContext;
+              # v0.22.4 mounts plugin API routes and sets up the auth gate at
+              # boot; on CephFS that takes >2min, longer than the liveness probe's
+              # 30s+30s*3 window. Give startup its own generous probe so liveness
+              # only applies once the port actually binds.
+              startupProbe = {
+                tcpSocket = {
+                  port = 9119;
+                };
+                initialDelaySeconds = 30;
+                periodSeconds = 15;
+                timeoutSeconds = 5;
+                failureThreshold = 40;
+              };
               readinessProbe = {
                 tcpSocket = {
                   port = 9119;
