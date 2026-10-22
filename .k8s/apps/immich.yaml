@@ -11,7 +11,7 @@ metadata:
     app.kubernetes.io/name: server
     app.kubernetes.io/version: v2.0.0
     helm.sh/chart: immich-0.10.3
-    kubenix/hash: 69a080f28970bdc443eb592683921f9cb5c95ffa
+    kubenix/hash: 171819ec62619c2c1a1e30a0fc5d422f6b939cec
   name: immich-server
   namespace: apps
 spec:
@@ -47,7 +47,7 @@ spec:
           envFrom:
             - secretRef:
                 name: immich-secret
-          image: ghcr.io/immich-app/immich-server:v3.3.4@sha256:f6475c58b07a8d89ec845aa8782731d36656c3c17d943e0a101dc6ed99a2e53f
+          image: ghcr.io/immich-app/immich-server:v3.3.5@sha256:485d546a2e31d6a8b4db8423fcba5c109de8c218d93410af115fd1ccfc4352a6
           imagePullPolicy: IfNotPresent
           livenessProbe:
             failureThreshold: 3
@@ -130,7 +130,7 @@ metadata:
     app.kubernetes.io/name: immich
     app.kubernetes.io/version: v2.0.0
     helm.sh/chart: immich-0.10.3
-    kubenix/hash: 69a080f28970bdc443eb592683921f9cb5c95ffa
+    kubenix/hash: 171819ec62619c2c1a1e30a0fc5d422f6b939cec
   name: immich-immich-config
   namespace: apps
 ---
@@ -149,7 +149,7 @@ metadata:
     app.kubernetes.io/service: immich-server
     app.kubernetes.io/version: v2.0.0
     helm.sh/chart: immich-0.10.3
-    kubenix/hash: 69a080f28970bdc443eb592683921f9cb5c95ffa
+    kubenix/hash: 171819ec62619c2c1a1e30a0fc5d422f6b939cec
   name: immich-server
   namespace: apps
 spec:
@@ -184,7 +184,7 @@ metadata:
     app.kubernetes.io/name: server
     app.kubernetes.io/version: v2.0.0
     helm.sh/chart: immich-0.10.3
-    kubenix/hash: 69a080f28970bdc443eb592683921f9cb5c95ffa
+    kubenix/hash: 171819ec62619c2c1a1e30a0fc5d422f6b939cec
   name: immich-server
   namespace: apps
 spec:
@@ -216,7 +216,7 @@ metadata:
     app.kubernetes.io/name: server
     app.kubernetes.io/version: v2.0.0
     helm.sh/chart: immich-0.10.3
-    kubenix/hash: 69a080f28970bdc443eb592683921f9cb5c95ffa
+    kubenix/hash: 171819ec62619c2c1a1e30a0fc5d422f6b939cec
   name: immich-server
   namespace: apps
 spec:

@@ -5,7 +5,7 @@ let
   secretName = "hindsight-secrets";
   apiImage = {
     repository = "ghcr.io/vectorize-io/hindsight-api";
-    tag = "1.0.0@sha256:0e96d2eb989051b0d2b28bbd5321c521a9b86c0af979d4d64373b654c1509e65";
+    tag = "1.1.0@sha256:c6335e2e08348133d2da15d7f92b07fe3c92c3718d284e7be85635c1a14a7605";
     pullPolicy = "IfNotPresent";
   };
   apiImageRef = "${apiImage.repository}:${apiImage.tag}";
@@ -119,7 +119,7 @@ in
         inherit namespace;
         image = {
           repository = "ghcr.io/vectorize-io/hindsight-control-plane";
-          tag = "1.0.0@sha256:5d8035f2d4f5d5f9585275a4a739c1fb269715ad1d44e388e075d9ec36f35f12";
+          tag = "1.1.0@sha256:2d4062346db80c61ee2f14b2c6314870dae1368ecfbf67eae4ed8247d0ab84a0";
           pullPolicy = "IfNotPresent";
         };
         port = 3000;
