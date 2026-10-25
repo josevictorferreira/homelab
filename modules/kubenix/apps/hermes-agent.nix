@@ -3,7 +3,7 @@
 let
   name = "hermes-agent";
   namespace = homelab.kubernetes.namespaces.applications;
-  image = "docker.io/nousresearch/hermes-agent:v0.22.4@sha256:a04cf256fecbb24add4db2ae1840d6b65cf37b8dc9b9c290b0cde516e44e67fa";
+  image = "docker.io/nousresearch/hermes-agent:v0.22.5@sha256:fd822bae0a61bf023450737edbeaeea5fc6460f17cb4ee240a7e67b306ed63fb";
   envFromSecret = [
     { secretRef.name = "${name}-env"; }
   ];
@@ -272,8 +272,8 @@ let
                         # Bootstrap Matrix dependencies at the versions the platform pins.
                         # The image bumps these pins on upgrade; the user-site copies on the
                         # PVC persist the old versions, so install the exact pins when they drift.
-                        python3 -c "import importlib.metadata as m, sys; sys.exit(0 if m.version('mautrix') == '0.21.1' and m.version('aiohttp') == '3.14.3' else 1)" 2>/dev/null || {
-                          python3 -m pip install --user --break-system-packages 'mautrix[encryption]==0.21.1' aiohttp==3.14.3 asyncpg aiosqlite Markdown aiohttp-socks 2>/dev/null || true
+                        python3 -c "import importlib.metadata as m, sys; sys.exit(0 if m.version('mautrix') == '0.21.1' and m.version('aiohttp') == '3.14.5' else 1)" 2>/dev/null || {
+                          python3 -m pip install --user --break-system-packages 'mautrix[encryption]==0.21.1' aiohttp==3.14.5 asyncpg aiosqlite Markdown aiohttp-socks 2>/dev/null || true
                         }
                         # Bootstrap hindsight-client at the version the catalog memory
                         # plugin requires (floor 0.10.1 since hindsight plugin 1.x; the

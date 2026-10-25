@@ -7,7 +7,7 @@ metadata:
   labels:
     app: hermes-agent
     component: dashboard
-    kubenix/hash: d4ab1faecd90fd2233cd3dd3ca2d68a65f0d2cd4
+    kubenix/hash: 7b74cbaafa80f9496cd409a5cd3fa8251cabb35a
   name: hermes-agent-dashboard
   namespace: apps
 spec:
@@ -43,7 +43,7 @@ spec:
           envFrom:
             - secretRef:
                 name: hermes-agent-env
-          image: docker.io/nousresearch/hermes-agent:v0.22.4@sha256:a04cf256fecbb24add4db2ae1840d6b65cf37b8dc9b9c290b0cde516e44e67fa
+          image: docker.io/nousresearch/hermes-agent:v0.22.5@sha256:fd822bae0a61bf023450737edbeaeea5fc6460f17cb4ee240a7e67b306ed63fb
           imagePullPolicy: IfNotPresent
           livenessProbe:
             failureThreshold: 3
@@ -140,7 +140,7 @@ metadata:
   labels:
     app: hermes-agent
     component: gateway
-    kubenix/hash: d4ab1faecd90fd2233cd3dd3ca2d68a65f0d2cd4
+    kubenix/hash: 7b74cbaafa80f9496cd409a5cd3fa8251cabb35a
   name: hermes-agent-gateway
   namespace: apps
 spec:
@@ -176,8 +176,8 @@ spec:
                               # Bootstrap Matrix dependencies at the versions the platform pins.
                               # The image bumps these pins on upgrade; the user-site copies on the
                               # PVC persist the old versions, so install the exact pins when they drift.
-                              python3 -c "import importlib.metadata as m, sys; sys.exit(0 if m.version('mautrix') == '0.21.1' and m.version('aiohttp') == '3.14.3' else 1)" 2>/dev/null || {
-                                python3 -m pip install --user --break-system-packages 'mautrix[encryption]==0.21.1' aiohttp==3.14.3 asyncpg aiosqlite Markdown aiohttp-socks 2>/dev/null || true
+                              python3 -c "import importlib.metadata as m, sys; sys.exit(0 if m.version('mautrix') == '0.21.1' and m.version('aiohttp') == '3.14.5' else 1)" 2>/dev/null || {
+                                python3 -m pip install --user --break-system-packages 'mautrix[encryption]==0.21.1' aiohttp==3.14.5 asyncpg aiosqlite Markdown aiohttp-socks 2>/dev/null || true
                               }
                               # Bootstrap hindsight-client at the version the catalog memory
                               # plugin requires (floor 0.10.1 since hindsight plugin 1.x; the
@@ -287,7 +287,7 @@ spec:
           envFrom:
             - secretRef:
                 name: hermes-agent-env
-          image: docker.io/nousresearch/hermes-agent:v0.22.4@sha256:a04cf256fecbb24add4db2ae1840d6b65cf37b8dc9b9c290b0cde516e44e67fa
+          image: docker.io/nousresearch/hermes-agent:v0.22.5@sha256:fd822bae0a61bf023450737edbeaeea5fc6460f17cb4ee240a7e67b306ed63fb
           imagePullPolicy: IfNotPresent
           name: gateway-multiplex
           resources:
@@ -419,7 +419,7 @@ spec:
               value: /opt/data
             - name: HERMES_HOME
               value: /opt/data
-          image: docker.io/nousresearch/hermes-agent:v0.22.4@sha256:a04cf256fecbb24add4db2ae1840d6b65cf37b8dc9b9c290b0cde516e44e67fa
+          image: docker.io/nousresearch/hermes-agent:v0.22.5@sha256:fd822bae0a61bf023450737edbeaeea5fc6460f17cb4ee240a7e67b306ed63fb
           imagePullPolicy: IfNotPresent
           name: sqlite-journal-mode
           resources:
@@ -496,7 +496,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: d4ab1faecd90fd2233cd3dd3ca2d68a65f0d2cd4
+    kubenix/hash: 7b74cbaafa80f9496cd409a5cd3fa8251cabb35a
   name: hermes-agent-cli-wrapper
   namespace: apps
 ---
@@ -508,7 +508,7 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     app: hermes-agent
-    kubenix/hash: d4ab1faecd90fd2233cd3dd3ca2d68a65f0d2cd4
+    kubenix/hash: 7b74cbaafa80f9496cd409a5cd3fa8251cabb35a
   name: hermes-agent-dashboard
   namespace: apps
 spec:
@@ -530,7 +530,7 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     app: hermes-agent
-    kubenix/hash: d4ab1faecd90fd2233cd3dd3ca2d68a65f0d2cd4
+    kubenix/hash: 7b74cbaafa80f9496cd409a5cd3fa8251cabb35a
   name: hermes-agent-gateway
   namespace: apps
 spec:
@@ -551,7 +551,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: d4ab1faecd90fd2233cd3dd3ca2d68a65f0d2cd4
+    kubenix/hash: 7b74cbaafa80f9496cd409a5cd3fa8251cabb35a
   name: hermes-agent-dashboard
   namespace: apps
 spec:
@@ -580,7 +580,7 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     app: hermes-agent
-    kubenix/hash: d4ab1faecd90fd2233cd3dd3ca2d68a65f0d2cd4
+    kubenix/hash: 7b74cbaafa80f9496cd409a5cd3fa8251cabb35a
   name: hermes-agent-readonly
 rules:
   - apiGroups:
@@ -622,7 +622,7 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     app: hermes-agent
-    kubenix/hash: d4ab1faecd90fd2233cd3dd3ca2d68a65f0d2cd4
+    kubenix/hash: 7b74cbaafa80f9496cd409a5cd3fa8251cabb35a
   name: hermes-agent-readonly
 roleRef:
   apiGroup: rbac.authorization.k8s.io
