@@ -86,47 +86,62 @@ in
             TRUST_PROXY = "1";
             PAPERCLIP_TELEMETRY_DISABLED = "1";
           };
-          probes = {
-            # /api/liveness is process-only (503 until startup recovery is
-            # done): cheap, no SQL, no auth.
-            startup = {
-              enabled = true;
-              custom = true;
-              spec = {
-                httpGet = {
-                  path = "/api/liveness";
-                  inherit port;
+          probes =
+            let
+              # private-hostname-guard 403s any Host not in the allow set
+              # (PAPERCLIP_PUBLIC_URL's host is allowed); kube-probes default
+              # to Host: <pod-ip>, so pin the header explicitly.
+              probeHeaders = [
+                {
+                  name = "Host";
+                  value = kubenix.lib.domainFor app;
+                }
+              ];
+            in
+            {
+              # /api/liveness is process-only (503 until startup recovery is
+              # done): cheap, no SQL, no auth.
+              startup = {
+                enabled = true;
+                custom = true;
+                spec = {
+                  httpGet = {
+                    path = "/api/liveness";
+                    inherit port;
+                    httpHeaders = probeHeaders;
+                  };
+                  periodSeconds = 10;
+                  failureThreshold = 36; # 6 min: first boot runs migrations
                 };
-                periodSeconds = 10;
-                failureThreshold = 36; # 6 min: first boot runs migrations
+              };
+              liveness = {
+                enabled = true;
+                custom = true;
+                spec = {
+                  httpGet = {
+                    path = "/api/liveness";
+                    inherit port;
+                    httpHeaders = probeHeaders;
+                  };
+                  periodSeconds = 30;
+                  failureThreshold = 3;
+                };
+              };
+              # /api/health probes the database (503 when unreachable).
+              readiness = {
+                enabled = true;
+                custom = true;
+                spec = {
+                  httpGet = {
+                    path = "/api/health";
+                    inherit port;
+                    httpHeaders = probeHeaders;
+                  };
+                  periodSeconds = 15;
+                  failureThreshold = 4;
+                };
               };
             };
-            liveness = {
-              enabled = true;
-              custom = true;
-              spec = {
-                httpGet = {
-                  path = "/api/liveness";
-                  inherit port;
-                };
-                periodSeconds = 30;
-                failureThreshold = 3;
-              };
-            };
-            # /api/health probes the database (503 when unreachable).
-            readiness = {
-              enabled = true;
-              custom = true;
-              spec = {
-                httpGet = {
-                  path = "/api/health";
-                  inherit port;
-                };
-                periodSeconds = 15;
-                failureThreshold = 4;
-              };
-            };
-          };
         };
       };
     };
