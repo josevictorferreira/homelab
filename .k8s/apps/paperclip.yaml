@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: paperclip
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: fa715c29ebbfbedd785e2cf375472a07c4407146
+    kubenix/hash: 91a40ec90a90ff891ace6a2ba6ef566c58ee8aef
     kubenix/module-instance: paperclip
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -68,7 +68,7 @@ spec:
               httpHeaders:
                 - name: Host
                   value: paperclip.josevictor.me
-              path: /api/liveness
+              path: /api/health
               port: 3100
             periodSeconds: 30
           name: main
@@ -98,7 +98,7 @@ spec:
               httpHeaders:
                 - name: Host
                   value: paperclip.josevictor.me
-              path: /api/liveness
+              path: /api/health
               port: 3100
             periodSeconds: 10
           volumeMounts:
@@ -156,7 +156,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: paperclip
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: fa715c29ebbfbedd785e2cf375472a07c4407146
+    kubenix/hash: 91a40ec90a90ff891ace6a2ba6ef566c58ee8aef
     kubenix/module-instance: paperclip
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -184,7 +184,7 @@ metadata:
     app.kubernetes.io/name: paperclip
     app.kubernetes.io/service: paperclip
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: fa715c29ebbfbedd785e2cf375472a07c4407146
+    kubenix/hash: 91a40ec90a90ff891ace6a2ba6ef566c58ee8aef
     kubenix/module-instance: paperclip
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -213,7 +213,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: paperclip
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: fa715c29ebbfbedd785e2cf375472a07c4407146
+    kubenix/hash: 91a40ec90a90ff891ace6a2ba6ef566c58ee8aef
     kubenix/module-instance: paperclip
     kubenix/module-name: release
     kubenix/module-version: 1.0.0

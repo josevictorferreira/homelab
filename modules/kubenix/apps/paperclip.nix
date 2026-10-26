@@ -99,14 +99,15 @@ in
               ];
             in
             {
-              # /api/liveness is process-only (503 until startup recovery is
-              # done): cheap, no SQL, no auth.
+              # /api/health serves both roles in this release: 200 once
+              # serving, 503 when the DB is unreachable. The process-only
+              # /api/liveness route only exists in newer images.
               startup = {
                 enabled = true;
                 custom = true;
                 spec = {
                   httpGet = {
-                    path = "/api/liveness";
+                    path = "/api/health";
                     inherit port;
                     httpHeaders = probeHeaders;
                   };
@@ -119,7 +120,7 @@ in
                 custom = true;
                 spec = {
                   httpGet = {
-                    path = "/api/liveness";
+                    path = "/api/health";
                     inherit port;
                     httpHeaders = probeHeaders;
                   };
