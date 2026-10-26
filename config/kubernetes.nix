@@ -72,6 +72,7 @@
       bookorbit = "10.10.10.160";
       glyph = "10.10.10.162";
       glyph-frontend = "10.10.10.168";
+      paperclip = "10.10.10.169";
       foyer = "10.10.10.163";
       ideator = "10.10.10.164";
       sable = "10.10.10.166";
@@ -109,6 +110,7 @@
       "ideator_production_queue"
       "ideator_production_cable"
       "glyph"
+      "paperclip"
     ];
   };
 

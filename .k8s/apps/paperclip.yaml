@@ -1,0 +1,229 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/controller: main
+    app.kubernetes.io/instance: paperclip
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: paperclip
+    helm.sh/chart: app-template-4.2.0
+    kubenix/hash: 996a0d161a7e901832233fd10d90f71648584b0b
+    kubenix/module-instance: paperclip
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: paperclip
+  namespace: apps
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/controller: main
+      app.kubernetes.io/instance: paperclip
+      app.kubernetes.io/name: paperclip
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/controller: main
+        app.kubernetes.io/instance: paperclip
+        app.kubernetes.io/name: paperclip
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app: paperclip
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+      automountServiceAccountToken: true
+      containers:
+        - env:
+            - name: PAPERCLIP_DEPLOYMENT_EXPOSURE
+              value: private
+            - name: PAPERCLIP_DEPLOYMENT_MODE
+              value: authenticated
+            - name: PAPERCLIP_MIGRATION_AUTO_APPLY
+              value: "true"
+            - name: PAPERCLIP_PUBLIC_URL
+              value: https://paperclip.josevictor.me
+            - name: PAPERCLIP_TELEMETRY_DISABLED
+              value: "1"
+            - name: TRUST_PROXY
+              value: "1"
+          envFrom:
+            - secretRef:
+                name: paperclip-env
+          image: ghcr.io/paperclipai/paperclip:2026.1023.0@sha256:40f46940c4612ead131aebe6079cd4651f8cd1434af49f7c621887f4a452a62e
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /api/liveness
+              port: 3100
+            periodSeconds: 30
+          name: main
+          ports:
+            - containerPort: 3100
+              name: http
+              protocol: TCP
+          readinessProbe:
+            failureThreshold: 4
+            httpGet:
+              path: /api/health
+              port: 3100
+            periodSeconds: 15
+          resources:
+            limits:
+              cpu: "2"
+              memory: 4Gi
+            requests:
+              cpu: 500m
+              memory: 1Gi
+          startupProbe:
+            failureThreshold: 36
+            httpGet:
+              path: /api/liveness
+              port: 3100
+            periodSeconds: 10
+          volumeMounts:
+            - mountPath: /paperclip
+              name: main
+      dnsPolicy: ClusterFirst
+      enableServiceLinks: false
+      hostIPC: false
+      hostNetwork: false
+      hostPID: false
+      imagePullSecrets:
+        - name: ghcr-registry-secret
+      initContainers:
+        - command:
+            - sh
+            - -c
+            - |
+              until pg_isready -h postgresql-rw.databases.svc.cluster.local -p 5432 -U postgres; do
+                echo "waiting for postgresql..."
+                sleep 3
+              done
+          image: docker.io/library/postgres:18-alpine
+          name: wait-for-postgres
+          resources:
+            limits:
+              cpu: 100m
+              memory: 64Mi
+            requests:
+              cpu: 50m
+              memory: 64Mi
+          volumeMounts:
+            - mountPath: /paperclip
+              name: main
+      securityContext:
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+        runAsGroup: 1000
+        runAsNonRoot: true
+        runAsUser: 1000
+      serviceAccountName: default
+      terminationGracePeriodSeconds: 120
+      volumes:
+        - name: main
+          persistentVolumeClaim:
+            claimName: paperclip
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: paperclip
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: paperclip
+    helm.sh/chart: app-template-4.2.0
+    kubenix/hash: 996a0d161a7e901832233fd10d90f71648584b0b
+    kubenix/module-instance: paperclip
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: paperclip
+  namespace: apps
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: rook-ceph-block
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+    lbipam.cilium.io/ips: 10.10.10.169
+    lbipam.cilium.io/sharing-key: paperclip
+  labels:
+    app.kubernetes.io/instance: paperclip
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: paperclip
+    app.kubernetes.io/service: paperclip
+    helm.sh/chart: app-template-4.2.0
+    kubenix/hash: 996a0d161a7e901832233fd10d90f71648584b0b
+    kubenix/module-instance: paperclip
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: paperclip
+  namespace: apps
+spec:
+  ports:
+    - name: http
+      port: 3100
+      protocol: TCP
+      targetPort: 3100
+  selector:
+    app.kubernetes.io/controller: main
+    app.kubernetes.io/instance: paperclip
+    app.kubernetes.io/name: paperclip
+  type: LoadBalancer
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: paperclip
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: paperclip
+    helm.sh/chart: app-template-4.2.0
+    kubenix/hash: 996a0d161a7e901832233fd10d90f71648584b0b
+    kubenix/module-instance: paperclip
+    kubenix/module-name: release
+    kubenix/module-version: 1.0.0
+  name: paperclip
+  namespace: apps
+spec:
+  ingressClassName: cilium
+  rules:
+    - host: paperclip.josevictor.me
+      http:
+        paths:
+          - backend:
+              service:
+                name: paperclip
+                port:
+                  number: 3100
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - paperclip.josevictor.me
+      secretName: wildcard-tls
