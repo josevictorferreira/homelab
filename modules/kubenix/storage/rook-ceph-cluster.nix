@@ -18,8 +18,6 @@ let
         attrs.disks;
     })
     storageNodes;
-  monitorGroupName = "k8s-storage"; # Name of the node group to run monitors on
-  monitorHostNames = homelab.nodes.group.${monitorGroupName}.names;
 in
 {
   kubernetes = {
@@ -85,7 +83,9 @@ in
               failureThreshold = 10;
             };
           };
-          mon.count = builtins.length monitorHostNames;
+          # Fixed at 3 (alpha, beta, delta): a 4th storage node would make the
+          # quorum even and put a mon on lab-gamma-wk, which resets under load.
+          mon.count = 3;
           mon.allowMultiplePerNode = false;
           dashboard.enabled = true;
           dashboard.ssl = false;
@@ -177,6 +177,10 @@ in
             # mclock auto-benchmarked these disks at ~32k IOPS, which is nonsense
             # for this hardware and let it schedule far too much recovery work,
             # so pin a realistic capacity and favour client I/O over backfill.
+            # lab-gamma-wk has ~7.6Gi and a history of memory-pressure evictions.
+            "osd/host:lab-gamma-wk" = {
+              osd_memory_target = "1610612736";
+            };
             "osd/host:lab-alpha-cp" = {
               osd_mclock_profile = "high_client_ops";
               osd_mclock_max_capacity_iops_ssd = "1500";

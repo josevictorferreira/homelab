@@ -102,12 +102,17 @@ rec {
         ipAddress = "10.10.20.202";
         mac = "00:E0:4C:68:09:01";
       };
-      # No OSDs: the consumer SSD/HDD on this node corrupted RocksDB twice after
-      # unclean resets (osd.5 2026-09-15, osd.3 2026-10-01); both were purged 2026-10-05.
+      # Only the Kingston A400 added 2026-10-27. The old CEPH_OSD_NVME partition on
+      # the boot SSD stays unused: it and the HDD corrupted RocksDB twice after
+      # unclean resets (osd.5 2026-09-15, osd.3 2026-10-01).
+      disks = [
+        "/dev/disk/by-partlabel/CEPH_OSD_SATA"
+      ];
       roles = [
         "nixos-server"
         "system-admin"
         "k8s-server"
+        "k8s-storage"
         "k8s-worker"
         "tailscale"
       ];
