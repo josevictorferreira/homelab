@@ -5,7 +5,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 99c8c63529f6491096e1ced3091551ecbbbaf344
+    kubenix/hash: 7ee66f450b5838395f934b4dba751525c2b969fb
   name: rook-ceph-cephfs-csi-ceph-com-ctrlplugin-sa
   namespace: rook-ceph
 ---
@@ -16,7 +16,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 99c8c63529f6491096e1ced3091551ecbbbaf344
+    kubenix/hash: 7ee66f450b5838395f934b4dba751525c2b969fb
   name: rook-ceph-cephfs-csi-ceph-com-nodeplugin-sa
   namespace: rook-ceph
 ---
@@ -27,7 +27,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 99c8c63529f6491096e1ced3091551ecbbbaf344
+    kubenix/hash: 7ee66f450b5838395f934b4dba751525c2b969fb
   name: rook-ceph-rbd-csi-ceph-com-ctrlplugin-sa
   namespace: rook-ceph
 ---
@@ -38,7 +38,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 99c8c63529f6491096e1ced3091551ecbbbaf344
+    kubenix/hash: 7ee66f450b5838395f934b4dba751525c2b969fb
   name: rook-ceph-rbd-csi-ceph-com-nodeplugin-sa
   namespace: rook-ceph
 ---
@@ -49,7 +49,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 99c8c63529f6491096e1ced3091551ecbbbaf344
+    kubenix/hash: 7ee66f450b5838395f934b4dba751525c2b969fb
   name: rook-ceph.cephfs.csi.ceph.com
   namespace: rook-ceph
 spec:
@@ -132,7 +132,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 99c8c63529f6491096e1ced3091551ecbbbaf344
+    kubenix/hash: 7ee66f450b5838395f934b4dba751525c2b969fb
   name: rook-ceph.rbd.csi.ceph.com
   namespace: rook-ceph
 spec:
@@ -215,7 +215,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 99c8c63529f6491096e1ced3091551ecbbbaf344
+    kubenix/hash: 7ee66f450b5838395f934b4dba751525c2b969fb
   name: ceph-csi-operator-config
   namespace: rook-ceph
 spec:
@@ -308,7 +308,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 99c8c63529f6491096e1ced3091551ecbbbaf344
+    kubenix/hash: 7ee66f450b5838395f934b4dba751525c2b969fb
   name: rook-ceph-cephfs-csi-ceph-com-ctrlplugin-cr
   namespace: rook-ceph
 rules:
@@ -410,6 +410,8 @@ rules:
     verbs:
       - get
       - list
+      - watch
+      - update
   - apiGroups:
       - snapshot.storage.k8s.io
     resources:
@@ -533,7 +535,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 99c8c63529f6491096e1ced3091551ecbbbaf344
+    kubenix/hash: 7ee66f450b5838395f934b4dba751525c2b969fb
   name: rook-ceph-cephfs-csi-ceph-com-nodeplugin-cr
   namespace: rook-ceph
 rules:
@@ -583,9 +585,15 @@ rules:
       - ""
     resources:
       - persistentvolumes
+    verbs:
+      - get
+  - apiGroups:
+      - ""
+    resources:
       - persistentvolumeclaims
     verbs:
       - get
+      - patch
   - apiGroups:
       - authentication.k8s.io
     resources:
@@ -600,7 +608,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 99c8c63529f6491096e1ced3091551ecbbbaf344
+    kubenix/hash: 7ee66f450b5838395f934b4dba751525c2b969fb
   name: rook-ceph-rbd-csi-ceph-com-ctrlplugin-cr
   namespace: rook-ceph
 rules:
@@ -696,6 +704,7 @@ rules:
       - get
       - list
       - watch
+      - update
   - apiGroups:
       - snapshot.storage.k8s.io
     resources:
@@ -840,7 +849,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 99c8c63529f6491096e1ced3091551ecbbbaf344
+    kubenix/hash: 7ee66f450b5838395f934b4dba751525c2b969fb
   name: rook-ceph-rbd-csi-ceph-com-nodeplugin-cr
   namespace: rook-ceph
 rules:
@@ -912,6 +921,7 @@ rules:
       - persistentvolumeclaims
     verbs:
       - get
+      - patch
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -920,7 +930,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 99c8c63529f6491096e1ced3091551ecbbbaf344
+    kubenix/hash: 7ee66f450b5838395f934b4dba751525c2b969fb
   name: rook-ceph-cephfs-csi-ceph-com-ctrlplugin-crb
   namespace: rook-ceph
 roleRef:
@@ -939,7 +949,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 99c8c63529f6491096e1ced3091551ecbbbaf344
+    kubenix/hash: 7ee66f450b5838395f934b4dba751525c2b969fb
   name: rook-ceph-cephfs-csi-ceph-com-nodeplugin-crb
   namespace: rook-ceph
 roleRef:
@@ -958,7 +968,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 99c8c63529f6491096e1ced3091551ecbbbaf344
+    kubenix/hash: 7ee66f450b5838395f934b4dba751525c2b969fb
   name: rook-ceph-rbd-csi-ceph-com-ctrlplugin-crb
   namespace: rook-ceph
 roleRef:
@@ -977,7 +987,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 99c8c63529f6491096e1ced3091551ecbbbaf344
+    kubenix/hash: 7ee66f450b5838395f934b4dba751525c2b969fb
   name: rook-ceph-rbd-csi-ceph-com-nodeplugin-crb
   namespace: rook-ceph
 roleRef:
@@ -996,7 +1006,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 99c8c63529f6491096e1ced3091551ecbbbaf344
+    kubenix/hash: 7ee66f450b5838395f934b4dba751525c2b969fb
   name: rook-ceph-cephfs-csi-ceph-com-ctrlplugin-r
   namespace: rook-ceph
 rules:
@@ -1049,7 +1059,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 99c8c63529f6491096e1ced3091551ecbbbaf344
+    kubenix/hash: 7ee66f450b5838395f934b4dba751525c2b969fb
   name: rook-ceph-cephfs-csi-ceph-com-nodeplugin-r
   namespace: rook-ceph
 rules:
@@ -1091,7 +1101,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 99c8c63529f6491096e1ced3091551ecbbbaf344
+    kubenix/hash: 7ee66f450b5838395f934b4dba751525c2b969fb
   name: rook-ceph-rbd-csi-ceph-com-ctrlplugin-r
   namespace: rook-ceph
 rules:
@@ -1144,7 +1154,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 99c8c63529f6491096e1ced3091551ecbbbaf344
+    kubenix/hash: 7ee66f450b5838395f934b4dba751525c2b969fb
   name: rook-ceph-rbd-csi-ceph-com-nodeplugin-r
   namespace: rook-ceph
 rules:
@@ -1186,7 +1196,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 99c8c63529f6491096e1ced3091551ecbbbaf344
+    kubenix/hash: 7ee66f450b5838395f934b4dba751525c2b969fb
   name: rook-ceph-cephfs-csi-ceph-com-ctrlplugin-rb
   namespace: rook-ceph
 roleRef:
@@ -1205,7 +1215,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 99c8c63529f6491096e1ced3091551ecbbbaf344
+    kubenix/hash: 7ee66f450b5838395f934b4dba751525c2b969fb
   name: rook-ceph-cephfs-csi-ceph-com-nodeplugin-rb
   namespace: rook-ceph
 roleRef:
@@ -1224,7 +1234,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 99c8c63529f6491096e1ced3091551ecbbbaf344
+    kubenix/hash: 7ee66f450b5838395f934b4dba751525c2b969fb
   name: rook-ceph-rbd-csi-ceph-com-ctrlplugin-rb
   namespace: rook-ceph
 roleRef:
@@ -1243,7 +1253,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 99c8c63529f6491096e1ced3091551ecbbbaf344
+    kubenix/hash: 7ee66f450b5838395f934b4dba751525c2b969fb
   name: rook-ceph-rbd-csi-ceph-com-nodeplugin-rb
   namespace: rook-ceph
 roleRef:

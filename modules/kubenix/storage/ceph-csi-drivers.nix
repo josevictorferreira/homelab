@@ -83,8 +83,8 @@ in
       chart = kubenix.lib.helm.fetch {
         repo = "https://ceph.github.io/ceph-csi-operator";
         chart = "ceph-csi-drivers";
-        version = "1.0.4";
-        sha256 = "sha256-mrn2dAjJcAohxpf6HsgOsr4h2q+mnmoIM6uXKRB0dZE=";
+        version = "1.1.0";
+        sha256 = "sha256-7zQzYpHrkj8KJpbkBCo5+bTXYsapt30lrujqfFSve6c=";
       };
       inherit namespace;
       values = {
