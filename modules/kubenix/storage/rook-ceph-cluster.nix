@@ -92,6 +92,13 @@ in
           network = {
             provider = "host";
             connections.requireMsgr2 = false;
+            # OSD replication/recovery/heartbeat traffic goes over the dedicated
+            # 2.5 GbE switch (storage0, see networking.storageNetwork in
+            # config/nodes.nix). The public network is deliberately left unset:
+            # mons and clients stay on 10.10.10.0/24 as before, and pinning it
+            # could make beta's OSD bind the floating VIP 10.10.10.250. Every
+            # OSD host must have a 10.10.20.0/24 address or its OSD will not start.
+            addressRanges.cluster = [ "10.10.20.0/24" ];
           };
           placement = {
             all = {

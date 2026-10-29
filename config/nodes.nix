@@ -79,6 +79,10 @@ rec {
       machine = "intel-nuc-t9plus";
       interface = "enp1s0";
       mac = "68:1D:EF:3B:71:4E";
+      storageNetwork = {
+        ipAddress = "10.10.20.201";
+        mac = "00:E0:4C:68:07:7C";
+      };
       disks = [
         "/dev/disk/by-partlabel/CEPH_OSD_NVME"
       ];
