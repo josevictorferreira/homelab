@@ -26,6 +26,16 @@ in
         deleteUnusedCrushRules = false;
         # Since Rook 1.20 CSI drivers are configured through the ceph-csi-operator
         # CRs, rendered by the ceph-csi-drivers chart (see ceph-csi-drivers.nix).
+        #
+        # Pin cephcsi to 3.17.1. Rook 1.21 leaves the image to the CSI operator
+        # default (3.18.1), which is built for x86-64-v3 and dies on start with
+        # "Fatal glibc error: CPU does not support x86-64-v3" on lab-alpha-cp and
+        # lab-gamma-wk (Celeron N5105, no AVX2). Keep this until an upstream
+        # cephcsi image runs on x86-64-v2 again.
+        csi.cephcsi = {
+          repository = "quay.io/cephcsi/cephcsi";
+          tag = "v3.17.1";
+        };
       };
     };
   };
