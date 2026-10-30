@@ -2,7 +2,45 @@
 
 **Feature:** 0004-platform-upgrade-2026-11
 **Date:** 2026-10-29
-**Status:** planned, nothing executed
+**Status:** executed 2026-10-29/30. All phases are done except the two items listed under "Not done" below.
+
+## Outcome (2026-10-30)
+
+| Component | Result |
+|---|---|
+| Rook / Ceph | 1.21.1 / Tentacle 20.2.4; daemon cephx keys rotated to aes256k; cephcsi held at 3.17.1, because 3.18 needs x86-64-v3 and the N5105 nodes lack it |
+| NixOS | 26.05 on alpha, beta, gamma, delta and the Pi (kernel 6.18) |
+| k3s | 1.32.7 → 1.33.3 → 1.34.11 → 1.35.8 → 1.36.4, pinned as `pkgs.k3s_1_36` |
+| Cilium | 1.18.7 → 1.19.10 → 1.20.4, `upgradeCompatibility = "1.18"`, `bpf.datapathMode = "veth"` |
+| Flux | 2.6 → 2.10.0; `.k8s/flux-system` is now tracked in git |
+| Charts | cert-manager 1.21.3, CNPG 0.29.1, Alloy 1.14.4, kube-prometheus-stack 92.16.1, Loki 20.2.0, Velero 12.2.2 (plugin 1.14.4), app-template 5.3.0, plus home-assistant, n8n, open-webui, searxng, immich, keycloak, sftpgo and redis at their latest charts |
+
+Fixes the upgrade turned up:
+
+1. **Tailscale 1.98 sets `src_valid_mark=1`.** Under Cilium's TPROXY routing this dropped every LAN request to the ingress, and under Cilium 1.20 it also dropped Envoy's connections to pods on its own node. Fixed with `net.ipv4.conf.all.accept_local = 1` in `modules/profiles/k8s-server.nix`.
+2. **The etcd-only Pi deadlocked on k3s 1.34.** Its client load balancer and the supervisor share port 6444. Fixed with `--lb-server-port=6446`, plus a one-time rewrite of the Pi's `server/cred/*.kubeconfig` files to `:6446`.
+3. **k3s 1.33 in nixpkgs 26.05 is EOL and uncached.** The cached 1.33.3 from the old 25.05 rev was used for that one step.
+4. **Chart-specific fixes:**
+   - Cilium 1.19 sets a bare-integer CPU limit; it is overridden with a string.
+   - searxng 1.3 adds a volume that collided with ours by name; ours was renamed.
+   - The immich chart's remote JSON schemas are stripped before rendering.
+   - Velero's immutable CRD-upgrade Job had to be deleted before reconciling.
+
+Not done:
+
+- **Rook `requireMsgr2 = true`.** The workstation's `~/Homelab` CephFS kernel mount (configured in `~/.config/nix`, outside this repo) uses the v1 monitor port 6789. It must move to msgr2 (port 3300, `ms_mode=prefer-crc`) first.
+- **lab-oci-bk is still on 25.05.** Its disk is 99% full with the MinIO offsite mirror, and that data was not touched.
+
+Follow-ups:
+
+- **Pi SD card.** The 2020 SL16G card averages ~600 ms per write. It slows every rollout and stalls etcd during server restarts. Replace it or move the root to a USB SSD.
+- **Pi etcd snapshot offload.** The offload service only uploads `*.db` files, but k3s snapshots have no extension, so nothing has ever been uploaded.
+- **Two managers for `cilium.yaml`.** Flux and beta's k3s addon controller both apply it, so every Cilium bump rolls the DaemonSet twice.
+- **CSI cephx keys stay `aes`.** Kernels below 7.0 can't use aes256k, so Ceph keeps warning about insecure key types and emergency ciphers.
+- **Pre-existing issues:**
+  - MinIO is marked insecure in nixpkgs.
+  - The `apps/wildcard-tls` Certificate has been failing since 2026-08-17.
+  - The CNPG `app` role is missing.
 
 ## 0. Non-negotiables
 
