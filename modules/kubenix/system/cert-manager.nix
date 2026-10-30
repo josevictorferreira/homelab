@@ -36,8 +36,8 @@ in
         {
           repo = "https://charts.jetstack.io";
           chart = "cert-manager";
-          version = "1.18.2";
-          sha256 = "sha256-vwe9ARF8VZ+Ntl1IR4TyNAXNmZU9+TNVVsnC+s+ZjQ0=";
+          version = "1.19.6";
+          sha256 = "sha256-ZxVc2Ch5S72/CmGCZVsx+l4iYklx4cNkIEryV411F5I=";
         };
       includeCRDs = true;
       noHooks = true;
