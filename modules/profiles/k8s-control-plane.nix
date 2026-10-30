@@ -26,6 +26,12 @@ let
     "--disable-apiserver"
     "--disable-controller-manager"
     "--disable-scheduler"
+    # k3s >= 1.34 points an etcd-only node's client load balancer at its own
+    # supervisor. The default balancer port (6444) is our supervisor port
+    # (--https-listen-port), so the balancer would target itself and the
+    # agent blocks before etcd starts. 6446 also claims 6445 for the
+    # apiserver balancer.
+    "--lb-server-port=6446"
     "--kubelet-arg=eviction-hard=${eviction.hard}"
     "--kubelet-arg=eviction-soft=${eviction.soft}"
     "--kubelet-arg=eviction-soft-grace-period=memory.available=1m,imagefs.available=2m,nodefs.available=2m"
