@@ -34,8 +34,8 @@ in
       values = {
         toolbox = {
           enabled = true;
-          # Match the running Ceph release; the chart default is Tentacle.
-          image = "quay.io/ceph/ceph:v19.2.7-20261009";
+          # Match the running Ceph release.
+          image = "quay.io/ceph/ceph:v20.2.4-20260818";
           resources = {
             requests.cpu = "50m";
             requests.memory = "64Mi";
@@ -53,7 +53,7 @@ in
           bluestore_bdev_label_require_all = false
         '';
         cephClusterSpec = {
-          # Must stay >= 19.2.4: 19.2.3 carries an upstream regression (tracker
+          # Must never go back to 19.2.3: it carries an upstream regression (tracker
           # #71534, introduced by ceph/ceph#62514) where BlueFS::truncate asserts
           # `cut_off == p->length`, wrongly assuming extents are always aligned to
           # the current alloc_unit. A near-full, fragmented OSD makes BlueFS fall
@@ -61,7 +61,7 @@ in
           # trips the assert. osd.0 on lab-delta-cp crashed mid-RocksDB-flush and
           # then crash-looped forever replaying the same WAL. Fixed by
           # ceph/ceph#63753, released in v19.2.4.
-          cephVersion.image = "quay.io/ceph/ceph:v19.2.7-20261009";
+          cephVersion.image = "quay.io/ceph/ceph:v20.2.4-20260818";
           cephVersion.allowUnsupported = false;
           # Keep Rook's per-daemon health gate on: it waits for PGs to be clean
           # before restarting the next mon/OSD. This was temporarily true in
