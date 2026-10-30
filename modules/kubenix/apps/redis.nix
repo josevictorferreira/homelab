@@ -14,8 +14,8 @@ in
       chart = kubenix.lib.helm.fetch {
         chartUrl = "oci://registry-1.docker.io/bitnamicharts/redis";
         chart = "redis";
-        version = "22.0.7";
-        sha256 = "sha256-aYghmMzdQO5ynmcG6w9aQmzRHnaLMKoNwsjZRKGdbrs=";
+        version = "28.3.10";
+        sha256 = "sha256-T6EaUtTJRAS30KDbg3q3FVbBkw+3J1dFw2cj8A799sQ=";
       };
       includeCRDs = true;
       noHooks = true;

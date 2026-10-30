@@ -9,9 +9,9 @@ metadata:
     app.kubernetes.io/instance: redis
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: redis
-    app.kubernetes.io/version: 8.2.1
-    helm.sh/chart: redis-22.0.7
-    kubenix/hash: 48b83acaa20e13cb92bbc9d8e3ee6795c0599165
+    app.kubernetes.io/version: 8.10.3
+    helm.sh/chart: redis-28.3.10
+    kubenix/hash: 690f3ec65175277f1d00e0ebb62c989aae00ffb0
   name: redis-master
   namespace: apps
 spec:
@@ -26,17 +26,16 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/configmap: 2a9ab4a5432825504d910f022638674ce88eaefe9f9f595ad8bc107377d104fb
-        checksum/health: aff24913d801436ea469d8d374b2ddb3ec4c43ee7ab24663d5f8ff1a1b6991a9
+        checksum/configmap: 62ff2843192643ad74a96fbad607a0b92db3dc81d3a369deaa3fb9aebbd24ddc
+        checksum/health: a2fc61ae99390643dac0673ed97203805136d4460b2319e7beff10546c1e1140
         checksum/scripts: 0717e77fd3bb941f602860e9be4f2ed87b481cddeadf37be463f8512ecde0c3e
-        checksum/secret: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
       labels:
         app.kubernetes.io/component: master
         app.kubernetes.io/instance: redis
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: redis
-        app.kubernetes.io/version: 8.2.1
-        helm.sh/chart: redis-22.0.7
+        app.kubernetes.io/version: 8.10.3
+        helm.sh/chart: redis-28.3.10
     spec:
       affinity:
         podAntiAffinity:
@@ -63,6 +62,8 @@ spec:
               value: master
             - name: ALLOW_EMPTY_PASSWORD
               value: "no"
+            - name: OPENSSL_FIPS
+              value: "yes"
             - name: REDIS_PASSWORD_FILE
               value: /opt/bitnami/redis/secrets/redis-password
             - name: REDIS_TLS_ENABLED
@@ -200,6 +201,9 @@ data:
     # End of master configuration
   redis.conf: |-
     # User-supplied common configuration:
+    # Enable ReJSON y Redisearch
+    loadmodule /opt/bitnami/redis/lib/redis/modules/redisearch.so
+    loadmodule /opt/bitnami/redis/lib/redis/modules/rejson.so
     # Enable AOF https://redis.io/topics/persistence#append-only-file
     appendonly yes
     # Disable RDB persistence, AOF persistence already enabled.
@@ -211,7 +215,6 @@ data:
     rename-command FLUSHDB ""
     rename-command FLUSHALL ""
     # End of replica configuration
-  users.acl: ""
 kind: ConfigMap
 metadata:
   annotations:
@@ -221,9 +224,9 @@ metadata:
     app.kubernetes.io/instance: redis
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: redis
-    app.kubernetes.io/version: 8.2.1
-    helm.sh/chart: redis-22.0.7
-    kubenix/hash: 48b83acaa20e13cb92bbc9d8e3ee6795c0599165
+    app.kubernetes.io/version: 8.10.3
+    helm.sh/chart: redis-28.3.10
+    kubenix/hash: 690f3ec65175277f1d00e0ebb62c989aae00ffb0
   name: redis-configuration
   namespace: apps
 ---
@@ -280,15 +283,15 @@ data:
   ping_readiness_local.sh: |-
     #!/bin/bash
 
+    timeout=$1
+    run_redis_command() {
+        local args=("-p" "$REDIS_PORT")
+        timeout -s 15 $timeout redis-cli "${args[@]}" "$@"
+    }
+
     [[ -f $REDIS_PASSWORD_FILE ]] && export REDIS_PASSWORD="$(< "${REDIS_PASSWORD_FILE}")"
     [[ -n "$REDIS_PASSWORD" ]] && export REDISCLI_AUTH="$REDIS_PASSWORD"
-    response=$(
-      timeout -s 15 $1 \
-      redis-cli \
-        -h localhost \
-        -p $REDIS_PORT \
-        ping
-    )
+    response=$(run_redis_command ping)
     if [ "$?" -eq "124" ]; then
       echo "Timed out"
       exit 1
@@ -332,9 +335,9 @@ metadata:
     app.kubernetes.io/instance: redis
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: redis
-    app.kubernetes.io/version: 8.2.1
-    helm.sh/chart: redis-22.0.7
-    kubenix/hash: 48b83acaa20e13cb92bbc9d8e3ee6795c0599165
+    app.kubernetes.io/version: 8.10.3
+    helm.sh/chart: redis-28.3.10
+    kubenix/hash: 690f3ec65175277f1d00e0ebb62c989aae00ffb0
   name: redis-health
   namespace: apps
 ---
@@ -368,9 +371,9 @@ metadata:
     app.kubernetes.io/instance: redis
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: redis
-    app.kubernetes.io/version: 8.2.1
-    helm.sh/chart: redis-22.0.7
-    kubenix/hash: 48b83acaa20e13cb92bbc9d8e3ee6795c0599165
+    app.kubernetes.io/version: 8.10.3
+    helm.sh/chart: redis-28.3.10
+    kubenix/hash: 690f3ec65175277f1d00e0ebb62c989aae00ffb0
   name: redis-scripts
   namespace: apps
 ---
@@ -384,9 +387,9 @@ metadata:
     app.kubernetes.io/instance: redis
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: redis
-    app.kubernetes.io/version: 8.2.1
-    helm.sh/chart: redis-22.0.7
-    kubenix/hash: 48b83acaa20e13cb92bbc9d8e3ee6795c0599165
+    app.kubernetes.io/version: 8.10.3
+    helm.sh/chart: redis-28.3.10
+    kubenix/hash: 690f3ec65175277f1d00e0ebb62c989aae00ffb0
   name: redis-headless
   namespace: apps
 spec:
@@ -413,9 +416,9 @@ metadata:
     app.kubernetes.io/instance: redis
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: redis
-    app.kubernetes.io/version: 8.2.1
-    helm.sh/chart: redis-22.0.7
-    kubenix/hash: 48b83acaa20e13cb92bbc9d8e3ee6795c0599165
+    app.kubernetes.io/version: 8.10.3
+    helm.sh/chart: redis-28.3.10
+    kubenix/hash: 690f3ec65175277f1d00e0ebb62c989aae00ffb0
   name: redis-master
   namespace: apps
 spec:
@@ -429,7 +432,6 @@ spec:
     app.kubernetes.io/component: master
     app.kubernetes.io/instance: redis
     app.kubernetes.io/name: redis
-  sessionAffinity: None
   type: LoadBalancer
 ---
 apiVersion: v1
@@ -443,9 +445,9 @@ metadata:
     app.kubernetes.io/instance: redis
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: redis
-    app.kubernetes.io/version: 8.2.1
-    helm.sh/chart: redis-22.0.7
-    kubenix/hash: 48b83acaa20e13cb92bbc9d8e3ee6795c0599165
+    app.kubernetes.io/version: 8.10.3
+    helm.sh/chart: redis-28.3.10
+    kubenix/hash: 690f3ec65175277f1d00e0ebb62c989aae00ffb0
   name: redis-master
   namespace: apps
 ---
@@ -459,9 +461,9 @@ metadata:
     app.kubernetes.io/instance: redis
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: redis
-    app.kubernetes.io/version: 8.2.1
-    helm.sh/chart: redis-22.0.7
-    kubenix/hash: 48b83acaa20e13cb92bbc9d8e3ee6795c0599165
+    app.kubernetes.io/version: 8.10.3
+    helm.sh/chart: redis-28.3.10
+    kubenix/hash: 690f3ec65175277f1d00e0ebb62c989aae00ffb0
   name: redis
   namespace: apps
 spec:
@@ -489,9 +491,9 @@ metadata:
     app.kubernetes.io/instance: redis
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: redis
-    app.kubernetes.io/version: 8.2.1
-    helm.sh/chart: redis-22.0.7
-    kubenix/hash: 48b83acaa20e13cb92bbc9d8e3ee6795c0599165
+    app.kubernetes.io/version: 8.10.3
+    helm.sh/chart: redis-28.3.10
+    kubenix/hash: 690f3ec65175277f1d00e0ebb62c989aae00ffb0
   name: redis-master
   namespace: apps
 spec:
