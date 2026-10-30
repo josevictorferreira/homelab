@@ -6,13 +6,16 @@
       chart = kubenix.lib.helm.fetch {
         repo = "https://helm.cilium.io";
         chart = "cilium";
-        version = "1.18.7";
-        sha256 = "sha256-DVvFDuFsmV5616wSO9Iiz5dFBNeCtcn7Yro9wOzeA3E";
+        version = "1.19.10";
+        sha256 = "sha256-jYWdIqH4OVoOBowWuMV1OPLd7b9Sv2D0XSJVvYY0fB0=";
       };
       includeCRDs = true;
       noHooks = true;
       values = {
         namespaceOverride = "kube-system";
+        # The first Cilium minor this cluster was installed with; keeps
+        # datapath defaults stable across upgrades.
+        upgradeCompatibility = "1.18";
         kubeProxyReplacement = true;
         k8sServiceHost = homelab.kubernetes.vipAddress;
         k8sServicePort = 6443;
@@ -47,6 +50,9 @@
           ui.enabled = false;
         };
         nodePort.enabled = true;
+        # The chart default is a bare integer, which kubenix rejects for a
+        # Quantity field.
+        cni.resources.limits.cpu = "1";
       };
     };
 

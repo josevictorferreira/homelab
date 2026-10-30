@@ -31,7 +31,7 @@
       ciliumloadbalancerippool = {
         attrName = "ciliumloadbalancerippool";
         group = "cilium.io";
-        version = "v2alpha1";
+        version = "v2";
         kind = "CiliumLoadBalancerIPPool";
       };
 
