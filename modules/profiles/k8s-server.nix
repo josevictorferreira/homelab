@@ -2,6 +2,7 @@
 , config
 , pkgs
 , homelab
+, hostConfig
 , inputs
 , ...
 }:
@@ -79,6 +80,13 @@ in
     boot.kernel.sysctl = {
       "fs.inotify.max_user_instances" = 8192;
       "fs.inotify.max_user_watches" = 524288;
+      # Tailscale >= 1.98 forces net.ipv4.conf.all.src_valid_mark=1 for its
+      # connmark rp_filter workaround. The reverse-path check then reuses
+      # Cilium's TPROXY mark, which routes via table 2004 where every address is
+      # local, so LAN traffic to the ingress VIP is dropped as a martian before
+      # it reaches Envoy. Accepting local-looking sources on the LAN interface
+      # lets that check pass whatever tailscaled sets.
+      "net.ipv4.conf.${hostConfig.interface}.accept_local" = 1;
     };
 
     networking = {
