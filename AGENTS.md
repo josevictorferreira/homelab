@@ -721,6 +721,21 @@ Our cluster is deployed and accessible in the user system kubectl, the context a
 **Context:** 2026-09-24: evictions fired 4 times in one day. Fixed with per-node thresholds (`kubeletEviction` in `config/nodes.nix`, consumed by `modules/profiles/k8s-worker.nix`) instead of the worker defaults sized for 500 GB disks. Do NOT move containerd onto `backup-pool` — that USB pool needs `zpool import -F` after unclean reboots.
 **Verify:** `kubectl get node lab-pi-bk -o jsonpath='{.status.conditions[?(@.type=="DiskPressure")].status}'` is `False`; on the Pi `journalctl -u k3s | grep -E 'pods ranked for eviction|Removing image'` is quiet.
 
+#### Tailscale's src_valid_mark Breaks Cilium Ingress Without accept_local
+**Lesson:** Keep `net.ipv4.conf.all.accept_local = 1` (`modules/profiles/k8s-server.nix`). Tailscale 1.98+ forces `net.ipv4.conf.all.src_valid_mark=1`. The reverse-path check then reuses Cilium's proxy mark, which routes through table 2004 (where everything is local), and drops ingress traffic as martians.
+**Context:** 2026-10-30, after the move to NixOS 26.05. Every `*.josevictor.me` host timed out from the LAN but worked from the nodes. Under Cilium 1.20, Envoy's connections to pods on its own node failed the same way, and sftpgo crash-looped on its OIDC discovery.
+**Verify:** `ssh root@<node> 'ip route get 10.10.10.110 from 10.10.10.10 iif enp1s0 mark 0x200'` prints a `local` route, not `Invalid argument`.
+
+#### etcd-only Pi Needs Its Own k3s Load-Balancer Port
+**Lesson:** The Pi runs etcd only and listens on `--https-listen-port=6444`, which is also k3s's default `--lb-server-port`. Since k3s 1.34 the Pi's client balancer points at its own supervisor, so it needs `--lb-server-port=6446` (set in `etcdOnlyFlags`). Without that, the balancer targets itself, and k3s blocks before etcd starts.
+**Context:** The k3s 1.34 step hung on the Pi with `Running load balancer k3s-agent-load-balancer 127.0.0.1:6444 -> [] [default: ]`. After the port change, the stale `server/cred/*.kubeconfig` files still said `:6444`; they only regenerate together with their certs, so they were rewritten by hand.
+**Verify:** `ssh root@10.10.10.209 'journalctl -u k3s | grep "Running load balancer" | tail -1'` shows `127.0.0.1:6446 ... [default: 127.0.0.1:6444]`.
+
+#### Pi Disk Pressure After k3s Restarts = Leaked containerd Leases
+**Lesson:** When a k3s restart interrupts an image pull on the Pi, containerd keeps a lease that expires only after 24 hours, and the lease pins the pulled layers. `crictl rmi --prune` and `nix-collect-garbage` cannot free that space. List the leases and delete every one except running pod sandboxes.
+**Context:** 2026-10-30. The Pi reached 100% full with 76 snapshots for 2 images. Deleting the stale leases freed 5.9 GB.
+**Verify:** `ssh root@10.10.10.209 'k3s ctr -n k8s.io leases ls'` lists only pod sandboxes, and `df -h /` is below 85%.
+
 #### Kubernetes Service Env Vars Break Integer-Expecting Apps
 **Lesson:** Kubernetes injects `{SERVICE_NAME}_PORT=tcp://IP:PORT` env vars from Service objects. Apps that parse these as integers (e.g., granian, gunicorn) crash with "invalid integer". Always set an explicit env var with the integer value (e.g., `SEARXNG_PORT=8080`) to override the injected `tcp://` value.
 **Context:** Searxng crashed with `Error: Invalid value for '--port': 'tcp://10.43.182.206:8080' is not a valid integer` because K8s injected `SEARXNG_PORT` from the Service.
