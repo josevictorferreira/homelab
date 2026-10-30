@@ -22,6 +22,10 @@ in
       inherit (homelab) timeZone;
       enable = true;
     };
+    # The 26.11 default. Every host imports only its own pools under a stable
+    # hostId, so a forced import would only ever hide a real problem.
+    boot.zfs.forceImportRoot = false;
+
     networking = {
       firewall.enable = false;
       inherit hostName;

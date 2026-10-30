@@ -48,9 +48,9 @@
   # A spurious ACPI GPE on this board fires phantom short power-button presses
   # (PNP0C0C), which logind acts on and cleanly powers the host off in a loop.
   # Ignore short presses; a deliberate long press still powers off.
-  services.logind = {
-    powerKey = "ignore";
-    powerKeyLongPress = "poweroff";
+  services.logind.settings.Login = {
+    HandlePowerKey = "ignore";
+    HandlePowerKeyLongPress = "poweroff";
   };
 
   # Thermal mitigation for a gk3v whose cooler is not transferring heat: the

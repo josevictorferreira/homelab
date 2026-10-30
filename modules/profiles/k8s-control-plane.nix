@@ -153,13 +153,10 @@ in
       ];
 
       # Rejoining an existing etcd cluster boots a temporary local etcd first,
-      # and on slow disks that can take several minutes. The systemd default of
-      # 90s kills k3s mid-bootstrap, which turns a single slow start into a
-      # permanent restart loop.
-      services.k3s.serviceConfig = {
-        TimeoutStartSec = "15min";
-        TimeoutStopSec = "2min";
-      };
+      # and on slow disks that can take several minutes. A start timeout kills
+      # k3s mid-bootstrap and turns one slow start into a permanent restart
+      # loop; the NixOS 26.05 k3s module already sets TimeoutStartSec = 0.
+      services.k3s.serviceConfig.TimeoutStopSec = "2min";
 
       timers.k3s-etcd-offload = {
         description = "Upload k3s etcd snapshots to MinIO";

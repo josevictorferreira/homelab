@@ -2,7 +2,11 @@
   description = "My Homelab Machines NixOS configurations";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
+    # Temporary: k3s 1.32 is gone from nixos-26.05, and k3s must move one minor
+    # at a time. Holds the last 25.05 rev used by the cluster until k3s reaches
+    # a minor packaged in 26.05 (see modules/profiles/k8s-server.nix).
+    nixpkgs-k3s-1-32.url = "github:NixOS/nixpkgs/ac62194c3917d5f474c1a844b6fd6da2db95077d";
     sops-nix.url = "github:Mic92/sops-nix";
     deploy-rs.url = "github:serokell/deploy-rs";
     kubenix.url = "github:hall/kubenix";

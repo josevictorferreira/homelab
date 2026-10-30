@@ -28,6 +28,11 @@ in
   ];
 
   config = lib.mkIf cfg.enable {
+    # nixpkgs 26.05 marks every MinIO community build insecure (CVE-2026-40344,
+    # CVE-2026-41145, CVE-2026-33322) and upstream no longer publishes fixed
+    # community releases. Same exposure as before the upgrade: this MinIO is
+    # only reachable on the LAN / tailnet. Replacing MinIO is tracked separately.
+    nixpkgs.config.permittedInsecurePackages = [ "minio-2025-10-15T17-29-55Z" ];
     environment.systemPackages = with pkgs; [
       zfs
       minio-client
