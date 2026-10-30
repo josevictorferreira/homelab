@@ -8,9 +8,9 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     app: n8n
-    chart: n8n-1.15.5
+    chart: n8n-1.24.43
     heritage: Helm
-    kubenix/hash: c0c1fbe6d6776ceee01ea9dd4d45b3ba40ef2066
+    kubenix/hash: 28f57f04e578024608c2ea83fe15717c86243b5f
     release: n8n
   name: n8n-binary-data-configmap
   namespace: apps
@@ -32,9 +32,9 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     app: n8n
-    chart: n8n-1.15.5
+    chart: n8n-1.24.43
     heritage: Helm
-    kubenix/hash: c0c1fbe6d6776ceee01ea9dd4d45b3ba40ef2066
+    kubenix/hash: 28f57f04e578024608c2ea83fe15717c86243b5f
     release: n8n
   name: n8n-database-configmap
   namespace: apps
@@ -55,15 +55,16 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     app: n8n
-    chart: n8n-1.15.5
+    chart: n8n-1.24.43
     heritage: Helm
-    kubenix/hash: c0c1fbe6d6776ceee01ea9dd4d45b3ba40ef2066
+    kubenix/hash: 28f57f04e578024608c2ea83fe15717c86243b5f
     release: n8n
   name: n8n-diagnostics-configmap
   namespace: apps
 ---
 apiVersion: v1
 data:
+  N8N_LOG_FORMAT: text
   N8N_LOG_LEVEL: info
   N8N_LOG_OUTPUT: console
 kind: ConfigMap
@@ -73,9 +74,9 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     app: n8n
-    chart: n8n-1.15.5
+    chart: n8n-1.24.43
     heritage: Helm
-    kubenix/hash: c0c1fbe6d6776ceee01ea9dd4d45b3ba40ef2066
+    kubenix/hash: 28f57f04e578024608c2ea83fe15717c86243b5f
     release: n8n
   name: n8n-logging-configmap
   namespace: apps
@@ -102,9 +103,9 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     app: n8n
-    chart: n8n-1.15.5
+    chart: n8n-1.24.43
     heritage: Helm
-    kubenix/hash: c0c1fbe6d6776ceee01ea9dd4d45b3ba40ef2066
+    kubenix/hash: 28f57f04e578024608c2ea83fe15717c86243b5f
     release: n8n
   name: n8n-metrics-configmap
   namespace: apps
@@ -121,16 +122,15 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     app: n8n
-    chart: n8n-1.15.5
+    chart: n8n-1.24.43
     heritage: Helm
-    kubenix/hash: c0c1fbe6d6776ceee01ea9dd4d45b3ba40ef2066
+    kubenix/hash: 28f57f04e578024608c2ea83fe15717c86243b5f
     release: n8n
   name: n8n-public-api-configmap
   namespace: apps
 ---
 apiVersion: v1
 data:
-  N8N_RUNNERS_ENABLED: "true"
   N8N_RUNNERS_HEARTBEAT_INTERVAL: "30"
   N8N_RUNNERS_MAX_CONCURRENCY: "5"
   N8N_RUNNERS_MODE: internal
@@ -142,9 +142,9 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     app: n8n
-    chart: n8n-1.15.5
+    chart: n8n-1.24.43
     heritage: Helm
-    kubenix/hash: c0c1fbe6d6776ceee01ea9dd4d45b3ba40ef2066
+    kubenix/hash: 28f57f04e578024608c2ea83fe15717c86243b5f
     release: n8n
   name: n8n-task-broker-configmap
   namespace: apps
@@ -159,9 +159,9 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     app: n8n
-    chart: n8n-1.15.5
+    chart: n8n-1.24.43
     heritage: Helm
-    kubenix/hash: c0c1fbe6d6776ceee01ea9dd4d45b3ba40ef2066
+    kubenix/hash: 28f57f04e578024608c2ea83fe15717c86243b5f
     release: n8n
   name: n8n-version-notifications-configmap
   namespace: apps
@@ -177,9 +177,9 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     app: n8n
-    chart: n8n-1.15.5
+    chart: n8n-1.24.43
     heritage: Helm
-    kubenix/hash: c0c1fbe6d6776ceee01ea9dd4d45b3ba40ef2066
+    kubenix/hash: 28f57f04e578024608c2ea83fe15717c86243b5f
     release: n8n
   name: n8n-workflow-history-configmap
   namespace: apps
@@ -196,9 +196,9 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: n8n
     app.kubernetes.io/part-of: n8n
-    app.kubernetes.io/version: 1.110.1
-    helm.sh/chart: n8n-1.15.5
-    kubenix/hash: c0c1fbe6d6776ceee01ea9dd4d45b3ba40ef2066
+    app.kubernetes.io/version: 2.41.6
+    helm.sh/chart: n8n-1.24.43
+    kubenix/hash: 28f57f04e578024608c2ea83fe15717c86243b5f
   name: n8n
   namespace: apps
 spec:
@@ -225,9 +225,9 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: n8n
     app.kubernetes.io/part-of: n8n
-    app.kubernetes.io/version: 1.110.1
-    helm.sh/chart: n8n-1.15.5
-    kubenix/hash: c0c1fbe6d6776ceee01ea9dd4d45b3ba40ef2066
+    app.kubernetes.io/version: 2.41.6
+    helm.sh/chart: n8n-1.24.43
+    kubenix/hash: 28f57f04e578024608c2ea83fe15717c86243b5f
   name: n8n
   namespace: apps
 ---
@@ -243,9 +243,9 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: n8n
     app.kubernetes.io/part-of: n8n
-    app.kubernetes.io/version: 1.110.1
-    helm.sh/chart: n8n-1.15.5
-    kubenix/hash: c0c1fbe6d6776ceee01ea9dd4d45b3ba40ef2066
+    app.kubernetes.io/version: 2.41.6
+    helm.sh/chart: n8n-1.24.43
+    kubenix/hash: 28f57f04e578024608c2ea83fe15717c86243b5f
   name: n8n
   namespace: apps
 spec:
@@ -273,7 +273,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: c0c1fbe6d6776ceee01ea9dd4d45b3ba40ef2066
+    kubenix/hash: 28f57f04e578024608c2ea83fe15717c86243b5f
   name: n8n-s3
   namespace: apps
 spec:
@@ -286,6 +286,7 @@ apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
   annotations:
+    ignore-check.kube-linter.io/pdb-unhealthy-pod-eviction-policy: unhealthyPodEvictionPolicy is conditionally rendered for Kubernetes >= 1.26 only
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
@@ -294,14 +295,15 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: n8n
     app.kubernetes.io/part-of: n8n
-    app.kubernetes.io/version: 1.110.1
-    helm.sh/chart: n8n-1.15.5
-    kubenix/hash: c0c1fbe6d6776ceee01ea9dd4d45b3ba40ef2066
+    app.kubernetes.io/version: 2.41.6
+    helm.sh/chart: n8n-1.24.43
+    kubenix/hash: 28f57f04e578024608c2ea83fe15717c86243b5f
   name: n8n
   namespace: apps
 spec:
-  minAvailable: 1
+  maxUnavailable: 1
   selector:
     matchLabels:
       app.kubernetes.io/instance: n8n
       app.kubernetes.io/name: n8n
+  unhealthyPodEvictionPolicy: AlwaysAllow

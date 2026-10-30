@@ -12,8 +12,8 @@ in
       chart = kubenix.lib.helm.fetch {
         repo = "https://community-charts.github.io/helm-charts";
         chart = "n8n";
-        version = "1.15.5";
-        sha256 = "sha256-1GiNnh/wuLx+ubKzd2o+hH0/9TO3yOA5A9re2AVlUNE=";
+        version = "1.24.43";
+        sha256 = "sha256-bEftJPIsR0grwsBqhI47vUrADsNJfEq/whon8M6oMUg=";
       };
       includeCRDs = true;
       noHooks = false;
