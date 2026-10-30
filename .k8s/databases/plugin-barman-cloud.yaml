@@ -7,7 +7,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 9044396bffe305e612e5be04d7dd3baa02b24b6e
+    kubenix/hash: 386d705f64aaa7933a5a8a63d96b7b3c3d039e0c
   name: objectstores.barmancloud.cnpg.io
   namespace: databases
 spec:
@@ -713,9 +713,9 @@ metadata:
     app.kubernetes.io/instance: plugin-barman-cloud
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: plugin-barman-cloud
-    app.kubernetes.io/version: v0.15.0
-    helm.sh/chart: plugin-barman-cloud-0.8.0
-    kubenix/hash: 9044396bffe305e612e5be04d7dd3baa02b24b6e
+    app.kubernetes.io/version: v0.15.1
+    helm.sh/chart: plugin-barman-cloud-0.8.1
+    kubenix/hash: 386d705f64aaa7933a5a8a63d96b7b3c3d039e0c
   name: plugin-barman-cloud
   namespace: databases
 spec:
@@ -747,7 +747,7 @@ spec:
                 configMapKeyRef:
                   key: SIDECAR_IMAGE
                   name: plugin-barman-cloud-config
-          image: ghcr.io/cloudnative-pg/plugin-barman-cloud:v0.15.0
+          image: ghcr.io/cloudnative-pg/plugin-barman-cloud:v0.15.1
           livenessProbe:
             initialDelaySeconds: 10
             periodSeconds: 10
@@ -804,7 +804,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 9044396bffe305e612e5be04d7dd3baa02b24b6e
+    kubenix/hash: 386d705f64aaa7933a5a8a63d96b7b3c3d039e0c
   name: barman-cloud-client
   namespace: databases
 spec:
@@ -829,7 +829,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 9044396bffe305e612e5be04d7dd3baa02b24b6e
+    kubenix/hash: 386d705f64aaa7933a5a8a63d96b7b3c3d039e0c
   name: barman-cloud-server
   namespace: databases
 spec:
@@ -856,7 +856,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 9044396bffe305e612e5be04d7dd3baa02b24b6e
+    kubenix/hash: 386d705f64aaa7933a5a8a63d96b7b3c3d039e0c
   name: plugin-barman-cloud-selfsigned-issuer
   namespace: databases
 spec:
@@ -864,14 +864,14 @@ spec:
 ---
 apiVersion: v1
 data:
-  SIDECAR_IMAGE: ghcr.io/cloudnative-pg/plugin-barman-cloud-sidecar:v0.15.0
+  SIDECAR_IMAGE: ghcr.io/cloudnative-pg/plugin-barman-cloud-sidecar:v0.15.1
 kind: ConfigMap
 metadata:
   annotations:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 9044396bffe305e612e5be04d7dd3baa02b24b6e
+    kubenix/hash: 386d705f64aaa7933a5a8a63d96b7b3c3d039e0c
   name: plugin-barman-cloud-config
   namespace: databases
 ---
@@ -888,10 +888,10 @@ metadata:
     app.kubernetes.io/instance: plugin-barman-cloud
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: plugin-barman-cloud
-    app.kubernetes.io/version: v0.15.0
+    app.kubernetes.io/version: v0.15.1
     cnpg.io/pluginName: barman-cloud.cloudnative-pg.io
-    helm.sh/chart: plugin-barman-cloud-0.8.0
-    kubenix/hash: 9044396bffe305e612e5be04d7dd3baa02b24b6e
+    helm.sh/chart: plugin-barman-cloud-0.8.1
+    kubenix/hash: 386d705f64aaa7933a5a8a63d96b7b3c3d039e0c
   name: barman-cloud
   namespace: databases
 spec:
@@ -913,9 +913,9 @@ metadata:
     app.kubernetes.io/instance: plugin-barman-cloud
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: plugin-barman-cloud
-    app.kubernetes.io/version: v0.15.0
-    helm.sh/chart: plugin-barman-cloud-0.8.0
-    kubenix/hash: 9044396bffe305e612e5be04d7dd3baa02b24b6e
+    app.kubernetes.io/version: v0.15.1
+    helm.sh/chart: plugin-barman-cloud-0.8.1
+    kubenix/hash: 386d705f64aaa7933a5a8a63d96b7b3c3d039e0c
   name: plugin-barman-cloud
   namespace: databases
 ---
@@ -926,7 +926,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 9044396bffe305e612e5be04d7dd3baa02b24b6e
+    kubenix/hash: 386d705f64aaa7933a5a8a63d96b7b3c3d039e0c
   name: plugin-barman-cloud
   namespace: databases
 rules:
@@ -1003,9 +1003,9 @@ metadata:
     app.kubernetes.io/instance: plugin-barman-cloud
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: plugin-barman-cloud
-    app.kubernetes.io/version: v0.15.0
-    helm.sh/chart: plugin-barman-cloud-0.8.0
-    kubenix/hash: 9044396bffe305e612e5be04d7dd3baa02b24b6e
+    app.kubernetes.io/version: v0.15.1
+    helm.sh/chart: plugin-barman-cloud-0.8.1
+    kubenix/hash: 386d705f64aaa7933a5a8a63d96b7b3c3d039e0c
   name: plugin-barman-cloud-binding
   namespace: databases
 roleRef:
@@ -1027,9 +1027,9 @@ metadata:
     app.kubernetes.io/instance: plugin-barman-cloud
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: plugin-barman-cloud
-    app.kubernetes.io/version: v0.15.0
-    helm.sh/chart: plugin-barman-cloud-0.8.0
-    kubenix/hash: 9044396bffe305e612e5be04d7dd3baa02b24b6e
+    app.kubernetes.io/version: v0.15.1
+    helm.sh/chart: plugin-barman-cloud-0.8.1
+    kubenix/hash: 386d705f64aaa7933a5a8a63d96b7b3c3d039e0c
   name: plugin-barman-cloud-leader-election-role
   namespace: databases
 rules:
@@ -1075,9 +1075,9 @@ metadata:
     app.kubernetes.io/instance: plugin-barman-cloud
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: plugin-barman-cloud
-    app.kubernetes.io/version: v0.15.0
-    helm.sh/chart: plugin-barman-cloud-0.8.0
-    kubenix/hash: 9044396bffe305e612e5be04d7dd3baa02b24b6e
+    app.kubernetes.io/version: v0.15.1
+    helm.sh/chart: plugin-barman-cloud-0.8.1
+    kubenix/hash: 386d705f64aaa7933a5a8a63d96b7b3c3d039e0c
   name: plugin-barman-cloud-leader-election-rolebinding
   namespace: databases
 roleRef:

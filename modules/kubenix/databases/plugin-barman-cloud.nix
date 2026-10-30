@@ -10,8 +10,8 @@ in
     chart = kubenix.lib.helm.fetch {
       repo = "https://cloudnative-pg.github.io/charts";
       chart = "plugin-barman-cloud";
-      version = "0.8.0";
-      sha256 = "sha256-oPhGA+7p2fstOLA7M7EQiYy381PqrO8AhqprGDChKhk=";
+      version = "0.8.1";
+      sha256 = "sha256-Zp6HKGx0o5vF7lGXQwKvIypTSPEZbp7Z4lwTVT9TZiA=";
     };
     inherit namespace;
     includeCRDs = true;
