@@ -10,8 +10,8 @@ in
       chart = kubenix.lib.helm.fetch {
         repo = "https://self-hosters-by-night.github.io/helm-charts";
         chart = "searxng";
-        version = "1.1.0";
-        sha256 = "sha256-8DA5H/PRXktku2u430ncar4UWcrHlQQQ1Jm1XnLlvm0=";
+        version = "1.3.1";
+        sha256 = "sha256-cw1eIkNTe6TEHglBR7PkK5C61df9zELPOUzmj9pinf8=";
       };
       includeCRDs = true;
       noHooks = true;
@@ -50,15 +50,17 @@ in
             effect = "NoSchedule";
           }
         ];
+        # Not named "settings": chart 1.3 adds its own volume by that name
+        # (default settings.yml) and would replace this one.
         extraVolumeMounts = [
           {
-            name = "settings";
+            name = "${app}-config";
             mountPath = "/etc/searxng/settings.yml";
             subPath = "settings.yml";
             readOnly = true;
           }
           {
-            name = "settings";
+            name = "${app}-config";
             mountPath = "/etc/searxng/limiter.toml";
             subPath = "limiter.toml";
             readOnly = true;
@@ -67,7 +69,7 @@ in
 
         extraVolumes = [
           {
-            name = "settings";
+            name = "${app}-config";
             configMap = {
               name = "${app}-config";
               items = [
