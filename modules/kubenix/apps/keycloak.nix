@@ -16,8 +16,8 @@ in
       chart = kubenix.lib.helm.fetch {
         chartUrl = "oci://registry-1.docker.io/cloudpirates/keycloak";
         chart = app;
-        version = "0.14.2";
-        sha256 = "sha256-wLz9gXImB232NqOhviNfxXREpXg3oKPMaTUFxPTvPBU=";
+        version = "0.22.0";
+        sha256 = "sha256-t0lmYp37XwPrNB7YCQwiICgu/42iqYISK2pPHncgBKM=";
       };
       includeCRDs = true;
       noHooks = false;

@@ -8,14 +8,15 @@ metadata:
     app.kubernetes.io/instance: keycloak
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: keycloak
-    app.kubernetes.io/version: 26.5.2
-    helm.sh/chart: keycloak-0.14.2
-    kubenix/hash: 5d7e16b7a088c1c8681eb2bd85d55b7abd15563d
+    app.kubernetes.io/version: 26.8.1
+    helm.sh/chart: keycloak-0.22.0
+    kubenix/hash: 76ad127fe75aa05b4b9c0b4ec291500ef388f10c
   name: keycloak
   namespace: apps
 spec:
   podManagementPolicy: OrderedReady
   replicas: 1
+  revisionHistoryLimit: 10
   selector:
     matchLabels:
       app.kubernetes.io/instance: keycloak
@@ -27,8 +28,8 @@ spec:
         app.kubernetes.io/instance: keycloak
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: keycloak
-        app.kubernetes.io/version: 26.5.2
-        helm.sh/chart: keycloak-0.14.2
+        app.kubernetes.io/version: 26.8.1
+        helm.sh/chart: keycloak-0.22.0
     spec:
       automountServiceAccountToken: false
       containers:
@@ -40,8 +41,10 @@ spec:
             - --proxy-headers=xforwarded
             - --http-port=8080
             - --https-port=8443
+            - --http-management-port=9000
             - --db=postgres
             - --db-url=jdbc:postgresql://postgresql-rw.databases.svc.cluster.local:5432/keycloak
+            - --health-enabled=true
           command:
             - /opt/keycloak/bin/kc.sh
           env:
@@ -71,8 +74,8 @@ spec:
           livenessProbe:
             failureThreshold: 3
             httpGet:
-              path: /realms/master
-              port: http
+              path: /health/live
+              port: management
               scheme: HTTP
             initialDelaySeconds: 60
             periodSeconds: 30
@@ -83,11 +86,14 @@ spec:
             - containerPort: 8080
               name: http
               protocol: TCP
+            - containerPort: 9000
+              name: management
+              protocol: TCP
           readinessProbe:
             failureThreshold: 3
             httpGet:
-              path: /realms/master
-              port: http
+              path: /health/ready
+              port: management
               scheme: HTTP
             initialDelaySeconds: 30
             periodSeconds: 10
@@ -112,8 +118,8 @@ spec:
           startupProbe:
             failureThreshold: 60
             httpGet:
-              path: /realms/master
-              port: http
+              path: /health/live
+              port: management
               scheme: HTTP
             initialDelaySeconds: 30
             periodSeconds: 10
@@ -142,13 +148,7 @@ spec:
           image: docker.io/keycloak/keycloak:26.8.1@sha256:ed1cab21814c7d18ce8f0e11d5a1fa1c6923de12dd4c7625a18c5d34452a57a4
           imagePullPolicy: Always
           name: copy-quarkus-lib
-          resources:
-            limits:
-              cpu: 500m
-              memory: 1.5Gi
-            requests:
-              cpu: 200m
-              memory: 256Mi
+          resources: {}
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
@@ -199,6 +199,8 @@ spec:
               name: keycloak-providers
       securityContext:
         fsGroup: 1001
+        seccompProfile:
+          type: RuntimeDefault
       serviceAccountName: default
       volumes:
         - emptyDir: {}
@@ -224,9 +226,9 @@ metadata:
     app.kubernetes.io/instance: keycloak
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: keycloak
-    app.kubernetes.io/version: 26.5.2
-    helm.sh/chart: keycloak-0.14.2
-    kubenix/hash: 5d7e16b7a088c1c8681eb2bd85d55b7abd15563d
+    app.kubernetes.io/version: 26.8.1
+    helm.sh/chart: keycloak-0.22.0
+    kubenix/hash: 76ad127fe75aa05b4b9c0b4ec291500ef388f10c
   name: keycloak
   namespace: apps
 spec:
@@ -250,9 +252,9 @@ metadata:
     app.kubernetes.io/instance: keycloak
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: keycloak
-    app.kubernetes.io/version: 26.5.2
-    helm.sh/chart: keycloak-0.14.2
-    kubenix/hash: 5d7e16b7a088c1c8681eb2bd85d55b7abd15563d
+    app.kubernetes.io/version: 26.8.1
+    helm.sh/chart: keycloak-0.22.0
+    kubenix/hash: 76ad127fe75aa05b4b9c0b4ec291500ef388f10c
   name: keycloak-headless
   namespace: apps
 spec:
@@ -279,9 +281,9 @@ metadata:
     app.kubernetes.io/instance: keycloak
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: keycloak
-    app.kubernetes.io/version: 26.5.2
-    helm.sh/chart: keycloak-0.14.2
-    kubenix/hash: 5d7e16b7a088c1c8681eb2bd85d55b7abd15563d
+    app.kubernetes.io/version: 26.8.1
+    helm.sh/chart: keycloak-0.22.0
+    kubenix/hash: 76ad127fe75aa05b4b9c0b4ec291500ef388f10c
   name: keycloak
   namespace: apps
 spec:
