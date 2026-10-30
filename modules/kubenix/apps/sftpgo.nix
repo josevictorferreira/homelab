@@ -20,8 +20,8 @@ in
       chart = kubenix.lib.helm.fetch {
         chartUrl = "oci://ghcr.io/sftpgo/helm-charts/sftpgo";
         chart = "sftpgo";
-        version = "0.47.0";
-        sha256 = "sha256-lfPoY0tniuxL3vw+PFYS3KwR8MGDmZZUIZGqobnSA8s=";
+        version = "0.48.0";
+        sha256 = "sha256-g97JnO01qXhMHrKTreoxxnrl4iM4MFuLb25+NZjgr7Q=";
       };
       includeCRDs = true;
       noHooks = true;
