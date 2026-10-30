@@ -10,8 +10,8 @@ in
     chart = kubenix.lib.helm.fetch {
       repo = "https://vmware-tanzu.github.io/helm-charts";
       chart = "velero";
-      version = "11.3.2";
-      sha256 = "0qycxy93p8d3m2fq6f10zyaqlnkvh31dka6ag9z0nwncdz33v3mk";
+      version = "12.2.2";
+      sha256 = "sha256-ACcKsEe2foDG7gakvtvgYcZiYhzptJufMgIKIii2jiQ=";
     };
     inherit namespace;
     values = {
@@ -42,7 +42,7 @@ in
       initContainers = [
         {
           name = "velero-plugin-for-aws";
-          image = "velero/velero-plugin-for-aws:v1.13.2@sha256:25c3a0a043fc396a0593a3da0aa16ed1f39df74883bda42c4588fc8877b72bde";
+          image = "velero/velero-plugin-for-aws:v1.14.4@sha256:c85a7fa803569e3128c33e4f5766f84ab156c8d171c9f1dd2715581d45ce98fa";
           volumeMounts = [
             {
               mountPath = "/target";
