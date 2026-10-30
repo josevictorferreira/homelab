@@ -2,7 +2,6 @@
 , config
 , pkgs
 , homelab
-, hostConfig
 , ...
 }:
 
@@ -81,11 +80,12 @@ in
       "fs.inotify.max_user_watches" = 524288;
       # Tailscale >= 1.98 forces net.ipv4.conf.all.src_valid_mark=1 for its
       # connmark rp_filter workaround. The reverse-path check then reuses
-      # Cilium's TPROXY mark, which routes via table 2004 where every address is
-      # local, so LAN traffic to the ingress VIP is dropped as a martian before
-      # it reaches Envoy. Accepting local-looking sources on the LAN interface
-      # lets that check pass whatever tailscaled sets.
-      "net.ipv4.conf.${hostConfig.interface}.accept_local" = 1;
+      # Cilium's proxy mark, which routes via table 2004 where every address is
+      # local, so packets to and from the ingress Envoy are dropped as martians:
+      # LAN clients on the NIC and, since Cilium 1.20, replies from pods on the
+      # same node on their lxc* interfaces. Accepting local-looking sources on
+      # every interface lets that check pass whatever tailscaled sets.
+      "net.ipv4.conf.all.accept_local" = 1;
     };
 
     networking = {
@@ -121,7 +121,7 @@ in
     # Pin the k3s minor explicitly. Kubernetes only supports moving one minor at
     # a time, and the default `pkgs.k3s` jumps whenever nixpkgs moves (26.05
     # ships 1.35). Bump this one step at a time, servers first.
-    services.k3s.package = pkgs.k3s_1_35;
+    services.k3s.package = pkgs.k3s_1_36;
 
     services.k3s.extraFlags = lib.mkDefault (toString [
       "--kubelet-arg=system-reserved=cpu=250m,memory=256Mi"
