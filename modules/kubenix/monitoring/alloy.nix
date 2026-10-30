@@ -88,8 +88,8 @@ in
     chart = kubenix.lib.helm.fetch {
       repo = "https://grafana.github.io/helm-charts";
       chart = "alloy";
-      version = "1.13.0";
-      sha256 = "sha256-3IBQOLROwvwdoErUD/Wo4Fi+/8LnaKoEllWJOYzxbLw=";
+      version = "1.14.4";
+      sha256 = "sha256-f/1NfGwg5O0/ADr4IzcNoUDeVTvWVi4LMsE6AmWwNW4=";
     };
     inherit namespace;
     noHooks = true;

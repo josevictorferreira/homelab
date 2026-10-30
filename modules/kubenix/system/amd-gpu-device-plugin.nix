@@ -5,8 +5,8 @@
       chart = kubenix.lib.helm.fetch {
         repo = "https://rocm.github.io/k8s-device-plugin";
         chart = "amd-gpu";
-        version = "0.20.0";
-        sha256 = "sha256-FwNSzH2qyEXiL0WmNc8/dWvNdB9SOVZ4TrvhSNtpswo=";
+        version = "0.22.0";
+        sha256 = "sha256-5BxV3jXmRMz8WD7WAHEtU9s4Mg3SOkd62wWVfpP6/DM=";
       };
       namespace = "kube-system";
       includeCRDs = true;

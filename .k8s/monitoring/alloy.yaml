@@ -9,9 +9,9 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: alloy
     app.kubernetes.io/part-of: alloy
-    app.kubernetes.io/version: v1.20.0
-    helm.sh/chart: alloy-1.13.0
-    kubenix/hash: 8474e4b3926ff16fcda1ff53a2bbe037d13945bb
+    app.kubernetes.io/version: v1.21.3
+    helm.sh/chart: alloy-1.14.4
+    kubenix/hash: 40b357e8c13d286811c22a5f6450e63075afe510
   name: alloy
   namespace: monitoring
 spec:
@@ -48,7 +48,7 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: spec.nodeName
-          image: docker.io/grafana/alloy:v1.20.0
+          image: docker.io/grafana/alloy:v1.21.3
           imagePullPolicy: IfNotPresent
           name: alloy
           ports:
@@ -84,7 +84,7 @@ spec:
         - args:
             - --watched-dir=/etc/alloy
             - --reload-url=http://localhost:12345/-/reload
-          image: quay.io/prometheus-operator/prometheus-config-reloader:v0.94.0@sha256:142a1f11df8dd165f00375b0b1826aecb9c9adeb05c39855893138d7c7575ff7
+          image: quay.io/prometheus-operator/prometheus-config-reloader:v0.94.2@sha256:a1897c67478bc23434534e91ad3855280771196b1daf17144db9dbcb655bef71
           imagePullPolicy: IfNotPresent
           name: config-reloader
           resources:
@@ -195,9 +195,9 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: alloy
     app.kubernetes.io/part-of: alloy
-    app.kubernetes.io/version: v1.20.0
-    helm.sh/chart: alloy-1.13.0
-    kubenix/hash: 8474e4b3926ff16fcda1ff53a2bbe037d13945bb
+    app.kubernetes.io/version: v1.21.3
+    helm.sh/chart: alloy-1.14.4
+    kubenix/hash: 40b357e8c13d286811c22a5f6450e63075afe510
   name: alloy
   namespace: monitoring
 ---
@@ -213,9 +213,9 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: alloy
     app.kubernetes.io/part-of: alloy
-    app.kubernetes.io/version: v1.20.0
-    helm.sh/chart: alloy-1.13.0
-    kubenix/hash: 8474e4b3926ff16fcda1ff53a2bbe037d13945bb
+    app.kubernetes.io/version: v1.21.3
+    helm.sh/chart: alloy-1.14.4
+    kubenix/hash: 40b357e8c13d286811c22a5f6450e63075afe510
   name: alloy
   namespace: monitoring
 spec:
@@ -243,9 +243,9 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: alloy
     app.kubernetes.io/part-of: alloy
-    app.kubernetes.io/version: v1.20.0
-    helm.sh/chart: alloy-1.13.0
-    kubenix/hash: 8474e4b3926ff16fcda1ff53a2bbe037d13945bb
+    app.kubernetes.io/version: v1.21.3
+    helm.sh/chart: alloy-1.14.4
+    kubenix/hash: 40b357e8c13d286811c22a5f6450e63075afe510
   name: alloy
   namespace: monitoring
 ---
@@ -261,9 +261,9 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: alloy
     app.kubernetes.io/part-of: alloy
-    app.kubernetes.io/version: v1.20.0
-    helm.sh/chart: alloy-1.13.0
-    kubenix/hash: 8474e4b3926ff16fcda1ff53a2bbe037d13945bb
+    app.kubernetes.io/version: v1.21.3
+    helm.sh/chart: alloy-1.14.4
+    kubenix/hash: 40b357e8c13d286811c22a5f6450e63075afe510
   name: alloy
   namespace: monitoring
 spec:
@@ -288,9 +288,9 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: alloy
     app.kubernetes.io/part-of: alloy
-    app.kubernetes.io/version: v1.20.0
-    helm.sh/chart: alloy-1.13.0
-    kubenix/hash: 8474e4b3926ff16fcda1ff53a2bbe037d13945bb
+    app.kubernetes.io/version: v1.21.3
+    helm.sh/chart: alloy-1.14.4
+    kubenix/hash: 40b357e8c13d286811c22a5f6450e63075afe510
   name: alloy
   namespace: apps
 rules:
@@ -317,9 +317,9 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: alloy
     app.kubernetes.io/part-of: alloy
-    app.kubernetes.io/version: v1.20.0
-    helm.sh/chart: alloy-1.13.0
-    kubenix/hash: 8474e4b3926ff16fcda1ff53a2bbe037d13945bb
+    app.kubernetes.io/version: v1.21.3
+    helm.sh/chart: alloy-1.14.4
+    kubenix/hash: 40b357e8c13d286811c22a5f6450e63075afe510
   name: alloy
   namespace: apps
 roleRef:

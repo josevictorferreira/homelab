@@ -5,7 +5,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 8aaa8f752f82d09f91f98e7a7945bc7152002c80
+    kubenix/hash: 2c999d5dc55b646729000751d6f7862f56496919
   name: amd-gpu-device-plugin-daemonset
   namespace: kube-system
 spec:
@@ -18,7 +18,7 @@ spec:
         name: amd-gpu-dp-ds
     spec:
       containers:
-        - image: docker.io/rocm/k8s-device-plugin:1.31.0.7
+        - image: docker.io/rocm/k8s-device-plugin:1.31.0.9
           name: amd-gpu-dp-cntr
           resources: {}
           securityContext:
