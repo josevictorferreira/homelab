@@ -14,8 +14,8 @@ in
       chart = kubenix.lib.helm.fetch {
         repo = "https://helm.openwebui.com/";
         chart = "open-webui";
-        version = "8.1.0";
-        sha256 = "sha256-qFG0Iq2IBwkqG6t2Z47GDU3fjftzy3xI7ALNJjctNQk=";
+        version = "17.4.0";
+        sha256 = "sha256-1kRGf/YFXFwalQTV4iJz4ry8W33YFbVG/95/m/82M7E=";
       };
       includeCRDs = true;
       noHooks = true;

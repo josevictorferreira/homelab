@@ -9,9 +9,9 @@ metadata:
     app.kubernetes.io/instance: open-webui
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: open-webui
-    app.kubernetes.io/version: 0.6.26
-    helm.sh/chart: open-webui-8.1.0
-    kubenix/hash: a4d1118c753ebd4efc49ea92c1fae30ca5859b86
+    app.kubernetes.io/version: 0.12.4
+    helm.sh/chart: open-webui-17.4.0
+    kubenix/hash: 691f9aecc7132fdf4b45d76b8f37b509ecf65bf7
   name: open-webui
   namespace: apps
 spec:
@@ -28,8 +28,8 @@ spec:
         app.kubernetes.io/instance: open-webui
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: open-webui
-        app.kubernetes.io/version: 0.6.26
-        helm.sh/chart: open-webui-8.1.0
+        app.kubernetes.io/version: 0.12.4
+        helm.sh/chart: open-webui-17.4.0
     spec:
       automountServiceAccountToken: false
       containers:
@@ -40,6 +40,8 @@ spec:
               value: "False"
             - name: OPENAI_API_BASE_URL
               value: https://openrouter.ai/api/v1
+            - name: OPENAI_API_KEY
+              value: 0p3n-w3bu!
             - name: STORAGE_PROVIDER
               value: s3
             - name: S3_ACCESS_KEY_ID
@@ -59,11 +61,8 @@ spec:
             - name: S3_REGION_NAME
               value: us-east-1
             - name: S3_KEY_PREFIX
-            - name: OPENAI_API_KEY
-              valueFrom:
-                secretKeyRef:
-                  key: RAG_OPENAI_API_KEY
-                  name: open-webui-secrets
+            - name: ENABLE_WEBSOCKET_SUPPORT
+              value: "False"
           envFrom:
             - secretRef:
                 name: open-webui-secrets
@@ -97,7 +96,7 @@ spec:
             - mountPath: /tmp/app-data
               name: data
       priorityClassName: preemptible
-      serviceAccountName: open-webui
+      serviceAccountName: open-webui-sa
       volumes:
         - emptyDir: {}
           name: data
@@ -113,9 +112,9 @@ metadata:
     app.kubernetes.io/instance: open-webui
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: open-webui
-    app.kubernetes.io/version: 0.6.26
-    helm.sh/chart: open-webui-8.1.0
-    kubenix/hash: a4d1118c753ebd4efc49ea92c1fae30ca5859b86
+    app.kubernetes.io/version: 0.12.4
+    helm.sh/chart: open-webui-17.4.0
+    kubenix/hash: 691f9aecc7132fdf4b45d76b8f37b509ecf65bf7
   name: open-webui
   namespace: apps
 spec:
@@ -141,10 +140,10 @@ metadata:
     app.kubernetes.io/instance: open-webui
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: open-webui
-    app.kubernetes.io/version: 0.6.26
-    helm.sh/chart: open-webui-8.1.0
-    kubenix/hash: a4d1118c753ebd4efc49ea92c1fae30ca5859b86
-  name: open-webui
+    app.kubernetes.io/version: 0.12.4
+    helm.sh/chart: open-webui-17.4.0
+    kubenix/hash: 691f9aecc7132fdf4b45d76b8f37b509ecf65bf7
+  name: open-webui-sa
   namespace: apps
 ---
 apiVersion: networking.k8s.io/v1
@@ -158,9 +157,9 @@ metadata:
     app.kubernetes.io/instance: open-webui
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: open-webui
-    app.kubernetes.io/version: 0.6.26
-    helm.sh/chart: open-webui-8.1.0
-    kubenix/hash: a4d1118c753ebd4efc49ea92c1fae30ca5859b86
+    app.kubernetes.io/version: 0.12.4
+    helm.sh/chart: open-webui-17.4.0
+    kubenix/hash: 691f9aecc7132fdf4b45d76b8f37b509ecf65bf7
   name: open-webui
   namespace: apps
 spec:
@@ -188,7 +187,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: a4d1118c753ebd4efc49ea92c1fae30ca5859b86
+    kubenix/hash: 691f9aecc7132fdf4b45d76b8f37b509ecf65bf7
   name: open-webui-s3
   namespace: apps
 spec:
