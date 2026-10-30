@@ -217,11 +217,16 @@ in
               chart = kubenix.lib.helm.fetch {
                 repo = "https://bjw-s-labs.github.io/helm-charts/";
                 chart = "app-template";
-                version = "4.2.0";
-                sha256 = "sha256-JhHJmGrvpmdHfADfM4M4mby64cSH6HO6VpKmeQfngJA=";
+                version = "5.3.0";
+                sha256 = "sha256-xIF2OVM6Oy29ooIPDE6lD8Do1DQhkOjVuMv9C0hr22g=";
               };
               values = lib.mkMerge [
                 {
+                  # Keep the 4.x defaults: pods run as the namespace's default
+                  # ServiceAccount with its token mounted (5.x creates a
+                  # per-release ServiceAccount and stops mounting the token).
+                  global.createDefaultServiceAccount = false;
+                  defaultPodOptions.automountServiceAccountToken = true;
                   persistence.main = cfg.persistence;
                   controllers.main.replicas = cfg.replicas;
                   controllers.main.containers.main = {
