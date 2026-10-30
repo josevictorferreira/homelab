@@ -22,8 +22,8 @@ in
       chart = kubenix.lib.helm.fetch {
         repo = "https://grafana-community.github.io/helm-charts";
         chart = "loki";
-        version = "18.13.7";
-        sha256 = "sha256-TkpN0Qj4fUaAO5r1YT2B3D4DhtltQTxfk7OJztBF+jw=";
+        version = "20.2.0";
+        sha256 = "sha256-KwI9uiCd9JAPeB3Ojj2hHYs3cDfxJ7GfUk5ArYrKhXQ=";
       };
       inherit namespace;
       noHooks = true;
