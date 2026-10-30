@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: readeck
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: e02ca7815840a6ce50cda21cd732af26fb7d3c1c
+    kubenix/hash: 39def5323e7e61cd0c186377937acb7bfed5666a
     kubenix/module-instance: readeck
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -47,7 +47,7 @@ spec:
           envFrom:
             - secretRef:
                 name: readeck-env
-          image: codeberg.org/readeck/readeck:0.23.1@sha256:d1dde9c0a7292fffe4170ec410aeffb03d67693b41f954918aad8dc3dd70786b
+          image: codeberg.org/readeck/readeck:0.23.5@sha256:17dea468f4f713930338062f58a3a5e0d04e37d2961ddb827792e223f3db91b4
           imagePullPolicy: IfNotPresent
           name: main
           ports:
@@ -107,7 +107,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: readeck
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: e02ca7815840a6ce50cda21cd732af26fb7d3c1c
+    kubenix/hash: 39def5323e7e61cd0c186377937acb7bfed5666a
     kubenix/module-instance: readeck
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -135,7 +135,7 @@ metadata:
     app.kubernetes.io/name: readeck
     app.kubernetes.io/service: readeck
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: e02ca7815840a6ce50cda21cd732af26fb7d3c1c
+    kubenix/hash: 39def5323e7e61cd0c186377937acb7bfed5666a
     kubenix/module-instance: readeck
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -164,7 +164,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: readeck
     helm.sh/chart: app-template-4.2.0
-    kubenix/hash: e02ca7815840a6ce50cda21cd732af26fb7d3c1c
+    kubenix/hash: 39def5323e7e61cd0c186377937acb7bfed5666a
     kubenix/module-instance: readeck
     kubenix/module-name: release
     kubenix/module-version: 1.0.0

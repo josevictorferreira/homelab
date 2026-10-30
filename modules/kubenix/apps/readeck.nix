@@ -12,7 +12,7 @@ in
       inherit namespace;
       image = {
         repository = "codeberg.org/readeck/readeck";
-        tag = "0.23.1@sha256:d1dde9c0a7292fffe4170ec410aeffb03d67693b41f954918aad8dc3dd70786b";
+        tag = "0.23.5@sha256:17dea468f4f713930338062f58a3a5e0d04e37d2961ddb827792e223f3db91b4";
         pullPolicy = "IfNotPresent";
       };
       port = 8000;
