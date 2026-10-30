@@ -19,8 +19,8 @@ in
       chart = kubenix.lib.helm.fetch {
         repo = "https://pajikos.github.io/home-assistant-helm-chart";
         chart = "home-assistant";
-        version = "0.3.68";
-        sha256 = "sha256-/YUEnJAaH6Ea1IeGmaHy2zqdr8nN3xPp11eczVIzrXY=";
+        version = "0.3.89";
+        sha256 = "sha256-RQdbwFhuGX/POGpGio4p3gUK/MaPrAQlwwPgGcukFCg=";
       };
       noHooks = true;
       inherit namespace;
