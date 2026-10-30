@@ -87,6 +87,20 @@ in
           # quorum even and put a mon on lab-gamma-wk, which resets under load.
           mon.count = 3;
           mon.allowMultiplePerNode = false;
+          # Ceph 19.2.6+/20.2.4+ (CVE-2025-30156) flags `aes` cephx keys and
+          # raises HEALTH_ERR for daemon (service) keys still using them.
+          # Rotate the daemon keys to aes256k by bumping keyGeneration; Rook
+          # restarts the daemons one by one. CSI client keys stay on `aes` and are
+          # not rotated: kernel RBD/CephFS clients only support aes256k from
+          # Linux 7.0, and every node runs 6.x. Rotating them would break mounts.
+          security.cephx = {
+            daemon = {
+              keyRotationPolicy = "KeyGeneration";
+              keyGeneration = 2;
+              keyType = "aes256k";
+            };
+            csi.keyType = "aes";
+          };
           dashboard.enabled = true;
           dashboard.ssl = false;
           network = {
