@@ -6,7 +6,8 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/part-of: cilium
-    kubenix/hash: 6d31e592c370de4cf3e641652d5c83a2d7d0249e
+    helm.sh/chart: cilium-1.20.4
+    kubenix/hash: ba031e6e7ac940816b40fae7914a47eb3590105b
   name: cilium-secrets
 ---
 apiVersion: apps/v1
@@ -18,8 +19,9 @@ metadata:
   labels:
     app.kubernetes.io/name: cilium-agent
     app.kubernetes.io/part-of: cilium
+    helm.sh/chart: cilium-1.20.4
     k8s-app: cilium
-    kubenix/hash: 6d31e592c370de4cf3e641652d5c83a2d7d0249e
+    kubenix/hash: ba031e6e7ac940816b40fae7914a47eb3590105b
   name: cilium
   namespace: kube-system
 spec:
@@ -29,11 +31,12 @@ spec:
   template:
     metadata:
       annotations:
-        cilium.io/cilium-configmap-checksum: 5272821061185f4f85a40d788eab160c517969491e2d61a21d735ea7a94eb0af
+        cilium.io/cilium-configmap-checksum: 08d96d98a5fccf4b54df3d3cc2982b736dfc23687b189f95862a2335420413a9
         kubectl.kubernetes.io/default-container: cilium-agent
       labels:
         app.kubernetes.io/name: cilium-agent
         app.kubernetes.io/part-of: cilium
+        helm.sh/chart: cilium-1.20.4
         k8s-app: cilium
     spec:
       affinity:
@@ -75,7 +78,7 @@ spec:
               value: "1"
             - name: KUBE_CLIENT_BACKOFF_DURATION
               value: "120"
-          image: quay.io/cilium/cilium:v1.19.10@sha256:e86fb55fa703ada191fbd4489513daa19674952c8c3c4985dc3c77ce51ac4f27
+          image: quay.io/cilium/cilium:v1.20.4@sha256:20fe92e4c86641233a450098c158d2d29085f3419931ab6bf681d2485dedf16e
           imagePullPolicy: IfNotPresent
           lifecycle:
             postStart:
@@ -221,7 +224,7 @@ spec:
               value: 10.10.10.250
             - name: KUBERNETES_SERVICE_PORT
               value: "6443"
-          image: quay.io/cilium/cilium:v1.19.10@sha256:e86fb55fa703ada191fbd4489513daa19674952c8c3c4985dc3c77ce51ac4f27
+          image: quay.io/cilium/cilium:v1.20.4@sha256:20fe92e4c86641233a450098c158d2d29085f3419931ab6bf681d2485dedf16e
           imagePullPolicy: IfNotPresent
           name: config
           securityContext:
@@ -246,7 +249,7 @@ spec:
               value: /run/cilium/cgroupv2
             - name: BIN_PATH
               value: /opt/cni/bin
-          image: quay.io/cilium/cilium:v1.19.10@sha256:e86fb55fa703ada191fbd4489513daa19674952c8c3c4985dc3c77ce51ac4f27
+          image: quay.io/cilium/cilium:v1.20.4@sha256:20fe92e4c86641233a450098c158d2d29085f3419931ab6bf681d2485dedf16e
           imagePullPolicy: IfNotPresent
           name: mount-cgroup
           securityContext:
@@ -276,7 +279,7 @@ spec:
           env:
             - name: BIN_PATH
               value: /opt/cni/bin
-          image: quay.io/cilium/cilium:v1.19.10@sha256:e86fb55fa703ada191fbd4489513daa19674952c8c3c4985dc3c77ce51ac4f27
+          image: quay.io/cilium/cilium:v1.20.4@sha256:20fe92e4c86641233a450098c158d2d29085f3419931ab6bf681d2485dedf16e
           imagePullPolicy: IfNotPresent
           name: apply-sysctl-overwrites
           securityContext:
@@ -302,7 +305,7 @@ spec:
             - /bin/bash
             - -c
             - --
-          image: quay.io/cilium/cilium:v1.19.10@sha256:e86fb55fa703ada191fbd4489513daa19674952c8c3c4985dc3c77ce51ac4f27
+          image: quay.io/cilium/cilium:v1.20.4@sha256:20fe92e4c86641233a450098c158d2d29085f3419931ab6bf681d2485dedf16e
           imagePullPolicy: IfNotPresent
           name: mount-bpf-fs
           securityContext:
@@ -337,7 +340,7 @@ spec:
               value: 10.10.10.250
             - name: KUBERNETES_SERVICE_PORT
               value: "6443"
-          image: quay.io/cilium/cilium:v1.19.10@sha256:e86fb55fa703ada191fbd4489513daa19674952c8c3c4985dc3c77ce51ac4f27
+          image: quay.io/cilium/cilium:v1.20.4@sha256:20fe92e4c86641233a450098c158d2d29085f3419931ab6bf681d2485dedf16e
           imagePullPolicy: IfNotPresent
           name: clean-cilium-state
           securityContext:
@@ -363,7 +366,7 @@ spec:
               name: cilium-run
         - command:
             - /install-plugin.sh
-          image: quay.io/cilium/cilium:v1.19.10@sha256:e86fb55fa703ada191fbd4489513daa19674952c8c3c4985dc3c77ce51ac4f27
+          image: quay.io/cilium/cilium:v1.20.4@sha256:20fe92e4c86641233a450098c158d2d29085f3419931ab6bf681d2485dedf16e
           imagePullPolicy: IfNotPresent
           name: install-cni-binaries
           resources:
@@ -484,8 +487,9 @@ metadata:
   labels:
     app.kubernetes.io/name: cilium-operator
     app.kubernetes.io/part-of: cilium
+    helm.sh/chart: cilium-1.20.4
     io.cilium/app: operator
-    kubenix/hash: 6d31e592c370de4cf3e641652d5c83a2d7d0249e
+    kubenix/hash: ba031e6e7ac940816b40fae7914a47eb3590105b
     name: cilium-operator
   name: cilium-operator
   namespace: kube-system
@@ -503,12 +507,13 @@ spec:
   template:
     metadata:
       annotations:
-        cilium.io/cilium-configmap-checksum: 5272821061185f4f85a40d788eab160c517969491e2d61a21d735ea7a94eb0af
+        cilium.io/cilium-configmap-checksum: 08d96d98a5fccf4b54df3d3cc2982b736dfc23687b189f95862a2335420413a9
         prometheus.io/port: "9963"
         prometheus.io/scrape: "true"
       labels:
         app.kubernetes.io/name: cilium-operator
         app.kubernetes.io/part-of: cilium
+        helm.sh/chart: cilium-1.20.4
         io.cilium/app: operator
         name: cilium-operator
     spec:
@@ -547,7 +552,7 @@ spec:
               value: 10.10.10.250
             - name: KUBERNETES_SERVICE_PORT
               value: "6443"
-          image: quay.io/cilium/operator-generic:v1.19.10@sha256:b3d1c26d4bc58e307282bad9639b4d598e73f91be1430028f36bc5fdce19a85c
+          image: quay.io/cilium/operator-generic:v1.20.4@sha256:7a7a3489dc66ad67e420d285c8a8d2e169b0957ad15e120f593d27081bf38d82
           imagePullPolicy: IfNotPresent
           livenessProbe:
             httpGet:
@@ -619,7 +624,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 6d31e592c370de4cf3e641652d5c83a2d7d0249e
+    kubenix/hash: ba031e6e7ac940816b40fae7914a47eb3590105b
   name: lb-pool
 spec:
   blocks:
@@ -633,7 +638,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 6d31e592c370de4cf3e641652d5c83a2d7d0249e
+    kubenix/hash: ba031e6e7ac940816b40fae7914a47eb3590105b
   name: default-l2-announcement-policy
   namespace: kube-system
 spec:
@@ -674,6 +679,7 @@ data:
   cluster-pool-ipv4-cidr: 10.0.0.0/8
   cluster-pool-ipv4-mask-size: "24"
   clustermesh-cache-ttl: 0s
+  clustermesh-default-global-namespace: "true"
   clustermesh-enable-endpoint-sync: "false"
   clustermesh-enable-mcs-api: "false"
   clustermesh-mcs-api-install-crds: "true"
@@ -681,16 +687,20 @@ data:
   cni-log-file: /var/run/cilium/cilium-cni.log
   custom-cni-conf: "false"
   datapath-mode: veth
+  datapath-plugins-state-dir: /var/run/cilium/plugins
   debug: "false"
   default-lb-service-ipam: lbipam
+  devices: ""
   direct-routing-skip-unreachable: "false"
   dnsproxy-enable-transparent-mode: "true"
   dnsproxy-socket-linger-timeout: "10"
   egress-gateway-reconciliation-trigger-interval: 1s
   enable-auto-protect-node-port-range: "true"
   enable-bpf-clock-probe: "false"
+  enable-datapath-plugins: "false"
   enable-drift-checker: "true"
   enable-dynamic-config: "true"
+  enable-dynamic-source-lookup-nodeport: "false"
   enable-endpoint-health-checking: "true"
   enable-endpoint-lockdown-on-policy-overflow: "false"
   enable-envoy-config: "true"
@@ -729,9 +739,11 @@ data:
   enable-xt-socket-fallback: "true"
   enforce-ingress-https: "true"
   envoy-access-log-buffer-size: "4096"
+  envoy-access-log-enabled: "true"
   envoy-base-id: "0"
   envoy-config-retry-interval: 15s
   envoy-keep-cap-netbindservice: "false"
+  envoy-node-locality-enabled: "false"
   external-envoy-proxy: "false"
   health-check-icmp-failure-threshold: "3"
   http-retry-count: "3"
@@ -741,12 +753,17 @@ data:
   identity-heartbeat-timeout: 30m0s
   identity-management-mode: agent
   ingress-default-lb-mode: shared
+  ingress-default-xff-num-trusted-hops: "0"
   ingress-hostnetwork-enabled: "false"
+  ingress-hostnetwork-http-listener-port: "0"
+  ingress-hostnetwork-https-listener-port: "0"
   ingress-hostnetwork-nodelabelselector: ""
   ingress-hostnetwork-shared-listener-port: "8080"
+  ingress-hostnetwork-tls-passthrough-listener-port: "0"
   ingress-lb-annotation-prefixes: lbipam.cilium.io nodeipam.cilium.io service.beta.kubernetes.io service.kubernetes.io cloud.google.com
   ingress-secrets-namespace: cilium-secrets
   ingress-shared-lb-service-name: cilium-ingress
+  ingress-use-remote-address: "true"
   install-no-conntrack-iptables-rules: "false"
   ipam: cluster-pool
   ipam-cilium-node-update-rate: 15s
@@ -780,6 +797,7 @@ data:
   preallocate-bpf-maps: "false"
   procfs: /host/proc
   proxy-cluster-max-connections: "1024"
+  proxy-cluster-max-pending-requests: "1024"
   proxy-cluster-max-requests: "1024"
   proxy-connect-timeout: "2"
   proxy-idle-timeout-seconds: "60"
@@ -819,7 +837,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 6d31e592c370de4cf3e641652d5c83a2d7d0249e
+    kubenix/hash: ba031e6e7ac940816b40fae7914a47eb3590105b
   name: cilium-config
   namespace: kube-system
 ---
@@ -834,7 +852,8 @@ metadata:
   labels:
     app.kubernetes.io/part-of: cilium
     cilium.io/ingress: "true"
-    kubenix/hash: 6d31e592c370de4cf3e641652d5c83a2d7d0249e
+    helm.sh/chart: cilium-1.20.4
+    kubenix/hash: ba031e6e7ac940816b40fae7914a47eb3590105b
   name: cilium-ingress
   namespace: kube-system
 spec:
@@ -855,7 +874,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 6d31e592c370de4cf3e641652d5c83a2d7d0249e
+    kubenix/hash: ba031e6e7ac940816b40fae7914a47eb3590105b
   name: cilium
   namespace: kube-system
 ---
@@ -866,7 +885,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 6d31e592c370de4cf3e641652d5c83a2d7d0249e
+    kubenix/hash: ba031e6e7ac940816b40fae7914a47eb3590105b
   name: cilium-operator
   namespace: kube-system
 ---
@@ -885,7 +904,7 @@ metadata:
     lbipam.cilium.io/ips: 10.10.10.110
     lbipam.cilium.io/sharing-key: cilium-ingress
   labels:
-    kubenix/hash: 6d31e592c370de4cf3e641652d5c83a2d7d0249e
+    kubenix/hash: ba031e6e7ac940816b40fae7914a47eb3590105b
     kubernetes.io/service-name: cilium-ingress
   name: cilium-ingress
   namespace: kube-system
@@ -900,7 +919,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 6d31e592c370de4cf3e641652d5c83a2d7d0249e
+    kubenix/hash: ba031e6e7ac940816b40fae7914a47eb3590105b
   name: cilium
 spec:
   controller: cilium.io/ingress-controller
@@ -913,7 +932,8 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/part-of: cilium
-    kubenix/hash: 6d31e592c370de4cf3e641652d5c83a2d7d0249e
+    helm.sh/chart: cilium-1.20.4
+    kubenix/hash: ba031e6e7ac940816b40fae7914a47eb3590105b
   name: cilium
 rules:
   - apiGroups:
@@ -938,7 +958,6 @@ rules:
       - namespaces
       - services
       - pods
-      - endpoints
       - nodes
     verbs:
       - get
@@ -966,7 +985,6 @@ rules:
       - cilium.io
     resources:
       - ciliumloadbalancerippools
-      - ciliumbgppeeringpolicies
       - ciliumbgpnodeconfigs
       - ciliumbgpadvertisements
       - ciliumbgppeerconfigs
@@ -984,6 +1002,7 @@ rules:
       - ciliumcidrgroups
       - ciliuml2announcementpolicies
       - ciliumpodippools
+      - ciliumdatapathplugins
     verbs:
       - list
       - watch
@@ -1034,7 +1053,8 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/part-of: cilium
-    kubenix/hash: 6d31e592c370de4cf3e641652d5c83a2d7d0249e
+    helm.sh/chart: cilium-1.20.4
+    kubenix/hash: ba031e6e7ac940816b40fae7914a47eb3590105b
   name: cilium-operator
 rules:
   - apiGroups:
@@ -1088,6 +1108,7 @@ rules:
     resources:
       - namespaces
       - secrets
+      - serviceaccounts
     verbs:
       - get
       - list
@@ -1096,7 +1117,6 @@ rules:
       - ""
     resources:
       - services
-      - endpoints
     verbs:
       - get
       - list
@@ -1175,9 +1195,12 @@ rules:
     resources:
       - ciliumendpointslices
       - ciliumenvoyconfigs
+      - ciliumbgpclusterconfigs
+      - ciliumbgpnodeconfigoverrides
       - ciliumbgppeerconfigs
       - ciliumbgpadvertisements
       - ciliumbgpnodeconfigs
+      - ciliumcidrgroups
     verbs:
       - create
       - update
@@ -1226,8 +1249,21 @@ rules:
       - ciliuml2announcementpolicies.cilium.io
       - ciliumpodippools.cilium.io
       - ciliumgatewayclassconfigs.cilium.io
+      - ciliumdatapathplugins.cilium.io
     resources:
       - customresourcedefinitions
+    verbs:
+      - update
+  - apiGroups:
+      - apiextensions.k8s.io
+    resourceNames:
+      - ciliumbgpclusterconfigs.cilium.io
+      - ciliumbgppeerconfigs.cilium.io
+      - ciliumbgpadvertisements.cilium.io
+      - ciliumbgpnodeconfigs.cilium.io
+      - ciliumbgpnodeconfigoverrides.cilium.io
+    resources:
+      - customresourcedefinitions/status
     verbs:
       - update
   - apiGroups:
@@ -1235,10 +1271,8 @@ rules:
     resources:
       - ciliumloadbalancerippools
       - ciliumpodippools
-      - ciliumbgppeeringpolicies
-      - ciliumbgpclusterconfigs
-      - ciliumbgpnodeconfigoverrides
       - ciliumbgppeerconfigs
+      - ciliumdatapathplugins
     verbs:
       - get
       - list
@@ -1294,7 +1328,8 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/part-of: cilium
-    kubenix/hash: 6d31e592c370de4cf3e641652d5c83a2d7d0249e
+    helm.sh/chart: cilium-1.20.4
+    kubenix/hash: ba031e6e7ac940816b40fae7914a47eb3590105b
   name: cilium
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -1313,7 +1348,8 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/part-of: cilium
-    kubenix/hash: 6d31e592c370de4cf3e641652d5c83a2d7d0249e
+    helm.sh/chart: cilium-1.20.4
+    kubenix/hash: ba031e6e7ac940816b40fae7914a47eb3590105b
   name: cilium-operator
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -1332,7 +1368,8 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/part-of: cilium
-    kubenix/hash: 6d31e592c370de4cf3e641652d5c83a2d7d0249e
+    helm.sh/chart: cilium-1.20.4
+    kubenix/hash: ba031e6e7ac940816b40fae7914a47eb3590105b
   name: cilium-config-agent
   namespace: kube-system
 rules:
@@ -1353,7 +1390,8 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/part-of: cilium
-    kubenix/hash: 6d31e592c370de4cf3e641652d5c83a2d7d0249e
+    helm.sh/chart: cilium-1.20.4
+    kubenix/hash: ba031e6e7ac940816b40fae7914a47eb3590105b
   name: cilium-ingress-secrets
   namespace: cilium-secrets
 rules:
@@ -1374,7 +1412,8 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/part-of: cilium
-    kubenix/hash: 6d31e592c370de4cf3e641652d5c83a2d7d0249e
+    helm.sh/chart: cilium-1.20.4
+    kubenix/hash: ba031e6e7ac940816b40fae7914a47eb3590105b
   name: cilium-operator-ingress-secrets
   namespace: cilium-secrets
 rules:
@@ -1396,7 +1435,8 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/part-of: cilium
-    kubenix/hash: 6d31e592c370de4cf3e641652d5c83a2d7d0249e
+    helm.sh/chart: cilium-1.20.4
+    kubenix/hash: ba031e6e7ac940816b40fae7914a47eb3590105b
   name: cilium-operator-tlsinterception-secrets
   namespace: cilium-secrets
 rules:
@@ -1418,7 +1458,8 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/part-of: cilium
-    kubenix/hash: 6d31e592c370de4cf3e641652d5c83a2d7d0249e
+    helm.sh/chart: cilium-1.20.4
+    kubenix/hash: ba031e6e7ac940816b40fae7914a47eb3590105b
   name: cilium-operator-ztunnel
   namespace: kube-system
 rules:
@@ -1432,6 +1473,14 @@ rules:
       - get
       - list
       - watch
+  - apiGroups:
+      - ""
+    resources:
+      - serviceaccounts
+    verbs:
+      - get
+      - list
+      - watch
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
@@ -1441,7 +1490,8 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/part-of: cilium
-    kubenix/hash: 6d31e592c370de4cf3e641652d5c83a2d7d0249e
+    helm.sh/chart: cilium-1.20.4
+    kubenix/hash: ba031e6e7ac940816b40fae7914a47eb3590105b
   name: cilium-tlsinterception-secrets
   namespace: cilium-secrets
 rules:
@@ -1462,7 +1512,8 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/part-of: cilium
-    kubenix/hash: 6d31e592c370de4cf3e641652d5c83a2d7d0249e
+    helm.sh/chart: cilium-1.20.4
+    kubenix/hash: ba031e6e7ac940816b40fae7914a47eb3590105b
   name: cilium-config-agent
   namespace: kube-system
 roleRef:
@@ -1482,7 +1533,8 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/part-of: cilium
-    kubenix/hash: 6d31e592c370de4cf3e641652d5c83a2d7d0249e
+    helm.sh/chart: cilium-1.20.4
+    kubenix/hash: ba031e6e7ac940816b40fae7914a47eb3590105b
   name: cilium-operator-ingress-secrets
   namespace: cilium-secrets
 roleRef:
@@ -1502,7 +1554,8 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/part-of: cilium
-    kubenix/hash: 6d31e592c370de4cf3e641652d5c83a2d7d0249e
+    helm.sh/chart: cilium-1.20.4
+    kubenix/hash: ba031e6e7ac940816b40fae7914a47eb3590105b
   name: cilium-operator-tlsinterception-secrets
   namespace: cilium-secrets
 roleRef:
@@ -1522,7 +1575,8 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/part-of: cilium
-    kubenix/hash: 6d31e592c370de4cf3e641652d5c83a2d7d0249e
+    helm.sh/chart: cilium-1.20.4
+    kubenix/hash: ba031e6e7ac940816b40fae7914a47eb3590105b
   name: cilium-operator-ztunnel
   namespace: kube-system
 roleRef:
@@ -1542,7 +1596,8 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/part-of: cilium
-    kubenix/hash: 6d31e592c370de4cf3e641652d5c83a2d7d0249e
+    helm.sh/chart: cilium-1.20.4
+    kubenix/hash: ba031e6e7ac940816b40fae7914a47eb3590105b
   name: cilium-secrets
   namespace: cilium-secrets
 roleRef:
@@ -1562,7 +1617,8 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     app.kubernetes.io/part-of: cilium
-    kubenix/hash: 6d31e592c370de4cf3e641652d5c83a2d7d0249e
+    helm.sh/chart: cilium-1.20.4
+    kubenix/hash: ba031e6e7ac940816b40fae7914a47eb3590105b
   name: cilium-tlsinterception-secrets
   namespace: cilium-secrets
 roleRef:

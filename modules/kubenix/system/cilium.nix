@@ -6,8 +6,8 @@
       chart = kubenix.lib.helm.fetch {
         repo = "https://helm.cilium.io";
         chart = "cilium";
-        version = "1.19.10";
-        sha256 = "sha256-jYWdIqH4OVoOBowWuMV1OPLd7b9Sv2D0XSJVvYY0fB0=";
+        version = "1.20.4";
+        sha256 = "sha256-KYp707isjg+hw4j3Kx+2Oked6D8zwQMG6PDZmRX1FsI=";
       };
       includeCRDs = true;
       noHooks = true;
@@ -50,6 +50,8 @@
           ui.enabled = false;
         };
         nodePort.enabled = true;
+        # Ingress relies on TPROXY, which is incompatible with netkit.
+        bpf.datapathMode = "veth";
         # The chart default is a bare integer, which kubenix rejects for a
         # Quantity field.
         cni.resources.limits.cpu = "1";
