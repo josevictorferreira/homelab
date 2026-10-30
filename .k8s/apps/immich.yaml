@@ -9,9 +9,9 @@ metadata:
     app.kubernetes.io/instance: immich
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: server
-    app.kubernetes.io/version: v2.0.0
-    helm.sh/chart: immich-0.10.3
-    kubenix/hash: 171819ec62619c2c1a1e30a0fc5d422f6b939cec
+    app.kubernetes.io/version: v3.2.0
+    helm.sh/chart: immich-0.13.4
+    kubenix/hash: 6f1db0cfd1b9135a59ef0f8f25c7cd7a4314d1ad
   name: immich-server
   namespace: apps
 spec:
@@ -33,7 +33,7 @@ spec:
         app.kubernetes.io/instance: immich
         app.kubernetes.io/name: server
     spec:
-      automountServiceAccountToken: true
+      automountServiceAccountToken: false
       containers:
         - env:
             - name: IMMICH_CONFIG_FILE
@@ -102,7 +102,7 @@ spec:
       hostNetwork: false
       hostPID: false
       priorityClassName: preemptible
-      serviceAccountName: default
+      serviceAccountName: immich-server
       volumes:
         - configMap:
             name: immich-immich-config
@@ -128,9 +128,9 @@ metadata:
     app.kubernetes.io/instance: immich
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: immich
-    app.kubernetes.io/version: v2.0.0
-    helm.sh/chart: immich-0.10.3
-    kubenix/hash: 171819ec62619c2c1a1e30a0fc5d422f6b939cec
+    app.kubernetes.io/version: v3.2.0
+    helm.sh/chart: immich-0.13.4
+    kubenix/hash: 6f1db0cfd1b9135a59ef0f8f25c7cd7a4314d1ad
   name: immich-immich-config
   namespace: apps
 ---
@@ -147,14 +147,15 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: server
     app.kubernetes.io/service: immich-server
-    app.kubernetes.io/version: v2.0.0
-    helm.sh/chart: immich-0.10.3
-    kubenix/hash: 171819ec62619c2c1a1e30a0fc5d422f6b939cec
+    app.kubernetes.io/version: v3.2.0
+    helm.sh/chart: immich-0.13.4
+    kubenix/hash: 6f1db0cfd1b9135a59ef0f8f25c7cd7a4314d1ad
   name: immich-server
   namespace: apps
 spec:
   ports:
-    - name: http
+    - appProtocol: kubernetes.io/ws
+      name: http
       port: 2283
       protocol: TCP
       targetPort: http
@@ -172,6 +173,22 @@ spec:
     app.kubernetes.io/name: server
   type: LoadBalancer
 ---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  annotations:
+    kubenix/k8s-version: "1.32"
+    kubenix/project-name: ze-homelab
+  labels:
+    app.kubernetes.io/instance: immich
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: server
+    app.kubernetes.io/version: v3.2.0
+    helm.sh/chart: immich-0.13.4
+    kubenix/hash: 6f1db0cfd1b9135a59ef0f8f25c7cd7a4314d1ad
+  name: immich-server
+  namespace: apps
+---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
@@ -182,9 +199,9 @@ metadata:
     app.kubernetes.io/instance: immich
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: server
-    app.kubernetes.io/version: v2.0.0
-    helm.sh/chart: immich-0.10.3
-    kubenix/hash: 171819ec62619c2c1a1e30a0fc5d422f6b939cec
+    app.kubernetes.io/version: v3.2.0
+    helm.sh/chart: immich-0.13.4
+    kubenix/hash: 6f1db0cfd1b9135a59ef0f8f25c7cd7a4314d1ad
   name: immich-server
   namespace: apps
 spec:
@@ -193,7 +210,7 @@ spec:
       scheme: http
     - port: metrics-ms
       scheme: http
-  jobLabel: immich-server
+  jobLabel: app.kubernetes.io/name
   namespaceSelector:
     matchNames:
       - apps
@@ -214,9 +231,9 @@ metadata:
     app.kubernetes.io/instance: immich
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: server
-    app.kubernetes.io/version: v2.0.0
-    helm.sh/chart: immich-0.10.3
-    kubenix/hash: 171819ec62619c2c1a1e30a0fc5d422f6b939cec
+    app.kubernetes.io/version: v3.2.0
+    helm.sh/chart: immich-0.13.4
+    kubenix/hash: 6f1db0cfd1b9135a59ef0f8f25c7cd7a4314d1ad
   name: immich-server
   namespace: apps
 spec:

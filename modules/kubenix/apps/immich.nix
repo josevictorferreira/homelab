@@ -1,4 +1,4 @@
-{ kubenix, homelab, ... }:
+{ kubenix, homelab, pkgs, ... }:
 
 let
   # Use root PVC with subPath to avoid overlapping CephFS mount issues
@@ -9,12 +9,19 @@ in
 {
   kubernetes = {
     helm.releases.${app} = {
-      chart = kubenix.lib.helm.fetch {
-        chartUrl = "oci://ghcr.io/immich-app/immich-charts/immich";
-        chart = "immich";
-        version = "0.10.3";
-        sha256 = "sha256-+GGHO1w55A5/oe5gp/lweWXBMy7a/2VdoxlEdlsVnzk=";
-      };
+      # Since 0.11 the chart and its bjw-s common subchart $ref JSON schemas on
+      # raw.githubusercontent.com, which helm cannot fetch inside the Nix
+      # sandbox; drop those schema files so `helm template` can run.
+      chart = pkgs.runCommand "immich-chart" { } ''
+        cp -r ${kubenix.lib.helm.fetch {
+          chartUrl = "oci://ghcr.io/immich-app/immich-charts/immich";
+          chart = "immich";
+          version = "0.13.4";
+          sha256 = "sha256-Nj9kifEjGhulJ2+9ktv58wAFYiCLuxH9Q04TOyKC4x8=";
+        }} $out
+        chmod -R u+w $out
+        grep -rl --include=values.schema.json 'https://' $out | xargs -r rm
+      '';
       includeCRDs = true;
       noHooks = true;
       inherit namespace;
