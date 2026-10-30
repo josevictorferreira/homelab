@@ -121,7 +121,7 @@ in
     # Pin the k3s minor explicitly. Kubernetes only supports moving one minor at
     # a time, and the default `pkgs.k3s` jumps whenever nixpkgs moves (26.05
     # ships 1.35). Bump this one step at a time, servers first.
-    services.k3s.package = pkgs.k3s_1_34;
+    services.k3s.package = pkgs.k3s_1_35;
 
     services.k3s.extraFlags = lib.mkDefault (toString [
       "--kubelet-arg=system-reserved=cpu=250m,memory=256Mi"
