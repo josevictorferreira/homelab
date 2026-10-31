@@ -110,6 +110,27 @@ in
             }
           ];
           "grafana.ini".server.root_url = "https://grafana.${homelab.domain}";
+          # Grafana 13 starts every bundled backend plugin at boot, and on the
+          # Pi each takes a minute or more. Only Prometheus, Alertmanager and
+          # Loki are used as datasources.
+          "grafana.ini".plugins.disable_plugins = lib.concatStringsSep "," [
+            "cloudwatch"
+            "elasticsearch"
+            "grafana-azure-monitor-datasource"
+            "grafana-postgresql-datasource"
+            "grafana-pyroscope-datasource"
+            "grafana-testdata-datasource"
+            "graphite"
+            "influxdb"
+            "jaeger"
+            "mssql"
+            "mysql"
+            "opentsdb"
+            "parca"
+            "stackdriver"
+            "tempo"
+            "zipkin"
+          ];
           "grafana.ini".database = {
             type = "postgres";
             host = "${kubenix.lib.postgresHost}:5432";
