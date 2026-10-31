@@ -22,7 +22,9 @@ in
 
         image = {
           repository = "ghcr.io/searxng/searxng";
-          digest = "sha256:ef6ae36e01f89f8dadcabc684a9159728fbda6f0be8d638edce26d0a3ede17c6";
+          # Multi-arch index for 2026.10.13-22c64b8d3 (the old pin was its
+          # arm64-only manifest, from when searxng ran on the Pi).
+          digest = "sha256:9b61996edcc679fb6665290f95fda15389a14eda6060e41a25c63ab2758f2436";
           pullPolicy = "IfNotPresent";
         };
 
