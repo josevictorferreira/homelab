@@ -97,6 +97,10 @@ in
           };
           ingress = kubenix.lib.ingressDomainFor "grafana";
           affinity = homelab.kubernetes.affinities.piNode;
+          # On the Pi's SD card a cold start (new image, schema migration) can
+          # take minutes before /api/health answers; the chart's 60s delay
+          # kills it in a loop.
+          livenessProbe.initialDelaySeconds = 600;
           tolerations = [
             {
               key = "pi-only";
