@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/name: searxng
     app.kubernetes.io/version: 1.3.1
     helm.sh/chart: searxng-1.3.1
-    kubenix/hash: 56bff5de5f13920591983eea0ebc0d14f787ac57
+    kubenix/hash: 3bbb2e9975c2abcfa3a3287e3188b27907e9327d
   name: searxng
   namespace: apps
 spec:
@@ -28,15 +28,6 @@ spec:
         app.kubernetes.io/version: 1.3.1
         helm.sh/chart: searxng-1.3.1
     spec:
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-              - matchExpressions:
-                  - key: kubernetes.io/hostname
-                    operator: In
-                    values:
-                      - lab-pi-bk
       containers:
         - env:
             - name: SEARXNG_PORT
@@ -103,11 +94,6 @@ spec:
               name: data
             - mountPath: /template
               name: settings
-      tolerations:
-        - effect: NoSchedule
-          key: pi-only
-          operator: Equal
-          value: "true"
       volumes:
         - emptyDir: {}
           name: data
@@ -153,7 +139,7 @@ metadata:
     app.kubernetes.io/name: searxng
     app.kubernetes.io/version: 1.3.1
     helm.sh/chart: searxng-1.3.1
-    kubenix/hash: 56bff5de5f13920591983eea0ebc0d14f787ac57
+    kubenix/hash: 3bbb2e9975c2abcfa3a3287e3188b27907e9327d
   name: searxng-settings
   namespace: apps
 ---
@@ -169,7 +155,7 @@ metadata:
     app.kubernetes.io/name: searxng
     app.kubernetes.io/version: 1.3.1
     helm.sh/chart: searxng-1.3.1
-    kubenix/hash: 56bff5de5f13920591983eea0ebc0d14f787ac57
+    kubenix/hash: 3bbb2e9975c2abcfa3a3287e3188b27907e9327d
   name: searxng
   namespace: apps
 spec:
@@ -195,7 +181,7 @@ metadata:
     app.kubernetes.io/name: searxng
     app.kubernetes.io/version: 1.3.1
     helm.sh/chart: searxng-1.3.1
-    kubenix/hash: 56bff5de5f13920591983eea0ebc0d14f787ac57
+    kubenix/hash: 3bbb2e9975c2abcfa3a3287e3188b27907e9327d
   name: searxng
   namespace: apps
 spec:

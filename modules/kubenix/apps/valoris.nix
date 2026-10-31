@@ -29,15 +29,6 @@ in
         priorityClassName = "preemptible";
         values = {
           defaultPodOptions = {
-            affinity = homelab.kubernetes.affinities.piNode;
-            tolerations = [
-              {
-                key = "pi-only";
-                operator = "Equal";
-                value = "true";
-                effect = "NoSchedule";
-              }
-            ];
             imagePullSecrets = [
               { name = "ghcr-registry-secret"; }
             ];
@@ -84,15 +75,6 @@ in
         priorityClassName = "preemptible";
         values = {
           defaultPodOptions = {
-            affinity = homelab.kubernetes.affinities.piNode;
-            tolerations = [
-              {
-                key = "pi-only";
-                operator = "Equal";
-                value = "true";
-                effect = "NoSchedule";
-              }
-            ];
             imagePullSecrets = [
               { name = "ghcr-registry-secret"; }
             ];

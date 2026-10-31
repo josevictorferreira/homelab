@@ -41,15 +41,6 @@ in
           };
         };
 
-        affinity = homelab.kubernetes.affinities.piNode;
-        tolerations = [
-          {
-            key = "pi-only";
-            operator = "Equal";
-            value = "true";
-            effect = "NoSchedule";
-          }
-        ];
         # Not named "settings": chart 1.3 adds its own volume by that name
         # (default settings.yml) and would replace this one.
         extraVolumeMounts = [

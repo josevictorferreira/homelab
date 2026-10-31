@@ -96,23 +96,9 @@ in
             passwordKey = "ADMIN_PASSWORD";
           };
           ingress = kubenix.lib.ingressDomainFor "grafana";
-          affinity = homelab.kubernetes.affinities.piNode;
-          # On the Pi's SD card a cold start (new image, schema migration) can
-          # take minutes before /api/health answers; the chart's 60s delay
-          # kills it in a loop.
-          livenessProbe.initialDelaySeconds = 600;
-          tolerations = [
-            {
-              key = "pi-only";
-              operator = "Equal";
-              value = "true";
-              effect = "NoSchedule";
-            }
-          ];
           "grafana.ini".server.root_url = "https://grafana.${homelab.domain}";
-          # Grafana 13 starts every bundled backend plugin at boot, and on the
-          # Pi each takes a minute or more. Only Prometheus, Alertmanager and
-          # Loki are used as datasources.
+          # Grafana 13 starts every bundled backend plugin at boot. Only
+          # Prometheus, Alertmanager and Loki are used as datasources.
           "grafana.ini".plugins.disable_plugins = lib.concatStringsSep "," [
             "cloudwatch"
             "elasticsearch"
