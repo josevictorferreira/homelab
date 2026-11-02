@@ -149,8 +149,8 @@ let
       value = "chrome";
     }
     {
-      name = "BROWSER_CDP_URL";
-      value = "ws://cloakbrowser.${namespace}.svc.cluster.local:9222";
+      name = "CAMOFOX_URL";
+      value = "http://camofox.${namespace}.svc.cluster.local:9377";
     }
     {
       name = "HINDSIGHT_MODE";

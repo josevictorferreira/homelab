@@ -1,8 +1,12 @@
 { homelab, ... }:
 
 let
-  name = "cloakbrowser";
+  name = "camofox";
   namespace = homelab.kubernetes.namespaces.applications;
+  # Camofox: REST API server wrapping Camoufox (anti-detect Firefox).
+  # Hermes talks to it natively via CAMOFOX_URL (browser.cloud_provider: camofox).
+  image = "ghcr.io/jo-inc/camofox-browser:1.18.1@sha256:cff2c1432b609bde9c9d0b91e5b924dae0799d3c7bc9d468c0bc949325beaf2a";
+  port = 9377;
 in
 {
   kubernetes.resources = {
@@ -17,16 +21,11 @@ in
           metadata.labels.app = name;
           spec = {
             containers.${name} = {
-              image = "cloakhq/cloakbrowser:latest";
-              args = [
-                "sh"
-                "-c"
-                "touch /.dockerenv && exec cloakserve"
-              ];
+              inherit image;
               ports = [
                 {
-                  name = "cdp";
-                  containerPort = 9222;
+                  name = "http";
+                  containerPort = port;
                 }
               ];
               volumeMounts = [
@@ -35,7 +34,6 @@ in
                   mountPath = "/dev/shm";
                 }
               ];
-              securityContext.capabilities.add = [ "SYS_ADMIN" ];
               resources = {
                 requests = {
                   memory = "512Mi";
@@ -47,11 +45,21 @@ in
                 };
               };
               readinessProbe = {
-                tcpSocket.port = 9222;
-                initialDelaySeconds = 30;
+                httpGet = {
+                  path = "/health";
+                  inherit port;
+                };
+                initialDelaySeconds = 15;
                 periodSeconds = 10;
               };
-              # No liveness probe — cloakserve manages its own Chrome lifecycle
+              livenessProbe = {
+                httpGet = {
+                  path = "/health";
+                  inherit port;
+                };
+                initialDelaySeconds = 60;
+                periodSeconds = 30;
+              };
             };
             volumes = [
               {
@@ -72,9 +80,9 @@ in
         selector.app = name;
         ports = [
           {
-            name = "cdp";
-            port = 9222;
-            targetPort = 9222;
+            name = "http";
+            inherit port;
+            targetPort = port;
           }
         ];
       };

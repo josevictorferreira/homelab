@@ -5,34 +5,37 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: adea86321cc8085ebf7d65f955fb6101649e9729
-  name: cloakbrowser
+    kubenix/hash: d59d1a70a83185698820f9fae76078409fd10ffa
+  name: camofox
   namespace: apps
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: cloakbrowser
+      app: camofox
   template:
     metadata:
       labels:
-        app: cloakbrowser
+        app: camofox
     spec:
       containers:
-        - args:
-            - sh
-            - -c
-            - touch /.dockerenv && exec cloakserve
-          image: cloakhq/cloakbrowser:latest
-          name: cloakbrowser
+        - image: ghcr.io/jo-inc/camofox-browser:1.18.1@sha256:cff2c1432b609bde9c9d0b91e5b924dae0799d3c7bc9d468c0bc949325beaf2a
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 9377
+            initialDelaySeconds: 60
+            periodSeconds: 30
+          name: camofox
           ports:
-            - containerPort: 9222
-              name: cdp
+            - containerPort: 9377
+              name: http
           readinessProbe:
-            initialDelaySeconds: 30
+            httpGet:
+              path: /health
+              port: 9377
+            initialDelaySeconds: 15
             periodSeconds: 10
-            tcpSocket:
-              port: 9222
           resources:
             limits:
               cpu: "2"
@@ -40,10 +43,6 @@ spec:
             requests:
               cpu: 500m
               memory: 512Mi
-          securityContext:
-            capabilities:
-              add:
-                - SYS_ADMIN
           volumeMounts:
             - mountPath: /dev/shm
               name: devshm
@@ -59,13 +58,13 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: adea86321cc8085ebf7d65f955fb6101649e9729
-  name: cloakbrowser
+    kubenix/hash: d59d1a70a83185698820f9fae76078409fd10ffa
+  name: camofox
   namespace: apps
 spec:
   ports:
-    - name: cdp
-      port: 9222
-      targetPort: 9222
+    - name: http
+      port: 9377
+      targetPort: 9377
   selector:
-    app: cloakbrowser
+    app: camofox
