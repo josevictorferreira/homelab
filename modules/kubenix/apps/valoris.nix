@@ -90,6 +90,7 @@ in
               KEYCLOAK_AZP.value = "valoris-frontend";
               OPENJEV_SERVICE_URL.value = "http://10.10.10.10:8102";
               OPENJEV_SERVICE_ENABLED.value = "true";
+              CAMOFOX_URL.value = "http://camofox.apps.svc.cluster.local:9377";
             };
           };
         };
@@ -141,6 +142,8 @@ in
               SOLID_QUEUE_WORKER_MAX_RSS_MB.value = "600";
               OPENJEV_SERVICE_URL.value = "http://10.10.10.10:8102";
               OPENJEV_SERVICE_ENABLED.value = "true";
+              # Shared Camoufox (anti-detect Firefox) engine used by the scrapers
+              CAMOFOX_URL.value = "http://camofox.apps.svc.cluster.local:9377";
             };
           };
         };
