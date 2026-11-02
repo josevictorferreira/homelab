@@ -22,6 +22,14 @@ in
           spec = {
             containers.${name} = {
               inherit image;
+              # Kubernetes injects CAMOFOX_PORT=tcp://<svc-ip>:9377 from the Service
+              # of the same name; the server parses that as its listen port (NaN).
+              env = [
+                {
+                  name = "CAMOFOX_PORT";
+                  value = toString port;
+                }
+              ];
               ports = [
                 {
                   name = "http";

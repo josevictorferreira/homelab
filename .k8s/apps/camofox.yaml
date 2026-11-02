@@ -5,7 +5,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: d59d1a70a83185698820f9fae76078409fd10ffa
+    kubenix/hash: 8d2e75ccd25c2e7365cc3c95f24f67d72fd017bc
   name: camofox
   namespace: apps
 spec:
@@ -19,7 +19,10 @@ spec:
         app: camofox
     spec:
       containers:
-        - image: ghcr.io/jo-inc/camofox-browser:1.18.1@sha256:cff2c1432b609bde9c9d0b91e5b924dae0799d3c7bc9d468c0bc949325beaf2a
+        - env:
+            - name: CAMOFOX_PORT
+              value: "9377"
+          image: ghcr.io/jo-inc/camofox-browser:1.18.1@sha256:cff2c1432b609bde9c9d0b91e5b924dae0799d3c7bc9d468c0bc949325beaf2a
           livenessProbe:
             httpGet:
               path: /health
@@ -58,7 +61,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: d59d1a70a83185698820f9fae76078409fd10ffa
+    kubenix/hash: 8d2e75ccd25c2e7365cc3c95f24f67d72fd017bc
   name: camofox
   namespace: apps
 spec:
