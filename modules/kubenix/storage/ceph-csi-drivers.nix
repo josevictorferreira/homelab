@@ -3,6 +3,17 @@
 let
   namespace = homelab.kubernetes.namespaces.storage;
 
+  # Pin cephcsi to 3.17.1: 3.18.1 (the ceph-csi-operator 1.1 default) is built
+  # for x86-64-v3 and dies on start with "Fatal glibc error: CPU does not
+  # support x86-64-v3" on lab-alpha-cp and lab-gamma-wk (Celeron N5105, no
+  # AVX2). The pin lives in our own ConfigMap on purpose: Rook 1.21 treats any
+  # v3.17 image in its rook-csi-operator-image-set-configmap as a stale 1.20
+  # leftover and blanks it on every operator start, and the CSI operator does
+  # not watch that ConfigMap, so the DaemonSets silently went back to 3.18.1
+  # after a node reboot. Keep until an upstream cephcsi runs on x86-64-v2.
+  imageSetName = "ceph-csi-image-set";
+  cephcsiImage = "quay.io/cephcsi/cephcsi:v3.17.1";
+
   # NixOS has no /lib/modules and no FHS binaries, so the CSI node plugins
   # need the booted kernel modules and the host /nix store. The lib-modules
   # entry overrides the operator's built-in volume of the same name (its
@@ -62,6 +73,7 @@ let
   # The chart also emits controllerPlugin.replicas per driver, so the
   # OperatorConfig default would not apply.
   driverDefaults = {
+    imageSet.name = imageSetName;
     grpcTimeout = 150;
     snapshotPolicy = "volumeSnapshot";
     log.rotation.enabled = false;
@@ -73,6 +85,14 @@ let
   };
 in
 {
+  kubernetes.resources.configMaps.${imageSetName} = {
+    metadata = {
+      name = imageSetName;
+      inherit namespace;
+    };
+    data.plugin = cephcsiImage;
+  };
+
   kubernetes = {
     # Rook 1.20+ no longer manages CSI driver settings; this chart (from the
     # ceph-csi-operator project, version matching the operator subchart bundled
@@ -91,7 +111,7 @@ in
         operatorConfig = {
           inherit namespace;
           driverSpecDefaults = {
-            imageSet.name = "rook-csi-operator-image-set-configmap";
+            imageSet.name = imageSetName;
             clusterName = namespace;
             log.rotation.enabled = false;
             nodePlugin = {
