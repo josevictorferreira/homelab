@@ -107,5 +107,26 @@ class BoardTest(unittest.TestCase):
         post.assert_called_once_with("jaheira", "Travei no card t_b (Testar PR 80): CI red", "vf-blocked-t_b")
 
 
+class DbRetryTest(unittest.TestCase):
+    def test_retries_transient_operational_error(self):
+        calls = []
+
+        def flaky():
+            calls.append(1)
+            if len(calls) == 1:
+                raise sqlite3.OperationalError("attempt to write a readonly database")
+            return "ok"
+
+        self.assertEqual(router.with_db_retry(flaky, wait=0), "ok")
+        self.assertEqual(len(calls), 2)
+
+    def test_gives_up_after_attempts(self):
+        def broken():
+            raise sqlite3.OperationalError("no such table")
+
+        with self.assertRaises(sqlite3.OperationalError):
+            router.with_db_retry(broken, attempts=2, wait=0)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -11,6 +11,7 @@
 """
 import json
 import re
+import sqlite3
 import sys
 import time
 
@@ -225,13 +226,25 @@ def announce_blocked(db, dry_run):
         comment_card(task_id, BLOCKED_MARK)
 
 
+def with_db_retry(fn, attempts=3, wait=3):
+    """Board reads can fail for a moment while a writer holds a hot rollback journal on CephFS
+    ("attempt to write a readonly database"); retry instead of reporting a blip as a broken job."""
+    for attempt in range(attempts):
+        try:
+            return fn()
+        except sqlite3.OperationalError:
+            if attempt == attempts - 1:
+                raise
+            time.sleep(wait)
+
+
 def main(argv=None):
     dry_run = "--dry-run" in (sys.argv[1:] if argv is None else argv)
     db = board()
     issues, prs = load_github()
-    apply(plan(issues, prs, load_cards(db)), dry_run)
-    relay_feed(db, dry_run)
-    announce_blocked(db, dry_run)
+    apply(plan(issues, prs, with_db_retry(lambda: load_cards(db))), dry_run)
+    with_db_retry(lambda: relay_feed(db, dry_run))
+    with_db_retry(lambda: announce_blocked(db, dry_run))
 
 
 if __name__ == "__main__":
