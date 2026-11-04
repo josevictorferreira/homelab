@@ -1,21 +1,20 @@
 ---
 name: valoris-issue-triage
-description: Daily triage of open GitHub issues on josevictorferreira/valoris; close the ones code can't fix and hand the rest to the valoris-flow (via kanban_complete metadata). Used by the 06:00 issue-triage card.
+description: Daily triage of open GitHub issues on josevictorferreira/valoris; close the ones code can't fix and hand the rest to the valoris-flow with the `triaged` label. Used by the 06:00 issue-triage card.
 ---
 
 # Valoris issue triage
 
 Decide, for every open issue of `josevictorferreira/valoris` that is not labeled
 `triaged`, whether a code change in the repo can fix it. You do not fix anything and you
-do not create kanban cards: the flow router creates a fix card for valygar for every
-issue you accept.
+do not create kanban cards: the `triaged` label is what hands an issue to the fix stage
+(the flow router creates valygar's fix card from it).
 
 ## Environment
 - Your terminal is an ssh session on the `sandbox-nix` host; `gh` and `git` are
   authenticated. Read-only clone for code context: `/workspace/hermes/workspace/valoris`
   (`git fetch -q origin && git checkout -q origin/main` first; never commit there).
 - List: `gh issue list -R josevictorferreira/valoris --state open --search "-label:triaged" --json number,title,labels,body,createdAt,comments --limit 50`.
-- Skip issues the card body lists as already being worked on by the flow.
 
 ## Decide, per issue
 Close it (`gh issue close <N> --reason "not planned" --comment "<why, 1-3 sentences>"`) when:
@@ -41,7 +40,7 @@ accepting when it is a real bug, even if small.
 ## Finish
 Call `kanban_complete` exactly once:
 - `summary`: one line per issue: `#N accepted|closed|skipped: <reason>`.
-- `metadata`: `{"accepted": [{"number": N, "title": "<issue title>"}, ...], "closed": [N, ...], "feed": "<feed line>"}`
+- `metadata`: `{"feed": "<feed line>"}`
 - `feed`: ONE sentence in Brazilian Portuguese, first person, only about real actions,
   e.g. `Triei 4 issues do valoris: aceitei #51 e #53 para correção, fechei #52 (DNS
   externo) e #54 (instabilidade momentânea).` Use `""` when there was nothing to triage.

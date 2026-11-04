@@ -1,13 +1,14 @@
 ---
 name: valoris-fix
-description: Fix one triaged GitHub issue of josevictorferreira/valoris and open (or update, on REDO cards) the PR. Used by valoris-flow fix cards ("#N Corrigir:" and "REDO #<card>:").
+description: Fix one triaged GitHub issue of josevictorferreira/valoris and open (or update, on REDO cards) the PR. Used by valoris-flow fix cards ("#N Corrigir:" and "REDO #<PR> ciclo <n>:").
 ---
 
 # Valoris fix
 
-The card body names the issue (and, on a REDO card, the existing PR plus the findings
-that rejected the previous attempt; the parent card results carry the full reviews).
-Ship the smallest correct fix with tests, push it, and hand the PR to the flow.
+The card body names the issue. On a REDO card it also names the existing PR and carries
+the review/test comment that rejected the previous attempt (the parent card result has the
+reviewer's or tester's summary too). Ship the smallest correct fix with tests, push it, and
+hand the PR to the flow: GitHub labels are how the flow moves on, so set them exactly as below.
 
 ## Environment
 - Your terminal is an ssh session on the `sandbox-nix` host; `gh` and `git` are
@@ -39,20 +40,25 @@ Ship the smallest correct fix with tests, push it, and hand the PR to the flow.
 3. `rspec` for the touched specs and `rubocop` for the touched files must pass. CI runs
    rubocop on the whole backend, so do not leave offenses.
 4. Commit (`fix(<domain>): <what> (#<N>)`), `git push -u origin fix/issue-<N>`.
-5. First attempt: `gh pr create -R josevictorferreira/valoris --base main --head fix/issue-<N> --title "fix(<domain>): <what>" --body "<root cause, fix, tests>\n\nCloses #<N>"`.
-   REDO: push to the same branch and add one PR comment listing how each finding was addressed.
+5. First attempt: `gh pr create -R josevictorferreira/valoris --base main --head fix/issue-<N> --label auto-pr --title "fix(<domain>): <what>" --body "<root cause, fix, tests>\n\nCloses #<N>"`.
+   The label `auto-pr` and the `Closes #<N>` line are how the flow finds the PR: both are required.
+   Do not request a reviewer; the flow assigns keldorn through a kanban card.
+   REDO: push to the same branch, add one PR comment listing how each finding was addressed, then
+   clear the verdict labels so the new commits get a fresh review:
+   `gh api -X DELETE repos/josevictorferreira/valoris/issues/<P>/labels/<label>` for each of
+   `auto-review-changes`, `auto-review-ok`, `auto-qa-failed`, `auto-qa-passed` (a 404 for a label the PR
+   does not have is fine).
 6. Confirm the commit is on the remote (`git ls-remote origin fix/issue-<N>`) and that
    `gh pr view <url> --json state` is OPEN.
 
 If the issue cannot be fixed by code after all (external site, infrastructure,
 already fixed on main), do not open a PR: comment the evidence on the issue, close it
-with `gh issue close <N> --reason "not planned"`, and complete without `pr_url`.
+with `gh issue close <N> --reason "not planned"`, and complete (the closed issue ends its flow).
 
 ## Finish
 Call `kanban_complete` exactly once:
 - `summary`: root cause, what changed, tests run (on REDO: how each finding was addressed).
-- `metadata`: `{"pr_url": "https://github.com/josevictorferreira/valoris/pull/<P>", "changed_files": [...], "tests": ["<command>", ...], "feed": "<feed line>"}`
-  (omit `pr_url` only when you closed the issue as not fixable).
+- `metadata`: `{"changed_files": [...], "tests": ["<command>", ...], "feed": "<feed line>"}`
 - `feed`: ONE sentence in Brazilian Portuguese, first person, e.g.
   `Criei o PR #57 no valoris para resolver a #51 (NetworkError na imobiliaria_perez: o
   extrator não tratava HTTP 403): https://github.com/josevictorferreira/valoris/pull/57`

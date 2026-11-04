@@ -1,13 +1,14 @@
 ---
 name: valoris-pr-test
-description: Verify that a reviewed valoris-flow fix PR really solves its issue (run specs, reproduce), then squash-merge it or send it back. Used by "Testar PR" cards.
+description: Verify that a reviewed valoris-flow fix PR really solves its issue (run specs, reproduce), then mark it ready for José's merge or send it back. Used by "Testar PR" cards.
 ---
 
 # Valoris PR test
 
-The card body has the PR, the issue and the cycle; parent results are irenicus' review
-(approved) and valygar's handoff. Your question: does this PR really fix the issue,
-without breaking anything? If yes, merge it. You do not fix code yourself.
+The card body has the PR, the issue and the cycle; parent result is keldorn's review
+(approved). Your question: does this PR really fix the issue,
+without breaking anything? If yes, label it ready for José to merge. You do not fix code
+yourself and you never merge.
 
 ## Environment
 - Your terminal is an ssh session on `sandbox-nix`; `gh`/`git` are authenticated.
@@ -36,22 +37,25 @@ without breaking anything? If yes, merge it. You do not fix code yourself.
    can run without production credentials. Skip this step if it cannot.
 5. CI: `gh pr checks <url>` must not have failing checks (pending: wait up to 10 minutes,
    `kanban_heartbeat` while waiting).
-6. Decide.
-   - Pass: `gh pr merge <url> --squash --delete-branch`. Then make sure the issue is
-     closed (`gh issue view <N> --json state`; if still open, `gh issue close <N> --comment "Fixed by <url>"`).
-     If the merge fails (conflict, not mergeable), that is a failure: report it.
-   - Fail: post one PR comment `**Test (jaheira): FAILED**` with the exact commands,
-     their output (trimmed) and what is still broken. If the card says this is the last
-     cycle, also `gh issue edit <N> --add-label needs-human`.
+6. Decide, then post ONE PR comment (`gh pr comment <url> --body-file <file>`) starting exactly with
+   `**Test (jaheira): PASSED**` or `**Test (jaheira): FAILED**` (the flow parses that line), listing the
+   commands you ran and their trimmed output; on failure, say exactly what is still broken. Then set the
+   verdict label (this is what moves the flow on):
+   - Pass: `gh api -X POST repos/josevictorferreira/valoris/issues/<P>/labels -f "labels[]=auto-qa-passed"`.
+     José merges; you do not.
+   - Fail: `gh api -X POST repos/josevictorferreira/valoris/issues/<P>/labels -f "labels[]=auto-qa-failed"`.
+     If the card says this is the last cycle, also add `needs-human` to the issue
+     (`gh api -X POST repos/josevictorferreira/valoris/issues/<N>/labels -f "labels[]=needs-human"`).
+   A PR that is not mergeable (conflicts) is a failure.
 
 ## Finish
 Call `kanban_complete` exactly once:
 - `summary`: commands run with pass/fail, and on failure exactly what valygar must fix
   (his REDO card receives this text).
-- `metadata`: `{"verdict": "merged" | "failed", "tests": ["<command>: pass|fail", ...], "feed": "<feed line>"}`
+- `metadata`: `{"tests": ["<command>: pass|fail", ...], "feed": "<feed line>"}`
 - `feed`: ONE sentence in Brazilian Portuguese, e.g.
-  `Testei o PR #57, a correção resolve a #51; fiz o merge e a issue foi fechada.` or
+  `Testei o PR #57, a correção resolve a #51; está pronto para merge: https://github.com/josevictorferreira/valoris/pull/57` or
   `Testei o PR #57 e fiz um comentário lá: a spec nova não falha sem a correção.`
 
-Never push commits, never edit the PR's code, never merge a PR that failed any step.
+Never push commits, never edit the PR's code, never merge any PR, never close the issue.
 Never call `kanban_request_review`, `kanban_request_changes` or `kanban_create`.
