@@ -24,8 +24,9 @@ flow_profiles=(irenicus jaheira valygar keldorn)
 
 drift=0
 
-# Copy in place: live files belong to the pod user and are only group-writable for us,
-# so overwrite contents (cp keeps owner and mode of an existing file) and chmod only new files.
+# Copy in place: live files belong to the pod user and are only group-writable for us, so
+# overwrite contents (cp keeps owner and mode). New files get the share's owner/group mapping;
+# never chmod (the share refuses it).
 put() {
   local from=$1 to=$2
   cmp -s "$from" "$to" 2>/dev/null && return 0
@@ -33,10 +34,7 @@ put() {
   echo "changed: $to"
   [[ $mode == --apply ]] || return 0
   mkdir -p "$(dirname "$to")"
-  local existed=0
-  [[ -e $to ]] && existed=1
   cp "$from" "$to"
-  (( existed )) || chmod 0664 "$to"
 }
 
 for f in "$src"/scripts/*.py; do
