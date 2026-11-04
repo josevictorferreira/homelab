@@ -13,7 +13,7 @@ import urllib.parse
 import urllib.request
 from datetime import date, datetime, timezone
 
-from valoris_flow import create_card, locked_state, run
+from valoris_flow import create_card, run
 
 LOKI = "http://loki.monitoring.svc.cluster.local:3100/loki/api/v1"
 WINDOW = 24 * 3600
@@ -124,9 +124,7 @@ def main():
         return
     groups = sorted(groups, key=lambda g: -g["count"])[:MAX_GROUPS]
     today = date.today().isoformat()
-    with locked_state() as state:
-        create_card(state, "logs", f"Triagem de logs do Valoris {today}", render(groups, start, end),
-                    f"valoris-flow:logs:{today}")
+    create_card("logs", f"Triagem de logs do Valoris {today}", render(groups, start, end), f"valoris-flow:logs:{today}")
 
 
 if __name__ == "__main__":

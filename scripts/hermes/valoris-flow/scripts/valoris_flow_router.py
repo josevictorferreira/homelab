@@ -1,124 +1,241 @@
 #!/usr/bin/env python3
-"""Valoris flow router (no-agent cron, every minute).
+"""Valoris flow router (no-agent cron, every 5 min). Stateless: every tick it
 
-For every flow card that completed since the last tick:
-  * posts its `metadata.feed` line (if any) to the Matrix feed room as the card's agent;
-  * creates the next stage's card (fix -> review -> test, rejections -> REDO fix).
-It also announces, once, any flow card that ends up blocked. Prints nothing (silent tick).
+  1. reads open `triaged` issues and open `auto-pr` PRs from GitHub plus the flow cards on the
+     kanban board, and creates whatever card the label state calls for (plan() below; the
+     idempotency key of each card makes re-creation a no-op);
+  2. relays each completed flow card's `metadata.feed` line to the Matrix feed room;
+  3. announces, once, every flow card that ends up blocked.
+
+`--dry-run` prints the actions instead of performing them. Otherwise prints nothing.
 """
 import json
+import re
+import sys
+import time
 
-from valoris_flow import MAX_CYCLES, REPO, board, create_card, locked_state, post_feed, run
+from valoris_flow import (MAX_CYCLES, MAX_OPEN_FIXES, REPO, board, closes_issue, comment_card, create_card, gh,
+                          gh_paged, post_feed, run)
+
+PREFIX = "valoris-flow:"
+REJECTIONS = ("auto-review-changes", "auto-qa-failed")
+REJECTION_HEADER = re.compile(r"^\s*\*\*(Review \(\w+\): CHANGES REQUESTED|Test \(\w+\): FAILED)\*\*")
+FEED_WINDOW = 2 * 3600
+FEED_MARK = "vf:feed-posted:"
+BLOCKED_MARK = "vf:blocked-announced"
 
 
-def fix_body(issue, title, cycle, prev_fix=None, rejection=None, pr=None):
-    lines = [f"Issue: https://github.com/{REPO}/issues/{issue} ({title})",
-             f"Cycle: {cycle}/{MAX_CYCLES}"]
-    if prev_fix:
-        lines += [f"REDO of card {prev_fix}. The previous attempt was rejected; the parent card",
-                  "results below carry the reviewer/tester findings. Address every finding.",
-                  f"Keep working on the existing PR {pr}: push new commits to its branch, do not open a new PR."]
-        if rejection:
-            lines += ["", "Rejection summary:", rejection]
-    return "\n".join(lines)
+def issue_url(n):
+    return f"https://github.com/{REPO}/issues/{n}"
 
 
-def stage_body(chain, cycle):
-    issue, pr = chain["issue"], chain["pr"]
-    lines = [f"PR: {pr}", f"Issue: https://github.com/{REPO}/issues/{issue} ({chain['title']})",
+def pr_url(n):
+    return f"https://github.com/{REPO}/pull/{n}"
+
+
+# ---------------------------------------------------------------- planning (pure)
+
+def plan(issues, prs, cards):
+    """Return the actions this tick needs. No I/O.
+
+    issues: open issues labeled `triaged`: {number, title, labels}
+    prs:    open PRs labeled `auto-pr`:   {number, title, head_sha, labels, closes, rejection_text}
+    cards:  non-archived flow cards in creation order: {key, status, id}
+    Actions: ("card", stage, title, body, key, parents) | ("label", issue, label) | ("feed", profile, text, txn)
+    """
+    by_key = {c["key"]: c for c in cards}
+    issue_by_n = {i["number"]: i for i in issues}
+    actions = []
+
+    def done(key):
+        return by_key.get(key, {}).get("status") == "done"
+
+    def active(key):
+        return key in by_key and by_key[key]["status"] != "done"
+
+    def keys(prefix):
+        return [c for c in cards if c["key"].startswith(prefix)]
+
+    for p in prs:
+        n, sha, labels = p["number"], p["head_sha"], set(p["labels"])
+        issue = issue_by_n.get(p["closes"])
+        if "needs-human" in labels or (issue and "needs-human" in issue["labels"]):
+            continue
+        title = issue["title"] if issue else p["title"]
+        redos = keys(f"{PREFIX}redo:{n}:")
+        if (p["closes"] and active(f"{PREFIX}fix:{p['closes']}")) or any(c["status"] != "done" for c in redos):
+            continue  # valygar is still pushing to this PR
+        reviews = keys(f"{PREFIX}review:{n}:")
+        review_key, qa_key = f"{PREFIX}review:{n}:{sha}", f"{PREFIX}qa:{n}:{sha}"
+        ref = {"issue": p["closes"], "title": title, "pr": n}
+
+        if review_key not in by_key:
+            last = redos[-1] if redos else by_key.get(f"{PREFIX}fix:{p['closes']}")
+            actions.append(("card", "review", f"Revisar PR {n} (issue #{p['closes']})",
+                            stage_body(ref, len(reviews) + 1), review_key, [last["id"]] if last else []))
+            continue
+        if not done(review_key):
+            continue
+
+        rejected_by = None
+        if "auto-qa-failed" in labels and done(qa_key):
+            rejected_by = by_key[qa_key]
+        elif "auto-review-changes" in labels and "auto-qa-failed" not in labels:
+            rejected_by = by_key[review_key]
+        if rejected_by:
+            redo_key = f"{PREFIX}redo:{n}:{sha}"
+            if redo_key in by_key:
+                continue
+            if len(reviews) >= MAX_CYCLES:
+                if p["closes"]:
+                    actions.append(("label", p["closes"], "needs-human"))
+                actions.append(("feed", "irenicus",
+                                f"A issue #{p['closes']} foi recusada {MAX_CYCLES} vezes e precisa de você: {pr_url(n)}",
+                                f"vf-cap-{n}-{sha}"))
+                continue
+            actions.append(("card", "redo", f"REDO #{n} ciclo {len(reviews) + 1}: {title}",
+                            redo_body(ref, len(reviews) + 1, p.get("rejection_text")), redo_key, [rejected_by["id"]]))
+            continue
+
+        if "auto-review-ok" in labels and not labels & {"auto-qa-passed", "auto-qa-failed"} and qa_key not in by_key:
+            actions.append(("card", "qa", f"Testar PR {n} (issue #{p['closes']})", stage_body(ref, len(reviews)),
+                            qa_key, [by_key[review_key]["id"]]))
+
+    occupied = {p["closes"] or f"pr{p['number']}" for p in prs}
+    occupied |= {int(c["key"].rsplit(":", 1)[1]) for c in keys(f"{PREFIX}fix:") if c["status"] != "done"}
+    slots = MAX_OPEN_FIXES - len(occupied)
+    with_pr = {p["closes"] for p in prs}
+    for i in sorted(issues, key=lambda i: i["number"]):
+        if slots <= 0:
+            break
+        n = i["number"]
+        if "needs-human" in i["labels"] or n in with_pr or f"{PREFIX}fix:{n}" in by_key:
+            continue
+        actions.append(("card", "fix", f"#{n} Corrigir: {i['title']}", fix_body(n, i["title"]), f"{PREFIX}fix:{n}", []))
+        slots -= 1
+    return actions
+
+
+def fix_body(n, title):
+    return "\n".join([f"Issue: {issue_url(n)} ({title})", f"Cycle: 1/{MAX_CYCLES}",
+                      f"Open the PR with the label `auto-pr` and `Closes #{n}` in its body."])
+
+
+def stage_body(ref, cycle):
+    lines = [f"PR: {pr_url(ref['pr'])}", f"Issue: {issue_url(ref['issue'])} ({ref['title']})",
              f"Cycle: {cycle}/{MAX_CYCLES}"]
     if cycle >= MAX_CYCLES:
-        lines.append(f"This is the last cycle: if you reject, also add the label `needs-human` to issue #{issue}.")
+        lines.append(f"This is the last cycle: if you reject, also add the label `needs-human` to issue #{ref['issue']}.")
     return "\n".join(lines)
 
 
-def start_fix(state, source_task, issue, title, cycle, parents=(), prev_fix=None, rejection=None):
-    """Create the fix card for `issue`; `source_task` is the card that triggered it."""
-    if cycle == 1:
-        state["chains"][str(issue)] = {"issue": issue, "title": title, "pr": None, "last_fix": None}
-    chain = state["chains"][str(issue)]
-    chain.update(cycle=cycle, active=True)
-    name = f"#{issue} Corrigir: {title}"
-    if prev_fix:
-        name = f"REDO #{prev_fix}: {name}"
-    create_card(state, "fix", name, fix_body(issue, title, cycle, prev_fix, rejection, chain["pr"]),
-                f"valoris-flow:fix:{issue}:{source_task}", parents, issue=issue)
+def redo_body(ref, cycle, rejection):
+    return "\n".join([
+        f"PR: {pr_url(ref['pr'])}", f"Issue: {issue_url(ref['issue'])} ({ref['title']})", f"Cycle: {cycle}/{MAX_CYCLES}",
+        "REDO: the previous attempt was rejected. Address every finding below, push new commits to the PR's",
+        "existing branch (do not open a new PR), then remove the verdict labels from the PR.",
+        "", "Rejection:", (rejection or "(see the latest review/test comment on the PR)")[:6000]])
 
 
-def on_completed(state, task_id, card, meta, summary):
-    stage = card["stage"]
-    if stage == "issues":
-        for item in meta.get("accepted", []):
-            issue = item["number"] if isinstance(item, dict) else int(item)
-            title = item.get("title", f"issue {issue}") if isinstance(item, dict) else f"issue {issue}"
-            if not state["chains"].get(str(issue), {}).get("active"):
-                start_fix(state, task_id, issue, title, 1)
-        return
-    if stage == "logs":
-        return
+# ---------------------------------------------------------------- I/O
 
-    chain = state["chains"][str(card["issue"])]
-    if stage == "fix":
-        if not meta.get("pr_url"):  # not fixable by code: valygar closed/commented the issue
-            chain["active"] = False
-            return
-        chain["pr"], chain["last_fix"] = meta["pr_url"], task_id
-        create_card(state, "review", f"Revisar PR {meta['pr_url'].rsplit('/', 1)[-1]} (issue #{chain['issue']})",
-                    stage_body(chain, chain["cycle"]),
-                    f"valoris-flow:review:{task_id}", [task_id], issue=chain["issue"])
-        return
-
-    approved = meta.get("verdict") in ("approved", "merged")
-    if approved and stage == "review":
-        create_card(state, "test", f"Testar PR {chain['pr'].rsplit('/', 1)[-1]} (issue #{chain['issue']})",
-                    stage_body(chain, chain["cycle"]),
-                    f"valoris-flow:test:{task_id}", [task_id, chain["last_fix"]], issue=chain["issue"])
-    elif approved:  # test passed and jaheira merged
-        chain["active"] = False
-    elif chain["cycle"] >= MAX_CYCLES:
-        chain["active"] = False
-        post_feed("irenicus", f"A issue #{chain['issue']} foi recusada {MAX_CYCLES} vezes e precisa de você: {chain['pr']}",
-                  f"vf-cap-{task_id}")
-    else:
-        start_fix(state, task_id, chain["issue"], chain["title"], chain["cycle"] + 1,
-                  parents=[task_id, chain["last_fix"]], prev_fix=chain["last_fix"], rejection=summary)
+def _labels(item):
+    return [label["name"] for label in item.get("labels", [])]
 
 
-def announce_blocked(state, db):
-    for task_id, card in state["cards"].items():
-        if card.get("blocked_notified"):
+def latest_rejection(n):
+    """Newest PR comment or review whose body starts with a rejection header."""
+    found = [(c["created_at"], c["body"]) for c in gh_paged(f"/repos/{REPO}/issues/{n}/comments?per_page=100")]
+    found += [(r.get("submitted_at") or "", r["body"]) for r in gh_paged(f"/repos/{REPO}/pulls/{n}/reviews?per_page=100")]
+    matching = sorted((ts, body) for ts, body in found if body and REJECTION_HEADER.match(body))
+    return matching[-1][1] if matching else None
+
+
+def load_github():
+    issues = [{"number": i["number"], "title": i["title"], "labels": _labels(i)}
+              for i in gh_paged(f"/repos/{REPO}/issues?state=open&labels=triaged&per_page=100")
+              if "pull_request" not in i]
+    prs = []
+    for p in gh_paged(f"/repos/{REPO}/pulls?state=open&per_page=100"):
+        labels = _labels(p)
+        if "auto-pr" not in labels:
             continue
-        row = db.execute("select status, assignee, title, last_failure_error from tasks where id = ?",
-                         (task_id,)).fetchone()
-        if row and row[0] == "blocked":
-            reason = (row[3] or "sem motivo registrado").splitlines()[0][:200]
-            post_feed(row[1], f"Travei no card {task_id} ({row[2]}): {reason}", f"vf-blocked-{task_id}")
-            card["blocked_notified"] = True
-        elif row and row[0] != "blocked":
-            card.pop("blocked_notified", None)
+        prs.append({"number": p["number"], "title": p["title"], "head_sha": p["head"]["sha"], "labels": labels,
+                    "closes": closes_issue(p.get("body")),
+                    "rejection_text": latest_rejection(p["number"]) if set(labels) & set(REJECTIONS) else None})
+    return issues, prs
 
 
-def main():
-    with locked_state() as state:
-        db = board()
-        if state["cursor"] is None:  # first run: start from now, never replay history
-            state["cursor"] = db.execute("select coalesce(max(id), 0) from task_events").fetchone()[0]
-            return
-        events = db.execute("select id, task_id from task_events where id > ? and kind = 'completed' order by id",
-                            (state["cursor"],)).fetchall()
-        for event_id, task_id in events:
-            card = state["cards"].get(task_id)
-            if card:
-                row = db.execute("select metadata, summary from task_runs where task_id = ? and outcome = 'completed' "
-                                 "order by id desc limit 1", (task_id,)).fetchone()
-                meta = json.loads(row[0]) if row and row[0] else {}
-                if meta.get("feed"):
-                    profile = db.execute("select assignee from tasks where id = ?", (task_id,)).fetchone()[0]
-                    post_feed(profile, meta["feed"], f"vf-done-{event_id}")
-                on_completed(state, task_id, card, meta, row[1] if row else None)
-            state["cursor"] = event_id
-        announce_blocked(state, db)
+def load_cards(db):
+    rows = db.execute("select idempotency_key, status, id from tasks where idempotency_key like ? "
+                      "and status != 'archived' order by created_at, rowid", (PREFIX + "%",)).fetchall()
+    return [{"key": k, "status": s, "id": i} for k, s, i in rows]
+
+
+def apply(actions, dry_run):
+    for action in actions:
+        if dry_run:
+            print(" ".join(str(part) for part in (action[:2] + action[4:5] if action[0] == "card" else action)))
+            continue
+        kind = action[0]
+        if kind == "card":
+            _, stage, title, body, key, parents = action
+            create_card(stage, title, body, key, parents)
+        elif kind == "label":
+            gh("POST", f"/repos/{REPO}/issues/{action[1]}/labels", {"labels": [action[2]]})
+        elif kind == "feed":
+            post_feed(action[1], action[2], action[3])
+
+
+def _commented(db, task_id, body):
+    return db.execute("select 1 from task_comments where task_id = ? and body = ?", (task_id, body)).fetchone()
+
+
+def relay_feed(db, dry_run, now=None):
+    since = (now or time.time()) - FEED_WINDOW
+    rows = db.execute("select r.id, r.task_id, t.assignee, r.metadata from task_runs r join tasks t on t.id = r.task_id "
+                      "where r.outcome = 'completed' and r.ended_at > ? and t.created_by = 'valoris-flow' "
+                      "order by r.id", (since,)).fetchall()
+    for run_id, task_id, assignee, metadata in rows:
+        try:
+            feed = (json.loads(metadata) if metadata else {}).get("feed")
+        except ValueError:
+            feed = None
+        mark = f"{FEED_MARK}{run_id}"
+        if not feed or _commented(db, task_id, mark):
+            continue
+        if dry_run:
+            print(f"feed {assignee} {feed}")
+            continue
+        post_feed(assignee, feed, f"vf-done-{run_id}")
+        comment_card(task_id, mark)
+
+
+def announce_blocked(db, dry_run):
+    rows = db.execute("select id, assignee, title, last_failure_error from tasks "
+                      "where status = 'blocked' and created_by = 'valoris-flow'").fetchall()
+    for task_id, assignee, title, error in rows:
+        if _commented(db, task_id, BLOCKED_MARK):
+            continue
+        reason = (error or "sem motivo registrado").splitlines()[0][:200]
+        if dry_run:
+            print(f"blocked {task_id} {reason}")
+            continue
+        post_feed(assignee, f"Travei no card {task_id} ({title}): {reason}", f"vf-blocked-{task_id}")
+        comment_card(task_id, BLOCKED_MARK)
+
+
+def main(argv=None):
+    dry_run = "--dry-run" in (sys.argv[1:] if argv is None else argv)
+    db = board()
+    issues, prs = load_github()
+    apply(plan(issues, prs, load_cards(db)), dry_run)
+    relay_feed(db, dry_run)
+    announce_blocked(db, dry_run)
 
 
 if __name__ == "__main__":
-    run("valoris-flow-router", main)
+    if "--dry-run" in sys.argv:
+        main()
+    else:
+        run("valoris-flow-router", main)

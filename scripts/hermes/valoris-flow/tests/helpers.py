@@ -4,6 +4,7 @@ import json
 import os
 import sqlite3
 import sys
+from contextlib import closing
 import urllib.error
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -13,20 +14,21 @@ sys.path.insert(0, os.path.join(os.path.dirname(HERE), "scripts"))
 def make_board(tmpdir):
     path = os.path.join(tmpdir, "kanban.db")
     with open(os.path.join(HERE, "kanban_schema.sql")) as f:
-        sqlite3.connect(path).executescript(f.read())
+        with closing(sqlite3.connect(path)) as db:
+            db.executescript(f.read())
     return path
 
 
 def add_task(path, task_id, status="todo", assignee="valygar", key=None, created_by="valoris-flow",
              title="t", created_at=1, last_failure_error=None):
-    with sqlite3.connect(path) as db:
+    with closing(sqlite3.connect(path)) as db, db:
         db.execute("insert into tasks (id, title, assignee, status, created_by, created_at, idempotency_key,"
                    " last_failure_error) values (?, ?, ?, ?, ?, ?, ?, ?)",
                    (task_id, title, assignee, status, created_by, created_at, key, last_failure_error))
 
 
 def add_run(path, task_id, ended_at, metadata=None, outcome="completed", profile="valygar", summary=None):
-    with sqlite3.connect(path) as db:
+    with closing(sqlite3.connect(path)) as db, db:
         cur = db.execute("insert into task_runs (task_id, profile, status, started_at, ended_at, outcome, summary,"
                          " metadata) values (?, ?, 'done', ?, ?, ?, ?, ?)",
                          (task_id, profile, ended_at - 10, ended_at, outcome, summary,
@@ -35,7 +37,7 @@ def add_run(path, task_id, ended_at, metadata=None, outcome="completed", profile
 
 
 def add_comment(path, task_id, body, author="valoris-flow"):
-    with sqlite3.connect(path) as db:
+    with closing(sqlite3.connect(path)) as db, db:
         db.execute("insert into task_comments (task_id, author, body, created_at) values (?, ?, ?, 1)",
                    (task_id, author, body))
 
