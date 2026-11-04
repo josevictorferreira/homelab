@@ -11,7 +11,7 @@ metadata:
     app.kubernetes.io/name: server
     app.kubernetes.io/version: v3.2.0
     helm.sh/chart: immich-0.13.4
-    kubenix/hash: 6f1db0cfd1b9135a59ef0f8f25c7cd7a4314d1ad
+    kubenix/hash: 0a8fe3519ccb4d6f862a93b3149b0cdc16420448
   name: immich-server
   namespace: apps
 spec:
@@ -47,7 +47,7 @@ spec:
           envFrom:
             - secretRef:
                 name: immich-secret
-          image: ghcr.io/immich-app/immich-server:v3.3.5@sha256:485d546a2e31d6a8b4db8423fcba5c109de8c218d93410af115fd1ccfc4352a6
+          image: ghcr.io/immich-app/immich-server:v3.3.6@sha256:e1981983b1c13f6024b57d72e7ecae3342eed1581201ab09fb248932d86c593a
           imagePullPolicy: IfNotPresent
           livenessProbe:
             failureThreshold: 3
@@ -130,7 +130,7 @@ metadata:
     app.kubernetes.io/name: immich
     app.kubernetes.io/version: v3.2.0
     helm.sh/chart: immich-0.13.4
-    kubenix/hash: 6f1db0cfd1b9135a59ef0f8f25c7cd7a4314d1ad
+    kubenix/hash: 0a8fe3519ccb4d6f862a93b3149b0cdc16420448
   name: immich-immich-config
   namespace: apps
 ---
@@ -149,7 +149,7 @@ metadata:
     app.kubernetes.io/service: immich-server
     app.kubernetes.io/version: v3.2.0
     helm.sh/chart: immich-0.13.4
-    kubenix/hash: 6f1db0cfd1b9135a59ef0f8f25c7cd7a4314d1ad
+    kubenix/hash: 0a8fe3519ccb4d6f862a93b3149b0cdc16420448
   name: immich-server
   namespace: apps
 spec:
@@ -185,7 +185,7 @@ metadata:
     app.kubernetes.io/name: server
     app.kubernetes.io/version: v3.2.0
     helm.sh/chart: immich-0.13.4
-    kubenix/hash: 6f1db0cfd1b9135a59ef0f8f25c7cd7a4314d1ad
+    kubenix/hash: 0a8fe3519ccb4d6f862a93b3149b0cdc16420448
   name: immich-server
   namespace: apps
 ---
@@ -201,7 +201,7 @@ metadata:
     app.kubernetes.io/name: server
     app.kubernetes.io/version: v3.2.0
     helm.sh/chart: immich-0.13.4
-    kubenix/hash: 6f1db0cfd1b9135a59ef0f8f25c7cd7a4314d1ad
+    kubenix/hash: 0a8fe3519ccb4d6f862a93b3149b0cdc16420448
   name: immich-server
   namespace: apps
 spec:
@@ -233,7 +233,7 @@ metadata:
     app.kubernetes.io/name: server
     app.kubernetes.io/version: v3.2.0
     helm.sh/chart: immich-0.13.4
-    kubenix/hash: 6f1db0cfd1b9135a59ef0f8f25c7cd7a4314d1ad
+    kubenix/hash: 0a8fe3519ccb4d6f862a93b3149b0cdc16420448
   name: immich-server
   namespace: apps
 spec:
