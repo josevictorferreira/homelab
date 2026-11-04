@@ -348,14 +348,17 @@ let
             subPath = "hermes";
           }
         ];
+      # Every kanban worker (an agent process) runs inside this container next to the
+      # gateway. At 500m the cgroup throttled ~30% of periods with two workers, the event
+      # loop stalled >10s and workers lost their session turn lease (worker_receipt_timeout).
       resources = {
         requests = {
-          cpu = "100m";
-          memory = "512Mi";
-        };
-        limits = {
           cpu = "500m";
           memory = "1Gi";
+        };
+        limits = {
+          cpu = "1500m";
+          memory = "2Gi";
         };
       };
       securityContext = commonSecurityContext;

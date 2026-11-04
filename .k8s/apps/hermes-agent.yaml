@@ -7,7 +7,7 @@ metadata:
   labels:
     app: hermes-agent
     component: dashboard
-    kubenix/hash: 833b4adcf8ea89b431fb911a4ebf6a4383b5934a
+    kubenix/hash: 4d7de5eef656fc4a31e2daeaed90ea6fa209c347
   name: hermes-agent-dashboard
   namespace: apps
 spec:
@@ -140,7 +140,7 @@ metadata:
   labels:
     app: hermes-agent
     component: gateway
-    kubenix/hash: 833b4adcf8ea89b431fb911a4ebf6a4383b5934a
+    kubenix/hash: 4d7de5eef656fc4a31e2daeaed90ea6fa209c347
   name: hermes-agent-gateway
   namespace: apps
 spec:
@@ -292,11 +292,11 @@ spec:
           name: gateway-multiplex
           resources:
             limits:
+              cpu: 1500m
+              memory: 2Gi
+            requests:
               cpu: 500m
               memory: 1Gi
-            requests:
-              cpu: 100m
-              memory: 512Mi
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
@@ -496,7 +496,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 833b4adcf8ea89b431fb911a4ebf6a4383b5934a
+    kubenix/hash: 4d7de5eef656fc4a31e2daeaed90ea6fa209c347
   name: hermes-agent-cli-wrapper
   namespace: apps
 ---
@@ -508,7 +508,7 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     app: hermes-agent
-    kubenix/hash: 833b4adcf8ea89b431fb911a4ebf6a4383b5934a
+    kubenix/hash: 4d7de5eef656fc4a31e2daeaed90ea6fa209c347
   name: hermes-agent-dashboard
   namespace: apps
 spec:
@@ -530,7 +530,7 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     app: hermes-agent
-    kubenix/hash: 833b4adcf8ea89b431fb911a4ebf6a4383b5934a
+    kubenix/hash: 4d7de5eef656fc4a31e2daeaed90ea6fa209c347
   name: hermes-agent-gateway
   namespace: apps
 spec:
@@ -551,7 +551,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 833b4adcf8ea89b431fb911a4ebf6a4383b5934a
+    kubenix/hash: 4d7de5eef656fc4a31e2daeaed90ea6fa209c347
   name: hermes-agent-dashboard
   namespace: apps
 spec:
@@ -580,7 +580,7 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     app: hermes-agent
-    kubenix/hash: 833b4adcf8ea89b431fb911a4ebf6a4383b5934a
+    kubenix/hash: 4d7de5eef656fc4a31e2daeaed90ea6fa209c347
   name: hermes-agent-readonly
 rules:
   - apiGroups:
@@ -622,7 +622,7 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     app: hermes-agent
-    kubenix/hash: 833b4adcf8ea89b431fb911a4ebf6a4383b5934a
+    kubenix/hash: 4d7de5eef656fc4a31e2daeaed90ea6fa209c347
   name: hermes-agent-readonly
 roleRef:
   apiGroup: rbac.authorization.k8s.io
