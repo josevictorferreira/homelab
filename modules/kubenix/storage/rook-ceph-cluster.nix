@@ -25,8 +25,8 @@ in
       chart = kubenix.lib.helm.fetch {
         repo = "https://charts.rook.io/release";
         chart = "rook-ceph-cluster";
-        version = "1.21.1";
-        sha256 = "sha256-RhVvTQbg57wS4W2sObjZ+/tS/N870YyRDjPu1KpBbyY=";
+        version = "1.21.2";
+        sha256 = "1lkhi7b5cn8m4891a6qqbsk8pn1xxc7xd7fma5n3pbj6bf6wy07i";
       };
       inherit namespace;
       includeCRDs = true;
