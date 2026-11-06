@@ -70,12 +70,9 @@ in
           # inactive, which is how the Rook 1.20.7 upgrade nearly compounded a
           # two-node outage.
           continueUpgradeAfterChecksEvenIfNotHealthy = false;
-          # TEMPORARILY true (2026-11-06) to let the operator purge the drained,
-          # empty, safe-to-destroy osd.2 after its device left the storage spec.
-          # Revert to false once rook-ceph-osd-2 is gone: this flag would let
-          # Rook purge ANY future OSD that goes out+safe, which is too much
-          # rope for a cluster that runs 3x replication on 4 OSD hosts.
-          removeOSDsIfOutAndSafeToRemove = true;
+          # Keep false: with it true, Rook's health monitor deletes the deployment
+          # of any OSD that is down+out+safe-to-destroy. It was enabled once
+          # (2026-11-06) to purge the drained osd.2, then reverted.
           # Rook's default OSD liveness budget is 3 x 10s with a 5s timeout. On
           # lab-alpha-cp osd.2 shares the root/etcd disk, and under recovery load
           # the admin-socket check stalls past 30s, so kubelet killed osd.1/osd.2
