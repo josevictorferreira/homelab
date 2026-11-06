@@ -166,7 +166,7 @@ let
     }
     {
       name = "HINDSIGHT_BUDGET";
-      value = "low";
+      value = "mid";
     }
     {
       name = "HINDSIGHT_API_KEY";

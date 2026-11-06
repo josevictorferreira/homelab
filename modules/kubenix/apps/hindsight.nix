@@ -50,9 +50,17 @@ in
               HINDSIGHT_API_RERANKER_SILICONFLOW_MODEL = "Qwen/Qwen3-Reranker-0.6B";
               HINDSIGHT_API_RERANKER_SILICONFLOW_TIMEOUT = "60";
               HINDSIGHT_API_RERANKER_SILICONFLOW_BASE_URL = "https://api.siliconflow.com/v1";
-              HINDSIGHT_API_RERANKER_MAX_CANDIDATES = "32";
+              # 100 candidates for the reranker (default 300, docs recommend ~100):
+              # 32 was starving recall quality; Qwen3-0.6B via SiliconFlow handles 100 easily.
+              HINDSIGHT_API_RERANKER_MAX_CANDIDATES = "100";
+              # Fail-open tail: if SiliconFlow is down, recall degrades to RRF fusion
+              # order instead of erroring (server seeds final scores from RRF rank).
+              HINDSIGHT_API_RERANKER_1_PROVIDER = "rrf";
               HINDSIGHT_API_WORKER_MAX_SLOTS = "8";
-              HINDSIGHT_API_WORKER_CONSOLIDATION_MAX_SLOTS = "2";
+              HINDSIGHT_API_WORKER_CONSOLIDATION_RESERVED_SLOTS = "2";
+              # Prune the async_operations audit trail after 90 days (default 0 = never;
+              # had grown to 11.7k rows over 6 months).
+              HINDSIGHT_API_OPERATION_RETENTION_DAYS = "90";
               HINDSIGHT_API_LLM_TIMEOUT = "120";
               HINDSIGHT_API_LLM_MAX_RETRIES = "2";
               # Cap concurrent LLM calls (#5152, from the omniroute era): 8 parallel
