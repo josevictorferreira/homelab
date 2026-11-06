@@ -58,11 +58,10 @@ rec {
         mac = "00:E0:4C:68:07:9A";
       };
       disks = [
-        "/dev/disk/by-partlabel/CEPH_OSD_NVME"
         "/dev/disk/by-partlabel/CEPH_OSD_SATA"
       ];
       # Not a control plane: the dead cooler and the root disk shared by etcd
-      # and osd.2 made it the cluster's weakest etcd member.
+      # and the (now removed) osd.2 made it the cluster's weakest etcd member.
       roles = [
         "nixos-server"
         "system-admin"
