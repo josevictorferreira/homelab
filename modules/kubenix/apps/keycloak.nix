@@ -30,7 +30,7 @@ in
 
         image = {
           repository = "keycloak/keycloak";
-          tag = "26.8.1@sha256:ed1cab21814c7d18ce8f0e11d5a1fa1c6923de12dd4c7625a18c5d34452a57a4";
+          tag = "26.8.2@sha256:3879c623248408de29a5303178b5816c77e8dfef3890c361f8c0bbeaa979ba3b";
         };
 
         # Disable embedded PostgreSQL - use external
@@ -124,7 +124,7 @@ in
         extraInitContainers = [
           {
             name = "copy-base-providers";
-            image = "keycloak/keycloak:26.8.1@sha256:ed1cab21814c7d18ce8f0e11d5a1fa1c6923de12dd4c7625a18c5d34452a57a4";
+            image = "keycloak/keycloak:26.8.2@sha256:3879c623248408de29a5303178b5816c77e8dfef3890c361f8c0bbeaa979ba3b";
             command = [
               "sh"
               "-c"

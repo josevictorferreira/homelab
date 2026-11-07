@@ -8,9 +8,9 @@ metadata:
     app.kubernetes.io/instance: sftpgo
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sftpgo
-    app.kubernetes.io/version: 2.7.4
+    app.kubernetes.io/version: 2.7.6
     helm.sh/chart: sftpgo-0.48.0
-    kubenix/hash: 6a3d950ecaece608ca2fcf7ffa3e59fa9bf45b2f
+    kubenix/hash: afc7738463020119b24789cbd9a292a18b7e7cb3
   name: sftpgo
   namespace: apps
 spec:
@@ -28,7 +28,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: 1ea232fdb0bf3728a1a954ed99fb1f00a526a7481a939c15c0f0aff57ff59a01
+        checksum/config: 6e195c506e49a0f8415f9fd91b5c0fdba5f772442a583cb85d41369a3f9788a8
         homelab.io/relay-config-hash: b9f73f9064b21443921acac6f1474d245e47802d7fb0bd698da7033974f4b288
       labels:
         app.kubernetes.io/instance: sftpgo
@@ -62,7 +62,7 @@ spec:
           envFrom:
             - secretRef:
                 name: sftpgo-config
-          image: ghcr.io/drakkan/sftpgo:v2.7.4
+          image: ghcr.io/drakkan/sftpgo:v2.7.6
           imagePullPolicy: IfNotPresent
           livenessProbe:
             httpGet:
@@ -181,9 +181,9 @@ metadata:
     app.kubernetes.io/instance: sftpgo
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sftpgo
-    app.kubernetes.io/version: 2.7.4
+    app.kubernetes.io/version: 2.7.6
     helm.sh/chart: sftpgo-0.48.0
-    kubenix/hash: 6a3d950ecaece608ca2fcf7ffa3e59fa9bf45b2f
+    kubenix/hash: afc7738463020119b24789cbd9a292a18b7e7cb3
   name: sftpgo
   namespace: apps
 ---
@@ -199,9 +199,9 @@ metadata:
     app.kubernetes.io/instance: sftpgo
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sftpgo
-    app.kubernetes.io/version: 2.7.4
+    app.kubernetes.io/version: 2.7.6
     helm.sh/chart: sftpgo-0.48.0
-    kubenix/hash: 6a3d950ecaece608ca2fcf7ffa3e59fa9bf45b2f
+    kubenix/hash: afc7738463020119b24789cbd9a292a18b7e7cb3
   name: sftpgo
   namespace: apps
 spec:
@@ -224,9 +224,9 @@ metadata:
     app.kubernetes.io/instance: sftpgo
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sftpgo
-    app.kubernetes.io/version: 2.7.4
+    app.kubernetes.io/version: 2.7.6
     helm.sh/chart: sftpgo-0.48.0
-    kubenix/hash: 6a3d950ecaece608ca2fcf7ffa3e59fa9bf45b2f
+    kubenix/hash: afc7738463020119b24789cbd9a292a18b7e7cb3
   name: sftpgo
   namespace: apps
 spec:
@@ -323,9 +323,9 @@ metadata:
     app.kubernetes.io/instance: sftpgo
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sftpgo
-    app.kubernetes.io/version: 2.7.4
+    app.kubernetes.io/version: 2.7.6
     helm.sh/chart: sftpgo-0.48.0
-    kubenix/hash: 6a3d950ecaece608ca2fcf7ffa3e59fa9bf45b2f
+    kubenix/hash: afc7738463020119b24789cbd9a292a18b7e7cb3
   name: sftpgo
   namespace: apps
 ---
@@ -339,9 +339,9 @@ metadata:
     app.kubernetes.io/instance: sftpgo
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sftpgo
-    app.kubernetes.io/version: 2.7.4
+    app.kubernetes.io/version: 2.7.6
     helm.sh/chart: sftpgo-0.48.0
-    kubenix/hash: 6a3d950ecaece608ca2fcf7ffa3e59fa9bf45b2f
+    kubenix/hash: afc7738463020119b24789cbd9a292a18b7e7cb3
   name: sftpgo-api
   namespace: apps
 spec:
@@ -372,9 +372,9 @@ metadata:
     app.kubernetes.io/instance: sftpgo
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sftpgo
-    app.kubernetes.io/version: 2.7.4
+    app.kubernetes.io/version: 2.7.6
     helm.sh/chart: sftpgo-0.48.0
-    kubenix/hash: 6a3d950ecaece608ca2fcf7ffa3e59fa9bf45b2f
+    kubenix/hash: afc7738463020119b24789cbd9a292a18b7e7cb3
   name: sftpgo-ui
   namespace: apps
 spec:
@@ -402,7 +402,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 6a3d950ecaece608ca2fcf7ffa3e59fa9bf45b2f
+    kubenix/hash: afc7738463020119b24789cbd9a292a18b7e7cb3
   name: sftpgo-webdav
   namespace: apps
 spec:

@@ -30,7 +30,7 @@ in
       values = {
         image = {
           repository = "ghcr.io/drakkan/sftpgo";
-          tag = "v2.7.4";
+          tag = "v2.7.6";
           pullPolicy = "IfNotPresent";
         };
 

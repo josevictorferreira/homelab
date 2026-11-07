@@ -10,11 +10,16 @@ in
     chart = kubenix.lib.helm.fetch {
       repo = "https://vmware-tanzu.github.io/helm-charts";
       chart = "velero";
-      version = "12.2.2";
-      sha256 = "sha256-ACcKsEe2foDG7gakvtvgYcZiYhzptJufMgIKIii2jiQ=";
+      version = "12.2.3";
+      sha256 = "sha256-UrB3I+lm1Db1p3vzkCBAGX+GjyFCcrF8exhVpK0d7qo=";
     };
     inherit namespace;
     values = {
+      # Chart 12.2.x still pins appVersion 1.18.2; run the bugfix-only 1.18.4.
+      image = {
+        repository = "docker.io/velero/velero";
+        tag = "v1.18.4";
+      };
       configuration = {
         backupStorageLocation = [ ];
         volumeSnapshotLocation = [ ];

@@ -7,7 +7,7 @@ metadata:
     kubenix/project-name: ze-homelab
     operator.prometheus.io/version: 0.94.2
   labels:
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
   name: alertmanagerconfigs.monitoring.coreos.com
   namespace: monitoring
 spec:
@@ -11442,7 +11442,7 @@ metadata:
     kubenix/project-name: ze-homelab
     operator.prometheus.io/version: 0.94.2
   labels:
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
   name: alertmanagers.monitoring.coreos.com
   namespace: monitoring
 spec:
@@ -21314,7 +21314,7 @@ metadata:
     kubenix/project-name: ze-homelab
     operator.prometheus.io/version: 0.94.2
   labels:
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
   name: podmonitors.monitoring.coreos.com
   namespace: monitoring
 spec:
@@ -22663,7 +22663,7 @@ metadata:
     kubenix/project-name: ze-homelab
     operator.prometheus.io/version: 0.94.2
   labels:
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
   name: probes.monitoring.coreos.com
   namespace: monitoring
 spec:
@@ -24021,7 +24021,7 @@ metadata:
     kubenix/project-name: ze-homelab
     operator.prometheus.io/version: 0.94.2
   labels:
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
   name: prometheusagents.monitoring.coreos.com
   namespace: monitoring
 spec:
@@ -35429,7 +35429,7 @@ metadata:
     kubenix/project-name: ze-homelab
     operator.prometheus.io/version: 0.94.2
   labels:
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
   name: prometheuses.monitoring.coreos.com
   namespace: monitoring
 spec:
@@ -49056,7 +49056,7 @@ metadata:
     kubenix/project-name: ze-homelab
     operator.prometheus.io/version: 0.94.2
   labels:
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
   name: prometheusrules.monitoring.coreos.com
   namespace: monitoring
 spec:
@@ -49310,7 +49310,7 @@ metadata:
     kubenix/project-name: ze-homelab
     operator.prometheus.io/version: 0.94.2
   labels:
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
   name: scrapeconfigs.monitoring.coreos.com
   namespace: monitoring
 spec:
@@ -61349,7 +61349,7 @@ metadata:
     kubenix/project-name: ze-homelab
     operator.prometheus.io/version: 0.94.2
   labels:
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
   name: servicemonitors.monitoring.coreos.com
   namespace: monitoring
 spec:
@@ -62713,7 +62713,7 @@ metadata:
     kubenix/project-name: ze-homelab
     operator.prometheus.io/version: 0.94.2
   labels:
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
   name: thanosrulers.monitoring.coreos.com
   namespace: monitoring
 spec:
@@ -72387,10 +72387,10 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kube-prometheus-stack-prometheus-operator
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-admission
   namespace: monitoring
@@ -72431,10 +72431,10 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kube-prometheus-stack-prometheus-operator
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-admission
   namespace: monitoring
@@ -72497,8 +72497,8 @@ metadata:
     app.kubernetes.io/name: prometheus-node-exporter
     app.kubernetes.io/part-of: prometheus-node-exporter
     app.kubernetes.io/version: 1.12.1
-    helm.sh/chart: prometheus-node-exporter-4.60.1
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    helm.sh/chart: prometheus-node-exporter-5.0.0
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-prometheus-node-exporter
   namespace: monitoring
@@ -72576,7 +72576,13 @@ spec:
             successThreshold: 1
             timeoutSeconds: 1
           securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
             readOnlyRootFilesystem: true
+            seccompProfile:
+              type: RuntimeDefault
           volumeMounts:
             - mountPath: /host/proc
               name: proc
@@ -72627,8 +72633,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/name: grafana
     app.kubernetes.io/version: 13.3.0
-    helm.sh/chart: grafana-14.2.0
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    helm.sh/chart: grafana-14.4.0
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
   name: kube-prometheus-stack-grafana
   namespace: monitoring
 spec:
@@ -72650,7 +72656,6 @@ spec:
         app.kubernetes.io/instance: kube-prometheus-stack
         app.kubernetes.io/name: grafana
         app.kubernetes.io/version: 13.3.0
-        helm.sh/chart: grafana-14.2.0
     spec:
       automountServiceAccountToken: true
       containers:
@@ -72681,7 +72686,7 @@ spec:
               value: http://localhost:3000/api/admin/provisioning/dashboards/reload
             - name: REQ_METHOD
               value: POST
-          image: quay.io/kiwigrid/k8s-sidecar:2.14.1
+          image: quay.io/kiwigrid/k8s-sidecar:2.14.3
           imagePullPolicy: IfNotPresent
           name: grafana-sc-dashboard
           securityContext:
@@ -72720,7 +72725,7 @@ spec:
               value: http://localhost:3000/api/admin/provisioning/datasources/reload
             - name: REQ_METHOD
               value: POST
-          image: quay.io/kiwigrid/k8s-sidecar:2.14.1
+          image: quay.io/kiwigrid/k8s-sidecar:2.14.3
           imagePullPolicy: IfNotPresent
           name: grafana-sc-datasources
           securityContext:
@@ -72846,7 +72851,7 @@ spec:
               value: /etc/grafana/provisioning/alerting
             - name: RESOURCE
               value: both
-          image: quay.io/kiwigrid/k8s-sidecar:2.14.1
+          image: quay.io/kiwigrid/k8s-sidecar:2.14.3
           imagePullPolicy: IfNotPresent
           name: grafana-init-sc-alerts
           securityContext:
@@ -72900,8 +72905,8 @@ metadata:
     app.kubernetes.io/name: kube-state-metrics
     app.kubernetes.io/part-of: kube-state-metrics
     app.kubernetes.io/version: 2.20.0
-    helm.sh/chart: kube-state-metrics-8.8.0
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    helm.sh/chart: kube-state-metrics-9.0.0
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-kube-state-metrics
   namespace: monitoring
@@ -72967,6 +72972,8 @@ spec:
             readOnlyRootFilesystem: true
       dnsPolicy: ClusterFirst
       hostNetwork: false
+      nodeSelector:
+        kubernetes.io/os: linux
       securityContext:
         fsGroup: 65534
         runAsGroup: 65534
@@ -72989,10 +72996,10 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kube-prometheus-stack-prometheus-operator
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-operator
   namespace: monitoring
@@ -73012,8 +73019,6 @@ spec:
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: kube-prometheus-stack-prometheus-operator
         app.kubernetes.io/part-of: kube-prometheus-stack
-        app.kubernetes.io/version: 92.16.1
-        chart: kube-prometheus-stack-92.16.1
         heritage: Helm
         release: kube-prometheus-stack
     spec:
@@ -73100,11 +73105,11 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     grafana_dashboard: "1"
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-alertmanager-overview
   namespace: monitoring
@@ -73122,11 +73127,11 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     grafana_dashboard: "1"
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-apiserver
   namespace: monitoring
@@ -73144,11 +73149,11 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     grafana_dashboard: "1"
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-cluster-total
   namespace: monitoring
@@ -73166,11 +73171,11 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     grafana_dashboard: "1"
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-controller-manager
   namespace: monitoring
@@ -73188,11 +73193,11 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     grafana_dashboard: "1"
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-etcd
   namespace: monitoring
@@ -73244,8 +73249,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/name: grafana
     app.kubernetes.io/version: 13.3.0
-    helm.sh/chart: grafana-14.2.0
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    helm.sh/chart: grafana-14.4.0
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
   name: kube-prometheus-stack-grafana
   namespace: monitoring
 ---
@@ -73274,8 +73279,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/name: grafana
     app.kubernetes.io/version: 13.3.0
-    helm.sh/chart: grafana-14.2.0
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    helm.sh/chart: grafana-14.4.0
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
   name: kube-prometheus-stack-grafana-config-dashboards
   namespace: monitoring
 ---
@@ -73311,11 +73316,11 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     grafana_datasource: "1"
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-grafana-datasource
   namespace: monitoring
@@ -73333,11 +73338,11 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     grafana_dashboard: "1"
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-grafana-overview
   namespace: monitoring
@@ -73355,11 +73360,11 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     grafana_dashboard: "1"
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-k8s-coredns
   namespace: monitoring
@@ -73377,11 +73382,11 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     grafana_dashboard: "1"
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-k8s-resources-cluster
   namespace: monitoring
@@ -73399,11 +73404,11 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     grafana_dashboard: "1"
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-k8s-resources-multicluster
   namespace: monitoring
@@ -73421,11 +73426,11 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     grafana_dashboard: "1"
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-k8s-resources-namespace
   namespace: monitoring
@@ -73443,11 +73448,11 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     grafana_dashboard: "1"
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-k8s-resources-node
   namespace: monitoring
@@ -73465,11 +73470,11 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     grafana_dashboard: "1"
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-k8s-resources-nodes-overview
   namespace: monitoring
@@ -73487,11 +73492,11 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     grafana_dashboard: "1"
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-k8s-resources-pod
   namespace: monitoring
@@ -73509,11 +73514,11 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     grafana_dashboard: "1"
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-k8s-resources-workload
   namespace: monitoring
@@ -73531,11 +73536,11 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     grafana_dashboard: "1"
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-k8s-resources-workloads-namespace
   namespace: monitoring
@@ -73553,11 +73558,11 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     grafana_dashboard: "1"
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-kubelet
   namespace: monitoring
@@ -73575,11 +73580,11 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     grafana_dashboard: "1"
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-namespace-by-pod
   namespace: monitoring
@@ -73597,11 +73602,11 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     grafana_dashboard: "1"
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-namespace-by-workload
   namespace: monitoring
@@ -73619,11 +73624,11 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     grafana_dashboard: "1"
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-node-cluster-rsrc-use
   namespace: monitoring
@@ -73641,11 +73646,11 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     grafana_dashboard: "1"
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-node-rsrc-use
   namespace: monitoring
@@ -73663,11 +73668,11 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     grafana_dashboard: "1"
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-nodes
   namespace: monitoring
@@ -73685,11 +73690,11 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     grafana_dashboard: "1"
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-nodes-aix
   namespace: monitoring
@@ -73707,11 +73712,11 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     grafana_dashboard: "1"
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-nodes-darwin
   namespace: monitoring
@@ -73729,11 +73734,11 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     grafana_dashboard: "1"
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-persistentvolumesusage
   namespace: monitoring
@@ -73751,11 +73756,11 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     grafana_dashboard: "1"
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-pod-total
   namespace: monitoring
@@ -73773,11 +73778,11 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     grafana_dashboard: "1"
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-prometheus
   namespace: monitoring
@@ -73795,11 +73800,11 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     grafana_dashboard: "1"
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-scheduler
   namespace: monitoring
@@ -73817,11 +73822,11 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     grafana_dashboard: "1"
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-workload-total
   namespace: monitoring
@@ -73839,10 +73844,10 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: alertmanager-kube-prometheus-stack-alertmanager
   namespace: monitoring
@@ -73861,10 +73866,10 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kube-prometheus-stack-prometheus
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-prometheus-token
   namespace: monitoring
@@ -73881,10 +73886,10 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
     self-monitor: "true"
   name: kube-prometheus-stack-alertmanager
@@ -73916,11 +73921,11 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     heritage: Helm
     jobLabel: coredns
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-coredns
   namespace: kube-system
@@ -73946,8 +73951,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/name: grafana
     app.kubernetes.io/version: 13.3.0
-    helm.sh/chart: grafana-14.2.0
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    helm.sh/chart: grafana-14.4.0
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
   name: kube-prometheus-stack-grafana
   namespace: monitoring
 spec:
@@ -73972,11 +73977,11 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     heritage: Helm
     jobLabel: kube-controller-manager
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-kube-controller-manager
   namespace: kube-system
@@ -74002,11 +74007,11 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     heritage: Helm
     jobLabel: kube-etcd
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-kube-etcd
   namespace: kube-system
@@ -74032,11 +74037,11 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     heritage: Helm
     jobLabel: kube-scheduler
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-kube-scheduler
   namespace: kube-system
@@ -74064,8 +74069,8 @@ metadata:
     app.kubernetes.io/name: kube-state-metrics
     app.kubernetes.io/part-of: kube-state-metrics
     app.kubernetes.io/version: 2.20.0
-    helm.sh/chart: kube-state-metrics-8.8.0
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    helm.sh/chart: kube-state-metrics-9.0.0
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-kube-state-metrics
   namespace: monitoring
@@ -74093,10 +74098,10 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kube-prometheus-stack-prometheus-operator
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-operator
   namespace: monitoring
@@ -74121,10 +74126,10 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
     self-monitor: "true"
   name: kube-prometheus-stack-prometheus
@@ -74158,9 +74163,9 @@ metadata:
     app.kubernetes.io/name: prometheus-node-exporter
     app.kubernetes.io/part-of: prometheus-node-exporter
     app.kubernetes.io/version: 1.12.1
-    helm.sh/chart: prometheus-node-exporter-4.60.1
+    helm.sh/chart: prometheus-node-exporter-5.0.0
     jobLabel: node-exporter
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-prometheus-node-exporter
   namespace: monitoring
@@ -74189,10 +74194,10 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kube-prometheus-stack-alertmanager
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-alertmanager
   namespace: monitoring
@@ -74208,8 +74213,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/name: grafana
     app.kubernetes.io/version: 13.3.0
-    helm.sh/chart: grafana-14.2.0
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    helm.sh/chart: grafana-14.4.0
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
   name: kube-prometheus-stack-grafana
   namespace: monitoring
 ---
@@ -74227,8 +74232,8 @@ metadata:
     app.kubernetes.io/name: kube-state-metrics
     app.kubernetes.io/part-of: kube-state-metrics
     app.kubernetes.io/version: 2.20.0
-    helm.sh/chart: kube-state-metrics-8.8.0
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    helm.sh/chart: kube-state-metrics-9.0.0
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-kube-state-metrics
   namespace: monitoring
@@ -74247,10 +74252,10 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kube-prometheus-stack-prometheus-operator
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-operator
   namespace: monitoring
@@ -74269,10 +74274,10 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kube-prometheus-stack-prometheus
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-prometheus
   namespace: monitoring
@@ -74291,8 +74296,8 @@ metadata:
     app.kubernetes.io/name: prometheus-node-exporter
     app.kubernetes.io/part-of: prometheus-node-exporter
     app.kubernetes.io/version: 1.12.1
-    helm.sh/chart: prometheus-node-exporter-4.60.1
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    helm.sh/chart: prometheus-node-exporter-5.0.0
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-prometheus-node-exporter
   namespace: monitoring
@@ -74308,10 +74313,10 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-alertmanager
   namespace: monitoring
@@ -74376,10 +74381,10 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-prometheus
   namespace: monitoring
@@ -74429,7 +74434,7 @@ spec:
   enableOTLPReceiver: false
   externalUrl: http://kube-prometheus-stack-prometheus.monitoring:9090
   hostNetwork: false
-  image: quay.io/prometheus/prometheus:v3.15.1-distroless
+  image: quay.io/prometheus/prometheus:v3.16.0-distroless
   imagePullPolicy: IfNotPresent
   listenLocal: false
   logFormat: logfmt
@@ -74486,7 +74491,7 @@ spec:
         storageClassName: rook-ceph-block
   tsdb:
     outOfOrderTimeWindow: 0s
-  version: v3.15.1-distroless
+  version: v3.16.0-distroless
   walCompression: true
 ---
 apiVersion: monitoring.coreos.com/v1
@@ -74500,10 +74505,10 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-alertmanager.rules
   namespace: monitoring
@@ -74657,10 +74662,10 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-config-reloaders
   namespace: monitoring
@@ -74691,10 +74696,10 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-etcd
   namespace: monitoring
@@ -74875,10 +74880,10 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-general.rules
   namespace: monitoring
@@ -74934,10 +74939,10 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-k8s.rules.container-cpu-usage-seconds-tot
   namespace: monitoring
@@ -74971,10 +74976,10 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-k8s.rules.container-memory-cache
   namespace: monitoring
@@ -75000,10 +75005,10 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-k8s.rules.container-memory-rss
   namespace: monitoring
@@ -75029,10 +75034,10 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-k8s.rules.container-memory-swap
   namespace: monitoring
@@ -75058,10 +75063,10 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-k8s.rules.container-memory-working-set-by
   namespace: monitoring
@@ -75087,10 +75092,10 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-k8s.rules.container-resource
   namespace: monitoring
@@ -75178,10 +75183,10 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-k8s.rules.pod-owner
   namespace: monitoring
@@ -75328,10 +75333,10 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-kube-apiserver-availability.rules
   namespace: monitoring
@@ -75452,10 +75457,10 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-kube-apiserver-burnrate.rules
   namespace: monitoring
@@ -75714,10 +75719,10 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-kube-apiserver-histogram.rules
   namespace: monitoring
@@ -75747,10 +75752,10 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-kube-apiserver-slos
   namespace: monitoring
@@ -75826,10 +75831,10 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-kube-prometheus-general.rules
   namespace: monitoring
@@ -75853,10 +75858,10 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-kube-prometheus-node-recording.rules
   namespace: monitoring
@@ -75888,10 +75893,10 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-kube-scheduler.rules
   namespace: monitoring
@@ -75947,10 +75952,10 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-kube-state-metrics
   namespace: monitoring
@@ -76018,10 +76023,10 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-kubelet.rules
   namespace: monitoring
@@ -76071,10 +76076,10 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-kubernetes-apps
   namespace: monitoring
@@ -76367,10 +76372,10 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-kubernetes-resources
   namespace: monitoring
@@ -76575,10 +76580,10 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-kubernetes-storage
   namespace: monitoring
@@ -76691,10 +76696,10 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-kubernetes-system
   namespace: monitoring
@@ -76736,10 +76741,10 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-kubernetes-system-apiserver
   namespace: monitoring
@@ -76828,10 +76833,10 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-kubernetes-system-controller-manager
   namespace: monitoring
@@ -76869,10 +76874,10 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-kubernetes-system-kubelet
   namespace: monitoring
@@ -77075,10 +77080,10 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-kubernetes-system-scheduler
   namespace: monitoring
@@ -77116,10 +77121,10 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-node-exporter
   namespace: monitoring
@@ -77448,10 +77453,10 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-node-exporter.rules
   namespace: monitoring
@@ -77553,10 +77558,10 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-node-network
   namespace: monitoring
@@ -77585,10 +77590,10 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-node.rules
   namespace: monitoring
@@ -77644,10 +77649,10 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-prometheus
   namespace: monitoring
@@ -77936,10 +77941,10 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-prometheus-operator
   namespace: monitoring
@@ -78031,10 +78036,10 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-alertmanager
   namespace: monitoring
@@ -78065,10 +78070,10 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-apiserver
   namespace: monitoring
@@ -78114,10 +78119,10 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-coredns
   namespace: monitoring
@@ -78148,8 +78153,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/name: grafana
     app.kubernetes.io/version: 13.3.0
-    helm.sh/chart: grafana-14.2.0
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    helm.sh/chart: grafana-14.4.0
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-grafana
   namespace: monitoring
@@ -78179,10 +78184,10 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-kube-controller-manager
   namespace: monitoring
@@ -78221,10 +78226,10 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-kube-etcd
   namespace: monitoring
@@ -78256,10 +78261,10 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-kube-scheduler
   namespace: monitoring
@@ -78300,8 +78305,8 @@ metadata:
     app.kubernetes.io/name: kube-state-metrics
     app.kubernetes.io/part-of: kube-state-metrics
     app.kubernetes.io/version: 2.20.0
-    helm.sh/chart: kube-state-metrics-8.8.0
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    helm.sh/chart: kube-state-metrics-9.0.0
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-kube-state-metrics
   namespace: monitoring
@@ -78326,10 +78331,10 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-kubelet
   namespace: monitoring
@@ -78465,10 +78470,10 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kube-prometheus-stack-prometheus-operator
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-operator
   namespace: monitoring
@@ -78495,10 +78500,10 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-prometheus
   namespace: monitoring
@@ -78530,8 +78535,8 @@ metadata:
     app.kubernetes.io/name: prometheus-node-exporter
     app.kubernetes.io/part-of: prometheus-node-exporter
     app.kubernetes.io/version: 1.12.1
-    helm.sh/chart: prometheus-node-exporter-4.60.1
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    helm.sh/chart: prometheus-node-exporter-5.0.0
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-prometheus-node-exporter
   namespace: monitoring
@@ -78557,8 +78562,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/name: grafana
     app.kubernetes.io/version: 13.3.0
-    helm.sh/chart: grafana-14.2.0
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    helm.sh/chart: grafana-14.4.0
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
   name: kube-prometheus-stack-grafana
   namespace: monitoring
 spec:
@@ -78589,8 +78594,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/name: grafana
     app.kubernetes.io/version: 13.3.0
-    helm.sh/chart: grafana-14.2.0
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    helm.sh/chart: grafana-14.4.0
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
   name: kube-prometheus-stack-grafana-clusterrole
   namespace: monitoring
 rules:
@@ -78617,8 +78622,8 @@ metadata:
     app.kubernetes.io/name: kube-state-metrics
     app.kubernetes.io/part-of: kube-state-metrics
     app.kubernetes.io/version: 2.20.0
-    helm.sh/chart: kube-state-metrics-8.8.0
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    helm.sh/chart: kube-state-metrics-9.0.0
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-kube-state-metrics
   namespace: monitoring
@@ -78833,10 +78838,10 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kube-prometheus-stack-prometheus-operator
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-operator
   namespace: monitoring
@@ -78999,10 +79004,10 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-prometheus
   namespace: monitoring
@@ -79051,8 +79056,8 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/name: grafana
     app.kubernetes.io/version: 13.3.0
-    helm.sh/chart: grafana-14.2.0
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    helm.sh/chart: grafana-14.4.0
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
   name: kube-prometheus-stack-grafana-clusterrolebinding
   namespace: monitoring
 roleRef:
@@ -79077,8 +79082,8 @@ metadata:
     app.kubernetes.io/name: kube-state-metrics
     app.kubernetes.io/part-of: kube-state-metrics
     app.kubernetes.io/version: 2.20.0
-    helm.sh/chart: kube-state-metrics-8.8.0
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    helm.sh/chart: kube-state-metrics-9.0.0
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-kube-state-metrics
   namespace: monitoring
@@ -79104,10 +79109,10 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: kube-prometheus-stack-prometheus-operator
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-operator
   namespace: monitoring
@@ -79131,10 +79136,10 @@ metadata:
     app.kubernetes.io/instance: kube-prometheus-stack
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: kube-prometheus-stack
-    app.kubernetes.io/version: 92.16.1
-    chart: kube-prometheus-stack-92.16.1
+    app.kubernetes.io/version: 92.22.0
+    chart: kube-prometheus-stack-92.22.0
     heritage: Helm
-    kubenix/hash: f23e38881dbf7328860d4127e21deacef28fc65d
+    kubenix/hash: 6fc4b128502e9ec7e7cd6be73f5dc96bb4985071
     release: kube-prometheus-stack
   name: kube-prometheus-stack-prometheus
   namespace: monitoring

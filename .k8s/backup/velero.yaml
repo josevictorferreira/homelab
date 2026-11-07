@@ -10,8 +10,8 @@ metadata:
     app.kubernetes.io/name: velero
     app.kubernetes.io/version: 1.18.2
     component: velero
-    helm.sh/chart: velero-12.2.2
-    kubenix/hash: 5e46bd2d00c1f9639574d9eba2a172f60a25e0a3
+    helm.sh/chart: velero-12.2.3
+    kubenix/hash: 1f714adb22bc17007689403464d5ca20dd7eaaa4
   name: velero
   namespace: backup
 spec:
@@ -29,7 +29,7 @@ spec:
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: velero
         app.kubernetes.io/version: 1.18.2
-        helm.sh/chart: velero-12.2.2
+        helm.sh/chart: velero-12.2.3
         name: velero
     spec:
       automountServiceAccountToken: true
@@ -48,6 +48,11 @@ spec:
                 fieldRef:
                   apiVersion: v1
                   fieldPath: metadata.namespace
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.name
             - name: LD_LIBRARY_PATH
               value: /plugins
             - name: AWS_SHARED_CREDENTIALS_FILE
@@ -58,7 +63,7 @@ spec:
               value: /credentials/cloud
             - name: ALIBABA_CLOUD_CREDENTIALS_FILE
               value: /credentials/cloud
-          image: docker.io/velero/velero:v1.18.2
+          image: docker.io/velero/velero:v1.18.4
           imagePullPolicy: IfNotPresent
           livenessProbe:
             failureThreshold: 5
@@ -123,8 +128,8 @@ metadata:
     app.kubernetes.io/instance: velero
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velero
-    helm.sh/chart: velero-12.2.2
-    kubenix/hash: 5e46bd2d00c1f9639574d9eba2a172f60a25e0a3
+    helm.sh/chart: velero-12.2.3
+    kubenix/hash: 1f714adb22bc17007689403464d5ca20dd7eaaa4
   name: velero-upgrade-crds
   namespace: backup
 spec:
@@ -141,7 +146,7 @@ spec:
             - --apply
           command:
             - /velero
-          image: docker.io/velero/velero:v1.18.2
+          image: docker.io/velero/velero:v1.18.4
           imagePullPolicy: IfNotPresent
           name: velero
       restartPolicy: OnFailure
@@ -162,8 +167,8 @@ metadata:
     app.kubernetes.io/instance: velero
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velero
-    helm.sh/chart: velero-12.2.2
-    kubenix/hash: 5e46bd2d00c1f9639574d9eba2a172f60a25e0a3
+    helm.sh/chart: velero-12.2.3
+    kubenix/hash: 1f714adb22bc17007689403464d5ca20dd7eaaa4
   name: velero-repo-maintenance
   namespace: backup
 ---
@@ -178,8 +183,8 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velero
     app.kubernetes.io/version: 1.18.2
-    helm.sh/chart: velero-12.2.2
-    kubenix/hash: 5e46bd2d00c1f9639574d9eba2a172f60a25e0a3
+    helm.sh/chart: velero-12.2.3
+    kubenix/hash: 1f714adb22bc17007689403464d5ca20dd7eaaa4
   name: velero
   namespace: backup
 spec:
@@ -204,8 +209,8 @@ metadata:
     app.kubernetes.io/instance: velero
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velero
-    helm.sh/chart: velero-12.2.2
-    kubenix/hash: 5e46bd2d00c1f9639574d9eba2a172f60a25e0a3
+    helm.sh/chart: velero-12.2.3
+    kubenix/hash: 1f714adb22bc17007689403464d5ca20dd7eaaa4
   name: velero-server
   namespace: backup
 ---
@@ -223,8 +228,8 @@ metadata:
     app.kubernetes.io/instance: velero
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velero
-    helm.sh/chart: velero-12.2.2
-    kubenix/hash: 5e46bd2d00c1f9639574d9eba2a172f60a25e0a3
+    helm.sh/chart: velero-12.2.3
+    kubenix/hash: 1f714adb22bc17007689403464d5ca20dd7eaaa4
   name: velero-server-upgrade-crds
   namespace: backup
 ---
@@ -238,8 +243,8 @@ metadata:
     app.kubernetes.io/instance: velero
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velero
-    helm.sh/chart: velero-12.2.2
-    kubenix/hash: 5e46bd2d00c1f9639574d9eba2a172f60a25e0a3
+    helm.sh/chart: velero-12.2.3
+    kubenix/hash: 1f714adb22bc17007689403464d5ca20dd7eaaa4
   name: velero
   namespace: backup
 spec:
@@ -269,8 +274,8 @@ metadata:
     app.kubernetes.io/instance: velero
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velero
-    helm.sh/chart: velero-12.2.2
-    kubenix/hash: 5e46bd2d00c1f9639574d9eba2a172f60a25e0a3
+    helm.sh/chart: velero-12.2.3
+    kubenix/hash: 1f714adb22bc17007689403464d5ca20dd7eaaa4
   name: velero-upgrade-crds
   namespace: backup
 rules:
@@ -296,8 +301,8 @@ metadata:
     app.kubernetes.io/instance: velero
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velero
-    helm.sh/chart: velero-12.2.2
-    kubenix/hash: 5e46bd2d00c1f9639574d9eba2a172f60a25e0a3
+    helm.sh/chart: velero-12.2.3
+    kubenix/hash: 1f714adb22bc17007689403464d5ca20dd7eaaa4
   name: velero-server
   namespace: backup
 roleRef:
@@ -323,8 +328,8 @@ metadata:
     app.kubernetes.io/instance: velero
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velero
-    helm.sh/chart: velero-12.2.2
-    kubenix/hash: 5e46bd2d00c1f9639574d9eba2a172f60a25e0a3
+    helm.sh/chart: velero-12.2.3
+    kubenix/hash: 1f714adb22bc17007689403464d5ca20dd7eaaa4
   name: velero-upgrade-crds
   namespace: backup
 roleRef:
@@ -347,8 +352,8 @@ metadata:
     app.kubernetes.io/instance: velero
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velero
-    helm.sh/chart: velero-12.2.2
-    kubenix/hash: 5e46bd2d00c1f9639574d9eba2a172f60a25e0a3
+    helm.sh/chart: velero-12.2.3
+    kubenix/hash: 1f714adb22bc17007689403464d5ca20dd7eaaa4
   name: velero-server
   namespace: backup
 rules:
@@ -370,8 +375,8 @@ metadata:
     app.kubernetes.io/instance: velero
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velero
-    helm.sh/chart: velero-12.2.2
-    kubenix/hash: 5e46bd2d00c1f9639574d9eba2a172f60a25e0a3
+    helm.sh/chart: velero-12.2.3
+    kubenix/hash: 1f714adb22bc17007689403464d5ca20dd7eaaa4
   name: velero-server
   namespace: backup
 roleRef:
@@ -387,7 +392,7 @@ apiVersion: velero.io/v1
 kind: BackupStorageLocation
 metadata:
   labels:
-    kubenix/hash: 5e46bd2d00c1f9639574d9eba2a172f60a25e0a3
+    kubenix/hash: 1f714adb22bc17007689403464d5ca20dd7eaaa4
   name: default
   namespace: backup
 spec:
@@ -406,7 +411,7 @@ apiVersion: velero.io/v1
 kind: Schedule
 metadata:
   labels:
-    kubenix/hash: 5e46bd2d00c1f9639574d9eba2a172f60a25e0a3
+    kubenix/hash: 1f714adb22bc17007689403464d5ca20dd7eaaa4
   name: daily-backup
   namespace: backup
 spec:

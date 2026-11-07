@@ -19,8 +19,8 @@ in
       chart = kubenix.lib.helm.fetch {
         repo = "https://pajikos.github.io/home-assistant-helm-chart";
         chart = "home-assistant";
-        version = "0.3.89";
-        sha256 = "sha256-RQdbwFhuGX/POGpGio4p3gUK/MaPrAQlwwPgGcukFCg=";
+        version = "0.3.90";
+        sha256 = "sha256-AMP4rjhkHacn1HQ3KhIQjpSfUb2mBm1lB8SHkSpcP5U=";
       };
       noHooks = true;
       inherit namespace;
@@ -30,7 +30,7 @@ in
 
         image = {
           repository = "ghcr.io/home-assistant/home-assistant";
-          tag = "2026.7.0";
+          tag = "2026.11.0";
           pullPolicy = "IfNotPresent";
         };
 

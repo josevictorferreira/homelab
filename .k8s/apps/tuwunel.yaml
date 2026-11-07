@@ -5,7 +5,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: e35138400117ba11c78ac576f6de55b31f7bacf5
+    kubenix/hash: a55eb3e786b30d42bce19c4aafba0fb9d7a83e97
   name: tuwunel
   namespace: apps
 spec:
@@ -56,7 +56,7 @@ spec:
               value: "false"
             - name: TUWUNEL_DB_POOL_WORKERS
               value: "16"
-          image: ghcr.io/matrix-construct/tuwunel:v1.7.0@sha256:8acfc755db4956c496e93f3b63693bbea298735835daadf882be791e2317dc0b
+          image: ghcr.io/matrix-construct/tuwunel:v1.9.4@sha256:0e86c6164d6c9f5b60291938eb61ad8395021c37fe58d47a963ea7edddbedaec
           imagePullPolicy: IfNotPresent
           livenessProbe:
             failureThreshold: 5
@@ -122,7 +122,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: e35138400117ba11c78ac576f6de55b31f7bacf5
+    kubenix/hash: a55eb3e786b30d42bce19c4aafba0fb9d7a83e97
   name: tuwunel-data-v2
   namespace: apps
 spec:
@@ -142,7 +142,7 @@ metadata:
     lbipam.cilium.io/ips: 10.10.10.157
     lbipam.cilium.io/sharing-key: tuwunel
   labels:
-    kubenix/hash: e35138400117ba11c78ac576f6de55b31f7bacf5
+    kubenix/hash: a55eb3e786b30d42bce19c4aafba0fb9d7a83e97
   name: tuwunel
   namespace: apps
 spec:
@@ -161,7 +161,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: e35138400117ba11c78ac576f6de55b31f7bacf5
+    kubenix/hash: a55eb3e786b30d42bce19c4aafba0fb9d7a83e97
   name: tuwunel
   namespace: apps
 spec:

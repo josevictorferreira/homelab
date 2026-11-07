@@ -3,7 +3,7 @@
 let
   namespace = homelab.kubernetes.namespaces.storage;
 
-  # Pin cephcsi to 3.17.1: 3.18.1 (the ceph-csi-operator 1.1 default) is built
+  # Pin cephcsi to 3.17.x: 3.18.1 (the ceph-csi-operator 1.1 default) is built
   # for x86-64-v3 and dies on start with "Fatal glibc error: CPU does not
   # support x86-64-v3" on lab-alpha-cp and lab-gamma-wk (Celeron N5105, no
   # AVX2). The pin lives in our own ConfigMap on purpose: Rook 1.21 treats any
@@ -11,8 +11,9 @@ let
   # leftover and blanks it on every operator start, and the CSI operator does
   # not watch that ConfigMap, so the DaemonSets silently went back to 3.18.1
   # after a node reboot. Keep until an upstream cephcsi runs on x86-64-v2.
+  # v3.17.2 verified to require only x86-64-v2 (GNU property 0x03).
   imageSetName = "ceph-csi-image-set";
-  cephcsiImage = "quay.io/cephcsi/cephcsi:v3.17.1";
+  cephcsiImage = "quay.io/cephcsi/cephcsi:v3.17.2";
 
   # NixOS has no /lib/modules and no FHS binaries, so the CSI node plugins
   # need the booted kernel modules and the host /nix store. The lib-modules

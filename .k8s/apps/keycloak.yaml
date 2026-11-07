@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/name: keycloak
     app.kubernetes.io/version: 26.8.1
     helm.sh/chart: keycloak-0.22.0
-    kubenix/hash: 76ad127fe75aa05b4b9c0b4ec291500ef388f10c
+    kubenix/hash: fd9e82d383d2357736a3b6e6a11760a5bfb1e957
   name: keycloak
   namespace: apps
 spec:
@@ -69,7 +69,7 @@ spec:
                 secretKeyRef:
                   key: db-password
                   name: keycloak-env
-          image: docker.io/keycloak/keycloak:26.8.1@sha256:ed1cab21814c7d18ce8f0e11d5a1fa1c6923de12dd4c7625a18c5d34452a57a4
+          image: docker.io/keycloak/keycloak:26.8.2@sha256:3879c623248408de29a5303178b5816c77e8dfef3890c361f8c0bbeaa979ba3b
           imagePullPolicy: Always
           livenessProbe:
             failureThreshold: 3
@@ -145,7 +145,7 @@ spec:
             - sh
             - -c
             - cp -r /opt/keycloak/lib/quarkus/* /shared-quarkus/
-          image: docker.io/keycloak/keycloak:26.8.1@sha256:ed1cab21814c7d18ce8f0e11d5a1fa1c6923de12dd4c7625a18c5d34452a57a4
+          image: docker.io/keycloak/keycloak:26.8.2@sha256:3879c623248408de29a5303178b5816c77e8dfef3890c361f8c0bbeaa979ba3b
           imagePullPolicy: Always
           name: copy-quarkus-lib
           resources: {}
@@ -165,7 +165,7 @@ spec:
             - sh
             - -c
             - cp -r /opt/keycloak/providers/. /shared/
-          image: keycloak/keycloak:26.8.1@sha256:ed1cab21814c7d18ce8f0e11d5a1fa1c6923de12dd4c7625a18c5d34452a57a4
+          image: keycloak/keycloak:26.8.2@sha256:3879c623248408de29a5303178b5816c77e8dfef3890c361f8c0bbeaa979ba3b
           name: copy-base-providers
           volumeMounts:
             - mountPath: /shared
@@ -228,7 +228,7 @@ metadata:
     app.kubernetes.io/name: keycloak
     app.kubernetes.io/version: 26.8.1
     helm.sh/chart: keycloak-0.22.0
-    kubenix/hash: 76ad127fe75aa05b4b9c0b4ec291500ef388f10c
+    kubenix/hash: fd9e82d383d2357736a3b6e6a11760a5bfb1e957
   name: keycloak
   namespace: apps
 spec:
@@ -254,7 +254,7 @@ metadata:
     app.kubernetes.io/name: keycloak
     app.kubernetes.io/version: 26.8.1
     helm.sh/chart: keycloak-0.22.0
-    kubenix/hash: 76ad127fe75aa05b4b9c0b4ec291500ef388f10c
+    kubenix/hash: fd9e82d383d2357736a3b6e6a11760a5bfb1e957
   name: keycloak-headless
   namespace: apps
 spec:
@@ -283,7 +283,7 @@ metadata:
     app.kubernetes.io/name: keycloak
     app.kubernetes.io/version: 26.8.1
     helm.sh/chart: keycloak-0.22.0
-    kubenix/hash: 76ad127fe75aa05b4b9c0b4ec291500ef388f10c
+    kubenix/hash: fd9e82d383d2357736a3b6e6a11760a5bfb1e957
   name: keycloak
   namespace: apps
 spec:

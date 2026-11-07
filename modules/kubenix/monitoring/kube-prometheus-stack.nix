@@ -15,8 +15,8 @@ in
       chart = kubenix.lib.helm.fetch {
         repo = "https://prometheus-community.github.io/helm-charts";
         chart = "kube-prometheus-stack";
-        version = "92.16.1";
-        sha256 = "sha256-HHR7pqy9HMVtiMNexn1zVmlggpcRBrCURThChCFO3dI=";
+        version = "92.22.0";
+        sha256 = "sha256-HzvVeK1FZnT7iMYhHlXi/f4IXl/teomYgqp7rZE486A=";
       };
       includeCRDs = true;
       inherit namespace;
