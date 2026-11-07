@@ -5,7 +5,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: a55eb3e786b30d42bce19c4aafba0fb9d7a83e97
+    kubenix/hash: d9087f3441953f7033353d85ca30b416d36949cb
   name: tuwunel
   namespace: apps
 spec:
@@ -81,11 +81,11 @@ spec:
             timeoutSeconds: 30
           resources:
             limits:
-              cpu: 500m
-              memory: 1Gi
+              cpu: "2"
+              memory: 4Gi
             requests:
               cpu: 100m
-              memory: 128Mi
+              memory: 512Mi
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
@@ -122,7 +122,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: a55eb3e786b30d42bce19c4aafba0fb9d7a83e97
+    kubenix/hash: d9087f3441953f7033353d85ca30b416d36949cb
   name: tuwunel-data-v2
   namespace: apps
 spec:
@@ -142,7 +142,7 @@ metadata:
     lbipam.cilium.io/ips: 10.10.10.157
     lbipam.cilium.io/sharing-key: tuwunel
   labels:
-    kubenix/hash: a55eb3e786b30d42bce19c4aafba0fb9d7a83e97
+    kubenix/hash: d9087f3441953f7033353d85ca30b416d36949cb
   name: tuwunel
   namespace: apps
 spec:
@@ -161,7 +161,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: a55eb3e786b30d42bce19c4aafba0fb9d7a83e97
+    kubenix/hash: d9087f3441953f7033353d85ca30b416d36949cb
   name: tuwunel
   namespace: apps
 spec:

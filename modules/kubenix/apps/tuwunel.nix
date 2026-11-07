@@ -111,11 +111,11 @@ in
                 resources = {
                   requests = {
                     cpu = "100m";
-                    memory = "128Mi";
+                    memory = "512Mi";
                   };
                   limits = {
-                    cpu = "500m";
-                    memory = "1Gi";
+                    cpu = "2";
+                    memory = "4Gi"; # v1.9 RocksDB migration needs >1Gi; revisit after migration completes
                   };
                 };
                 securityContext = {
