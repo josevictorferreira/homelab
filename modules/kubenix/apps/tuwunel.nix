@@ -137,9 +137,12 @@ in
                     path = "/_matrix/client/versions";
                     port = 8008;
                   };
+                  # TEMP during v1.9 RocksDB migration (2026-11-07): HTTP not served while
+                  # migrating, probe kills the process mid-run. Huge failureThreshold so the
+                  # migration can run for hours; revert after migration completes.
                   initialDelaySeconds = 600;
                   periodSeconds = 30;
-                  failureThreshold = 5;
+                  failureThreshold = 720;
                   timeoutSeconds = 30;
                 };
                 readinessProbe = {
