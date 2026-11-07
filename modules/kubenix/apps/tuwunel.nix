@@ -132,7 +132,7 @@ in
                   # the migration can run for hours; revert after migration completes.
                   initialDelaySeconds = 10;
                   periodSeconds = 30;
-                  failureThreshold = 720;
+                  failureThreshold = 2880;
                   timeoutSeconds = 30;
                 };
                 livenessProbe = {
@@ -145,7 +145,7 @@ in
                   # migration can run for hours; revert after migration completes.
                   initialDelaySeconds = 600;
                   periodSeconds = 30;
-                  failureThreshold = 720;
+                  failureThreshold = 2880;
                   timeoutSeconds = 30;
                 };
                 readinessProbe = {
