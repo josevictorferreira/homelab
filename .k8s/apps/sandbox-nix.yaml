@@ -6,7 +6,7 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     app: sandbox-nix
-    kubenix/hash: 2bfb2774d65e05f0b94d06844926aa54904991fd
+    kubenix/hash: b99be0cc5ab7e1aee4606bab26bd457c4c6b17a0
   name: sandbox-nix
   namespace: apps
 spec:
@@ -20,6 +20,23 @@ spec:
       labels:
         app: sandbox-nix
     spec:
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - preference:
+                matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values:
+                      - lab-delta-cp
+              weight: 100
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: NotIn
+                    values:
+                      - lab-alpha-cp
       containers:
         - command:
             - /bin/sh
@@ -132,7 +149,7 @@ metadata:
     lbipam.cilium.io/sharing-key: sandbox-nix
   labels:
     app: sandbox-nix
-    kubenix/hash: 2bfb2774d65e05f0b94d06844926aa54904991fd
+    kubenix/hash: b99be0cc5ab7e1aee4606bab26bd457c4c6b17a0
   name: sandbox-nix
   namespace: apps
 spec:

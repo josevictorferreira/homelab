@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/name: loki
     app.kubernetes.io/version: 3.7.9
     helm.sh/chart: loki-20.2.0
-    kubenix/hash: 56e78c8492835316d1e20aacbdf0d8bb5d31b2f8
+    kubenix/hash: f4daf3a16e94ed8076da850672e373156e7b2de9
   name: loki
   namespace: monitoring
 spec:
@@ -43,7 +43,7 @@ spec:
                   - key: kubernetes.io/hostname
                     operator: In
                     values:
-                      - lab-alpha-cp
+                      - lab-delta-cp
               weight: 100
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -280,7 +280,7 @@ metadata:
     app.kubernetes.io/name: loki
     app.kubernetes.io/version: 3.7.9
     helm.sh/chart: loki-20.2.0
-    kubenix/hash: 56e78c8492835316d1e20aacbdf0d8bb5d31b2f8
+    kubenix/hash: f4daf3a16e94ed8076da850672e373156e7b2de9
   name: loki
   namespace: monitoring
 ---
@@ -298,7 +298,7 @@ metadata:
     app.kubernetes.io/name: loki
     app.kubernetes.io/version: 3.7.9
     helm.sh/chart: loki-20.2.0
-    kubenix/hash: 56e78c8492835316d1e20aacbdf0d8bb5d31b2f8
+    kubenix/hash: f4daf3a16e94ed8076da850672e373156e7b2de9
   name: loki-runtime
   namespace: monitoring
 ---
@@ -314,7 +314,7 @@ metadata:
     app.kubernetes.io/name: loki
     app.kubernetes.io/version: 3.7.9
     helm.sh/chart: loki-20.2.0
-    kubenix/hash: 56e78c8492835316d1e20aacbdf0d8bb5d31b2f8
+    kubenix/hash: f4daf3a16e94ed8076da850672e373156e7b2de9
   name: loki
   namespace: monitoring
 spec:
@@ -350,7 +350,7 @@ metadata:
     app.kubernetes.io/name: loki
     app.kubernetes.io/version: 3.7.9
     helm.sh/chart: loki-20.2.0
-    kubenix/hash: 56e78c8492835316d1e20aacbdf0d8bb5d31b2f8
+    kubenix/hash: f4daf3a16e94ed8076da850672e373156e7b2de9
     prometheus.io/service-monitor: "false"
     variant: headless
   name: loki-headless
@@ -388,7 +388,7 @@ metadata:
     app.kubernetes.io/name: loki
     app.kubernetes.io/version: 3.7.9
     helm.sh/chart: loki-20.2.0
-    kubenix/hash: 56e78c8492835316d1e20aacbdf0d8bb5d31b2f8
+    kubenix/hash: f4daf3a16e94ed8076da850672e373156e7b2de9
   name: loki-memberlist
   namespace: monitoring
 spec:
@@ -416,7 +416,7 @@ metadata:
     app.kubernetes.io/name: loki
     app.kubernetes.io/version: 3.7.9
     helm.sh/chart: loki-20.2.0
-    kubenix/hash: 56e78c8492835316d1e20aacbdf0d8bb5d31b2f8
+    kubenix/hash: f4daf3a16e94ed8076da850672e373156e7b2de9
   name: loki
   namespace: monitoring
 ---
@@ -431,7 +431,7 @@ metadata:
     app.kubernetes.io/name: loki
     app.kubernetes.io/version: 3.7.9
     helm.sh/chart: loki-20.2.0
-    kubenix/hash: 56e78c8492835316d1e20aacbdf0d8bb5d31b2f8
+    kubenix/hash: f4daf3a16e94ed8076da850672e373156e7b2de9
   name: loki
   namespace: monitoring
 spec:
@@ -466,7 +466,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 56e78c8492835316d1e20aacbdf0d8bb5d31b2f8
+    kubenix/hash: f4daf3a16e94ed8076da850672e373156e7b2de9
   name: loki-s3
   namespace: monitoring
 spec:
@@ -484,7 +484,7 @@ metadata:
     app.kubernetes.io/name: loki
     app.kubernetes.io/version: 3.7.9
     helm.sh/chart: loki-20.2.0
-    kubenix/hash: 56e78c8492835316d1e20aacbdf0d8bb5d31b2f8
+    kubenix/hash: f4daf3a16e94ed8076da850672e373156e7b2de9
   name: loki-clusterrole
   namespace: monitoring
 rules: []
@@ -500,7 +500,7 @@ metadata:
     app.kubernetes.io/name: loki
     app.kubernetes.io/version: 3.7.9
     helm.sh/chart: loki-20.2.0
-    kubenix/hash: 56e78c8492835316d1e20aacbdf0d8bb5d31b2f8
+    kubenix/hash: f4daf3a16e94ed8076da850672e373156e7b2de9
   name: loki-clusterrolebinding
   namespace: monitoring
 roleRef:
@@ -519,6 +519,6 @@ kind: ConfigMap
 metadata:
   labels:
     grafana_datasource: "1"
-    kubenix/hash: 56e78c8492835316d1e20aacbdf0d8bb5d31b2f8
+    kubenix/hash: f4daf3a16e94ed8076da850672e373156e7b2de9
   name: loki-datasource
   namespace: monitoring

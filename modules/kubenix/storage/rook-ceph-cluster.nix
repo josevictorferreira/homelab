@@ -371,16 +371,17 @@ in
                   requests.cpu = "100m";
                   requests.memory = "1Gi";
                 };
-                # Keep the MDS off lab-gamma-wk: 8Gi node already carrying two
-                # OSDs (~3.6Gi actual) with a history of memory-pressure
-                # evictions and reboot loops.
+                # Keep the MDS off lab-gamma-wk and lab-alpha-cp: gamma is an
+                # 8Gi node carrying OSDs with memory pressure history, and
+                # alpha has a broken CPU fan running at 105C / 400MHz.
+                # Runs on lab-beta-cp and lab-delta-cp.
                 placement.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms = [
                   {
                     matchExpressions = [
                       {
                         key = "kubernetes.io/hostname";
                         operator = "NotIn";
-                        values = [ "lab-gamma-wk" ];
+                        values = [ "lab-gamma-wk" "lab-alpha-cp" ];
                       }
                     ];
                   }
