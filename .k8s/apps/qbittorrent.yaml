@@ -12,12 +12,12 @@ metadata:
     app.kubernetes.io/version: 5.1.4
     helm-revision: "1"
     helm.sh/chart: qbittorrent-24.2.20
-    kubenix/hash: ce1ccd18d8fbf5b3efefceabfeafea7d5514596e
+    kubenix/hash: 4a30d1f9864ee99c9dc8d5bfff0bb77816d9f9f1
     release: qbittorrent
   name: qbittorrent
   namespace: apps
 spec:
-  replicas: 0
+  replicas: 1
   revisionHistoryLimit: 3
   selector:
     matchLabels:
@@ -430,7 +430,7 @@ metadata:
     app.kubernetes.io/version: 5.1.4
     helm-revision: "1"
     helm.sh/chart: qbittorrent-24.2.20
-    kubenix/hash: ce1ccd18d8fbf5b3efefceabfeafea7d5514596e
+    kubenix/hash: 4a30d1f9864ee99c9dc8d5bfff0bb77816d9f9f1
     release: qbittorrent
   name: qbittorrent-config
   namespace: apps
@@ -458,7 +458,7 @@ metadata:
     app.kubernetes.io/version: 5.1.4
     helm-revision: "1"
     helm.sh/chart: qbittorrent-24.2.20
-    kubenix/hash: ce1ccd18d8fbf5b3efefceabfeafea7d5514596e
+    kubenix/hash: 4a30d1f9864ee99c9dc8d5bfff0bb77816d9f9f1
     release: qbittorrent
     service.name: main
   name: qbittorrent
@@ -491,7 +491,7 @@ metadata:
     app.kubernetes.io/version: 5.1.4
     helm-revision: "1"
     helm.sh/chart: qbittorrent-24.2.20
-    kubenix/hash: ce1ccd18d8fbf5b3efefceabfeafea7d5514596e
+    kubenix/hash: 4a30d1f9864ee99c9dc8d5bfff0bb77816d9f9f1
     release: qbittorrent
     service.name: torrent
   name: qbittorrent-torrent
@@ -529,7 +529,7 @@ metadata:
     app.kubernetes.io/version: 5.1.4
     helm-revision: "1"
     helm.sh/chart: qbittorrent-24.2.20
-    kubenix/hash: ce1ccd18d8fbf5b3efefceabfeafea7d5514596e
+    kubenix/hash: 4a30d1f9864ee99c9dc8d5bfff0bb77816d9f9f1
     release: qbittorrent
   name: qbittorrent
   namespace: apps

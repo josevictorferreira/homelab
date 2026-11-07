@@ -12,12 +12,12 @@ metadata:
     app.kubernetes.io/version: 2.3.0.5236
     helm-revision: "1"
     helm.sh/chart: prowlarr-21.3.7
-    kubenix/hash: 04f774cd3b1b44f2bac1c971d955c3ab9b64ab90
+    kubenix/hash: 146b716c2cb95cadbb1a87595040cd84819341f4
     release: prowlarr
   name: prowlarr
   namespace: apps
 spec:
-  replicas: 0
+  replicas: 1
   revisionHistoryLimit: 3
   selector:
     matchLabels:
@@ -350,7 +350,7 @@ metadata:
     grafana_dashboard: "1"
     helm-revision: "1"
     helm.sh/chart: prowlarr-21.3.7
-    kubenix/hash: 04f774cd3b1b44f2bac1c971d955c3ab9b64ab90
+    kubenix/hash: 146b716c2cb95cadbb1a87595040cd84819341f4
     release: prowlarr
   name: prowlarr-dashboard
   namespace: apps
@@ -369,7 +369,7 @@ metadata:
     app.kubernetes.io/version: 2.3.0.5236
     helm-revision: "1"
     helm.sh/chart: prowlarr-21.3.7
-    kubenix/hash: 04f774cd3b1b44f2bac1c971d955c3ab9b64ab90
+    kubenix/hash: 146b716c2cb95cadbb1a87595040cd84819341f4
     release: prowlarr
   name: prowlarr-config
   namespace: apps
@@ -395,7 +395,7 @@ metadata:
     app.kubernetes.io/version: 2.3.0.5236
     helm-revision: "1"
     helm.sh/chart: prowlarr-21.3.7
-    kubenix/hash: 04f774cd3b1b44f2bac1c971d955c3ab9b64ab90
+    kubenix/hash: 146b716c2cb95cadbb1a87595040cd84819341f4
     release: prowlarr
     service.name: main
   name: prowlarr
@@ -427,7 +427,7 @@ metadata:
     app.kubernetes.io/version: 2.3.0.5236
     helm-revision: "1"
     helm.sh/chart: prowlarr-21.3.7
-    kubenix/hash: 04f774cd3b1b44f2bac1c971d955c3ab9b64ab90
+    kubenix/hash: 146b716c2cb95cadbb1a87595040cd84819341f4
     release: prowlarr
     service.name: metrics
   name: prowlarr-metrics
@@ -459,7 +459,7 @@ metadata:
     app.kubernetes.io/version: 2.3.0.5236
     helm-revision: "1"
     helm.sh/chart: prowlarr-21.3.7
-    kubenix/hash: 04f774cd3b1b44f2bac1c971d955c3ab9b64ab90
+    kubenix/hash: 146b716c2cb95cadbb1a87595040cd84819341f4
     release: prowlarr
   name: prowlarr
   namespace: apps
@@ -490,7 +490,7 @@ metadata:
     app.kubernetes.io/version: 2.3.0.5236
     helm-revision: "1"
     helm.sh/chart: prowlarr-21.3.7
-    kubenix/hash: 04f774cd3b1b44f2bac1c971d955c3ab9b64ab90
+    kubenix/hash: 146b716c2cb95cadbb1a87595040cd84819341f4
     release: prowlarr
   name: prowlarr
   namespace: apps
