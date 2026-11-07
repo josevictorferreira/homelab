@@ -12,7 +12,7 @@ metadata:
     app.kubernetes.io/version: 5.1.4
     helm-revision: "1"
     helm.sh/chart: qbittorrent-24.2.20
-    kubenix/hash: 4a30d1f9864ee99c9dc8d5bfff0bb77816d9f9f1
+    kubenix/hash: db538cbb44d9c425393a4abb8bcd0d46ddeebb3b
     release: qbittorrent
   name: qbittorrent
   namespace: apps
@@ -101,7 +101,7 @@ spec:
           envFrom:
             - secretRef:
                 name: gluetun-vpn-credentials
-          image: oci.trueforge.org/tccr/gluetun:v3.40.0@sha256:a8189e29155e0f8142be1500ae068a92b189b1b25abbba036321e74d6389bf2b
+          image: ghcr.io/qdm12/gluetun:v3.41.3@sha256:fa19cc76b2af13d57a8d3dc3066f2ada061b1c761b8aecf989b3877c0486e027
           imagePullPolicy: IfNotPresent
           name: qbittorrent-gluetun
           resources:
@@ -169,7 +169,7 @@ spec:
               value: "62657"
             - name: QBT_WEBUI_PORT
               value: "8080"
-          image: ghcr.io/home-operations/qbittorrent:5.1.4@sha256:56ecd30a7f5e1357daf5eea2a6935134d329b7b268a3a9b9c67041b65fb87fc6
+          image: ghcr.io/home-operations/qbittorrent:5.3.0@sha256:5a858e61f94cf2712391db32ed03556576c700858f3e62c4c6fcde262443ebd8
           imagePullPolicy: IfNotPresent
           livenessProbe:
             failureThreshold: 5
@@ -311,7 +311,7 @@ spec:
               value: "2002"
             - name: PUID
               value: "2002"
-          image: ghcr.io/home-operations/qbittorrent:5.1.4@sha256:56ecd30a7f5e1357daf5eea2a6935134d329b7b268a3a9b9c67041b65fb87fc6
+          image: ghcr.io/home-operations/qbittorrent:5.3.0@sha256:5a858e61f94cf2712391db32ed03556576c700858f3e62c4c6fcde262443ebd8
           imagePullPolicy: IfNotPresent
           name: qbittorrent-init-install-vuetorrent
           resources:
@@ -430,7 +430,7 @@ metadata:
     app.kubernetes.io/version: 5.1.4
     helm-revision: "1"
     helm.sh/chart: qbittorrent-24.2.20
-    kubenix/hash: 4a30d1f9864ee99c9dc8d5bfff0bb77816d9f9f1
+    kubenix/hash: db538cbb44d9c425393a4abb8bcd0d46ddeebb3b
     release: qbittorrent
   name: qbittorrent-config
   namespace: apps
@@ -458,7 +458,7 @@ metadata:
     app.kubernetes.io/version: 5.1.4
     helm-revision: "1"
     helm.sh/chart: qbittorrent-24.2.20
-    kubenix/hash: 4a30d1f9864ee99c9dc8d5bfff0bb77816d9f9f1
+    kubenix/hash: db538cbb44d9c425393a4abb8bcd0d46ddeebb3b
     release: qbittorrent
     service.name: main
   name: qbittorrent
@@ -491,7 +491,7 @@ metadata:
     app.kubernetes.io/version: 5.1.4
     helm-revision: "1"
     helm.sh/chart: qbittorrent-24.2.20
-    kubenix/hash: 4a30d1f9864ee99c9dc8d5bfff0bb77816d9f9f1
+    kubenix/hash: db538cbb44d9c425393a4abb8bcd0d46ddeebb3b
     release: qbittorrent
     service.name: torrent
   name: qbittorrent-torrent
@@ -529,7 +529,7 @@ metadata:
     app.kubernetes.io/version: 5.1.4
     helm-revision: "1"
     helm.sh/chart: qbittorrent-24.2.20
-    kubenix/hash: 4a30d1f9864ee99c9dc8d5bfff0bb77816d9f9f1
+    kubenix/hash: db538cbb44d9c425393a4abb8bcd0d46ddeebb3b
     release: qbittorrent
   name: qbittorrent
   namespace: apps

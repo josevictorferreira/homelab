@@ -21,7 +21,7 @@ let
   '';
   qbtImage = {
     repository = "ghcr.io/home-operations/qbittorrent";
-    tag = "5.1.4@sha256:56ecd30a7f5e1357daf5eea2a6935134d329b7b268a3a9b9c67041b65fb87fc6";
+    tag = "5.3.0@sha256:5a858e61f94cf2712391db32ed03556576c700858f3e62c4c6fcde262443ebd8";
     pullPolicy = "IfNotPresent";
   };
 in
@@ -42,6 +42,11 @@ in
         qbitportforwardImage = {
           repository = "docker.io/mjmeli/qbittorrent-port-forward-gluetun-server";
           tag = "2025.12.21.02@sha256:4e30826d2f46bdcf387b6c3a610478ab3856d55fff457f98196e4d48975eb1dd";
+          pullPolicy = "IfNotPresent";
+        };
+        gluetunImage = {
+          repository = "ghcr.io/qdm12/gluetun";
+          tag = "v3.41.3@sha256:fa19cc76b2af13d57a8d3dc3066f2ada061b1c761b8aecf989b3877c0486e027";
           pullPolicy = "IfNotPresent";
         };
         securityContext = {
