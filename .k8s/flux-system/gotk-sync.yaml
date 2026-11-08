@@ -10,7 +10,7 @@ spec:
     branch: main
   secretRef:
     name: flux-system
-  url: ssh://git@github.com/josevictorferreira/homelab
+  url: ssh://git@ssh.github.com:443/josevictorferreira/homelab
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
