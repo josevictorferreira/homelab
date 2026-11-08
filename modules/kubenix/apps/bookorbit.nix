@@ -61,6 +61,7 @@ in
           LIBRARY_BROWSE_ROOT = "/books";
           BOOK_DOCK_PATH = "/books";
           NODE_MAX_OLD_SPACE_SIZE = "2048";
+          UV_THREADPOOL_SIZE = "16";
         };
         controllers.main.containers.main.probes = {
           # 2026-10-06: startup is CPU-bound and ran past the liveness window
