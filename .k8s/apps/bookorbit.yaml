@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: bookorbit
     helm.sh/chart: app-template-5.3.0
-    kubenix/hash: ecaf690645974013546f82cfeac67f99ab1d36c2
+    kubenix/hash: 7d9c3631864bd84e1c2764433a29111a4f817737
     kubenix/module-instance: bookorbit
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -57,7 +57,7 @@ spec:
           envFrom:
             - secretRef:
                 name: bookorbit-config
-          image: ghcr.io/bookorbit/bookorbit:3.6.0@sha256:bbb5da52e96dbbff1dd36f55454f9845e6cde264b4b3428a3ea783124a4ca62e
+          image: ghcr.io/bookorbit/bookorbit:3.7.0@sha256:0d5f4a31576a2bcd96afa77b8eac75c3b8df395f0f9b9215995de59236f22b95
           imagePullPolicy: IfNotPresent
           livenessProbe:
             httpGet:
@@ -141,7 +141,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: bookorbit
     helm.sh/chart: app-template-5.3.0
-    kubenix/hash: ecaf690645974013546f82cfeac67f99ab1d36c2
+    kubenix/hash: 7d9c3631864bd84e1c2764433a29111a4f817737
     kubenix/module-instance: bookorbit
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -169,7 +169,7 @@ metadata:
     app.kubernetes.io/name: bookorbit
     app.kubernetes.io/service: bookorbit
     helm.sh/chart: app-template-5.3.0
-    kubenix/hash: ecaf690645974013546f82cfeac67f99ab1d36c2
+    kubenix/hash: 7d9c3631864bd84e1c2764433a29111a4f817737
     kubenix/module-instance: bookorbit
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -198,7 +198,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: bookorbit
     helm.sh/chart: app-template-5.3.0
-    kubenix/hash: ecaf690645974013546f82cfeac67f99ab1d36c2
+    kubenix/hash: 7d9c3631864bd84e1c2764433a29111a4f817737
     kubenix/module-instance: bookorbit
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
