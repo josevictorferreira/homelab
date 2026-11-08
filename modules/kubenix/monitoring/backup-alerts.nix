@@ -128,6 +128,55 @@ in
             }
           ];
         }
+
+        # ── Shared subfolders backup/restore ──
+        # Added 2026-11-08: the shared backup silently failed for ~4 weeks (MinIO
+        # user was lost when backup-pool was recreated) with no dedicated alert.
+        {
+          name = "shared-subfolders-backup.rules";
+          rules = [
+            {
+              alert = "SharedSubfoldersBackupJobFailed";
+              expr = ''increase(kube_job_status_failed{namespace="${homelab.kubernetes.namespaces.backup}", job_name=~"shared-subfolders-backup.*"}[6h]) > 0'';
+              "for" = "5m";
+              labels.severity = "critical";
+              annotations = {
+                summary = "Shared subfolders backup job failed";
+                description = "Job {{ $labels.job_name }} in namespace {{ $labels.namespace }} has failed.";
+              };
+            }
+            {
+              alert = "SharedSubfoldersBackupStale";
+              expr = ''time() - kube_cronjob_status_last_successful_time{namespace="${homelab.kubernetes.namespaces.backup}", cronjob="shared-subfolders-backup"} > 93600'';
+              "for" = "15m";
+              labels.severity = "critical";
+              annotations = {
+                summary = "Shared subfolders backup is stale";
+                description = "No successful shared-subfolders-backup run in over 26 hours.";
+              };
+            }
+            {
+              alert = "SharedSubfoldersRestoreDrillFailed";
+              expr = ''increase(kube_job_status_failed{namespace="${homelab.kubernetes.namespaces.backup}", job_name=~"shared-subfolders-restore-drill.*"}[168h]) > 0'';
+              "for" = "5m";
+              labels.severity = "warning";
+              annotations = {
+                summary = "Shared subfolders restore drill failed";
+                description = "Job {{ $labels.job_name }} in namespace {{ $labels.namespace }} has failed. Restore capability may be compromised.";
+              };
+            }
+            {
+              alert = "SharedSubfoldersRestoreDrillStale";
+              expr = ''time() - kube_cronjob_status_last_successful_time{namespace="${homelab.kubernetes.namespaces.backup}", cronjob="shared-subfolders-restore-drill"} > 604800'';
+              "for" = "30m";
+              labels.severity = "warning";
+              annotations = {
+                summary = "Shared subfolders restore drill is stale";
+                description = "No successful shared-subfolders-restore-drill run in over 7 days.";
+              };
+            }
+          ];
+        }
       ];
     }
   ];

@@ -5,7 +5,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 2c85fb678ea48ea31c5fbaf74768455ac0451b74
+    kubenix/hash: 16d1a2e0481077ce83979957fd8892be2cb7ab9d
   name: shared-subfolders-restore-drill
   namespace: backup
 spec:
@@ -49,8 +49,10 @@ spec:
                   for folder in notetaking images backups openclaw; do
                     echo "Checking folder: $folder"
 
-                    # Count files in this folder
-                    COUNT=$(rclone lsl "minio:homelab-backup-shared/current/$folder/" 2>/dev/null | wc -l || echo "0")
+                    # Count files in this folder (keep rclone stderr: auth/endpoint failures
+                    # must be visible in pod logs, and under pipefail a failed rclone is
+                    # caught by || COUNT=0 instead of corrupting the count)
+                    COUNT=$(rclone lsl "minio:homelab-backup-shared/current/$folder/" | wc -l) || COUNT=0
 
                     if [ "$COUNT" -gt 0 ]; then
                       echo "OK: folder $folder exists with $COUNT items"

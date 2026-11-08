@@ -43,8 +43,10 @@ let
     for folder in ${toString expectedFolders}; do
       echo "Checking folder: $folder"
 
-      # Count files in this folder
-      COUNT=$(rclone lsl "minio:${minioBucket}/current/$folder/" 2>/dev/null | wc -l || echo "0")
+      # Count files in this folder (keep rclone stderr: auth/endpoint failures
+      # must be visible in pod logs, and under pipefail a failed rclone is
+      # caught by || COUNT=0 instead of corrupting the count)
+      COUNT=$(rclone lsl "minio:${minioBucket}/current/$folder/" | wc -l) || COUNT=0
 
       if [ "$COUNT" -gt 0 ]; then
         echo "OK: folder $folder exists with $COUNT items"

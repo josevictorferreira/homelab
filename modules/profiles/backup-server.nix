@@ -167,9 +167,7 @@ in
           done
 
           ## Per-service creds + policies
-          ## (no "shared" here: the shared bucket exists but has no per-service
-          ## minio_shared_* secrets — its writers use other credentials)
-          SERVICES="velero postgres rgw etcd"
+          SERVICES="velero postgres rgw etcd shared"
           for svc in $SERVICES; do
             BUCKET="homelab-backup-$svc"
             AK_FILE="/run/secrets/minio_''${svc}_access_key_id"
@@ -188,6 +186,7 @@ in
               {
                 "Effect": "Allow",
                 "Action": [
+                  "s3:CreateBucket",
                   "s3:ListBucket",
                   "s3:GetBucketLocation",
                   "s3:ListBucketMultipartUploads"
@@ -279,6 +278,10 @@ in
       minio_rgw_secret_access_key.mode = "0400";
       minio_etcd_access_key_id.mode = "0400";
       minio_etcd_secret_access_key.mode = "0400";
+      # K8s-side credentials for shared-subfolders-backup + restore drill
+      # (values mirror k8s-secrets.enc.yaml minio_shared_backup_*)
+      minio_shared_access_key_id.mode = "0400";
+      minio_shared_secret_access_key.mode = "0400";
     };
 
     systemd.tmpfiles.rules = [
