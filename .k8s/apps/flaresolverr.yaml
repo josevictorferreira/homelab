@@ -5,11 +5,11 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: ef7ae396285030620d56761bef3f5a31fa7c5042
+    kubenix/hash: 070c7c41df84a27588153be58871a8a7bd42e041
   name: flaresolverr
   namespace: apps
 spec:
-  replicas: 0
+  replicas: 1
   selector:
     matchLabels:
       app: flaresolverr
@@ -64,7 +64,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: ef7ae396285030620d56761bef3f5a31fa7c5042
+    kubenix/hash: 070c7c41df84a27588153be58871a8a7bd42e041
   name: flaresolverr
   namespace: apps
 spec:
