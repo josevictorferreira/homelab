@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: blocky
     helm.sh/chart: app-template-5.3.0
-    kubenix/hash: ac526027343055e3d2aef6391e5a38a756f9ba41
+    kubenix/hash: 07c05f0ad6dea7ae9acf3b52ff38b89f35043ef2
     kubenix/module-instance: blocky
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -35,7 +35,7 @@ spec:
     spec:
       automountServiceAccountToken: true
       containers:
-        - image: ghcr.io/0xerr0r/blocky:v0.35.0@sha256:4f165b63db0d76c96ecc47c7a8f57caeedc003a912bdce29abb0e283ce02e16b
+        - image: ghcr.io/0xerr0r/blocky:v0.36.0@sha256:191c0f1e688aa37698297ef4059e11a2b080299a878f5b31d6d32ace9d0c54b2
           imagePullPolicy: IfNotPresent
           name: main
           ports:
@@ -82,7 +82,7 @@ metadata:
     app.kubernetes.io/name: blocky
     app.kubernetes.io/service: blocky-dns
     helm.sh/chart: app-template-5.3.0
-    kubenix/hash: ac526027343055e3d2aef6391e5a38a756f9ba41
+    kubenix/hash: 07c05f0ad6dea7ae9acf3b52ff38b89f35043ef2
     kubenix/module-instance: blocky
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -118,7 +118,7 @@ metadata:
     app.kubernetes.io/name: blocky
     app.kubernetes.io/service: blocky-dot
     helm.sh/chart: app-template-5.3.0
-    kubenix/hash: ac526027343055e3d2aef6391e5a38a756f9ba41
+    kubenix/hash: 07c05f0ad6dea7ae9acf3b52ff38b89f35043ef2
     kubenix/module-instance: blocky
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -150,7 +150,7 @@ metadata:
     app.kubernetes.io/name: blocky
     app.kubernetes.io/service: blocky-main
     helm.sh/chart: app-template-5.3.0
-    kubenix/hash: ac526027343055e3d2aef6391e5a38a756f9ba41
+    kubenix/hash: 07c05f0ad6dea7ae9acf3b52ff38b89f35043ef2
     kubenix/module-instance: blocky
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -179,7 +179,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: blocky
     helm.sh/chart: app-template-5.3.0
-    kubenix/hash: ac526027343055e3d2aef6391e5a38a756f9ba41
+    kubenix/hash: 07c05f0ad6dea7ae9acf3b52ff38b89f35043ef2
     kubenix/module-instance: blocky
     kubenix/module-name: release
     kubenix/module-version: 1.0.0

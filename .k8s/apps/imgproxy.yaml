@@ -8,7 +8,7 @@ metadata:
     app: imgproxy-imgproxy
     chart: imgproxy-1.1.0
     heritage: Helm
-    kubenix/hash: 75fb67e0d74ebc53d6c3a3fe0904ed15a76fded2
+    kubenix/hash: bb3b966410387531bc9a5048b52a2e70f36f7b3c
     release: imgproxy
   name: imgproxy-imgproxy
   namespace: apps
@@ -40,7 +40,7 @@ spec:
                 name: imgproxy-config
             - secretRef:
                 name: valoris-s3
-          image: ghcr.io/imgproxy/imgproxy:v4.0.22@sha256:b2953f6a7417be7e8a88819da9d3428270ca942cff280f8e143406fb5f962ed0
+          image: ghcr.io/imgproxy/imgproxy:v4.0.23@sha256:1e9718a2c940157b2bc400729497a78bde93738a859d0ffcdde185f019b3991b
           imagePullPolicy: IfNotPresent
           livenessProbe:
             failureThreshold: 5
@@ -99,7 +99,7 @@ metadata:
     chart: imgproxy-1.1.0
     heritage: Helm
     imgproxy: "true"
-    kubenix/hash: 75fb67e0d74ebc53d6c3a3fe0904ed15a76fded2
+    kubenix/hash: bb3b966410387531bc9a5048b52a2e70f36f7b3c
     release: imgproxy
   name: imgproxy-imgproxy-env-secrets
   namespace: apps
@@ -118,7 +118,7 @@ metadata:
     chart: imgproxy-1.1.0
     heritage: Helm
     imgproxy: "true"
-    kubenix/hash: 75fb67e0d74ebc53d6c3a3fe0904ed15a76fded2
+    kubenix/hash: bb3b966410387531bc9a5048b52a2e70f36f7b3c
     release: imgproxy
   name: imgproxy-imgproxy
   namespace: apps
@@ -146,7 +146,7 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     imgproxy: "true"
-    kubenix/hash: 75fb67e0d74ebc53d6c3a3fe0904ed15a76fded2
+    kubenix/hash: bb3b966410387531bc9a5048b52a2e70f36f7b3c
     release: prometheus-operator
   name: imgproxy-imgproxy
   namespace: apps
@@ -177,7 +177,7 @@ metadata:
     chart: imgproxy-1.1.0
     heritage: Helm
     imgproxy: "true"
-    kubenix/hash: 75fb67e0d74ebc53d6c3a3fe0904ed15a76fded2
+    kubenix/hash: bb3b966410387531bc9a5048b52a2e70f36f7b3c
     release: imgproxy
   name: imgproxy-imgproxy
   namespace: apps
@@ -206,7 +206,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 75fb67e0d74ebc53d6c3a3fe0904ed15a76fded2
+    kubenix/hash: bb3b966410387531bc9a5048b52a2e70f36f7b3c
   name: imgproxy-s3
   namespace: apps
 spec:
@@ -223,7 +223,7 @@ metadata:
     kubenix/project-name: ze-homelab
   labels:
     imgproxy: "true"
-    kubenix/hash: 75fb67e0d74ebc53d6c3a3fe0904ed15a76fded2
+    kubenix/hash: bb3b966410387531bc9a5048b52a2e70f36f7b3c
   name: imgproxy-imgproxy-pdb
   namespace: apps
 spec:
