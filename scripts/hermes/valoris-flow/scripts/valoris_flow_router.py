@@ -16,7 +16,7 @@ import sys
 import time
 
 from valoris_flow import (MAX_CYCLES, MAX_OPEN_FIXES, REPO, board, closes_issue, comment_card, create_card, gh,
-                          gh_paged, post_feed, run)
+                          gh_paged, post_feed, reclaim_card, run, unblock_card)
 
 PREFIX = "valoris-flow:"
 REJECTIONS = ("auto-review-changes", "auto-qa-failed")
@@ -24,6 +24,11 @@ REJECTION_HEADER = re.compile(r"^\s*\*\*(Review \(\w+\): CHANGES REQUESTED|Test 
 FEED_WINDOW = 2 * 3600
 FEED_MARK = "vf:feed-posted:"
 BLOCKED_MARK = "vf:blocked-announced"
+HEAL_STALE_HEARTBEAT = 3600          # running card with no heartbeat for this long -> reclaim
+HEAL_BLOCK_RETRIES = 2               # give infra-blocked cards this many unblock chances
+INFRA_FAILURE = re.compile(r"(?i)kanban owner (?:silent|refused)|gateway starting|deadline|timeouterror")
+ZOMBIE_MARK = "vf:zombie-reclaimed:"
+UNBLOCK_MARK = "vf:infra-unblocked:"
 
 
 def issue_url(n):
@@ -173,6 +178,56 @@ def load_cards(db):
     return [{"key": k, "status": s, "id": i} for k, s, i in rows]
 
 
+def heal_cards(db, dry_run, now=None):
+    """Recover flow cards wedged by gateway restarts, which hermes' own sweeps never catch:
+
+    - running with a heartbeat older than HEAL_STALE_HEARTBEAT: the worker is gone (its pod died
+      mid-run) but the claim stays, because the crash sweep is host-local and skips the
+      foreign-host claim of a dead pod incarnation forever -> `reclaim` releases it.
+    - blocked by infra failures (kanban-owner/gateway handshake timeouts around a gateway
+      restart) rather than by the work itself -> `unblock` requeues it. hermes' breaker does not
+      touch block_recurrences, so the bound is our own comment counter (HEAL_BLOCK_RETRIES
+      unblocks per card, ever); after that a human owns it (announce_blocked already pinged).
+    """
+    now = now or time.time()
+    healed = []
+    rows = db.execute("select id, assignee, title, status, last_heartbeat_at, last_failure_error "
+                      "from tasks where created_by = 'valoris-flow' and status in ('running', 'blocked')").fetchall()
+    for task_id, assignee, title, status, heartbeat, error in rows:
+        if status == "running":
+            if heartbeat is None or now - heartbeat < HEAL_STALE_HEARTBEAT:
+                continue
+            if _commented(db, task_id, f"{ZOMBIE_MARK}{heartbeat}"):
+                continue  # already requeued for this heartbeat; give the dispatcher time
+            if dry_run:
+                print(f"reclaim {task_id} (heartbeat {int(now - heartbeat)}s old)")
+                healed.append(task_id)
+                continue
+            reclaim_card(task_id)
+            comment_card(task_id, f"{ZOMBIE_MARK}{heartbeat}")
+            post_feed(assignee, f"Card {task_id} ficou órfão (worker morto, sem heartbeat há "
+                      f"{int(now - heartbeat) // 60} min); recuperei o claim para o dispatcher retomar.",
+                      f"vf-heal-{task_id}-{int(heartbeat)}")
+        else:  # blocked
+            if not INFRA_FAILURE.search(error or ""):
+                continue
+            unblocks = db.execute("select count(*) from task_comments where task_id = ? and body like ?",
+                                  (task_id, UNBLOCK_MARK + "%")).fetchone()[0]
+            if unblocks >= HEAL_BLOCK_RETRIES:
+                continue
+            if dry_run:
+                print(f"unblock {task_id} ({(error or '').splitlines()[0][:80]})")
+                healed.append(task_id)
+                continue
+            unblock_card(task_id)
+            comment_card(task_id, f"{UNBLOCK_MARK}{unblocks + 1}")
+            post_feed(assignee, f"Card {task_id} travou por infra (gateway/owner indisponível); "
+                      f"desbloqueei para nova tentativa ({unblocks + 1}/{HEAL_BLOCK_RETRIES}).",
+                      f"vf-heal-{task_id}-{unblocks + 1}")
+        healed.append(task_id)
+    return healed
+
+
 def apply(actions, dry_run):
     for action in actions:
         if dry_run:
@@ -241,6 +296,7 @@ def with_db_retry(fn, attempts=3, wait=3):
 def main(argv=None):
     dry_run = "--dry-run" in (sys.argv[1:] if argv is None else argv)
     db = board()
+    with_db_retry(lambda: heal_cards(db, dry_run))
     issues, prs = load_github()
     apply(plan(issues, prs, with_db_retry(lambda: load_cards(db))), dry_run)
     with_db_retry(lambda: relay_feed(db, dry_run))

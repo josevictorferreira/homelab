@@ -67,6 +67,18 @@ def comment_card(task_id, text):
                    capture_output=True, text=True, check=True)
 
 
+def reclaim_card(task_id):
+    """Release a running card's worker claim so the dispatcher re-spawns it (zombie sweep)."""
+    subprocess.run(["hermes", "kanban", "--board", BOARD, "reclaim", task_id],
+                   capture_output=True, text=True, check=True)
+
+
+def unblock_card(task_id):
+    """Return a blocked card to ready (resets the consecutive-failure breaker)."""
+    subprocess.run(["hermes", "kanban", "--board", BOARD, "unblock", task_id],
+                   capture_output=True, text=True, check=True)
+
+
 def closes_issue(pr_body):
     """The issue number a PR body closes (`Closes #N`, `Fixes #N`, ...), or None."""
     m = _CLOSES.search(pr_body or "")

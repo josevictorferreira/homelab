@@ -1,4 +1,27 @@
--- DDL copied from kanban/boards/valoris/kanban.db (hermes v0.22.6) for tests.
+-- DDL copied from kanban/boards/valoris/kanban.db (hermes v0.23.0) for tests.
+CREATE TABLE kanban_notify_subs (
+    task_id       TEXT NOT NULL,
+    platform      TEXT NOT NULL,
+    chat_id       TEXT NOT NULL,
+    thread_id     TEXT NOT NULL DEFAULT '',
+    user_id       TEXT,
+    notifier_profile TEXT,
+    created_at    INTEGER NOT NULL,
+    last_event_id INTEGER NOT NULL DEFAULT 0, chat_type TEXT, delivery_metadata TEXT, delivery_mode TEXT NOT NULL DEFAULT 'notify', user_id_alt TEXT, last_ping_event_id INTEGER NOT NULL DEFAULT 0,
+    PRIMARY KEY (task_id, platform, chat_id, thread_id)
+);
+
+CREATE TABLE task_attachments (
+    id           INTEGER PRIMARY KEY AUTOINCREMENT,
+    task_id      TEXT NOT NULL,
+    filename     TEXT NOT NULL,
+    stored_path  TEXT NOT NULL,
+    content_type TEXT,
+    size         INTEGER NOT NULL DEFAULT 0,
+    uploaded_by  TEXT,
+    created_at   INTEGER NOT NULL
+);
+
 CREATE TABLE task_comments (
     id         INTEGER PRIMARY KEY AUTOINCREMENT,
     task_id    TEXT NOT NULL,
@@ -128,3 +151,4 @@ CREATE TABLE tasks (
     -- the amnesia that let the loop run unbounded).
     block_recurrences    INTEGER NOT NULL DEFAULT 0
 , provider_override TEXT, reasoning_effort TEXT, completion_contract TEXT, worker_started_at INTEGER);
+

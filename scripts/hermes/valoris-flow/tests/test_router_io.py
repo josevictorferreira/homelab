@@ -130,3 +130,94 @@ class DbRetryTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class HealCardsTest(unittest.TestCase):
+    def setUp(self):
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        self.path = make_board(tmp.name)
+        self.db = sqlite3.connect(self.path)
+        self.addCleanup(self.db.close)
+
+    def _mark_comment(self, task_id, text):
+        add_comment(self.path, task_id, text)
+
+    def test_reclaims_zombie_running_card_once_per_heartbeat(self):
+        now = 10_000
+        add_task(self.path, "t_z", "running", assignee="valygar", key="valoris-flow:fix:59")
+        self.db.execute("update tasks set last_heartbeat_at = ?", (now - 2 * router.HEAL_STALE_HEARTBEAT,))
+        self.db.commit()
+        with mock.patch.object(router, "reclaim_card") as reclaim, \
+                mock.patch.object(router, "post_feed") as post, \
+                mock.patch.object(router, "comment_card", side_effect=self._mark_comment):
+            first = router.heal_cards(self.db, dry_run=False, now=now)
+            second = router.heal_cards(self.db, dry_run=False, now=now)
+        self.assertEqual(first, ["t_z"])
+        self.assertEqual(second, [])  # the heartbeat mark stops a re-reclaim
+        reclaim.assert_called_once_with("t_z")
+        post.assert_called_once()
+
+    def test_fresh_running_card_left_alone(self):
+        add_task(self.path, "t_ok", "running", assignee="valygar")
+        self.db.execute("update tasks set last_heartbeat_at = 9_500", )
+        self.db.commit()
+        with mock.patch.object(router, "reclaim_card") as reclaim:
+            self.assertEqual(router.heal_cards(self.db, dry_run=False, now=10_000), [])
+        reclaim.assert_not_called()
+
+    def test_running_without_heartbeat_is_left_alone(self):
+        # None heartbeat means never started by this scheme; not a zombie we can judge
+        add_task(self.path, "t_nb", "running", assignee="valygar")
+        with mock.patch.object(router, "reclaim_card") as reclaim:
+            self.assertEqual(router.heal_cards(self.db, dry_run=False, now=10_000), [])
+        reclaim.assert_not_called()
+
+    def test_unblocks_infra_blocked_card_bounded_times(self):
+        add_task(self.path, "t_i", "blocked", assignee="valygar",
+                 last_failure_error="Kanban owner refused: Kanban owner silent for 199s: TimeoutError")
+        unblock = mock.patch.object(router, "unblock_card")
+        with mock.patch.object(router, "post_feed") as post, \
+                mock.patch.object(router, "comment_card", side_effect=self._mark_comment), \
+                unblock as unblock_mock:
+            healed = router.heal_cards(self.db, dry_run=False, now=10_000)
+            # simulate hermes re-blocking for the same infra reason
+            self.db.execute("update tasks set status = 'blocked'")
+            self.db.commit()
+            router.heal_cards(self.db, dry_run=False, now=10_000)
+            self.db.execute("update tasks set status = 'blocked'")
+            self.db.commit()
+            third = router.heal_cards(self.db, dry_run=False, now=10_000)
+        self.assertEqual(healed, ["t_i"])
+        self.assertEqual(third, [])  # bounded at HEAL_BLOCK_RETRIES unblocks
+        self.assertEqual(unblock_mock.call_count, router.HEAL_BLOCK_RETRIES)
+        self.assertEqual(post.call_count, router.HEAL_BLOCK_RETRIES)
+
+    def test_work_blocked_card_left_alone(self):
+        add_task(self.path, "t_w", "blocked", assignee="keldorn",
+                 last_failure_error="CI red: specs fail")
+        with mock.patch.object(router, "unblock_card") as unblock:
+            self.assertEqual(router.heal_cards(self.db, dry_run=False, now=10_000), [])
+        unblock.assert_not_called()
+
+    def test_heal_skips_cards_not_created_by_the_flow(self):
+        add_task(self.path, "t_u", "running", assignee="valygar", created_by="user")
+        self.db.execute("update tasks set last_heartbeat_at = 1")
+        self.db.commit()
+        with mock.patch.object(router, "reclaim_card") as reclaim:
+            self.assertEqual(router.heal_cards(self.db, dry_run=False, now=10_000), [])
+        reclaim.assert_not_called()
+
+    def test_dry_run_prints_and_touches_nothing(self):
+        import io
+        from contextlib import redirect_stdout
+        add_task(self.path, "t_d", "running", assignee="valygar", key="valoris-flow:fix:1")
+        self.db.execute("update tasks set last_heartbeat_at = 1")
+        self.db.commit()
+        with mock.patch.object(router, "reclaim_card") as reclaim, \
+                mock.patch.object(router, "post_feed"), \
+                mock.patch.object(router, "comment_card"), \
+                redirect_stdout(io.StringIO()) as out:
+            self.assertEqual(router.heal_cards(self.db, dry_run=True, now=10_000), ["t_d"])
+        self.assertIn("reclaim t_d", out.getvalue())
+        reclaim.assert_not_called()
