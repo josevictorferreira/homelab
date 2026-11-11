@@ -11,7 +11,7 @@ metadata:
     app.kubernetes.io/name: server
     app.kubernetes.io/version: v3.2.0
     helm.sh/chart: immich-0.13.4
-    kubenix/hash: f57ad3fc7f9a26842d5d6d88fd070be9576160a1
+    kubenix/hash: c584a71b10666c303a13e22f0feb5917570b3611
   name: immich-server
   namespace: apps
 spec:
@@ -23,6 +23,9 @@ spec:
       app.kubernetes.io/instance: immich
       app.kubernetes.io/name: server
   strategy:
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
     type: RollingUpdate
   template:
     metadata:
@@ -130,7 +133,7 @@ metadata:
     app.kubernetes.io/name: immich
     app.kubernetes.io/version: v3.2.0
     helm.sh/chart: immich-0.13.4
-    kubenix/hash: f57ad3fc7f9a26842d5d6d88fd070be9576160a1
+    kubenix/hash: c584a71b10666c303a13e22f0feb5917570b3611
   name: immich-immich-config
   namespace: apps
 ---
@@ -149,7 +152,7 @@ metadata:
     app.kubernetes.io/service: immich-server
     app.kubernetes.io/version: v3.2.0
     helm.sh/chart: immich-0.13.4
-    kubenix/hash: f57ad3fc7f9a26842d5d6d88fd070be9576160a1
+    kubenix/hash: c584a71b10666c303a13e22f0feb5917570b3611
   name: immich-server
   namespace: apps
 spec:
@@ -185,7 +188,7 @@ metadata:
     app.kubernetes.io/name: server
     app.kubernetes.io/version: v3.2.0
     helm.sh/chart: immich-0.13.4
-    kubenix/hash: f57ad3fc7f9a26842d5d6d88fd070be9576160a1
+    kubenix/hash: c584a71b10666c303a13e22f0feb5917570b3611
   name: immich-server
   namespace: apps
 ---
@@ -201,7 +204,7 @@ metadata:
     app.kubernetes.io/name: server
     app.kubernetes.io/version: v3.2.0
     helm.sh/chart: immich-0.13.4
-    kubenix/hash: f57ad3fc7f9a26842d5d6d88fd070be9576160a1
+    kubenix/hash: c584a71b10666c303a13e22f0feb5917570b3611
   name: immich-server
   namespace: apps
 spec:
@@ -233,7 +236,7 @@ metadata:
     app.kubernetes.io/name: server
     app.kubernetes.io/version: v3.2.0
     helm.sh/chart: immich-0.13.4
-    kubenix/hash: f57ad3fc7f9a26842d5d6d88fd070be9576160a1
+    kubenix/hash: c584a71b10666c303a13e22f0feb5917570b3611
   name: immich-server
   namespace: apps
 spec:

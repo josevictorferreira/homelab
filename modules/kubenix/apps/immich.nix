@@ -62,6 +62,14 @@ in
           controllers.main = {
             replicas = 1;
             pod.priorityClassName = "preemptible";
+            # The apps namespace quota runs near-full, so a surge pod can never
+            # be created while the old one holds its memory. Stop the old pod
+            # first (same effect as Recreate, but mutable strategy fields).
+            strategy = "RollingUpdate";
+            rollingUpdate = {
+              maxSurge = 0;
+              maxUnavailable = 1;
+            };
           };
           controllers.main.containers.main = {
             image = {
