@@ -5,7 +5,7 @@ let
   namespace = homelab.kubernetes.namespaces.applications;
   image = {
     repository = "ghcr.io/josevictorferreira/sable";
-    tag = "fda1409@sha256:ced52761d320932b640c8b497d015e197999b85b818cc6fc87671b1759a6b5e1";
+    tag = "fda1409@sha256:3b0f9a774e6cfef111e010bae4504ea8690165940e2743ae0cabed455a5fb247";
     pullPolicy = "IfNotPresent";
   };
   port = 8080;

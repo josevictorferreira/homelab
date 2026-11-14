@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sable
     helm.sh/chart: app-template-5.3.0
-    kubenix/hash: bf93e84890118422d9afe08c7c85f97c9ddd3207
+    kubenix/hash: 83defd8c1c0a21caed8c0909eaa7a268b0d09905
     kubenix/module-instance: sable
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -38,7 +38,7 @@ spec:
     spec:
       automountServiceAccountToken: true
       containers:
-        - image: ghcr.io/josevictorferreira/sable:fda1409@sha256:ced52761d320932b640c8b497d015e197999b85b818cc6fc87671b1759a6b5e1
+        - image: ghcr.io/josevictorferreira/sable:fda1409@sha256:3b0f9a774e6cfef111e010bae4504ea8690165940e2743ae0cabed455a5fb247
           imagePullPolicy: IfNotPresent
           livenessProbe:
             failureThreshold: 3
@@ -105,7 +105,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sable
     helm.sh/chart: app-template-5.3.0
-    kubenix/hash: bf93e84890118422d9afe08c7c85f97c9ddd3207
+    kubenix/hash: 83defd8c1c0a21caed8c0909eaa7a268b0d09905
     kubenix/module-instance: sable
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -126,7 +126,7 @@ metadata:
     app.kubernetes.io/name: sable
     app.kubernetes.io/service: sable
     helm.sh/chart: app-template-5.3.0
-    kubenix/hash: bf93e84890118422d9afe08c7c85f97c9ddd3207
+    kubenix/hash: 83defd8c1c0a21caed8c0909eaa7a268b0d09905
     kubenix/module-instance: sable
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -155,7 +155,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sable
     helm.sh/chart: app-template-5.3.0
-    kubenix/hash: bf93e84890118422d9afe08c7c85f97c9ddd3207
+    kubenix/hash: 83defd8c1c0a21caed8c0909eaa7a268b0d09905
     kubenix/module-instance: sable
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
