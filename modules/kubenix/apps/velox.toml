@@ -678,6 +678,16 @@ provider = "antigravity-secondary"
 upstream_model = "gemini-3.7-flash-high"
 max_tokens = 65536
 
+[models.gemini-4-hydrogen-sonar-antigravity-primary]
+provider = "antigravity-primary"
+upstream_model = "gemini-4-hydrogen-sonar"
+max_tokens = 65536
+
+[models.gemini-4-hydrogen-sonar-antigravity-secondary]
+provider = "antigravity-secondary"
+upstream_model = "gemini-4-hydrogen-sonar"
+max_tokens = 65536
+
 # Embeddings. 1024 dimensions, which is what poise's photo_analyses.embedding
 # vector column is declared as.
 [models.voyage-3]
@@ -850,6 +860,13 @@ strategy = "round-robin"
 targets = [
   { model = "gemini-3-7-flash-antigravity-primary" },
   { model = "gemini-3-7-flash-antigravity-secondary" },
+]
+
+[combos.gemini-4-hydrogen-sonar]
+strategy = "round-robin"
+targets = [
+  { model = "gemini-4-hydrogen-sonar-antigravity-primary" },
+  { model = "gemini-4-hydrogen-sonar-antigravity-secondary" },
 ]
 
 [combos.radagast]

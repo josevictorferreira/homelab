@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-5.3.0
-    kubenix/hash: 7f3880d4c61cf7fbd293c7432bb5d0aada4b1f04
+    kubenix/hash: 363e188e7c17fec9014d1afa2500faf722d373d9
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -29,7 +29,7 @@ spec:
   template:
     metadata:
       annotations:
-        velox.josevictor.me/config-hash: 63435e26af9486fd1be65a1d7ed5753f819c3e405a19a3681f8ee61cd77aa47b
+        velox.josevictor.me/config-hash: abcad8893765b80968cfccc18a9445ff1fcd7a9ece51f30a6ef373577256f493
         velox.josevictor.me/oauth-agent-config-hash: 56586bc48139688a6e1069f9a0d25d36f367e209b88ae0783de43c3b8f546df0
       labels:
         app.kubernetes.io/controller: main
@@ -214,7 +214,7 @@ metadata:
     app.kubernetes.io/name: velox
     app.kubernetes.io/service: velox
     helm.sh/chart: app-template-5.3.0
-    kubenix/hash: 7f3880d4c61cf7fbd293c7432bb5d0aada4b1f04
+    kubenix/hash: 363e188e7c17fec9014d1afa2500faf722d373d9
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -243,7 +243,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-5.3.0
-    kubenix/hash: 7f3880d4c61cf7fbd293c7432bb5d0aada4b1f04
+    kubenix/hash: 363e188e7c17fec9014d1afa2500faf722d373d9
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -950,6 +950,16 @@ data:
     upstream_model = "gemini-3.7-flash-high"
     max_tokens = 65536
 
+    [models.gemini-4-hydrogen-sonar-antigravity-primary]
+    provider = "antigravity-primary"
+    upstream_model = "gemini-4-hydrogen-sonar"
+    max_tokens = 65536
+
+    [models.gemini-4-hydrogen-sonar-antigravity-secondary]
+    provider = "antigravity-secondary"
+    upstream_model = "gemini-4-hydrogen-sonar"
+    max_tokens = 65536
+
     # Embeddings. 1024 dimensions, which is what poise's photo_analyses.embedding
     # vector column is declared as.
     [models.voyage-3]
@@ -1122,6 +1132,13 @@ data:
     targets = [
       { model = "gemini-3-7-flash-antigravity-primary" },
       { model = "gemini-3-7-flash-antigravity-secondary" },
+    ]
+
+    [combos.gemini-4-hydrogen-sonar]
+    strategy = "round-robin"
+    targets = [
+      { model = "gemini-4-hydrogen-sonar-antigravity-primary" },
+      { model = "gemini-4-hydrogen-sonar-antigravity-secondary" },
     ]
 
     [combos.radagast]
@@ -1402,7 +1419,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 7f3880d4c61cf7fbd293c7432bb5d0aada4b1f04
+    kubenix/hash: 363e188e7c17fec9014d1afa2500faf722d373d9
   name: velox-config
   namespace: apps
 ---
@@ -1508,7 +1525,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 7f3880d4c61cf7fbd293c7432bb5d0aada4b1f04
+    kubenix/hash: 363e188e7c17fec9014d1afa2500faf722d373d9
   name: velox-oauth-agent-config
   namespace: apps
 ---
@@ -1519,7 +1536,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 7f3880d4c61cf7fbd293c7432bb5d0aada4b1f04
+    kubenix/hash: 363e188e7c17fec9014d1afa2500faf722d373d9
   name: velox-oauth-agent
   namespace: apps
 ---
@@ -1530,7 +1547,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 7f3880d4c61cf7fbd293c7432bb5d0aada4b1f04
+    kubenix/hash: 363e188e7c17fec9014d1afa2500faf722d373d9
   name: velox-oauth-agent
   namespace: apps
 rules:
@@ -1552,7 +1569,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 7f3880d4c61cf7fbd293c7432bb5d0aada4b1f04
+    kubenix/hash: 363e188e7c17fec9014d1afa2500faf722d373d9
   name: velox-oauth-agent
   namespace: apps
 roleRef:
