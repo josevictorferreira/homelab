@@ -22,10 +22,11 @@ in
       enableSuperuserAccess = true;
       superuserSecret.name = "postgresql-superuser";
       inherit (pg) storage resources;
-      # Grown from 8Gi on 2026-10-05 and to 16Gi on 2026-10-21: WAL filled up
-      # while archiving to the Pi failed, and CNPG refuses to start PostgreSQL
-      # without WAL free space (the PVC then has to be patched by hand).
-      walStorage = pg.walStorage // { size = "16Gi"; };
+      # Grown from 8Gi on 2026-10-05, to 16Gi on 2026-10-21 and to 24Gi on
+      # 2026-11-17: WAL filled up while archiving to the Pi failed, and CNPG
+      # refuses to start PostgreSQL without WAL free space (the PVC then has to
+      # be patched by hand).
+      walStorage = pg.walStorage // { size = "24Gi"; };
       postgresql = pg.postgresql // {
         parameters = pg.postgresql.parameters // {
           # Bulk restore: fewer checkpoints while data streams in.
@@ -36,11 +37,12 @@ in
       plugins = [
         {
           name = "barman-cloud.cloudnative-pg.io";
-          # Re-enabled 2026-10-10 after the Pi backup-pool was recreated and MinIO
-          # restored. If the Pi goes down again, set both to false (CNPG calls
-          # ArchiveWAL on any enabled plugin) or WAL fills the volume.
-          enabled = true;
-          isWALArchiver = true;
+          # Disabled 2026-11-17: the Pi has been off the network since 2026-11-12
+          # and WAL filled the volume. Both must be false (CNPG calls ArchiveWAL
+          # on any enabled plugin). Set both back to true once the Pi and MinIO
+          # are up, then take a fresh base backup.
+          enabled = false;
+          isWALArchiver = false;
           parameters.barmanObjectName = "pi-minio";
         }
       ];
