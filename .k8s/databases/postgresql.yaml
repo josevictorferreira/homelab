@@ -5,7 +5,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: 882c74f7cee7470c7a395f63cdbafee5c75e0d1f
+    kubenix/hash: dfd28d46aad96e6db852d03a76ef1270ef3c674c
   name: postgresql
   namespace: databases
 spec:
@@ -40,8 +40,8 @@ spec:
             spec:
               type: LoadBalancer
   plugins:
-    - enabled: true
-      isWALArchiver: true
+    - enabled: false
+      isWALArchiver: false
       name: barman-cloud.cloudnative-pg.io
       parameters:
         barmanObjectName: pi-minio
@@ -88,5 +88,5 @@ spec:
   superuserSecret:
     name: postgresql-superuser
   walStorage:
-    size: 16Gi
+    size: 24Gi
     storageClass: rook-ceph-block
