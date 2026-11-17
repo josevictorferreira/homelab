@@ -6,8 +6,8 @@
       chart = kubenix.lib.helm.fetch {
         repo = "https://helm.cilium.io";
         chart = "cilium";
-        version = "1.20.4";
-        sha256 = "sha256-KYp707isjg+hw4j3Kx+2Oked6D8zwQMG6PDZmRX1FsI=";
+        version = "1.20.5";
+        sha256 = "sha256-K3fcFNlHi1Jw5nljFv6vvnJ1rgmdLXTV1ubMmPR/Cpw=";
       };
       includeCRDs = true;
       noHooks = true;

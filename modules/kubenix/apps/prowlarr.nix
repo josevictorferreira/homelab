@@ -20,7 +20,7 @@ in
         podOptions.priorityClassName = "preemptible";
         image = {
           repository = "ghcr.io/home-operations/prowlarr";
-          tag = "2.7.0.5723@sha256:cb239d1e762981aa617a14318d033f55f9ae775bf67b4e3a25b310ad5bc6a286";
+          tag = "3.0.2.5780@sha256:083e346fff979d3f64130e8ef62b242265e07490f20495114f7b9e4ee82dbdf2";
           pullPolicy = "IfNotPresent";
         };
         exportarrImage = {
