@@ -870,8 +870,10 @@ targets = [
 ]
 
 [combos.radagast]
-strategy = "round-robin"
+strategy = "priority"
 targets = [
+  { model = "gemini-4-hydrogen-sonar-antigravity-primary" },
+  { model = "gemini-4-hydrogen-sonar-antigravity-secondary" },
   { model = "gemini-3-8-flash-antigravity-primary" },
   { model = "gemini-3-8-flash-antigravity-secondary" },
 ]
