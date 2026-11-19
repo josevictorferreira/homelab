@@ -77,6 +77,22 @@ in
               tag = "v3.4.2@sha256:fc880c1bf665b4aab1e74c15e56ab871225989cd546536e6b77e771869af06bd";
               pullPolicy = "IfNotPresent";
             };
+            # v3.4.2 startup exceeds the chart's hardcoded startup-probe budget
+            # (30x10s) on the 500m CPU limit when the node is busy (lab-alpha-cp
+            # saturated), crash-looping the container mid-initialization. Give
+            # startup 15 minutes; liveness/readiness only run after it passes.
+            probes.startup = {
+              enabled = true;
+              custom = true;
+              spec = {
+                httpGet = {
+                  path = "/api/server/ping";
+                  port = "http";
+                };
+                periodSeconds = 10;
+                failureThreshold = 90;
+              };
+            };
             resources = {
               requests = {
                 cpu = "100m";

@@ -11,7 +11,7 @@ metadata:
     app.kubernetes.io/name: server
     app.kubernetes.io/version: v3.2.0
     helm.sh/chart: immich-0.13.4
-    kubenix/hash: 6c634ec55309185575b4abdbcca9bfee9de5378c
+    kubenix/hash: acdb0d715962cfac10184fe46261c8d6c8115e0a
   name: immich-server
   namespace: apps
 spec:
@@ -87,7 +87,7 @@ spec:
               cpu: 100m
               memory: 512Mi
           startupProbe:
-            failureThreshold: 30
+            failureThreshold: 90
             httpGet:
               path: /api/server/ping
               port: http
@@ -133,7 +133,7 @@ metadata:
     app.kubernetes.io/name: immich
     app.kubernetes.io/version: v3.2.0
     helm.sh/chart: immich-0.13.4
-    kubenix/hash: 6c634ec55309185575b4abdbcca9bfee9de5378c
+    kubenix/hash: acdb0d715962cfac10184fe46261c8d6c8115e0a
   name: immich-immich-config
   namespace: apps
 ---
@@ -152,7 +152,7 @@ metadata:
     app.kubernetes.io/service: immich-server
     app.kubernetes.io/version: v3.2.0
     helm.sh/chart: immich-0.13.4
-    kubenix/hash: 6c634ec55309185575b4abdbcca9bfee9de5378c
+    kubenix/hash: acdb0d715962cfac10184fe46261c8d6c8115e0a
   name: immich-server
   namespace: apps
 spec:
@@ -188,7 +188,7 @@ metadata:
     app.kubernetes.io/name: server
     app.kubernetes.io/version: v3.2.0
     helm.sh/chart: immich-0.13.4
-    kubenix/hash: 6c634ec55309185575b4abdbcca9bfee9de5378c
+    kubenix/hash: acdb0d715962cfac10184fe46261c8d6c8115e0a
   name: immich-server
   namespace: apps
 ---
@@ -204,7 +204,7 @@ metadata:
     app.kubernetes.io/name: server
     app.kubernetes.io/version: v3.2.0
     helm.sh/chart: immich-0.13.4
-    kubenix/hash: 6c634ec55309185575b4abdbcca9bfee9de5378c
+    kubenix/hash: acdb0d715962cfac10184fe46261c8d6c8115e0a
   name: immich-server
   namespace: apps
 spec:
@@ -236,7 +236,7 @@ metadata:
     app.kubernetes.io/name: server
     app.kubernetes.io/version: v3.2.0
     helm.sh/chart: immich-0.13.4
-    kubenix/hash: 6c634ec55309185575b4abdbcca9bfee9de5378c
+    kubenix/hash: acdb0d715962cfac10184fe46261c8d6c8115e0a
   name: immich-server
   namespace: apps
 spec:
