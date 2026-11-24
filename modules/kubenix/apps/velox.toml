@@ -396,6 +396,11 @@ upstream_model = "eleven_v3"
 provider = "openrouter-audio"
 upstream_model = "openai/whisper-1"
 
+[models.glm-5-4-zai]
+provider = "glm"
+upstream_model = "glm-5.4"
+max_tokens = 131072
+
 [models.glm-5-3-zai]
 provider = "glm"
 upstream_model = "glm-5.3"
@@ -707,6 +712,11 @@ targets = [
   { model = "qwen3-6-35b-yoloauto" },
   { model = "deepseek-v4-flash-pgsgrove" },
   { model = "glm-4-5-air-zai" },
+]
+
+[combos.glm-5-4]
+targets = [
+  { model = "glm-5-4-zai" },
 ]
 
 [combos.glm-5-3]
