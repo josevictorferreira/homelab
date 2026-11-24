@@ -369,6 +369,7 @@ let
                     "immich-app/immich"
                     "rishikanthc/scriberr"
                     "bookorbit/bookorbit"
+                    "codeberg:readeck/readeck"
                   ]
                   ++ grouped "ai" [
                     "open-webui/open-webui"
