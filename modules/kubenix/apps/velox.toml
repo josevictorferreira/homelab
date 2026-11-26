@@ -18,7 +18,9 @@ log_level = "info"
 log_format = "json"
 
 [limits]
-max_body_bytes = 4194304
+# pi encodes each image attachment up to 4.5 MiB and resends it with the
+# history on every turn, so 4 MiB rejected any vision session with a 413.
+max_body_bytes = 33554432
 shutdown_drain_ms = 10000
 shutdown_grace_ms = 30000
 # Default TTFB (30s) kills LLM extraction calls that carry a whole story in
@@ -67,6 +69,10 @@ vision = true
 kind = "anthropic"
 base_url = "https://api.z.ai/api/anthropic/v1"
 api_key_env = "GLM_API_KEY"
+
+[providers.glm.capabilities]
+vision = true
+
 # Claude via the claude-primary OAuth subscription (Pro Max 5x through the
 # team org), presented with claude-code auth mode: Bearer token + Claude Code
 # beta headers (oauth-2025-04-20 since the 2026-09-18 fix). Verified
@@ -102,11 +108,6 @@ api_key_env = "NEURALWATT_API_KEY"
 kind = "openai-compatible"
 base_url = "https://token-plan-sgp.xiaomimimo.com/v1"
 api_key_env = "XIAOMI_MIMO_API_KEY"
-
-[providers.kimi-coding]
-kind = "anthropic"
-base_url = "https://api.kimi.com/coding"
-api_key_env = "KIMI_API_KEY"
 
 [providers.cerebras]
 kind = "openai-compatible"
@@ -165,6 +166,9 @@ api_key_env = "PUTER_API_KEY"
 kind = "openai-compatible"
 base_url = "https://api.pgsgrove.com/v1"
 api_key_env = "PGS_GROVE_API_KEY"
+
+[providers.pgs-grove.capabilities]
+vision = true
 
 [providers.nanogpt]
 kind = "openai-compatible"
@@ -338,10 +342,6 @@ structured_output = false
 # ceiling z.ai actually accepts: it reports the range as [1,131072] and rejects
 # 200000. It treats the value as a cap rather than a reserved budget, so a large
 # prompt does not push the request over the context window.
-#
-# `kimi-k3-kimi-coding` is deliberately left without one: that endpoint is
-# currently answering 404, so no ceiling could be verified against it, and the
-# adapter default applies until it can be.
 # ---------------------------------------------------------------------------
 # TTS model aliases. The client-facing name is the `voice` combo below, which
 # prefers the self-hosted box and falls back to Speechify then ElevenLabs.
@@ -554,14 +554,6 @@ upstream_model = "kimi-k2.7-code"
 [models.kimi-k2-7-code-nanogpt]
 provider = "nanogpt"
 upstream_model = "kimi-k2.7-code"
-
-[models.kimi-k3-kimi-coding]
-provider = "kimi-coding"
-upstream_model = "k3"
-
-[models.kimi-k3-openrouter]
-provider = "openrouter"
-upstream_model = "moonshotai/kimi-k3"
 
 [models.minimax-m2-5-alibaba]
 provider = "alibaba-token-plan"
@@ -805,11 +797,6 @@ targets = [
 targets = [
   { model = "kimi-k2-7-code-neuralwatt" },
   { model = "kimi-k2-7-code-nanogpt" },
-]
-
-[combos.kimi-k3]
-targets = [
-  { model = "kimi-k3-openrouter" },
 ]
 
 [combos.minimax-m2-5]

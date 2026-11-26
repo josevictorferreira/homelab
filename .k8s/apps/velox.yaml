@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-5.3.0
-    kubenix/hash: d4bdd3ad5806cfa56d4d0dd7c158e3c08bd0130f
+    kubenix/hash: 903675d6ea192e4fd796ad005c8f918d31af5989
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -29,7 +29,7 @@ spec:
   template:
     metadata:
       annotations:
-        velox.josevictor.me/config-hash: 8dccf105a891caf1003ad3a316412c190222f6e01f54d9f037220384d1a39b02
+        velox.josevictor.me/config-hash: 83669ac0451e9838681433b4b3980bac2bee235f46d6168a6dc8a2b7a93774cf
         velox.josevictor.me/oauth-agent-config-hash: 56586bc48139688a6e1069f9a0d25d36f367e209b88ae0783de43c3b8f546df0
       labels:
         app.kubernetes.io/controller: main
@@ -214,7 +214,7 @@ metadata:
     app.kubernetes.io/name: velox
     app.kubernetes.io/service: velox
     helm.sh/chart: app-template-5.3.0
-    kubenix/hash: d4bdd3ad5806cfa56d4d0dd7c158e3c08bd0130f
+    kubenix/hash: 903675d6ea192e4fd796ad005c8f918d31af5989
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -243,7 +243,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: velox
     helm.sh/chart: app-template-5.3.0
-    kubenix/hash: d4bdd3ad5806cfa56d4d0dd7c158e3c08bd0130f
+    kubenix/hash: 903675d6ea192e4fd796ad005c8f918d31af5989
     kubenix/module-instance: velox
     kubenix/module-name: release
     kubenix/module-version: 1.0.0
@@ -290,7 +290,9 @@ data:
     log_format = "json"
 
     [limits]
-    max_body_bytes = 4194304
+    # pi encodes each image attachment up to 4.5 MiB and resends it with the
+    # history on every turn, so 4 MiB rejected any vision session with a 413.
+    max_body_bytes = 33554432
     shutdown_drain_ms = 10000
     shutdown_grace_ms = 30000
     # Default TTFB (30s) kills LLM extraction calls that carry a whole story in
@@ -339,6 +341,10 @@ data:
     kind = "anthropic"
     base_url = "https://api.z.ai/api/anthropic/v1"
     api_key_env = "GLM_API_KEY"
+
+    [providers.glm.capabilities]
+    vision = true
+
     # Claude via the claude-primary OAuth subscription (Pro Max 5x through the
     # team org), presented with claude-code auth mode: Bearer token + Claude Code
     # beta headers (oauth-2025-04-20 since the 2026-09-18 fix). Verified
@@ -374,11 +380,6 @@ data:
     kind = "openai-compatible"
     base_url = "https://token-plan-sgp.xiaomimimo.com/v1"
     api_key_env = "XIAOMI_MIMO_API_KEY"
-
-    [providers.kimi-coding]
-    kind = "anthropic"
-    base_url = "https://api.kimi.com/coding"
-    api_key_env = "KIMI_API_KEY"
 
     [providers.cerebras]
     kind = "openai-compatible"
@@ -437,6 +438,9 @@ data:
     kind = "openai-compatible"
     base_url = "https://api.pgsgrove.com/v1"
     api_key_env = "PGS_GROVE_API_KEY"
+
+    [providers.pgs-grove.capabilities]
+    vision = true
 
     [providers.nanogpt]
     kind = "openai-compatible"
@@ -610,10 +614,6 @@ data:
     # ceiling z.ai actually accepts: it reports the range as [1,131072] and rejects
     # 200000. It treats the value as a cap rather than a reserved budget, so a large
     # prompt does not push the request over the context window.
-    #
-    # `kimi-k3-kimi-coding` is deliberately left without one: that endpoint is
-    # currently answering 404, so no ceiling could be verified against it, and the
-    # adapter default applies until it can be.
     # ---------------------------------------------------------------------------
     # TTS model aliases. The client-facing name is the `voice` combo below, which
     # prefers the self-hosted box and falls back to Speechify then ElevenLabs.
@@ -826,14 +826,6 @@ data:
     [models.kimi-k2-7-code-nanogpt]
     provider = "nanogpt"
     upstream_model = "kimi-k2.7-code"
-
-    [models.kimi-k3-kimi-coding]
-    provider = "kimi-coding"
-    upstream_model = "k3"
-
-    [models.kimi-k3-openrouter]
-    provider = "openrouter"
-    upstream_model = "moonshotai/kimi-k3"
 
     [models.minimax-m2-5-alibaba]
     provider = "alibaba-token-plan"
@@ -1077,11 +1069,6 @@ data:
     targets = [
       { model = "kimi-k2-7-code-neuralwatt" },
       { model = "kimi-k2-7-code-nanogpt" },
-    ]
-
-    [combos.kimi-k3]
-    targets = [
-      { model = "kimi-k3-openrouter" },
     ]
 
     [combos.minimax-m2-5]
@@ -1431,7 +1418,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: d4bdd3ad5806cfa56d4d0dd7c158e3c08bd0130f
+    kubenix/hash: 903675d6ea192e4fd796ad005c8f918d31af5989
   name: velox-config
   namespace: apps
 ---
@@ -1537,7 +1524,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: d4bdd3ad5806cfa56d4d0dd7c158e3c08bd0130f
+    kubenix/hash: 903675d6ea192e4fd796ad005c8f918d31af5989
   name: velox-oauth-agent-config
   namespace: apps
 ---
@@ -1548,7 +1535,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: d4bdd3ad5806cfa56d4d0dd7c158e3c08bd0130f
+    kubenix/hash: 903675d6ea192e4fd796ad005c8f918d31af5989
   name: velox-oauth-agent
   namespace: apps
 ---
@@ -1559,7 +1546,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: d4bdd3ad5806cfa56d4d0dd7c158e3c08bd0130f
+    kubenix/hash: 903675d6ea192e4fd796ad005c8f918d31af5989
   name: velox-oauth-agent
   namespace: apps
 rules:
@@ -1581,7 +1568,7 @@ metadata:
     kubenix/k8s-version: "1.32"
     kubenix/project-name: ze-homelab
   labels:
-    kubenix/hash: d4bdd3ad5806cfa56d4d0dd7c158e3c08bd0130f
+    kubenix/hash: 903675d6ea192e4fd796ad005c8f918d31af5989
   name: velox-oauth-agent
   namespace: apps
 roleRef:

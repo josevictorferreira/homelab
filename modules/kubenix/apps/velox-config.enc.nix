@@ -33,7 +33,6 @@ in
       PUTER_API_KEY = kubenix.lib.secretsFor "velox_puter_api_key";
       NANOGPT_API_KEY = kubenix.lib.secretsFor "velox_nanogpt_api_key";
       PGS_GROVE_API_KEY = kubenix.lib.secretsFor "pgs_grove_api_key";
-      KIMI_API_KEY = kubenix.lib.secretsFor "moonshot_api_key";
       VOYAGE_API_KEY = kubenix.lib.secretsFor "voyage_api_key";
       SPEECHIFY_API_KEY = kubenix.lib.secretsFor "speechify_api_key";
       ELEVENLABS_API_KEY = kubenix.lib.secretsFor "elevenlabs_api_key";
